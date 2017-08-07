@@ -943,6 +943,9 @@ async def wild(ctx):
             return
         else:
             wild = discord.utils.get(ctx.message.server.roles, name = entered_wild)
+            if wild is None and entered_want in pokemon_list:
+                wild = await Meowth.create_role(server = ctx.message.server, name = entered_want, hoist = False, mentionable = True)
+                await asyncio.sleep(0.5)
             wild_number = pokemon_list.index(entered_wild) + 1
             wild_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(wild_number))
             wild_embed = discord.Embed(title="Meowth! Click here for directions to the wild {0}!".format(entered_wild.capitalize()),url=wild_gmaps_link,description="This is just my best guess!",colour=discord.Colour(0x2ecc71))

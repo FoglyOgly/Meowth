@@ -32,10 +32,12 @@ the Team Mystic emoji. Then replace any instance of the :mystic: emoji in the co
 each of the 25 custom emoji. The following lines of the code have custom emoji that have to be replaced. 13-39, 879, 1022, 1023, 
 1024, 1026, 1027, 1028, 1033, 1038.
 
-9. Go back to your app page in Discord and click to reveal the bot token, then copy it and paste it into line 1122. 
+9. In lines 940 and 964, replace "yourtown+yourstate" with your community's location. This makes the Google Maps thing work a lot better.
+
+10. Go back to your app page in Discord and click to reveal the bot token, then copy it and paste it into line 1122. 
 Save meowth.py.
 
-10. Run meowth.py from the command prompt or terminal window. If successful, it should print "Meowth! That's right!" to the 
+11. Run meowth.py from the command prompt or terminal window. If successful, it should print "Meowth! That's right!" to the 
 window and the bot should show up as online in Discord.
 
 

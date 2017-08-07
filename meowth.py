@@ -973,6 +973,9 @@ async def raid(ctx):
             raid_channel_name = "{0}{1}".format(entered_raid, "-".join(raid_details_list))
             raid_channel = await Meowth.create_channel(ctx.message.server, raid_channel_name)
             raid = discord.utils.get(ctx.message.server.roles, name = entered_raid)
+            if raid is None and entered_want in pokemon_list:
+                raid = await Meowth.create_role(server = ctx.message.server, name = entered_want, hoist = False, mentionable = True)
+                await asyncio.sleep(0.5)
             raid_number = pokemon_list.index(entered_raid) + 1
             raid_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(raid_number))
             raid_embed = discord.Embed(title="Meowth! Click here for directions to the raid!",url=raid_gmaps_link,description="Weaknesses: {0}".format(raid_dict[entered_raid]),colour=discord.Colour(0x2ecc71))

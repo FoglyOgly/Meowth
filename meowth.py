@@ -937,7 +937,7 @@ async def wild(ctx):
         entered_wild = ctx.message.content[6:space1].lower()
         wild_details = ctx.message.content[space1:]
         wild_details_list = wild_details.split()
-        wild_gmaps_link = "https://www.google.com/maps/search/?api=1&query={0}+joplin+mo".format('+'.join(wild_details_list))
+        wild_gmaps_link = "https://www.google.com/maps/search/?api=1&query={0}+yourtown+yourstate".format('+'.join(wild_details_list))
         if entered_wild not in pokemon_list:
             await Meowth.send_message(ctx.message.channel, "Meowth! That's not a Pokemon! Check your spelling!")
             return

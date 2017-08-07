@@ -6,6 +6,9 @@ from time import strftime
 
 my_bot = Bot(command_prefix="!")
 
+"""Below is a dict of raid bosses with their type weaknesses. The strings in them are custom emoji and will need to be changed
+to match your server. These become part of the raid report message."""
+
 raid_dict = {
     "lugia": "<:rock:342403044694163477> <:ghost1:342403046829195274> <:electric:342403046678200324> <:ice:342403047055687690> <:dark:342403047122796544>",
     "moltres": "<:rock:342403044694163477>x2 <:water:342403046740852737> <:electric:342403046678200324>",
@@ -37,27 +40,7 @@ raid_dict = {
     }
 
 
-    
-lugia_raidmessage = ("Meowth! So you want to take on Lugia, eh? Lugia is a Psychic/Flying-type Legendary Pokemon so you'll need all the help you can get!"
-                     "I suggest around 16 trainers! The best Pokemon to use against Lugia are Tyranitar, Gyarados, and Golem! Dark, Rock, and Ghost attacks work best! Good luck!")
-
-moltres_raidmessage = ("Meowth! So it's Moltres you want, is it? Moltres is a Fire/Flying-type Legendary Pokemon; I suggest having a group of ten or more to be safe!"
-                       "The best Pokemon to use against Moltres are Golem, Omastar, Tyranitar, and Vaporeon! Moltres has a DOUBLE weakness to Rock type attacks, but Water attacks are also effective! Good luck!")
-
-zapdos_raidmessage = ("Meowth! If you're going to fight Zapdos, I can help! Zapdos is an Electric/Flying-type Legendary Pokemon! The best Pokemon to use against Zapdos are"
-                      "Golem, Tyranitar, and Piloswine! Rock and Ice attacks work best! Good luck!")
-
-articuno_raidmessage =("Meowth! So you're going to take on Articuno, the Ice/Flying-type Legendary Pokemon? I suggest having a group of ten or more trainers to be safe!"
-                       "The best Pokemon to use against Articuno are Tyranitar and Flareon! Rock and Fire attacks work best! Good luck!")
-
-tyranitar_raidmessage = ("Meowth! So you want a Tyranitar for your collection, do ya? Tyranitar is a Dark/Rock-type Pokemon; I suggest having a group of at least eight trainers!"
-                         "The best Pokemon to use against Tyranitar are Machamp, Poliwrath, Heracross, and Rhydon! Fighting, Ground, and Water attacks work best! Good luck!")
-
-snorlax_raidmessage = ("Meowth! So you're after Snorlax this time? Snorlax is a Normal-type Pokemon; I suggest having a group of at least eight trainers!"
-                       "The best Pokemon to use against Snorlax are Machamp, Dragonite, Heracross, and Tyranitar! Fighting attacks work best! Good luck!")
-
-
-
+"""A list of all Pokemon up to Gen VII. This helps partially futureproof"""
 
 
 pokemon_list = [
@@ -865,10 +848,19 @@ pokemon_list = [
     "marshadow"
     ]
 
+"""The empty lists Meowth will populate for keeping track of active raids, people who are on the way to a raid or waiting at 
+a raid, and a list of messages saying when the raids will expire. These all become lists of tuples."""
+
 raidchannel_list = []
 omw_list = []
 waiting_list = []
 raidexpmsg_list=[]
+
+@my_bot.event
+async def on_ready():
+    print("Meowth! That's right!") #prints to the terminal or cmd prompt window upon successful connection to Discord
+
+"""Welcome message to the server and some basic instructions."""
 
 @my_bot.event
 async def on_member_join(member):
@@ -879,9 +871,7 @@ async def on_member_join(member):
     await my_bot.send_message(server, message.format(server, member, announcements, admin))
 
 
-@my_bot.event
-async def on_ready():
-    print("Meowth! That's right!")
+"""A command for setting a team role. These roles have to be created manually beforehand."""
 
 @my_bot.command(pass_context = True)
 async def team(ctx):
@@ -891,15 +881,15 @@ async def team(ctx):
     role = discord.utils.get(ctx.message.server.roles, name=entered_team)
     roles = [
         "340599625641885706",
-        "340599664460038145",
+        "340599664460038145", #these roles will have to be changed
         "340599699658506250"
         ]
     for r in ctx.message.author.roles:
         if r.id in roles:
-            await my_bot.send_message(ctx.message.channel, "Meowth! You already have a team role!")
+            await my_bot.send_message(ctx.message.channel, "Meowth! You already have a team role!") #checks if user already has a team
             return
     if role is None or role.name not in list(team_dict.keys()):
-        await my_bot.send_message(ctx.message.channel, "Meowth! Invalid team!")
+        await my_bot.send_message(ctx.message.channel, "Meowth! Invalid team!") #checks if team is one of the three
         return
     else:
         try:
@@ -907,6 +897,9 @@ async def team(ctx):
             await my_bot.send_message(ctx.message.channel, "Meowth! Added {0} to Team {1}! {2}".format(ctx.message.author.mention, role.name.capitalize(), team_dict[entered_team]))
         except discord.Forbidden:
             await my_bot.send_message(ctx.message.channel, "Meowth! I can't add roles!")
+            
+"""A command for setting a role for a Pokemon species the user wants. 
+Meowth creates a role if one does not exist for the species."""
 @my_bot.command(pass_context = True)                
 async def want(ctx):
     entered_want = ctx.message.content[6:].lower()
@@ -927,11 +920,13 @@ async def want(ctx):
     else:
         await my_bot.add_roles(ctx.message.author, role)
         want_number = pokemon_list.index(entered_want) + 1
-        want_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(want_number))
+        want_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(want_number)) #This part embeds the sprite
         want_embed = discord.Embed(colour=discord.Colour(0x2ecc71))
         want_embed.set_thumbnail(url=want_img_url)
         await my_bot.send_message(ctx.message.channel, content="Meowth! Got it! {0} wants {1}".format(ctx.message.author.mention, entered_want.capitalize()),embed=want_embed)
 
+"""A command for reporting a wild Pokemon spawn location. Meowth will insert the details (really just everything after
+the species name) into a Google maps link and post the link to the same channel the report was made in."""
 @my_bot.command(pass_context = True)
 async def wild(ctx):
     space1 = ctx.message.content.find(" ",6)
@@ -942,8 +937,7 @@ async def wild(ctx):
         entered_wild = ctx.message.content[6:space1].lower()
         wild_details = ctx.message.content[space1:]
         wild_details_list = wild_details.split()
-        plus = '+'
-        wild_gmaps_link = "https://www.google.com/maps/search/?api=1&query={0}+joplin+mo".format(plus.join(wild_details_list))
+        wild_gmaps_link = "https://www.google.com/maps/search/?api=1&query={0}+joplin+mo".format('+'.join(wild_details_list))
         if entered_wild not in pokemon_list:
             await my_bot.send_message(ctx.message.channel, "Meowth! That's not a Pokemon! Check your spelling!")
             return
@@ -954,6 +948,9 @@ async def wild(ctx):
             wild_embed = discord.Embed(title="Meowth! Click here for directions to the wild {0}!".format(entered_wild.capitalize()),url=wild_gmaps_link,description="This is just my best guess!",colour=discord.Colour(0x2ecc71))
             wild_embed.set_thumbnail(url=wild_img_url)
             await my_bot.send_message(ctx.message.channel, content="Meowth! Wild {0} reported by {1}! Details: {2}".format(wild.mention, ctx.message.author.mention, wild_details),embed=wild_embed)
+
+"""A command for reporting a raid. This works the same way as the wild command but embeds the
+icons of the boss's type weaknesses as custom emoji."""
 @my_bot.command(pass_context=True)
 async def raid(ctx):
     space1 = ctx.message.content.find(" ",6)
@@ -982,15 +979,26 @@ async def raid(ctx):
             raid_embed = discord.Embed(title="Meowth! Click here for directions to the raid!",url=raid_gmaps_link,description="Weaknesses: {0}".format(raid_dict[entered_raid]),colour=discord.Colour(0x2ecc71))
             raid_embed.set_thumbnail(url=raid_img_url)
             await my_bot.send_message(ctx.message.channel, content = "Meowth! {0} raid reported by {1}! Coordinate in {2}".format(raid.mention, ctx.message.author.mention, raid_channel.mention),embed=raid_embed)
-            await asyncio.sleep(1)
+            await asyncio.sleep(1) #Wait for the channel to be created.
             raidmsg = await my_bot.send_message(raid_channel, content = "Meowth! {0} raid reported by {1}! Coordinate here! Reply (not react) to this message with <:omw:342301297502060554> to say you are on your way, or <:here:342302638173323265> if you are at the raid already!".format(raid.mention, ctx.message.author.mention),embed=raid_embed)
             raidchannel_list.append(raid_channel)
                 
+"""Deletes any raid channel that is created after two hours and removes corresponding entries in waiting, omw, and
+raidexpmsg lists.""" 
 @my_bot.event
 async def on_channel_create(channel):
     await asyncio.sleep(7200)
-    await my_bot.delete_channel(channel)
+    if channel in raidchannel_list:
+        raidchannel_list.remove(channel)
+        for i in omw_list:
+            if i[0] == channel:
+                omw_list.remove(i)
+        for j in waiting_list:
+            if j[0] == channel:
+                waiting_list.remove(j)
+        await my_bot.delete_channel(channel)
     
+"""A command for removing the role for wanting a Pokemon."""
 @my_bot.command(pass_context=True)
 async def unwant(ctx):
     entered_unwant = ctx.message.content[8:].lower()
@@ -998,16 +1006,18 @@ async def unwant(ctx):
     if role is None and entered_unwant not in pokemon_list:
         await my_bot.send_message(ctx.message.channel, "Meowth! {0} is not a Pokemon! Check your spelling!".format(entered_unwant))
         return
-    else:
-        try:
-            await my_bot.remove_roles(ctx.message.author, role)
-            unwant_number = pokemon_list.index(entered_unwant) + 1
-            unwant_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(unwant_number))
-            unwant_embed = discord.Embed(colour=discord.Colour(0x2ecc71))
-            unwant_embed.set_thumbnail(url=unwant_img_url)
-            await my_bot.send_message(ctx.message.channel, content="Meowth! Got it! {0} no longer wants {1}".format(ctx.message.author.mention, entered_unwant.capitalize()),embed=unwant_embed)
-        except:
-            await my_bot.send_message(ctx.message.channel, "Meowth! {0} already doesn't want {1}".format(ctx.message.author.mention, role.name.capitalize()))
+    else:    
+        await my_bot.remove_roles(ctx.message.author, role)
+        unwant_number = pokemon_list.index(entered_unwant) + 1
+        unwant_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(unwant_number))
+        unwant_embed = discord.Embed(colour=discord.Colour(0x2ecc71))
+        unwant_embed.set_thumbnail(url=unwant_img_url)
+        await my_bot.send_message(ctx.message.channel, content="Meowth! Got it! {0} no longer wants {1}".format(ctx.message.author.mention, entered_unwant.capitalize()),embed=unwant_embed)
+
+"""Meowth watches for messages that start with the omw, here, unomw, unhere emoji. For omw and here, Meowth
+counts the number of emoji and adds that user and the number to the omw and waiting lists. For unomw and unhere,
+Meowth removes that user and their number from the list regardless of emoji count. The emoji here will have to be
+changed to fit the emoji ids in your server."""
 @my_bot.event
 async def on_message(message):
     if message.channel in raidchannel_list and message.content.startswith('<:omw:342301297502060554>'):
@@ -1031,7 +1041,10 @@ async def on_message(message):
         for c in omw_list:
             if c[1] == message.author.mention:
                 omw_list.remove(c)
-    await my_bot.process_commands(message)                
+    await my_bot.process_commands(message)
+    
+"""A command to set an end time for a raid. Works only in raid channels, can be set or overridden by anyone.
+Meowth displays the end time in HH:MM local time and saves that message in raidexpmsg_list."""
 @my_bot.command(pass_context = True)
 async def timerset(ctx):
     if ctx.message.channel in raidchannel_list:
@@ -1045,6 +1058,8 @@ async def timerset(ctx):
         localexpire = time.localtime(expire)
         raidexpmsg = await my_bot.send_message(ctx.message.channel, "Meowth! This raid will end at {0}!".format(strftime("%I:%M", localexpire)))
         raidexpmsg_list.append((ctx.message.channel, raidexpmsg))
+        
+"""A command to retrieve and resend previously set expire time for a raid."""
 @my_bot.command(pass_context=True)
 async def timer(ctx):
     if ctx.message.channel in raidchannel_list:
@@ -1053,7 +1068,7 @@ async def timer(ctx):
                 await my_bot.send_message(ctx.message.channel, e[1].content)
                 return
 
-
+"""A command to list the number and users who are on the way to the raid."""
 @my_bot.command(pass_context=True)
 async def otw(ctx):
     if ctx.message.channel in raidchannel_list:
@@ -1066,6 +1081,7 @@ async def otw(ctx):
         await asyncio.sleep(1)
         await my_bot.send_message(ctx.message.channel, "Meowth! {0} on the way including {1} and the people with them! Be considerate and wait for them if possible!".format(str(ctx_omwcount),", ".join(ctx_omwlist)))
 
+"""A command to list the number and users who are waiting at the raid."""
 @my_bot.command(pass_context=True)
 async def waiting(ctx):
     if ctx.message.channel in raidchannel_list:
@@ -1078,6 +1094,8 @@ async def waiting(ctx):
         await asyncio.sleep(1)
         await my_bot.send_message(ctx.message.channel, "Meowth! {0} waiting at the raid including {1} and the people with them! Be considerate and let them know if and when you'll be there!".format(str(ctx_waitingcount),", ".join(ctx_waitinglist)))
 
+"""A command that removes all users currently waiting to start the raid from the waiting list. Users who are waiting
+for a second group must reannounce with the here emoji."""
 @my_bot.command(pass_context=True)
 async def starting(ctx):
     if ctx.message.channel in raidchannel_list:
@@ -1090,15 +1108,7 @@ async def starting(ctx):
         await my_bot.send_message(ctx.message.channel, "Meowth! The group that was waiting is starting the raid! Trainers {0}, please respond with <:here:342302638173323265> if you are waiting for another group!".format(", ".join(ctx_startinglist)))
         
 
-@my_bot.event
-async def on_channel_delete(channel):
-    raidchannel_list.remove(channel)
-    for i in omw_list:
-        if i[0] == channel:
-            omw_list.remove(i)
-    for j in waiting_list:
-        if j[0] == channel:
-            waiting_list.remove(j)
+
             
     
 

@@ -2,8 +2,9 @@
 A Discord helper bot for Pokemon Go communities.
 
 
-Meowth is a Discord bot written in Python 3.5 using version 0.16.8 of the discord.py library. Directions for installing
-and running on your server:
+Meowth is a Discord bot written in Python 3.5 using version 0.16.8 of the discord.py library.
+
+## Directions for installing and running on your server:
 
 1. Install Python 3.5 for whatever OS you have on your home computer. https://www.python.org/downloads/release/python-350/
 2. Install discord.py. To do this, run this command in your command prompt: python3 -m pip install -U discord.py
@@ -21,29 +22,30 @@ Press enter and select the server you want to add Meowth too.
 
 6. Give Meowth admin privileges.
 
-7. If you haven't already, create a role for each team. The role ids need to be copied and pasted to lines 83-85 of meowth.py.
+7. Open meowth.py in a text editor. You'll need to make a few easy edits. First, go back to your app page in Discord and click to reveal the bot token, then copy it and paste it into line 27, replacing the "mytokenhere" string. 
 
-7. Upload the other images as custom emoji for your server. There are 18 type icons, an omw emoji (car), an unomw emoji (car with
+8. If you haven't already, create a role for each team. The role ids need to be copied and pasted to lines 34-36 of meowth.py.
+
+9. In lines 41 and 42, replace "yourtown" and "yourstate" with your community's location. This makes the Google Maps thing work a lot better.
+
+10. If you're going to use the included emoji, upload the images in the folder as custom emoji for your server. There are 18 type icons, an omw emoji (car), an unomw emoji (car with
 a circle and a line through it), and here and unhere emoji (Go Plus), and an emoji for each of the three teams.
 
-8. Open meowth.py in IDLE. You'll need to make a few more easy edits. First, you'll need to replace the custom emoji with the 
-strings that bots use to use the custom emoji. To find that string, in a Discord channel, type \:mystic: to get the string for 
-the Team Mystic emoji. Then replace any instance of the :mystic: emoji in the code with that string. You'll have to do this for 
-each of the 25 custom emoji. The following lines of the code have custom emoji that have to be replaced. 13-39, 879, 1022, 1023, 
-1024, 1026, 1027, 1028, 1033, 1038.
+11. Replace the custom emoji with the strings
+that bots need to use the custom emoji. To find that string, in a Discord channel, type \:emoji_name: to get the string for 
+the an emoji. Then configure the emoji using the variables in lines 61-87. You'll have to do this for 
+each of the 25 custom emoji. You can also just use plain strings if your emoji slots are already taken or if you just prefer it that way.
 
-9. In lines 940 and 964, replace "yourtown+yourstate" with your community's location. This makes the Google Maps thing work a lot better.
+12. Save meowth.py
 
-10. Go back to your app page in Discord and click to reveal the bot token, then copy it and paste it into line 1122. 
-Save meowth.py.
-
-11. Run meowth.py from the command prompt or terminal window. If successful, it should print "Meowth! That's right!" to the 
+13. Run meowth.py from the command prompt or terminal window. If successful, it should print "Meowth! That's right!" to the 
 window and the bot should show up as online in Discord.
 
 
 
 
-Directions for using Meowth (avoid punctuation of any kind inside commands, the <> are there for decoration):
+## Directions for using Meowth:
+Note: avoid punctuation of any kind inside commands. The <> in these instructions are there for decoration
 
 1. !team <teamname> - adds you to a team role on the server. These roles must be created beforehand.
 
@@ -58,9 +60,9 @@ Pokemon. The created raid channel will automatically delete in two hours.
 
 5. :omw:/:here: - in a raid channel, the custom emoji for omw and here tell Meowth that you are on your way to or at a raid.
 If you have multiple trainers with you, type another emoji for each additional trainer. Typing :here: also removes you from the
-on the way list.
+on the way list. The exact phrases are configurable on lines 64-67.
 
-6. :unomw:/:unhere: - in a raid channel, these custom emoji tell Meowth to remove you from the on the way or waiting lists.
+6. :unomw:/:unhere: - in a raid channel, these custom emoji tell Meowth to remove you from the on the way or waiting lists. The exact phrases are configurable on lines 64-67.
 
 7. !otw/!waiting - in a raid channel, these commands tell Meowth to list and mention the trainers who said they were on the way
 or at a raid. It also includes the total number.
@@ -74,14 +76,16 @@ the time at which the raid will end. Also overwrites any previously used !timers
 10. !timer - in a raid channel, tells Meowth to resend the message from the last !timerset command. Prevents unnecessary
 scrolling.
 
-General notes on Meowth:
+## General notes on Meowth:
+
 Meowth relies completely on user reports of raids, wild spawns, on the way to a raid, at a raid, and starting a raid. Meowth
 was designed as an alternative to Discord bots that use scanners and other illegitimate sources of information about Pokemon Go.
 As a result, Meowth works only as well as the users who use it. As there are 10+ ways of interacting with Meowth, there
 can be a bit of a rough learning period, but it quickly becomes worth it.
 
-Known issues:
+## Known issues:
+
 Compatibility with Python 3.6+ or discord.py 1.0 is currently unknown.
-Occassional failure to remove users from on the way or waiting lists, cause unknown.
+
 Complete inability to deal with misspelled Pokemon names.
 

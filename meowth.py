@@ -36,6 +36,14 @@ roles = [
     "instinctid"
 ]
 
+# Used for Meowth's welcome message. New members are
+# directed check out this #channel first.
+welcome_channel = 'announcements'
+
+# Used for Meowth's welcome message. New members are
+# directed to ask an @admin if they have questions
+admin_role = 'admin'
+
 # Your town and state. These are pasted
 # verbatim into the Google Maps query.
 yourtown = ""
@@ -974,8 +982,8 @@ async def on_ready():
 @Meowth.event
 async def on_member_join(member):
     server = member.server
-    announcements = discord.utils.get(server.channels, name='announcements')
-    admin = discord.utils.get(server.roles, name='admin')                
+    announcements = discord.utils.get(server.channels, name=welcome_channel)
+    admin = discord.utils.get(server.roles, name=admin_role)                
     message = "Meowth! Welcome to {0.name}, {1.mention}! Set your team by typing '!team mystic', '!team valor', or '!team instinct' without quotations. Then head over to {2.mention} to get caught up on what's happening! If you have any questions just ask an {3.mention}."
     await Meowth.send_message(server, message.format(server, member, announcements, admin))
 

@@ -6,38 +6,143 @@ from time import strftime
 
 Meowth = Bot(command_prefix="!")
 
-"""Below is a dict of raid bosses with their type weaknesses. The strings in them are custom emoji and will need to be changed
-to match your server. These become part of the raid report message."""
+
+"""
+
+======================
+
+Configuration
+
+======================
+
+"""
+
+"""
+
+Server information
+
+"""
+# IDs for team roles.
+# Find this ID information by doing \@role, which will
+# return a string like this: <@&123456789123456789>.
+# Just grab the numbers out of the string.
+roles = [
+    "mysticid",
+    "valorid",
+    "instinctid"
+]
+
+# Your town and state. These are pasted
+# verbatim into the Google Maps query.
+yourtown = ""
+yourstate = ""
+
+"""
+
+Define your server's special strings here.
+
+To use emoji, obtain the ID with \:emoji_name:
+and format the string as <emoji_name:id>
+
+The default values are custom emoji and will need to have
+their IDs changed to match your server.
+
+You can also use plain strings, if you want.
+However, don't use strings that contains the bot's
+command prefix (at the top of the file)
+
+"""
+
+# Emoji for team assignments
+team_dict = {"mystic": "<:mystic:id>", "valor": "<:valor:id>", "instinct": "<:instinct:id>"}
+
+# Emoji for raid organization
+omw_id = "<:omw:id>"
+unomw_id = "<:unomw:id>"
+here_id = "<:here:id>"
+unhere_id = "<:unhere:id>"
+
+# Emoji for Pokemon types.
+type_id_dict = {
+    'fire'     : "<:fire1:id>",
+    'water'    : "<:water:id>",
+    'electric' : "<:electric:id>",
+    'grass'    : "<:grass:id>",
+    'ice'      : "<:ice:id>",
+    'fighting' : "<:fighting:id>",
+    'poison'   : "<:poison:id>",
+    'ground'   : "<:ground:id>",
+    'flying'   : "<:flying:id>",
+    'psychic'  : "<:psychic:id>",
+    'bug'      : "<:bug1:id>",
+    'rock'     : "<:rock:id>",
+    'ghost'    : "<:ghost1:id>",
+    'dragon'   : "<:dragon:id>",
+    'dark'     : "<:dark:id>",
+    'steel'    : "<:steel:id>",
+    'fairy'    : "<:fairy:id>"
+}
+
+"""
+
+======================
+
+End configuration
+
+======================
+
+"""
+
+
+
+"""Below is a dict of raid bosses with their type weaknesses. These become part of the raid report message."""
 
 raid_dict = {
-    "lugia": "<:rock:id> <:ghost1:id> <:electric:id> <:ice:id> <:dark:id>",
-    "moltres": "<:rock:id>x2 <:water:id> <:electric:id>",
-    "zapdos": "<:rock:id> <:ice:id>",
-    "articuno": "<:rock:id>x2 <:steel:id> <:fire1:id> <:electric:id>",
-    "tyranitar": "<:fighting:id>x2 <:ground:id> <:bug1:id> <:steel:id> <:water:id> <:grass:id> <:fairy:id>",
-    "snorlax": "<:fighting:id>",
-    "lapras": "<:fighting:id> <:rock:id> <:grass:id> <:electric:id>",
-    "rhydon": "<:water:id>x2 <:grass:id>x2 <:ice:id> <:steel:id> <:ground:id> <:fighting:id>",
-    "blastoise": "<:electric:id> <:grass:id>",
-    "charizard": "<:rock:id>x2 <:water:id> <:electric:id>",
-    "venusaur": "<:flying:id> <:fire1:id> <:psychic:id> <:ice:id>",
-    "flareon": "<:water:id> <:ground:id> <:rock:id>",
-    "jolteon": "<:ground:id>",
-    "vaporeon": "<:grass:id> <:electric:id>",
-    "gengar": "<:ground:id> <:ghost1:id> <:psychic:id> <:dark:id>",
-    "machamp": "<:flying:id> <:psychic:id> <:fairy:id>",
-    "alakazam": "<:bug1:id> <:ghost1:id> <:dark:id>",
-    "arcanine": "<:ground:id> <:rock:id> <:water:id>",
-    "magmar": "<:ground:id> <:rock:id> <:water:id>",
-    "electabuzz": "<:ground:id>",
-    "weezing": "<:psychic:id>",
-    "exeggutor": "<:bug1:id>x2 <:flying:id> <:poison:id> <:ghost1:id> <:fire1:id> <:ice:id> <:dark:id>",
-    "muk": "<:ground:id> <:psychic:id>",
-    "croconaw": "<:grass:id> <:electric:id>",
-    "quilava": "<:ground:id> <:rock:id> <:water:id>",
-    "bayleef": "<:flying:id> <:poison:id> <:bug1:id> <:fire1:id> <:ice:id>",
-    "magikarp": "<:grass:id> <:electric:id>"
-    }
+    "lugia": ["rock", "ghost", "electric", "ice", "dark"],
+    "moltres": ["rockx2", "water", "electric"],
+    "zapdos": ["rock", "ice"],
+    "articuno": ["rockx2", "steel", "fire", "electric"],
+    "tyranitar": ["fightingx2", "ground", "bug", "steel", "water", "grass", "fairy"],
+    "snorlax": ["fighting"],
+    "lapras": ["fighting", "rock", "grass", "electric"],
+    "rhydon": ["waterx2", "grassx2", "ice", "steel", "ground", "fighting"],
+    "blastoise": ["electric", "grass"],
+    "charizard": ["rockx2", "water", "electric"],
+    "venusaur": ["flying", "fire", "psychic", "ice"],
+    "flareon": ["water", "ground", "rock"],
+    "jolteon": ["ground"],
+    "vaporeon": ["electric", "grass"],
+    "gengar": ["ground", "ghost", "psychic", "dark"],
+    "machamp": ["flying", "psychic", "fairy"],
+    "alakazam": ["bug", "ghost", "dark"],
+    "arcanine": ["water", "ground", "rock"],
+    "magmar": ["water", "ground", "rock"],
+    "electabuzz": ["ground"],
+    "weezing": ["ground", "psychic"],
+    "exeggutor": ["bugx2", "flying", "poison", "ghost", "fire", "ice", "dark"],
+    "muk": ["ground", "psychic"],
+    "croconaw": ["electric", "grass"],
+    "quilava": ["water", "ground", "rock"],
+    "bayleef": ["flying", "poison", "bug", "fire", "ice"],
+    "magikarp": ["electric", "grass"],
+}
+
+"""Given a list of weaknesses, return a
+space-separated string of their type IDs,
+as defined in the type_id_dict"""
+def weakness_to_str(weak_list):
+    ret = ""
+    for weakness in weak_list:
+        # Handle an "x2" postfix defining a double weakness
+        x2 = ""
+        if weakness[-2:] == "x2":
+            weakness = weakness[:-2]
+            x2 = "x2"
+        
+        # Append to string
+        ret += type_id_dict[weakness] + x2 + " "
+    
+    return ret
 
 
 """A list of all Pokemon up to Gen VII. This helps partially futureproof"""
@@ -876,14 +981,8 @@ async def on_member_join(member):
 @Meowth.command(pass_context = True)
 async def team(ctx):
     role = None
-    team_dict = {"mystic": "<:mystic:id>", "valor": "<:valor:id>", "instinct": "<:instinct:id>"}
     entered_team = ctx.message.content[6:].lower()
     role = discord.utils.get(ctx.message.server.roles, name=entered_team)
-    roles = [
-        "mysticid",
-        "valorid", #these roles will have to be changed
-        "instinctid"
-        ]
     for r in ctx.message.author.roles:
         if r.id in roles:
             await Meowth.send_message(ctx.message.channel, "Meowth! You already have a team role!") #checks if user already has a team
@@ -937,7 +1036,7 @@ async def wild(ctx):
         entered_wild = ctx.message.content[6:space1].lower()
         wild_details = ctx.message.content[space1:]
         wild_details_list = wild_details.split()
-        wild_gmaps_link = "https://www.google.com/maps/search/?api=1&query={0}+yourtown+yourstate".format('+'.join(wild_details_list))
+        wild_gmaps_link = "https://www.google.com/maps/search/?api=1&query={0}+{1}+{2}".format('+'.join(wild_details_list, yourtown, yourstate))
         if entered_wild not in pokemon_list:
             await Meowth.send_message(ctx.message.channel, "Meowth! That's not a Pokemon! Check your spelling!")
             return
@@ -964,7 +1063,7 @@ async def raid(ctx):
         entered_raid = ctx.message.content[6:space1].lower()
         raid_details = ctx.message.content[space1:]
         raid_details_list = raid_details.split()
-        raid_gmaps_link = "https://www.google.com/maps/search/?api=1&query={0}+yourtown+yourstate".format('+'.join(raid_details_list))
+        raid_gmaps_link = "https://www.google.com/maps/search/?api=1&query={0}+{1}+{2}".format('+'.join(wild_details_list, yourtown, yourstate))
         if entered_raid not in pokemon_list:
             await Meowth.send_message(ctx.message.channel, "Meowth! That's not a Pokemon! Check your spelling!")
             return
@@ -981,11 +1080,11 @@ async def raid(ctx):
                 await asyncio.sleep(0.5)
             raid_number = pokemon_list.index(entered_raid) + 1
             raid_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(raid_number))
-            raid_embed = discord.Embed(title="Meowth! Click here for directions to the raid!",url=raid_gmaps_link,description="Weaknesses: {0}".format(raid_dict[entered_raid]),colour=discord.Colour(0x2ecc71))
+            raid_embed = discord.Embed(title="Meowth! Click here for directions to the raid!",url=raid_gmaps_link,description="Weaknesses: {0}".format(weakness_to_str(raid_dict[entered_raid])),colour=discord.Colour(0x2ecc71))
             raid_embed.set_thumbnail(url=raid_img_url)
             await Meowth.send_message(ctx.message.channel, content = "Meowth! {0} raid reported by {1}! Coordinate in {2}".format(raid.mention, ctx.message.author.mention, raid_channel.mention),embed=raid_embed)
             await asyncio.sleep(1) #Wait for the channel to be created.
-            raidmsg = await Meowth.send_message(raid_channel, content = "Meowth! {0} raid reported by {1}! Coordinate here! Reply (not react) to this message with <:omw:id> to say you are on your way, or <:here:id> if you are at the raid already!".format(raid.mention, ctx.message.author.mention),embed=raid_embed)
+            raidmsg = await Meowth.send_message(raid_channel, content = "Meowth! {0} raid reported by {1}! Coordinate here! Reply (not react) to this message with {2} to say you are on your way, or {3} if you are at the raid already!".format(raid.mention, ctx.message.author.mention, omw_id, here_id),embed=raid_embed)
             raidchannel_list.append(raid_channel)
                 
 """Deletes any raid channel that is created after two hours and removes corresponding entries in waiting, omw, and
@@ -1025,23 +1124,23 @@ Meowth removes that user and their number from the list regardless of emoji coun
 changed to fit the emoji ids in your server."""
 @Meowth.event
 async def on_message(message):
-    if message.channel in raidchannel_list and message.content.startswith('<:omw:id>'):
-        await Meowth.send_message(message.channel, "Meowth! {0} is on the way with {1} trainers!".format(message.author.mention,message.content.count('<:omw:342301297502060554>')))
-        omw_list.append((message.channel,message.author.mention,message.content.count('<:omw:id>')))
+    if message.channel in raidchannel_list and message.content.startswith(omw_id):
+        await Meowth.send_message(message.channel, "Meowth! {0} is on the way with {1} trainers!".format(message.author.mention,message.content.count(omw_id)))
+        omw_list.append((message.channel,message.author.mention,message.content.count(omw_id)))
         return
-    if message.channel in raidchannel_list and message.content.startswith('<:here:342302638173323265>'):
-        await Meowth.send_message(message.channel, "Meowth! {0} is at the raid with {1} trainers!".format(message.author.mention, message.content.count('<:here:342302638173323265>')))
-        waiting_list.append((message.channel,message.author.mention,message.content.count('<:here:id>')))
+    if message.channel in raidchannel_list and message.content.startswith(here_id):
+        await Meowth.send_message(message.channel, "Meowth! {0} is at the raid with {1} trainers!".format(message.author.mention, message.content.count(here_id)))
+        waiting_list.append((message.channel,message.author.mention,message.content.count(here_id)))
         for a in omw_list:
             if a[1] == message.author.mention:
                 omw_list.remove(a)
         return
-    if message.channel in raidchannel_list and message.content.startswith('<:unhere:id>'):
+    if message.channel in raidchannel_list and message.content.startswith(unhere_id):
         await Meowth.send_message(message.channel, "Meowth! {0} and the trainers with them have left the raid!".format(message.author.mention))
         for b in waiting_list:
             if b[1] == message.author.mention:
                 waiting_list.remove(b)
-    if message.channel in raidchannel_list and message.content.startswith('<:unomw:id>'):
+    if message.channel in raidchannel_list and message.content.startswith(unomw_id):
         await Meowth.send_message(message.channel, "Meowth! {0} and the trainers with them are no longer on their way!".format(message.author.mention))
         for c in omw_list:
             if c[1] == message.author.mention:
@@ -1110,7 +1209,7 @@ async def starting(ctx):
                 ctx_startinglist.append(a[1])
                 waiting_list.remove(a)
         await asyncio.sleep(1)
-        await Meowth.send_message(ctx.message.channel, "Meowth! The group that was waiting is starting the raid! Trainers {0}, please respond with <:here:id> if you are waiting for another group!".format(", ".join(ctx_startinglist)))
+        await Meowth.send_message(ctx.message.channel, "Meowth! The group that was waiting is starting the raid! Trainers {0}, please respond with {1} if you are waiting for another group!".format(", ".join(ctx_startinglist), here_id))
         
 
 

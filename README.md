@@ -4,8 +4,7 @@ A Discord helper bot for Pokemon Go communities.
 
 Meowth is a Discord bot written in Python 3.5 using version 0.16.8 of the discord.py library.
 
-## Directions for installing
-and running on your server:
+## Directions for installing and running on your server:
 
 1. Install Python 3.5 for whatever OS you have on your home computer. https://www.python.org/downloads/release/python-350/
 2. Install discord.py. To do this, run this command in your command prompt: python3 -m pip install -U discord.py
@@ -45,7 +44,8 @@ window and the bot should show up as online in Discord.
 
 
 
-## Directions for using Meowth (avoid punctuation of any kind inside commands, the <> are there for decoration):
+## Directions for using Meowth:
+Note: avoid punctuation of any kind inside commands. The <> in these instructions are there for decoration
 
 1. !team <teamname> - adds you to a team role on the server. These roles must be created beforehand.
 

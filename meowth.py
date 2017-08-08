@@ -994,12 +994,13 @@ raidchannel_dict = {}
 create a human-readable list from them."""
 team_msg = " or ".join(["'!team {0}'".format(team) for team in team_dict.keys()])
 
-# Get the admin role for the server
-admin = discord.utils.get(ctx.message.server.roles, name=admin_role)
-# Define a string pointing to the admin role.
-# If the admin role is not defined, print the
-# generic message "an admin"
-admin_str = "a member of {0}".format(admin.mention) if admin else "an admin"
+
+# Given the name of the admin role, return a human-readable
+# string pointing to the admin role. If the admin role is
+# not defined, print the generic message "an admin"
+def get_admin_str(admin):
+    return "a member of {0}".format(admin.mention) if admin else "an admin"
+
 @Meowth.event
 async def on_ready():
     print("Meowth! That's right!") #prints to the terminal or cmd prompt window upon successful connection to Discord
@@ -1015,7 +1016,7 @@ async def on_member_join(member):
     
     # Optional messages if @admin or #announcements is configured.
     ann_message = " Then head over to {3.mention} to get caught up on what's happening!"
-    admin_message = " If you have any questions just ask a member of {4.mention}."
+    admin_message = " If you have any questions just ask {4}."
     
     message = "Meowth! Welcome to {0.name}, {1.mention}! Set your team by typing {2} without quotations."
     if announcements:
@@ -1023,7 +1024,7 @@ async def on_member_join(member):
     if admin:
         message += admin_message
     
-    await Meowth.send_message(server, message.format(server, member, team_msg, announcements, admin))
+    await Meowth.send_message(server, message.format(server, member, team_msg, announcements, get_admin_str(admin)))
 
 """A command to print the welcome message.
 Optionally takes an argument welcoming a specific user.
@@ -1059,8 +1060,7 @@ async def team(ctx):
     # Check if the role is configured on the server
     elif role is None:
         admin = discord.utils.get(ctx.message.server.roles, name=admin_role)
-        admin_str = "a member of {0}".format(admin.mention) if admin else "an admin"
-        await Meowth.send_message(ctx.message.channel, "Meowth! The \"{0}\" role isn't configured on this server! Contact {1}!".format(entered_team, admin_str))
+        await Meowth.send_message(ctx.message.channel, "Meowth! The \"{0}\" role isn't configured on this server! Contact {1}!".format(entered_team, get_admin_str(admin)))
     else:
         try:
             await Meowth.add_roles(ctx.message.author, role)

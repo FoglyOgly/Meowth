@@ -37,11 +37,11 @@ roles = [
 ]
 
 # Used for Meowth's welcome message. New members are
-# directed check out this #channel first.
+# directed check out this #channel first. Leave blank to omit
 welcome_channel = 'announcements'
 
-# Used for Meowth's welcome message. New members are
-# directed to ask an @admin if they have questions
+# Used for Meowth's welcome message. New members are directed
+# to ask an @admin if they have questions. Leave blank to omit
 admin_role = 'admin'
 
 # Your town and state. These are pasted
@@ -65,7 +65,7 @@ command prefix (at the top of the file)
 
 """
 
-# Emoji for team assignments
+# Emoji for team assignments. If your roles have different names (e.g capitalized) then replace the dictionary keys
 team_dict = {"mystic": "<:mystic:id>", "valor": "<:valor:id>", "instinct": "<:instinct:id>"}
 
 # Emoji for raid organization
@@ -990,9 +990,20 @@ The trainer_dict contains "trainer" elements, which have the following fields:
 
 raidchannel_dict = {}
 
+""" Take the server-defined team role names and
+create a human-readable list from them."""
+team_msg = " or ".join(["'!team {0}'".format(team) for team in team_dict.keys()])
+
+# Get the admin role for the server
+admin = discord.utils.get(ctx.message.server.roles, name=admin_role)
+# Define a string pointing to the admin role.
+# If the admin role is not defined, print the
+# generic message "an admin"
+admin_str = "a member of {0}".format(admin.mention) if admin else "an admin"
 @Meowth.event
 async def on_ready():
     print("Meowth! That's right!") #prints to the terminal or cmd prompt window upon successful connection to Discord
+
 
 """Welcome message to the server and some basic instructions."""
 
@@ -1000,25 +1011,56 @@ async def on_ready():
 async def on_member_join(member):
     server = member.server
     announcements = discord.utils.get(server.channels, name=welcome_channel)
-    admin = discord.utils.get(server.roles, name=admin_role)                
-    message = "Meowth! Welcome to {0.name}, {1.mention}! Set your team by typing '!team mystic', '!team valor', or '!team instinct' without quotations. Then head over to {2.mention} to get caught up on what's happening! If you have any questions just ask an {3.mention}."
-    await Meowth.send_message(server, message.format(server, member, announcements, admin))
+    admin = discord.utils.get(server.roles, name=admin_role)
+    
+    # Optional messages if @admin or #announcements is configured.
+    ann_message = " Then head over to {3.mention} to get caught up on what's happening!"
+    admin_message = " If you have any questions just ask a member of {4.mention}."
+    
+    message = "Meowth! Welcome to {0.name}, {1.mention}! Set your team by typing {2} without quotations."
+    if announcements:
+        message += ann_message
+    if admin:
+        message += admin_message
+    
+    await Meowth.send_message(server, message.format(server, member, team_msg, announcements, admin))
 
-
+"""A command to print the welcome message.
+Optionally takes an argument welcoming a specific user.
+If omitted, welcomes the message author."""
+@Meowth.command(pass_context=True)
+async def welcome(ctx):
+    member = ctx.message.author
+    space1 = ctx.message.content.find(" ")
+    if space1 != -1:
+        member = discord.utils.get(ctx.message.server.members, name=ctx.message.content[9:])
+        if not member:
+            await Meowth.send_message(ctx.message.channel, "Meowth! No member named \"{0}\"!".format(ctx.message.content[9:]))
+    
+    if member:
+        await on_member_join(member)
+        
 """A command for setting a team role. These roles have to be created manually beforehand."""
 
 @Meowth.command(pass_context = True)
 async def team(ctx):
     role = None
-    entered_team = ctx.message.content[6:].lower()
+    entered_team = ctx.message.content[6:]
     role = discord.utils.get(ctx.message.server.roles, name=entered_team)
+    # Check if user already belongs to a team role
     for r in ctx.message.author.roles:
         if r.id in roles:
-            await Meowth.send_message(ctx.message.channel, "Meowth! You already have a team role!") #checks if user already has a team
+            await Meowth.send_message(ctx.message.channel, "Meowth! You already have a team role!")
             return
-    if role is None or role.name not in list(team_dict.keys()):
-        await Meowth.send_message(ctx.message.channel, "Meowth! {0} isn't a valid team!".format(entered_team)) # checks if team is one of the three
+    # Check if team is one of the three defined in the team_dict
+    if entered_team not in list(team_dict.keys()):
+        await Meowth.send_message(ctx.message.channel, "Meowth! \"{0}\" isn't a valid team! Try {1}".format(entered_team, team_msg))
         return
+    # Check if the role is configured on the server
+    elif role is None:
+        admin = discord.utils.get(ctx.message.server.roles, name=admin_role)
+        admin_str = "a member of {0}".format(admin.mention) if admin else "an admin"
+        await Meowth.send_message(ctx.message.channel, "Meowth! The \"{0}\" role isn't configured on this server! Contact {1}!".format(entered_team, admin_str))
     else:
         try:
             await Meowth.add_roles(ctx.message.author, role)
@@ -1043,7 +1085,7 @@ async def want(ctx):
         await Meowth.send_message(ctx.message.channel, content="Meowth! Got it! {0} wants {1}".format(ctx.message.author.mention, entered_want.capitalize()),embed=want_embed)
         return
     if role is None and entered_want not in pokemon_list:
-        await Meowth.send_message(ctx.message.channel, "Meowth! {0} is not a Pokemon! Check your spelling!".format(entered_want.capitalize()))
+        await Meowth.send_message(ctx.message.channel, "Meowth! \"{0}\" is not a Pokemon! Check your spelling!".format(entered_want))
         return
     else:
         await Meowth.add_roles(ctx.message.author, role)
@@ -1067,7 +1109,7 @@ async def wild(ctx):
         wild_details_list = wild_details.split()
         wild_gmaps_link = "https://www.google.com/maps/search/?api=1&query={0}+{1}+{2}".format('+'.join(wild_details_list), yourtown, yourstate)
         if entered_wild not in pokemon_list:
-            await Meowth.send_message(ctx.message.channel, "Meowth! {0} is not a Pokemon! Check your spelling!".format(entered_wild.capitalize()))
+            await Meowth.send_message(ctx.message.channel, "Meowth! \"{0}\" is not a Pokemon! Check your spelling!".format(entered_wild))
             return
         else:
             wild = discord.utils.get(ctx.message.server.roles, name = entered_wild)
@@ -1094,10 +1136,10 @@ async def raid(ctx):
         raid_details_list = raid_details.split()
         raid_gmaps_link = "https://www.google.com/maps/search/?api=1&query={0}+{1}+{2}".format('+'.join(raid_details_list), yourtown, yourstate)
         if entered_raid not in pokemon_list:
-            await Meowth.send_message(ctx.message.channel, "Meowth! That's not a Pokemon! Check your spelling!")
+            await Meowth.send_message(ctx.message.channel, "Meowth! \"{0}\" is not a Pokemon! Check your spelling!".format(entered_raid))
             return
         if entered_raid not in list(raid_dict.keys()) and entered_raid in pokemon_list:
-            await Meowth.send_message(ctx.message.channel, "Meowth! That Pokemon does not appear in raids!")
+            await Meowth.send_message(ctx.message.channel, "Meowth! The Pokemon {0} does not appear in raids!".format(entered_raid.capitalize()))
             return
         else:
             raid_channel_name = entered_raid + sanitize_channel_name(raid_details)
@@ -1133,7 +1175,7 @@ async def unwant(ctx):
     entered_unwant = ctx.message.content[8:].lower()
     role = discord.utils.get(ctx.message.server.roles, name=entered_unwant)
     if role is None and entered_unwant not in pokemon_list:
-        await Meowth.send_message(ctx.message.channel, "Meowth! {0} is not a Pokemon! Check your spelling!".format(entered_unwant.capitalize()))
+        await Meowth.send_message(ctx.message.channel, "Meowth! \"{0}\" is not a Pokemon! Check your spelling!".format(entered_unwant))
         return
     else:    
         await Meowth.remove_roles(ctx.message.author, role)

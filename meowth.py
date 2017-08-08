@@ -22,6 +22,10 @@ Configuration
 Server information
 
 """
+# Bot token ID, needed for authentication.
+# This is found on the app page when you click to reveal the bot user's token
+bot_token = "mytokenhere"
+
 # IDs for team roles.
 # Find this ID information by doing \@role, which will
 # return a string like this: <@&123456789123456789>.
@@ -1271,4 +1275,4 @@ async def starting(ctx):
     
 
 
-Meowth.run("mytokenhere")
+Meowth.run(bot_token)

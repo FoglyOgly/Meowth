@@ -966,6 +966,18 @@ pokemon_list = [
     ]
 
 
+# Convert an arbitrary string into something which
+# is acceptable as a Discord channel name.
+def sanitize_channel_name(name):
+    # Remove all characters other than alphanumerics,
+    # dashes, underscores, and spaces
+    ret = re.sub(r"[^a-zA-Z0-9 _\-]", "", name)
+    # Replace spaces with dashes
+    ret = ret.replace(" ", "-")
+    
+    return ret
+
+
 """
 Meowth tracks raiding commands through the raidchannel_dict.
 Each channel contains the following fields:
@@ -1106,6 +1118,7 @@ async def raid(ctx):
               'trainer_dict' : {},
               'exp' : "No expiration time set!"
             }
+
                 
 """Deletes any raid channel that is created after two hours and removes corresponding entries in waiting, omw, and
 raidexpmsg lists.""" 

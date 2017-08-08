@@ -1036,7 +1036,7 @@ async def wild(ctx):
         entered_wild = ctx.message.content[6:space1].lower()
         wild_details = ctx.message.content[space1:]
         wild_details_list = wild_details.split()
-        wild_gmaps_link = "https://www.google.com/maps/search/?api=1&query={0}+{1}+{2}".format('+'.join(wild_details_list, yourtown, yourstate))
+        wild_gmaps_link = "https://www.google.com/maps/search/?api=1&query={0}+{1}+{2}".format('+'.join(wild_details_list), yourtown, yourstate)
         if entered_wild not in pokemon_list:
             await Meowth.send_message(ctx.message.channel, "Meowth! That's not a Pokemon! Check your spelling!")
             return
@@ -1063,7 +1063,7 @@ async def raid(ctx):
         entered_raid = ctx.message.content[6:space1].lower()
         raid_details = ctx.message.content[space1:]
         raid_details_list = raid_details.split()
-        raid_gmaps_link = "https://www.google.com/maps/search/?api=1&query={0}+{1}+{2}".format('+'.join(wild_details_list, yourtown, yourstate))
+        raid_gmaps_link = "https://www.google.com/maps/search/?api=1&query={0}+{1}+{2}".format('+'.join(raid_details_list), yourtown, yourstate)
         if entered_raid not in pokemon_list:
             await Meowth.send_message(ctx.message.channel, "Meowth! That's not a Pokemon! Check your spelling!")
             return

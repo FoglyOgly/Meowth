@@ -26,16 +26,6 @@ Server information
 # This is found on the app page when you click to reveal the bot user's token
 bot_token = "mytokenhere"
 
-# IDs for team roles.
-# Find this ID information by doing \@role, which will
-# return a string like this: <@&123456789123456789>.
-# Just grab the numbers out of the string.
-roles = [
-    "mysticid",
-    "valorid",
-    "instinctid"
-]
-
 # Used for Meowth's welcome message. New members are
 # directed check out this #channel first. Leave blank to omit
 welcome_channel = 'announcements'
@@ -1048,11 +1038,23 @@ async def team(ctx):
     role = None
     entered_team = ctx.message.content[6:]
     role = discord.utils.get(ctx.message.server.roles, name=entered_team)
-    # Check if user already belongs to a team role
-    for r in ctx.message.author.roles:
-        if r.id in roles:
-            await Meowth.send_message(ctx.message.channel, "Meowth! You already have a team role!")
-            return
+
+    # Check if user already belongs to a team role by
+    # getting the role objects of all teams in team_dict and
+    # checking if the message author has any of them.
+    for team in team_dict.keys():
+        temp_role = discord.utils.get(ctx.message.server.roles, name=team)
+        # If the role is valid,
+        if temp_role:
+            # and the user has this role,
+            if temp_role in ctx.message.author.roles:
+                # then report that a role is already assigned
+                await Meowth.send_message(ctx.message.channel, "Meowth! You already have a team role!")
+                return
+        # If the role isn't valid, something is misconfigured, so fire a warning.
+        else:
+            print("WARNING: Role {0} in team_dict not configured as a role on the server!".format(team))
+    
     # Check if team is one of the three defined in the team_dict
     if entered_team not in list(team_dict.keys()):
         await Meowth.send_message(ctx.message.channel, "Meowth! \"{0}\" isn't a valid team! Try {1}".format(entered_team, team_msg))

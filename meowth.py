@@ -1,5 +1,6 @@
 import discord
 import asyncio
+import re
 from discord.ext.commands import Bot
 import time
 from time import strftime

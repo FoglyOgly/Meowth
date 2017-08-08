@@ -1075,27 +1075,27 @@ Meowth creates a role if one does not exist for the species."""
 @Meowth.command(pass_context = True)                
 async def want(ctx):
     entered_want = ctx.message.content[6:].lower()
-    role = discord.utils.get(ctx.message.server.roles, name=entered_want)
-    if role is None and entered_want in pokemon_list:
-        newrole = await Meowth.create_role(server = ctx.message.server, name = entered_want, hoist = False, mentionable = True)
-        await asyncio.sleep(0.5)
-        await Meowth.add_roles(ctx.message.author, newrole)
-        want_number = pokemon_list.index(entered_want) + 1
-        want_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(want_number))
-        want_embed = discord.Embed(colour=discord.Colour(0x2ecc71))
-        want_embed.set_thumbnail(url=want_img_url)
-        await Meowth.send_message(ctx.message.channel, content="Meowth! Got it! {0} wants {1}".format(ctx.message.author.mention, entered_want.capitalize()),embed=want_embed)
-        return
-    if role is None and entered_want not in pokemon_list:
+    if entered_want not in pokemon_list:
         await Meowth.send_message(ctx.message.channel, "Meowth! \"{0}\" is not a Pokemon! Check your spelling!".format(entered_want))
         return
     else:
-        await Meowth.add_roles(ctx.message.author, role)
-        want_number = pokemon_list.index(entered_want) + 1
-        want_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(want_number)) #This part embeds the sprite
-        want_embed = discord.Embed(colour=discord.Colour(0x2ecc71))
-        want_embed.set_thumbnail(url=want_img_url)
-        await Meowth.send_message(ctx.message.channel, content="Meowth! Got it! {0} wants {1}".format(ctx.message.author.mention, entered_want.capitalize()),embed=want_embed)
+        role = discord.utils.get(ctx.message.server.roles, name=entered_want)
+        # Create role if it doesn't exist yet
+        if role is None:
+            role = await Meowth.create_role(server = ctx.message.server, name = entered_want, hoist = False, mentionable = True)
+            await asyncio.sleep(0.5)
+        
+        # If user is already wanting the Pokemon,
+        # print a less noisy message
+        if role in ctx.message.author.roles:
+            await Meowth.send_message(ctx.message.channel, content="Meowth! {0}, I already know you want {1}!".format(ctx.message.author.mention, entered_want.capitalize()))
+        else:
+            await Meowth.add_roles(ctx.message.author, role)
+            want_number = pokemon_list.index(entered_want) + 1
+            want_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(want_number)) #This part embeds the sprite
+            want_embed = discord.Embed(colour=discord.Colour(0x2ecc71))
+            want_embed.set_thumbnail(url=want_img_url)
+            await Meowth.send_message(ctx.message.channel, content="Meowth! Got it! {0} wants {1}".format(ctx.message.author.mention, entered_want.capitalize()),embed=want_embed)
 
 """A command for reporting a wild Pokemon spawn location. Meowth will insert the details (really just everything after
 the species name) into a Google maps link and post the link to the same channel the report was made in."""
@@ -1176,16 +1176,26 @@ async def on_channel_create(channel):
 async def unwant(ctx):
     entered_unwant = ctx.message.content[8:].lower()
     role = discord.utils.get(ctx.message.server.roles, name=entered_unwant)
-    if role is None and entered_unwant not in pokemon_list:
+    if entered_unwant not in pokemon_list:
         await Meowth.send_message(ctx.message.channel, "Meowth! \"{0}\" is not a Pokemon! Check your spelling!".format(entered_unwant))
         return
-    else:    
-        await Meowth.remove_roles(ctx.message.author, role)
-        unwant_number = pokemon_list.index(entered_unwant) + 1
-        unwant_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(unwant_number))
-        unwant_embed = discord.Embed(colour=discord.Colour(0x2ecc71))
-        unwant_embed.set_thumbnail(url=unwant_img_url)
-        await Meowth.send_message(ctx.message.channel, content="Meowth! Got it! {0} no longer wants {1}".format(ctx.message.author.mention, entered_unwant.capitalize()),embed=unwant_embed)
+    else:
+        # Create role if it doesn't exist yet
+        if role is None:
+            role = await Meowth.create_role(server = ctx.message.server, name = entered_unwant, hoist = False, mentionable = True)
+            await asyncio.sleep(0.5)
+        
+        # If user is not already wanting the Pokemon,
+        # print a less noisy message
+        if role not in ctx.message.author.roles:
+            await Meowth.send_message(ctx.message.channel, content="Meowth! {0}, I already know you don't want {1}!".format(ctx.message.author.mention, entered_unwant.capitalize()))
+        else:
+            await Meowth.remove_roles(ctx.message.author, role)
+            unwant_number = pokemon_list.index(entered_unwant) + 1
+            unwant_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(unwant_number))
+            unwant_embed = discord.Embed(colour=discord.Colour(0x2ecc71))
+            unwant_embed.set_thumbnail(url=unwant_img_url)
+            await Meowth.send_message(ctx.message.channel, content="Meowth! Got it! {0} no longer wants {1}".format(ctx.message.author.mention, entered_unwant.capitalize()),embed=unwant_embed)
 
 """Meowth watches for messages that start with the omw, here, unomw, unhere emoji. For omw and here, Meowth
 counts the number of emoji and adds that user and the number to the omw and waiting lists. For unomw and unhere,

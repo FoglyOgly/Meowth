@@ -1125,26 +1125,56 @@ changed to fit the emoji ids in your server."""
 @Meowth.event
 async def on_message(message):
     if message.channel in raidchannel_list and message.content.startswith(omw_id):
+        # TODO: handle case where a user sends :omw:
+        # after they've already sent :here:
         await Meowth.send_message(message.channel, "Meowth! {0} is on the way with {1} trainers!".format(message.author.mention,message.content.count(omw_id)))
-        omw_list.append((message.channel,message.author.mention,message.content.count(omw_id)))
+        # Check if trainer is already in the list.
+        # Specifically, look for a matching entry of [channel, author.mention]
+        already_listed = False
+        for a in range(len(omw_list)):
+            # If already listed, replace previous count with the new one
+            if omw_list[a][0] == message.channel and omw_list[a][1] == message.author.mention:
+                already_listed = True
+                omw_list[a] = (message.channel,message.author.mention,message.content.count(omw_id))
+        # If not already listed, create a new entry
+        if not already_listed:
+            omw_list.append((message.channel,message.author.mention,message.content.count(omw_id)))
         return
+    # TODO: there's no relation between the :here: count and the :omw: count.
+    # For example, if a user is :omw: with 4, they have to send 4x :here:
+    # or else they only count as 1 person waiting
     if message.channel in raidchannel_list and message.content.startswith(here_id):
         await Meowth.send_message(message.channel, "Meowth! {0} is at the raid with {1} trainers!".format(message.author.mention, message.content.count(here_id)))
-        waiting_list.append((message.channel,message.author.mention,message.content.count(here_id)))
-        for a in omw_list:
-            if a[1] == message.author.mention:
-                omw_list.remove(a)
+        # Check if trainer is already in the list.
+        # Specifically, look for a matching entry of [channel, author.mention]
+        already_listed = False
+        for a in range(len(waiting_list)):
+            # If already listed, replace previous count with the new one
+            if waiting_list[a][0] == message.channel and waiting_list[a][1] == message.author.mention:
+                already_listed = True
+                waiting_list[a] = (message.channel,message.author.mention,message.content.count(here_id))
+        # If not already listed, create a new entry
+        if not already_listed:
+            waiting_list.append((message.channel,message.author.mention,message.content.count(here_id)))
+        for b in omw_list:
+            if b[0] == message.channel and b[1] == message.author.mention:
+                omw_list.remove(b)
+                break
         return
     if message.channel in raidchannel_list and message.content.startswith(unhere_id):
-        await Meowth.send_message(message.channel, "Meowth! {0} and the trainers with them have left the raid!".format(message.author.mention))
-        for b in waiting_list:
-            if b[1] == message.author.mention:
-                waiting_list.remove(b)
+        for c in waiting_list:
+            if c[0] == message.channel and c[1] == message.author.mention:
+                await Meowth.send_message(message.channel, "Meowth! {0} and the trainers with them have left the raid!".format(message.author.mention))
+                waiting_list.remove(c)
+                break
+        return
     if message.channel in raidchannel_list and message.content.startswith(unomw_id):
-        await Meowth.send_message(message.channel, "Meowth! {0} and the trainers with them are no longer on their way!".format(message.author.mention))
-        for c in omw_list:
-            if c[1] == message.author.mention:
-                omw_list.remove(c)
+        for d in omw_list:
+            if d[0] == message.channel and d[1] == message.author.mention:
+                await Meowth.send_message(message.channel, "Meowth! {0} and the trainers with them are no longer on their way!".format(message.author.mention))
+                omw_list.remove(d)
+                break
+        return
     await Meowth.process_commands(message)
     
 """A command to set an end time for a raid. Works only in raid channels, can be set or overridden by anyone.
@@ -1178,12 +1208,18 @@ async def otw(ctx):
     if ctx.message.channel in raidchannel_list:
         ctx_omwcount = 0
         ctx_omwlist = []
-        for (a, b, c) in omw_list:
-            if a == ctx.message.channel:
-                ctx_omwcount += c
-                ctx_omwlist.append(b)
+        for (channel, mention, count) in omw_list:
+            if channel == ctx.message.channel:
+                ctx_omwcount += count
+                ctx_omwlist.append(mention)
         await asyncio.sleep(1)
-        await Meowth.send_message(ctx.message.channel, "Meowth! {0} on the way including {1} and the people with them! Be considerate and wait for them if possible!".format(str(ctx_omwcount),", ".join(ctx_omwlist)))
+        
+        # If at least 1 person is on the way,
+        # add an extra message indicating who it is.
+        otw_exstr = ""
+        if ctx_omwcount > 0:
+            otw_exstr = " including {0} and the people with them! Be considerate and wait for them if possible".format(", ".join(ctx_omwlist))
+        await Meowth.send_message(ctx.message.channel, "Meowth! {0} on the way{1}!".format(str(ctx_omwcount), otw_exstr))
 
 """A command to list the number and users who are waiting at the raid."""
 @Meowth.command(pass_context=True)
@@ -1191,12 +1227,19 @@ async def waiting(ctx):
     if ctx.message.channel in raidchannel_list:
         ctx_waitingcount = 0
         ctx_waitinglist = []
-        for (a, b, c) in waiting_list:
-            if a == ctx.message.channel:
-                ctx_waitingcount += c
-                ctx_waitinglist.append(b)
+        for (channel, mention, count) in waiting_list:
+            if channel == ctx.message.channel:
+                ctx_waitingcount += count
+                ctx_waitinglist.append(mention)
         await asyncio.sleep(1)
-        await Meowth.send_message(ctx.message.channel, "Meowth! {0} waiting at the raid including {1} and the people with them! Be considerate and let them know if and when you'll be there!".format(str(ctx_waitingcount),", ".join(ctx_waitinglist)))
+        
+        # If at least 1 person is waiting,
+        # add an extra message indicating who it is.
+        waiting_exstr = ""
+        if ctx_waitingcount > 0:
+            waiting_exstr = " including {0} and the people with them! Be considerate and let them know if and when you'll be there".format(", ".join(ctx_waitinglist))
+        await Meowth.send_message(ctx.message.channel, "Meowth! {0} waiting at the raid{1}!".format(str(ctx_waitingcount), waiting_exstr))
+        # await Meowth.send_message(ctx.message.channel, "Meowth! {0} waiting at the raid including {1} and the people with them! Be considerate and let them know if and when you'll be there!".format(str(ctx_waitingcount),", ".join(ctx_waitinglist)))
 
 """A command that removes all users currently waiting to start the raid from the waiting list. Users who are waiting
 for a second group must reannounce with the here emoji."""
@@ -1209,7 +1252,11 @@ async def starting(ctx):
                 ctx_startinglist.append(a[1])
                 waiting_list.remove(a)
         await asyncio.sleep(1)
-        await Meowth.send_message(ctx.message.channel, "Meowth! The group that was waiting is starting the raid! Trainers {0}, please respond with {1} if you are waiting for another group!".format(", ".join(ctx_startinglist), here_id))
+        
+        starting_str = "Meowth! The group that was waiting is starting the raid! Trainers {0}, please respond with {1} if you are waiting for another group!".format(", ".join(ctx_startinglist), here_id)
+        if len(ctx_startinglist) == 0:
+            starting_str = "Meowth! How can you start when there's no one waiting at this raid!?"
+        await Meowth.send_message(ctx.message.channel, starting_str)
         
 
 

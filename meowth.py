@@ -974,7 +974,7 @@ Helper functions
 # Given a list of weaknesses, return a
 # space-separated string of their type IDs,
 # as defined in the type_id_dict
-def weakness_to_str(weak_list):
+def weakness_to_str(server, weak_list):
     ret = ""
     for weakness in weak_list:
         # Handle an "x2" postfix defining a double weakness
@@ -1227,7 +1227,7 @@ async def raid(ctx):
                 await asyncio.sleep(0.5)
             raid_number = pokemon_list.index(entered_raid) + 1
             raid_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(raid_number))
-            raid_embed = discord.Embed(title="Meowth! Click here for directions to the raid!",url=raid_gmaps_link,description="Weaknesses: {0}".format(weakness_to_str(raid_dict[entered_raid])),colour=discord.Colour(0x2ecc71))
+            raid_embed = discord.Embed(title="Meowth! Click here for directions to the raid!",url=raid_gmaps_link,description="Weaknesses: {0}".format(weakness_to_str(ctx.message.server, raid_dict[entered_raid])),colour=discord.Colour(0x2ecc71))
             raid_embed.set_thumbnail(url=raid_img_url)
             await Meowth.send_message(ctx.message.channel, content = "Meowth! {0} raid reported by {1}! Details: {2}. Coordinate in {3}".format(raid.mention, ctx.message.author.mention, raid_details, raid_channel.mention),embed=raid_embed)
             await asyncio.sleep(1) #Wait for the channel to be created.

@@ -1042,7 +1042,6 @@ async def on_member_join(member):
     server = member.server
     admin = discord.utils.get(server.roles, name=admin_role)
     announcements = discord.utils.get(server.channels, name=welcome_channel)
-    team_msg = " or ".join(["'!team {0}'".format(team) for team in team_dict.keys()])
     
     ann_message = " Then head over to {3.mention} to get caught up on what's happening!"
     admin_message = " If you have any questions just ask {4}."

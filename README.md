@@ -44,7 +44,7 @@ a circle and a line through it), and here and unhere emoji (Go Plus), and an emo
 
 6. **Configure raid command strings.** Replace the custom emoji with the strings
 that bots need to use the custom emoji. To find that string, in a Discord channel, type \:emoji_name: to get the string for 
-the an emoji. Then configure the emoji using the variables in lines 63-86. You'll have to do this for 
+the an emoji. Then configure the emoji using the variables in lines 63-87. You'll have to do this for
 each of the 25 custom emoji. You can also just use plain strings if your emoji slots are already taken or if you just prefer it that way.
 
 7. Save meowth.py. Next time you run it, the changes will take effect.
@@ -68,9 +68,9 @@ Pokemon. The created raid channel will automatically delete in two hours.
 
 5. :omw:/:here: - in a raid channel, the custom emoji for omw and here tell Meowth that you are on your way to or at a raid.
 If you have multiple trainers with you, type another emoji for each additional trainer. Typing :here: also removes you from the
-on the way list. The exact phrases are configurable on lines 64-67.
+on the way list. The exact phrases are configurable on lines 65-68.
 
-6. :unomw:/:unhere: - in a raid channel, these custom emoji tell Meowth to remove you from the on the way or waiting lists. The exact phrases are configurable on lines 64-67.
+6. :unomw:/:unhere: - in a raid channel, these custom emoji tell Meowth to remove you from the on the way or waiting lists. The exact phrases are configurable on lines 65-68.
 
 7. !otw/!waiting - in a raid channel, these commands tell Meowth to list and mention the trainers who said they were on the way
 or at a raid. It also includes the total number.

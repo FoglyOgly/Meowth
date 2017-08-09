@@ -42,7 +42,7 @@ window and the bot should show up as online in Discord.
 5. **Upload emoji to server (optional).** If you're going to use the included emoji, upload the images in the folder as custom emoji for your server. There are 18 type icons, an omw emoji (car), an unomw emoji (car with
 a circle and a line through it), and here and unhere emoji (Go Plus), and an emoji for each of the three teams.
 
-6. **Configure raid command strings.** Using the variables in lines 69-92, customize the emoji messages to match the ones on your server. Meowth will attempt to look up the names in your server's emoji list. You'll have to do this for each of the 25 custom emoji. You can also just use plain strings if your emoji slots are already taken or if you just prefer it that way.
+6. **Configure raid command strings.** Using the variables in lines 69-93, customize the emoji messages to match the ones on your server. Meowth will attempt to look up the names in your server's emoji list. You'll have to do this for each of the 25 custom emoji. You can also just use plain strings if your emoji slots are already taken or if you just prefer it that way.
 
 7. Save meowth.py. Next time you run it, the changes will take effect.
 

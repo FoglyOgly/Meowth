@@ -1231,8 +1231,12 @@ async def otw(ctx):
         # If at least 1 person is on the way,
         # add an extra message indicating who it is.
         otw_exstr = ""
+        otw_list = []
+        for trainer in trainer_dict.keys():
+            if trainer_dict[trainer]['status']=='omw':
+                otw_list.append(trainer)
         if ctx_omwcount > 0:
-            otw_exstr = " including {0} and the people with them! Be considerate and wait for them if possible".format(", ".join(trainer_dict.keys()))
+            otw_exstr = " including {0} and the people with them! Be considerate and wait for them if possible".format(", ".join(otw_list))
         await Meowth.send_message(ctx.message.channel, "Meowth! {0} on the way{1}!".format(str(ctx_omwcount), otw_exstr))
 
 """A command to list the number and users who are waiting at the raid."""
@@ -1251,8 +1255,12 @@ async def waiting(ctx):
         # If at least 1 person is waiting,
         # add an extra message indicating who it is.
         waiting_exstr = ""
+        waiting_list = []
+        for trainer in trainer_dict.keys():
+            if trainer_dict[trainer]['status']=='waiting':
+                waiting_list.append(trainer)
         if ctx_waitingcount > 0:
-            waiting_exstr = " including {0} and the people with them! Be considerate and let them know if and when you'll be there".format(", ".join(trainer_dict.keys()))
+            waiting_exstr = " including {0} and the people with them! Be considerate and let them know if and when you'll be there".format(", ".join(waiting_list))
         await Meowth.send_message(ctx.message.channel, "Meowth! {0} waiting at the raid{1}!".format(str(ctx_waitingcount), waiting_exstr))
 
 """A command that removes all users currently waiting to start the raid from the waiting list. Users who are waiting

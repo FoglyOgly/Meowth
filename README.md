@@ -37,7 +37,7 @@ window and the bot should show up as online in Discord.
 
 3. **Enable the welcome message**. On lines 32 and 36, configure the names of your server's @admin role and #announcements or #welcome channel.
 
-4. **Enable Google Maps hints.** In lines 41 and 41, replace "yourtown" and "yourstate" with your community's location. This makes the Google Maps location links work a lot better.
+4. **Enable Google Maps hints.** In lines 40 and 41, replace "yourtown" and "yourstate" with your community's location. This makes the Google Maps location links work a lot better.
 
 5. **Upload emoji to server (optional).** If you're going to use the included emoji, upload the images in the folder as custom emoji for your server. There are 18 type icons, an omw emoji (car), an unomw emoji (car with
 a circle and a line through it), and here and unhere emoji (Go Plus), and an emoji for each of the three teams.

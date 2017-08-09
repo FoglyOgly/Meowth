@@ -1439,7 +1439,7 @@ async def emoji_help(ctx):
         To specify you are in a group, copy the emoji once for each person in your group.
         This will remove you from the "omw" list.
     {3}: indicate you are leaving the raid location.
-        This will remove you and your group from the "waiting" list.```""".format(parse_emoji(message.server, omw_id), parse_emoji(message.server, unomw_id), parse_emoji(message.server, here_id), parse_emoji(message.server, unhere_id))
+        This will remove you and your group from the "waiting" list.```""".format(parse_emoji(ctx.message.server, omw_id), parse_emoji(ctx.message.server, unomw_id), parse_emoji(ctx.message.server, here_id), parse_emoji(ctx.message.server, unhere_id))
     await Meowth.send_message(ctx.message.channel, helpmsg)
 
 @Meowth.command(pass_context=True)
@@ -1518,7 +1518,7 @@ async def starting(ctx):
         for trainer in ctx_startinglist:
             del trainer_dict[trainer]
         
-        starting_str = "Meowth! The group that was waiting is starting the raid! Trainers {0}, please respond with {1} if you are waiting for another group!".format(", ".join(ctx_startinglist), parse_emoji(message.server, here_id))
+        starting_str = "Meowth! The group that was waiting is starting the raid! Trainers {0}, please respond with {1} if you are waiting for another group!".format(", ".join(ctx_startinglist), parse_emoji(ctx.message.server, here_id))
         if len(ctx_startinglist) == 0:
             starting_str = "Meowth! How can you start when there's no one waiting at this raid!?"
         await Meowth.send_message(ctx.message.channel, starting_str)

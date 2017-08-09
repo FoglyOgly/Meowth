@@ -77,6 +77,7 @@ unhere_id = "<:unhere:id>"
 
 # Emoji for Pokemon types.
 type_id_dict = {
+    'normal'   : "<:normal:id>",
     'fire'     : "<:fire1:id>",
     'water'    : "<:water:id>",
     'electric' : "<:electric:id>",
@@ -1015,7 +1016,7 @@ async def team(ctx):
     entered_team = ctx.message.content[6:].lower()
     role = discord.utils.get(ctx.message.server.roles, name=entered_team)
     for r in ctx.message.author.roles:
-        if r.id in roles:
+        if r.mention in roles:
             await Meowth.send_message(ctx.message.channel, "Meowth! You already have a team role!") #checks if user already has a team
             return
     if role is None or role.name not in list(team_dict.keys()):

@@ -1,6 +1,7 @@
 import discord
 import asyncio
 import re
+import pickle
 from discord.ext.commands import Bot
 import time
 from time import strftime
@@ -30,6 +31,9 @@ bot_token = "mytokenhere"
 # Used for Meowth's welcome message. New members are
 # directed check out this #channel first. Leave blank to omit
 welcome_channel = 'announcements'
+# Default channel for the server.
+# Leave blank to use Discord's buggy server.default_channel
+default_channel = 'general'
 
 # Used for Meowth's welcome message. New members are directed
 # to ask an @admin if they have questions. Leave blank to omit
@@ -1056,8 +1060,8 @@ async def on_member_join(member):
     server = member.server
     admin = discord.utils.get(server.roles, name=admin_role)
     announcements = discord.utils.get(server.channels, name=welcome_channel)
-    team_msg = " or ".join(["'!team {0}'".format(team) for team in team_dict.keys()])
     
+    # Build welcome message
     ann_message = " Then head over to {3.mention} to get caught up on what's happening!"
     admin_message = " If you have any questions just ask {4}."
     
@@ -1067,8 +1071,22 @@ async def on_member_join(member):
     if admin:
         message += admin_message
     
-    await Meowth.send_message(server, message.format(server, member, team_msg, announcements, get_admin_str(admin)))
+    # Figure out which channel to send the message to
+    
+    # If default channel is not configured in Meowth,
+    # AND Discord doesn't have it configured, give up and print a warning
+    default = discord.utils.get(server.channels, name=default_channel) or server.default_channel
+    if not default:
+        print("WARNING: no default channel configured. Unable to send welcome message.")
+    else:
+        await Meowth.send_message(default, message.format(server, member, team_msg, announcements, get_admin_str(admin)))
 
+
+"""
+
+Admin commands
+
+"""
 
 @Meowth.command(pass_context=True, hidden=True)
 async def welcome(ctx):
@@ -1086,6 +1104,54 @@ async def welcome(ctx):
     
     if member:
         await on_member_join(member)
+
+
+@Meowth.command(pass_context=True, hidden=True)
+async def save(ctx):
+    """Save persistent state to file.
+    
+    Usage: !save [filename]
+    File path is relative to current directory."""
+    member = ctx.message.author
+    space1 = ctx.message.content.find(" ")
+    if space1 == -1:
+        print("Needs filename!")
+    else:
+        try:
+            fd = open(ctx.message.content[6:], "wb")
+            pickle.dump(raidchannel_dict, fd)
+            fd.close()
+        except Exception as err:
+            print("Error occured while trying to write file!")
+            print(err)
+
+@Meowth.command(pass_context=True, hidden=True)
+async def load(ctx):
+    """Load persistent state from file.
+    
+    Usage: !load [filename]
+    File path is relative to current directory."""
+    global raidchannel_dict
+    
+    member = ctx.message.author
+    space1 = ctx.message.content.find(" ")
+    if space1 == -1:
+        print("Needs filename!")
+    else:
+        try:
+            fd = open(ctx.message.content[6:], "rb")
+            raidchannel_dict = pickle.load(fd)
+            fd.close()
+        except Exception as err:
+            print("Error occured while trying to read file!")
+            print(err)
+
+"""
+
+End admin commands
+
+"""
+
 
 @Meowth.command(pass_context = True)
 async def team(ctx):

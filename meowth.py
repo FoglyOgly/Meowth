@@ -44,11 +44,13 @@ yourstate = ""
 
 Define your server's special strings here.
 
-To use emoji, obtain the ID with \:emoji_name:
-and format the string as <emoji_name:id>
+To use emoji, use :emoji_name: in the string.
+Meowth will query the server's emoji list in order
+to send the correct emoji. If it doesn't find the emoji,
+it'll send the string through raw.
 
 The default values are custom emoji and will need to have
-their IDs changed to match your server.
+their names changed to match your server.
 
 You can also use plain strings, if you want.
 However, don't use strings that contains the bot's
@@ -56,34 +58,34 @@ command prefix (at the top of the file)
 
 """
 
-# Emoji for team assignments. If your roles have different names (e.g capitalized) then replace the dictionary keys
-team_dict = {"mystic": "<:mystic:id>", "valor": "<:valor:id>", "instinct": "<:instinct:id>"}
+# Emoji for team assignments
+team_dict = {"mystic": ":mystic:", "valor": ":valor:", "instinct": ":instinct:"}
 
 # Emoji for raid organization
-omw_id = "<:omw:id>"
-unomw_id = "<:unomw:id>"
-here_id = "<:here:id>"
-unhere_id = "<:unhere:id>"
+omw_id = ":omw:"
+unomw_id = ":unomw:"
+here_id = ":here:"
+unhere_id = ":unhere:"
 
 # Emoji for Pokemon types.
 type_id_dict = {
-    'fire'     : "<:fire1:id>",
-    'water'    : "<:water:id>",
-    'electric' : "<:electric:id>",
-    'grass'    : "<:grass:id>",
-    'ice'      : "<:ice:id>",
-    'fighting' : "<:fighting:id>",
-    'poison'   : "<:poison:id>",
-    'ground'   : "<:ground:id>",
-    'flying'   : "<:flying:id>",
-    'psychic'  : "<:psychic:id>",
-    'bug'      : "<:bug1:id>",
-    'rock'     : "<:rock:id>",
-    'ghost'    : "<:ghost1:id>",
-    'dragon'   : "<:dragon:id>",
-    'dark'     : "<:dark:id>",
-    'steel'    : "<:steel:id>",
-    'fairy'    : "<:fairy:id>"
+    'fire'     : ":fire1:",
+    'water'    : ":water:",
+    'electric' : ":electric:",
+    'grass'    : ":grass:",
+    'ice'      : ":ice:",
+    'fighting' : ":fighting:",
+    'poison'   : ":poison:",
+    'ground'   : ":ground:",
+    'flying'   : ":flying:",
+    'psychic'  : ":psychic:",
+    'bug'      : ":bug1:",
+    'rock'     : ":rock:",
+    'ghost'    : ":ghost1:",
+    'dragon'   : ":dragon:",
+    'dark'     : ":dark:",
+    'steel'    : ":steel:",
+    'fairy'    : ":fairy:"
 }
 
 """
@@ -982,7 +984,7 @@ def weakness_to_str(weak_list):
             x2 = "x2"
         
         # Append to string
-        ret += type_id_dict[weakness] + x2 + " "
+        ret += parse_emoji(server, type_id_dict[weakness]) + x2 + " "
     
     return ret
 
@@ -1003,6 +1005,18 @@ def sanitize_channel_name(name):
 # not defined, print the generic message "an admin"
 def get_admin_str(admin):
     return "a member of {0}".format(admin.mention) if admin else "an admin"
+
+# Given a string, if it fits the pattern :emoji name:,
+# and <emoji_name> is in the server's emoji list, then
+# return the string <:emoji name:emoji id>. Otherwise,
+# just return the string unmodified.
+def parse_emoji(server, emoji_string):
+    if emoji_string[0] == ':' and emoji_string[-1] == ':':
+        emoji = discord.utils.get(server.emojis, name=emoji_string.strip(':'))
+        if emoji:
+            emoji_string = "<:{0}:{1}>".format(emoji.name, emoji.id)
+    
+    return emoji_string
 
 """
 
@@ -1110,7 +1124,7 @@ async def team(ctx):
     else:
         try:
             await Meowth.add_roles(ctx.message.author, role)
-            await Meowth.send_message(ctx.message.channel, "Meowth! Added {0} to Team {1}! {2}".format(ctx.message.author.mention, role.name.capitalize(), team_dict[entered_team]))
+            await Meowth.send_message(ctx.message.channel, "Meowth! Added {0} to Team {1}! {2}".format(ctx.message.author.mention, role.name.capitalize(), parse_emoji(ctx.message.server, team_dict[entered_team])))
         except discord.Forbidden:
             await Meowth.send_message(ctx.message.channel, "Meowth! I can't add roles!")
 
@@ -1217,7 +1231,7 @@ async def raid(ctx):
             raid_embed.set_thumbnail(url=raid_img_url)
             await Meowth.send_message(ctx.message.channel, content = "Meowth! {0} raid reported by {1}! Details: {2}. Coordinate in {3}".format(raid.mention, ctx.message.author.mention, raid_details, raid_channel.mention),embed=raid_embed)
             await asyncio.sleep(1) #Wait for the channel to be created.
-            raidmsg = await Meowth.send_message(raid_channel, content = "Meowth! {0} raid reported by {1}! Details: {2}. Coordinate here! Reply (not react) to this message with {3} to say you are on your way, or {4} if you are at the raid already!".format(raid.mention, ctx.message.author.mention, raid_details, omw_id, here_id),embed=raid_embed)
+            await Meowth.send_message(raid_channel, content = "Meowth! {0} raid reported by {1}! Details: {2}. Coordinate here! Reply (not react) to this message with {3} to say you are on your way, or {4} if you are at the raid already!".format(raid.mention, ctx.message.author.mention, raid_details, parse_emoji(ctx.message.server, omw_id), parse_emoji(ctx.message.server, here_id)),embed=raid_embed)
             raidchannel_dict[raid_channel] = {
               'trainer_dict' : {},
               'exp' : "No expiration time set!"
@@ -1307,33 +1321,35 @@ changed to fit the emoji ids in your server."""
 async def on_message(message):
     if message.channel in raidchannel_dict:
         trainer_dict = raidchannel_dict[message.channel]['trainer_dict']
-        if message.content.startswith(omw_id):
+        omw_emoji = parse_emoji(message.server, omw_id)
+        if message.content.startswith(omw_emoji):
             # TODO: handle case where a user sends :omw:
             # after they've already sent :here:
-            await Meowth.send_message(message.channel, "Meowth! {0} is on the way with {1} trainers!".format(message.author.mention,message.content.count(omw_id)))
+            await Meowth.send_message(message.channel, "Meowth! {0} is on the way with {1} trainers!".format(message.author.mention,message.content.count(omw_emoji)))
             # Add trainer name to trainer list
             if message.author.mention not in trainer_dict:
                 trainer_dict[message.author.mention] = {}
             trainer_dict[message.author.mention]['status'] = "omw"
-            trainer_dict[message.author.mention]['count'] = message.content.count(omw_id)
+            trainer_dict[message.author.mention]['count'] = message.content.count(omw_emoji)
             return
         # TODO: there's no relation between the :here: count and the :omw: count.
         # For example, if a user is :omw: with 4, they have to send 4x :here:
         # or else they only count as 1 person waiting
-        if message.content.startswith(here_id):
-            await Meowth.send_message(message.channel, "Meowth! {0} is at the raid with {1} trainers!".format(message.author.mention, message.content.count(here_id)))
+        here_emoji = parse_emoji(message.server, here_id)
+        if message.content.startswith(here_emoji):
+            await Meowth.send_message(message.channel, "Meowth! {0} is at the raid with {1} trainers!".format(message.author.mention, message.content.count(here_emoji)))
             # Add trainer name to trainer list
             if message.author.mention not in raidchannel_dict[message.channel]['trainer_dict']:
                 trainer_dict[message.author.mention] = {}
             trainer_dict[message.author.mention]['status'] = "waiting"
-            trainer_dict[message.author.mention]['count'] = message.content.count(here_id)
+            trainer_dict[message.author.mention]['count'] = message.content.count(here_emoji)
             return
-        if message.content.startswith(unhere_id):
+        if message.content.startswith(parse_emoji(message.server, unhere_id)):
             if message.author.mention in trainer_dict and trainer_dict[message.author.mention]['status'] == "waiting":
                 await Meowth.send_message(message.channel, "Meowth! {0} and the trainers with them have left the raid!".format(message.author.mention))
                 del trainer_dict[message.author.mention]
             return
-        if message.content.startswith(unomw_id):
+        if message.content.startswith(parse_emoji(message.server, unomw_id)):
             if message.author.mention in trainer_dict and trainer_dict[message.author.mention]['status'] == "omw":
                 await Meowth.send_message(message.channel, "Meowth! {0} and the trainers with them are no longer on their way!".format(message.author.mention))
                 del trainer_dict[message.author.mention]
@@ -1355,7 +1371,7 @@ async def emoji_help(ctx):
         To specify you are in a group, copy the emoji once for each person in your group.
         This will remove you from the "omw" list.
     {3}: indicate you are leaving the raid location.
-        This will remove you and your group from the "waiting" list.```""".format(omw_id, unomw_id, here_id, unhere_id)
+        This will remove you and your group from the "waiting" list.```""".format(parse_emoji(message.server, omw_id), parse_emoji(message.server, unomw_id), parse_emoji(message.server, here_id), parse_emoji(message.server, unhere_id))
     await Meowth.send_message(ctx.message.channel, helpmsg)
 
 @Meowth.command(pass_context=True)
@@ -1426,7 +1442,7 @@ async def starting(ctx):
         for trainer in ctx_startinglist:
             del trainer_dict[trainer]
         
-        starting_str = "Meowth! The group that was waiting is starting the raid! Trainers {0}, please respond with {1} if you are waiting for another group!".format(", ".join(ctx_startinglist), here_id)
+        starting_str = "Meowth! The group that was waiting is starting the raid! Trainers {0}, please respond with {1} if you are waiting for another group!".format(", ".join(ctx_startinglist), parse_emoji(message.server, here_id))
         if len(ctx_startinglist) == 0:
             starting_str = "Meowth! How can you start when there's no one waiting at this raid!?"
         await Meowth.send_message(ctx.message.channel, starting_str)

@@ -30,7 +30,7 @@ bot_token = "mytokenhere"
 
 # Define Meowth's master (that's you).
 # Meowth will only take admin commands from this user
-master = "yourusername"
+master = "yourusername#yourid"
 
 # Used for Meowth's welcome message. New members are
 # directed check out this #channel first. Leave blank to omit
@@ -1027,6 +1027,15 @@ def parse_emoji(server, emoji_string):
     
     return emoji_string
 
+# Given a User, check that it is Meowth's master
+def check_master(user):
+    return str(user) == master
+
+# Given a violating message, raise an exception
+# reporting unauthorized use of admin commands
+def raise_admin_violation(message):
+    raise Exception("Received admin command {0} from unauthorized user {1}!".format(message.content, message.author))
+
 """
 
 ======================
@@ -1101,7 +1110,7 @@ async def welcome(ctx):
     Optionally takes an argument welcoming a specific user.
     If omitted, welcomes the message author."""
     member = ctx.message.author
-    if member.name == master:
+    if check_master(member):
         space1 = ctx.message.content.find(" ")
         if space1 != -1:
             member = discord.utils.get(ctx.message.server.members, name=ctx.message.content[9:])
@@ -1111,7 +1120,7 @@ async def welcome(ctx):
         if member:
             await on_member_join(member)
     else:
-        raise Exception("Received admin command {0} from unauthorized user {1}!".format(ctx.message.content, member.name))
+        raise_admin_violation(ctx.message)
 
 
 @Meowth.command(pass_context=True, hidden=True)
@@ -1121,7 +1130,7 @@ async def save(ctx):
     Usage: !save [filename]
     File path is relative to current directory."""
     member = ctx.message.author
-    if member.name == master:
+    if check_master(member):
         space1 = ctx.message.content.find(" ")
         if space1 == -1:
             print("Needs filename!")
@@ -1134,7 +1143,7 @@ async def save(ctx):
                 print("Error occured while trying to write file!")
                 print(err)
     else:
-        raise Exception("Received admin command {0} from unauthorized user {1}!".format(ctx.message.content, member.name))
+        raise_admin_violation(ctx.message)
 
 @Meowth.command(pass_context=True, hidden=True)
 async def load(ctx):
@@ -1145,7 +1154,7 @@ async def load(ctx):
     global raidchannel_dict
     
     member = ctx.message.author
-    if member.name == master:
+    if check_master(member):
         space1 = ctx.message.content.find(" ")
         if space1 == -1:
             print("Needs filename!")
@@ -1158,7 +1167,7 @@ async def load(ctx):
                 print("Error occured while trying to read file!")
                 print(err)
     else:
-        raise Exception("Received admin command {0} from unauthorized user {1}!".format(ctx.message.content, member.name))
+        raise_admin_violation(ctx.message)
 
 """
 

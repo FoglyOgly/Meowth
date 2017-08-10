@@ -28,6 +28,10 @@ Server information
 # This is found on the app page when you click to reveal the bot user's token
 bot_token = "mytokenhere"
 
+# Define Meowth's master (that's you).
+# Meowth will only take admin commands from this user
+master = "yourusername"
+
 # Used for Meowth's welcome message. New members are
 # directed check out this #channel first. Leave blank to omit
 welcome_channel = 'announcements'
@@ -1091,20 +1095,23 @@ Admin commands
 
 @Meowth.command(pass_context=True, hidden=True)
 async def welcome(ctx):
-    """Print the welcome message.
+    """Print the welcome message (used for testing).
     
     Usage: !welcome [user]
     Optionally takes an argument welcoming a specific user.
     If omitted, welcomes the message author."""
     member = ctx.message.author
-    space1 = ctx.message.content.find(" ")
-    if space1 != -1:
-        member = discord.utils.get(ctx.message.server.members, name=ctx.message.content[9:])
-        if not member:
-            await Meowth.send_message(ctx.message.channel, "Meowth! No member named \"{0}\"!".format(ctx.message.content[9:]))
-    
-    if member:
-        await on_member_join(member)
+    if member.name == master:
+        space1 = ctx.message.content.find(" ")
+        if space1 != -1:
+            member = discord.utils.get(ctx.message.server.members, name=ctx.message.content[9:])
+            if not member:
+                await Meowth.send_message(ctx.message.channel, "Meowth! No member named \"{0}\"!".format(ctx.message.content[9:]))
+        
+        if member:
+            await on_member_join(member)
+    else:
+        raise Exception("Received admin command {0} from unauthorized user {1}!".format(ctx.message.content, member.name))
 
 
 @Meowth.command(pass_context=True, hidden=True)
@@ -1114,17 +1121,20 @@ async def save(ctx):
     Usage: !save [filename]
     File path is relative to current directory."""
     member = ctx.message.author
-    space1 = ctx.message.content.find(" ")
-    if space1 == -1:
-        print("Needs filename!")
+    if member.name == master:
+        space1 = ctx.message.content.find(" ")
+        if space1 == -1:
+            print("Needs filename!")
+        else:
+            try:
+                fd = open(ctx.message.content[6:], "wb")
+                pickle.dump(raidchannel_dict, fd)
+                fd.close()
+            except Exception as err:
+                print("Error occured while trying to write file!")
+                print(err)
     else:
-        try:
-            fd = open(ctx.message.content[6:], "wb")
-            pickle.dump(raidchannel_dict, fd)
-            fd.close()
-        except Exception as err:
-            print("Error occured while trying to write file!")
-            print(err)
+        raise Exception("Received admin command {0} from unauthorized user {1}!".format(ctx.message.content, member.name))
 
 @Meowth.command(pass_context=True, hidden=True)
 async def load(ctx):
@@ -1135,17 +1145,20 @@ async def load(ctx):
     global raidchannel_dict
     
     member = ctx.message.author
-    space1 = ctx.message.content.find(" ")
-    if space1 == -1:
-        print("Needs filename!")
+    if member.name == master:
+        space1 = ctx.message.content.find(" ")
+        if space1 == -1:
+            print("Needs filename!")
+        else:
+            try:
+                fd = open(ctx.message.content[6:], "rb")
+                raidchannel_dict = pickle.load(fd)
+                fd.close()
+            except Exception as err:
+                print("Error occured while trying to read file!")
+                print(err)
     else:
-        try:
-            fd = open(ctx.message.content[6:], "rb")
-            raidchannel_dict = pickle.load(fd)
-            fd.close()
-        except Exception as err:
-            print("Error occured while trying to read file!")
-            print(err)
+        raise Exception("Received admin command {0} from unauthorized user {1}!".format(ctx.message.content, member.name))
 
 """
 

@@ -6,7 +6,7 @@ import re
 import json
 from collections import Counter
 
-with open("pkmn.json", "rb") as fd:
+with open("pkmn.json", "r") as fd:
     pokemon_list = json.load(fd)['pokemon_list']
 
 def words(text):

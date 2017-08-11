@@ -27,28 +27,24 @@ Press enter and select the server you want to add Meowth too.
 8. Run meowth.py from the command prompt or terminal window. If successful, it should print "Meowth! That's right!" to the 
 window and the bot should show up as online in Discord.
 
-9. All commands except !team should be working. The welcome message may or may not be working at this point. Google Maps links may not be that accurate yet. The raid commands will be using unwieldy default values like <:omw:id>
+9. All commands except !team should be working. The welcome message may or may not be working at this point. Google Maps links may not be that accurate yet. The raid commands will be using default values like :omw: which may not be configured on your server.
 
 ## Configure Meowth
 
-1. Open config.py in a text editor again. You'll need to make a few easy edits.
+1. Open config.py in a text editor. You'll need to make a few easy edits.
 
+2. **Enable the !team command.** If you haven't already, create a role for each team. Enter the role names in the team_dict on line 58. The team emoji are configured on this line as well (see step 5 and 6).
 
-2. **Enable the !team command.** If you haven't already, create a role for each team. Enter the role names in the team_dict on line 60. The team emoji are configured on this line as well (see step 5 and 6).
+3. **Enable the welcome message**. On lines 26, 30, and 34, configure the names of your server's @admin role, default channel, and #announcements/#welcome channel.
 
-
-3. **Enable the welcome message**. On lines 32 and 36, configure the names of your server's @admin role and #announcements or #welcome channel.
-
-4. **Enable Google Maps hints.** In lines 40 and 41, replace "yourtown" and "yourstate" with your community's location. This makes the Google Maps location links work a lot better.
+4. **Enable Google Maps hints.** In lines 38 and 39, replace "yourtown" and "yourstate" with your community's location. This makes the Google Maps location links work a lot better.
 
 5. **Upload emoji to server (optional).** If you're going to use the included emoji, upload the images in the folder as custom emoji for your server. There are 18 type icons, an omw emoji (car), an unomw emoji (car with
 a circle and a line through it), and here and unhere emoji (Go Plus), and an emoji for each of the three teams.
 
-6. **Configure raid command strings.** Replace the custom emoji with the strings
-that bots need to use the custom emoji. To find that string, in a Discord channel, type \:emoji_name: to get the string for 
-the an emoji. Then configure the emoji using the variables in lines 63-87. You'll have to do this for each of the 25 custom emoji. You can also just use plain strings if your emoji slots are already taken or if you just prefer it that way.
+6. **Configure raid command strings.** Using the variables in lines 61-85, customize the emoji messages to match the ones on your server. Meowth will attempt to look up the names in your server's emoji list. You'll have to do this for each of the 25 custom emoji. You can also just use plain strings if your emoji slots are already taken or if you just prefer it that way.
 
-7. Save config.py. Next time you run it, the changes will take effect.
+7. Save config.py. Next time you run Meowth, the changes will take effect.
 
 
 
@@ -69,9 +65,9 @@ Pokemon. The created raid channel will automatically delete in two hours.
 
 5. :omw:/:here: - in a raid channel, the custom emoji for omw and here tell Meowth that you are on your way to or at a raid.
 If you have multiple trainers with you, type another emoji for each additional trainer. Typing :here: also removes you from the
-on the way list. The exact phrases are configurable on lines 65-68.
+on the way list. The exact phrases are configurable on lines 53-56.
 
-6. :unomw:/:unhere: - in a raid channel, these custom emoji tell Meowth to remove you from the on the way or waiting lists. The exact phrases are configurable on lines 65-68.
+6. :unomw:/:unhere: - in a raid channel, these custom emoji tell Meowth to remove you from the on the way or waiting lists. The exact phrases are configurable on lines 53-56.
 
 7. !otw/!waiting - in a raid channel, these commands tell Meowth to list and mention the trainers who said they were on the way
 or at a raid. It also includes the total number.

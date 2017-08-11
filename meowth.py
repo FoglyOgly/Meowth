@@ -3,100 +3,12 @@ import asyncio
 import re
 from discord.ext.commands import Bot
 import time
+from config import *
 from time import strftime
 
 Meowth = Bot(command_prefix="!")
 
 
-"""
-
-======================
-
-Configuration
-
-======================
-
-"""
-
-"""
-
-Server information
-
-"""
-# Bot token ID, needed for authentication.
-# This is found on the app page when you click to reveal the bot user's token
-bot_token = "mytokenhere"
-
-# Used for Meowth's welcome message. New members are
-# directed check out this #channel first. Leave blank to omit
-welcome_channel = 'announcements'
-
-# Used for Meowth's welcome message. New members are directed
-# to ask an @admin if they have questions. Leave blank to omit
-admin_role = 'admin'
-
-# Your town and state. These are pasted
-# verbatim into the Google Maps query.
-yourtown = ""
-yourstate = ""
-
-"""
-
-Define your server's special strings here.
-
-To use emoji, use :emoji_name: in the string.
-Meowth will query the server's emoji list in order
-to send the correct emoji. If it doesn't find the emoji,
-it'll send the string through raw.
-
-The default values are custom emoji and will need to have
-their names changed to match your server.
-
-You can also use plain strings, if you want.
-However, don't use strings that contains the bot's
-command prefix (at the top of the file)
-
-"""
-
-# Emoji for team assignments
-team_dict = {"mystic": ":mystic:", "valor": ":valor:", "instinct": ":instinct:"}
-
-# Emoji for raid organization
-omw_id = ":omw:"
-unomw_id = ":unomw:"
-here_id = ":here:"
-unhere_id = ":unhere:"
-
-# Emoji for Pokemon types.
-type_id_dict = {
-    'fire'     : ":fire1:",
-    'water'    : ":water:",
-    'electric' : ":electric:",
-    'grass'    : ":grass:",
-    'ice'      : ":ice:",
-    'fighting' : ":fighting:",
-    'poison'   : ":poison:",
-    'ground'   : ":ground:",
-    'flying'   : ":flying:",
-    'psychic'  : ":psychic:",
-    'bug'      : ":bug1:",
-    'rock'     : ":rock:",
-    'ghost'    : ":ghost1:",
-    'dragon'   : ":dragon:",
-    'dark'     : ":dark:",
-    'steel'    : ":steel:",
-    'fairy'    : ":fairy:"
-}
-
-"""
-
-======================
-
-End configuration
-
-======================
-
-"""
 
 
 """
@@ -1056,7 +968,6 @@ async def on_member_join(member):
     server = member.server
     admin = discord.utils.get(server.roles, name=admin_role)
     announcements = discord.utils.get(server.channels, name=welcome_channel)
-    team_msg = " or ".join(["'!team {0}'".format(team) for team in team_dict.keys()])
     
     ann_message = " Then head over to {3.mention} to get caught up on what's happening!"
     admin_message = " If you have any questions just ask {4}."
@@ -1236,6 +1147,7 @@ async def raid(ctx):
               'trainer_dict' : {},
               'exp' : "No expiration time set!"
             }
+
                 
 """Deletes any raid channel that is created after two hours and removes corresponding entries in waiting, omw, and
 raidexpmsg lists.""" 
@@ -1393,8 +1305,12 @@ async def otw(ctx):
         # If at least 1 person is on the way,
         # add an extra message indicating who it is.
         otw_exstr = ""
+        otw_list = []
+        for trainer in trainer_dict.keys():
+            if trainer_dict[trainer]['status']=='omw':
+                otw_list.append(trainer)
         if ctx_omwcount > 0:
-            otw_exstr = " including {0} and the people with them! Be considerate and wait for them if possible".format(", ".join(trainer_dict.keys()))
+            otw_exstr = " including {0} and the people with them! Be considerate and wait for them if possible".format(", ".join(otw_list))
         await Meowth.send_message(ctx.message.channel, "Meowth! {0} on the way{1}!".format(str(ctx_omwcount), otw_exstr))
 
 @Meowth.command(pass_context=True)
@@ -1416,8 +1332,12 @@ async def waiting(ctx):
         # If at least 1 person is waiting,
         # add an extra message indicating who it is.
         waiting_exstr = ""
+        waiting_list = []
+        for trainer in trainer_dict.keys():
+            if trainer_dict[trainer]['status']=='waiting':
+                waiting_list.append(trainer)
         if ctx_waitingcount > 0:
-            waiting_exstr = " including {0} and the people with them! Be considerate and let them know if and when you'll be there".format(", ".join(trainer_dict.keys()))
+            waiting_exstr = " including {0} and the people with them! Be considerate and let them know if and when you'll be there".format(", ".join(waiting_list))
         await Meowth.send_message(ctx.message.channel, "Meowth! {0} waiting at the raid{1}!".format(str(ctx_waitingcount), waiting_exstr))
 
 @Meowth.command(pass_context=True)

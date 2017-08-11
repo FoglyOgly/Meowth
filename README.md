@@ -22,7 +22,7 @@ Press enter and select the server you want to add Meowth too.
 
 6. Give Meowth admin privileges.
 
-7. Go back to your app page in Discord and click to reveal the bot token, then copy it. Open meowth.py in a text editor.  Paste the bot token into line 28, replacing the "mytokenhere" string.
+7. Go back to your app page in Discord and click to reveal the bot token, then copy it. Open config.py in a text editor.  Paste the bot token into line 18, replacing the "mytokenhere" string.
 
 8. Run meowth.py from the command prompt or terminal window. If successful, it should print "Meowth! That's right!" to the 
 window and the bot should show up as online in Discord.
@@ -31,9 +31,11 @@ window and the bot should show up as online in Discord.
 
 ## Configure Meowth
 
-1. Open meowth.py in a text editor again. You'll need to make a few easy edits.
+1. Open config.py in a text editor. You'll need to make a few easy edits.
+
 
 2. **Enable the !team command.** If you haven't already, create a role for each team. Enter the role names in the team_dict on line 62. The team emoji are configured on this line as well (see step 5 and 6).
+
 
 3. **Enable the welcome message**. On lines 32 and 36, configure the names of your server's @admin role and #announcements or #welcome channel.
 
@@ -42,9 +44,9 @@ window and the bot should show up as online in Discord.
 5. **Upload emoji to server (optional).** If you're going to use the included emoji, upload the images in the folder as custom emoji for your server. There are 18 type icons, an omw emoji (car), an unomw emoji (car with
 a circle and a line through it), and here and unhere emoji (Go Plus), and an emoji for each of the three teams.
 
-6. **Configure raid command strings.** Using the variables in lines 65-88, customize the emoji messages to match the ones on your server. Meowth will attempt to look up the names in your server's emoji list. You'll have to do this for each of the 25 custom emoji. You can also just use plain strings if your emoji slots are already taken or if you just prefer it that way.
+6. **Configure raid command strings.** Using the variables in lines 63-87, customize the emoji messages to match the ones on your server. Meowth will attempt to look up the names in your server's emoji list. You'll have to do this for each of the 25 custom emoji. You can also just use plain strings if your emoji slots are already taken or if you just prefer it that way.
 
-7. Save meowth.py. Next time you run it, the changes will take effect.
+7. Save config.py. Next time you run Meowth, the changes will take effect.
 
 
 
@@ -67,7 +69,7 @@ Pokemon. The created raid channel will automatically delete in two hours.
 If you have multiple trainers with you, type another emoji for each additional trainer. Typing :here: also removes you from the
 on the way list. The exact phrases are configurable on lines 65-68.
 
-6. :unomw:/:unhere: - in a raid channel, these custom emoji tell Meowth to remove you from the on the way or waiting lists. The exact phrases are configurable on lines 64-67.
+6. :unomw:/:unhere: - in a raid channel, these custom emoji tell Meowth to remove you from the on the way or waiting lists. The exact phrases are configurable on lines 65-68.
 
 7. !otw/!waiting - in a raid channel, these commands tell Meowth to list and mention the trainers who said they were on the way
 or at a raid. It also includes the total number.

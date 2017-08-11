@@ -33,7 +33,9 @@ window and the bot should show up as online in Discord.
 
 1. Open config.py in a text editor again. You'll need to make a few easy edits.
 
-2. **Enable the !team command.** If you haven't already, create a role for each team. The role ids need to be copied and pasted to lines 25-27 of config.py.
+
+2. **Enable the !team command.** If you haven't already, create a role for each team. Enter the role names in the team_dict on line 60. The team emoji are configured on this line as well (see step 5 and 6).
+
 
 3. **Enable the welcome message**. On lines 32 and 36, configure the names of your server's @admin role and #announcements or #welcome channel.
 
@@ -44,8 +46,7 @@ a circle and a line through it), and here and unhere emoji (Go Plus), and an emo
 
 6. **Configure raid command strings.** Replace the custom emoji with the strings
 that bots need to use the custom emoji. To find that string, in a Discord channel, type \:emoji_name: to get the string for 
-the an emoji. Then configure the emoji using the variables in lines 60-86. You'll have to do this for 
-each of the 25 custom emoji. You can also just use plain strings if your emoji slots are already taken or if you just prefer it that way.
+the an emoji. Then configure the emoji using the variables in lines 63-87. You'll have to do this for each of the 25 custom emoji. You can also just use plain strings if your emoji slots are already taken or if you just prefer it that way.
 
 7. Save config.py. Next time you run it, the changes will take effect.
 

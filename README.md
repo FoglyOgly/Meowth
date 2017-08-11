@@ -33,7 +33,6 @@ window and the bot should show up as online in Discord.
 
 1. Open config.py in a text editor. You'll need to make a few easy edits.
 
-
 2. **Enable the !team command.** If you haven't already, create a role for each team. Enter the role names in the team_dict on line 58. The team emoji are configured on this line as well (see step 5 and 6).
 
 3. **Enable the welcome message**. On lines 26, 30, and 34, configure the names of your server's @admin role, default channel, and #announcements/#welcome channel.
@@ -66,9 +65,9 @@ Pokemon. The created raid channel will automatically delete in two hours.
 
 5. :omw:/:here: - in a raid channel, the custom emoji for omw and here tell Meowth that you are on your way to or at a raid.
 If you have multiple trainers with you, type another emoji for each additional trainer. Typing :here: also removes you from the
-on the way list. The exact phrases are configurable on lines 61-64.
+on the way list. The exact phrases are configurable on lines 53-56.
 
-6. :unomw:/:unhere: - in a raid channel, these custom emoji tell Meowth to remove you from the on the way or waiting lists. The exact phrases are configurable on lines 61-64.
+6. :unomw:/:unhere: - in a raid channel, these custom emoji tell Meowth to remove you from the on the way or waiting lists. The exact phrases are configurable on lines 53-56.
 
 7. !otw/!waiting - in a raid channel, these commands tell Meowth to list and mention the trainers who said they were on the way
 or at a raid. It also includes the total number.

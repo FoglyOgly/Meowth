@@ -17,16 +17,6 @@ Server information
 # This is found on the app page when you click to reveal the bot user's token
 bot_token = "mytokenhere"
 
-# IDs for team roles.
-# Find this ID information by doing \@role, which will
-# return a string like this: <@&123456789123456789>.
-# Just grab the numbers out of the string.
-roles = [
-    "mysticid",
-    "valorid",
-    "instinctid"
-]
-
 # Used for Meowth's welcome message. New members are
 # directed check out this #channel first.
 welcome_channel = 'announcements'

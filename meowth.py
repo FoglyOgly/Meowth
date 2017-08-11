@@ -13,7 +13,7 @@ import spelling
 Meowth = Bot(command_prefix="!")
 
 # Load configuration
-with open("config.json", "rb") as fd:
+with open("config.json", "r") as fd:
     config = json.load(fd)
     team_dict = config['team_dict']
     omw_id = config['omw_id']
@@ -22,7 +22,7 @@ with open("config.json", "rb") as fd:
     unhere_id = config['unhere_id']
 
 # Load Pokemon list and raid info
-with open("pkmn.json", "rb") as fd:
+with open("pkmn.json", "r") as fd:
     pkmn_info = json.load(fd)
     pokemon_list = pkmn_info['pokemon_list']
     raid_info = pkmn_info['raid_info']

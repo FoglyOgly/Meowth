@@ -57,34 +57,34 @@ command prefix (at the top of the file)
 """
 
 # Emoji for team assignments
-team_dict = {"mystic": "<:mystic:id>", "valor": "<:valor:id>", "instinct": "<:instinct:id>"}
+team_dict = {"mystic": ":mystic:", "valor": ":valor:", "instinct": ":instinct:"}
 
 # Emoji for raid organization
-omw_id = "<:omw:id>"
-unomw_id = "<:unomw:id>"
-here_id = "<:here:id>"
-unhere_id = "<:unhere:id>"
+omw_id = ":omw:"
+unomw_id = ":unomw:"
+here_id = ":here:"
+unhere_id = ":unhere:"
 
 # Emoji for Pokemon types.
 type_id_dict = {
-    'normal'   : "<:normal:id>",
-    'fire'     : "<:fire1:id>",
-    'water'    : "<:water:id>",
-    'electric' : "<:electric:id>",
-    'grass'    : "<:grass:id>",
-    'ice'      : "<:ice:id>",
-    'fighting' : "<:fighting:id>",
-    'poison'   : "<:poison:id>",
-    'ground'   : "<:ground:id>",
-    'flying'   : "<:flying:id>",
-    'psychic'  : "<:psychic:id>",
-    'bug'      : "<:bug1:id>",
-    'rock'     : "<:rock:id>",
-    'ghost'    : "<:ghost1:id>",
-    'dragon'   : "<:dragon:id>",
-    'dark'     : "<:dark:id>",
-    'steel'    : "<:steel:id>",
-    'fairy'    : "<:fairy:id>"
+    'normal'   : ":normal:",
+    'fire'     : ":fire1:",
+    'water'    : ":water:",
+    'electric' : ":electric:",
+    'grass'    : ":grass:",
+    'ice'      : ":ice:",
+    'fighting' : ":fighting:",
+    'poison'   : ":poison:",
+    'ground'   : ":ground:",
+    'flying'   : ":flying:",
+    'psychic'  : ":psychic:",
+    'bug'      : ":bug1:",
+    'rock'     : ":rock:",
+    'ghost'    : ":ghost1:",
+    'dragon'   : ":dragon:",
+    'dark'     : ":dark:",
+    'steel'    : ":steel:",
+    'fairy'    : ":fairy:"
 }
 
 """

@@ -22,7 +22,7 @@ Press enter and select the server you want to add Meowth too.
 
 6. Give Meowth admin privileges.
 
-7. Go back to your app page in Discord and click to reveal the bot token, then copy it. Open meowth.py in a text editor.  Paste the bot token into line 28, replacing the "mytokenhere" string.
+7. Go back to your app page in Discord and click to reveal the bot token, then copy it. Open config.py in a text editor.  Paste the bot token into line 18, replacing the "mytokenhere" string.
 
 8. Run meowth.py from the command prompt or terminal window. If successful, it should print "Meowth! That's right!" to the 
 window and the bot should show up as online in Discord.
@@ -31,9 +31,11 @@ window and the bot should show up as online in Discord.
 
 ## Configure Meowth
 
-1. Open meowth.py in a text editor again. You'll need to make a few easy edits.
+1. Open config.py in a text editor again. You'll need to make a few easy edits.
+
 
 2. **Enable the !team command.** If you haven't already, create a role for each team. Enter the role names in the team_dict on line 60. The team emoji are configured on this line as well (see step 5 and 6).
+
 
 3. **Enable the welcome message**. On lines 32 and 36, configure the names of your server's @admin role and #announcements or #welcome channel.
 
@@ -44,10 +46,9 @@ a circle and a line through it), and here and unhere emoji (Go Plus), and an emo
 
 6. **Configure raid command strings.** Replace the custom emoji with the strings
 that bots need to use the custom emoji. To find that string, in a Discord channel, type \:emoji_name: to get the string for 
-the an emoji. Then configure the emoji using the variables in lines 63-87. You'll have to do this for
-each of the 25 custom emoji. You can also just use plain strings if your emoji slots are already taken or if you just prefer it that way.
+the an emoji. Then configure the emoji using the variables in lines 63-87. You'll have to do this for each of the 25 custom emoji. You can also just use plain strings if your emoji slots are already taken or if you just prefer it that way.
 
-7. Save meowth.py. Next time you run it, the changes will take effect.
+7. Save config.py. Next time you run it, the changes will take effect.
 
 
 

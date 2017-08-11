@@ -4,108 +4,13 @@ import re
 import pickle
 from discord.ext.commands import Bot
 import time
+from config import *
 from time import strftime
 
 Meowth = Bot(command_prefix="!")
 
 
-"""
 
-======================
-
-Configuration
-
-======================
-
-"""
-
-"""
-
-Server information
-
-"""
-# Bot token ID, needed for authentication.
-# This is found on the app page when you click to reveal the bot user's token
-bot_token = "mytokenhere"
-
-# Define Meowth's master (that's you).
-# Meowth will only take admin commands from this user
-master = "yourusername#yourid"
-
-# Used for Meowth's welcome message. New members are
-# directed check out this #channel first. Leave blank to omit
-welcome_channel = 'announcements'
-# Default channel for the server.
-# Leave blank to use Discord's buggy server.default_channel
-default_channel = 'general'
-
-# Used for Meowth's welcome message. New members are directed
-# to ask an @admin if they have questions. Leave blank to omit
-admin_role = 'admin'
-
-# Your town and state. These are pasted
-# verbatim into the Google Maps query.
-yourtown = ""
-yourstate = ""
-
-"""
-
-Define your server's special strings here.
-
-To use emoji, use :emoji_name: in the string.
-Meowth will query the server's emoji list in order
-to send the correct emoji. If it doesn't find the emoji,
-it'll send the string through raw.
-
-The default values are custom emoji and will need to have
-their names changed to match your server.
-
-You can also use plain strings, if you want.
-However, don't use strings that contains the bot's
-command prefix (at the top of the file)
-
-"""
-
-# Emoji for team assignments
-team_dict = {"mystic": ":mystic:", "valor": ":valor:", "instinct": ":instinct:"}
-
-# Emoji for raid organization
-omw_id = ":omw:"
-unomw_id = ":unomw:"
-here_id = ":here:"
-unhere_id = ":unhere:"
-
-# Emoji for Pokemon types.
-type_id_dict = {
-    'normal'   : ":normal:",
-    'fire'     : ":fire1:",
-    'water'    : ":water:",
-    'electric' : ":electric:",
-    'grass'    : ":grass:",
-    'ice'      : ":ice:",
-    'fighting' : ":fighting:",
-    'poison'   : ":poison:",
-    'ground'   : ":ground:",
-    'flying'   : ":flying:",
-    'psychic'  : ":psychic:",
-    'bug'      : ":bug1:",
-    'rock'     : ":rock:",
-    'ghost'    : ":ghost1:",
-    'dragon'   : ":dragon:",
-    'dark'     : ":dark:",
-    'steel'    : ":steel:",
-    'fairy'    : ":fairy:"
-}
-
-"""
-
-======================
-
-End configuration
-
-======================
-
-"""
 
 
 """

@@ -100,6 +100,16 @@ def check_master(user):
 def raise_admin_violation(message):
     raise Exception("Received admin command {0} from unauthorized user {1}!".format(message.content, message.author))
 
+def spellcheck(word):
+    suggestion = spelling.correction(word)
+    
+    print(suggestion)
+    # If we have a spellcheck suggestion
+    if suggestion != word:
+        return "Meowth! \"{0}\" is not a Pokemon! Did you mean \"{1}\"?".format(word, spelling.correction(word))
+    else:
+        return "Meowth! \"{0}\" is not a Pokemon! Check your spelling!".format(word)
+
 """
 
 ======================
@@ -295,8 +305,7 @@ async def want(ctx):
     
     entered_want = ctx.message.content[6:].lower()
     if entered_want not in pokemon_list:
-        await Meowth.send_message(ctx.message.channel, "did you mean {0}".format(spelling.correction(word)))
-        await Meowth.send_message(ctx.message.channel, "Meowth! \"{0}\" is not a Pokemon! Check your spelling!".format(entered_want))
+        await Meowth.send_message(ctx.message.channel, spellcheck(entered_want))
         return
     else:
         role = discord.utils.get(ctx.message.server.roles, name=entered_want)
@@ -333,7 +342,7 @@ async def wild(ctx):
         wild_details = ctx.message.content[space1:]
         wild_gmaps_link = create_gmaps_query(wild_details)
         if entered_wild not in pokemon_list:
-            await Meowth.send_message(ctx.message.channel, "Meowth! \"{0}\" is not a Pokemon! Check your spelling!".format(entered_wild))
+            await Meowth.send_message(ctx.message.channel, spellcheck(entered_wild))
             return
         else:
             wild = discord.utils.get(ctx.message.server.roles, name = entered_wild)
@@ -365,7 +374,7 @@ async def raid(ctx):
         raid_details = ctx.message.content[space1:]
         raid_gmaps_link = create_gmaps_query(raid_details)
         if entered_raid not in pokemon_list:
-            await Meowth.send_message(ctx.message.channel, "Meowth! \"{0}\" is not a Pokemon! Check your spelling!".format(entered_raid))
+            await Meowth.send_message(ctx.message.channel, spellcheck(entered_raid))
             return
         if entered_raid not in list(raid_info.keys()) and entered_raid in pokemon_list:
             await Meowth.send_message(ctx.message.channel, "Meowth! The Pokemon {0} does not appear in raids!".format(entered_raid.capitalize()))
@@ -411,7 +420,7 @@ async def unwant(ctx):
     entered_unwant = ctx.message.content[8:].lower()
     role = discord.utils.get(ctx.message.server.roles, name=entered_unwant)
     if entered_unwant not in pokemon_list:
-        await Meowth.send_message(ctx.message.channel, "Meowth! \"{0}\" is not a Pokemon! Check your spelling!".format(entered_unwant))
+        await Meowth.send_message(ctx.message.channel, spellcheck(entered_unwant))
         return
     else:
         # Create role if it doesn't exist yet

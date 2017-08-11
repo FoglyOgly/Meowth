@@ -17,19 +17,17 @@ Server information
 # This is found on the app page when you click to reveal the bot user's token
 bot_token = "mytokenhere"
 
-# IDs for team roles.
-# Find this ID information by doing \@role, which will
-# return a string like this: <@&123456789123456789>.
-# Just grab the numbers out of the string.
-roles = [
-    "mysticid",
-    "valorid",
-    "instinctid"
-]
+# Define Meowth's master (that's you).
+# Meowth will only take admin commands from this user
+master = "yourusername#yourid"
 
 # Used for Meowth's welcome message. New members are
 # directed check out this #channel first.
 welcome_channel = 'announcements'
+
+# Default channel for the server.
+# Leave blank to use Discord's buggy server.default_channel
+default_channel = 'general'
 
 # Used for Meowth's welcome message. New members are
 # directed to ask an @admin if they have questions

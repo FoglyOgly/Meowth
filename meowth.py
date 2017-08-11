@@ -103,7 +103,6 @@ def raise_admin_violation(message):
 def spellcheck(word):
     suggestion = spelling.correction(word)
     
-    print(suggestion)
     # If we have a spellcheck suggestion
     if suggestion != word:
         return "Meowth! \"{0}\" is not a Pokemon! Did you mean \"{1}\"?".format(word, spelling.correction(word))

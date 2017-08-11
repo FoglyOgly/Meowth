@@ -1,12 +1,14 @@
 import discord
 import asyncio
 import re
+import pickle
 from discord.ext.commands import Bot
 import time
 from config import *
 from time import strftime
 
 Meowth = Bot(command_prefix="!")
+
 
 
 
@@ -930,6 +932,15 @@ def parse_emoji(server, emoji_string):
     
     return emoji_string
 
+# Given a User, check that it is Meowth's master
+def check_master(user):
+    return str(user) == master
+
+# Given a violating message, raise an exception
+# reporting unauthorized use of admin commands
+def raise_admin_violation(message):
+    raise Exception("Received admin command {0} from unauthorized user {1}!".format(message.content, message.author))
+
 """
 
 ======================
@@ -969,6 +980,7 @@ async def on_member_join(member):
     admin = discord.utils.get(server.roles, name=admin_role)
     announcements = discord.utils.get(server.channels, name=welcome_channel)
     
+    # Build welcome message
     ann_message = " Then head over to {3.mention} to get caught up on what's happening!"
     admin_message = " If you have any questions just ask {4}."
     
@@ -978,25 +990,96 @@ async def on_member_join(member):
     if admin:
         message += admin_message
     
-    await Meowth.send_message(server, message.format(server, member, team_msg, announcements, get_admin_str(admin)))
+    # Figure out which channel to send the message to
+    
+    # If default channel is not configured in Meowth,
+    # AND Discord doesn't have it configured, give up and print a warning
+    default = discord.utils.get(server.channels, name=default_channel) or server.default_channel
+    if not default:
+        print("WARNING: no default channel configured. Unable to send welcome message.")
+    else:
+        await Meowth.send_message(default, message.format(server, member, team_msg, announcements, get_admin_str(admin)))
 
+
+"""
+
+Admin commands
+
+"""
 
 @Meowth.command(pass_context=True, hidden=True)
 async def welcome(ctx):
-    """Print the welcome message.
+    """Print the welcome message (used for testing).
     
     Usage: !welcome [user]
     Optionally takes an argument welcoming a specific user.
     If omitted, welcomes the message author."""
     member = ctx.message.author
-    space1 = ctx.message.content.find(" ")
-    if space1 != -1:
-        member = discord.utils.get(ctx.message.server.members, name=ctx.message.content[9:])
-        if not member:
-            await Meowth.send_message(ctx.message.channel, "Meowth! No member named \"{0}\"!".format(ctx.message.content[9:]))
+    if check_master(member):
+        space1 = ctx.message.content.find(" ")
+        if space1 != -1:
+            member = discord.utils.get(ctx.message.server.members, name=ctx.message.content[9:])
+            if not member:
+                await Meowth.send_message(ctx.message.channel, "Meowth! No member named \"{0}\"!".format(ctx.message.content[9:]))
+        
+        if member:
+            await on_member_join(member)
+    else:
+        raise_admin_violation(ctx.message)
+
+
+@Meowth.command(pass_context=True, hidden=True)
+async def save(ctx):
+    """Save persistent state to file.
     
-    if member:
-        await on_member_join(member)
+    Usage: !save [filename]
+    File path is relative to current directory."""
+    member = ctx.message.author
+    if check_master(member):
+        space1 = ctx.message.content.find(" ")
+        if space1 == -1:
+            print("Needs filename!")
+        else:
+            try:
+                fd = open(ctx.message.content[6:], "wb")
+                pickle.dump(raidchannel_dict, fd)
+                fd.close()
+            except Exception as err:
+                print("Error occured while trying to write file!")
+                print(err)
+    else:
+        raise_admin_violation(ctx.message)
+
+@Meowth.command(pass_context=True, hidden=True)
+async def load(ctx):
+    """Load persistent state from file.
+    
+    Usage: !load [filename]
+    File path is relative to current directory."""
+    global raidchannel_dict
+    
+    member = ctx.message.author
+    if check_master(member):
+        space1 = ctx.message.content.find(" ")
+        if space1 == -1:
+            print("Needs filename!")
+        else:
+            try:
+                fd = open(ctx.message.content[6:], "rb")
+                raidchannel_dict = pickle.load(fd)
+                fd.close()
+            except Exception as err:
+                print("Error occured while trying to read file!")
+                print(err)
+    else:
+        raise_admin_violation(ctx.message)
+
+"""
+
+End admin commands
+
+"""
+
 
 @Meowth.command(pass_context = True)
 async def team(ctx):
@@ -1283,7 +1366,7 @@ async def emoji_help(ctx):
         To specify you are in a group, copy the emoji once for each person in your group.
         This will remove you from the "omw" list.
     {3}: indicate you are leaving the raid location.
-        This will remove you and your group from the "waiting" list.```""".format(parse_emoji(message.server, omw_id), parse_emoji(message.server, unomw_id), parse_emoji(message.server, here_id), parse_emoji(message.server, unhere_id))
+        This will remove you and your group from the "waiting" list.```""".format(parse_emoji(ctx.message.server, omw_id), parse_emoji(ctx.message.server, unomw_id), parse_emoji(ctx.message.server, here_id), parse_emoji(ctx.message.server, unhere_id))
     await Meowth.send_message(ctx.message.channel, helpmsg)
 
 @Meowth.command(pass_context=True)
@@ -1362,7 +1445,7 @@ async def starting(ctx):
         for trainer in ctx_startinglist:
             del trainer_dict[trainer]
         
-        starting_str = "Meowth! The group that was waiting is starting the raid! Trainers {0}, please respond with {1} if you are waiting for another group!".format(", ".join(ctx_startinglist), parse_emoji(message.server, here_id))
+        starting_str = "Meowth! The group that was waiting is starting the raid! Trainers {0}, please respond with {1} if you are waiting for another group!".format(", ".join(ctx_startinglist), parse_emoji(ctx.message.server, here_id))
         if len(ctx_startinglist) == 0:
             starting_str = "Meowth! How can you start when there's no one waiting at this raid!?"
         await Meowth.send_message(ctx.message.channel, starting_str)

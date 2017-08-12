@@ -12,20 +12,22 @@ import spelling
 
 Meowth = Bot(command_prefix="!")
 
-# Load configuration
-with open("config.json", "r") as fd:
-    config = json.load(fd)
-    team_dict = config['team_dict']
-    omw_id = config['omw_id']
-    unomw_id = config['unomw_id']
-    here_id = config['here_id']
-    unhere_id = config['unhere_id']
+config = {}
+pkmn_info = {}
 
-# Load Pokemon list and raid info
-with open("pkmn.json", "r") as fd:
-    pkmn_info = json.load(fd)
-    pokemon_list = pkmn_info['pokemon_list']
-    raid_info = pkmn_info['raid_info']
+def load_config():
+    global config
+    global pkmn_info
+    
+    # Load configuration
+    with open("config.json", "r") as fd:
+        config = json.load(fd)
+    
+    # Load Pokemon list and raid info
+    with open("pkmn.json", "r") as fd:
+        pkmn_info = json.load(fd)
+
+load_config()
 
 
 """
@@ -85,6 +87,19 @@ def parse_emoji(server, emoji_string):
     
     return emoji_string
 
+def print_emoji_name(server, emoji_string):
+    # By default, just print the emoji_string
+    ret = "`" + emoji_string + "`"
+    
+    emoji = parse_emoji(server, emoji_string)
+    # If the string was transformed by the parse_emoji
+    # call, then it really was an emoji and we should
+    # add the raw string so people know what to write.
+    if emoji != emoji_string:
+        ret = emoji + " (`" + emoji_string + "`)"
+    
+    return ret
+
 # Given an arbitrary string, create a Google Maps
 # query using the configured hints
 def create_gmaps_query(details):
@@ -133,7 +148,7 @@ The trainer_dict contains "trainer" elements, which have the following fields:
 
 raidchannel_dict = {}
 
-team_msg = " or ".join(["'!team {0}'".format(team) for team in team_dict.keys()])
+team_msg = " or ".join(["'!team {0}'".format(team) for team in config['team_dict'].keys()])
 
 @Meowth.event
 async def on_ready():
@@ -242,6 +257,18 @@ async def load(ctx):
     else:
         raise_admin_violation(ctx.message)
 
+@Meowth.command(pass_context=True, hidden=True)
+async def configure(ctx):
+    """Load persistent state from file.
+    
+    Usage: !load [filename]
+    File path is relative to current directory."""
+    member = ctx.message.author
+    if check_master(member):
+        load_config()
+    else:
+        raise_admin_violation(ctx.message)
+
 """
 
 End admin commands
@@ -263,7 +290,7 @@ async def team(ctx):
     # Check if user already belongs to a team role by
     # getting the role objects of all teams in team_dict and
     # checking if the message author has any of them.
-    for team in team_dict.keys():
+    for team in config['team_dict'].keys():
         temp_role = discord.utils.get(ctx.message.server.roles, name=team)
         # If the role is valid,
         if temp_role:
@@ -276,7 +303,7 @@ async def team(ctx):
         else:
             print("WARNING: Role {0} in team_dict not configured as a role on the server!".format(team))
     # Check if team is one of the three defined in the team_dict
-    if entered_team not in list(team_dict.keys()):
+    if entered_team not in list(config['team_dict'].keys()):
         await Meowth.send_message(ctx.message.channel, "Meowth! \"{0}\" isn't a valid team! Try {1}".format(entered_team, team_msg))
         return
     # Check if the role is configured on the server
@@ -286,7 +313,7 @@ async def team(ctx):
     else:
         try:
             await Meowth.add_roles(ctx.message.author, role)
-            await Meowth.send_message(ctx.message.channel, "Meowth! Added {0} to Team {1}! {2}".format(ctx.message.author.mention, role.name.capitalize(), parse_emoji(ctx.message.server, team_dict[entered_team])))
+            await Meowth.send_message(ctx.message.channel, "Meowth! Added {0} to Team {1}! {2}".format(ctx.message.author.mention, role.name.capitalize(), parse_emoji(ctx.message.server, config['team_dict'][entered_team])))
         except discord.Forbidden:
             await Meowth.send_message(ctx.message.channel, "Meowth! I can't add roles!")
 
@@ -303,7 +330,7 @@ async def want(ctx):
     assigning it to the user."""
     
     entered_want = ctx.message.content[6:].lower()
-    if entered_want not in pokemon_list:
+    if entered_want not in pkmn_info['pokemon_list']:
         await Meowth.send_message(ctx.message.channel, spellcheck(entered_want))
         return
     else:
@@ -319,7 +346,7 @@ async def want(ctx):
             await Meowth.send_message(ctx.message.channel, content="Meowth! {0}, I already know you want {1}!".format(ctx.message.author.mention, entered_want.capitalize()))
         else:
             await Meowth.add_roles(ctx.message.author, role)
-            want_number = pokemon_list.index(entered_want) + 1
+            want_number = pkmn_info['pokemon_list'].index(entered_want) + 1
             want_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(want_number)) #This part embeds the sprite
             want_embed = discord.Embed(colour=discord.Colour(0x2ecc71))
             want_embed.set_thumbnail(url=want_img_url)
@@ -340,7 +367,7 @@ async def wild(ctx):
         entered_wild = ctx.message.content[6:space1].lower()
         wild_details = ctx.message.content[space1:]
         wild_gmaps_link = create_gmaps_query(wild_details)
-        if entered_wild not in pokemon_list:
+        if entered_wild not in pkmn_info['pokemon_list']:
             await Meowth.send_message(ctx.message.channel, spellcheck(entered_wild))
             return
         else:
@@ -348,7 +375,7 @@ async def wild(ctx):
             if wild is None:
                 wild = await Meowth.create_role(server = ctx.message.server, name = entered_wild, hoist = False, mentionable = True)
                 await asyncio.sleep(0.5)
-            wild_number = pokemon_list.index(entered_wild) + 1
+            wild_number = pkmn_info['pokemon_list'].index(entered_wild) + 1
             wild_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(wild_number))
             wild_embed = discord.Embed(title="Meowth! Click here for directions to the wild {0}!".format(entered_wild.capitalize()),url=wild_gmaps_link,description="This is just my best guess!",colour=discord.Colour(0x2ecc71))
             wild_embed.set_thumbnail(url=wild_img_url)
@@ -364,37 +391,59 @@ async def raid(ctx):
     Meowth's message will also include the type weaknesses of the boss.
     
     Finally, Meowth will create a separate channel for the raid report, for the purposes of organizing the raid."""
+    
+    if 'raid_channels' in config and ctx.message.channel.name not in config['raid_channels']:
+        abc = []
+        for channel in config['raid_channels']:
+            ch = discord.utils.get(ctx.message.server.channels, name = channel)
+            if ch and ch.permissions_for(ctx.message.author).read_messages:
+                abc.append(ch.mention)
+        await Meowth.send_message(ctx.message.channel, """Meowth! Please confine raid reports to one of these channels:
+    {0}""".format(", ".join(abc)))
+        return
+    
     space1 = ctx.message.content.find(" ",6)
     if space1 == -1:
         await Meowth.send_message(ctx.message.channel, "Meowth! Give more details when reporting! Usage: !raid <pokemon name> <location>")
         return
+    
+    entered_raid = ctx.message.content[6:space1].lower()
+    raid_details = ctx.message.content[space1:]
+    raid_gmaps_link = create_gmaps_query(raid_details)
+    if entered_raid not in pkmn_info['pokemon_list']:
+        await Meowth.send_message(ctx.message.channel, spellcheck(entered_raid))
+        return
+    if entered_raid not in list(pkmn_info['raid_info'].keys()) and entered_raid in pkmn_info['pokemon_list']:
+        await Meowth.send_message(ctx.message.channel, "Meowth! The Pokemon {0} does not appear in raids!".format(entered_raid.capitalize()))
+        return
     else:
-        entered_raid = ctx.message.content[6:space1].lower()
-        raid_details = ctx.message.content[space1:]
-        raid_gmaps_link = create_gmaps_query(raid_details)
-        if entered_raid not in pokemon_list:
-            await Meowth.send_message(ctx.message.channel, spellcheck(entered_raid))
-            return
-        if entered_raid not in list(raid_info.keys()) and entered_raid in pokemon_list:
-            await Meowth.send_message(ctx.message.channel, "Meowth! The Pokemon {0} does not appear in raids!".format(entered_raid.capitalize()))
-            return
-        else:
-            raid_channel_name = entered_raid + sanitize_channel_name(raid_details)
-            raid_channel = await Meowth.create_channel(ctx.message.server, raid_channel_name)
-            raid = discord.utils.get(ctx.message.server.roles, name = entered_raid)
-            if raid is None:
-                raid = await Meowth.create_role(server = ctx.message.server, name = entered_raid, hoist = False, mentionable = True)
-                await asyncio.sleep(0.5)
-            raid_number = pokemon_list.index(entered_raid) + 1
-            raid_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(raid_number))
-            raid_embed = discord.Embed(title="Meowth! Click here for directions to the raid!",url=raid_gmaps_link,description="Weaknesses: {0}".format(weakness_to_str(ctx.message.server, raid_info[entered_raid])),colour=discord.Colour(0x2ecc71))
-            raid_embed.set_thumbnail(url=raid_img_url)
-            await Meowth.send_message(ctx.message.channel, content = "Meowth! {0} raid reported by {1}! Details: {2}. Coordinate in {3}".format(raid.mention, ctx.message.author.mention, raid_details, raid_channel.mention),embed=raid_embed)
-            await asyncio.sleep(1) #Wait for the channel to be created.
-            await Meowth.send_message(raid_channel, content = "Meowth! {0} raid reported by {1}! Details: {2}. Coordinate here! Reply (not react) to this message with {3} to say you are on your way, or {4} if you are at the raid already!".format(raid.mention, ctx.message.author.mention, raid_details, parse_emoji(ctx.message.server, omw_id), parse_emoji(ctx.message.server, here_id)),embed=raid_embed)
-            raidchannel_dict[raid_channel] = {
-              'trainer_dict' : {},
-              'exp' : "No expiration time set!"
+        raid_channel_name = entered_raid + sanitize_channel_name(raid_details)
+        raid_channel = await Meowth.create_channel(ctx.message.server, raid_channel_name, *ctx.message.channel.overwrites)
+        raid = discord.utils.get(ctx.message.server.roles, name = entered_raid)
+        if raid is None:
+            raid = await Meowth.create_role(server = ctx.message.server, name = entered_raid, hoist = False, mentionable = True)
+            await asyncio.sleep(0.5)
+        raid_number = pkmn_info['pokemon_list'].index(entered_raid) + 1
+        raid_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(raid_number))
+        raid_embed = discord.Embed(title="Meowth! Click here for directions to the raid!",url=raid_gmaps_link,description="Weaknesses: {0}".format(weakness_to_str(ctx.message.server, pkmn_info['raid_info'][entered_raid])),colour=discord.Colour(0x2ecc71))
+        raid_embed.set_thumbnail(url=raid_img_url)
+        await Meowth.send_message(ctx.message.channel, content = "Meowth! {0} raid reported by {1}! Details: {2}. Coordinate in {3}".format(raid.mention, ctx.message.author.mention, raid_details, raid_channel.mention),embed=raid_embed)
+        await asyncio.sleep(1) #Wait for the channel to be created.
+            
+        raidmsg = """Meowth! {0} raid reported by {1}! Details: {2}. Coordinate here!
+
+Reply (not react) to this message with {3} to say you are on your way, or {4} if you are at the raid already!
+If your plans change, reply with {5} if you are no longer on the way, or {6} if you left the raid.
+
+To see a list of trainers on their way use !otw. To see a list of trainers at the raid use !waiting.
+Be sure to set the time left on the raid using !timerset H:MM so others can check it with !timer.
+Once you start a raid, use !starting to clear the waiting list.
+
+This channel will be deleted in 2 hours.""".format(raid.mention, ctx.message.author.mention, raid_details, print_emoji_name(ctx.message.server, config['omw_id']), print_emoji_name(ctx.message.server, config['here_id']), print_emoji_name(ctx.message.server, config['unomw_id']), print_emoji_name(ctx.message.server, config['unhere_id']))
+        await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)
+        raidchannel_dict[raid_channel] = {
+          'trainer_dict' : {},
+          'exp' : "No expiration time set!"
             }
 
                 
@@ -418,7 +467,7 @@ async def unwant(ctx):
     the server role for the Pokemon species."""
     entered_unwant = ctx.message.content[8:].lower()
     role = discord.utils.get(ctx.message.server.roles, name=entered_unwant)
-    if entered_unwant not in pokemon_list:
+    if entered_unwant not in pkmn_info['pokemon_list']:
         await Meowth.send_message(ctx.message.channel, spellcheck(entered_unwant))
         return
     else:
@@ -433,7 +482,7 @@ async def unwant(ctx):
             await Meowth.send_message(ctx.message.channel, content="Meowth! {0}, I already know you don't want {1}!".format(ctx.message.author.mention, entered_unwant.capitalize()))
         else:
             await Meowth.remove_roles(ctx.message.author, role)
-            unwant_number = pokemon_list.index(entered_unwant) + 1
+            unwant_number = pkmn_info['pokemon_list'].index(entered_unwant) + 1
             unwant_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(unwant_number))
             unwant_embed = discord.Embed(colour=discord.Colour(0x2ecc71))
             unwant_embed.set_thumbnail(url=unwant_img_url)
@@ -482,7 +531,7 @@ changed to fit the emoji ids in your server."""
 async def on_message(message):
     if message.channel in raidchannel_dict:
         trainer_dict = raidchannel_dict[message.channel]['trainer_dict']
-        omw_emoji = parse_emoji(message.server, omw_id)
+        omw_emoji = parse_emoji(message.server, config['omw_id'])
         if message.content.startswith(omw_emoji):
             # TODO: handle case where a user sends :omw:
             # after they've already sent :here:
@@ -496,7 +545,7 @@ async def on_message(message):
         # TODO: there's no relation between the :here: count and the :omw: count.
         # For example, if a user is :omw: with 4, they have to send 4x :here:
         # or else they only count as 1 person waiting
-        here_emoji = parse_emoji(message.server, here_id)
+        here_emoji = parse_emoji(message.server, config['here_id'])
         if message.content.startswith(here_emoji):
             await Meowth.send_message(message.channel, "Meowth! {0} is at the raid with {1} trainers!".format(message.author.mention, message.content.count(here_emoji)))
             # Add trainer name to trainer list
@@ -505,12 +554,12 @@ async def on_message(message):
             trainer_dict[message.author.mention]['status'] = "waiting"
             trainer_dict[message.author.mention]['count'] = message.content.count(here_emoji)
             return
-        if message.content.startswith(parse_emoji(message.server, unhere_id)):
+        if message.content.startswith(parse_emoji(message.server, config['unhere_id'])):
             if message.author.mention in trainer_dict and trainer_dict[message.author.mention]['status'] == "waiting":
                 await Meowth.send_message(message.channel, "Meowth! {0} and the trainers with them have left the raid!".format(message.author.mention))
                 del trainer_dict[message.author.mention]
             return
-        if message.content.startswith(parse_emoji(message.server, unomw_id)):
+        if message.content.startswith(parse_emoji(message.server, config['unomw_id'])):
             if message.author.mention in trainer_dict and trainer_dict[message.author.mention]['status'] == "omw":
                 await Meowth.send_message(message.channel, "Meowth! {0} and the trainers with them are no longer on their way!".format(message.author.mention))
                 del trainer_dict[message.author.mention]
@@ -532,7 +581,7 @@ async def emoji_help(ctx):
         To specify you are in a group, copy the emoji once for each person in your group.
         This will remove you from the "omw" list.
     {3}: indicate you are leaving the raid location.
-        This will remove you and your group from the "waiting" list.```""".format(parse_emoji(ctx.message.server, omw_id), parse_emoji(ctx.message.server, unomw_id), parse_emoji(ctx.message.server, here_id), parse_emoji(ctx.message.server, unhere_id))
+        This will remove you and your group from the "waiting" list.```""".format(config['omw_id'], config['unomw_id'], config['here_id'], config['unhere_id'])
     await Meowth.send_message(ctx.message.channel, helpmsg)
 
 @Meowth.command(pass_context=True)
@@ -611,7 +660,7 @@ async def starting(ctx):
         for trainer in ctx_startinglist:
             del trainer_dict[trainer]
         
-        starting_str = "Meowth! The group that was waiting is starting the raid! Trainers {0}, please respond with {1} if you are waiting for another group!".format(", ".join(ctx_startinglist), parse_emoji(ctx.message.server, here_id))
+        starting_str = "Meowth! The group that was waiting is starting the raid! Trainers {0}, please respond with {1} if you are waiting for another group!".format(", ".join(ctx_startinglist), parse_emoji(ctx.message.server, config['here_id']))
         if len(ctx_startinglist) == 0:
             starting_str = "Meowth! How can you start when there's no one waiting at this raid!?"
         await Meowth.send_message(ctx.message.channel, starting_str)

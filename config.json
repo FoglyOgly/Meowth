@@ -4,6 +4,10 @@
 
 "//": "Server information",
 
+"//": "Language you want for Meowth.",
+"//": "fr, en",
+"language": "en",
+
 "//": "Bot token ID, needed for authentication.",
 "//": "This is found on the app page when you click to reveal the bot user's token",
 "bot_token": "mytokenhere",

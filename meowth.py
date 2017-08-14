@@ -457,7 +457,7 @@ async def raid(ctx):
     if entered_raid not in pkmn_info['pokemon_list']:
         await Meowth.send_message(ctx.message.channel, spellcheck(entered_raid))
         return
-    if entered_raid not in pkmn_info['raid_info'] and entered_raid in pkmn_info['pokemon_list']:
+    if entered_raid not in pkmn_info['raid_list'] and entered_raid in pkmn_info['pokemon_list']:
         await Meowth.send_message(ctx.message.channel, "Meowth! The Pokemon {0} does not appear in raids!".format(entered_raid.capitalize()))
         return
     else:

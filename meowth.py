@@ -14,10 +14,14 @@ Meowth = Bot(command_prefix="!")
 
 config = {}
 pkmn_info = {}
+type_chart = {}
+type_list = []
 
 def load_config():
     global config
     global pkmn_info
+    global type_chart
+    global type_list
     
     # Load configuration
     with open("config.json", "r") as fd:
@@ -26,6 +30,12 @@ def load_config():
     # Load Pokemon list and raid info
     with open("pkmn.json", "r") as fd:
         pkmn_info = json.load(fd)
+    
+    # Load type information
+    with open("type_chart.json", "r") as fd:
+        type_chart = json.load(fd)
+    with open("type_list.json", "r") as fd:
+        type_list = json.load(fd)
 
 load_config()
 
@@ -39,6 +49,40 @@ Helper functions
 ======================
 
 """
+
+# Given a Pokemon name, return a list of its
+# weaknesses as defined in the type chart
+def get_weaknesses(species):
+    # Get the Pokemon's number
+    number = pkmn_info['pokemon_list'].index(species)
+    # Look up its type
+    pk_type = type_list[number]
+    
+    # Calculate sum of its weaknesses
+    # and resistances.
+    # -2 == immune
+    # -1 == NVE
+    #  0 == neutral
+    #  1 == SE
+    #  2 == double SE
+    type_eff = {}
+    for type in pk_type:
+        for atk_type in type_chart[type]:
+            if atk_type not in type_eff:
+                type_eff[atk_type] = 0
+            type_eff[atk_type] += type_chart[type][atk_type]
+    
+    # Summarize into a list of weaknesses,
+    # sorting double weaknesses to the front and marking them with 'x2'.
+    ret = []
+    for type, effectiveness in sorted(type_eff.items(), key=lambda x: x[1], reverse=True):
+        if effectiveness == 1:
+            ret.append(type.lower())
+        elif effectiveness == 2:
+            ret.append(type.lower() + "x2")
+    
+    return ret
+
 
 # Given a list of weaknesses, return a
 # space-separated string of their type IDs,
@@ -413,7 +457,7 @@ async def raid(ctx):
     if entered_raid not in pkmn_info['pokemon_list']:
         await Meowth.send_message(ctx.message.channel, spellcheck(entered_raid))
         return
-    if entered_raid not in list(pkmn_info['raid_info'].keys()) and entered_raid in pkmn_info['pokemon_list']:
+    if entered_raid not in pkmn_info['raid_info'] and entered_raid in pkmn_info['pokemon_list']:
         await Meowth.send_message(ctx.message.channel, "Meowth! The Pokemon {0} does not appear in raids!".format(entered_raid.capitalize()))
         return
     else:
@@ -425,7 +469,7 @@ async def raid(ctx):
             await asyncio.sleep(0.5)
         raid_number = pkmn_info['pokemon_list'].index(entered_raid) + 1
         raid_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(raid_number))
-        raid_embed = discord.Embed(title="Meowth! Click here for directions to the raid!",url=raid_gmaps_link,description="Weaknesses: {0}".format(weakness_to_str(ctx.message.server, pkmn_info['raid_info'][entered_raid])),colour=discord.Colour(0x2ecc71))
+        raid_embed = discord.Embed(title="Meowth! Click here for directions to the raid!",url=raid_gmaps_link,description="Weaknesses: {0}".format(weakness_to_str(ctx.message.server, get_weaknesses(entered_raid))),colour=discord.Colour(0x2ecc71))
         raid_embed.set_thumbnail(url=raid_img_url)
         await Meowth.send_message(ctx.message.channel, content = "Meowth! {0} raid reported by {1}! Details: {2}. Coordinate in {3}".format(raid.mention, ctx.message.author.mention, raid_details, raid_channel.mention),embed=raid_embed)
         await asyncio.sleep(1) #Wait for the channel to be created.

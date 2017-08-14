@@ -7,7 +7,6 @@ from discord.ext.commands import Bot
 import time
 from time import strftime
 
-# from config import *
 import spelling
 
 Meowth = Bot(command_prefix="!")
@@ -168,6 +167,41 @@ def spellcheck(word):
     else:
         return "Meowth! \"{0}\" is not a Pokemon! Check your spelling!".format(word)
 
+# Coroutine for deleting channels.
+# Waits 5 minutes, then deletes the channel
+async def delete_channel(channel):
+    # If the channel exists, get ready to delete it.
+    # Otherwise, just clean up the dict since someone
+    # else deleted the actual channel at some point.
+    if discord.utils.get(channel.server.channels, id=channel.id):
+        await Meowth.send_message(channel, "This channel timer has expired! The channel will be deleted in 5 minutes.")
+        await asyncio.sleep(300)
+        # If the channel has already been deleted from the dict, someone
+        # else got to it before us, so don't do anything.
+        # Also, if the channel got reactivated, don't do anything either.
+        if raidchannel_dict[channel] and not raidchannel_dict[channel]['active']:
+            del raidchannel_dict[channel]
+            # Check one last time to make sure the channel exists
+            if discord.utils.get(channel.server.channels, id=channel.id):
+                await Meowth.delete_channel(channel)
+    else:
+        del raidchannel_dict[channel]
+
+# Periodic callback.
+# Loop through all channels--if any are found
+# to have the timer expired, mark them for deletion
+async def channel_cleanup():
+    while True:
+        deleted_channels = []
+        print (raidchannel_dict)
+        
+        for channel in raidchannel_dict:
+            if raidchannel_dict[channel]['active'] and raidchannel_dict[channel]['exp'] <= time.localtime(time.time()):
+                loop.create_task(delete_channel(channel))
+                raidchannel_dict[channel]['active'] = False
+        
+        await asyncio.sleep(60)
+
 """
 
 ======================
@@ -183,7 +217,8 @@ End helper functions
 Meowth tracks raiding commands through the raidchannel_dict.
 Each channel contains the following fields:
 'trainer_dict' : a dictionary of all trainers interested in the raid.
-'exp'          : a message indicating the expiry time of the raid.
+'exp'          : an instance of time.struct_time tracking when the raid ends.
+'active'       : a Boolean indicating whether the raid is still active.
 
 The trainer_dict contains "trainer" elements, which have the following fields:
 'status' : a string indicating either "omw" or "waiting"
@@ -191,6 +226,14 @@ The trainer_dict contains "trainer" elements, which have the following fields:
 """
 
 raidchannel_dict = {}
+
+# Create a channel cleanup loop which runs every minute
+loop = asyncio.get_event_loop()
+loop.create_task(channel_cleanup())
+
+@Meowth.command(pass_context=True, hidden=True)
+async def schedule(ctx):
+    await channel_cleanup()
 
 team_msg = " or ".join(["'!team {0}'".format(team) for team in config['team_dict'].keys()])
 
@@ -485,21 +528,13 @@ Once you start a raid, use !starting to clear the waiting list.
 
 This channel will be deleted in 2 hours.""".format(raid.mention, ctx.message.author.mention, raid_details, print_emoji_name(ctx.message.server, config['omw_id']), print_emoji_name(ctx.message.server, config['here_id']), print_emoji_name(ctx.message.server, config['unomw_id']), print_emoji_name(ctx.message.server, config['unhere_id']))
         await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)
+        
         raidchannel_dict[raid_channel] = {
           'trainer_dict' : {},
-          'exp' : "No expiration time set!"
-            }
+          'exp' : time.localtime(time.time() + 2 * 60 * 60), # Two hours from now
+          'active' : True
+        }
 
-                
-"""Deletes any raid channel that is created after two hours and removes corresponding entries in waiting, omw, and
-raidexpmsg lists.""" 
-@Meowth.event
-async def on_channel_create(channel):
-    await asyncio.sleep(7200)
-    if channel in raidchannel_dict:
-        del raidchannel_dict[channel]
-        await Meowth.delete_channel(channel)
-    
 @Meowth.command(pass_context=True)
 async def unwant(ctx):
     """A command for removing the a !want for a Pokemon.
@@ -532,6 +567,10 @@ async def unwant(ctx):
             unwant_embed.set_thumbnail(url=unwant_img_url)
             await Meowth.send_message(ctx.message.channel, content="Meowth! Got it! {0} no longer wants {1}".format(ctx.message.author.mention, entered_unwant.capitalize()),embed=unwant_embed)
 
+# Print raid timer
+async def print_raid_timer(channel):
+    await Meowth.send_message(channel, "Meowth! This raid will end at {0}!".format(strftime("%I:%M", raidchannel_dict[channel]['exp'])))
+
 @Meowth.command(pass_context = True)
 async def timerset(ctx):
     """Set the remaining duration on a raid.
@@ -552,11 +591,15 @@ async def timerset(ctx):
         expire = ticks + s
         localexpire = time.localtime(expire)
         
+        # Update timestamp
+        raidchannel_dict[ctx.message.channel]['exp'] = localexpire
+        if not raidchannel_dict[ctx.message.channel]['active']:
+            await Meowth.send_message(ctx.message.channel, "The channel has been reactivated.")
+        raidchannel_dict[ctx.message.channel]['active'] = True
         # Send message
-        expmsg = "Meowth! This raid will end at {0}!".format(strftime("%I:%M", localexpire))
-        await Meowth.send_message(ctx.message.channel, expmsg)
-        # Save message for later !timer inquiries
-        raidchannel_dict[ctx.message.channel]['exp'] = expmsg
+        await print_raid_timer(ctx.message.channel)
+        # Trigger channel cleanup
+        await channel_cleanup()
         
 @Meowth.command(pass_context=True)
 async def timer(ctx):
@@ -565,7 +608,8 @@ async def timer(ctx):
     Usage: !timer
     The expiry time should have been previously set with !timerset."""
     if ctx.message.channel in raidchannel_dict:
-        await Meowth.send_message(ctx.message.channel, raidchannel_dict[ctx.message.channel]['exp'])
+        # await Meowth.send_message(ctx.message.channel, "Meowth! This raid will end at {0}!".format(strftime("%I:%M", raidchannel_dict[ctx.message.channel]['exp'])))
+        await print_raid_timer(ctx.message.channel)
 
 """Meowth watches for messages that start with the omw, here, unomw, unhere emoji. For omw and here, Meowth
 counts the number of emoji and adds that user and the number to the omw and waiting lists. For unomw and unhere,

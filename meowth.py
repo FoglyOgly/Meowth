@@ -1,13 +1,14 @@
-import discord
+import os
 import asyncio
 import re
 import pickle
 import json
-from discord.ext.commands import Bot
 import time
 from time import strftime
 
-# from config import *
+import discord
+from discord.ext.commands import Bot
+
 import spelling
 
 Meowth = Bot(command_prefix="!")
@@ -17,6 +18,11 @@ pkmn_info = {}
 type_chart = {}
 type_list = []
 
+# Append path of this script to the path of
+# config files which we're loading.
+# Assumes that config files will always live in the same directory.
+script_path = os.path.dirname(os.path.realpath(__file__))
+
 def load_config():
     global config
     global pkmn_info
@@ -24,17 +30,17 @@ def load_config():
     global type_list
     
     # Load configuration
-    with open("config.json", "r") as fd:
+    with open(os.path.join(script_path, "config.json"), "r") as fd:
         config = json.load(fd)
     
     # Load Pokemon list and raid info
-    with open("pkmn.json", "r") as fd:
+    with open(os.path.join(script_path, "pkmn.json"), "r") as fd:
         pkmn_info = json.load(fd)
     
     # Load type information
-    with open("type_chart.json", "r") as fd:
+    with open(os.path.join(script_path, "type_chart.json"), "r") as fd:
         type_chart = json.load(fd)
-    with open("type_list.json", "r") as fd:
+    with open(os.path.join(script_path, "type_list.json"), "r") as fd:
         type_list = json.load(fd)
 
 load_config()
@@ -267,12 +273,14 @@ async def save(ctx):
         if space1 == -1:
             print("Needs filename!")
         else:
+            filename = ctx.message.content[6:]
             try:
                 fd = open(ctx.message.content[6:], "wb")
                 pickle.dump(raidchannel_dict, fd)
                 fd.close()
+                print("Successfully saved state to {0}!".format(filename))
             except Exception as err:
-                print("Error occured while trying to write file!")
+                print("Error occured while trying to write file {0}!".format(filename))
                 print(err)
     else:
         raise_admin_violation(ctx.message)
@@ -291,12 +299,14 @@ async def load(ctx):
         if space1 == -1:
             print("Needs filename!")
         else:
+            filename = ctx.message.content[6:]
             try:
                 fd = open(ctx.message.content[6:], "rb")
                 raidchannel_dict = pickle.load(fd)
                 fd.close()
+                print("Successfully loaded state from {0}!".format(filename))
             except Exception as err:
-                print("Error occured while trying to read file!")
+                print("Error occured while trying to read file {0}!".format(filename))
                 print(err)
     else:
         raise_admin_violation(ctx.message)

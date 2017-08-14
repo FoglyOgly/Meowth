@@ -2,11 +2,17 @@
 # http://norvig.com/spell-correct.html,
 # with the English-language dictionary replaced by the Pokemon name list
 
+import os
 import re
 import json
 from collections import Counter
 
-with open("pkmn.json", "r") as fd:
+# Append path of this script to the path of
+# config files which we're loading.
+# Assumes that config files will always live in the same directory.
+script_path = os.path.dirname(os.path.realpath(__file__))
+
+with open(os.path.join(script_path, "pkmn.json"), "r") as fd:
     pokemon_list = json.load(fd)['pokemon_list']
 
 def words(text):

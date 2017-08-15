@@ -5,8 +5,19 @@
 import re
 import json
 from collections import Counter
+import gettext
 
-with open("pkmn.json", "r") as fd:
+config = {}
+with open("config.json","r") as fd:
+    config = json.load(fd)
+
+language = gettext.translation('meowth', localedir='locale', languages=[config['language']])
+language.install()
+
+pokemon_path_source = "locale/{0}/pkmn.json".format(config['language'])
+
+
+with open(pokemon_path_source, "r") as fd:
     pokemon_list = json.load(fd)['pokemon_list']
 
 def words(text):

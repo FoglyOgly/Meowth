@@ -15,14 +15,13 @@ import gettext
 
 
 # Set up message catalog access
-language = gettext.translation('meowth', localedir='locale', languages=[config['language']])
-language.install()
+
 
 Meowth = Bot(command_prefix="!")
 
 
 
-pokemon_path_source = "locale/{0}/pkmn.json".format(language)
+
 
 
 config = {}
@@ -39,6 +38,10 @@ def load_config():
     # Load configuration
     with open("config.json", "r") as fd:
         config = json.load(fd)
+
+    language = gettext.translation('meowth', localedir='locale', languages=[config['language']])
+    language.install()
+    pokemon_path_source = "locale/{0}/pkmn.json".format(config['language'])
     
     # Load Pokemon list and raid info
     with open(pokemon_path_source, "r") as fd:

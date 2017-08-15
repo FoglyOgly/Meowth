@@ -12,12 +12,6 @@ import spelling
 
 import gettext
 
-# Set up message catalog access
-language = gettext.translation('meowth', localedir='locale', languages=['fr'])
-language.install()
-
-Meowth = Bot(command_prefix="!")
-
 # Load configuration
 with open("config.json", "r") as fd:
     config = json.load(fd)
@@ -27,6 +21,14 @@ with open("config.json", "r") as fd:
     here_id = config['here_id']
     unhere_id = config['unhere_id']
     language = config['language']
+
+# Set up message catalog access
+language = gettext.translation('meowth', localedir='locale', languages=[config['language']])
+language.install()
+
+Meowth = Bot(command_prefix="!")
+
+
 
 pokemon_path_source = "locale/{0}/pkmn.json".format(language)
 

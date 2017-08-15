@@ -5,6 +5,7 @@
 import os
 import re
 from collections import Counter
+import gettext
 
 WORDS = None
 N = None

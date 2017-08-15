@@ -1,0 +1,257 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-08-13 00:31+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: meowth.py:77
+#, python-brace-format
+msgid "a member of {0}"
+msgstr ""
+
+#: meowth.py:77
+msgid "an admin"
+msgstr ""
+
+#: meowth.py:104
+#, python-brace-format
+msgid "Received admin command {0} from unauthorized user {1}!"
+msgstr ""
+
+#: meowth.py:111
+#, python-brace-format
+msgid "Meowth! \"{0}\" is not a Pokemon! Did you mean \"{1}\"?"
+msgstr ""
+
+#: meowth.py:113
+#, python-brace-format
+msgid "Meowth! \"{0}\" is not a Pokemon! Check your spelling!"
+msgstr ""
+
+#: meowth.py:139
+msgid " or "
+msgstr ""
+
+#: meowth.py:143
+msgid "Meowth! That's right!"
+msgstr ""
+
+#: meowth.py:155
+#, python-brace-format
+msgid " Then head over to {3.mention} to get caught up on what's happening!"
+msgstr ""
+
+#: meowth.py:156
+#, python-brace-format
+msgid " If you have any questions just ask {4}."
+msgstr ""
+
+#: meowth.py:158
+#, python-brace-format
+msgid ""
+"Meowth! Welcome to {0.name}, {1.mention}! Set your team by typing {2} "
+"without quotations."
+msgstr ""
+
+#: meowth.py:170
+msgid "WARNING: no default channel configured. Unable to send welcome message."
+msgstr ""
+
+#: meowth.py:194
+#, python-brace-format
+msgid "Meowth! No member named \"{0}\"!"
+msgstr ""
+
+#: meowth.py:212 meowth.py:236
+msgid "Needs filename!"
+msgstr ""
+
+#: meowth.py:219
+msgid "Error occured while trying to write file!"
+msgstr ""
+
+#: meowth.py:243
+msgid "Error occured while trying to read file!"
+msgstr ""
+
+#: meowth.py:276
+msgid "Meowth! You already have a team role!"
+msgstr ""
+
+#: meowth.py:280
+#, python-brace-format
+msgid "WARNING: Role {0} in team_dict not configured as a role on the server!"
+msgstr ""
+
+#: meowth.py:283
+#, python-brace-format
+msgid "Meowth! \"{0}\" isn't a valid team! Try {1}"
+msgstr ""
+
+#: meowth.py:288
+#, python-brace-format
+msgid "Meowth! The \"{0}\" role isn't configured on this server! Contact {1}!"
+msgstr ""
+
+#: meowth.py:292
+#, python-brace-format
+msgid "Meowth! Added {0} to Team {1}! {2}"
+msgstr ""
+
+#: meowth.py:294
+msgid "Meowth! I can't add roles!"
+msgstr ""
+
+#: meowth.py:322
+#, python-brace-format
+msgid "Meowth! {0}, I already know you want {1}!"
+msgstr ""
+
+#: meowth.py:329
+#, python-brace-format
+msgid "Meowth! Got it! {0} wants {1}"
+msgstr ""
+
+#: meowth.py:340
+msgid ""
+"Meowth! Give more details when reporting! Usage: !wild <pokemon name> "
+"<location>"
+msgstr ""
+
+#: meowth.py:356
+#, python-brace-format
+msgid "Meowth! Click here for directions to the wild {0}!"
+msgstr ""
+
+#: meowth.py:356
+msgid "This is just my best guess!"
+msgstr ""
+
+#: meowth.py:358
+#, python-brace-format
+msgid "Meowth! Wild {0} reported by {1}! Details: {2}"
+msgstr ""
+
+#: meowth.py:372
+msgid ""
+"Meowth! Give more details when reporting! Usage: !raid <pokemon name> "
+"<location>"
+msgstr ""
+
+#: meowth.py:382
+#, python-brace-format
+msgid "Meowth! The Pokemon {0} does not appear in raids!"
+msgstr ""
+
+#: meowth.py:393
+msgid "Meowth! Click here for directions to the raid!"
+msgstr ""
+
+#: meowth.py:393
+#, python-brace-format
+msgid "Weaknesses: {0}"
+msgstr ""
+
+#: meowth.py:395
+#, python-brace-format
+msgid "Meowth! {0} raid reported by {1}! Details: {2}. Coordinate in {3}"
+msgstr ""
+
+#: meowth.py:397
+#, python-brace-format
+msgid ""
+"Meowth! {0} raid reported by {1}! Details: {2}. Coordinate here! Reply (not "
+"react) to this message with {3} to say you are on your way, or {4} if you "
+"are at the raid already!"
+msgstr ""
+
+#: meowth.py:400
+msgid "No expiration time set!"
+msgstr ""
+
+#: meowth.py:436
+#, python-brace-format
+msgid "Meowth! {0}, I already know you don't want {1}!"
+msgstr ""
+
+#: meowth.py:443
+#, python-brace-format
+msgid "Meowth! Got it! {0} no longer wants {1}"
+msgstr ""
+
+#: meowth.py:460
+msgid "Meowth...I couldn't understand your time format..."
+msgstr ""
+
+#: meowth.py:466
+#, python-brace-format
+msgid "Meowth! This raid will end at {0}!"
+msgstr ""
+
+#: meowth.py:492
+#, python-brace-format
+msgid "Meowth! {0} is on the way with {1} trainers!"
+msgstr ""
+
+#: meowth.py:504
+#, python-brace-format
+msgid "Meowth! {0} is at the raid with {1} trainers!"
+msgstr ""
+
+#: meowth.py:513
+#, python-brace-format
+msgid "Meowth! {0} and the trainers with them have left the raid!"
+msgstr ""
+
+#: meowth.py:518
+#, python-brace-format
+msgid "Meowth! {0} and the trainers with them are no longer on their way!"
+msgstr ""
+
+#: meowth.py:565
+#, python-brace-format
+msgid ""
+" including {0} and the people with them! Be considerate and wait for them if "
+"possible"
+msgstr ""
+
+#: meowth.py:566
+#, python-brace-format
+msgid "Meowth! {0} on the way{1}!"
+msgstr ""
+
+#: meowth.py:592
+#, python-brace-format
+msgid ""
+" including {0} and the people with them! Be considerate and let them know if "
+"and when you'll be there"
+msgstr ""
+
+#: meowth.py:593
+#, python-brace-format
+msgid "Meowth! {0} waiting at the raid{1}!"
+msgstr ""
+
+#: meowth.py:617
+#, python-brace-format
+msgid ""
+"Meowth! The group that was waiting is starting the raid! Trainers {0}, "
+"please respond with {1} if you are waiting for another group!"
+msgstr ""
+
+#: meowth.py:619
+msgid "Meowth! How can you start when there's no one waiting at this raid!?"
+msgstr ""

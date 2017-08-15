@@ -1,32 +1,33 @@
 # Sourced from
-# http://norvig.com/spell-correct.html,
-# with the English-language dictionary replaced by the Pokemon name list
+# http://norvig.com/spell-correct.html
+# Use set_dictionary to set the dictionary of words
 
 import os
 import re
-import json
 from collections import Counter
 
-# Append path of this script to the path of
-# config files which we're loading.
-# Assumes that config files will always live in the same directory.
-script_path = os.path.dirname(os.path.realpath(__file__))
+WORDS = None
+N = None
 
-with open(os.path.join(script_path, "pkmn.json"), "r") as fd:
-    pokemon_list = json.load(fd)['pokemon_list']
+def set_dictionary(word_list):
+    global WORDS
+    global N
+    WORDS = Counter(word_list)
+    N=sum(WORDS.values())
+
 
 def words(text):
     return re.findall(r'\w+', text.lower())
 
-# NOTE: Since we're only correcting spelling of Pokemon,
-# our dictionary is just the list of Pokemon
-WORDS = Counter(pokemon_list)
-
-def P(word, N=sum(WORDS.values())): 
+    
+def P(word):
     "Probability of `word`."
+    if not N:
+        return 0
+    
     return WORDS[word] / N
 
-def correction(word): 
+def correction(word):
     "Most probable spelling correction for word."
     return max(candidates(word), key=P)
 
@@ -34,8 +35,11 @@ def candidates(word):
     "Generate possible spelling corrections for word."
     return (known([word]) or known(edits1(word)) or known(edits2(word)) or [word])
 
-def known(words): 
+def known(words):
     "The subset of `words` that appear in the dictionary of WORDS."
+    if not WORDS:
+        return None
+    
     return set(w for w in words if w in WORDS)
 
 def edits1(word):

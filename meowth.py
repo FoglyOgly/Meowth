@@ -42,6 +42,8 @@ def load_config():
         type_chart = json.load(fd)
     with open(os.path.join(script_path, "type_list.json"), "r") as fd:
         type_list = json.load(fd)
+    
+    spelling.set_dictionary(pkmn_info['pokemon_list'])
 
 load_config()
 

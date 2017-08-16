@@ -201,7 +201,9 @@ Meowth tracks raiding commands through the raidchannel_dict.
 Each channel contains the following fields:
 'trainer_dict' : a dictionary of all trainers interested in the raid.
 'exp'          : a message indicating the expiry time of the raid.
-
+'end'          : ending/auto-deletion time, defaults to 30 mins form room 
+                 creation. Updated by the timerset command
+                 
 The trainer_dict contains "trainer" elements, which have the following fields:
 'status' : a string indicating either "omw" or "waiting"
 'count'  : the number of trainers in the party
@@ -503,22 +505,30 @@ To see a list of trainers on their way use !otw. To see a list of trainers at th
 Be sure to set the time left on the raid using !timerset H:MM so others can check it with !timer.
 Once you start a raid, use !starting to clear the waiting list.
 
-This channel will be deleted in 2 hours.""".format(raid.mention, ctx.message.author.mention, raid_details, print_emoji_name(ctx.message.server, config['omw_id']), print_emoji_name(ctx.message.server, config['here_id']), print_emoji_name(ctx.message.server, config['unomw_id']), print_emoji_name(ctx.message.server, config['unhere_id']))
+This channel will be deleted in 30 minutes if no timer is set!""".format(raid.mention, ctx.message.author.mention, raid_details, print_emoji_name(ctx.message.server, config['omw_id']), print_emoji_name(ctx.message.server, config['here_id']), print_emoji_name(ctx.message.server, config['unomw_id']), print_emoji_name(ctx.message.server, config['unhere_id']))
         await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)
         raidchannel_dict[raid_channel] = {
           'trainer_dict' : {},
-          'exp' : "No expiration time set!"
+          'exp' : "No expiration time set!",
+          'end' : time.time()
             }
 
                 
-"""Deletes any raid channel that is created after two hours and removes corresponding entries in waiting, omw, and
+"""Deletes any raid channel that is created after 30 mins if no timer is set and removes corresponding entries in waiting, omw, and
 raidexpmsg lists.""" 
 @Meowth.event
 async def on_channel_create(channel):
-    await asyncio.sleep(7200)
-    if channel in raidchannel_dict:
+    await asyncio.sleep(1800)
+    if (channel in raidchannel_dict) and (raidchannel_dict[channel]["end"] < time.time()):
         del raidchannel_dict[channel]
         await Meowth.delete_channel(channel)
+    else:
+        while raidchannel_dict[channel]["end"] > time.time(): 
+            wait_time = raidchannel_dict[channel]["end"] - time.time()
+            await asyncio.sleep(wait_time)
+        del raidchannel_dict[channel]
+        await Meowth.delete_channel(channel) 
+
     
 @Meowth.command(pass_context=True)
 async def unwant(ctx):
@@ -577,6 +587,7 @@ async def timerset(ctx):
         await Meowth.send_message(ctx.message.channel, expmsg)
         # Save message for later !timer inquiries
         raidchannel_dict[ctx.message.channel]['exp'] = expmsg
+        raidchannel_dict[ctx.message.channel]["end"] = expire
         
 @Meowth.command(pass_context=True)
 async def timer(ctx):

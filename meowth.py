@@ -648,7 +648,7 @@ async def on_message(message):
         # or else they only count as 1 person waiting
         here_emoji = parse_emoji(message.server, config['here_id'])
         if message.content.startswith(here_emoji):
-            await _coming(message, message.content.count(here_emoji))
+            await _here(message, message.content.count(here_emoji))
             return
         if message.content.startswith(parse_emoji(message.server, config['unhere_id'])):
             if message.author.mention in trainer_dict and trainer_dict[message.author.mention]['status'] == "waiting":
@@ -669,7 +669,12 @@ async def coming(ctx):
     count = 1
     space1 = ctx.message.content.find(" ")
     if space1 != -1:
-        count = ctx.message.content[8:].lower()
+        try:
+            arg = ctx.message.content[8:]
+            count = int(arg)
+        except ValueError:
+            await Meowth.send_message(ctx.message.channel, _("Meowth! \"{0}\" is not a number! Usage: !coming [count]").format(arg))
+            return
     
     await _coming(ctx.message, count)
 
@@ -678,11 +683,12 @@ async def here(ctx):
     """Indicate you have arrived at the raid.
     
     Usage: !here [count]
-    Works only in raid channels. If *count* is omitted, and
+    Works only in raid channels. If count is omitted, and
     you have previous issued !coming, then preserves the count
     from that command. Otherwise, assumes you are a group of 1."""
     trainer_dict = raidchannel_dict[ctx.message.channel]['trainer_dict']
     
+    count = 1
     space1 = ctx.message.content.find(" ")
     if space1 == -1:
         if ctx.message.author.mention in trainer_dict:
@@ -690,7 +696,12 @@ async def here(ctx):
         else:
             count = 1
     else:
-        count = ctx.message.content[6:].lower()
+        try:
+            arg = ctx.message.content[6:]
+            count = int(arg)
+        except ValueError:
+            await Meowth.send_message(ctx.message.channel, _("Meowth! \"{0}\" is not a number! Usage: !here [count]").format(arg))
+            return
     await _here(ctx.message, count)
 
 @Meowth.command(pass_context=True)

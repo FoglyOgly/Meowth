@@ -146,7 +146,7 @@ def parse_emoji(server, emoji_string):
         if emoji:
             emoji_string = "<:{0}:{1}>".format(emoji.name, emoji.id)
     
-    return emoji_string
+    return emoji_string.lower()
 
 def print_emoji_name(server, emoji_string):
     # By default, just print the emoji_string

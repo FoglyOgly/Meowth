@@ -664,53 +664,91 @@ async def on_message(message):
 async def coming(ctx):
     """Indicate you are on the way to a raid.
     
-    Usage: !coming [count]
-    Works only in raid channels. If *count* is omitted, assumes you are a group of 1."""
-    count = 1
-    space1 = ctx.message.content.find(" ")
-    if space1 != -1:
-        try:
-            arg = ctx.message.content[8:]
-            count = int(arg)
-        except ValueError:
-            await Meowth.send_message(ctx.message.channel, _("Meowth! \"{0}\" is not a number! Usage: !coming [count]").format(arg))
-            return
-    
-    await _coming(ctx.message, count)
+    Usage: !coming [message]
+    Works only in raid channels. If message is omitted, assumes you are a group of 1.
+    Otherwise, this command expects at least one word in your message to be a number,
+    and will assume you are a group with that many people."""
+    if ctx.message.channel in raidchannel_dict:
+        count = 1
+        space1 = ctx.message.content.find(" ")
+        if space1 != -1:
+            # Search for a number in the message
+            # by trying to convert each word to integer
+            count = None
+            duplicate = False
+            for word in ctx.message.content[8:].split():
+                try:
+                    newcount = int(word)
+                    if not count:
+                        count = newcount
+                    else:
+                        duplicate = True
+                except ValueError:
+                    pass
+            # If count wasn't set, we didn't find a number
+            if not count:
+                await Meowth.send_message(ctx.message.channel, _("Meowth! Exactly *how many* are coming? There wasn't a number anywhere in your message. Or, just say `!coming` if you're by yourself."))
+                return
+            # Don't allow duplicates
+            if duplicate:
+                await Meowth.send_message(ctx.message.channel, _("Meowth...I got confused because there were several numbers in your message. I don't know which one is the right one."))
+                return
+        
+        await _coming(ctx.message, count)
 
 @Meowth.command(pass_context=True)
 async def here(ctx):
     """Indicate you have arrived at the raid.
     
-    Usage: !here [count]
-    Works only in raid channels. If count is omitted, and
-    you have previous issued !coming, then preserves the count
-    from that command. Otherwise, assumes you are a group of 1."""
-    trainer_dict = raidchannel_dict[ctx.message.channel]['trainer_dict']
-    
-    count = 1
-    space1 = ctx.message.content.find(" ")
-    if space1 == -1:
-        if ctx.message.author.mention in trainer_dict:
-            count = trainer_dict[ctx.message.author.mention]['count']
+    Usage: !here [message]
+    Works only in raid channels. If message is omitted, and
+    you have previously issued !coming, then preserves the count
+    from that command. Otherwise, assumes you are a group of 1.
+    Otherwise, this command expects at least one word in your message to be a number,
+    and will assume you are a group with that many people."""
+    if ctx.message.channel in raidchannel_dict:
+        trainer_dict = raidchannel_dict[ctx.message.channel]['trainer_dict']
+        
+        # If no message, default count is 1
+        count = 1
+        space1 = ctx.message.content.find(" ")
+        if space1 == -1:
+            # If there was a previous !coming command, take the count from that
+            if ctx.message.author.mention in trainer_dict:
+                count = trainer_dict[ctx.message.author.mention]['count']
+            else:
+                count = 1
         else:
-            count = 1
-    else:
-        try:
-            arg = ctx.message.content[6:]
-            count = int(arg)
-        except ValueError:
-            await Meowth.send_message(ctx.message.channel, _("Meowth! \"{0}\" is not a number! Usage: !here [count]").format(arg))
-            return
-    await _here(ctx.message, count)
+            # Search for a number in the message
+            # by trying to convert each word to integer
+            count = None
+            duplicate = False
+            for word in ctx.message.content[6:].split():
+                try:
+                    newcount = int(word)
+                    if not count:
+                        count = newcount
+                    else:
+                        duplicate = True
+                except ValueError:
+                    pass
+            # If count wasn't set, we didn't find a number
+            if not count:
+                await Meowth.send_message(ctx.message.channel, _("Meowth! Exactly *how many* are here? There wasn't a number anywhere in your message. Or, just say `!here` if you're by yourself."))
+                return
+            # Don't allow duplicates
+            if duplicate:
+                await Meowth.send_message(ctx.message.channel, _("Meowth...I got confused because there were several numbers in your message. I don't know which one is the right one."))
+                return
+        await _here(ctx.message, count)
 
 @Meowth.command(pass_context=True)
 async def cancel(ctx):
     """Indicate you are no longer interested in a raid.
     
     Usage: !cancel
-    Works only in raid channels. Removes you from the list of trainers
-    who are "otw" or "here"."""
+    Works only in raid channels. Removes you and your party
+    from the list of trainers who are "otw" or "here"."""
     await _cancel(ctx.message)
 
 @Meowth.command(pass_context = True)

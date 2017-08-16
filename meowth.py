@@ -577,6 +577,9 @@ async def timerset(ctx):
         try:
             h, m = ctx.message.content[10:].split(':')
             s = int(h) * 3600 + int(m) * 60
+            if s <= 0: # or s >= 7200: # mewtwo timer?
+                await Meowth.send_message(ctx.message.channel, "Meowth! Shame on you! Try again.")
+                return  
         except:
             await Meowth.send_message(ctx.message.channel, _("Meowth...I couldn't understand your time format..."))
             return

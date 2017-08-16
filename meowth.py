@@ -742,7 +742,15 @@ async def starting(ctx):
             starting_str = _("Meowth! How can you start when there's no one waiting at this raid!?")
         await Meowth.send_message(ctx.message.channel, starting_str)
         
-
+@Meowth.command(pass_context = True)
+async def delete(ctx):
+        deleting_str = "Meowth! This channel will be deleted in 3 minutes"
+        await Meowth.send_message(ctx.message.channel, deleting_str)
+        await asyncio.sleep(180)
+        if ctx.message.channel in raidchannel_dict:
+            del raidchannel_dict[ctx.message.channel]
+            await Meowth.delete_channel(ctx.message.channel)
+"""this will trigger a delete command by any user to delete the channel after 3 minutes"""
 
             
     

@@ -557,13 +557,13 @@ Be sure to set the time left on the raid using !timerset H:MM so others can chec
 Once you start a raid, use !starting to clear the waiting list.
 
 This channel will be deleted in 2 hours.""".format(raid.mention, ctx.message.author.mention, raid_details, print_emoji_name(ctx.message.server, config['omw_id']), print_emoji_name(ctx.message.server, config['here_id']), print_emoji_name(ctx.message.server, config['unomw_id']), print_emoji_name(ctx.message.server, config['unhere_id']))
-        await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)
-        
+        raidmessage = await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)
         raidchannel_dict[raid_channel] = {
           'trainer_dict' : {},
           'exp' : time.localtime(time.time() + 2 * 60 * 60), # Two hours from now
           'manual_timer' : False, # No one has explicitly set the timer, Meowth is just assuming 2 hours
-          'active' : True
+          'active' : True,
+          'raidmessage' : raidmessage
         }
 
 @Meowth.command(pass_context=True)
@@ -622,6 +622,12 @@ async def timerset(ctx):
         try:
             h, m = ctx.message.content[10:].split(':')
             s = int(h) * 3600 + int(m) * 60
+            if s >= 7200:
+                await Meowth.send_message(ctx.message.channel, _("Meowth...that's too long. Raids currently last no more than two hours..."))
+                return
+            if s < 0:
+                await Meowth.send_message(ctx.message.channel, _("Meowth...I can't do that! That time is in the past!"))
+                return
         except:
             await Meowth.send_message(ctx.message.channel, _("Meowth...I couldn't understand your time format..."))
             return
@@ -715,7 +721,26 @@ async def on_message(message):
         if message.content.startswith(parse_emoji(message.server, config['unomw_id'])):
             if message.author.mention in trainer_dict and trainer_dict[message.author.mention]['status'] == "omw":
                 await _cancel(message)
-            # return
+            return
+        if "/maps" in message.content:
+            mapsindex = message.content.find("/maps")
+            newlocindex = message.content.rfind("http", 0, mapsindex)
+            if newlocindex == -1:
+                return
+            newlocend = message.content.find(" ", newlocindex)
+            newloc = message.content[newlocindex:newlocend]
+            oldraidmsg = raidchannel_dict[message.channel]['raidmessage']
+            oldembed = oldraidmsg.embeds[0]
+            newembed = discord.Embed(title=oldembed['title'],url=newloc,description=oldembed['description'],colour=discord.Colour(0x2ecc71))
+            newembed.set_thumbnail(url=oldembed['thumbnail']['url'])
+            await Meowth.edit_message(oldraidmsg, new_content=oldraidmsg.content, embed=newembed)
+            otw_list = []
+            trainer_dict = raidchannel_dict[message.channel]['trainer_dict']
+            for trainer in trainer_dict.keys():
+                if trainer_dict[trainer]['status']=='omw':
+                    otw_list.append(trainer)
+            await Meowth.send_message(message.channel, content = "Meowth! Someone has suggested a different location for the raid than what I guessed! Trainers {0}: make sure you are headed to the right place!".format(", ".join(otw_list)), embed = newembed)
+            return
     await Meowth.process_commands(message)
 
 @Meowth.command(pass_context=True)

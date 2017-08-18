@@ -216,7 +216,7 @@ async def channel_cleanup(loop = False):
         
         for channel in raidchannel_dict:
             if raidchannel_dict[channel]['active'] and raidchannel_dict[channel]['exp'] <= time.localtime(time.time()):
-                loop.create_task(delete_channel(channel))
+                event_loop.create_task(delete_channel(channel))
                 raidchannel_dict[channel]['active'] = False
         
         # If this is not a looping cleanup, then
@@ -252,8 +252,8 @@ The trainer_dict contains "trainer" elements, which have the following fields:
 raidchannel_dict = {}
 
 # Create a channel cleanup loop which runs every minute
-loop = asyncio.get_event_loop()
-loop.create_task(channel_cleanup(loop=True))
+event_loop = asyncio.get_event_loop()
+event_loop.create_task(channel_cleanup(loop=True))
 
 @Meowth.command(pass_context=True, hidden=True)
 async def schedule(ctx):
@@ -625,8 +625,8 @@ async def timerset(ctx):
             if s >= 7200:
                 await Meowth.send_message(ctx.message.channel, _("Meowth...that's too long. Raids currently last no more than two hours..."))
                 return
-            if s < 0:
-                await Meowth.send_message(ctx.message.channel, _("Meowth...I can't do that! That time is in the past!"))
+            if int(h) < 0 or int(m) < 0:
+                await Meowth.send_message(ctx.message.channel, _("Meowth...I can't do that! No negative numbers, please!"))
                 return
         except:
             await Meowth.send_message(ctx.message.channel, _("Meowth...I couldn't understand your time format..."))

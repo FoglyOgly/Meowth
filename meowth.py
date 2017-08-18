@@ -515,6 +515,9 @@ This channel will be deleted in 2 hours.""".format(raid.mention, ctx.message.aut
           'exp' : "No expiration time set!",
           'raidmessage' : raidmessage
             }
+        raidtime = re.search('[01]:[0-5][0-9]', raid_details)
+        if raidtime:
+            await Meowth.send_message(raid_channel, "!timerset {0}".format(raidtime.group(0)))
 
                 
 """Deletes any raid channel that is created after two hours and removes corresponding entries in waiting, omw, and

@@ -650,6 +650,45 @@ async def timer(ctx):
     if ctx.message.channel in raidchannel_dict:
         await print_raid_timer(ctx.message.channel)
 
+
+"""
+Behind-the-scenes functions for raid management.
+Triggerable through commands or through emoji
+"""
+async def _coming(message, count):
+    if message.channel in raidchannel_dict:
+        trainer_dict = raidchannel_dict[message.channel]['trainer_dict']
+        
+        # TODO: handle case where a user sends !coming
+        # after they've already sent !here
+        await Meowth.send_message(message.channel, _("Meowth! {0} is on the way with {1} trainers!").format(message.author.mention,count))
+        # Add trainer name to trainer list
+        if message.author.mention not in trainer_dict:
+            trainer_dict[message.author.mention] = {}
+        trainer_dict[message.author.mention]['status'] = "omw"
+        trainer_dict[message.author.mention]['count'] = count
+
+async def _here(message, count):
+    if message.channel in raidchannel_dict:
+        trainer_dict = raidchannel_dict[message.channel]['trainer_dict']
+        
+        await Meowth.send_message(message.channel, _("Meowth! {0} is at the raid with {1} trainers!").format(message.author.mention, count))
+        # Add trainer name to trainer list
+        if message.author.mention not in raidchannel_dict[message.channel]['trainer_dict']:
+            trainer_dict[message.author.mention] = {}
+        trainer_dict[message.author.mention]['status'] = "waiting"
+        trainer_dict[message.author.mention]['count'] = count
+
+async def _cancel(message):
+    if message.channel in raidchannel_dict:
+        trainer_dict = raidchannel_dict[message.channel]['trainer_dict']
+        
+        if message.author.mention in trainer_dict and trainer_dict[message.author.mention]['status'] == "waiting":
+            await Meowth.send_message(message.channel, _("Meowth! {0} and the {1} trainers with them have left the raid!").format(message.author.mention, trainer_dict[message.author.mention]['count']))
+        if message.author.mention in trainer_dict and trainer_dict[message.author.mention]['status'] == "omw":
+            await Meowth.send_message(message.channel, _("Meowth! {0} and the {1} trainers with them are no longer on their way!").format(message.author.mention, trainer_dict[message.author.mention]['count']))
+        del trainer_dict[message.author.mention]
+
 """Meowth watches for messages that start with the omw, here, unomw, unhere emoji. For omw and here, Meowth
 counts the number of emoji and adds that user and the number to the omw and waiting lists. For unomw and unhere,
 Meowth removes that user and their number from the list regardless of emoji count. The emoji here will have to be
@@ -660,38 +699,115 @@ async def on_message(message):
         trainer_dict = raidchannel_dict[message.channel]['trainer_dict']
         omw_emoji = parse_emoji(message.server, config['omw_id'])
         if message.content.startswith(omw_emoji):
-            # TODO: handle case where a user sends :omw:
-            # after they've already sent :here:
-            await Meowth.send_message(message.channel, _("Meowth! {0} is on the way with {1} trainers!").format(message.author.mention,message.content.count(omw_emoji)))
-            # Add trainer name to trainer list
-            if message.author.mention not in trainer_dict:
-                trainer_dict[message.author.mention] = {}
-            trainer_dict[message.author.mention]['status'] = "omw"
-            trainer_dict[message.author.mention]['count'] = message.content.count(omw_emoji)
+            await _coming(message, message.content.count(omw_emoji))
             return
         # TODO: there's no relation between the :here: count and the :omw: count.
         # For example, if a user is :omw: with 4, they have to send 4x :here:
         # or else they only count as 1 person waiting
         here_emoji = parse_emoji(message.server, config['here_id'])
         if message.content.startswith(here_emoji):
-            await Meowth.send_message(message.channel, _("Meowth! {0} is at the raid with {1} trainers!").format(message.author.mention, message.content.count(here_emoji)))
-            # Add trainer name to trainer list
-            if message.author.mention not in raidchannel_dict[message.channel]['trainer_dict']:
-                trainer_dict[message.author.mention] = {}
-            trainer_dict[message.author.mention]['status'] = "waiting"
-            trainer_dict[message.author.mention]['count'] = message.content.count(here_emoji)
+            await _here(message, message.content.count(here_emoji))
             return
         if message.content.startswith(parse_emoji(message.server, config['unhere_id'])):
             if message.author.mention in trainer_dict and trainer_dict[message.author.mention]['status'] == "waiting":
-                await Meowth.send_message(message.channel, _("Meowth! {0} and the trainers with them have left the raid!").format(message.author.mention))
-                del trainer_dict[message.author.mention]
+                await _cancel(message)
             return
         if message.content.startswith(parse_emoji(message.server, config['unomw_id'])):
             if message.author.mention in trainer_dict and trainer_dict[message.author.mention]['status'] == "omw":
-                await Meowth.send_message(message.channel, _("Meowth! {0} and the trainers with them are no longer on their way!").format(message.author.mention))
-                del trainer_dict[message.author.mention]
-            return
+                await _cancel(message)
+            # return
     await Meowth.process_commands(message)
+
+@Meowth.command(pass_context=True)
+async def coming(ctx):
+    """Indicate you are on the way to a raid.
+    
+    Usage: !coming [message]
+    Works only in raid channels. If message is omitted, assumes you are a group of 1.
+    Otherwise, this command expects at least one word in your message to be a number,
+    and will assume you are a group with that many people."""
+    if ctx.message.channel in raidchannel_dict:
+        count = 1
+        space1 = ctx.message.content.find(" ")
+        if space1 != -1:
+            # Search for a number in the message
+            # by trying to convert each word to integer
+            count = None
+            duplicate = False
+            for word in ctx.message.content[8:].split():
+                try:
+                    newcount = int(word)
+                    if not count:
+                        count = newcount
+                    else:
+                        duplicate = True
+                except ValueError:
+                    pass
+            # If count wasn't set, we didn't find a number
+            if not count:
+                await Meowth.send_message(ctx.message.channel, _("Meowth! Exactly *how many* are coming? There wasn't a number anywhere in your message. Or, just say `!coming` if you're by yourself."))
+                return
+            # Don't allow duplicates
+            if duplicate:
+                await Meowth.send_message(ctx.message.channel, _("Meowth...I got confused because there were several numbers in your message. I don't know which one is the right one."))
+                return
+        
+        await _coming(ctx.message, count)
+
+@Meowth.command(pass_context=True)
+async def here(ctx):
+    """Indicate you have arrived at the raid.
+    
+    Usage: !here [message]
+    Works only in raid channels. If message is omitted, and
+    you have previously issued !coming, then preserves the count
+    from that command. Otherwise, assumes you are a group of 1.
+    Otherwise, this command expects at least one word in your message to be a number,
+    and will assume you are a group with that many people."""
+    if ctx.message.channel in raidchannel_dict:
+        trainer_dict = raidchannel_dict[ctx.message.channel]['trainer_dict']
+        
+        # If no message, default count is 1
+        count = 1
+        space1 = ctx.message.content.find(" ")
+        if space1 == -1:
+            # If there was a previous !coming command, take the count from that
+            if ctx.message.author.mention in trainer_dict:
+                count = trainer_dict[ctx.message.author.mention]['count']
+            else:
+                count = 1
+        else:
+            # Search for a number in the message
+            # by trying to convert each word to integer
+            count = None
+            duplicate = False
+            for word in ctx.message.content[6:].split():
+                try:
+                    newcount = int(word)
+                    if not count:
+                        count = newcount
+                    else:
+                        duplicate = True
+                except ValueError:
+                    pass
+            # If count wasn't set, we didn't find a number
+            if not count:
+                await Meowth.send_message(ctx.message.channel, _("Meowth! Exactly *how many* are here? There wasn't a number anywhere in your message. Or, just say `!here` if you're by yourself."))
+                return
+            # Don't allow duplicates
+            if duplicate:
+                await Meowth.send_message(ctx.message.channel, _("Meowth...I got confused because there were several numbers in your message. I don't know which one is the right one."))
+                return
+        await _here(ctx.message, count)
+
+@Meowth.command(pass_context=True)
+async def cancel(ctx):
+    """Indicate you are no longer interested in a raid.
+    
+    Usage: !cancel
+    Works only in raid channels. Removes you and your party
+    from the list of trainers who are "otw" or "here"."""
+    await _cancel(ctx.message)
 
 @Meowth.command(pass_context = True)
 async def emoji_help(ctx):

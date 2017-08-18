@@ -90,7 +90,7 @@ can be a bit of a rough learning period, but it quickly becomes worth it.
 
 ## Known issues:
 
-Compatibility with Python 3.6+ or discord.py 1.0 is currently unknown.
+Compatibility with Python 3.6 on Mac OS X requires running "Install Certificates.command" in the Python 3.6 folder. Incompatible with discord.py 1.0
 
-Complete inability to deal with misspelled Pokemon names.
+
 

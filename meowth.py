@@ -641,7 +641,7 @@ async def on_message(message):
             return
         if "/maps" in message.content:
             mapsindex = message.content.find("/maps")
-            newlocindex = message.content.rfind("http", mapsindex)
+            newlocindex = message.content.rfind("http", 0, mapsindex)
             if newlocindex == -1:
                 return
             newlocend = message.content.find(" ", newlocindex)

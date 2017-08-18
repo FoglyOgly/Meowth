@@ -509,10 +509,11 @@ Be sure to set the time left on the raid using !timerset H:MM so others can chec
 Once you start a raid, use !starting to clear the waiting list.
 
 This channel will be deleted in 2 hours.""".format(raid.mention, ctx.message.author.mention, raid_details, print_emoji_name(ctx.message.server, config['omw_id']), print_emoji_name(ctx.message.server, config['here_id']), print_emoji_name(ctx.message.server, config['unomw_id']), print_emoji_name(ctx.message.server, config['unhere_id']))
-        await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)
+        raidmessage = await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)
         raidchannel_dict[raid_channel] = {
           'trainer_dict' : {},
-          'exp' : "No expiration time set!"
+          'exp' : "No expiration time set!",
+          'raidmessage' : raidmessage
             }
 
                 
@@ -633,6 +634,21 @@ async def on_message(message):
                 await Meowth.send_message(message.channel, _("Meowth! {0} and the trainers with them are no longer on their way!").format(message.author.mention))
                 del trainer_dict[message.author.mention]
             return
+        if "https://goo.gl/maps" in message.content:
+            newlocindex = message.content.find("https://goo.gl/maps")
+            newlocend = message.content.find(" ", newlocindex)
+            newloc = message.content[newlocindex:newlocend]
+            oldraidmsg = raidchannel_dict[message.channel]['raidmessage']
+            oldembed = oldraidmsg.embeds[0]
+            newembed = discord.Embed(title=oldembed['title'],url=newloc,description=oldembed['description'],colour=discord.Colour(0x2ecc71))
+            newembed.set_thumbnail(url=oldembed['thumbnail']['url'])
+            await Meowth.edit_message(oldraidmsg, new_content=oldraidmsg.content, embed=newembed)
+            otw_list = []
+            trainer_dict = raidchannel_dict[message.channel]['trainer_dict']
+            for trainer in trainer_dict.keys():
+                if trainer_dict[trainer]['status']=='omw':
+                    otw_list.append(trainer)
+            await Meowth.send_message(message.channel, content = "Meowth! Someone has suggested a different location for the raid than what I guessed! Trainers {0}: make sure you are headed to the right place!".format(", ".join(otw_list)), embed = newembed)
     await Meowth.process_commands(message)
 
 @Meowth.command(pass_context = True)

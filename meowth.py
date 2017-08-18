@@ -571,6 +571,11 @@ async def timerset(ctx):
         ticks = time.time()
         try:
             h, m = ctx.message.content[10:].split(':')
+            if int(h) >= 2 or int(m) >= 60:
+                await Meowth.send_message(ctx.message.channel, _("Meowth... Raids currently last no more than two hours..."))
+                return
+            if int(h) < 0 or int(m) < 0:
+                await Meowth.send_message(ctx.message.channel, _("Meowth... I couldn't understand your time format..."))
             s = int(h) * 3600 + int(m) * 60
         except:
             await Meowth.send_message(ctx.message.channel, _("Meowth...I couldn't understand your time format..."))

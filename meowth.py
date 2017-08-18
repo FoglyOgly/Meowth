@@ -634,8 +634,11 @@ async def on_message(message):
                 await Meowth.send_message(message.channel, _("Meowth! {0} and the trainers with them are no longer on their way!").format(message.author.mention))
                 del trainer_dict[message.author.mention]
             return
-        if "https://goo.gl/maps" in message.content:
-            newlocindex = message.content.find("https://goo.gl/maps")
+        if "/maps" in message.content:
+            mapsindex = message.content.find("/maps")
+            newlocindex = message.content.rfind("http", mapsindex)
+            if newlocindex == -1:
+                return
             newlocend = message.content.find(" ", newlocindex)
             newloc = message.content[newlocindex:newlocend]
             oldraidmsg = raidchannel_dict[message.channel]['raidmessage']

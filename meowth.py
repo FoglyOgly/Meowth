@@ -525,7 +525,13 @@ async def raid(ctx):
         return
     
     entered_raid = ctx.message.content[6:space1].lower()
-    raid_details = ctx.message.content[space1:]
+    raid_message = ctx.message.content[space1:]
+    raidtime = re.search('[01]:[0-5][0-9]', ctx.message.content)
+    if raidtime:
+        raid_details = ctx.message.content[space1:raidtime.start()-1]
+        raidexp = raidtime.group()
+    else:
+        raid_details = raid_message
     raid_gmaps_link = create_gmaps_query(raid_details)
     if entered_raid not in pkmn_info['pokemon_list']:
         await Meowth.send_message(ctx.message.channel, spellcheck(entered_raid))
@@ -553,11 +559,11 @@ Reply (not react) to this message with {3} to say you are on your way, or {4} if
 If your plans change, reply with {5} if you are no longer on the way, or {6} if you left the raid.
 
 To see a list of trainers on their way use !otw. To see a list of trainers at the raid use !waiting.
-Be sure to set the time left on the raid using !timerset H:MM so others can check it with !timer.
 Once you start a raid, use !starting to clear the waiting list.
 
 This channel will be deleted in 2 hours.""".format(raid.mention, ctx.message.author.mention, raid_details, print_emoji_name(ctx.message.server, config['omw_id']), print_emoji_name(ctx.message.server, config['here_id']), print_emoji_name(ctx.message.server, config['unomw_id']), print_emoji_name(ctx.message.server, config['unhere_id']))
         raidmessage = await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)
+        
         raidchannel_dict[raid_channel] = {
           'trainer_dict' : {},
           'exp' : time.localtime(time.time() + 2 * 60 * 60), # Two hours from now
@@ -565,6 +571,10 @@ This channel will be deleted in 2 hours.""".format(raid.mention, ctx.message.aut
           'active' : True,
           'raidmessage' : raidmessage
         }
+        if raidtime:
+            await _timerset(raid_channel,raidexp)
+        else:
+            await Meowth.send_message(raid_channel, content = "Meowth! Hey {0}, if you can, set the time left on the raid using !timerset H:MM so others can check it with !timer.".format(ctx.message.author.mention))
 
 @Meowth.command(pass_context=True)
 async def unwant(ctx):
@@ -608,8 +618,8 @@ async def print_raid_timer(channel):
         else:
             await Meowth.send_message(channel, "Meowth! No one told me when the raid ends, so I'm assuming it will end at {0}!".format(strftime("%I:%M", raidchannel_dict[channel]['exp'])))
 
-@Meowth.command(pass_context = True)
-async def timerset(ctx):
+
+async def _timerset(channel, exptime):
     """Set the remaining duration on a raid.
     
     Usage: !timerset <HH:MM>
@@ -617,35 +627,43 @@ async def timerset(ctx):
     Meowth displays the end time in HH:MM local time."""
     
     # Meowth saves the timer message in the channel's 'exp' field.
-    if ctx.message.channel in raidchannel_dict:
+    if channel in raidchannel_dict:
         ticks = time.time()
         try:
-            h, m = ctx.message.content[10:].split(':')
+            h, m = exptime.split(':')
             s = int(h) * 3600 + int(m) * 60
             if s >= 7200:
-                await Meowth.send_message(ctx.message.channel, _("Meowth...that's too long. Raids currently last no more than two hours..."))
+                await Meowth.send_message(channel, _("Meowth...that's too long. Raids currently last no more than two hours..."))
                 return
             if int(h) < 0 or int(m) < 0:
-                await Meowth.send_message(ctx.message.channel, _("Meowth...I can't do that! No negative numbers, please!"))
+                await Meowth.send_message(channel, _("Meowth...I can't do that! No negative numbers, please!"))
                 return
         except:
-            await Meowth.send_message(ctx.message.channel, _("Meowth...I couldn't understand your time format..."))
+            await Meowth.send_message(channel, _("Meowth...I couldn't understand your time format..."))
             return
         expire = ticks + s
         localexpire = time.localtime(expire)
         
         # Update timestamp
-        raidchannel_dict[ctx.message.channel]['exp'] = localexpire
+        raidchannel_dict[channel]['exp'] = localexpire
         # Reactivate channel
-        if not raidchannel_dict[ctx.message.channel]['active']:
-            await Meowth.send_message(ctx.message.channel, "The channel has been reactivated.")
-        raidchannel_dict[ctx.message.channel]['active'] = True
+        if not raidchannel_dict[channel]['active']:
+            await Meowth.send_message(channel, "The channel has been reactivated.")
+        raidchannel_dict[channel]['active'] = True
         # Mark that timer has been manually set
-        raidchannel_dict[ctx.message.channel]['manual_timer'] = True
+        raidchannel_dict[channel]['manual_timer'] = True
         # Send message
-        await print_raid_timer(ctx.message.channel)
+        await print_raid_timer(channel)
         # Trigger channel cleanup
         await channel_cleanup()
+
+@Meowth.command(pass_context=True)
+async def timerset(ctx):
+    exptime = re.search('[01]:[0-5][0-9]', ctx.message.content)
+    if exptime:
+        await _timerset(ctx.message.channel, exptime.group(0))
+    else:
+        await Meowth.send_message(ctx.message.channel, _("Meowth... I couldn't understand your time format. Try again like this: !timerset H:MM"))
         
 @Meowth.command(pass_context=True)
 async def timer(ctx):

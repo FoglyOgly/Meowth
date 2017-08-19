@@ -11,7 +11,7 @@ Meowth is a Discord bot written in Python 3.5 using version 0.16.8 of the discor
 (On Windows: py -m pip install -U discord.py should work)
 
 3. Download the files in this repository. The source code is in meowth.py, the rest of the files are images for the custom emoji
-that Meowth uses.
+that Meowth uses and config files.
 
 4. Go here https://discordapp.com/developers/applications/me#top and create a new app. Name it Meowth if you like and upload the 
 Meowth avatar included in the repository. Create a bot user for your app.
@@ -20,9 +20,9 @@ Meowth avatar included in the repository. Create a bot user for your app.
 Then go to your Discord application page again and copy the client id, inserting it into the above link where it says <CLIENT_ID>.
 Press enter and select the server you want to add Meowth too.
 
-6. Give Meowth admin privileges.
+6. Give Meowth, at the least, permissions to read and write messages, embed links,manage channels, and manage roles.
 
-7. Go back to your app page in Discord and click to reveal the bot token, then copy it. Open config.py in a text editor.  Paste the bot token into line 18, replacing the "mytokenhere" string.
+7. Go back to your app page in Discord and click to reveal the bot token, then copy it. Open config.json in a text editor.  Paste the bot token into line 13, replacing the "mytokenhere" string.
 
 8. Run meowth.py from the command prompt or terminal window. If successful, it should print "Meowth! That's right!" to the 
 window and the bot should show up as online in Discord.
@@ -31,20 +31,20 @@ window and the bot should show up as online in Discord.
 
 ## Configure Meowth
 
-1. Open config.py in a text editor. You'll need to make a few easy edits.
+1. Open config.json in a text editor. You'll need to make a few easy edits.
 
-2. **Enable the !team command.** If you haven't already, create a role for each team. Enter the role names in the team_dict on line 58. The team emoji are configured on this line as well (see step 5 and 6).
+2. **Enable the !team command.** If you haven't already, create a role for each team. Enter the role names in the team_dict on line 46. The team emoji are configured on this line as well (see step 5 and 6).
 
-3. **Enable the welcome message**. On lines 26, 30, and 34, configure the names of your server's @admin role, default channel, and #announcements/#welcome channel.
+3. **Enable the welcome message**. On lines 21, 25, and 29, configure the names of your server's @admin role, default channel, and #announcements/#welcome channel.
 
-4. **Enable Google Maps hints.** In lines 38 and 39, replace "yourtown" and "yourstate" with your community's location. This makes the Google Maps location links work a lot better.
+4. **Enable Google Maps hints.** In lines 33 and 34, replace the blank strings next to "yourtown" and "yourstate" with your community's location. This makes the Google Maps location links work a lot better.
 
 5. **Upload emoji to server (optional).** If you're going to use the included emoji, upload the images in the folder as custom emoji for your server. There are 18 type icons, an omw emoji (car), an unomw emoji (car with
 a circle and a line through it), and here and unhere emoji (Go Plus), and an emoji for each of the three teams.
 
 6. **Configure raid command strings.** Using the variables in lines 61-85, customize the emoji messages to match the ones on your server. Meowth will attempt to look up the names in your server's emoji list. You'll have to do this for each of the 25 custom emoji. You can also just use plain strings if your emoji slots are already taken or if you just prefer it that way.
 
-7. Save config.py. Next time you run Meowth, the changes will take effect.
+7. Save config.json. Next time you run Meowth, the changes will take effect.
 
 
 
@@ -59,15 +59,13 @@ Note: avoid punctuation of any kind inside commands. The <> in these instruction
 3. !wild <pokemonname> <location> - Meowth will send a message @mentioning <pokemonname> and including a Google Maps link
 to <location>. If <location> is blank, Meowth will ask for more details.
 
-4. !raid <pokemonname> <location> - Does the same thing as !wild, but also creates a new channel by the name of
+4. !raid <pokemonname> <location> <time remaining> - Does the same thing as !wild, but also creates a new channel by the name of
 #<pokemonname>-<location>. The message also includes the custom emoji for the types that do super effective damage against the 
-Pokemon. The created raid channel will automatically delete in two hours.
+Pokemon. The created raid channel will automatically delete after the <time remaining> has expired. If <time remaining> is not given or is given in a format other than H:MM, Meowth will assume a two-hour time remaining and ask you to use !timerset.
 
-5. :omw:/:here: - in a raid channel, the custom emoji for omw and here tell Meowth that you are on your way to or at a raid.
-If you have multiple trainers with you, type another emoji for each additional trainer. Typing :here: also removes you from the
-on the way list. The exact phrases are configurable on lines 53-56.
+5. :omw:/:here:/!coming/!here - in a raid channel, the custom emoji for omw and here tell Meowth that you are on your way to or at a raid. !coming and !here do the same things as the custom emoji. If you have multiple trainers with you, type another emoji for each additional trainer. If you are using the commands, use them with !coming <number> to do the same thing. Typing :here: also removes you from the on the way list. The exact phrases are configurable on lines 53-56.
 
-6. :unomw:/:unhere: - in a raid channel, these custom emoji tell Meowth to remove you from the on the way or waiting lists. The exact phrases are configurable on lines 53-56.
+6. :unomw:/:unhere:/!cancel - in a raid channel, these custom emoji tell Meowth to remove you from the on the way or waiting lists. The !cancel command removes you from either list if you are on one. The exact phrases are configurable on lines 53-56.
 
 7. !otw/!waiting - in a raid channel, these commands tell Meowth to list and mention the trainers who said they were on the way
 or at a raid. It also includes the total number.
@@ -80,6 +78,7 @@ the time at which the raid will end. Also overwrites any previously used !timers
 
 10. !timer - in a raid channel, tells Meowth to resend the message from the last !timerset command. Prevents unnecessary
 scrolling.
+
 
 ## General notes on Meowth:
 

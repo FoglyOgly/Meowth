@@ -620,11 +620,7 @@ async def print_raid_timer(channel):
 
 
 async def _timerset(channel, exptime):
-    """Set the remaining duration on a raid.
-    
-    Usage: !timerset <HH:MM>
-    Works only in raid channels, can be set or overridden by anyone.
-    Meowth displays the end time in HH:MM local time."""
+
     
     # Meowth saves the timer message in the channel's 'exp' field.
     if channel in raidchannel_dict:
@@ -659,6 +655,11 @@ async def _timerset(channel, exptime):
 
 @Meowth.command(pass_context=True)
 async def timerset(ctx):
+    """Set the remaining duration on a raid.
+    
+    Usage: !timerset <HH:MM>
+    Works only in raid channels, can be set or overridden by anyone.
+    Meowth displays the end time in HH:MM local time."""
     exptime = re.search('[01]:[0-5][0-9]', ctx.message.content)
     if exptime:
         await _timerset(ctx.message.channel, exptime.group(0))

@@ -146,6 +146,8 @@ def parse_emoji(server, emoji_string):
         emoji = discord.utils.get(server.emojis, name=emoji_string.strip(':'))
         if emoji:
             emoji_string = "<:{0}:{1}>".format(emoji.name, emoji.id)
+        else:
+            emoji_strong = "{0}".format(emoji_string.strip(':').capitalize())
     
     return emoji_string
 
@@ -164,13 +166,17 @@ def print_emoji_name(server, emoji_string):
 
 # Given an arbitrary string, create a Google Maps
 # query using the configured hints
-def create_gmaps_query(details):
+def create_gmaps_query(details, channel):
     details_list = details.split()
-    return "https://www.google.com/maps/search/?api=1&query={0}+{1}+{2}".format('+'.join(details_list), config['yourtown'], config['yourstate'])
+    loc_list = server_dict[channel.server]['city_channels'][channel.name].split()
+    return "https://www.google.com/maps/search/?api=1&query={0}+{1}".format('+'.join(details_list),'+'.join(loc_list))
 
 # Given a User, check that it is Meowth's master
 def check_master(user):
     return str(user) == config['master']
+
+def check_server_owner(user, server):
+    return str(user) == str(server.owner)
 
 # Given a violating message, raise an exception
 # reporting unauthorized use of admin commands
@@ -199,13 +205,13 @@ To reactivate the channel, use !timerset to set the timer again.""")
         # If the channel has already been deleted from the dict, someone
         # else got to it before us, so don't do anything.
         # Also, if the channel got reactivated, don't do anything either.
-        if raidchannel_dict[channel] and not raidchannel_dict[channel]['active']:
-            del raidchannel_dict[channel]
+        if server_dict[channel.server]['raidchannel_dict'][channel] and not server_dict[channel.server]['raidchannel_dict'][channel]['active']:
+            del server_dict[channel.server]['raidchannel_dict'][channel]
             # Check one last time to make sure the channel exists
             if discord.utils.get(channel.server.channels, id=channel.id):
                 await Meowth.delete_channel(channel)
     else:
-        del raidchannel_dict[channel]
+        del server_dict[channel.server]['raidchannel_dict'][channel]
 
 # Periodic callback.
 # Loop through all channels--if any are found
@@ -214,10 +220,10 @@ async def channel_cleanup(loop = False):
     while True:
         deleted_channels = []
         
-        for channel in raidchannel_dict:
-            if raidchannel_dict[channel]['active'] and raidchannel_dict[channel]['exp'] <= time.localtime(time.time()):
+        for channel in server_dict[channel.server]['raidchannel_dict']:
+            if server_dict[channel.server]['raidchannel_dict'][channel]['active'] and server_dict[channel.server]['raidchannel_dict'][channel]['exp'] <= time.localtime(time.time()):
                 event_loop.create_task(delete_channel(channel))
-                raidchannel_dict[channel]['active'] = False
+                server_dict[channel.server]['raidchannel_dict'][channel]['active'] = False
         
         # If this is not a looping cleanup, then
         # just break out and exit.
@@ -225,6 +231,11 @@ async def channel_cleanup(loop = False):
             break
         
         await asyncio.sleep(60)
+async def autosave(loop = False):
+    while True:
+        event_loop.create_task(_save())
+        await asyncio.sleep(60)
+        
 
 """
 
@@ -249,15 +260,14 @@ The trainer_dict contains "trainer" elements, which have the following fields:
 'count'  : the number of trainers in the party
 """
 
-raidchannel_dict = {}
+
+server_dict = {}
 
 # Create a channel cleanup loop which runs every minute
 event_loop = asyncio.get_event_loop()
 event_loop.create_task(channel_cleanup(loop=True))
+event_loop.create_task(autosave(loop=True))
 
-@Meowth.command(pass_context=True, hidden=True)
-async def schedule(ctx):
-    await channel_cleanup()
 
 team_msg = " or ".join(["'!team {0}'".format(team) for team in config['team_dict'].keys()])
 
@@ -265,23 +275,91 @@ team_msg = " or ".join(["'!team {0}'".format(team) for team in config['team_dict
 @Meowth.event
 async def on_ready():
     print(_("Meowth! That's right!")) #prints to the terminal or cmd prompt window upon successful connection to Discord
+    try:
+        fd = open("serverdict", "rb")
+        server_dict = pickle.load(fd)
+        fd.close()
+    except Exception as err:
+        print(_("Error occured while trying to load files!"))
+        print(err)
 
+@Meowth.event
+async def on_server_join(server):
+    owner = server.owner
+    server_dict[server] = {'welcome': False, 'team': False, 'want': False, 'other': False, 'done': False, 'raidchannel_dict' : {}}
+    await Meowth.send_message(owner, _("Meowth! I'm Meowth, a Discord helper bot for Pokemon Go communities, and someone has invited me to your server! Type !help to see a list of things I can do, and type !configure to set me up for your server."))
+
+@Meowth.command(pass_context=True, hidden=True)
+async def configure(ctx):
+    if check_server_owner(ctx.message.author, ctx.message.server):
+        server = ctx.message.server
+        owner = ctx.message.author
+        await Meowth.send_message(owner, _("Meowth! That's great! First, I have a feature where I welcome new members to the server. If you have a bot that handles this already, or if you don't want this feature, type N, otherwise type Y to enable this feature!"))
+        welcomereply = await Meowth.wait_for_message(author = owner)
+        if welcomereply.content == "Y":
+            server_dict[server]['welcome'] = True
+            await Meowth.send_message(owner, "Meowth! Welcome message enabled!")
+        await Meowth.send_message(owner, _("Meowth! Alright. Next I have a feature for assigning roles for each Pokemon Go team. If you have a bot that handles this already, or you don't want this feature, type N, otherwise type Y to enable the feature!"))
+        teamreply = await Meowth.wait_for_message(author = owner)
+        if teamreply.content == "Y":
+            server_dict[server]['team']=True
+            await Meowth.send_message(owner, "Meowth! Team assignments enabled!")
+        await Meowth.send_message(owner, _("Meowth! Alright. Last I just want to check that you want to enable my main functions. These include assigning roles for each Pokemon a user wants, creating channels for raids, and keeping track of users coming to each raid. If you don't want me to do any of that, type N, otherwise type Y to enable my main functions!"))
+        otherreply = await Meowth.wait_for_message(author = owner)
+        if otherreply.content == "Y":
+            server_dict[server]['other']=True
+            await Meowth.send_message(owner, _("Meowth! Okay. Now make sure that I have either an admin role on your server, or at least a role with these permissions: read messages, send messages, embed links, manage roles, manage channels."))
+            await Meowth.send_message(owner, _("Meowth! Next, I need to know which channels will be used for raid reports. If your server covers only one community, that's probably your server's default channel. If you cover multiple communities, you should probably have a channel for each community that only those with roles for that community can see. Otherwise your users could be inundated with notifications for raids that are not relevant to them!"))
+            await Meowth.send_message(owner, _("Meowth! Here's what I need: a list of channels in your server that will be used for raid and wild reports. Give them in this format: channelname, channelname, channelname"))
+            await Meowth.send_message(owner, _("In other words, the name of each channel, each separated by a comma and a single space."))
+            citychannel_dict = {}
+            citychannels = await Meowth.wait_for_message(author = owner)
+            citychannel_list = citychannels.content.split(', ')
+            server_channel_list = []
+            for channel in server.channels:
+                server_channel_list.append(channel.name)
+            if set(citychannel_list) <= set(server_channel_list):
+                await Meowth.send_message(server.owner, "Meowth! Great! Looks like all of these are names of channels in your server.")
+            else:
+                await Meowth.send_message(server.owner, "Meowth! Something went wrong! Please type !config to start over!")
+                return
+            await Meowth.send_message(server.owner, """Meowth! Alright, we need to set starting locations for each of the channels you just mentioned in the SAME ORDER you typed before. This is what I use to generate Google Maps links to give people directions to raids and spawns! Knowing what town everything is in is often good enough to narrow it down. One way to put it is, for each channel you just listed, I need a location specific enough that I'll know which First Baptist Church people mean. This is important, so please enter it in just this way. For each channel, give me a location using only letters, no punctuation. So something like 'kansas city mo' or 'hull uk' without the quotes.""")
+            cities = await Meowth.wait_for_message(author=server.owner)
+            city_list = cities.content.split(', ')
+            if len(city_list) == len(citychannel_list):
+                for i in range(len(citychannel_list)):
+                    citychannel_dict[citychannel_list[i]]=city_list[i]
+            else:
+                await Meowth.send_message(server.owner,"""Meowth! There weren't the same number of cities and channels! Please type !config to start over!""")
+                return
+            server_dict[server]['city_channels'] = citychannel_dict
+            await Meowth.send_message(server.owner, "Meowth! Ok. Time to double-check that I have all the permissions I need. Remember that I need to be able to read and send messages, embed links, manage roles, and manage channels on your server. You can restrict me to specific channels by editing channel-specific permissions if you like. When you're sure I have those, type !done")
+            await Meowth.wait_for_message(author=server.owner, content = "!done")
+            try:
+                await Meowth.create_channel(server, 'meowth-chat')
+                server_dict[server]['done']=True
+                fd = open("serverdict", "wb")
+                pickle.dump(server_dict, fd)
+                fd.close()
+            except:
+                await Meowth.send_message(owner, "Meowth! You didn't give me enough permissions! Type !config to start over!")
 
 """Welcome message to the server and some basic instructions."""
 
 @Meowth.event
 async def on_member_join(member):
     server = member.server
-    admin = discord.utils.get(server.roles, name=config['admin_role'])
-    announcements = discord.utils.get(server.channels, name=config['welcome_channel'])
+    if server_dict[server]['done'] == False or server_dict[server]['welcome'] == False:
+        return
+
     
     # Build welcome message
-    ann_message = _(" Then head over to {3.mention} to get caught up on what's happening!")
-    admin_message = _(" If you have any questions just ask {4}.")
+
+    admin_message = _(" If you have any questions just ask an admin.")
     
-    message = _("Meowth! Welcome to {0.name}, {1.mention}! Set your team by typing {2} without quotations.")
-    if announcements:
-        message += ann_message
+    message = _("Meowth! Welcome to {0.name}, {1.mention}! ")
+    if server_dict[server]['team'] == True:
+        message += "Set your team by typing {0} without quotations.".format(team_msg)
     if admin:
         message += admin_message
     
@@ -289,11 +367,11 @@ async def on_member_join(member):
     
     # If default channel is not configured in Meowth,
     # AND Discord doesn't have it configured, give up and print a warning
-    default = discord.utils.get(server.channels, name=config['default_channel']) or server.default_channel
+    default = server.default_channel
     if not default:
         print(_("WARNING: no default channel configured. Unable to send welcome message."))
     else:
-        await Meowth.send_message(default, message.format(server, member, team_msg, announcements, get_admin_str(admin)))
+        await Meowth.send_message(default, message.format(server, member))
 
 
 """
@@ -302,88 +380,35 @@ Admin commands
 
 """
 
-@Meowth.command(pass_context=True, hidden=True)
-async def welcome(ctx):
-    """Print the welcome message (used for testing).
-    
-    Usage: !welcome [user]
-    Optionally takes an argument welcoming a specific user.
-    If omitted, welcomes the message author."""
-    member = ctx.message.author
-    if check_master(member):
-        space1 = ctx.message.content.find(" ")
-        if space1 != -1:
-            member = discord.utils.get(ctx.message.server.members, name=ctx.message.content[9:])
-            if not member:
-                await Meowth.send_message(ctx.message.channel, _("Meowth! No member named \"{0}\"!").format(ctx.message.content[9:]))
-        
-        if member:
-            await on_member_join(member)
-    else:
-        raise_admin_violation(ctx.message)
+
+
+async def _save():
+    fd = open("serverdict", "wb")
+    pickle.dump(server_dict, fd)
+    fd.close()
 
 
 @Meowth.command(pass_context=True, hidden=True)
 async def save(ctx):
     """Save persistent state to file.
     
-    Usage: !save [filename]
+    Usage: !save
     File path is relative to current directory."""
     member = ctx.message.author
     if check_master(member):
         space1 = ctx.message.content.find(" ")
         if space1 == -1:
-            print(_("Needs filename!"))
-        else:
-            filename = ctx.message.content[6:]
             try:
-                fd = open(ctx.message.content[6:], "wb")
-                pickle.dump(raidchannel_dict, fd)
-                fd.close()
-                print("Successfully saved state to {0}!".format(filename))
+                await _save()
             except Exception as err:
-                print(_("Error occured while trying to write file {0}!").format(filename))
+                print(_("Error occured while trying to save!"))
                 print(err)
     else:
         raise_admin_violation(ctx.message)
 
-@Meowth.command(pass_context=True, hidden=True)
-async def load(ctx):
-    """Load persistent state from file.
-    
-    Usage: !load [filename]
-    File path is relative to current directory."""
-    global raidchannel_dict
-    
-    member = ctx.message.author
-    if check_master(member):
-        space1 = ctx.message.content.find(" ")
-        if space1 == -1:
-            print(_("Needs filename!"))
-        else:
-            filename = ctx.message.content[6:]
-            try:
-                fd = open(ctx.message.content[6:], "rb")
-                raidchannel_dict = pickle.load(fd)
-                fd.close()
-                print("Successfully loaded state from {0}!".format(filename))
-            except Exception as err:
-                print(_("Error occured while trying to read file {0}!").format(filename))
-                print(err)
-    else:
-        raise_admin_violation(ctx.message)
 
-@Meowth.command(pass_context=True, hidden=True)
-async def configure(ctx):
-    """Load persistent state from file.
-    
-    Usage: !load [filename]
-    File path is relative to current directory."""
-    member = ctx.message.author
-    if check_master(member):
-        load_config()
-    else:
-        raise_admin_violation(ctx.message)
+
+
 
 """
 
@@ -445,7 +470,10 @@ async def want(ctx):
     """Behind the scenes, Meowth tracks user !wants by
     creating a server role for the Pokemon species, and
     assigning it to the user."""
-    
+    meowthchat = discord.utils.get(ctx.message.server.channels, name='meowth-chat')
+    if ctx.message.channel.name != meowthchat.name:
+        await Meowth.send_message(ctx.message.channel, "Meowth! Please use {0} for !want commands!".format(meowthchat.name))
+        return
     entered_want = ctx.message.content[6:].lower()
     if entered_want not in pkmn_info['pokemon_list']:
         await Meowth.send_message(ctx.message.channel, spellcheck(entered_want))
@@ -476,6 +504,9 @@ async def wild(ctx):
     Usage: !wild <species> <location>
     Meowth will insert the details (really just everything after the species name) into a
     Google maps link and post the link to the same channel the report was made in."""
+    if ctx.message.channel.name not in server_dict[ctx.message.server]['city_channels'].keys() and ctx.message.channel != ctx.message.server.default_channel:
+        await Meowth.send_message(ctx.message.channel, _("Meowth! Please restrict wild reports to city channels or the default channel!"))
+        return
     space1 = ctx.message.content.find(" ",6)
     if space1 == -1:
         await Meowth.send_message(ctx.message.channel, _("Meowth! Give more details when reporting! Usage: !wild <pokemon name> <location>"))
@@ -483,7 +514,7 @@ async def wild(ctx):
     else:
         entered_wild = ctx.message.content[6:space1].lower()
         wild_details = ctx.message.content[space1:]
-        wild_gmaps_link = create_gmaps_query(wild_details)
+        wild_gmaps_link = create_gmaps_query(wild_details, ctx.message.channel)
         if entered_wild not in pkmn_info['pokemon_list']:
             await Meowth.send_message(ctx.message.channel, spellcheck(entered_wild))
             return
@@ -508,16 +539,11 @@ async def raid(ctx):
     Meowth's message will also include the type weaknesses of the boss.
     
     Finally, Meowth will create a separate channel for the raid report, for the purposes of organizing the raid."""
-    
-    if 'raid_channels' in config and ctx.message.channel.name not in config['raid_channels']:
-        abc = []
-        for channel in config['raid_channels']:
-            ch = discord.utils.get(ctx.message.server.channels, name = channel)
-            if ch and ch.permissions_for(ctx.message.author).read_messages:
-                abc.append(ch.mention)
-        await Meowth.send_message(ctx.message.channel, """Meowth! Please confine raid reports to one of these channels:
-    {0}""".format(", ".join(abc)))
+    if ctx.message.channel.name not in server_dict[ctx.message.server]['city_channels'].keys() and ctx.message.channel != ctx.message.server.default_channel:
+        await Meowth.send_message(ctx.message.channel, "Meowth! Please restrict raid reports to a city channel or the default channel!")
         return
+    
+
     
     space1 = ctx.message.content.find(" ",6)
     if space1 == -1:
@@ -532,7 +558,7 @@ async def raid(ctx):
         raidexp = raidtime.group()
     else:
         raid_details = raid_message
-    raid_gmaps_link = create_gmaps_query(raid_details)
+    raid_gmaps_link = create_gmaps_query(raid_details, ctx.message.channel)
     if entered_raid not in pkmn_info['pokemon_list']:
         await Meowth.send_message(ctx.message.channel, spellcheck(entered_raid))
         return
@@ -564,7 +590,7 @@ Once you start a raid, use !starting to clear the waiting list.
 This channel will be deleted in 2 hours.""".format(raid.mention, ctx.message.author.mention, raid_details, print_emoji_name(ctx.message.server, config['omw_id']), print_emoji_name(ctx.message.server, config['here_id']), print_emoji_name(ctx.message.server, config['unomw_id']), print_emoji_name(ctx.message.server, config['unhere_id']))
         raidmessage = await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)
         
-        raidchannel_dict[raid_channel] = {
+        server_dict[ctx.message.server]['raidchannel_dict'][raid_channel] = {
           'trainer_dict' : {},
           'exp' : time.localtime(time.time() + 2 * 60 * 60), # Two hours from now
           'manual_timer' : False, # No one has explicitly set the timer, Meowth is just assuming 2 hours
@@ -610,20 +636,20 @@ async def unwant(ctx):
 
 # Print raid timer
 async def print_raid_timer(channel):
-    if not raidchannel_dict[channel]['active']:
-        await Meowth.send_message(channel, "Meowth! This raid's timer has already expired as of {0}!".format(strftime("%I:%M", raidchannel_dict[channel]['exp'])))
+    if not server_dict[channel.server]['raidchannel_dict'][channel]['active']:
+        await Meowth.send_message(channel, "Meowth! This raid's timer has already expired as of {0}!".format(strftime("%I:%M", server_dict[channel.server]['raidchannel_dict'][channel]['exp'])))
     else:
-        if raidchannel_dict[channel]['manual_timer']:
-            await Meowth.send_message(channel, "Meowth! This raid will end at {0}!".format(strftime("%I:%M", raidchannel_dict[channel]['exp'])))
+        if server_dict[channel.server]['raidchannel_dict'][channel]['manual_timer']:
+            await Meowth.send_message(channel, "Meowth! This raid will end at {0}!".format(strftime("%I:%M", server_dict[channel.server]['raidchannel_dict'][channel]['exp'])))
         else:
-            await Meowth.send_message(channel, "Meowth! No one told me when the raid ends, so I'm assuming it will end at {0}!".format(strftime("%I:%M", raidchannel_dict[channel]['exp'])))
+            await Meowth.send_message(channel, "Meowth! No one told me when the raid ends, so I'm assuming it will end at {0}!".format(strftime("%I:%M", server_dict[channel.server]['raidchannel_dict'][channel]['exp'])))
 
 
 async def _timerset(channel, exptime):
 
     
     # Meowth saves the timer message in the channel's 'exp' field.
-    if channel in raidchannel_dict:
+    if channel in server_dict[channel.server]['raidchannel_dict']:
         ticks = time.time()
         try:
             h, m = exptime.split(':')
@@ -641,13 +667,13 @@ async def _timerset(channel, exptime):
         localexpire = time.localtime(expire)
         
         # Update timestamp
-        raidchannel_dict[channel]['exp'] = localexpire
+        server_dict[channel.server]['raidchannel_dict'][channel]['exp'] = localexpire
         # Reactivate channel
-        if not raidchannel_dict[channel]['active']:
+        if not server_dict[channel.server]['raidchannel_dict'][channel]['active']:
             await Meowth.send_message(channel, "The channel has been reactivated.")
-        raidchannel_dict[channel]['active'] = True
+        server_dict[channel.server]['raidchannel_dict'][channel]['active'] = True
         # Mark that timer has been manually set
-        raidchannel_dict[channel]['manual_timer'] = True
+        server_dict[channel.server]['raidchannel_dict'][channel]['manual_timer'] = True
         # Send message
         await print_raid_timer(channel)
         # Trigger channel cleanup
@@ -672,7 +698,7 @@ async def timer(ctx):
     
     Usage: !timer
     The expiry time should have been previously set with !timerset."""
-    if ctx.message.channel in raidchannel_dict:
+    if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict']:
         await print_raid_timer(ctx.message.channel)
 
 
@@ -681,8 +707,8 @@ Behind-the-scenes functions for raid management.
 Triggerable through commands or through emoji
 """
 async def _coming(message, count):
-    if message.channel in raidchannel_dict:
-        trainer_dict = raidchannel_dict[message.channel]['trainer_dict']
+    if message.channel in server_dict[message.server]['raidchannel_dict']:
+        trainer_dict = server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']
         
         # TODO: handle case where a user sends !coming
         # after they've already sent !here
@@ -692,27 +718,30 @@ async def _coming(message, count):
             trainer_dict[message.author.mention] = {}
         trainer_dict[message.author.mention]['status'] = "omw"
         trainer_dict[message.author.mention]['count'] = count
+        server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict'] = trainer_dict
 
 async def _here(message, count):
-    if message.channel in raidchannel_dict:
-        trainer_dict = raidchannel_dict[message.channel]['trainer_dict']
+    if message.channel in server_dict[message.server]['raidchannel_dict']:
+        trainer_dict = server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']
         
         await Meowth.send_message(message.channel, _("Meowth! {0} is at the raid with {1} trainers!").format(message.author.mention, count))
         # Add trainer name to trainer list
-        if message.author.mention not in raidchannel_dict[message.channel]['trainer_dict']:
+        if message.author.mention not in trainer_dict:
             trainer_dict[message.author.mention] = {}
         trainer_dict[message.author.mention]['status'] = "waiting"
         trainer_dict[message.author.mention]['count'] = count
+        server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict'] = trainer_dict
 
 async def _cancel(message):
-    if message.channel in raidchannel_dict:
-        trainer_dict = raidchannel_dict[message.channel]['trainer_dict']
+    if message.channel in server_dict[message.server]['raidchannel_dict']:
+        trainer_dict = server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']
         
         if message.author.mention in trainer_dict and trainer_dict[message.author.mention]['status'] == "waiting":
             await Meowth.send_message(message.channel, _("Meowth! {0} and the {1} trainers with them have left the raid!").format(message.author.mention, trainer_dict[message.author.mention]['count']))
         if message.author.mention in trainer_dict and trainer_dict[message.author.mention]['status'] == "omw":
             await Meowth.send_message(message.channel, _("Meowth! {0} and the {1} trainers with them are no longer on their way!").format(message.author.mention, trainer_dict[message.author.mention]['count']))
         del trainer_dict[message.author.mention]
+        server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict'] = trainer_dict
 
 """Meowth watches for messages that start with the omw, here, unomw, unhere emoji. For omw and here, Meowth
 counts the number of emoji and adds that user and the number to the omw and waiting lists. For unomw and unhere,
@@ -720,8 +749,8 @@ Meowth removes that user and their number from the list regardless of emoji coun
 changed to fit the emoji ids in your server."""
 @Meowth.event
 async def on_message(message):
-    if message.channel in raidchannel_dict and raidchannel_dict[message.channel]['active']:
-        trainer_dict = raidchannel_dict[message.channel]['trainer_dict']
+    if message.channel in server_dict[message.server]['raidchannel_dict'] and server_dict[message.server]['raidchannel_dict'][message.channel]['active']:
+        trainer_dict = server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']
         omw_emoji = parse_emoji(message.server, config['omw_id'])
         if message.content.startswith(omw_emoji):
             await _coming(message, message.content.count(omw_emoji))
@@ -748,13 +777,13 @@ async def on_message(message):
                 return
             newlocend = message.content.find(" ", newlocindex)
             newloc = message.content[newlocindex:newlocend]
-            oldraidmsg = raidchannel_dict[message.channel]['raidmessage']
+            oldraidmsg = server_dict[message.server]['raidchannel_dict'][message.channel]['raidmessage']
             oldembed = oldraidmsg.embeds[0]
             newembed = discord.Embed(title=oldembed['title'],url=newloc,description=oldembed['description'],colour=discord.Colour(0x2ecc71))
             newembed.set_thumbnail(url=oldembed['thumbnail']['url'])
             await Meowth.edit_message(oldraidmsg, new_content=oldraidmsg.content, embed=newembed)
             otw_list = []
-            trainer_dict = raidchannel_dict[message.channel]['trainer_dict']
+            trainer_dict = server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']
             for trainer in trainer_dict.keys():
                 if trainer_dict[trainer]['status']=='omw':
                     otw_list.append(trainer)
@@ -770,7 +799,7 @@ async def coming(ctx):
     Works only in raid channels. If message is omitted, assumes you are a group of 1.
     Otherwise, this command expects at least one word in your message to be a number,
     and will assume you are a group with that many people."""
-    if ctx.message.channel in raidchannel_dict:
+    if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict']:
         count = 1
         space1 = ctx.message.content.find(" ")
         if space1 != -1:
@@ -808,8 +837,8 @@ async def here(ctx):
     from that command. Otherwise, assumes you are a group of 1.
     Otherwise, this command expects at least one word in your message to be a number,
     and will assume you are a group with that many people."""
-    if ctx.message.channel in raidchannel_dict:
-        trainer_dict = raidchannel_dict[ctx.message.channel]['trainer_dict']
+    if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict']:
+        trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
         
         # If no message, default count is 1
         count = 1
@@ -881,12 +910,12 @@ async def otw(ctx):
     
     Usage: !otw
     Works only in raid channels."""
-    if ctx.message.channel in raidchannel_dict and raidchannel_dict[ctx.message.channel]['active']:
+    if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
         ctx_omwcount = 0
         
         # Grab all trainers who are :omw: and sum
         # up their counts
-        trainer_dict = raidchannel_dict[ctx.message.channel]['trainer_dict']
+        trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
         for trainer in trainer_dict.values():
             if trainer['status'] == "omw":
                 ctx_omwcount += trainer['count']
@@ -908,12 +937,12 @@ async def waiting(ctx):
     
     Usage: !waiting
     Works only in raid channels."""
-    if ctx.message.channel in raidchannel_dict and raidchannel_dict[ctx.message.channel]['active']:
+    if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
         ctx_waitingcount = 0
         
         # Grab all trainers who are :here: and sum
         # up their counts
-        trainer_dict = raidchannel_dict[ctx.message.channel]['trainer_dict']
+        trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
         for trainer in trainer_dict.values():
             if trainer['status'] == "waiting":
                 ctx_waitingcount += trainer['count']
@@ -937,10 +966,10 @@ async def starting(ctx):
     Works only in raid channels. Sends a message and clears the waiting list. Users who are waiting
     for a second group must reannounce with the :here: emoji."""
     
-    if ctx.message.channel in raidchannel_dict and raidchannel_dict[ctx.message.channel]['active']:
+    if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
         ctx_startinglist = []
         
-        trainer_dict = raidchannel_dict[ctx.message.channel]['trainer_dict']
+        trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
         
         # Add all waiting trainers to the starting list
         for trainer in trainer_dict:
@@ -950,6 +979,7 @@ async def starting(ctx):
         # Go back and delete the trainers from the waiting list
         for trainer in ctx_startinglist:
             del trainer_dict[trainer]
+        server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict'] = trainer_dict
         
 
         starting_str = "Meowth! The group that was waiting is starting the raid! Trainers {0}, please respond with {1} if you are waiting for another group!".format(", ".join(ctx_startinglist), parse_emoji(ctx.message.server, config['here_id']))

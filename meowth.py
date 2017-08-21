@@ -15,6 +15,9 @@ import spelling
 
 Meowth = Bot(command_prefix="!")
 
+with open("serverdict", "rb") as fd:
+    server_dict = pickle.load(fd)
+
 
 config = {}
 pkmn_info = {}
@@ -261,7 +264,7 @@ The trainer_dict contains "trainer" elements, which have the following fields:
 """
 
 
-server_dict = {}
+
 
 # Create a channel cleanup loop which runs every minute
 event_loop = asyncio.get_event_loop()

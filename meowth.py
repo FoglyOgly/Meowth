@@ -278,19 +278,13 @@ team_msg = " or ".join(["'!team {0}'".format(team) for team in config['team_dict
 @Meowth.event
 async def on_ready():
     print(_("Meowth! That's right!")) #prints to the terminal or cmd prompt window upon successful connection to Discord
-    try:
-        fd = open("serverdict", "rb")
-        server_dict = pickle.load(fd)
-        fd.close()
-    except Exception as err:
-        print(_("Error occured while trying to load files!"))
-        print(err)
+
 
 @Meowth.event
 async def on_server_join(server):
     owner = server.owner
     server_dict[server] = {'welcome': False, 'team': False, 'want': False, 'other': False, 'done': False, 'raidchannel_dict' : {}}
-    await Meowth.send_message(owner, _("Meowth! I'm Meowth, a Discord helper bot for Pokemon Go communities, and someone has invited me to your server! Type !help to see a list of things I can do, and type !configure to set me up for your server."))
+    await Meowth.send_message(owner, _("Meowth! I'm Meowth, a Discord helper bot for Pokemon Go communities, and someone has invited me to your server! Type !help to see a list of things I can do, and type !configure in any channel of your server to begin!"))
 
 @Meowth.command(pass_context=True, hidden=True)
 async def configure(ctx):
@@ -324,7 +318,7 @@ async def configure(ctx):
             if set(citychannel_list) <= set(server_channel_list):
                 await Meowth.send_message(server.owner, "Meowth! Great! Looks like all of these are names of channels in your server.")
             else:
-                await Meowth.send_message(server.owner, "Meowth! Something went wrong! Please type !config to start over!")
+                await Meowth.send_message(server.owner, "Meowth! Something went wrong! Please type !configure to start over!")
                 return
             await Meowth.send_message(server.owner, """Meowth! Alright, we need to set starting locations for each of the channels you just mentioned in the SAME ORDER you typed before. This is what I use to generate Google Maps links to give people directions to raids and spawns! Knowing what town everything is in is often good enough to narrow it down. One way to put it is, for each channel you just listed, I need a location specific enough that I'll know which First Baptist Church people mean. This is important, so please enter it in just this way. For each channel, give me a location using only letters, no punctuation. So something like 'kansas city mo' or 'hull uk' without the quotes.""")
             cities = await Meowth.wait_for_message(author=server.owner)
@@ -336,7 +330,7 @@ async def configure(ctx):
                 await Meowth.send_message(server.owner,"""Meowth! There weren't the same number of cities and channels! Please type !config to start over!""")
                 return
             server_dict[server]['city_channels'] = citychannel_dict
-            await Meowth.send_message(server.owner, "Meowth! Ok. Time to double-check that I have all the permissions I need. Remember that I need to be able to read and send messages, embed links, manage roles, and manage channels on your server. You can restrict me to specific channels by editing channel-specific permissions if you like. When you're sure I have those, type !done")
+            await Meowth.send_message(server.owner, "Meowth! Ok. Time to double-check that I have all the permissions I need. Remember that I need to be able to read and send messages, embed links, manage roles, and manage channels on your server. You can restrict me to specific channels by editing channel-specific permissions if you like. When you're sure I have those, type !done - when you do, I will create a channel called #meowth-chat where all !want commands must be issued. (You'll thank me for keeping that clutter out of your default channels!)")
             await Meowth.wait_for_message(author=server.owner, content = "!done")
             try:
                 await Meowth.create_channel(server, 'meowth-chat')
@@ -344,8 +338,11 @@ async def configure(ctx):
                 fd = open("serverdict", "wb")
                 pickle.dump(server_dict, fd)
                 fd.close()
+                await Meowth.send_message(owner, "Meowth! Alright! I'm ready to go! One more thing. I like to use custom emoji for certain things, especially for displaying type weaknesses for raid bosses! I'm going to send you a .rar file that contains all the emoji I need. There are 23 in all. All you have to do is download, extract, and upload the images to Discord as custom emoji. You can do this all at once, and you can just leave the emoji titles alone!")
+                fd = open("emoji.rar", "rb")
+                await Meowth.send_file(owner, fd)
             except:
-                await Meowth.send_message(owner, "Meowth! You didn't give me enough permissions! Type !config to start over!")
+                await Meowth.send_message(owner, "Meowth! You didn't give me enough permissions! Type !configure to start over!")
 
 """Welcome message to the server and some basic instructions."""
 
@@ -468,7 +465,8 @@ async def want(ctx):
     
     Usage: !want <species>
     Meowth will mention you if anyone reports seeing
-    this species in their !wild or !raid command."""
+    this species in their !wild or !raid command.
+    This command only works in #meowth-chat."""
     
     """Behind the scenes, Meowth tracks user !wants by
     creating a server role for the Pokemon species, and
@@ -584,13 +582,13 @@ async def raid(ctx):
             
         raidmsg = """Meowth! {0} raid reported by {1}! Details: {2}. Coordinate here!
 
-Reply (not react) to this message with {3} to say you are on your way, or {4} if you are at the raid already!
-If your plans change, reply with {5} if you are no longer on the way, or {6} if you left the raid.
+Reply (not react) to this message with {3} or !coming to say you are on your way, or {4} or !here if you are at the raid already!
+If your plans change, reply with !cancel to remove your party from the list of those on the way or waiting.
 
 To see a list of trainers on their way use !otw. To see a list of trainers at the raid use !waiting.
 Once you start a raid, use !starting to clear the waiting list.
 
-This channel will be deleted in 2 hours.""".format(raid.mention, ctx.message.author.mention, raid_details, print_emoji_name(ctx.message.server, config['omw_id']), print_emoji_name(ctx.message.server, config['here_id']), print_emoji_name(ctx.message.server, config['unomw_id']), print_emoji_name(ctx.message.server, config['unhere_id']))
+This channel will be deleted in 2 hours, or five minutes after the raid expires, whichever comes first!""".format(raid.mention, ctx.message.author.mention, raid_details, print_emoji_name(ctx.message.server, config['omw_id']), print_emoji_name(ctx.message.server, config['here_id']), print_emoji_name(ctx.message.server, config['unomw_id']), print_emoji_name(ctx.message.server, config['unhere_id']))
         raidmessage = await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)
         
         server_dict[ctx.message.server]['raidchannel_dict'][raid_channel] = {
@@ -765,14 +763,6 @@ async def on_message(message):
         if message.content.startswith(here_emoji):
             await _here(message, message.content.count(here_emoji))
             return
-        if message.content.startswith(parse_emoji(message.server, config['unhere_id'])):
-            if message.author.mention in trainer_dict and trainer_dict[message.author.mention]['status'] == "waiting":
-                await _cancel(message)
-            return
-        if message.content.startswith(parse_emoji(message.server, config['unomw_id'])):
-            if message.author.mention in trainer_dict and trainer_dict[message.author.mention]['status'] == "omw":
-                await _cancel(message)
-            return
         if "/maps" in message.content:
             mapsindex = message.content.find("/maps")
             newlocindex = message.content.rfind("http", 0, mapsindex)
@@ -895,15 +885,9 @@ async def emoji_help(ctx):
     {0}: indicate you are on the way to a raid.
         To tell Meowth you are in a group, copy the emoji once for each person in your group.
         
-    {1}: indicate you are no longer on the way to a raid.
-        This will remove you and your group from the "omw" list.
-        
-    {2}: indicate you have arrived at the raid.
+    {1}: indicate you have arrived at the raid.
         To specify you are in a group, copy the emoji once for each person in your group.
-        This will remove you from the "omw" list.
-        
-    {3}: indicate you are leaving the raid location.
-        This will remove you and your group from the "waiting" list.""".format(print_emoji_name(ctx.message.server, config['omw_id']), print_emoji_name(ctx.message.server, config['unomw_id']), print_emoji_name(ctx.message.server, config['here_id']), print_emoji_name(ctx.message.server, config['unhere_id']))
+        This will remove you from the "omw" list.""".format(print_emoji_name(ctx.message.server, config['omw_id']), print_emoji_name(ctx.message.server, config['here_id']))
     
     await Meowth.send_message(ctx.message.channel, helpmsg)
 

@@ -284,7 +284,7 @@ async def on_ready():
 @Meowth.event
 async def on_server_join(server):
     owner = server.owner
-    server_dict[server] = {'offset': 0, 'welcome': False, 'team': False, 'want': False, 'other': False, 'done': False, 'raidchannel_dict' : {}}
+    server_dict[server] = {'want_channel_list': [], 'offset': 0, 'welcome': False, 'team': False, 'want': False, 'other': False, 'done': False, 'raidchannel_dict' : {}}
     await Meowth.send_message(owner, _("Meowth! I'm Meowth, a Discord helper bot for Pokemon Go communities, and someone has invited me to your server! Type !help to see a list of things I can do, and type !configure in any channel of your server to begin!"))
 
 @Meowth.command(pass_context=True, hidden=True)
@@ -338,10 +338,15 @@ async def configure(ctx):
                 await Meowth.send_message(server.owner,"""Meowth! There weren't the same number of cities and channels! Please type !config to start over!""")
                 return
             server_dict[server]['city_channels'] = citychannel_dict
-            await Meowth.send_message(server.owner, "Meowth! Ok. Time to double-check that I have all the permissions I need. Remember that I need to be able to read and send messages, embed links, manage roles, and manage channels on your server. You can restrict me to specific channels by editing channel-specific permissions if you like. When you're sure I have those, type !done - when you do, I will create a channel called #meowth-chat where all !want commands must be issued. (You'll thank me for keeping that clutter out of your default channels!)")
-            await Meowth.wait_for_message(author=server.owner, content = "!done")
+            await Meowth.send_message(server.owner, "Meowth! Ok. Time to double-check that I have all the permissions I need. Remember that I need to be able to read and send messages, embed links, manage roles, and manage channels on your server. You can restrict me to specific channels by editing channel-specific permissions if you like. The last thing you should know is that the !want and !unwant commands can produce a lot of clutter if they are allowed on your main channels. I suggest having a dedicated channel for want and unwant. Just type the name or names of the channel(s) you want me to allow. If you type something that isn't a name of an existing channel, I'll create one by that name. By the way: if you need to change any of these settings, just type !configure in your server and we can do this again.")
+            wantchs = await Meowth.wait_for_message(author=server.owner)
+            want_list = wantchs.content.split(', ')
             try:
-                await Meowth.create_channel(server, 'meowth-chat')
+                for want_channel_name in want_list:
+                    want_channel = discord.utils.get(server.channels, name = want_channel_name)
+                    if want_channel == None:
+                        want_channel = await Meowth.create_channel(server, want_channel_name)
+                    server_dict[server]['want_channel_list'].append(want_channel)
                 server_dict[server]['done']=True
                 fd = open("serverdict", "wb")
                 pickle.dump(server_dict, fd)
@@ -479,32 +484,33 @@ async def want(ctx):
     """Behind the scenes, Meowth tracks user !wants by
     creating a server role for the Pokemon species, and
     assigning it to the user."""
-    meowthchat = discord.utils.get(ctx.message.server.channels, name='meowth-chat')
-    if ctx.message.channel.name != meowthchat.name:
-        await Meowth.send_message(ctx.message.channel, "Meowth! Please use {0} for !want commands!".format(meowthchat.name))
-        return
-    entered_want = ctx.message.content[6:].lower()
-    if entered_want not in pkmn_info['pokemon_list']:
-        await Meowth.send_message(ctx.message.channel, spellcheck(entered_want))
+
+    if ctx.message.channel not in server_dict[ctx.message.server]['want_channel_list']:
+        await Meowth.send_message(ctx.message.channel, "Meowth! Please use one of the following channels for !want commands: {0}".format(", ".join(i.mention for i in server_dict[ctx.message.server]['want_channel_list'])))
         return
     else:
-        role = discord.utils.get(ctx.message.server.roles, name=entered_want)
-        # Create role if it doesn't exist yet
-        if role is None:
-            role = await Meowth.create_role(server = ctx.message.server, name = entered_want, hoist = False, mentionable = True)
-            await asyncio.sleep(0.5)
-        
-        # If user is already wanting the Pokemon,
-        # print a less noisy message
-        if role in ctx.message.author.roles:
-            await Meowth.send_message(ctx.message.channel, content=_("Meowth! {0}, I already know you want {1}!").format(ctx.message.author.mention, entered_want.capitalize()))
+        entered_want = ctx.message.content[6:].lower()
+        if entered_want not in pkmn_info['pokemon_list']:
+            await Meowth.send_message(ctx.message.channel, spellcheck(entered_want))
+            return
         else:
-            await Meowth.add_roles(ctx.message.author, role)
-            want_number = pkmn_info['pokemon_list'].index(entered_want) + 1
-            want_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(want_number)) #This part embeds the sprite
-            want_embed = discord.Embed(colour=discord.Colour(0x2ecc71))
-            want_embed.set_thumbnail(url=want_img_url)
-            await Meowth.send_message(ctx.message.channel, content=_("Meowth! Got it! {0} wants {1}").format(ctx.message.author.mention, entered_want.capitalize()),embed=want_embed)
+            role = discord.utils.get(ctx.message.server.roles, name=entered_want)
+            # Create role if it doesn't exist yet
+            if role is None:
+                role = await Meowth.create_role(server = ctx.message.server, name = entered_want, hoist = False, mentionable = True)
+                await asyncio.sleep(0.5)
+            
+            # If user is already wanting the Pokemon,
+            # print a less noisy message
+            if role in ctx.message.author.roles:
+                await Meowth.send_message(ctx.message.channel, content=_("Meowth! {0}, I already know you want {1}!").format(ctx.message.author.mention, entered_want.capitalize()))
+            else:
+                await Meowth.add_roles(ctx.message.author, role)
+                want_number = pkmn_info['pokemon_list'].index(entered_want) + 1
+                want_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(want_number)) #This part embeds the sprite
+                want_embed = discord.Embed(colour=discord.Colour(0x2ecc71))
+                want_embed.set_thumbnail(url=want_img_url)
+                await Meowth.send_message(ctx.message.channel, content=_("Meowth! Got it! {0} wants {1}").format(ctx.message.author.mention, entered_want.capitalize()),embed=want_embed)
 
 @Meowth.command(pass_context = True)
 async def wild(ctx):

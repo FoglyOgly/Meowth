@@ -10,7 +10,7 @@
 
 "//": "Bot token ID, needed for authentication.",
 "//": "This is found on the app page when you click to reveal the bot user's token",
-"bot_token": "mytokenhere",
+"bot_token": "yourtoken",
 
 "//": "Define Meowth's master (that's you).",
 "//": "Meowth will only take admin commands from this user",

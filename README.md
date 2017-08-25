@@ -1,12 +1,30 @@
 # Meowth
 A Discord helper bot for Pokemon Go communities.
 
-
 Meowth is a Discord bot written in Python 3.5 using version 0.16.8 of the discord.py library.
+
+## Meowth 2.0 is here! 
+
+Meowth is now able to handle being on multiple servers of any size in any part of the world and can be invited to your server without having to install Python or run anything on a local machine yourself. The configuration process is now handled completely on Discord via DM with the server owner. First, a list of current features:
+
+1. User-driven (not automated) wild spawn and raid reporting.
+2. Role management for each Pokemon species (Discord limits a server to 250 roles, however) that allows each user to opt-in only for the Pokemon they want. These roles are mentioned when spawns or raids are reported.
+3. Raid coordination: several methods of interacting with Meowth allow users to declare themselves as interested in, on the way to, or at a raid. These are compiled into lists that let users easily determine the size of the current raid party. Each reported raid gets its own channel that is deleted when the reported time on the raid expires. Meowth also queries Google Maps to get a guess of the raid location (no access to the game means no list of gyms).
+4. Optional team management and new member welcome functions.
+
+## Directions for inviting a remotely hosted Meowth to your server:
+1. Be a user with the "Manage Server" permission on the server you're trying to invite Meowth to, or get such a person to follow these directions. The server owner will have to do the configure process anyway, so you might as well get that person.
+2. Follow this link: https://discordapp.com/oauth2/authorize?client_id=346759953006198784&scope=bot&permissions=0 and select your server.
+3. In your server, type !configure if you are the server owner. Meowth will DM you and ask you some questions about your time zone, what functions you want to enable, what channels you want to restrict certain functions to, and what locations to insert to Google Maps queries (these are channel-specific). Do NOT send anything to your server while in this process as a few times Meowth is just waiting to see any message from you. If you make a mistake just type !configure in your server to start over.
+4. Meowth will send you a file with some custom emoji in it. You can just bulk upload those to your server. Meowth currently uses 23 custom emoji. 18 of these are type icons (for displaying type weaknesses of raid bosses), 3 of them are team icons, and 2 are for raid coordination. All functions are available without custom emoji, but the type icons in particular look slick in raid reports.
+5. That's it! You can join the Meowth server here for updates, setup help, feature requests, or just to test out the bot before you add it. https://discord.gg/hhVjAN8 
+
+If you want to tinker with Meowth yourself, you can still download this repo, make whatever changes you want (or keep everything if you want) and run Meowth locally. The configure process is the same except you'll have to use your own bot token.
 
 ## Directions for installing and running the bot on your server:
 
 1. Install Python 3.5 for whatever OS you have on your home computer. https://www.python.org/downloads/release/python-350/
+
 2. Install discord.py. To do this, run this command in your command prompt: python3 -m pip install -U discord.py
 (On Windows: py -m pip install -U discord.py should work)
 
@@ -20,7 +38,7 @@ Meowth avatar included in the repository. Create a bot user for your app.
 Then go to your Discord application page again and copy the client id, inserting it into the above link where it says <CLIENT_ID>.
 Press enter and select the server you want to add Meowth too.
 
-6. Give Meowth, at the least, permissions to read and write messages, embed links,manage channels, and manage roles.
+6. Give Meowth, at the least, permissions to read and write messages, embed links, manage channels, and manage roles.
 
 7. Go back to your app page in Discord and click to reveal the bot token, then copy it. Open config.json in a text editor.  Paste the bot token into line 13, replacing the "mytokenhere" string.
 
@@ -28,24 +46,6 @@ Press enter and select the server you want to add Meowth too.
 window and the bot should show up as online in Discord.
 
 9. All commands except !team should be working. The welcome message may or may not be working at this point. Google Maps links may not be that accurate yet. The raid commands will be using default values like :omw: which may not be configured on your server.
-
-## Configure Meowth
-
-1. Open config.json in a text editor. You'll need to make a few easy edits.
-
-2. **Enable the !team command.** If you haven't already, create a role for each team. Enter the role names in the team_dict on line 46. The team emoji are configured on this line as well (see step 5 and 6).
-
-3. **Enable the welcome message**. On lines 21, 25, and 29, configure the names of your server's @admin role, default channel, and #announcements/#welcome channel.
-
-4. **Enable Google Maps hints.** In lines 33 and 34, replace the blank strings next to "yourtown" and "yourstate" with your community's location. This makes the Google Maps location links work a lot better.
-
-5. **Upload emoji to server (optional).** If you're going to use the included emoji, upload the images in the folder as custom emoji for your server. There are 18 type icons, an omw emoji (car), an unomw emoji (car with
-a circle and a line through it), and here and unhere emoji (Go Plus), and an emoji for each of the three teams.
-
-6. **Configure raid command strings.** Using the variables in lines 61-85, customize the emoji messages to match the ones on your server. Meowth will attempt to look up the names in your server's emoji list. You'll have to do this for each of the 25 custom emoji. You can also just use plain strings if your emoji slots are already taken or if you just prefer it that way.
-
-7. Save config.json. Next time you run Meowth, the changes will take effect.
-
 
 
 

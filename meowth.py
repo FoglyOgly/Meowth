@@ -280,12 +280,15 @@ team_msg = " or ".join(["'!team {0}'".format(team) for team in config['team_dict
 async def on_ready():
     print(_("Meowth! That's right!")) #prints to the terminal or cmd prompt window upon successful connection to Discord
     await channel_cleanup()
+    for server in Meowth.servers:
+        server_dict[server] = server_dict.pop(server)
+        
 
 
 @Meowth.event
 async def on_server_join(server):
     owner = server.owner
-    server_dict[server] = {'want_channel_list': [], 'offset': None, 'welcome': False, 'team': False, 'want': False, 'other': False, 'done': False, 'raidchannel_dict' : {}}
+    server_dict[server] = {'want_channel_list': [], 'offset': 0, 'welcome': False, 'team': False, 'want': False, 'other': False, 'done': False, 'raidchannel_dict' : {}}
     await Meowth.send_message(owner, _("Meowth! I'm Meowth, a Discord helper bot for Pokemon Go communities, and someone has invited me to your server! Type !help to see a list of things I can do, and type !configure in any channel of your server to begin!"))
 
 @Meowth.command(pass_context=True, hidden=True)
@@ -293,30 +296,26 @@ async def configure(ctx):
     if check_server_owner(ctx.message.author, ctx.message.server):
         server = ctx.message.server
         owner = ctx.message.author
-        await Meowth.send_message(owner, "Meowth! Ok, before we enable any of my features, I need to know what timezone you're in! This will help me coordinate raids for you. The current 24-hr time UTC is {0}. How many hours off from that are you? Please enter your answer as a number between -12 and 14.".format(strftime("%H:%M",time.gmtime())))
+        await Meowth.send_message(owner, "Meowth! Ok, before we enable any of my features, I need to know what timezone you're in! This will help me coordinate raids for you. The current 24-hr time UTC is {0}. How many hours off from that are you? Please enter your answer as a number between -12 and 12.".format(strftime("%H:%M",time.gmtime())))
         offsetmsg = await Meowth.wait_for_message(author = owner)
-        try:
-            offset = float(offsetmsg.content)
-        except ValueError:
-            await Meowth.send_message(owner, _("Meowth! I couldn't convert your answer to a number! Type !configure in your server to start again."))
-            return
+        offset = float(offsetmsg.content)
         if not -12 <= offset <= 14:
-            await Meowth.send_message(owner, _("Meowth! That's not a valid timezone! Type !configure in your server to start again."))
+            await Meowth.send_message(owner, _("Meowth! I couldn't convert your answer to a number! Type !configure in your server to start again."))
             return
         server_dict[server]['offset'] = offset
         await Meowth.send_message(owner, _("Meowth! That's great! First, I have a feature where I welcome new members to the server. If you have a bot that handles this already, or if you don't want this feature, type N, otherwise type Y to enable this feature!"))
         welcomereply = await Meowth.wait_for_message(author = owner)
-        if welcomereply.content == "Y":
+        if welcomereply.content == "Y" or welcomereply.content == "y":
             server_dict[server]['welcome'] = True
             await Meowth.send_message(owner, "Meowth! Welcome message enabled!")
         await Meowth.send_message(owner, _("Meowth! Alright. Next I have a feature for assigning roles for each Pokemon Go team. If you have a bot that handles this already, or you don't want this feature, type N, otherwise type Y to enable the feature!"))
         teamreply = await Meowth.wait_for_message(author = owner)
-        if teamreply.content == "Y":
+        if teamreply.content == "Y" or teamreply.content == "y":
             server_dict[server]['team']=True
             await Meowth.send_message(owner, "Meowth! Team assignments enabled!")
         await Meowth.send_message(owner, _("Meowth! Alright. Last I just want to check that you want to enable my main functions. These include assigning roles for each Pokemon a user wants, creating channels for raids, and keeping track of users coming to each raid. If you don't want me to do any of that, type N, otherwise type Y to enable my main functions!"))
         otherreply = await Meowth.wait_for_message(author = owner)
-        if otherreply.content == "Y":
+        if otherreply.content == "Y" or otherreply.content == "y":
             server_dict[server]['other']=True
             await Meowth.send_message(owner, _("Meowth! Okay. Now make sure that I have either an admin role on your server, or at least a role with these permissions: read messages, send messages, embed links, manage roles, manage channels."))
             await Meowth.send_message(owner, _("Meowth! Next, I need to know which channels will be used for raid reports. If your server covers only one community, that's probably your server's default channel. If you cover multiple communities, you should probably have a channel for each community that only those with roles for that community can see. Otherwise your users could be inundated with notifications for raids that are not relevant to them!"))
@@ -378,8 +377,7 @@ async def on_member_join(member):
     message = _("Meowth! Welcome to {0.name}, {1.mention}! ")
     if server_dict[server]['team'] == True:
         message += "Set your team by typing {0} without quotations.".format(team_msg)
-    if admin:
-        message += admin_message
+    message += admin_message
     
     # Figure out which channel to send the message to
     
@@ -468,8 +466,7 @@ async def team(ctx):
         return
     # Check if the role is configured on the server
     elif role is None:
-        admin = discord.utils.get(ctx.message.server.roles, name=config['admin_role'])
-        await Meowth.send_message(ctx.message.channel, _("Meowth! The \"{0}\" role isn't configured on this server! Contact {1}!").format(entered_team, get_admin_str(admin)))
+        await Meowth.send_message(ctx.message.channel, _("Meowth! The \"{0}\" role isn't configured on this server! Contact an admin!").format(entered_team))
     else:
         try:
             await Meowth.add_roles(ctx.message.author, role)
@@ -607,7 +604,7 @@ If your plans change, reply with !cancel to remove your party from the list of t
 To see a list of trainers on their way use !otw. To see a list of trainers at the raid use !waiting.
 Once you start a raid, use !starting to clear the waiting list.
 
-This channel will be deleted in 2 hours, or five minutes after the raid expires, whichever comes first!""".format(raid.mention, ctx.message.author.mention, raid_details, print_emoji_name(ctx.message.server, config['omw_id']), print_emoji_name(ctx.message.server, config['here_id']))
+This channel will be deleted in 2 hours, or five minutes after the raid expires, whichever comes first!""".format(raid.mention, ctx.message.author.mention, raid_details, print_emoji_name(ctx.message.server, config['omw_id']), print_emoji_name(ctx.message.server, config['here_id']), print_emoji_name(ctx.message.server, config['unomw_id']), print_emoji_name(ctx.message.server, config['unhere_id']))
         raidmessage = await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)
         
         server_dict[ctx.message.server]['raidchannel_dict'][raid_channel] = {

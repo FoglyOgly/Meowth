@@ -279,6 +279,7 @@ team_msg = " or ".join(["'!team {0}'".format(team) for team in config['team_dict
 @Meowth.event
 async def on_ready():
     print(_("Meowth! That's right!")) #prints to the terminal or cmd prompt window upon successful connection to Discord
+    await channel_cleanup()
 
 
 @Meowth.event
@@ -485,7 +486,7 @@ async def want(ctx):
     creating a server role for the Pokemon species, and
     assigning it to the user."""
 
-    if ctx.message.channel not in server_dict[ctx.message.server]['want_channel_list']:
+    if server_dict[ctx.message.server]['want_channel_list'] and ctx.message.channel not in server_dict[ctx.message.server]['want_channel_list']:
         await Meowth.send_message(ctx.message.channel, "Meowth! Please use one of the following channels for !want commands: {0}".format(", ".join(i.mention for i in server_dict[ctx.message.server]['want_channel_list'])))
         return
     else:

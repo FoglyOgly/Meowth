@@ -285,7 +285,7 @@ async def on_ready():
 @Meowth.event
 async def on_server_join(server):
     owner = server.owner
-    server_dict[server] = {'want_channel_list': [], 'offset': 0, 'welcome': False, 'team': False, 'want': False, 'other': False, 'done': False, 'raidchannel_dict' : {}}
+    server_dict[server] = {'want_channel_list': [], 'offset': None, 'welcome': False, 'team': False, 'want': False, 'other': False, 'done': False, 'raidchannel_dict' : {}}
     await Meowth.send_message(owner, _("Meowth! I'm Meowth, a Discord helper bot for Pokemon Go communities, and someone has invited me to your server! Type !help to see a list of things I can do, and type !configure in any channel of your server to begin!"))
 
 @Meowth.command(pass_context=True, hidden=True)
@@ -293,11 +293,15 @@ async def configure(ctx):
     if check_server_owner(ctx.message.author, ctx.message.server):
         server = ctx.message.server
         owner = ctx.message.author
-        await Meowth.send_message(owner, "Meowth! Ok, before we enable any of my features, I need to know what timezone you're in! This will help me coordinate raids for you. The current 24-hr time UTC is {0}. How many hours off from that are you? Please enter your answer as a number between -12 and 12.".format(strftime("%H:%M",time.gmtime())))
+        await Meowth.send_message(owner, "Meowth! Ok, before we enable any of my features, I need to know what timezone you're in! This will help me coordinate raids for you. The current 24-hr time UTC is {0}. How many hours off from that are you? Please enter your answer as a number between -12 and 14.".format(strftime("%H:%M",time.gmtime())))
         offsetmsg = await Meowth.wait_for_message(author = owner)
-        offset = float(offsetmsg.content)
-        if not -12 <= offset <= 14:
+        try:
+            offset = float(offsetmsg.content)
+        except ValueError:
             await Meowth.send_message(owner, _("Meowth! I couldn't convert your answer to a number! Type !configure in your server to start again."))
+            return
+        if not -12 <= offset <= 14:
+            await Meowth.send_message(owner, _("Meowth! That's not a valid timezone! Type !configure in your server to start again."))
             return
         server_dict[server]['offset'] = offset
         await Meowth.send_message(owner, _("Meowth! That's great! First, I have a feature where I welcome new members to the server. If you have a bot that handles this already, or if you don't want this feature, type N, otherwise type Y to enable this feature!"))
@@ -603,7 +607,7 @@ If your plans change, reply with !cancel to remove your party from the list of t
 To see a list of trainers on their way use !otw. To see a list of trainers at the raid use !waiting.
 Once you start a raid, use !starting to clear the waiting list.
 
-This channel will be deleted in 2 hours, or five minutes after the raid expires, whichever comes first!""".format(raid.mention, ctx.message.author.mention, raid_details, print_emoji_name(ctx.message.server, config['omw_id']), print_emoji_name(ctx.message.server, config['here_id']), print_emoji_name(ctx.message.server, config['unomw_id']), print_emoji_name(ctx.message.server, config['unhere_id']))
+This channel will be deleted in 2 hours, or five minutes after the raid expires, whichever comes first!""".format(raid.mention, ctx.message.author.mention, raid_details, print_emoji_name(ctx.message.server, config['omw_id']), print_emoji_name(ctx.message.server, config['here_id']))
         raidmessage = await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)
         
         server_dict[ctx.message.server]['raidchannel_dict'][raid_channel] = {

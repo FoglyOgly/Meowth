@@ -775,9 +775,8 @@ async def _cancel(message):
         del trainer_dict[message.author.mention]
         server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict'] = trainer_dict
 
-"""Meowth watches for messages that start with the omw, here, unomw, unhere emoji. For omw and here, Meowth
-counts the number of emoji and adds that user and the number to the omw and waiting lists. For unomw and unhere,
-Meowth removes that user and their number from the list regardless of emoji count. The emoji here will have to be
+"""Meowth watches for messages that start with the omw and here emoji. Meowth
+counts the number of emoji and adds that user and the number to the omw and waiting lists. The emoji here will have to be
 changed to fit the emoji ids in your server."""
 @Meowth.event
 async def on_message(message):

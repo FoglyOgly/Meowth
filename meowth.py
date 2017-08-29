@@ -389,9 +389,6 @@ async def configure(ctx):
                     fd.close()
                 except:
                     await Meowth.send_message(owner, "Meowth! You didn't give me enough permissions! Type !configure to start over!")
-            await Meowth.send_message(owner, "**Emojis**\n\nMeowth! Alright! I'm ready to go! One more thing. I like to use custom emoji for certain things, especially for displaying type weaknesses for raid bosses! I'm going to send you a .rar file that contains all the emoji I need. There are 23 in all. All you have to do is download, extract, and upload the images to Discord as custom emoji. You can do this all at once, and you can just leave the emoji titles alone!")
-            fd = open("emoji.rar", "rb")
-            await Meowth.send_file(owner, fd)
             server_dict[server]['done']=True
         if otherreply.content == "N" or otherreply.content == "n":
             server_dict[server]['other']=False
@@ -399,7 +396,10 @@ async def configure(ctx):
             server_dict[server]['wildset']=False
             server_dict[server]['wantset']=False
             server_dict[server]['done']=True
-            await Meowth.send_message(owner, _("Meowth! Okay. All of my main functions have been disabled. You're all set!"))
+            await Meowth.send_message(owner, _("Meowth! Okay. All of my main functions have been disabled."))
+        await Meowth.send_message(owner, "**Emojis**\n\nMeowth! Alright! I'm ready to go! One more thing. I like to use custom emoji for certain things, especially for displaying type weaknesses for raid bosses! I'm going to send you a .rar file that contains all the emoji I need. There are 23 in all. All you have to do is download, extract, and upload the images to Discord as custom emoji. You can do this all at once, and you can just leave the emoji titles alone!")
+        fd = open("emoji.rar", "rb")
+        await Meowth.send_file(owner, fd)
 
 """Welcome message to the server and some basic instructions."""
 

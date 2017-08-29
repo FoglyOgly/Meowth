@@ -376,7 +376,6 @@ async def configure(ctx):
                 server_dict[server]['wantset']=False
             else:
                 server_dict[server]['wantset']=True
-                want_channel_list = []
                 want_list = wantchs.content.split(', ')
                 try:
                     for want_channel_name in want_list:

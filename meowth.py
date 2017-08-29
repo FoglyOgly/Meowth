@@ -604,7 +604,7 @@ If your plans change, reply with !cancel to remove your party from the list of t
 To see a list of trainers on their way use !otw. To see a list of trainers at the raid use !waiting.
 Once you start a raid, use !starting to clear the waiting list.
 
-This channel will be deleted in 2 hours, or five minutes after the raid expires, whichever comes first!""".format(raid.mention, ctx.message.author.mention, raid_details, print_emoji_name(ctx.message.server, config['omw_id']), print_emoji_name(ctx.message.server, config['here_id']), print_emoji_name(ctx.message.server, config['unomw_id']), print_emoji_name(ctx.message.server, config['unhere_id']))
+This channel will be deleted in 2 hours, or five minutes after the raid expires, whichever comes first!""".format(raid.mention, ctx.message.author.mention, raid_details, print_emoji_name(ctx.message.server, config['omw_id']), print_emoji_name(ctx.message.server, config['here_id']))
         raidmessage = await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)
         
         server_dict[ctx.message.server]['raidchannel_dict'][raid_channel] = {
@@ -775,44 +775,46 @@ async def _cancel(message):
         del trainer_dict[message.author.mention]
         server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict'] = trainer_dict
 
-"""Meowth watches for messages that start with the omw, here, unomw, unhere emoji. For omw and here, Meowth
-counts the number of emoji and adds that user and the number to the omw and waiting lists. For unomw and unhere,
-Meowth removes that user and their number from the list regardless of emoji count. The emoji here will have to be
+"""Meowth watches for messages that start with the omw and here emoji. Meowth
+counts the number of emoji and adds that user and the number to the omw and waiting lists. The emoji here will have to be
 changed to fit the emoji ids in your server."""
 @Meowth.event
 async def on_message(message):
-    if message.channel in server_dict[message.server]['raidchannel_dict'] and server_dict[message.server]['raidchannel_dict'][message.channel]['active']:
-        trainer_dict = server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']
-        omw_emoji = parse_emoji(message.server, config['omw_id'])
-        if message.content.startswith(omw_emoji):
-            await _coming(message, message.content.count(omw_emoji))
-            return
-        # TODO: there's no relation between the :here: count and the :omw: count.
-        # For example, if a user is :omw: with 4, they have to send 4x :here:
-        # or else they only count as 1 person waiting
-        here_emoji = parse_emoji(message.server, config['here_id'])
-        if message.content.startswith(here_emoji):
-            await _here(message, message.content.count(here_emoji))
-            return
-        if "/maps" in message.content:
-            mapsindex = message.content.find("/maps")
-            newlocindex = message.content.rfind("http", 0, mapsindex)
-            if newlocindex == -1:
-                return
-            newlocend = message.content.find(" ", newlocindex)
-            newloc = message.content[newlocindex:newlocend]
-            oldraidmsg = server_dict[message.server]['raidchannel_dict'][message.channel]['raidmessage']
-            oldembed = oldraidmsg.embeds[0]
-            newembed = discord.Embed(title=oldembed['title'],url=newloc,description=oldembed['description'],colour=discord.Colour(0x2ecc71))
-            newembed.set_thumbnail(url=oldembed['thumbnail']['url'])
-            await Meowth.edit_message(oldraidmsg, new_content=oldraidmsg.content, embed=newembed)
-            otw_list = []
+    raid_status = server_dict[message.server]['raidchannel_dict'].get(message.channel,None)
+    if raid_status is not None:
+        if server_dict[message.server]['raidchannel_dict'][message.channel]['active']:
             trainer_dict = server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']
-            for trainer in trainer_dict.keys():
-                if trainer_dict[trainer]['status']=='omw':
-                    otw_list.append(trainer)
-            await Meowth.send_message(message.channel, content = "Meowth! Someone has suggested a different location for the raid than what I guessed! Trainers {0}: make sure you are headed to the right place!".format(", ".join(otw_list)), embed = newembed)
-            return
+            omw_emoji = parse_emoji(message.server, config['omw_id'])
+            if message.content.startswith(omw_emoji):
+                await _coming(message, message.content.count(omw_emoji))
+                return
+            # TODO: there's no relation between the :here: count and the :omw: count.
+            # For example, if a user is :omw: with 4, they have to send 4x :here:
+            # or else they only count as 1 person waiting
+            here_emoji = parse_emoji(message.server, config['here_id'])
+            if message.content.startswith(here_emoji):
+                await _here(message, message.content.count(here_emoji))
+                return
+            if "/maps" in message.content:
+                mapsindex = message.content.find("/maps")
+                newlocindex = message.content.rfind("http", 0, mapsindex)
+                if newlocindex == -1:
+                    return
+                newlocend = message.content.find(" ", newlocindex)
+                newloc = message.content[newlocindex:newlocend]
+                oldraidmsg = server_dict[message.server]['raidchannel_dict'][message.channel]['raidmessage']
+                oldembed = oldraidmsg.embeds[0]
+                newembed = discord.Embed(title=oldembed['title'],url=newloc,description=oldembed['description'],colour=discord.Colour(0x2ecc71))
+                newembed.set_thumbnail(url=oldembed['thumbnail']['url'])
+                await Meowth.edit_message(oldraidmsg, new_content=oldraidmsg.content, embed=newembed)
+                otw_list = []
+                trainer_dict = server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']
+                for trainer in trainer_dict.keys():
+                    if trainer_dict[trainer]['status']=='omw':
+                        otw_list.append(trainer)
+                await Meowth.send_message(message.channel, content = "Meowth! Someone has suggested a different location for the raid than what I guessed! Trainers {0}: make sure you are headed to the right place!".format(", ".join(otw_list)), embed = newembed)
+                return
+    
     await Meowth.process_commands(message)
 
 @Meowth.command(pass_context=True)

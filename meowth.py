@@ -439,6 +439,20 @@ async def team(ctx):
     
     Usage: !team <team name>
     The team roles have to be created manually beforehand by the server administrator."""
+
+    server = ctx.message.server
+    toprole = server.me.top_role.name
+    position = server.me.top_role.position
+    high_roles = []
+    
+    for team in config['team_dict'].keys():
+        temp_role = discord.utils.get(ctx.message.server.roles, name=team)
+        if temp_role.position > position:
+            high_roles.append(temp_role.name)
+    
+    if high_roles:
+        await Meowth.send_message(ctx.message.channel, _("Meowth! My roles are ranked lower than the following team roles: **{0}**\nPlease get an admin to move my roles above them!").format(', '.join(high_roles)))
+        return
     
     role = None
     entered_team = ctx.message.content[6:]

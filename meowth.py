@@ -558,9 +558,9 @@ async def want(ctx):
 @Meowth.command(pass_context = True)
 async def wild(ctx):
         bot = ""
-        await _wild(ctx.message, bot)
+        await _wild(ctx.message)
 
-async def _wild(message, bot):
+async def _wild(message):
     """Report a wild Pokemon spawn location.
 
     Usage: !wild <species> <location>
@@ -571,20 +571,14 @@ async def _wild(message, bot):
         await Meowth.send_message(message.channel, _("Meowth! Please restrict wild reports to city channels or the default channel!"))
         return
     if server_dict[message.server]['wildset'] == True:
-        if bot == "":
-            space1 = message.content.find(" ",6)
-            if space1 == -1:
-                await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!wild <pokemon name> <location>**"))
-                return
-            else:
-                entered_wild = message.content[6:space1].lower()
-                wild_details = message.content[space1:]
-                wild_gmaps_link = create_gmaps_query(wild_details, message.channel)
+        space1 = message.content.find(" ",6)
+        if space1 == -1:
+            await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!wild <pokemon name> <location>**"))
+            return
         else:
-            space1 = bot.split(" ")
-            entered_wild = space1[1].lower()
-            wild_details = space1[2]
-            wild_gmaps_link = "https://www.google.com/maps/dir/Current+Location/{0}".format(wild_details)
+            entered_wild = message.content[6:space1].lower()
+            wild_details = message.content[space1:]
+            wild_gmaps_link = create_gmaps_query(wild_details, message.channel)
 
         if entered_wild not in pkmn_info['pokemon_list']:
             await Meowth.send_message(message.channel, spellcheck(entered_wild))
@@ -605,9 +599,9 @@ async def _wild(message, bot):
 @Meowth.command(pass_context=True)
 async def raid(ctx):
         bot = ""
-        await _raid(ctx.message, bot)
+        await _raid(ctx.message)
 
-async def _raid(message, bot):
+async def _raid(message):
     """Report an ongoing raid.
 
     Usage: !raid <species> <location>
@@ -620,31 +614,19 @@ async def _raid(message, bot):
         await Meowth.send_message(message.channel, "Meowth! Please restrict raid reports to a city channel or the default channel!")
         return
     if server_dict[message.server]['raidset'] == True:
-        if bot == "":
-            space1 = message.content.find(" ",6)
-            if space1 == -1:
-                await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**"))
-                return
-            entered_raid = message.content[6:space1].lower()
-            raid_message = message.content[space1:]
-            raidtime = re.search('[01]:[0-5][0-9]', message.content)
-            if raidtime:
-                raid_details = message.content[space1:raidtime.start()-1]
-                raidexp = raidtime.group()
-            else:
-                raid_details = raid_message
-            raid_gmaps_link = create_gmaps_query(raid_details, message.channel)
+        space1 = message.content.find(" ",6)
+        if space1 == -1:
+            await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**"))
+            return
+        entered_raid = message.content[6:space1].lower()
+        raid_message = message.content[space1:]
+        raidtime = re.search('[01]:[0-5][0-9]', message.content)
+        if raidtime:
+            raid_details = message.content[space1:raidtime.start()-1]
+            raidexp = raidtime.group()
         else:
-            space1 = bot.find(" ",6)
-            entered_raid = bot.split(" ")[1].lower()
-            raid_message = bot[space1:]
-            raidtime = re.search('[01]:[0-5][0-9]', bot)
-            raid_gmaps_link = "https://www.google.com/maps/dir/Current+Location/{0}".format(bot.split("|")[1])
-            if raidtime:
-                raid_details = bot[space1:raidtime.start()-1]
-                raidexp = raidtime.group()
-            else:
-                raid_details = raid_message
+            raid_details = raid_message
+        raid_gmaps_link = create_gmaps_query(raid_details, message.channel)
 
         if entered_raid not in pkmn_info['pokemon_list']:
             await Meowth.send_message(message.channel, spellcheck(entered_raid))
@@ -885,29 +867,6 @@ Meowth removes that user and their number from the list regardless of emoji coun
 changed to fit the emoji ids in your server."""
 @Meowth.event
 async def on_message(message):
-    if str(message.author) == "GymHuntrBot#7279":
-        if message.embeds:
-            ghgps = message.embeds[0]['url'].split("#")[1]
-            ghdesc = message.embeds[0]['description'].splitlines()
-            ghgym = ghdesc[0][2:-3]
-            ghpokeid = ghdesc[1]
-            ghtime = ghdesc[3].split(" ")
-            ghhour = ghtime[2]
-            ghminute = ghtime[4].zfill(2)
-            bot = "!raid {0} {1} {2}:{3} |{4}".format(ghpokeid, ghgym, ghhour, ghminute, ghgps)
-            await Meowth.delete_message(message)
-            await _raid(message, bot)
-            return
-        return
-    if str(message.author) == "HuntrBot#1845":
-        if message.embeds:
-            hlocation = message.embeds[0]['url'].split("#")[1]
-            hpokeid = message.embeds[0]['title'].split(" ")[2]
-            bot = "!wild {0} {1}".format(hpokeid, hlocation)
-            await Meowth.delete_message(message)
-            await _wild(message, bot)
-            return
-        return
     if message.channel in server_dict[message.server]['raidchannel_dict'] and server_dict[message.server]['raidchannel_dict'][message.channel]['active']:
         trainer_dict = server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']
         omw_emoji = parse_emoji(message.server, config['omw_id'])

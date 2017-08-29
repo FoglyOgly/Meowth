@@ -383,7 +383,8 @@ async def configure(ctx):
                         want_channel = discord.utils.get(server.channels, name = want_channel_name)
                         if want_channel == None:
                             want_channel = await Meowth.create_channel(server, want_channel_name)
-                        server_dict[server]['want_channel_list'].append(want_channel)
+                        if want_channel not in server_dict[server]['want_channel_list']:
+                            server_dict[server]['want_channel_list'].append(want_channel)
                     fd = open("serverdict", "wb")
                     pickle.dump(server_dict, fd)
                     fd.close()
@@ -523,7 +524,7 @@ async def want(ctx):
     """Behind the scenes, Meowth tracks user !wants by
     creating a server role for the Pokemon species, and
     assigning it to the user."""
-    if server_dict[message.server]['wantset'] == True:
+    if server_dict[ctx.message.server]['wantset'] == True:
         if server_dict[ctx.message.server]['want_channel_list'] and ctx.message.channel not in server_dict[ctx.message.server]['want_channel_list']:
             await Meowth.send_message(ctx.message.channel, "Meowth! Please use one of the following channels for **!want** commands: {0}".format(", ".join(i.mention for i in server_dict[ctx.message.server]['want_channel_list'])))
             return
@@ -707,7 +708,7 @@ async def unwant(ctx):
 
     """Behind the scenes, Meowth removes the user from
     the server role for the Pokemon species."""
-    if server_dict[message.server]['wantset'] == True:
+    if server_dict[ctx.message.server]['wantset'] == True:
         entered_unwant = ctx.message.content[8:].lower()
         role = discord.utils.get(ctx.message.server.roles, name=entered_unwant)
         if entered_unwant not in pkmn_info['pokemon_list']:

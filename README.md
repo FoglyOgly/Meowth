@@ -1,3 +1,4 @@
+Beta branch!
 # Meowth
 A Discord helper bot for Pokemon Go communities.
 

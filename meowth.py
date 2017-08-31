@@ -287,7 +287,7 @@ async def on_ready():
     print(_("Meowth! That's right!")) #prints to the terminal or cmd prompt window upon successful connection to Discord
     await channel_cleanup()
     for server in Meowth.servers:
-        await Meowth.send_message(server.owner, "Meowth! I've got some new configuration options! Please run !configure to ensure I can continue running!")
+        await Meowth.send_message(server.owner, "Meowth! I've been updated to prepare for new upcoming raid bosses, but I also have some other changes! Please make sure I have the 'add reactions' permission to ensure I work correctly!")
         server_dict[server] = server_dict.pop(server)
         
 
@@ -953,12 +953,21 @@ async def coming(ctx):
     """Indicate you are on the way to a raid.
     
     Usage: !coming [message]
-    Works only in raid channels. If message is omitted, assumes you are a group of 1.
+    Works only in raid channels. If message is omitted, checks for previous !maybe
+    command and takes the count from that. If it finds none, assumes you are a group
+    of 1.
     Otherwise, this command expects at least one word in your message to be a number,
     and will assume you are a group with that many people."""
     if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
+        trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
         count = 1
         space1 = ctx.message.content.find(" ")
+        if space1 == -1:
+            # If there was a previous !maybe command, take the count from that
+            if ctx.message.author.mention in trainer_dict:
+                count = trainer_dict[ctx.message.author.mention]['count']
+            else:
+                count = 1
         if space1 != -1:
             # Search for a number in the message
             # by trying to convert each word to integer

@@ -1153,10 +1153,10 @@ async def lists(ctx):
     Usage: !lists
     Works only in raid channels. Calls the interest, otw, and waiting lists. Also prints
     the raid timer."""
-        await _interest(ctx)
-        await _otw(ctx)
-        await _waiting(ctx)
-        await _timer(ctx)
+    await _interest(ctx)
+    await _otw(ctx)
+    await _waiting(ctx)
+    await _timer(ctx)
 
 @Meowth.command(pass_context=True)
 async def starting(ctx):

@@ -566,7 +566,6 @@ async def want(ctx):
 
 @Meowth.command(pass_context = True)
 async def wild(ctx):
-        bot = ""
         await _wild(ctx.message)
 
 async def _wild(message):
@@ -607,7 +606,6 @@ async def _wild(message):
 
 @Meowth.command(pass_context=True)
 async def raid(ctx):
-        bot = ""
         await _raid(ctx.message)
 
 async def _raid(message):
@@ -684,8 +682,6 @@ This channel will be deleted in 2 hours or five minutes after the timer expires.
                 await _timerset(raid_channel,raidexp)
             else:
                 await Meowth.send_message(raid_channel, content = "Meowth! Hey {0}, if you can, set the time left on the raid using **!timerset H:MM** so others can check it with **!timer**.".format(message.author.mention))
-            if bot:
-                await Meowth.send_message(raid_channel, "This raid was reported by GymHuntrBot. If it is a duplicate of a raid already reported by a human, I can delete it with three **!duplicate** messages.")
     else:
         await Meowth.send_message(message.channel, "Meowth! **!raid** commands have been disabled.")
 

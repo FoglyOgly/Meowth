@@ -313,9 +313,9 @@ async def configure(ctx):
             server_dict[server]['team']=False
         await Meowth.send_message(owner, _("**Welcome Message Configuration**\n\nNext, I have a feature where I welcome new members to the server with a short welcome message in a channel or with a direct message. If you have a bot that handles this already, or if you don't want this feature, type N, otherwise type Y to enable this feature!"))
         if server_dict[server]['team'] == True:
-            await Meowth.send_message(owner, _("Sample message:```Meowth! [SERVER], @[MEMBER]! Set your team by typing '!team mystic' or '!team valor' or '!team instinct' without quotations. If you have any questions just ask an admin.```"))
+            await Meowth.send_message(owner, _("Sample message:```Meowth! Welcome to [SERVER], @[MEMBER]! Set your team by typing '!team mystic' or '!team valor' or '!team instinct' without quotations. If you have any questions just ask an admin.```"))
         else:
-            await Meowth.send_message(owner, _("Sample message:```Meowth! [SERVER], @[MEMBER]! If you have any questions just ask an admin.```"))
+            await Meowth.send_message(owner, _("Sample message:```Meowth! Welcome to [SERVER], @[MEMBER]! If you have any questions just ask an admin.```"))
         welcomereply = await Meowth.wait_for_message(author = owner)
         if welcomereply.content == "Y" or welcomereply.content == "y":
             server_dict[server]['welcome'] = True

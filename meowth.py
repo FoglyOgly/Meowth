@@ -953,12 +953,21 @@ async def coming(ctx):
     """Indicate you are on the way to a raid.
     
     Usage: !coming [message]
-    Works only in raid channels. If message is omitted, assumes you are a group of 1.
+    Works only in raid channels. If message is omitted, checks for previous !maybe
+    command and takes the count from that. If it finds none, assumes you are a group
+    of 1.
     Otherwise, this command expects at least one word in your message to be a number,
     and will assume you are a group with that many people."""
     if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
+        trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
         count = 1
         space1 = ctx.message.content.find(" ")
+        if space1 == -1:
+            # If there was a previous !maybe command, take the count from that
+            if ctx.message.author.mention in trainer_dict:
+                count = trainer_dict[ctx.message.author.mention]['count']
+            else:
+                count = 1
         if space1 != -1:
             # Search for a number in the message
             # by trying to convert each word to integer

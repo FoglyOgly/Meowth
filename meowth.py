@@ -287,7 +287,7 @@ async def on_ready():
     print(_("Meowth! That's right!")) #prints to the terminal or cmd prompt window upon successful connection to Discord
     await channel_cleanup()
     for server in Meowth.servers:
-        await Meowth.send_message(server.owner, "Meowth! I've got some new configuration options! Please run !configure to ensure I can continue running!")
+        await Meowth.send_message(server.owner, "Meowth! I've been updated to prepare for new upcoming raid bosses, but I also have some other changes! Please make sure I have the 'add reactions' permission to ensure I work correctly!")
         server_dict[server] = server_dict.pop(server)
         
 

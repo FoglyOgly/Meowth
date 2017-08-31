@@ -1058,6 +1058,10 @@ async def interest(ctx):
 
     Usage: !interest
     Works only in raid channels."""
+    await _interest(ctx)
+
+async def _interest(ctx):
+
     if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
         ctx_maybecount = 0
 
@@ -1083,19 +1087,23 @@ async def interest(ctx):
 @Meowth.command(pass_context=True)
 async def otw(ctx):
     """Lists the number and users who are on the way to a raid.
-    
+
     Usage: !otw
     Works only in raid channels."""
+    await _otw(ctx)
+
+async def _otw(ctx):
+
     if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
         ctx_omwcount = 0
-        
+
         # Grab all trainers who are :omw: and sum
         # up their counts
         trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
         for trainer in trainer_dict.values():
             if trainer['status'] == "omw":
                 ctx_omwcount += trainer['count']
-        
+
         # If at least 1 person is on the way,
         # add an extra message indicating who it is.
         otw_exstr = ""
@@ -1110,19 +1118,23 @@ async def otw(ctx):
 @Meowth.command(pass_context=True)
 async def waiting(ctx):
     """List the number and users who are waiting at a raid.
-    
+
     Usage: !waiting
     Works only in raid channels."""
+    await _waiting(ctx)
+
+async def _waiting(ctx):
+
     if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
         ctx_waitingcount = 0
-        
+
         # Grab all trainers who are :here: and sum
         # up their counts
         trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
         for trainer in trainer_dict.values():
             if trainer['status'] == "waiting":
                 ctx_waitingcount += trainer['count']
-        
+
         # If at least 1 person is waiting,
         # add an extra message indicating who it is.
         waiting_exstr = ""
@@ -1133,6 +1145,18 @@ async def waiting(ctx):
         if ctx_waitingcount > 0:
             waiting_exstr = _(" including {0} and the people with them! Be considerate and let them know if and when you'll be there").format(", ".join(waiting_list))
         await Meowth.send_message(ctx.message.channel, _("Meowth! {0} waiting at the raid{1}!").format(str(ctx_waitingcount), waiting_exstr))
+
+@Meowth.command(pass_context=True)
+async def lists(ctx):
+    """Print all lists concerning a raid at once.
+    
+    Usage: !lists
+    Works only in raid channels. Calls the interest, otw, and waiting lists. Also prints
+    the raid timer."""
+        await _interest(ctx)
+        await _otw(ctx)
+        await _waiting(ctx)
+        await _timer(ctx)
 
 @Meowth.command(pass_context=True)
 async def starting(ctx):

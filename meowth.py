@@ -241,7 +241,7 @@ async def channel_cleanup(loop = False):
             for channel in deadchannel_list:
                 del server_dict[server]['raidchannel_dict'][channel]
         await asyncio.sleep(60)
-        
+
 async def autosave(loop = False):
     while True:
         event_loop.create_task(_save())
@@ -606,7 +606,7 @@ async def _wild(message, bot):
             wild_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(wild_number))
             wild_embed = discord.Embed(title=_("Meowth! Click here for directions to the wild {0}!").format(entered_wild.capitalize()),url=wild_gmaps_link,description=_("This is just my best guess!"),colour=discord.Colour(0x2ecc71))
             wild_embed.set_thumbnail(url=wild_img_url)
-            await Meowth.send_message(message.channel, content=_("Meowth! Wild {0} reported by {1}! Details: {2}").format(wild.mention, message.author.mention, wild_details),embed=wild_embed)
+            await Meowth.send_message(message.channel, content=_("Meowth! Wild {0} reported by {1}! Details:{2}").format(wild.mention, message.author.mention, wild_details),embed=wild_embed)
     else:
         await Meowth.send_message(message.channel, "Meowth! **!wild** commands have been disabled.")
 

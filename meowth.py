@@ -787,6 +787,9 @@ async def timer(ctx):
     
     Usage: !timer
     The expiry time should have been previously set with !timerset."""
+    await _timer(ctx)
+
+async def _timer(ctx):
     if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict']:
         await print_raid_timer(ctx.message.channel)
 

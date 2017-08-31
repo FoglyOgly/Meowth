@@ -1101,6 +1101,11 @@ async def emoji_help(ctx):
     await Meowth.send_message(ctx.message.channel, helpmsg)
 
 @Meowth.command(pass_context=True)
+async def interested(ctx):
+    if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
+        await Meowth.send_message(ctx.message.channel, content = "Meowth! Hey {0}, I don't know if you meant **!maybe** to say that you are interested or **!interest** to see the other trainers interest".format(ctx.message.author.mention))    
+    
+@Meowth.command(pass_context=True)
 async def interest(ctx):
         await _interest(ctx)
 
@@ -1130,6 +1135,10 @@ async def _interest(ctx):
             maybe_exstr = _(" including {0} and the people with them! Let them know if there is a group forming").format(", ".join(maybe_list))
         await Meowth.send_message(ctx.message.channel, _("Meowth! {0} interested{1}!").format(str(ctx_maybecount), maybe_exstr))
 
+@Meowth.command(pass_context=True)
+async def omw(ctx):
+    if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
+        await Meowth.send_message(ctx.message.channel, content = "Meowth! Hey {0}, I don't know if you meant **!coming** to say that you are coming or **!otw** to see the other trainers on their way".format(ctx.message.author.mention))        
 
 @Meowth.command(pass_context=True)
 async def otw(ctx):

@@ -241,6 +241,7 @@ async def channel_cleanup(loop = False):
             for channel in deadchannel_list:
                 del server_dict[server]['raidchannel_dict'][channel]
         await asyncio.sleep(60)
+        
 async def autosave(loop = False):
     while True:
         event_loop.create_task(_save())

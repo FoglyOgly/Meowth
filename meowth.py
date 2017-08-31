@@ -798,8 +798,10 @@ Triggerable through commands or through emoji
 async def _maybe(message, count):
     if message.channel in server_dict[message.server]['raidchannel_dict'] and server_dict[message.server]['raidchannel_dict'][message.channel]['active']:
         trainer_dict = server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']
-
-        await Meowth.send_message(message.channel, _("Meowth! {0} is interested and has {1} trainers!").format(message.author.mention, count))
+        if count == 1:
+            await Meowth.send_message(message.channel, _("Meowth! {0} is interested!").format(message.author.mention))
+        else:
+            await Meowth.send_message(message.channel, _("Meowth! {0} is interested with a total of {1} trainers!").format(message.author.mention, count))
         # Add trainer name to trainer list
         if message.author.mention not in server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']:
             trainer_dict[message.author.mention] = {}
@@ -813,7 +815,10 @@ async def _coming(message, count):
 
         # TODO: handle case where a user sends !coming
         # after they've already sent !here
-        await Meowth.send_message(message.channel, _("Meowth! {0} is on the way with {1} trainers!").format(message.author.mention,count))
+        if count == 1:
+            await Meowth.send_message(message.channel, _("Meowth! {0} is on the way!").format(message.author.mention))
+        else:
+            await Meowth.send_message(message.channel, _("Meowth! {0} is on the way with a total of {1} trainers!").format(message.author.mention, count))
         # Add trainer name to trainer list
         if message.author.mention not in trainer_dict:
             trainer_dict[message.author.mention] = {}
@@ -825,8 +830,10 @@ async def _coming(message, count):
 async def _here(message, count):
     if message.channel in server_dict[message.server]['raidchannel_dict'] and server_dict[message.server]['raidchannel_dict'][message.channel]['active']:
         trainer_dict = server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']
-        
-        await Meowth.send_message(message.channel, _("Meowth! {0} is at the raid with {1} trainers!").format(message.author.mention, count))
+        if count == 1:
+            await Meowth.send_message(message.channel, _("Meowth! {0} is at the raid!").format(message.author.mention))
+        else:
+            await Meowth.send_message(message.channel, _("Meowth! {0} is at the raid with a total of {1} trainers!").format(message.author.mention, count))
         # Add trainer name to trainer list
         if message.author.mention not in trainer_dict:
             trainer_dict[message.author.mention] = {}

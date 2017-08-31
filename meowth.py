@@ -670,7 +670,7 @@ If your plans change, reply with !cancel to remove your party from the list of t
 To see a list of trainers on their way use !otw. To see a list of trainers at the raid use !waiting.
 Once you start a raid, use !starting to clear the waiting list.
 
-This channel will be deleted in 2 hours, or five minutes after the raid expires, whichever comes first!""".format(raid.mention, message.author.mention, raid_details, print_emoji_name(message.server, config['omw_id']), print_emoji_name(message.server, config['here_id']), print_emoji_name(message.server, config['unomw_id']), print_emoji_name(message.server, config['unhere_id']))
+This channel will be deleted in 2 hours, or five minutes after the raid expires, whichever comes first!""".format(raid.mention, message.author.mention, raid_details, print_emoji_name(message.server, config['omw_id']), print_emoji_name(message.server, config['here_id']))
         raidmessage = await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)
         
         server_dict[message.server]['raidchannel_dict'][raid_channel] = {

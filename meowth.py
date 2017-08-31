@@ -1059,7 +1059,7 @@ async def emoji_help(ctx):
 @Meowth.command(pass_context=True)
 async def interested(ctx):
     if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
-        await Meowth.send_message(ctx.message.channel, content = "Meowth! Hey {0}, I don't know if you meant **!maybe** to say that you are interested or **!interest** to see the other trainers interest".format(ctx.message.author.mention))    
+        await Meowth.send_message(ctx.message.channel, content = "Meowth! Hey {0}, I don't know if you meant **!maybe** to say that you are interested or **!interest** to see the other trainers interested".format(ctx.message.author.mention))    
     
 @Meowth.command(pass_context=True)
 async def interest(ctx):

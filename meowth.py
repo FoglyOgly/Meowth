@@ -313,9 +313,9 @@ async def configure(ctx):
             server_dict[server]['team']=False
         await Meowth.send_message(owner, _("**Welcome Message Configuration**\n\nNext, I have a feature where I welcome new members to the server with a short welcome message in a channel or with a direct message. If you have a bot that handles this already, or if you don't want this feature, type N, otherwise type Y to enable this feature!"))
         if server_dict[server]['team'] == True:
-            await Meowth.send_message(owner, _("Sample message:```Meowth! [SERVER], @[MEMBER]! Set your team by typing '!team mystic' or '!team valor' or '!team instinct' without quotations. If you have any questions just ask an admin.```"))
+            await Meowth.send_message(owner, _("Sample message:```Meowth! Welcome to [SERVER], @[MEMBER]! Set your team by typing '!team mystic' or '!team valor' or '!team instinct' without quotations. If you have any questions just ask an admin.```"))
         else:
-            await Meowth.send_message(owner, _("Sample message:```Meowth! [SERVER], @[MEMBER]! If you have any questions just ask an admin.```"))
+            await Meowth.send_message(owner, _("Sample message:```Meowth! Welcome to [SERVER], @[MEMBER]! If you have any questions just ask an admin.```"))
         welcomereply = await Meowth.wait_for_message(author = owner)
         if welcomereply.content == "Y" or welcomereply.content == "y":
             server_dict[server]['welcome'] = True
@@ -332,7 +332,7 @@ async def configure(ctx):
         if otherreply.content == "Y" or otherreply.content == "y":
             server_dict[server]['other']=True
             await Meowth.send_message(owner, _("Meowth! Okay. Now make sure that I have either an admin role on your server, or at least a role with these permissions: 'read messages', 'send messages', 'embed links', 'manage roles', 'add reactions', and 'manage channels'. Also, check if my role is at the top of your server role hierarchy."))
-            await Meowth.send_message(owner, _("**City Channel Configuration**\n\nMeowth! Next, I need to know which channels will be used for raid and/or reports. If your server covers only one community, that's probably your server's default channel. If you cover multiple communities, you should probably have a channel for each community that only those with roles for that community can see. Otherwise your users could be spammed with notifications for raids that are not relevant to them!"))
+            await Meowth.send_message(owner, _("**City Channel Configuration**\n\nMeowth! Next, I need to know which channels will be used for raid and/or wild reports. If your server covers only one community, that's probably your server's default channel. If you cover multiple communities, you should probably have a channel for each community that only those with roles for that community can see. Otherwise your users could be spammed with notifications for raids that are not relevant to them!"))
             await Meowth.send_message(owner, _("Here's what I need: a list of channels in your server that will be used for raid and/or wild reports. Give them in this format: channelname, channelname, channelname"))
             await Meowth.send_message(owner, _("In other words, the name of each channel, each separated by a comma and a single space. If you do not require raid and wild reporting and are only requiring want/unwant, reply with 'N'; however, want/unwant is quite limited without raid or wild reporting."))
             citychannel_dict = {}
@@ -379,7 +379,7 @@ async def configure(ctx):
                     server_dict[server]['wildset']=True
                 elif wildconfigset.content == "N" or wildconfigset.content == "n":
                     server_dict[server]['wildset']=False
-            await Meowth.send_message(server.owner, """Meowth! Ok. Time to do one last check that I have either an admin role on your server, or at least a role with these permissions: 'read messages', 'send messages', 'embed links', 'manage roles', 'add reactions' and 'manage channels'. Also, check if my role is at the top of your server role hierarchy. You can restrict me to specific channels by editing channel-specific permissions if you like.\n\n**Want/Unwant Configuration**\n\nThe last thing you should know is that the !want and !unwant commands can produce a lot of clutter if they are allowed on your main channels. I suggest having a dedicated channel for want and unwant. Just type the name or names of the channel(s) you want me to allow. If you type something that isn't a name of an existing channel, I'll create one by that name. If you do not want to enable want/unwant, reply with 'N'. By the way: if you need to change any of these settings, just type !configure in your server and we can do this again.""")
+            await Meowth.send_message(server.owner, """Meowth! Ok. Time to do one last check that I have either an admin role on your server, or at least a role with these permissions: 'read messages', 'send messages', 'embed links', 'manage roles', 'add reactions', and 'manage channels'. Also, check if my role is at the top of your server role hierarchy. You can restrict me to specific channels by editing channel-specific permissions if you like.\n\n**Want/Unwant Configuration**\n\nThe last thing you should know is that the !want and !unwant commands can produce a lot of clutter if they are allowed on your main channels. I suggest having a dedicated channel for want and unwant. Just type the name or names of the channel(s) you want me to allow. If you type something that isn't a name of an existing channel, I'll create one by that name. If you do not want to enable want/unwant, reply with 'N'. By the way: if you need to change any of these settings, just type !configure in your server and we can do this again.""")
             wantchs = await Meowth.wait_for_message(author=server.owner)
             if wantchs.content == "N" or wantchs.content == "n":
                 server_dict[server]['wantset']=False
@@ -566,15 +566,14 @@ async def want(ctx):
 
 @Meowth.command(pass_context = True)
 async def wild(ctx):
-        await _wild(ctx.message)
-
-async def _wild(message):
     """Report a wild Pokemon spawn location.
 
     Usage: !wild <species> <location>
     Meowth will insert the details (really just everything after the species name) into a
     Google maps link and post the link to the same channel the report was made in."""
+    await _wild(ctx.message)
 
+async def _wild(message):
     if message.channel.name not in server_dict[message.server]['city_channels'].keys() and message.channel != message.server.default_channel:
         await Meowth.send_message(message.channel, _("Meowth! Please restrict wild reports to city channels or the default channel!"))
         return
@@ -606,9 +605,6 @@ async def _wild(message):
 
 @Meowth.command(pass_context=True)
 async def raid(ctx):
-        await _raid(ctx.message)
-
-async def _raid(message):
     """Report an ongoing raid.
 
     Usage: !raid <species> <location>
@@ -617,6 +613,9 @@ async def _raid(message):
     Meowth's message will also include the type weaknesses of the boss.
 
     Finally, Meowth will create a separate channel for the raid report, for the purposes of organizing the raid."""
+    await _raid(ctx.message)
+
+async def _raid(message):
     if message.channel.name not in server_dict[message.server]['city_channels'].keys() and message.channel != message.server.default_channel:
         await Meowth.send_message(message.channel, "Meowth! Please restrict raid reports to a city channel or the default channel!")
         return
@@ -655,7 +654,7 @@ async def _raid(message):
             await Meowth.send_message(message.channel, content = "Meowth! {0} raid reported by {1}! Details:{2}. Coordinate in {3}".format(raid.mention, message.author.mention, raid_details, raid_channel.mention),embed=raid_embed)
             await asyncio.sleep(1) #Wait for the channel to be created.
 
-            raidmsg = """Meowth! {0} raid reported by {1}! Details: {2}. Coordinate here!
+            raidmsg = """Meowth! {0} raid reported by {1}! Details:{2}. Coordinate here!
 
 Reply to this message with **!coming** (`!coming [number]` for trainers with you) to say you are on your way, and reply with **!here** once you arrive.
 If you are at the raid already, reply with **!here** (`!here [number]` for trainers with you).
@@ -784,13 +783,13 @@ async def timerset(ctx):
 
 @Meowth.command(pass_context=True)
 async def timer(ctx):
-        await _timer(ctx)
-
-async def _timer(ctx):
     """Have Meowth resend the expire time message for a raid.
 
     Usage: !timer
     The expiry time should have been previously set with !timerset."""
+    await _timer(ctx)
+
+async def _timer(ctx):
     if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict']:
         await print_raid_timer(ctx.message.channel)
 
@@ -895,7 +894,7 @@ async def on_message(message):
                         return
                     newlocend = message.content.find(" ", newlocindex)
                     if newlocend == -1:
-                        newloc = message.content
+                        newloc = message.content[newlocindex:]
                     else:
                         newloc = message.content[newlocindex:newlocend+1]
                     oldraidmsg = server_dict[message.server]['raidchannel_dict'][message.channel]['raidmessage']
@@ -954,12 +953,21 @@ async def coming(ctx):
     """Indicate you are on the way to a raid.
 
     Usage: !coming [message]
-    Works only in raid channels. If message is omitted, assumes you are a group of 1.
+    Works only in raid channels. If message is omitted, checks for previous !maybe
+    command and takes the count from that. If it finds none, assumes you are a group
+    of 1.
     Otherwise, this command expects at least one word in your message to be a number,
     and will assume you are a group with that many people."""
     if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
+        trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
         count = 1
         space1 = ctx.message.content.find(" ")
+        if space1 == -1:
+            # If there was a previous !maybe command, take the count from that
+            if ctx.message.author.mention in trainer_dict:
+                count = trainer_dict[ctx.message.author.mention]['count']
+            else:
+                count = 1
         if space1 != -1:
             # Search for a number in the message
             # by trying to convert each word to integer
@@ -976,7 +984,7 @@ async def coming(ctx):
                     pass
             # If count wasn't set, we didn't find a number
             if not count:
-                await Meowth.send_message(ctx.message.channel, _("Meowth! Exactly *how many* are coming? There wasn't a number anywhere in your message. Or, just say `!coming` if you're by yourself."))
+                await Meowth.send_message(ctx.message.channel, _("Meowth! Exactly *how many* are coming? There wasn't a number anywhere in your message. Or, just say **!coming** if you're by yourself."))
                 return
             # Don't allow duplicates
             if duplicate:
@@ -1023,7 +1031,7 @@ async def here(ctx):
                     pass
             # If count wasn't set, we didn't find a number
             if not count:
-                await Meowth.send_message(ctx.message.channel, _("Meowth! Exactly *how many* are here? There wasn't a number anywhere in your message. Or, just say `!here` if you're by yourself."))
+                await Meowth.send_message(ctx.message.channel, _("Meowth! Exactly *how many* are here? There wasn't a number anywhere in your message. Or, just say **!here** if you're by yourself."))
                 return
             # Don't allow duplicates
             if duplicate:
@@ -1057,19 +1065,15 @@ async def emoji_help(ctx):
     await Meowth.send_message(ctx.message.channel, helpmsg)
 
 @Meowth.command(pass_context=True)
-async def interested(ctx):
-    if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
-        await Meowth.send_message(ctx.message.channel, content = "Meowth! Hey {0}, I don't know if you meant **!maybe** to say that you are interested or **!interest** to see the other trainers interested".format(ctx.message.author.mention))    
-    
-@Meowth.command(pass_context=True)
 async def interest(ctx):
-        await _interest(ctx)
-
-async def _interest(ctx):
     """Lists the number and users who are interested in the raid.
 
     Usage: !interest
     Works only in raid channels."""
+    await _interest(ctx)
+
+async def _interest(ctx):
+
     if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
         ctx_maybecount = 0
 
@@ -1091,20 +1095,17 @@ async def _interest(ctx):
             maybe_exstr = _(" including {0} and the people with them! Let them know if there is a group forming").format(", ".join(maybe_list))
         await Meowth.send_message(ctx.message.channel, _("Meowth! {0} interested{1}!").format(str(ctx_maybecount), maybe_exstr))
 
-@Meowth.command(pass_context=True)
-async def omw(ctx):
-    if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
-        await Meowth.send_message(ctx.message.channel, content = "Meowth! Hey {0}, I don't know if you meant **!coming** to say that you are coming or **!otw** to see the other trainers on their way".format(ctx.message.author.mention))        
 
 @Meowth.command(pass_context=True)
 async def otw(ctx):
-        await _otw(ctx)
-
-async def _otw(ctx):
     """Lists the number and users who are on the way to a raid.
 
     Usage: !otw
     Works only in raid channels."""
+    await _otw(ctx)
+
+async def _otw(ctx):
+
     if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
         ctx_omwcount = 0
 
@@ -1128,13 +1129,14 @@ async def _otw(ctx):
 
 @Meowth.command(pass_context=True)
 async def waiting(ctx):
-        await _waiting(ctx)
-
-async def _waiting(ctx):
     """List the number and users who are waiting at a raid.
 
     Usage: !waiting
     Works only in raid channels."""
+    await _waiting(ctx)
+
+async def _waiting(ctx):
+
     if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
         ctx_waitingcount = 0
 
@@ -1158,10 +1160,15 @@ async def _waiting(ctx):
 
 @Meowth.command(pass_context=True)
 async def lists(ctx):
-        await _interest(ctx)
-        await _otw(ctx)
-        await _waiting(ctx)
-        await _timer(ctx)
+    """Print all lists concerning a raid at once.
+
+    Usage: !lists
+    Works only in raid channels. Calls the interest, otw, and waiting lists. Also prints
+    the raid timer."""
+    await _interest(ctx)
+    await _otw(ctx)
+    await _waiting(ctx)
+    await _timer(ctx)
 
 @Meowth.command(pass_context=True)
 async def starting(ctx):
@@ -1193,6 +1200,16 @@ async def starting(ctx):
         await Meowth.send_message(ctx.message.channel, starting_str)
 
 @Meowth.command(pass_context=True)
+async def omw(ctx):
+    if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
+        await Meowth.send_message(ctx.message.channel, content = "Meowth! Hey {0}, I don't know if you meant **!coming** to say that you are coming or **!otw** to see the other trainers on their way".format(ctx.message.author.mention))
+
+@Meowth.command(pass_context=True)
+async def interested(ctx):
+    if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
+        await Meowth.send_message(ctx.message.channel, content = "Meowth! Hey {0}, I don't know if you meant **!maybe** to say that you are interested or **!interest** to see the other trainers interest".format(ctx.message.author.mention))
+
+@Meowth.command(pass_context=True, hidden=True)
 async def duplicate(ctx):
     if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
         ctx_dupecount = 0
@@ -1216,8 +1233,6 @@ async def duplicate(ctx):
             else:
                 del server_dict[ctx.message.channel.server]['raidchannel_dict'][ctx.message.channel]
     server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict'] = trainer_dict
-
-
 
 
 

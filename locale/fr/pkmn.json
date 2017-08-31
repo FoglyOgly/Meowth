@@ -4,7 +4,10 @@
 
 "//": "Below is a dict of raid bosses with their type weaknesses. These become part of the raid report message.",
 "raid_list": [
-	"mewtwo",
+    "raikou",
+    "entei",
+    "suicune",
+    "mewtwo",
     "lugia",
     "sulfura",
     "electhor",

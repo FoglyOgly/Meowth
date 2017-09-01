@@ -306,10 +306,14 @@ async def configure(ctx):
         server_dict[server]['done']=False
         await Meowth.send_message(owner, _("""__**Meowth Configuration**__\n\nMeowth! That's Right! Welcome to the configuration for Meowth the Pokemon Go Helper Bot! I will be guiding you through some setup steps to get me setup on your server.\n\n**Team Assignment Configuration**\n\nFirst, I have a feature that allows users to assign their Pokemon Go team using roles. If you have a bot that handles this already, or you don't want this feature, type N, otherwise type Y to enable the feature!"""))
         teamreply = await Meowth.wait_for_message(author = owner)
-        if teamreply.content == "Y" or teamreply.content == "y":
+        if teamreply.content.lower() == "y":
             server_dict[server]['team']=True
-            await Meowth.send_message(owner, "Meowth! Team assignments enabled! Please make sure that my role is moved to the top of your server role hierarchy, or at least above your team roles. Your team roles must be 'mystic', 'valor', and 'instinct' and *must* be lowercase.")
-        elif teamreply.content == "N" or teamreply.content == "n":
+            for team in config['team_dict'].keys():
+                temp_role = discord.utils.get(server.roles, name=team)
+                if temp_role == None:
+                    await Meowth.create_role(server = server, name = team, hoist = False, mentionable = True)
+            await Meowth.send_message(owner, "Meowth! Team assignments enabled! Please make sure that my role is moved to the top of your server role hierarchy, or at least above your team roles. Your team roles must be 'mystic', 'valor', and 'instinct' and *must* be lowercase. I should have made some for you if you didn't have them, you can set their colors and other settings later.")
+        elif teamreply.content.lower == "n":
             server_dict[server]['team']=False
         await Meowth.send_message(owner, _("**Welcome Message Configuration**\n\nNext, I have a feature where I welcome new members to the server with a short welcome message in a channel or with a direct message. If you have a bot that handles this already, or if you don't want this feature, type N, otherwise type Y to enable this feature!"))
         if server_dict[server]['team'] == True:
@@ -317,19 +321,19 @@ async def configure(ctx):
         else:
             await Meowth.send_message(owner, _("Sample message:```Meowth! Welcome to [SERVER], @[MEMBER]! If you have any questions just ask an admin.```"))
         welcomereply = await Meowth.wait_for_message(author = owner)
-        if welcomereply.content == "Y" or welcomereply.content == "y":
+        if welcomereply.content.lower() == "y":
             server_dict[server]['welcome'] = True
             await Meowth.send_message(owner, "Meowth! Welcome message enabled!\n\n**Welcome Message Channel Configuration**\n\nNow I need to know what channel you want me to post these welcome messages in. Reply with a channel name or 'DM' if you would rather I direct message the user.")
             welcomechannelreply = await Meowth.wait_for_message(author = owner)
-            if welcomechannelreply.content == "DM" or welcomechannelreply == "dm":
+            if welcomechannelreply.lower() == "dm":
                 server_dict[server]['welcomechan'] = "dm"
             else:
                 server_dict[server]['welcomechan'] = welcomechannelreply.content
-        elif welcomereply.content == "N" or welcomereply.content == "n":
+        elif welcomereply.content.lower() == "n":
             server_dict[server]['welcome'] = False
         await Meowth.send_message(owner, _("**Main Function Configuration**\n\nMeowth! Alright. Next I just want to check that you want to enable *any* of my main functions. These include assigning roles for each Pokemon a user wants, wild spawn reports, creating channels for raids, and keeping track of users coming to each raid. If you don't want me to do *any* of that, type N, otherwise type Y to start enabling my main functions!"))
         otherreply = await Meowth.wait_for_message(author = owner)
-        if otherreply.content == "Y" or otherreply.content == "y":
+        if otherreply.content.lower() == "y":
             server_dict[server]['other']=True
             await Meowth.send_message(owner, _("Meowth! Okay. Now make sure that I have either an admin role on your server, or at least a role with these permissions: 'read messages', 'send messages', 'embed links', 'manage roles', and 'manage channels'. Also, check if my role is at the top of your server role hierarchy."))
             await Meowth.send_message(owner, _("**City Channel Configuration**\n\nMeowth! Next, I need to know which channels will be used for raid and/or wild reports. If your server covers only one community, that's probably your server's default channel. If you cover multiple communities, you should probably have a channel for each community that only those with roles for that community can see. Otherwise your users could be spammed with notifications for raids that are not relevant to them!"))
@@ -337,11 +341,11 @@ async def configure(ctx):
             await Meowth.send_message(owner, _("In other words, the name of each channel, each separated by a comma and a single space. If you do not require raid and wild reporting and are only requiring want/unwant, reply with 'N'; however, want/unwant is quite limited without raid or wild reporting."))
             citychannel_dict = {}
             citychannels = await Meowth.wait_for_message(author = owner)
-            if citychannels.content == "N" or citychannels.content == "n":
+            if citychannels.content.lower() == "n":
                 server_dict[server]['wildset']=False
                 server_dict[server]['raidset']=False
             else:
-                citychannel_list = citychannels.content.split(', ')
+                citychannel_list = citychannels.content.lower().split(', ')
                 server_channel_list = []
                 for channel in server.channels:
                     server_channel_list.append(channel.name)
@@ -362,7 +366,7 @@ async def configure(ctx):
                 server_dict[server]['city_channels'] = citychannel_dict
                 await Meowth.send_message(server.owner, "**Raid Command**\n\nMeowth! Alright. Do you want raid reports in these channels? Reply with 'Y' to enable !raid reports, or 'N' to disable !raid")
                 raidconfigset = await Meowth.wait_for_message(author=server.owner)
-                if raidconfigset.content == "Y" or raidconfigset.content == "y":
+                if raidconfigset.content.lower() == "y":
                     server_dict[server]['raidset']=True
                     await Meowth.send_message(owner, "**Timezone Configuration**\n\nMeowth! Ok, to finish the raid configuration I need to know what timezone you're in! This will help me coordinate raids for you. The current 24-hr time UTC is {0}. How many hours off from that are you? Please enter your answer as a number between -12 and 12.".format(strftime("%H:%M",time.gmtime())))
                     offsetmsg = await Meowth.wait_for_message(author = owner)
@@ -371,21 +375,21 @@ async def configure(ctx):
                         await Meowth.send_message(owner, _("Meowth! I couldn't convert your answer to a number! Type !configure in your server to start again."))
                         return
                     server_dict[server]['offset'] = offset
-                elif raidconfigset.content == "N" or raidconfigset.content == "n":
+                elif raidconfigset.content.lower() == "n":
                     server_dict[server]['raidset']=False
                 await Meowth.send_message(server.owner, "**Wild Command**\n\nMeowth! Alright. Do you want wild reports in these channels? Reply with 'Y' to enable !wild reports, or 'N' to disable !wild")
                 wildconfigset = await Meowth.wait_for_message(author=server.owner)
-                if wildconfigset.content == "Y" or wildconfigset.content == "y":
+                if wildconfigset.content.lower() == "y":
                     server_dict[server]['wildset']=True
-                elif wildconfigset.content == "N" or wildconfigset.content == "n":
+                elif wildconfigset.content.lower() == "n":
                     server_dict[server]['wildset']=False
             await Meowth.send_message(server.owner, """Meowth! Ok. Time to do one last check that I have either an admin role on your server, or at least a role with these permissions: 'read messages', 'send messages', 'embed links', 'manage roles', and 'manage channels'. Also, check if my role is at the top of your server role hierarchy. You can restrict me to specific channels by editing channel-specific permissions if you like.\n\n**Want/Unwant Configuration**\n\nThe last thing you should know is that the !want and !unwant commands can produce a lot of clutter if they are allowed on your main channels. I suggest having a dedicated channel for want and unwant. Just type the name or names of the channel(s) you want me to allow. If you type something that isn't a name of an existing channel, I'll create one by that name. If you do not want to enable want/unwant, reply with 'N'. By the way: if you need to change any of these settings, just type !configure in your server and we can do this again.""")
             wantchs = await Meowth.wait_for_message(author=server.owner)
-            if wantchs.content == "N" or wantchs.content == "n":
+            if wantchs.content.lower() == "n":
                 server_dict[server]['wantset']=False
             else:
                 server_dict[server]['wantset']=True
-                want_list = wantchs.content.split(', ')
+                want_list = wantchs.content.lower().split(', ')
                 try:
                     for want_channel_name in want_list:
                         want_channel = discord.utils.get(server.channels, name = want_channel_name)
@@ -399,7 +403,7 @@ async def configure(ctx):
                 except:
                     await Meowth.send_message(owner, "Meowth! You didn't give me enough permissions! Type !configure to start over!")
             server_dict[server]['done']=True
-        if otherreply.content == "N" or otherreply.content == "n":
+        if otherreply.content.lower() == "n":
             server_dict[server]['other']=False
             server_dict[server]['raidset']=False
             server_dict[server]['wildset']=False
@@ -487,7 +491,7 @@ async def team(ctx):
     The team roles have to be created manually beforehand by the server administrator."""
 
     role = None
-    entered_team = ctx.message.content[6:]
+    entered_team = ctx.message.content[6:].lower()
     role = discord.utils.get(ctx.message.server.roles, name=entered_team)
 
     # Check if user already belongs to a team role by

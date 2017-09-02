@@ -696,52 +696,6 @@ This channel will be deleted in 2 hours or five minutes after the timer expires.
             else:
                 await Meowth.send_message(raid_channel, content = "Meowth! Hey {0}, if you can, set the time left on the raid using **!timerset H:MM** so others can check it with **!timer**.".format(message.author.mention))
 
-    else:
-        raid_details = raid_message
-    raid_gmaps_link = create_gmaps_query(raid_details, ctx.message.channel)
-    if entered_raid not in pkmn_info['pokemon_list']:
-        await Meowth.send_message(ctx.message.channel, spellcheck(entered_raid))
-        return
-    if entered_raid not in pkmn_info['raid_list'] and entered_raid in pkmn_info['pokemon_list']:
-        await Meowth.send_message(ctx.message.channel, "Meowth! The Pokemon {0} does not appear in raids!".format(entered_raid.capitalize()))
-        return
-    else:
-        raid_channel_name = entered_raid + sanitize_channel_name(raid_details)
-        raid_channel = await Meowth.create_channel(ctx.message.server, raid_channel_name, *ctx.message.channel.overwrites)
-        raid = discord.utils.get(ctx.message.server.roles, name = entered_raid)
-        if raid is None:
-            raid = await Meowth.create_role(server = ctx.message.server, name = entered_raid, hoist = False, mentionable = True)
-            await asyncio.sleep(0.5)
-        raid_number = pkmn_info['pokemon_list'].index(entered_raid) + 1
-        raid_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(raid_number))
-        raid_embed = discord.Embed(title="Meowth! Click here for directions to the raid!",url=raid_gmaps_link,description="Weaknesses: {0}".format(weakness_to_str(ctx.message.server, get_weaknesses(entered_raid))),colour=discord.Colour(0x2ecc71))
-        raid_embed.set_thumbnail(url=raid_img_url)
-        await Meowth.send_message(ctx.message.channel, content = "Meowth! {0} raid reported by {1}! Details: {2}. Coordinate in {3}".format(raid.mention, ctx.message.author.mention, raid_details, raid_channel.mention),embed=raid_embed)
-        await asyncio.sleep(1) #Wait for the channel to be created.
-            
-        raidmsg = """Meowth! {0} raid reported by {1}! Details: {2}. Coordinate here!
-
-Reply (not react) to this message with {3} or !coming to say you are on your way, or {4} or !here if you are at the raid already!
-If your plans change, reply with !cancel to remove your party from the list of those on the way or waiting.
-
-To see a list of trainers on their way use !otw. To see a list of trainers at the raid use !waiting.
-Once you start a raid, use !starting to clear the waiting list.
-
-This channel will be deleted in 2 hours, or five minutes after the raid expires, whichever comes first!""".format(raid.mention, ctx.message.author.mention, raid_details, print_emoji_name(ctx.message.server, config['omw_id']), print_emoji_name(ctx.message.server, config['here_id']))
-        raidmessage = await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)
-        
-        server_dict[ctx.message.server]['raidchannel_dict'][raid_channel] = {
-          'trainer_dict' : {},
-          'exp' : time.time() + 2 * 60 * 60, # Two hours from now
-          'manual_timer' : False, # No one has explicitly set the timer, Meowth is just assuming 2 hours
-          'active' : True,
-          'raidmessage' : raidmessage
-        }
-        if raidtime:
-            await _timerset(raid_channel,raidexp)
-        else:
-            await Meowth.send_message(raid_channel, content = "Meowth! Hey {0}, if you can, set the time left on the raid using !timerset H:MM so others can check it with !timer.".format(ctx.message.author.mention))
-
 @Meowth.command(pass_context=True)
 async def unwant(ctx):
     """A command for removing the a !want for a Pokemon.

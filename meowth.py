@@ -282,6 +282,7 @@ async def on_ready():
     await channel_cleanup()
     for server in Meowth.servers:
         server_dict[server] = server_dict.pop(server)
+        await Meowth.send_message(server.owner, "Meowth! That's right! I've been rebooted! You don't need to do anything this time, but you may find some commands don't respond in currently active channels, or the channels may not delete as expected. Sorry for any inconvenience!")
         
 
 

@@ -328,7 +328,7 @@ async def configure(ctx):
         if welcomechannelreply.content.lower() == "dm":
             server_dict[server]['welcomechan'] = "dm"
         else:
-            server_dict[server]['welcomechan'] = welcomechannelreply.content
+            server_dict[server]['welcomechan'] = welcomechannelreply.content.lower()
     elif welcomereply.content.lower() == "n":
         server_dict[server]['welcome'] = False
     await Meowth.send_message(owner, _("**Main Function Configuration**\n\nMeowth! Alright. Next I just want to check that you want to enable *any* of my main functions. These include assigning roles for each Pokemon a user wants, wild spawn reports, creating channels for raids, and keeping track of users coming to each raid. If you don't want me to do *any* of that, type N, otherwise type Y to start enabling my main functions!"))
@@ -430,7 +430,6 @@ async def on_member_join(member):
         message += "Set your team by typing {0} without quotations.".format(team_msg)
     message += admin_message
 
-    print(server_dict[server]['welcomechan'])
     if server_dict[server]['welcomechan'] == "dm":
         await Meowth.send_message(member, message.format(server, member))
     else:

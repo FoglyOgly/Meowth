@@ -328,7 +328,7 @@ async def configure(ctx):
         if welcomechannelreply.content.lower() == "dm":
             server_dict[server]['welcomechan'] = "dm"
         else:
-            server_dict[server]['welcomechan'] = welcomechannelreply.content
+            server_dict[server]['welcomechan'] = welcomechannelreply.content.lower()
     elif welcomereply.content.lower() == "n":
         server_dict[server]['welcome'] = False
     await Meowth.send_message(owner, _("**Main Function Configuration**\n\nMeowth! Alright. Next I just want to check that you want to enable *any* of my main functions. These include assigning roles for each Pokemon a user wants, wild spawn reports, creating channels for raids, and keeping track of users coming to each raid. If you don't want me to do *any* of that, type N, otherwise type Y to start enabling my main functions!"))
@@ -413,7 +413,7 @@ async def configure(ctx):
     await Meowth.send_message(owner, "**Emojis**\n\nMeowth! Alright! I'm ready to go! One more thing. I like to use custom emoji for certain things, especially for displaying type weaknesses for raid bosses! I'm going to send you a .rar file that contains all the emoji I need. There are 23 in all. All you have to do is download, extract, and upload the images to Discord as custom emoji. You can do this all at once, and you can just leave the emoji titles alone!")
     fd = open("emoji.rar", "rb")
     await Meowth.send_file(owner, fd)
-    
+
 """Welcome message to the server and some basic instructions."""
 
 @Meowth.event
@@ -430,7 +430,6 @@ async def on_member_join(member):
         message += "Set your team by typing {0} without quotations.".format(team_msg)
     message += admin_message
 
-    print(server_dict[server]['welcomechan'])
     if server_dict[server]['welcomechan'] == "dm":
         await Meowth.send_message(member, message.format(server, member))
     else:

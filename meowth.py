@@ -228,7 +228,18 @@ async def channel_cleanup(loop = False):
                 if server_dict[channel.server]['raidchannel_dict'][channel]['active'] and server_dict[channel.server]['raidchannel_dict'][channel]['exp'] <= time.time():
                     event_loop.create_task(delete_channel(channel))
                     server_dict[channel.server]['raidchannel_dict'][channel]['active'] = False
-        
+        for server in Meowth.servers:
+            deadchannels = []
+            for channel in server_dict[server]['raidchannel_dict']:
+                keep_looking = True
+                for channel2 in server.channels:
+                    if channel == channel2:
+                        keep_looking = False
+                        break
+                if keep_looking:
+                    deadchannels.append(channel)
+            for deadchannel in deadchannels:
+                del server_dict[server]['raidchannel_dict'][deadchannel]
         # If this is not a looping cleanup, then
         # just break out and exit.
         if not loop:
@@ -686,12 +697,13 @@ This channel will be deleted in 2 hours or five minutes after the timer expires.
             raidmessage = await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)
 
             server_dict[message.server]['raidchannel_dict'][raid_channel] = {
-              'trainer_dict' : {},
-              'exp' : time.time() + 2 * 60 * 60, # Two hours from now
-              'manual_timer' : False, # No one has explicitly set the timer, Meowth is just assuming 2 hours
-              'active' : True,
-              'raidmessage' : raidmessage
-            }
+                'reportcity' : message.channel.name,
+                'trainer_dict' : {},
+                'exp' : time.time() + 2 * 60 * 60, # Two hours from now
+                'manual_timer' : False, # No one has explicitly set the timer, Meowth is just assuming 2 hours
+                'active' : True,
+                'raidmessage' : raidmessage
+                }
             if raidtime:
                 await _timerset(raid_channel,raidexp)
             else:

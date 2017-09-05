@@ -298,6 +298,7 @@ async def configure(ctx):
     server = ctx.message.server
     owner = ctx.message.author
     server_dict[server]['done']=False
+    server_dict[server] = {'want_channel_list': [], 'offset': 0, 'welcome': False, 'welcomechan': "", 'wantset': False, 'raidset': False, 'wildset': False, 'team': False, 'want': False, 'other': False, 'done': False}
     await Meowth.send_message(owner, _("""__**Meowth Configuration**__\n\nMeowth! That's Right! Welcome to the configuration for Meowth the Pokemon Go Helper Bot! I will be guiding you through some setup steps to get me setup on your server.\n\n**Team Assignment Configuration**\n\nFirst, I have a feature that allows users to assign their Pokemon Go team using roles. If you have a bot that handles this already, or you don't want this feature, type N, otherwise type Y to enable the feature!"""))
     teamreply = await Meowth.wait_for_message(author = owner, check=lambda message: message.server is None)
     if teamreply.content.lower() == "y":
@@ -1187,15 +1188,37 @@ async def _waiting(ctx):
 
 @Meowth.command(pass_context=True)
 async def lists(ctx):
-    """Print all lists concerning a raid at once.
+    """Print all lists concerning a raid at once in raid channels and lists all active raids in city channels.
 
     Usage: !lists
-    Works only in raid channels. Calls the interest, otw, and waiting lists. Also prints
+    Works only in raid or city channels. Calls the interest, otw, and waiting lists. Also prints
     the raid timer."""
-    await _interest(ctx)
-    await _otw(ctx)
-    await _waiting(ctx)
-    await _timer(ctx)
+    activeraidnum = 0
+    if server_dict[ctx.message.server]['raidset'] == True:
+        if ctx.message.channel.name in server_dict[ctx.message.server]['city_channels'].keys():
+            await Meowth.send_message(ctx.message.channel, _("Current Raids in {0}:").format(ctx.message.channel.name.capitalize()))
+            for activeraid in server_dict[ctx.message.server]['raidchannel_dict']:
+                ctx_waitingcount = 0
+                ctx_omwcount = 0
+                ctx_maybecount = 0
+                for trainer in server_dict[ctx.message.server]['raidchannel_dict'][activeraid]['trainer_dict'].values():
+                    if trainer['status'] == "waiting":
+                        ctx_waitingcount += trainer['count']
+                    elif trainer['status'] == "omw":
+                        ctx_omwcount += trainer['count']
+                    elif trainer['status'] == "maybe":
+                        ctx_maybecount += trainer['count']
+                localexpire = time.gmtime(server_dict[ctx.message.channel.server]['raidchannel_dict'][activeraid]['exp'] + 3600 * server_dict[ctx.message.channel.server]['offset'])
+                if server_dict[ctx.message.server]['raidchannel_dict'][activeraid]['reportcity'] == ctx.message.channel.name and server_dict[ctx.message.server]['raidchannel_dict'][activeraid]['active'] and discord.utils.get(ctx.message.channel.server.channels, id=activeraid.id):
+                    await Meowth.send_message(ctx.message.channel, _("{0.mention} - interested = {1}, {2} = {3}, {4} = {5}, Ends at {6}").format(activeraid, ctx_maybecount, parse_emoji(ctx.message.server, config['omw_id']), ctx_omwcount, parse_emoji(ctx.message.server, config['here_id']), ctx_waitingcount, strftime("%I:%M", localexpire)))
+                    activeraidnum += 1
+            if activeraidnum == 0:
+                await Meowth.send_message(ctx.message.channel, _("Meowth! No active raids! Report one with **!raid <name> <location>**."))
+        elif ctx.message.channel in server_dict[ctx.message.channel.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
+            await _interest(ctx)
+            await _otw(ctx)
+            await _waiting(ctx)
+            await _timer(ctx)
 
 @Meowth.command(pass_context=True)
 async def starting(ctx):
@@ -1244,7 +1267,7 @@ async def duplicate(ctx):
         trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
         if ctx.message.author.mention not in server_dict[ctx.message.server]['raidchannel_dict']:
             trainer_dict[ctx.message.author.mention] = {}
-            trainer_dict[ctx.message.author.mention]['dupe'] = "dupe"
+        trainer_dict[ctx.message.author.mention]['dupe'] = "dupe"
         for trainer in trainer_dict.values():
             if trainer['dupe'] == "dupe":
                 ctx_dupecount += 1

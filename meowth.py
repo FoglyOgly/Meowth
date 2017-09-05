@@ -677,7 +677,7 @@ async def _raid(message, bot):
             await Meowth.send_message(message.channel, content = "Meowth! {0} raid reported by {1}! Details:{2}. Coordinate in {3}".format(raid.mention, message.author.mention, raid_details, raid_channel.mention),embed=raid_embed)
             await asyncio.sleep(1) #Wait for the channel to be created.
 
-            raidmsg = """Meowth! {0} raid reported by {1}! Details:{2}. Coordinate here!
+            raidmsg = """Meowth! {0} raid reported in {1.mention} by {2}! Details:{3}. Coordinate here!
 
 Reply to this message with **!coming** (`!coming [number]` for trainers with you) to say you are on your way, and reply with **!here** once you arrive.
 If you are at the raid already, reply with **!here** (`!here [number]` for trainers with you).
@@ -690,10 +690,11 @@ Once you start a raid, use **!starting** to clear the waiting list to allow the 
 
 Sometimes I'm not great at directions, but I'll correct my directions if anybody sends me a maps link.
 
-This channel will be deleted in 2 hours or five minutes after the timer expires.""".format(raid.mention, message.author.mention, raid_details)
+This channel will be deleted in 2 hours or five minutes after the timer expires.""".format(raid.mention, message.channel, message.author.mention, raid_details)
             raidmessage = await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)
 
             server_dict[message.server]['raidchannel_dict'][raid_channel] = {
+              'reportcity' : message.channel.name,
               'trainer_dict' : {},
               'exp' : time.time() + 2 * 60 * 60, # Two hours from now
               'manual_timer' : False, # No one has explicitly set the timer, Meowth is just assuming 2 hours
@@ -719,30 +720,34 @@ async def unwant(ctx):
     """Behind the scenes, Meowth removes the user from
     the server role for the Pokemon species."""
     if server_dict[ctx.message.server]['wantset'] == True:
-        entered_unwant = ctx.message.content[8:].lower()
-        role = discord.utils.get(ctx.message.server.roles, name=entered_unwant)
-        if entered_unwant not in pkmn_info['pokemon_list']:
-            await Meowth.send_message(ctx.message.channel, spellcheck(entered_unwant))
+        if server_dict[ctx.message.server]['want_channel_list'] and ctx.message.channel not in server_dict[ctx.message.server]['want_channel_list']:
+            await Meowth.send_message(ctx.message.channel, "Meowth! Please use one of the following channels for **!unwant** commands: {0}".format(", ".join(i.mention for i in server_dict[ctx.message.server]['want_channel_list'])))
             return
         else:
-            # Create role if it doesn't exist yet
-            if role is None:
-                role = await Meowth.create_role(server = ctx.message.server, name = entered_unwant, hoist = False, mentionable = True)
-                await asyncio.sleep(0.5)
-
-            # If user is not already wanting the Pokemon,
-            # print a less noisy message
-            if role not in ctx.message.author.roles:
-                await Meowth.add_reaction(ctx.message, '✅')
-                #await Meowth.send_message(ctx.message.channel, content=_("Meowth! {0}, I already know you don't want {1}!").format(ctx.message.author.mention, entered_unwant.capitalize()))
+            entered_unwant = ctx.message.content[8:].lower()
+            role = discord.utils.get(ctx.message.server.roles, name=entered_unwant)
+            if entered_unwant not in pkmn_info['pokemon_list']:
+                await Meowth.send_message(ctx.message.channel, spellcheck(entered_unwant))
+                return
             else:
-                await Meowth.remove_roles(ctx.message.author, role)
-                unwant_number = pkmn_info['pokemon_list'].index(entered_unwant) + 1
-                await Meowth.add_reaction(ctx.message, '✅')
-                #unwant_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(unwant_number))
-                #unwant_embed = discord.Embed(colour=discord.Colour(0x2ecc71))
-                #unwant_embed.set_thumbnail(url=unwant_img_url)
-                #await Meowth.send_message(ctx.message.channel, content=_("Meowth! Got it! {0} no longer wants {1}").format(ctx.message.author.mention, entered_unwant.capitalize()),embed=unwant_embed)
+                # Create role if it doesn't exist yet
+                if role is None:
+                    role = await Meowth.create_role(server = ctx.message.server, name = entered_unwant, hoist = False, mentionable = True)
+                    await asyncio.sleep(0.5)
+
+                # If user is not already wanting the Pokemon,
+                # print a less noisy message
+                if role not in ctx.message.author.roles:
+                    await Meowth.add_reaction(ctx.message, '✅')
+                    #await Meowth.send_message(ctx.message.channel, content=_("Meowth! {0}, I already know you don't want {1}!").format(ctx.message.author.mention, entered_unwant.capitalize()))
+                else:
+                    await Meowth.remove_roles(ctx.message.author, role)
+                    unwant_number = pkmn_info['pokemon_list'].index(entered_unwant) + 1
+                    await Meowth.add_reaction(ctx.message, '✅')
+                    #unwant_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(unwant_number))
+                    #unwant_embed = discord.Embed(colour=discord.Colour(0x2ecc71))
+                    #unwant_embed.set_thumbnail(url=unwant_img_url)
+                    #await Meowth.send_message(ctx.message.channel, content=_("Meowth! Got it! {0} no longer wants {1}").format(ctx.message.author.mention, entered_unwant.capitalize()),embed=unwant_embed)
     else:
         await Meowth.send_message(message.channel, "Meowth! **!unwant** commands have been disabled.")
 
@@ -1208,15 +1213,38 @@ async def _waiting(ctx):
 
 @Meowth.command(pass_context=True)
 async def lists(ctx):
-    """Print all lists concerning a raid at once.
+    """Print all lists concerning a raid at once in raid channels and lists all active raids in city channels.
 
     Usage: !lists
-    Works only in raid channels. Calls the interest, otw, and waiting lists. Also prints
+    Works only in raid or city channels. Calls the interest, otw, and waiting lists. Also prints
     the raid timer."""
-    await _interest(ctx)
-    await _otw(ctx)
-    await _waiting(ctx)
-    await _timer(ctx)
+    ctx_waitingcount = 0
+    ctx_omwcount = 0
+    ctx_maybecount = 0
+    raidcount = 0
+    activeraidnum = 0
+    if server_dict[ctx.message.server]['raidset'] == True:
+        if ctx.message.channel.name in server_dict[ctx.message.server]['city_channels'].keys():
+            await Meowth.send_message(ctx.message.channel, _("Current Raids:"))
+            for activeraid in server_dict[ctx.message.server]['raidchannel_dict']:
+                for trainer in server_dict[ctx.message.server]['raidchannel_dict'][activeraid]['trainer_dict'].values():
+                    if trainer['status'] == "waiting":
+                        ctx_waitingcount += trainer['count']
+                    elif trainer['status'] == "omw":
+                        ctx_omwcount += trainer['count']
+                    elif trainer['status'] == "maybe":
+                        ctx_maybecount += trainer['count']
+                localexpire = time.gmtime(server_dict[ctx.message.channel.server]['raidchannel_dict'][activeraid]['exp'] + 3600 * server_dict[ctx.message.channel.server]['offset'])
+                if server_dict[ctx.message.server]['raidchannel_dict'][activeraid]['reportcity'] == ctx.message.channel.name and server_dict[ctx.message.server]['raidchannel_dict'][activeraid]['active'] and discord.utils.get(ctx.message.channel.server.channels, id=activeraid.id):
+                    await Meowth.send_message(ctx.message.channel, _("{0.mention} - interested = {1}, {2} = {3}, {4} = {5}, Ends at {6}").format(activeraid, ctx_maybecount, parse_emoji(ctx.message.server, config['omw_id']), ctx_omwcount, parse_emoji(ctx.message.server, config['here_id']), ctx_waitingcount, strftime("%I:%M", localexpire)))
+                    activeraidnum += 1
+            if activeraidnum == 0:
+                await Meowth.send_message(ctx.message.channel, _("Meowth! No active raids! Report one with **!raid <name> <location>**."))
+        elif ctx.message.channel in server_dict[ctx.message.channel.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
+            await _interest(ctx)
+            await _otw(ctx)
+            await _waiting(ctx)
+            await _timer(ctx)
 
 @Meowth.command(pass_context=True)
 async def starting(ctx):

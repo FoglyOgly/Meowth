@@ -1292,7 +1292,7 @@ async def duplicate(ctx):
         trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
         if ctx.message.author.mention not in server_dict[ctx.message.server]['raidchannel_dict']:
             trainer_dict[ctx.message.author.mention] = {}
-            trainer_dict[ctx.message.author.mention]['dupe'] = "dupe"
+        trainer_dict[ctx.message.author.mention]['dupe'] = "dupe"
         for trainer in trainer_dict.values():
             if trainer['dupe'] == "dupe":
                 ctx_dupecount += 1

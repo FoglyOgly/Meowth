@@ -1204,10 +1204,11 @@ async def lists(ctx):
 
     Usage: !lists
     Works only in raid or city channels. Calls the interest, otw, and waiting lists. Also prints
-    the raid timer."""
+    the raid timer. In city channels, lists all active raids."""
     activeraidnum = 0
     if server_dict[ctx.message.server]['raidset'] == True:
         if ctx.message.channel.name in server_dict[ctx.message.server]['city_channels'].keys():
+            print(server_dict[ctx.message.server])
             await Meowth.send_message(ctx.message.channel, _("Current Raids in {0}:").format(ctx.message.channel.name.capitalize()))
             for activeraid in server_dict[ctx.message.server]['raidchannel_dict']:
                 ctx_waitingcount = 0
@@ -1238,7 +1239,7 @@ async def starting(ctx):
     
     Usage: !starting
     Works only in raid channels. Sends a message and clears the waiting list. Users who are waiting
-    for a second group must reannounce with the :here: emoji."""
+    for a second group must reannounce with the :here: emoji or !here."""
     
     if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
         ctx_startinglist = []
@@ -1262,18 +1263,23 @@ async def starting(ctx):
         await Meowth.send_message(ctx.message.channel, starting_str)
 
 
-@Meowth.command(pass_context=True)
+@Meowth.command(pass_context=True, hidden=True)
 async def omw(ctx):
     if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
         await Meowth.send_message(ctx.message.channel, content = "Meowth! Hey {0}, I don't know if you meant **!coming** to say that you are coming or **!otw** to see the other trainers on their way".format(ctx.message.author.mention))
 
-@Meowth.command(pass_context=True)
+@Meowth.command(pass_context=True, hidden=True)
 async def interested(ctx):
     if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
         await Meowth.send_message(ctx.message.channel, content = "Meowth! Hey {0}, I don't know if you meant **!maybe** to say that you are interested or **!interest** to see the other trainers interest".format(ctx.message.author.mention))
 
-@Meowth.command(pass_context=True, hidden=True)
+@Meowth.command(pass_context=True)
 async def duplicate(ctx):
+    """A command to report a raid channel as a duplicate.
+
+    Usage: !duplicate
+    Works only in raid channels. When three users report a channel as a duplicate,
+    Meowth deactivates the channel and marks it for deletion."""
     if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
         ctx_dupecount = 0
         trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
@@ -1296,6 +1302,7 @@ async def duplicate(ctx):
             else:
                 del server_dict[ctx.message.channel.server]['raidchannel_dict'][ctx.message.channel]
     server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict'] = trainer_dict
+
 
 
 

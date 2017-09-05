@@ -304,6 +304,7 @@ async def configure(ctx):
     server = ctx.message.server
     owner = ctx.message.author
     server_dict[server]['done']=False
+    server_dict[server] = {'want_channel_list': [], 'offset': 0, 'welcome': False, 'welcomechan': "", 'wantset': False, 'raidset': False, 'wildset': False, 'team': False, 'want': False, 'other': False, 'done': False}
     await Meowth.send_message(owner, _("""__**Meowth Configuration**__\n\nMeowth! That's Right! Welcome to the configuration for Meowth the Pokemon Go Helper Bot! I will be guiding you through some setup steps to get me setup on your server.\n\n**Team Assignment Configuration**\n\nFirst, I have a feature that allows users to assign their Pokemon Go team using roles. If you have a bot that handles this already, or you don't want this feature, type N, otherwise type Y to enable the feature!"""))
     teamreply = await Meowth.wait_for_message(author = owner, check=lambda message: message.server is None)
     if teamreply.content.lower() == "y":

@@ -1169,15 +1169,14 @@ async def lists(ctx):
     Usage: !lists
     Works only in raid or city channels. Calls the interest, otw, and waiting lists. Also prints
     the raid timer."""
-    ctx_waitingcount = 0
-    ctx_omwcount = 0
-    ctx_maybecount = 0
-    raidcount = 0
     activeraidnum = 0
     if server_dict[ctx.message.server]['raidset'] == True:
         if ctx.message.channel.name in server_dict[ctx.message.server]['city_channels'].keys():
-            await Meowth.send_message(ctx.message.channel, _("Current Raids:"))
+            await Meowth.send_message(ctx.message.channel, _("Current Raids in {0}:").format(ctx.message.channel.name.capitalize()))
             for activeraid in server_dict[ctx.message.server]['raidchannel_dict']:
+                ctx_waitingcount = 0
+                ctx_omwcount = 0
+                ctx_maybecount = 0
                 for trainer in server_dict[ctx.message.server]['raidchannel_dict'][activeraid]['trainer_dict'].values():
                     if trainer['status'] == "waiting":
                         ctx_waitingcount += trainer['count']

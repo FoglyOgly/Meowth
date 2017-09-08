@@ -1,3 +1,4 @@
+Beta branch!
 # Meowth
 A Discord helper bot for Pokemon Go communities.
 
@@ -14,7 +15,7 @@ Meowth is now able to handle being on multiple servers of any size in any part o
 
 ## Directions for inviting a remotely hosted Meowth to your server:
 1. Be a user with the "Manage Server" permission on the server you're trying to invite Meowth to, or get such a person to follow these directions. The server owner will have to do the configure process anyway, so you might as well get that person.
-2. Follow this link: https://discordapp.com/oauth2/authorize?client_id=346759953006198784&scope=bot&permissions=0 and select your server.
+2. Follow this link: https://discordapp.com/oauth2/authorize?client_id=346759953006198784&scope=bot&permissions=268471376 and select your server.
 3. In your server, type !configure if you are the server owner. Meowth will DM you and ask you some questions about your time zone, what functions you want to enable, what channels you want to restrict certain functions to, and what locations to insert to Google Maps queries (these are channel-specific). Do NOT send anything to your server while in this process as a few times Meowth is just waiting to see any message from you. If you make a mistake just type !configure in your server to start over.
 4. Meowth will send you a file with some custom emoji in it. You can just bulk upload those to your server. Meowth currently uses 23 custom emoji. 18 of these are type icons (for displaying type weaknesses of raid bosses), 3 of them are team icons, and 2 are for raid coordination. All functions are available without custom emoji, but the type icons in particular look slick in raid reports.
 5. That's it! You can join the Meowth server here for updates, setup help, feature requests, or just to test out the bot before you add it. https://discord.gg/hhVjAN8 
@@ -34,7 +35,7 @@ that Meowth uses and config files.
 4. Go here https://discordapp.com/developers/applications/me#top and create a new app. Name it Meowth if you like and upload the 
 Meowth avatar included in the repository. Create a bot user for your app.
 
-5. Copy this link. https://discordapp.com/oauth2/authorize?client_id=<CLIENT_ID>&scope=bot Paste it into your browser.
+5. Copy this link. https://discordapp.com/oauth2/authorize?client_id=<CLIENT_ID>&scope=bot&permissions=268454928 Paste it into your browser.
 Then go to your Discord application page again and copy the client id, inserting it into the above link where it says <CLIENT_ID>.
 Press enter and select the server you want to add Meowth too.
 

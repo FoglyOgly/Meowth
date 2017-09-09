@@ -1295,6 +1295,38 @@ async def duplicate(ctx):
             else:
                 del server_dict[ctx.message.channel.server]['raidchannel_dict'][ctx.message.channel]
     server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict'] = trainer_dict
+    
+@Meowth.command(pass_context=True)
+async def location(ctx):
+    """Change raid location.
+
+    Usage: !location <address>
+    Works only in raid channels. Changes the google map links."""
+    
+    if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
+        message = ctx.message
+        space1 = message.content.find(" ",6)
+        if space1 == -1:
+            await Meowth.send_message(message.channel, _("Meowth! We're missing the new location details! Usage: **!location <location>**"))
+            return
+        else:
+            report_city = server_dict[message.server]['raidchannel_dict'][message.channel]['reportcity']
+            report_channel = discord.utils.get(message.server.channels, name=report_city)
+            
+            details = message.content[space1:]
+            newloc = create_gmaps_query(details, report_channel)
+            oldraidmsg = server_dict[message.server]['raidchannel_dict'][message.channel]['raidmessage']
+            oldembed = oldraidmsg.embeds[0]
+            newembed = discord.Embed(title=oldembed['title'],url=newloc,description=oldembed['description'],colour=discord.Colour(0x2ecc71))
+            newembed.set_thumbnail(url=oldembed['thumbnail']['url'])
+            await Meowth.edit_message(oldraidmsg, new_content=oldraidmsg.content, embed=newembed)
+            otw_list = []
+            trainer_dict = server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']
+            for trainer in trainer_dict.keys():
+                if trainer_dict[trainer]['status']=='omw':
+                    otw_list.append(trainer)
+            await Meowth.send_message(message.channel, content = _("Meowth! Someone has suggested a different location for the raid! Trainers {trainer_list}: make sure you are headed to the right place!").format(trainer_list=", ".join(otw_list)), embed = newembed)
+            return
 
 
 

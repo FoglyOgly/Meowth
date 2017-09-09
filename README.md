@@ -29,24 +29,22 @@ If you want to tinker with Meowth yourself, you can still download this repo, ma
 2. Install discord.py. To do this, run this command in your command prompt: python3 -m pip install -U discord.py
 (On Windows: py -m pip install -U discord.py should work)
 
-3. Download the files in this repository. The source code is in meowth.py, the rest of the files are images for the custom emoji
-that Meowth uses and config files.
+3. Download the files in this repository. The source code is in meowth.py, bot config is in config.json and language files are in locale.
 
 4. Go here https://discordapp.com/developers/applications/me#top and create a new app. Name it Meowth if you like and upload the 
-Meowth avatar included in the repository. Create a bot user for your app.
+Meowth avatar included or one of your own. 
 
-5. Copy this link. https://discordapp.com/oauth2/authorize?client_id=<CLIENT_ID>&scope=bot&permissions=268454928 Paste it into your browser.
-Then go to your Discord application page again and copy the client id, inserting it into the above link where it says <CLIENT_ID>.
-Press enter and select the server you want to add Meowth too.
+5. Create a bot user for your app and reveal the bot token, then copy it. Open config.json in a text editor.  Paste the bot token into line 13, replacing the "mytokenhere" string.
 
-6. Give Meowth, at the least, permissions to read and write messages, embed links, manage channels, and manage roles.
+6. Run meowth.py from the command prompt or terminal window. If successful, it should print "Meowth! That's right!" or similar to the 
+console.
 
-7. Go back to your app page in Discord and click to reveal the bot token, then copy it. Open config.json in a text editor.  Paste the bot token into line 13, replacing the "mytokenhere" string.
+7. Go to your Discord application page and copy the Client ID. Paste it into the following link, replacing <CLIENT_ID>.
+   https://discordapp.com/oauth2/authorize?client_id=<CLIENT_ID>&scope=bot&permissions=268822608 
 
-8. Run meowth.py from the command prompt or terminal window. If successful, it should print "Meowth! That's right!" to the 
-window and the bot should show up as online in Discord.
+5. Select the server you want to add Meowth to and complete the prompts.
 
-9. All commands except !team should be working. The welcome message may or may not be working at this point. Google Maps links may not be that accurate yet. The raid commands will be using default values like :omw: which may not be configured on your server.
+9. The bot should now be online and have sent you DM in Discord. Simply type !configure in your server to start the configuration process.
 
 
 

@@ -43,33 +43,31 @@ console.
 
 5. Select the server you want to add Meowth to and complete the prompts.
 
-9. The bot should now be online and have sent you DM in Discord. Simply type !configure in your server to start the configuration process.
+9. The bot should now be online and have sent you DM in Discord. Add the team roles: mystic, instinct and valor. Ensure they're below the bot role in the server role hierarchy. 
 
-
+10. Simply type !configure in your server to start the configuration process.
 
 ## Directions for using Meowth:
 Note: avoid punctuation of any kind inside commands. The <> in these instructions are there for decoration
 
-1. !team <teamname> - adds you to a team role on the server. These roles must be created beforehand.
+1. !team <teamname> - Adds you to a team role on the server. These roles should be created beforehand.
 
-2. !want <pokemonname> - adds you to an invisible role for a Pokemon. Meowth will create a role if none exists.
+2. !want <pokemonname> - Adds a pokemon role to you so you'll be mentioned on reports. Meowth will create a role if none exists.
 
-3. !wild <pokemonname> <location> - Meowth will send a message @mentioning <pokemonname> and including a Google Maps link
-to <location>. If <location> is blank, Meowth will ask for more details.
+3. !wild <pokemonname> <location> - Meowth will @mention <pokemonname> and include a Google Maps link to <location>. If <location> is blank, Meowth will ask for more details.
 
-4. !raid <pokemonname> <location> <time remaining> - Does the same thing as !wild, but also creates a new channel by the name of
-#<pokemonname>-<location>. The message also includes the custom emoji for the types that do super effective damage against the 
-Pokemon. The created raid channel will automatically delete after the <time remaining> has expired. If <time remaining> is not given or is given in a format other than H:MM, Meowth will assume a two-hour time remaining and ask you to use !timerset.
+4. !raid <pokemonname> <location> <time remaining> - Mentions the pokemon role, gives a google maps link o creates a new channel by the name of
+#<pokemonname>-<location>. The message shows type effectiveness against the Pokemon. The raid channel will automatically delete after <time remaining> has expired. If <time remaining> is not given or is given in a format other than H:MM, Meowth will assume a two-hour time remaining and ask you to use !timerset.
 
-5. :omw:/:here:/!coming/!here - in a raid channel, the custom emoji for omw and here tell Meowth that you are on your way to or at a raid. !coming and !here do the same things as the custom emoji. If you have multiple trainers with you, type another emoji for each additional trainer. If you are using the commands, use them with !coming <number> to do the same thing. Typing :here: also removes you from the on the way list. The exact phrases are configurable on lines 53-56.
+5. !coming/!here - In a raid channel, this will tell Meowth that you are on your way to or at a raid. If you have multiple trainers with you, add a number, such as !coming <number>.
 
-6. :unomw:/:unhere:/!cancel - in a raid channel, these custom emoji tell Meowth to remove you from the on the way or waiting lists. The !cancel command removes you from either list if you are on one. The exact phrases are configurable on lines 53-56.
+6. !cancel - In a raid channel, this will tell Meowth to remove you from the on the way or waiting lists. The !cancel command removes you from either list if you are on one.
 
-7. !otw/!waiting - in a raid channel, these commands tell Meowth to list and mention the trainers who said they were on the way
-or at a raid. It also includes the total number.
+7. !otw/!waiting/!lists - In a raid channel, these commands tell Meowth to list and mention the trainers who said they were on the way
+or at a raid. It also includes the total number. !lists shows all member statuses.
 
 8. !starting - in a raid channel, this command tells Meowth to delete the !waiting list for that raid. Meowth will mention the
-users and ask them to respond with :here: if they are still waiting.
+users and ask them to respond with !here if they are still waiting.
 
 9. !timerset H:MM - in a raid channel, this tells Meowth how long is remaining on the raid. Meowth will send a message notifying
 the time at which the raid will end. Also overwrites any previously used !timerset command for that raid.

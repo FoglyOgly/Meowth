@@ -600,8 +600,18 @@ async def _wild(message):
             await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!wild <pokemon name> <location>**"))
             return
         else:
-            entered_wild = message.content[6:space1].lower()
-            wild_details = message.content[space1:]
+            content = message.content[6:].lower()
+            entered_wild = content.split(' ',1)[0]
+            wild_details = content.split(' ',1)[1]
+            if entered_wild not in pkmn_info['pokemon_list']:
+                entered_wild2 = ' '.join([content.split(' ',2)[0],content.split(' ',2)[1]])
+                if entered_wild2 in pkmn_info['pokemon_list']:
+                    entered_wild = entered_wild2
+                    try:
+                        wild_details = content.split(' ',2)[2]
+                    except IndexError:
+                        await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!wild <pokemon name> <location>**"))
+                        return
             wild_gmaps_link = create_gmaps_query(wild_details, message.channel)
 
 

@@ -978,7 +978,7 @@ async def _maybe(message, count):
     if message.channel in server_dict[message.server]['raidchannel_dict'] and server_dict[message.server]['raidchannel_dict'][message.channel]['active']:
         trainer_dict = server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']
         if count == 1:
-            await Meowth.send_message(message.channel, _("Meowth! {0} is interested!").format(member=message.author.mention))
+            await Meowth.send_message(message.channel, _("Meowth! {member} is interested!").format(member=message.author.mention))
         else:
             await Meowth.send_message(message.channel, _("Meowth! {member} is interested with a total of {trainer_count} trainers!").format(member=message.author.mention, trainer_count=count))
         # Add trainer name to trainer list

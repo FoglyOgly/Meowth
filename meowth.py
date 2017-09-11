@@ -288,7 +288,7 @@ async def on_ready():
     await channel_cleanup()
     for server in Meowth.servers:
         server_dict[server] = server_dict.pop(server)
-        await Meowth.send_message(server.owner, _("Meowth! That's right! I've been rebooted! You don't need to do anything this time, but you may find some commands don't respond in currently active channels, or the channels may not delete as expected. Sorry for any inconvenience!"))
+        await Meowth.send_message(server.owner, _("**Meowth! That's right! I've been updated!**\n\n**Changes:**\n    - Added '!location' and '!location new commands' for raids.\n    - Shifted the bot to use our servers emoji (external emoji)\n    - Updated !configure to be easier to understand and step through\n\nWith emoji now being pulled from out discord server, you can delete the Meowth-required emoji now from your server custom emoji.\n**NOTE: Meowth's must have the 'Use External Emoji' role.**\nPlease make sure it's added."))
 
 
 

@@ -203,11 +203,12 @@ To reactivate the channel, use !timerset to set the timer again."""))
         # If the channel has already been deleted from the dict, someone
         # else got to it before us, so don't do anything.
         # Also, if the channel got reactivated, don't do anything either.
-        if server_dict[channel.server]['raidchannel_dict'][channel] and not server_dict[channel.server]['raidchannel_dict'][channel]['active']:
-            del server_dict[channel.server]['raidchannel_dict'][channel]
-            # Check one last time to make sure the channel exists
-            if discord.utils.get(channel.server.channels, id=channel.id):
-                await Meowth.delete_channel(channel)
+        if channel in server_dict[channel.server]['raidchannel_dict']:
+            if server_dict[channel.server]['raidchannel_dict'][channel] and not server_dict[channel.server]['raidchannel_dict'][channel]['active']:
+                del server_dict[channel.server]['raidchannel_dict'][channel]
+                # Check one last time to make sure the channel exists
+                if discord.utils.get(channel.server.channels, id=channel.id):
+                    await Meowth.delete_channel(channel)
     else:
         del server_dict[channel.server]['raidchannel_dict'][channel]
 
@@ -217,28 +218,35 @@ To reactivate the channel, use !timerset to set the timer again."""))
 async def channel_cleanup(loop = False):
     while True:
         deleted_channels = []
-
-        for channel in Meowth.get_all_channels():
-            if channel in server_dict[channel.server]['raidchannel_dict']:
-                if server_dict[channel.server]['raidchannel_dict'][channel]['active'] and server_dict[channel.server]['raidchannel_dict'][channel]['exp'] <= time.time():
-                    event_loop.create_task(delete_channel(channel))
-                    server_dict[channel.server]['raidchannel_dict'][channel]['active'] = False
-        for server in Meowth.servers:
-            deadchannels = []
-            for channel in server_dict[server]['raidchannel_dict']:
-                keep_looking = True
-                for channel2 in server.channels:
-                    if channel == channel2:
-                        keep_looking = False
-                        break
-                if keep_looking:
-                    deadchannels.append(channel)
-            for deadchannel in deadchannels:
-                del server_dict[server]['raidchannel_dict'][deadchannel]
-        # If this is not a looping cleanup, then
-        # just break out and exit.
-        if not loop:
-            break
+        channel_list = Meowth.get_all_channels()
+        for channel in channel_list:
+            try:
+                testdict = server_dict[channel.server]
+            except KeyError:
+                server_dict[channel.server] = {'want_channel_list': [], 'offset': 0, 'welcome': False, 'team': False, 'want': False, 'other': False, 'done': False, 'raidchannel_dict' : {}}
+                await Meowth.send_message(channel.server.owner, _("Meowth! I'm Meowth, a Discord helper bot for Pokemon Go communities. I've just been restarted and can't find any data about your server, so please type !configure in any channel of your server to set me up!"))
+                continue
+            if server_dict[channel.server]:
+                if channel in server_dict[channel.server]['raidchannel_dict']:
+                    if server_dict[channel.server]['raidchannel_dict'][channel]['active'] and server_dict[channel.server]['raidchannel_dict'][channel]['exp'] <= time.time():
+                        event_loop.create_task(delete_channel(channel))
+                        server_dict[channel.server]['raidchannel_dict'][channel]['active'] = False
+            for server in Meowth.servers:
+                deadchannels = []
+                for channel in server_dict[server]['raidchannel_dict']:
+                    keep_looking = True
+                    for channel2 in server.channels:
+                        if channel == channel2:
+                            keep_looking = False
+                            break
+                    if keep_looking:
+                        deadchannels.append(channel)
+                for deadchannel in deadchannels:
+                    del server_dict[server]['raidchannel_dict'][deadchannel]
+            # If this is not a looping cleanup, then
+            # just break out and exit.
+            if not loop:
+                break
 
         await asyncio.sleep(60)
 async def autosave(loop = False):
@@ -285,10 +293,10 @@ team_msg = " or ".join(["'!team {0}'".format(team) for team in config['team_dict
 @Meowth.event
 async def on_ready():
     print(_("Meowth! That's right!")) #prints to the terminal or cmd prompt window upon successful connection to Discord
-    await channel_cleanup()
     for server in Meowth.servers:
+        await Meowth.send_message(server.owner, _("**Meowth! That's right! I've been updated!**\n\n**Changes:**\n    - Added '!location' and '!location new' commands for raids.\n    - Shifted the bot to use our servers emoji (external emoji)\n    - Updated !configure to be easier to understand and step through\n\nWith emoji now being pulled from our discord server, you can delete the Meowth-required emoji now from your server custom emoji.\n**NOTICE: Meowth must have the 'Use External Emoji' permission.**\nPlease make sure it's added to my role.\n\nNote: The first push of this update about half an hour ago may have resulted in some unresponsiveness from Meowth in existing raid channels, and raid channels may not have been deleting or expiring as intended. Apologies for the inconvenience. This issue has now been resolved. If you have any questions, simply ask us in our Meowth Discord. Thanks."))
         server_dict[server] = server_dict.pop(server)
-        await Meowth.send_message(server.owner, _("**Meowth! That's right! I've been updated!**\n\n**Changes:**\n    - Added '!location' and '!location new' commands for raids.\n    - Shifted the bot to use our servers emoji (external emoji)\n    - Updated !configure to be easier to understand and step through\n\nWith emoji now being pulled from out discord server, you can delete the Meowth-required emoji now from your server custom emoji.\n**NOTE: Meowth must have the 'Use External Emoji' permission.**\nPlease make sure it's added to my role."))
+    await channel_cleanup()
 
 
 

@@ -288,7 +288,7 @@ async def on_ready():
     await channel_cleanup()
     for server in Meowth.servers:
         server_dict[server] = server_dict.pop(server)
-        await Meowth.send_message(server.owner, _("**Meowth! That's right! I've been updated!**\n\n**Changes:**\n    - Added '!location' and '!location new' commands for raids.\n    - Shifted the bot to use our servers emoji (external emoji)\n    - Updated !configure to be easier to understand and step through\n\nWith emoji now being pulled from out discord server, you can delete the Meowth-required emoji now from your server custom emoji.\n**NOTE: Meowth's must have the 'Use External Emoji' role.**\nPlease make sure it's added."))
+        await Meowth.send_message(server.owner, _("**Meowth! That's right! I've been updated!**\n\n**Changes:**\n    - Added '!location' and '!location new' commands for raids.\n    - Shifted the bot to use our servers emoji (external emoji)\n    - Updated !configure to be easier to understand and step through\n\nWith emoji now being pulled from out discord server, you can delete the Meowth-required emoji now from your server custom emoji.\n**NOTE: Meowth must have the 'Use External Emoji' permission.**\nPlease make sure it's added to my role."))
 
 
 
@@ -471,7 +471,11 @@ async def configure(ctx):
                 await Meowth.send_message(owner, _("**Timezone Configuration**\nTo help coordinate raids reports for you, I need to know what timezone you're in! The current 24-hr time UTC is {utctime}. How many hours off from that are you?\n\nRespond with: A number from **-12** to **12**:").format(utctime=strftime("%H:%M",time.gmtime())))
                 while True:
                     offsetmsg = await Meowth.wait_for_message(author = owner, check=lambda message: message.server is None)
-                    offset = float(offsetmsg.content)
+                    try:
+                        offset = float(offsetmsg.content)
+                    except ValueError:
+                        await Meowth.send_message(owner, _("I couldn't convert your answer to an appropriate timezone!.\nPlease double check what you sent me and resend a number strarting from **-12** to **12**."))
+                        continue
                     if not -12 <= offset <= 14:
                         await Meowth.send_message(owner, _("I couldn't convert your answer to an appropriate timezone!.\nPlease double check what you sent me and resend a number strarting from **-12** to **12**."))
                         continue
@@ -536,18 +540,19 @@ async def on_member_join(member):
 
     admin_message = _(" If you have any questions just ask an admin.")
 
-    message = _("Meowth! Welcome to {server.name}, {new_member_name.mention}! ")
+    welcomemessage = _("Meowth! Welcome to {server_name}, {new_member_name}! ")
     if server_dict[server]['team'] == True:
-        message += _("Set your team by typing {team_command} without quotations.").format(team_command=team_msg)
-    message += admin_message
+        welcomemessage += _("Set your team by typing {team_command} without quotations.").format(team_command=team_msg)
+    welcomemessage += admin_message
 
     if server_dict[server]['welcomechan'] == "dm":
-        await Meowth.send_message(member, message.format(server, member))
+        await Meowth.send_message(member, welcomemessage.format(server_name=server.name, new_member_name=member.mention))        
+        
     else:
         default = discord.utils.get(server.channels, name = server_dict[server]['welcomechan'])
         if not default:
             print(_("WARNING: no default channel configured. Unable to send welcome message."))
-        await Meowth.send_message(default, message.format(server=server, new_member_name=member))
+        await Meowth.send_message(default, welcomemessage.format(server_name=server.name, new_member_name=member.mention))
 
 
 

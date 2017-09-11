@@ -6,7 +6,8 @@
 
 "//": "Language you want for Meowth.",
 "//": "fr, en",
-"language": "en",
+"bot-language": "en",
+"pokemon-language": "en",
 
 "//": "Bot token ID, needed for authentication.",
 "//": "This is found on the app page when you click to reveal the bot user's token",

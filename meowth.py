@@ -293,10 +293,10 @@ team_msg = " or ".join(["'!team {0}'".format(team) for team in config['team_dict
 @Meowth.event
 async def on_ready():
     print(_("Meowth! That's right!")) #prints to the terminal or cmd prompt window upon successful connection to Discord
-    await channel_cleanup()
     for server in Meowth.servers:
-        server_dict[server] = server_dict.pop(server)
         await Meowth.send_message(server.owner, _("**Meowth! That's right! I've been updated!**\n\n**Changes:**\n    - Added '!location' and '!location new' commands for raids.\n    - Shifted the bot to use our servers emoji (external emoji)\n    - Updated !configure to be easier to understand and step through\n\nWith emoji now being pulled from our discord server, you can delete the Meowth-required emoji now from your server custom emoji.\n**NOTICE: Meowth must have the 'Use External Emoji' permission.**\nPlease make sure it's added to my role.\n\nNote: The first push of this update about half an hour ago may have resulted in some unresponsiveness from Meowth in existing raid channels, and raid channels may not have been deleting or expiring as intended. Apologies for the inconvenience. This issue has now been resolved. If you have any questions, simply ask us in our Meowth Discord. Thanks."))
+        server_dict[server] = server_dict.pop(server)
+    await channel_cleanup()
 
 
 

@@ -299,7 +299,6 @@ async def on_ready():
     await channel_cleanup()
 
 
-
 @Meowth.event
 async def on_server_join(server):
     owner = server.owner
@@ -1048,52 +1047,6 @@ async def _cancel(message):
                 await Meowth.send_message(message.channel, _("Meowth! {member} and their total of {trainer_count} trainers are no longer on their way!").format(member=message.author.mention, trainer_count=trainer_dict[message.author.mention]['count']))
         del trainer_dict[message.author.mention]
         server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict'] = trainer_dict
-"""Meowth watches for messages that start with the omw and here emoji. Meowth
-counts the number of emoji and adds that user and the number to the omw and waiting lists. The emoji here will have to be
-changed to fit the emoji ids in your server."""
-@Meowth.event
-async def on_message(message):
-    if message.server is not None:
-        raid_status = server_dict[message.server]['raidchannel_dict'].get(message.channel,None)
-        if raid_status is not None:
-            if server_dict[message.server]['raidchannel_dict'][message.channel]['active']:
-                trainer_dict = server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']
-                omw_emoji = parse_emoji(message.server, config['omw_id'])
-                if message.content.startswith(omw_emoji):
-                    await _coming(message, message.content.count(omw_emoji))
-                    return
-                # TODO: there's no relation between the :here: count and the :omw: count.
-                # For example, if a user is :omw: with 4, they have to send 4x :here:
-                # or else they only count as 1 person waiting
-                here_emoji = parse_emoji(message.server, config['here_id'])
-                if message.content.startswith(here_emoji):
-                    await _here(message, message.content.count(here_emoji))
-                    return
-                if "/maps" in message.content:
-                    mapsindex = message.content.find("/maps")
-                    newlocindex = message.content.rfind("http", 0, mapsindex)
-                    if newlocindex == -1:
-                        return
-                    newlocend = message.content.find(" ", newlocindex)
-                    if newlocend == -1:
-                        newloc = message.content[newlocindex:]
-                    else:
-                        newloc = message.content[newlocindex:newlocend+1]
-                    oldraidmsg = server_dict[message.server]['raidchannel_dict'][message.channel]['raidmessage']
-                    oldreportmsg = server_dict[message.server]['raidchannel_dict'][message.channel]['raidreport']
-                    oldembed = oldraidmsg.embeds[0]
-                    newembed = discord.Embed(title=oldembed['title'],url=newloc,description=oldembed['description'],colour=discord.Colour(0x2ecc71))
-                    newembed.set_thumbnail(url=oldembed['thumbnail']['url'])
-                    await Meowth.edit_message(oldraidmsg, new_content=oldraidmsg.content, embed=newembed)
-                    await Meowth.edit_message(oldreportmsg, new_content=oldreportmsg.content, embed=newembed)
-                    otw_list = []
-                    trainer_dict = server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']
-                    for trainer in trainer_dict.keys():
-                        if trainer_dict[trainer]['status']=='omw':
-                            otw_list.append(trainer)
-                    await Meowth.send_message(message.channel, content = _("Meowth! Someone has suggested a different location for the raid than what I guessed! Trainers {trainer_list}: make sure you are headed to the right place!").format(trainer_list=", ".join(otw_list)), embed = newembed)
-                    return
-    await Meowth.process_commands(message)
 
 @Meowth.command(pass_context=True)
 async def maybe(ctx):
@@ -1468,7 +1421,19 @@ async def new(ctx):
             report_channel = discord.utils.get(message.server.channels, name=report_city)
             
             details = message.content[space1:]
-            newloc = create_gmaps_query(details, report_channel)
+            if "/maps" in message.content:
+                mapsindex = message.content.find("/maps")
+                newlocindex = message.content.rfind("http", 0, mapsindex)
+                if newlocindex == -1:
+                    return
+                newlocend = message.content.find(" ", newlocindex)
+                if newlocend == -1:
+                    newloc = message.content[newlocindex:]
+                else:
+                    newloc = message.content[newlocindex:newlocend+1]
+            else:
+                newloc = create_gmaps_query(details, report_channel)
+                
             server_dict[message.server]['raidchannel_dict'][message.channel]['address'] = details
             oldraidmsg = server_dict[message.server]['raidchannel_dict'][message.channel]['raidmessage']
             oldreportmsg = server_dict[message.server]['raidchannel_dict'][message.channel]['raidreport']

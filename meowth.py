@@ -288,7 +288,7 @@ async def on_ready():
     await channel_cleanup()
     for server in Meowth.servers:
         server_dict[server] = server_dict.pop(server)
-        await Meowth.send_message(server.owner, _("**Meowth! That's right! I've been updated!**\n\n**Changes:**\n    - Added '!location' and '!location new' commands for raids.\n    - Shifted the bot to use our servers emoji (external emoji)\n    - Updated !configure to be easier to understand and step through\n\nWith emoji now being pulled from out discord server, you can delete the Meowth-required emoji now from your server custom emoji.\n**NOTE: Meowth must have the 'Use External Emoji' permission.**\nPlease make sure it's added to my role."))
+        await Meowth.send_message(server.owner, _("**Meowth! That's right! I've been updated!**\n\n**Changes:**\n    - Added '!location' and '!location new' commands for raids.\n    - Shifted the bot to use our servers emoji (external emoji)\n    - Updated !configure to be easier to understand and step through\n\nWith emoji now being pulled from our discord server, you can delete the Meowth-required emoji now from your server custom emoji.\n**NOTE: Meowth must have the 'Use External Emoji' permission.**\nPlease make sure it's added to my role."))
 
 
 

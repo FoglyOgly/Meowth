@@ -803,16 +803,22 @@ async def _raid(message):
 
             raidmsg = _("""Meowth! {pokemon} raid reported by {member}! Details:{location_details}. Coordinate here!
 
-Reply to this message with **!coming** (`!coming [number]` for trainers with you) to say you are on your way, and reply with **!here** once you arrive.
-If you are at the raid already, reply with **!here** (`!here [number]` for trainers with you).
-If you are interested in the raid and want to wait for a group, use **!maybe**.
-If your plans change, reply with **!cancel** if you are no longer on the way or if you have left the raid.
-You can set the time remaining with **!timerset H:MM** and access this with **!timer**.
+To update your status, choose from the following commands:
+**!maybe, !coming, !here, !cancel**
+If you are bringing more than one trainer/account, add the number of accounts total on your first status update.
+Example: `!coming 5`
 
-You can see the list of trainers interested with **!interest**, trainers on their way with **!otw**, trainers at the raid with **!waiting**, or all lists with **!lists**.
-Once you start a raid, use **!starting** to clear the waiting list to allow the next group to coordinate.
+To see the list of trainers who have given their status:
+**!interest, !otw, !waiting**
 
-Sometimes I'm not great at directions, but I'll correct my directions if anybody sends me a maps link.
+**!location** will show the current raid location.
+**!location new <address>** will let you correct the raid address.
+Sending a Google Maps link will also update the raid location.
+
+**!timer** will show the current raid time.
+**!timerset** will let you correct the raid countdown time.
+
+Message **!starting** when the raid is beginning to clear the raid's 'here' list.
 
 This channel will be deleted in 2 hours or five minutes after the timer expires.""").format(pokemon=raid.mention, member=message.author.mention, location_details=raid_details)
             raidmessage = await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)

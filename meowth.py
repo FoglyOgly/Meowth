@@ -776,7 +776,7 @@ async def raid(ctx):
 
 async def _raid(message):
     if message.channel.name not in server_dict[message.server]['city_channels'].keys():
-        await Meowth.send_message(message.channel, _("Meowth! Please restrict raid reports to a city channel or the default channel!"))
+        await Meowth.send_message(message.channel, _("Meowth! Please restrict raid reports to a city channel!"))
         return
     if server_dict[message.server]['raidset'] == True:
         space1 = message.content.find(" ",6)

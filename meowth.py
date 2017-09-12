@@ -756,7 +756,7 @@ async def _wild(message):
             wild_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(wild_number))
             wild_embed = discord.Embed(title=_("Meowth! Click here for directions to the wild {pokemon}!").format(pokemon=entered_wild.capitalize()),url=wild_gmaps_link,description=_("This is just my best guess!"),colour=discord.Colour(0x2ecc71))
             wild_embed.set_thumbnail(url=wild_img_url)
-            await Meowth.send_message(message.channel, content=_("Meowth! Wild {pokemon} reported by {member}! Details:{location_details}").format(pokemon=wild.mention, member=message.author.mention, location_details=wild_details),embed=wild_embed)
+            await Meowth.send_message(message.channel, content=_("Meowth! Wild {pokemon} reported by {member}! Details: {location_details}").format(pokemon=wild.mention, member=message.author.mention, location_details=wild_details),embed=wild_embed)
     else:
         await Meowth.send_message(message.channel, _("Meowth! **!wild** commands have been disabled."))
 
@@ -775,7 +775,7 @@ async def raid(ctx):
     await _raid(ctx.message)
 
 async def _raid(message):
-    if message.channel.name not in server_dict[message.server]['city_channels'].keys() and message.channel != message.server.default_channel:
+    if message.channel.name not in server_dict[message.server]['city_channels'].keys():
         await Meowth.send_message(message.channel, _("Meowth! Please restrict raid reports to a city channel or the default channel!"))
         return
     if server_dict[message.server]['raidset'] == True:
@@ -810,10 +810,10 @@ async def _raid(message):
             raid_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(raid_number))
             raid_embed = discord.Embed(title=_("Meowth! Click here for directions to the raid!"),url=raid_gmaps_link,description=_("Weaknesses: {weakness_list}").format(weakness_list=weakness_to_str(message.server, get_weaknesses(entered_raid))),colour=discord.Colour(0x2ecc71))
             raid_embed.set_thumbnail(url=raid_img_url)
-            raidreport = await Meowth.send_message(message.channel, content = _("Meowth! {pokemon} raid reported by {member}! Details:{location_details}. Coordinate in {raid_channel}").format(pokemon=raid.mention, member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention),embed=raid_embed)
+            raidreport = await Meowth.send_message(message.channel, content = _("Meowth! {pokemon} raid reported by {member}! Details: {location_details}. Coordinate in {raid_channel}").format(pokemon=raid.mention, member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention),embed=raid_embed)
             await asyncio.sleep(1) #Wait for the channel to be created.
 
-            raidmsg = _("""Meowth! {pokemon} raid reported by {member}! Details:{location_details}. Coordinate here!
+            raidmsg = _("""Meowth! {pokemon} raid reported by {member}! Details: {location_details}. Coordinate here!
 
 To update your status, choose from the following commands:
 **!maybe, !coming, !here, !cancel**

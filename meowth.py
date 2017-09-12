@@ -1414,7 +1414,7 @@ async def new(ctx):
         message = ctx.message
         space1 = message.content.find(" ",13)
         if space1 == -1:
-            await Meowth.send_message(message.channel, _("Meowth! We're missing the new location details! Usage: **!location set <new address>**"))
+            await Meowth.send_message(message.channel, _("Meowth! We're missing the new location details! Usage: **!location new <new address>**"))
             return
         else:
             report_city = server_dict[message.server]['raidchannel_dict'][message.channel]['reportcity']

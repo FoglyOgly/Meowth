@@ -468,9 +468,8 @@ team_msg = " or ".join(["'!team {0}'".format(team) for team in config['team_dict
 async def on_ready():
     print(_("Meowth! That's right!")) #prints to the terminal or cmd prompt window upon successful connection to Discord
     for server in Meowth.servers:
-        await Meowth.send_message(server.owner, _("**Meowth! That's right! I've been updated!**\n\n**Changes:**\n    - Rewrote maintenance functions.\n    - Fixed emoji raid updates not working.\n    - Updated !configure to allow user to cancel.\n\nWith team and pokemon-type emoji now being pulled from our discord server, you can delete these from your own server. Don't remove the :otw: and :here: emoji though if you wish to use the raid emoji updates.\n\n**NOTICE: The 'Use External Emoji' permission is required.**\nPlease make sure it's added to my role.\n\nDeveloper Note: The update a day ago revealed an issue with raid channels not being maintained properly by Meowth. Apologies for the inconvenience this has caused and we appreciate your patience while we resolve the issue. If you have any questions, simply ask us in our Meowth Bot Discord. Thanks."))
         try:
-            if server not in server_dict[server]:
+            if server not in server_dict:
                 server_dict[server] = {'want_channel_list': [], 'offset': 0, 'welcome': False, 'team': False, 'want': False, 'other': False, 'done': False, 'raidchannel_dict' : {}}
         except KeyError:
             server_dict[server] = {'want_channel_list': [], 'offset': 0, 'welcome': False, 'team': False, 'want': False, 'other': False, 'done': False, 'raidchannel_dict' : {}} 
@@ -717,6 +716,8 @@ async def configure(ctx):
                             break
                 server_dict_temp['offset'] = offset
                 await Meowth.send_message(owner, _("**Timezone set**\n---"))
+                break
+            else:
                 break
         elif otherreply.content.lower() == "n":
             server_dict_temp['other']=False

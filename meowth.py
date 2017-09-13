@@ -465,7 +465,7 @@ team_msg = " or ".join(["'!team {0}'".format(team) for team in config['team_dict
 async def on_ready():
     print(_("Meowth! That's right!")) #prints to the terminal or cmd prompt window upon successful connection to Discord
     for server in Meowth.servers:
-        await Meowth.send_message(server.owner, _("**Meowth! That's right! I've been updated!**\n\n**Changes:**\n    - Added '!location' and '!location new' commands for raids.\n    - Shifted the bot to use our servers emoji (external emoji)\n    - Updated !configure to be easier to understand and step through\n\nWith emoji now being pulled from our discord server, you can delete the Meowth-required emoji now from your server custom emoji.\n**NOTICE: Meowth must have the 'Use External Emoji' permission.**\nPlease make sure it's added to my role.\n\nNote: The first push of this update about half an hour ago may have resulted in some unresponsiveness from Meowth in existing raid channels, and raid channels may not have been deleting or expiring as intended. Apologies for the inconvenience. This issue has now been resolved. If you have any questions, simply ask us in our Meowth Discord. Thanks."))
+        await Meowth.send_message(server.owner, _("**Meowth! That's right! I've been updated!**\n\n**Changes:**\n    - Rewrote maintenance functions.\n    - Fixed emoji raid updates not working.\n    - Updated !configure to allow user to cancel.\n\nWith team and pokemon-type emoji now being pulled from our discord server, you can delete these from your own server. Don't remove the :otw: and :here: emoji though if you wish to use the raid emoji updates.\n\n**NOTICE: The 'Use External Emoji' permission is required.**\nPlease make sure it's added to my role.\n\nDeveloper Note: The update a day ago revealed an issue with raid channels not being maintained properly by Meowth. Apologies for the inconvenience this has caused and we appreciate your patience while we resolve the issue. If you have any questions, simply ask us in our Meowth Bot Discord. Thanks."))
         server_dict[server] = server_dict.pop(server)
     await channel_cleanup()
 
@@ -777,8 +777,16 @@ async def exit(ctx):
 
     Usage: !exit.
     Calls the save function and quits the script."""
-    await _save()
-    quit()
+    member = ctx.message.author
+    if check_master(member):
+		try:
+			await _save()
+		except Exception as err:
+			print(_("Error occured while trying to save!"))
+			print(err)
+		quit()
+    else:
+        raise_admin_violation(ctx.message)
     
 @Meowth.command(pass_context=True, hidden=True)
 async def save(ctx):

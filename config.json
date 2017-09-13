@@ -32,8 +32,8 @@
 "team_dict": {"mystic": "<:mystic:350686962388303873>", "valor": "<:valor:350686957820706816>", "instinct": "<:instinct:350686957703135232>"},
 
 "//": "Emoji for raid organization",
-"omw_id": "<:omw:350686937750962182>",
-"here_id": "<:here:350686955316445185>",
+"omw_id": ":omw:",
+"here_id": ":here:",
                       
 "//": "Emoji for Pokemon types.",
 "type_id_dict": {

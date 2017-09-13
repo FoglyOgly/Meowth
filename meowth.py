@@ -26,9 +26,12 @@ def setup_logger(name, log_file, level):
     
     return logger
 
+try:
+    os.makedirs("logs")
+except OSError as exception:
+    pass
+    
 logger = setup_logger('discord','logs/meowth.log',logging.INFO)
-
-logger.info('test')
 
 Meowth = commands.Bot(command_prefix="!")
 

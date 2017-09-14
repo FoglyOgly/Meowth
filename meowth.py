@@ -41,6 +41,7 @@ with open("serverdict", "rb") as fd:
 config = {}
 pkmn_info = {}
 type_chart = {}
+zone_list = {}
 type_list = []
 active_raids = []
 
@@ -52,6 +53,7 @@ script_path = os.path.dirname(os.path.realpath(__file__))
 def load_config():
     global config
     global pkmn_info
+    global zone_list
     global type_chart
     global type_list
 
@@ -64,10 +66,15 @@ def load_config():
     language.install()
     pokemon_language = [config['pokemon-language']]
     pokemon_path_source = "locale/{0}/pkmn.json".format(config['pokemon-language'])
+    zone_path_source = "locale/{0}/zone.json"
 
     # Load Pokemon list and raid info
     with open(os.path.join(script_path, pokemon_path_source), "r") as fd:
         pkmn_info = json.load(fd)
+        
+    # Load zone role list
+    with open(os.path.join(script_path, zone_path_source), "r") as fd:
+        zone_list = json.load(fd)
 
     # Load type information
     with open(os.path.join(script_path, "type_chart.json"), "r") as fd:
@@ -568,6 +575,38 @@ async def configure(ctx):
             await Meowth.send_message(owner, _("I'm sorry I don't understand. Please reply with either **N** to disable, or **Y** to enable."))
             continue
         break
+    #new function to assign "zones"
+    await Meowth.send_message(owner, _("**Zone roles**\nZone roles:\n - If you want to have roles that users can opt-in and out of for different regions\n - **Note** \n - you will need to create the roles and assign permissions as you desire. This option will allow users to manage which roles they have\nIf you don't want __Zones__ want to disable them.\n\nRespond with: **N** to disable, or **Y** to enable:"))
+    while True:
+        otherreply = await Meowth.wait_for_message(author = owner, check=lambda message: message.server is None)
+        if otherreply.content.lower() == "y":
+            server_dict_temp['other']=True
+            await Meowth.send_message(owner, _("**Zones enabled**\n---\n**Zone List**\n I'll need you to provide a list of roles in your server you will allow users to self-manage in this format: `role, role, role`"))
+            
+            await Meowth.send_message(owner, _("If you do not require zones, you may want to disable this function.\n\nRespond with: **N** to disable, or the **channel-name** list to enable, each seperated with a comma and space:"))
+            zone_dict = {}
+            while True:
+                zone = await Meowth.wait_for_message(author = owner, check=lambda message: message.server is None)
+                if zone.content.lower() == "n":
+                    server_dict_temp['zoneset']=False
+                    await Meowth.send_message(owner, _("**Reporting Channels disabled**\n---"))
+                    break
+                elif zone.content.lower() == "cancel":
+                    await Meowth.send_message(owner, _("**CONFIG CANCELLED!**\nNo changes have been made."))
+                    return
+                else:
+                    zone_list = zone.content.lower().split(', ')
+                    server_role_list = []
+                    for role in server.roles:
+                        server_role_list.append(role.name)
+                    
+                    diff = set(zone_list) - set(server_role_list)
+                    if not diff:
+                        await Meowth.send_message(owner, _("**Reporting Channels enabled**\n---"))
+                    else:
+                        await Meowth.send_message(owner, _("The role list you provided doesn't match with your servers roles.\nThe following aren't in your server: {invalid_roles}\nPlease double check your channel list and resend your reponse.").format(invalid_roles=", ".join(diff)))
+                        continue
+        break    
     await Meowth.send_message(owner, _("**Main Functions**\nMain Functions include:\n - **!want** and creating tracked Pokemon roles \n - **!wild** Pokemon reports\n - **!raid** reports and channel creation for raid management.\nIf you don't want __any__ of the Pokemon tracking or Raid management features, you may want to disable them.\n\nRespond with: **N** to disable, or **Y** to enable:"))
     while True:
         otherreply = await Meowth.wait_for_message(author = owner, check=lambda message: message.server is None)
@@ -753,7 +792,8 @@ async def on_member_join(member):
     if server_dict[server]['team'] == True:
         welcomemessage += _("Set your team by typing {team_command} without quotations.").format(team_command=team_msg)
     welcomemessage += admin_message
-
+    if server_dict[server]['zone'] == True:
+        welcomemessage += _("Declare which regions you want to opt-in or opt-out by typing {join_command} or {leave_command} without quotations.").format(join_command=join_msg)
     if server_dict[server]['welcomechan'] == "dm":
         await Meowth.send_message(member, welcomemessage.format(server_name=server.name, new_member_name=member.mention))        
         
@@ -1111,6 +1151,59 @@ async def unwant(ctx):
                 #unwant_embed = discord.Embed(colour=discord.Colour(0x2ecc71))
                 #unwant_embed.set_thumbnail(url=unwant_img_url)
                 #await Meowth.send_message(ctx.message.channel, content=_("Meowth! Got it! {member} no longer wants {pokemon}").format(member=ctx.message.author.mention, pokemon=entered_unwant.capitalize()),embed=unwant_embed)
+
+@Meowth.command(pass_context = True)
+async def join(ctx):
+    """A command for declaring a region the user wants.
+    Usage: !join <zone>
+    Meowth will allow you access to the zone(s) you desire. #meowth-chat."""
+
+    """Behind the scenes, Meowth assigns it to the user."""
+
+    if server_dict[ctx.message.server]['zoneset'] == True:
+        if server_dict[ctx.message.server]['want_channel_list'] and ctx.message.channel not in server_dict[ctx.message.server]['want_channel_list']:
+            await Meowth.send_message(ctx.message.channel, _("Meowth! Please use one of the following channels for **!join** commands: {want_channel_list}").format(want_channel_list=", ".join(i.mention for i in server_dict[ctx.message.server]['want_channel_list'])))
+            return
+        else:
+            entered_join = ctx.message.content[6:].lower()
+            if entered_join not in zone_list['zone_list']:#I think something isn't right here
+                await Meowth.send_message(ctx.message.channel, spellcheck(entered_join))
+                return
+            role = discord.utils.get(ctx.message.server.roles, name=entered_join)
+            
+            # If user is already wanting the Pokemon,
+            # print a less noisy message
+            if role in ctx.message.author.roles:
+                await Meowth.send_message(ctx.message.channel, content=_("Meowth! {member}, I already know you're in {role}!").format(member=ctx.message.author.mention, role=entered_join.capitalize()))
+            else:
+                await Meowth.add_roles(ctx.message.author, role)
+                await Meowth.send_message(ctx.message.channel, content=_("Meowth! Got it! {member} joined {role}").format(member=ctx.message.author.mention, role=entered_join.capitalize()))
+
+@Meowth.command(pass_context=True)
+async def leave(ctx):
+    """A command for leaving a region.
+    Usage: !leave <region>
+    You will no longer have access to this role's priveleges."""
+
+    """Behind the scenes, Meowth removes the user from
+    the server role."""
+
+    if server_dict[ctx.message.server]['zoneset'] == True:
+        entered_leave = ctx.message.content[8:].lower()
+        role = discord.utils.get(ctx.message.server.roles, name=entered_leave)
+        if entered_leave not in zone_list['zone_list']:#I think this is also incorrect
+            await Meowth.send_message(ctx.message.channel, spellcheck(entered_leave))
+            return
+        else:
+            
+            # If user is not already wanting the Pokemon,
+            # print a less noisy message
+            if role not in ctx.message.author.roles:
+                await Meowth.add_reaction(ctx.message, '✅')
+            else:
+                await Meowth.remove_roles(ctx.message.author, role)
+                unwant_number = zone_list['zone_list'].index(entered_leave) + 1#almost certain this is wrong
+                await Meowth.add_reaction(ctx.message, '✅')
 
 # Print raid timer
 async def print_raid_timer(channel):

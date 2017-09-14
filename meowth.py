@@ -1065,7 +1065,8 @@ This channel will be deleted in 2 hours or five minutes after the timer expires.
                 'active' : True,
                 'raidmessage' : raidmessage,
                 'raidreport' : raidreport,
-                'address' : raid_details
+                'address' : raid_details,
+                'exraid' : False
                 }
 
             if raidtime:
@@ -1131,6 +1132,13 @@ async def _timerset(channel, exptime):
 
     # Meowth saves the timer message in the channel's 'exp' field.
     if channel in server_dict[channel.server]['raidchannel_dict']:
+        try:
+            if server_dict[channel.server]['raidchannel_dict'][channel]['exraid'] == True:
+                await Meowth.send_message(channel, _("Timerset isn't supported for exraids. Please get a mod/admin to remove the channel if expiry is required early."))
+                return
+        except KeyError:
+            pass
+        
         ticks = time.time()
         try:
             h, m = exptime.split(':')
@@ -1727,7 +1735,7 @@ async def _exraid(message):
             return
         space1 = message.content.find(" ",8)
         if space1 == -1:
-            await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**"))
+            await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!exraid <pokemon name> <location>**"))
             return
         entered_raid = message.content[8:space1].lower()
         raid_message = message.content[space1:]
@@ -1750,14 +1758,15 @@ async def _exraid(message):
             raid_channel_overwrites = message.channel.overwrites
             for overwrite in raid_channel_overwrites:
                 overwrite[1].send_messages = False
-            raid_channel = await Meowth.create_channel(message.server, raid_channel_name, *raid_channel_overwrites)
+                meowth_overwrite = (Meowth.user, discord.PermissionOverwrite(send_messages = True))
+            raid_channel = await Meowth.create_channel(message.server, raid_channel_name, *raid_channel_overwrites, meowth_overwrite)
             raid = discord.utils.get(message.server.roles, name = entered_raid)
             if raid is None:
                 raid = await Meowth.create_role(server = message.server, name = entered_raid, hoist = False, mentionable = True)
                 await asyncio.sleep(0.5)
             raid_number = pkmn_info['pokemon_list'].index(entered_raid) + 1
             raid_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(raid_number))
-            raid_embed = discord.Embed(title=_("Meowth! Click here for directions to the raid!"),url=raid_gmaps_link,description=_("Weaknesses: {weakness_list}").format(weakness_list=weakness_to_str(message.server, get_weaknesses(entered_raid))),colour=discord.Colour(0x2ecc71))
+            raid_embed = discord.Embed(title=_("Meowth! Click here for directions to the EX raid!"),url=raid_gmaps_link,description=_("Weaknesses: {weakness_list}").format(weakness_list=weakness_to_str(message.server, get_weaknesses(entered_raid))),colour=discord.Colour(0x2ecc71))
             raid_embed.set_thumbnail(url=raid_img_url)
             raidreport = await Meowth.send_message(message.channel, content = _("Meowth! {pokemon} EX raid reported by {member}! Details: {location_details}. Send proof of your invite to this EX raid to an admin and coordinate in {raid_channel}").format(pokemon=raid.mention, member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention),embed=raid_embed)
             await asyncio.sleep(1) #Wait for the channel to be created.
@@ -1792,14 +1801,15 @@ This channel will be deleted in 2 days if an admin doesn't delete it manually be
                 'active' : True,
                 'raidmessage' : raidmessage,
                 'raidreport' : raidreport,
-                'address' : raid_details
+                'address' : raid_details,
+                'exraid' : True
                 }
 
 
 
             event_loop.create_task(expiry_check(raid_channel))
     else:
-        await Meowth.send_message(message.channel, _("Meowth! **!raid** commands have been disabled."))
+        await Meowth.send_message(message.channel, _("Meowth! **!exraid** commands have been disabled."))
 
 
 

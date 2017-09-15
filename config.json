@@ -17,16 +17,10 @@
 "//": "Meowth will only take admin commands from this user",
 "master": "yourusername#yourid",
 
+"//": "Limit egg assumed hatches to certain egg levels.",
+"allow_assume": {"5": "True", "4": "False", "3": "False", "2": "False", "1": "False"},
 
-
-"//": "Define your server's special strings here.                     ",
-
-"//": "The default values are custom emoji and will need to have      ",
-"//": "their names changed to match your server.                      ",
-
-"//": "You can also use plain strings, if you want.                   ",
-"//": "However, don't use strings that start with                     ",
-"//": "the bot's command prefix (exclamation mark)                    ",
+"//": "Define your server's emoji strings here.",
 
 "//": "Emoji for team assignments",
 "team_dict": {"mystic": "<:mystic:350686962388303873>", "valor": "<:valor:350686957820706816>", "instinct": "<:instinct:350686957703135232>"},

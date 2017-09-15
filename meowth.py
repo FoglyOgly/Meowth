@@ -1953,7 +1953,7 @@ async def _raidegg(message):
             del args_split[0]
         else:
             await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Use at least: **!raidegg <level> <location>**. Type !help raidegg for more info."))
-
+            
         if args_split[-1].isdigit():
             raidexp = args_split[-1]
             del args_split[-1]

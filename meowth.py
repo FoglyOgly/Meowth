@@ -516,7 +516,25 @@ team_msg = " or ".join(["'!team {0}'".format(team) for team in config['team_dict
 async def on_ready():
     print(_("Meowth! That's right!")) #prints to the terminal or cmd prompt window upon successful connection to Discord
     for server in Meowth.servers:
-        #await Meowth.send_message(server.owner, _("**Meowth! That's right! I've been rebooted! No reconfigure should be necessary this time!"))
+        reboot_msg = """**Meowth! That's right! I've been updated!**
+
+**Changes:**
+    - Added !exraid command for mewtwo exclusive raids
+    - Added !raidegg command
+    - Updated raid and egg timers to 0-59 minutes
+    - Added !raid <pokemon> command within raidegg channels to update eggs to open raids.
+    - Added !raid assume <pokemon> command for level 5 raidegg channels to have raids auto-update to their selected open raid.
+    - General housekeeping and fixes
+
+The previous format for timers of H:MM is no longer supported. Please make sure to announce this change to members.
+Old usage: !raid blastoise starbucks 0:43
+New usage: !raid blastoise starbucks 43
+
+For level 5 raid eggs, there's currently only 1 legendary for open, non-exclusive raids, so the !raid assume command can come in handy to pre-emptively tell the bot what to turn the egg channel into once it hatches.
+This doesn't work for lower level eggs, as there's no set pokemon for when they hatch.
+
+No reconfigure should be necessary this time!"""
+        await Meowth.send_message(server.owner, reboot_msg)
         try:
             if server not in server_dict:
                 server_dict[server] = {'want_channel_list': [], 'offset': 0, 'welcome': False, 'team': False, 'want': False, 'other': False, 'done': False, 'raidchannel_dict' : {}}
@@ -1064,8 +1082,12 @@ async def _raid(message):
                 await _eggassume(" ".join(args_split), message.channel)
                 return
             else:
-                await _eggtoraid(" ".join(args_split), message.channel)
-                return
+                if server_dict[message.channel.server]['raidchannel_dict'][message.channel]['active'] == False:
+                    await _eggtoraid(" ".join(args_split), message.channel)
+                    return
+                else:
+                    await Meowth.send_message(message.channel, _("Meowth! Please wait until the egg has hatched before changing it to an open raid!"))
+                    return
         
         entered_raid = args_split[0]
         del args_split[0]
@@ -1095,7 +1117,7 @@ async def _raid(message):
         raid_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(raid_number))
         raid_embed = discord.Embed(title=_("Meowth! Click here for directions to the raid!"),url=raid_gmaps_link,description=_("Weaknesses: {weakness_list}").format(weakness_list=weakness_to_str(message.server, get_weaknesses(entered_raid))),colour=discord.Colour(0x2ecc71))
         raid_embed.set_thumbnail(url=raid_img_url)
-        raidreport = await Meowth.send_message(message.channel, content = _("Meowth! {pokemon} raid reported by {member}! Details: {location_details}. Coordinate in {raid_channel}").format(pokemon=raid.mention, member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention),embed=raid_embed)
+        raidreport = await Meowth.send_message(message.channel, content = _("Meowth! {pokemon} raid reported by {member}! Details: {location_details}. Coordinate in {raid_channel}").format(pokemon=entered_raid.capitalize(), member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention),embed=raid_embed)
         await asyncio.sleep(1) #Wait for the channel to be created.
 
         raidmsg = _("""Meowth! {pokemon} raid reported by {member}! Details: {location_details}. Coordinate here!
@@ -1854,7 +1876,7 @@ async def _exraid(message):
         raid_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(raid_number))
         raid_embed = discord.Embed(title=_("Meowth! Click here for directions to the EX raid!"),url=raid_gmaps_link,description=_("Weaknesses: {weakness_list}").format(weakness_list=weakness_to_str(message.server, get_weaknesses(entered_raid))),colour=discord.Colour(0x2ecc71))
         raid_embed.set_thumbnail(url=raid_img_url)
-        raidreport = await Meowth.send_message(message.channel, content = _("Meowth! {pokemon} EX raid reported by {member}! Details: {location_details}. Send proof of your invite to this EX raid to an admin and coordinate in {raid_channel}").format(pokemon=raid.mention, member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention),embed=raid_embed)
+        raidreport = await Meowth.send_message(message.channel, content = _("Meowth! {pokemon} EX raid reported by {member}! Details: {location_details}. Send proof of your invite to this EX raid to an admin and coordinate in {raid_channel}").format(pokemon=entered_raid.capitalize(), member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention),embed=raid_embed)
         await asyncio.sleep(1) #Wait for the channel to be created.
 
         raidmsg = _("""Meowth! {pokemon} EX raid reported by {member}! Details: {location_details}. Coordinate here!
@@ -2061,7 +2083,7 @@ async def _eggtoraid(entered_raid, raid_channel):
     raid_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(raid_number))
     raid_embed = discord.Embed(title=_("Meowth! Click here for directions to the raid!"),url=raid_gmaps_link,description=_("Weaknesses: {weakness_list}").format(weakness_list=weakness_to_str(raid_channel.server, get_weaknesses(entered_raid))),colour=discord.Colour(0x2ecc71))
     raid_embed.set_thumbnail(url=raid_img_url)
-    raidreportcontent = _("Meowth! The egg has hatched into a {pokemon} raid! Details: {location_details}. Coordinate in {raid_channel}").format(pokemon=raid.mention, location_details=egg_address, raid_channel=raid_channel.mention)
+    raidreportcontent = _("Meowth! The egg has hatched into a {pokemon} raid! Details: {location_details}. Coordinate in {raid_channel}").format(pokemon=entered_raid.capitalize(), location_details=egg_address, raid_channel=raid_channel.mention)
     await Meowth.edit_channel(raid_channel, name=raid_channel_name)
     raidmsg = _("""Meowth! The egg hatched into a {pokemon} raid! Details: {location_details}. Coordinate here!
 
@@ -2082,7 +2104,7 @@ Sending a Google Maps link will also update the raid location.
 
 Message **!starting** when the raid is beginning to clear the raid's 'here' list.
 
-This channel will be deleted five minutes after the timer expires.""").format(pokemon=raid.mention, location_details=egg_address)
+This channel will be deleted five minutes after the timer expires.""").format(pokemon=entered_raid.capitalize(), location_details=egg_address)
 
     server_dict[raid_channel.server]['raidchannel_dict'][raid_channel] = {
         'reportcity' : reportcity,
@@ -2105,7 +2127,7 @@ This channel will be deleted five minutes after the timer expires.""").format(po
     for trainer in trainer_dict.keys():
         if trainer_dict[trainer]['status']=='maybe':
             maybe_list.append(trainer)
-    await Meowth.send_message(raid_channel, content = _("Meowth! Trainers {trainer_list}: The raid egg has just hatched into a {pokemon} raid!\nYou're now able to update your status with !coming or !here. If you've changed your plans, use !cancel.").format(trainer_list=", ".join(maybe_list), pokemon=entered_raid.capitalize()), embed = raid_embed)
+    await Meowth.send_message(raid_channel, content = _("Meowth! Trainers {trainer_list}: The raid egg has just hatched into a {pokemon} raid!\nYou're now able to update your status with !coming or !here. If you've changed your plans, use !cancel.").format(trainer_list=", ".join(maybe_list), pokemon=raid.mention), embed = raid_embed)
     
     event_loop.create_task(expiry_check(raid_channel))
         

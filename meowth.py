@@ -1078,7 +1078,7 @@ async def _raid(message):
         args = message.content.lstrip("!raid")
         args_split = args.split(" ")
         del args_split[0]
-        if len(args_split) == 1 and args_split[0] == '':
+        if len(args_split) <= 1:
             await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**"))
             return
         if fromegg is True:
@@ -1720,7 +1720,7 @@ async def _exraid(message):
         args = message.content.lstrip("!exraid")
         args_split = args.split(" ")
         del args_split[0]
-        if len(args_split) == 1 and args_split[0] == '':
+        if len(args_split) <= 1:
             await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!exraid <pokemon name> <location>**"))
             return
         entered_raid = args_split[0].lower()
@@ -1731,7 +1731,7 @@ async def _exraid(message):
         if entered_raid not in pkmn_info['raid_list'] and entered_raid in pkmn_info['pokemon_list']:
             await Meowth.send_message(message.channel, _("Meowth! The Pokemon {pokemon} does not appear in raids!").format(pokemon=entered_raid.capitalize()))
             return
-
+        
         raid_details = " ".join(args_split)
         raid_gmaps_link = create_gmaps_query(raid_details, message.channel)
 
@@ -1818,7 +1818,7 @@ async def _raidegg(message):
         args = message.content.lstrip("!raidegg")
         args_split = args.split(" ")
         del args_split[0]
-        if len(args_split) == 1:
+        if len(args_split) <= 1:
             await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!raidegg <level> <location>**"))
             return
 

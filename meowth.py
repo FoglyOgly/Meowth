@@ -1827,6 +1827,7 @@ async def _raidegg(message):
             del args_split[0]
         else:
             await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Use at least: **!raidegg <level> <location>**. Type !help raidegg for more info."))
+            return
             
         if args_split[-1].isdigit():
             raidexp = args_split[-1]
@@ -1939,6 +1940,7 @@ async def _eggtoraid(entered_raid, raid_channel):
     else:
         if entered_raid not in pkmn_info['raid_list']:
             await Meowth.send_message(raid_channel, _("Meowth! The Pokemon {pokemon} does not appear in raids!").format(pokemon=entered_raid.capitalize()))
+            return
         else:
             if get_number(entered_raid) not in raid_info['raid_eggs'][egglevel]['pokemon']:
                 await Meowth.send_message(raid_channel, _("Meowth! The Pokemon {pokemon} does not hatch from level {level} raid eggs!").format(pokemon=entered_raid.capitalize(), level=egglevel))

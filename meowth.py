@@ -1260,7 +1260,6 @@ async def _timerset(channel, exptime):
             return
         expire = ticks + s
 
-
         # Update timestamp
         server_dict[channel.server]['raidchannel_dict'][channel]['exp'] = expire
         # Reactivate channel
@@ -1269,6 +1268,19 @@ async def _timerset(channel, exptime):
         server_dict[channel.server]['raidchannel_dict'][channel]['active'] = True
         # Mark that timer has been manually set
         server_dict[channel.server]['raidchannel_dict'][channel]['manual_timer'] = True
+
+#Start---------------------------------------------------------------------------------------------------
+#Convert to local time
+        localexpiresecs = expire + 3600 * server_dict[channel.server]['offset']
+        localexpire = time.gmtime(localexpiresecs)
+        localexpstr = strftime("%I%M", localexpire)
+#Rename channel
+        if server_dict[channel.server]['raidchannel_dict'][channel]['type'] == 'egg':
+            raid_channel_name = localexpstr + "-" + "egg" + server_dict[channel.server]['raidchannel_dict'][channel]['egglevel'] + "-" + sanitize_channel_name(server_dict[channel.server]['raidchannel_dict'][channel]['address'])
+        else:
+            raid_channel_name = localexpstr + "-" + server_dict[channel.server]['raidchannel_dict'][channel]['pokemon'] + "-" + sanitize_channel_name(server_dict[channel.server]['raidchannel_dict'][channel]['address'])
+        await Meowth.edit_channel(channel, name=raid_channel_name)
+#End---------------------------------------------------------------------------------------------------
         # Send message
         timerstr = await print_raid_timer(channel)
         await Meowth.send_message(channel, timerstr)
@@ -1850,7 +1862,7 @@ async def _raidegg(message):
                 p_name = get_name(p)
                 p_type = get_type(message.server,p)
                 boss_list += ("\n"+p_name+" "+''.join(p_type))
-            raid_channel_name = "level-" + egg_level + "-egg-" + sanitize_channel_name(raid_details)
+            raid_channel_name = "egg" + egg_level + "-" + sanitize_channel_name(raid_details)
             raid_channel = await Meowth.create_channel(message.server, raid_channel_name, *message.channel.overwrites)
             raid_img_url = "https://raw.githubusercontent.com/apavlinovic/pokemon-go-imagery/master/images/{}".format(str(egg_img))
             raid_embed = discord.Embed(title=_("Meowth! Click here for directions to the coming raid!"),url=raid_gmaps_link,description=_("Possible Bosses: {boss_list}").format(boss_list=boss_list),colour=discord.Colour(0x2ecc71))
@@ -2041,7 +2053,10 @@ async def list(ctx):
                     else:
                         assumed_str = ""
                     if server_dict[ctx.message.server]['raidchannel_dict'][activeraid]['reportcity'] == ctx.message.channel.name and server_dict[ctx.message.server]['raidchannel_dict'][activeraid]['active'] and discord.utils.get(ctx.message.channel.server.channels, id=activeraid.id):
-                        listmsg += _(("\n{raidchannel} - {interestcount} interested, {comingcount} coming, {herecount} here. End time: {expiry}{manualtimer}").format(raidchannel=activeraid.mention, interestcount=ctx_maybecount, comingcount=ctx_omwcount, herecount=ctx_waitingcount, expiry=strftime("%I:%M", localexpire), manualtimer=assumed_str))
+#Start-----------------------------------------------------------------------------------------
+#Formatting
+                        listmsg += _(("\n{raidchannel}:\n[{interestcount} interested] [{comingcount} coming] [{herecount} here] End time: {expiry}{manualtimer}").format(raidchannel=activeraid.mention, interestcount=ctx_maybecount, comingcount=ctx_omwcount, herecount=ctx_waitingcount, expiry=strftime("%I:%M", localexpire), manualtimer=assumed_str))
+#End-----------------------------------------------------------------------------------------
                         activeraidnum += 1
                 if activeraidnum == 0:
                     await Meowth.send_message(ctx.message.channel, _("Meowth! No active raids! Report one with **!raid <name> <location>**."))

@@ -1093,7 +1093,7 @@ async def _raid(message):
                     await Meowth.send_message(message.channel, _("Meowth! Please wait until the egg has hatched before changing it to an open raid!"))
                     return
 
-        entered_raid = args_split[0]
+        entered_raid = args_split[0].lower()
         del args_split[0]
         if args_split[-1].isdigit():
             raidexp = args_split[-1]
@@ -1723,7 +1723,7 @@ async def _exraid(message):
         if len(args_split) == 1 and args_split[0] == '':
             await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!exraid <pokemon name> <location>**"))
             return
-        entered_raid = args_split[0]
+        entered_raid = args_split[0].lower()
         del args_split[0]
         if entered_raid not in pkmn_info['pokemon_list']:
             await Meowth.send_message(message.channel, spellcheck(entered_raid))
@@ -1907,7 +1907,7 @@ async def _eggassume(args, raid_channel):
     if config['allow_assume'][egglevel] == "False":
         await Meowth.send_message(raid_channel, _("Meowth! **!raid assume** is not allowed in this level egg."))
         return
-    entered_raid = args.lstrip("assume").lstrip(" ")
+    entered_raid = args.lstrip("assume").lstrip(" ").lower()
     if entered_raid not in pkmn_info['pokemon_list']:
         await Meowth.send_message(raid_channel, spellcheck(entered_raid))
         return

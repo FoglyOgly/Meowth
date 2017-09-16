@@ -948,7 +948,7 @@ async def team(ctx):
             print(_("WARNING: Role {team_role} in team_dict not configured as a role on the server!").format(team_role=team))
     # Check if team is one of the three defined in the team_dict
 
-    if entered_team not in list(config['team_dict'].keys()):
+    if entered_team not in config['team_dict'].keys():
         await Meowth.send_message(ctx.message.channel, _("Meowth! \"{entered_team}\" isn't a valid team! Try {available_teams}").format(entered_team=entered_team, available_teams=team_msg))
         return
     # Check if the role is configured on the server

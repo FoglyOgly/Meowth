@@ -249,6 +249,7 @@ async def expiry_check(channel):
                             pokemon = server_dict[server]['raidchannel_dict'][channel]['pokemon']
                             if pokemon != '':
                                 logger.info("Expire_Channel - Egg Auto Hatched - "+channel.name)
+                                active_raids.remove(channel)
                                 await _eggtoraid(pokemon, channel)
                                 return
                         event_loop.create_task(expire_channel(channel))
@@ -1271,7 +1272,7 @@ async def _timerset(channel, exptime):
         # Send message
         timerstr = await print_raid_timer(channel)
         await Meowth.send_message(channel, timerstr)
-        # Trigger channel cleanup
+        # Trigger expiry checking
         await expiry_check(channel)
 
 @Meowth.command(pass_context=True)

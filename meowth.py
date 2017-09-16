@@ -1078,9 +1078,6 @@ async def _raid(message):
         args = message.content.lstrip("!raid")
         args_split = args.split(" ")
         del args_split[0]
-        if len(args_split) <= 1:
-            await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**"))
-            return
         if fromegg is True:
             if args_split[0] == 'assume':
                 await _eggassume(" ".join(args_split), message.channel)
@@ -1092,7 +1089,9 @@ async def _raid(message):
                 else:
                     await Meowth.send_message(message.channel, _("Meowth! Please wait until the egg has hatched before changing it to an open raid!"))
                     return
-
+        elif len(args_split) <= 1:
+            await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**"))
+            return
         entered_raid = args_split[0].lower()
         del args_split[0]
         if args_split[-1].isdigit():
@@ -1224,7 +1223,7 @@ async def print_raid_timer(channel):
             timerstr += _("Meowth! This {raidtype} will {raidaction} at {expiry_time}!").format(raidtype=raidtype,raidaction=raidaction,expiry_time=strftime("%I:%M", localexpire))
         else:
             timerstr += _("Meowth! No one told me when the {raidtype} will {raidaction}, so I'm assuming it will {raidaction} at {expiry_time}!").format(raidtype=raidtype,raidaction=raidaction,expiry_time=strftime("%I:%M", localexpire))
-    
+
     return timerstr
 
 
@@ -1731,7 +1730,7 @@ async def _exraid(message):
         if entered_raid not in pkmn_info['raid_list'] and entered_raid in pkmn_info['pokemon_list']:
             await Meowth.send_message(message.channel, _("Meowth! The Pokemon {pokemon} does not appear in raids!").format(pokemon=entered_raid.capitalize()))
             return
-        
+
         raid_details = " ".join(args_split)
         raid_gmaps_link = create_gmaps_query(raid_details, message.channel)
 
@@ -1828,7 +1827,7 @@ async def _raidegg(message):
         else:
             await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Use at least: **!raidegg <level> <location>**. Type !help raidegg for more info."))
             return
-            
+
         if args_split[-1].isdigit():
             raidexp = args_split[-1]
             del args_split[-1]
@@ -1985,7 +1984,7 @@ This channel will be deleted five minutes after the timer expires.""").format(po
 
     raid_message = await Meowth.edit_message(raid_message, new_content=raidmsg, embed=raid_embed)
     egg_report = await Meowth.edit_message(egg_report, new_content=raidreportcontent, embed=raid_embed)
-    
+
     server_dict[raid_channel.server]['raidchannel_dict'][raid_channel] = {
     'reportcity' : reportcity,
     'trainer_dict' : trainer_dict,
@@ -2008,7 +2007,7 @@ This channel will be deleted five minutes after the timer expires.""").format(po
     await Meowth.send_message(raid_channel, content = _("Meowth! Trainers {trainer_list}: The raid egg has just hatched into a {pokemon} raid!\nYou're now able to update your status with !coming or !here. If you've changed your plans, use !cancel.").format(trainer_list=", ".join(maybe_list), pokemon=raid.mention), embed = raid_embed)
 
     event_loop.create_task(expiry_check(raid_channel))
-        
+
 
 @Meowth.group(pass_context=True)
 async def list(ctx):
@@ -2017,7 +2016,7 @@ async def list(ctx):
     Usage: !list
     Works only in raid or city channels. Calls the interested, waiting, and here lists. Also prints
     the raid timer. In city channels, lists all active raids."""
-    
+
     if ctx.invoked_subcommand is None:
         activeraidnum = 0
         listmsg = ""
@@ -2052,13 +2051,13 @@ async def list(ctx):
                     listmsg += await _interest(ctx)
                     listmsg += "\n"
                     listmsg += await print_raid_timer(ctx.message.channel)
-                    
+
                 else:
                     listmsg += await _interest(ctx)
                     listmsg += "\n" + await _otw(ctx)
                     listmsg += "\n" + await _waiting(ctx)
                     listmsg += "\n" + await print_raid_timer(ctx.message.channel)
-                    
+
         await Meowth.send_message(ctx.message.channel, listmsg)
 
 @list.command(pass_context=True)
@@ -2069,7 +2068,7 @@ async def interested(ctx):
     Works only in raid channels."""
     listmsg = await _interest(ctx)
     await Meowth.send_message(ctx.message.channel, listmsg)
-    
+
 @list.command(pass_context=True)
 async def coming(ctx):
     """Lists the number and users who are coming to a raid.
@@ -2163,11 +2162,11 @@ async def _waiting(ctx):
 @Meowth.command(pass_context=True, hidden=True)
 async def interest(ctx):
     await Meowth.send_message(ctx.message.channel, _("Meowth! We've moved this command to **!list interested**."))
-    
+
 @Meowth.command(pass_context=True, hidden=True)
 async def otw(ctx):
     await Meowth.send_message(ctx.message.channel, _("Meowth! We've moved this command to **!list coming**."))
-    
+
 @Meowth.command(pass_context=True, hidden=True)
 async def waiting(ctx):
     await Meowth.send_message(ctx.message.channel, _("Meowth! We've moved this command to **!list here**."))

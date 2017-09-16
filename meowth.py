@@ -948,7 +948,7 @@ async def team(ctx):
             print(_("WARNING: Role {team_role} in team_dict not configured as a role on the server!").format(team_role=team))
     # Check if team is one of the three defined in the team_dict
 
-    if entered_team not in list(config['team_dict'].keys()):
+    if entered_team not in config['team_dict'].keys():
         await Meowth.send_message(ctx.message.channel, _("Meowth! \"{entered_team}\" isn't a valid team! Try {available_teams}").format(entered_team=entered_team, available_teams=team_msg))
         return
     # Check if the role is configured on the server
@@ -1078,7 +1078,7 @@ async def _raid(message):
         args = message.content.lstrip("!raid")
         args_split = args.split(" ")
         del args_split[0]
-        if len(args_split) == 1 and args_split[0] == '':
+        if len(args_split) <= 1:
             await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**"))
             return
         if fromegg is True:
@@ -1093,7 +1093,7 @@ async def _raid(message):
                     await Meowth.send_message(message.channel, _("Meowth! Please wait until the egg has hatched before changing it to an open raid!"))
                     return
 
-        entered_raid = args_split[0]
+        entered_raid = args_split[0].lower()
         del args_split[0]
         if args_split[-1].isdigit():
             raidexp = args_split[-1]
@@ -1720,10 +1720,10 @@ async def _exraid(message):
         args = message.content.lstrip("!exraid")
         args_split = args.split(" ")
         del args_split[0]
-        if len(args_split) == 1 and args_split[0] == '':
+        if len(args_split) <= 1:
             await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!exraid <pokemon name> <location>**"))
             return
-        entered_raid = args_split[0]
+        entered_raid = args_split[0].lower()
         del args_split[0]
         if entered_raid not in pkmn_info['pokemon_list']:
             await Meowth.send_message(message.channel, spellcheck(entered_raid))
@@ -1731,7 +1731,7 @@ async def _exraid(message):
         if entered_raid not in pkmn_info['raid_list'] and entered_raid in pkmn_info['pokemon_list']:
             await Meowth.send_message(message.channel, _("Meowth! The Pokemon {pokemon} does not appear in raids!").format(pokemon=entered_raid.capitalize()))
             return
-
+        
         raid_details = " ".join(args_split)
         raid_gmaps_link = create_gmaps_query(raid_details, message.channel)
 
@@ -1818,7 +1818,7 @@ async def _raidegg(message):
         args = message.content.lstrip("!raidegg")
         args_split = args.split(" ")
         del args_split[0]
-        if len(args_split) == 1:
+        if len(args_split) <= 1:
             await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!raidegg <level> <location>**"))
             return
 
@@ -1827,6 +1827,7 @@ async def _raidegg(message):
             del args_split[0]
         else:
             await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Use at least: **!raidegg <level> <location>**. Type !help raidegg for more info."))
+            return
             
         if args_split[-1].isdigit():
             raidexp = args_split[-1]
@@ -1906,7 +1907,7 @@ async def _eggassume(args, raid_channel):
     if config['allow_assume'][egglevel] == "False":
         await Meowth.send_message(raid_channel, _("Meowth! **!raid assume** is not allowed in this level egg."))
         return
-    entered_raid = args.lstrip("assume").lstrip(" ")
+    entered_raid = args.lstrip("assume").lstrip(" ").lower()
     if entered_raid not in pkmn_info['pokemon_list']:
         await Meowth.send_message(raid_channel, spellcheck(entered_raid))
         return
@@ -1939,6 +1940,7 @@ async def _eggtoraid(entered_raid, raid_channel):
     else:
         if entered_raid not in pkmn_info['raid_list']:
             await Meowth.send_message(raid_channel, _("Meowth! The Pokemon {pokemon} does not appear in raids!").format(pokemon=entered_raid.capitalize()))
+            return
         else:
             if get_number(entered_raid) not in raid_info['raid_eggs'][egglevel]['pokemon']:
                 await Meowth.send_message(raid_channel, _("Meowth! The Pokemon {pokemon} does not hatch from level {level} raid eggs!").format(pokemon=entered_raid.capitalize(), level=egglevel))
@@ -1981,22 +1983,23 @@ Message **!starting** when the raid is beginning to clear the raid's 'here' list
 
 This channel will be deleted five minutes after the timer expires.""").format(pokemon=entered_raid.capitalize(), location_details=egg_address)
 
+    raid_message = await Meowth.edit_message(raid_message, new_content=raidmsg, embed=raid_embed)
+    egg_report = await Meowth.edit_message(egg_report, new_content=raidreportcontent, embed=raid_embed)
+    
     server_dict[raid_channel.server]['raidchannel_dict'][raid_channel] = {
-        'reportcity' : reportcity,
-        'trainer_dict' : trainer_dict,
-        'exp' : raidexp,
-        'manual_timer' : manual_timer,
-        'active' : True,
-        'raidmessage' : raid_message,
-        'raidreport' : egg_report,
-        'address' : egg_address,
-        'type' : 'raid',
-        'pokemon' : entered_raid,
-        'egglevel' : '0'
-        }
+    'reportcity' : reportcity,
+    'trainer_dict' : trainer_dict,
+    'exp' : raidexp,
+    'manual_timer' : manual_timer,
+    'active' : True,
+    'raidmessage' : raid_message,
+    'raidreport' : egg_report,
+    'address' : egg_address,
+    'type' : 'raid',
+    'pokemon' : entered_raid,
+    'egglevel' : '0'
+    }
 
-    await Meowth.edit_message(raid_message, new_content=raidmsg, embed=raid_embed)
-    await Meowth.edit_message(egg_report, new_content=raidreportcontent, embed=raid_embed)
     maybe_list = []
     trainer_dict = server_dict[raid_channel.server]['raidchannel_dict'][raid_channel]['trainer_dict']
     for trainer in trainer_dict.keys():

@@ -524,6 +524,10 @@ async def on_ready():
     - Updated raid and egg timers to 0-59 minutes
     - Added !raid <pokemon> command within raidegg channels to update eggs to open raids.
     - Added !raid assume <pokemon> command for level 5 raidegg channels to have raids auto-update to their selected open raid.
+    - Changed !maybe to !interested
+    - Changed !lists to !list
+    - Changed !interest, !otw, !waiting to !list interested, !list coming, !list here
+    - Tweaked list output in city channels
     - General housekeeping and fixes
 
 The previous format for timers of H:MM is no longer supported. Please make sure to announce this change to members.
@@ -1123,12 +1127,13 @@ async def _raid(message):
         raidmsg = _("""Meowth! {pokemon} raid reported by {member}! Details: {location_details}. Coordinate here!
 
 To update your status, choose from the following commands:
-**!maybe, !coming, !here, !cancel**
+**!interested, !coming, !here, !cancel**
 If you are bringing more than one trainer/account, add the number of accounts total on your first status update.
 Example: `!coming 5`
 
 To see the list of trainers who have given their status:
-**!interest, !otw, !waiting**
+**!list interested, !list coming, !list here**
+Alternatively **!list** by itself will show all of the above.
 
 **!location** will show the current raid location.
 **!location new <address>** will let you correct the raid address.
@@ -1205,6 +1210,7 @@ async def unwant(ctx):
 async def print_raid_timer(channel):
     localexpiresecs = server_dict[channel.server]['raidchannel_dict'][channel]['exp'] + 3600 * server_dict[channel.server]['offset']
     localexpire = time.gmtime(localexpiresecs)
+    timerstr = ""
     if server_dict[channel.server]['raidchannel_dict'][channel]['type'] == 'egg':
         raidtype = "egg"
         raidaction = "hatch"
@@ -1212,12 +1218,14 @@ async def print_raid_timer(channel):
         raidtype = "raid"
         raidaction = "end"
     if not server_dict[channel.server]['raidchannel_dict'][channel]['active']:
-        await Meowth.send_message(channel, _("Meowth! This {raidtype}'s timer has already expired as of {expiry_time}!").format(raidtype=raidtype,expiry_time=strftime("%I:%M", localexpire)))
+        timerstr += _("Meowth! This {raidtype}'s timer has already expired as of {expiry_time}!").format(raidtype=raidtype,expiry_time=strftime("%I:%M", localexpire))
     else:
         if server_dict[channel.server]['raidchannel_dict'][channel]['manual_timer']:
-            await Meowth.send_message(channel, _("Meowth! This {raidtype} will {raidaction} at {expiry_time}!").format(raidtype=raidtype,raidaction=raidaction,expiry_time=strftime("%I:%M", localexpire)))
+            timerstr += _("Meowth! This {raidtype} will {raidaction} at {expiry_time}!").format(raidtype=raidtype,raidaction=raidaction,expiry_time=strftime("%I:%M", localexpire))
         else:
-            await Meowth.send_message(channel, _("Meowth! No one told me when the {raidtype} will {raidaction}, so I'm assuming it will {raidaction} at {expiry_time}!").format(raidtype=raidtype,raidaction=raidaction,expiry_time=strftime("%I:%M", localexpire)))
+            timerstr += _("Meowth! No one told me when the {raidtype} will {raidaction}, so I'm assuming it will {raidaction} at {expiry_time}!").format(raidtype=raidtype,raidaction=raidaction,expiry_time=strftime("%I:%M", localexpire))
+    
+    return timerstr
 
 
 async def _timerset(channel, exptime):
@@ -1262,7 +1270,8 @@ async def _timerset(channel, exptime):
         # Mark that timer has been manually set
         server_dict[channel.server]['raidchannel_dict'][channel]['manual_timer'] = True
         # Send message
-        await print_raid_timer(channel)
+        timerstr = await print_raid_timer(channel)
+        await Meowth.send_message(channel, timerstr)
         # Trigger channel cleanup
         await expiry_check(channel)
 
@@ -1286,12 +1295,9 @@ async def timer(ctx):
 
     Usage: !timer
     The expiry time should have been previously set with !timerset."""
-    await _timer(ctx)
-
-async def _timer(ctx):
     if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict']:
-        await print_raid_timer(ctx.message.channel)
-
+        timerstr = await print_raid_timer(ctx.message.channel)
+        await Meowth.send_message(ctx.message.channel, timerstr)
 
 """
 Behind-the-scenes functions for raid management.
@@ -1365,10 +1371,10 @@ async def _cancel(message):
         server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict'] = trainer_dict
 
 @Meowth.command(pass_context=True)
-async def maybe(ctx):
+async def interested(ctx):
     """Indicate you are interested in the raid.
 
-    Usage: !maybe [message]
+    Usage: !interested [message]
     Works only in raid channels. If message is omitted, assumes you are a group of 1.
     Otherwise, this command expects at least one word in your message to be a number,
     and will assume you are a group with that many people."""
@@ -1514,134 +1520,6 @@ async def cancel(ctx):
     await _cancel(ctx.message)
 
 @Meowth.command(pass_context=True)
-async def interest(ctx):
-    """Lists the number and users who are interested in the raid.
-
-    Usage: !interest
-    Works only in raid channels."""
-    await _interest(ctx)
-
-async def _interest(ctx):
-
-    if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
-        ctx_maybecount = 0
-
-        # Grab all trainers who are maybe and sum
-        # up their counts
-        trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
-        for trainer in trainer_dict.values():
-            if trainer['status'] == "maybe":
-                ctx_maybecount += trainer['count']
-
-        # If at least 1 person is interested,
-        # add an extra message indicating who it is.
-        maybe_exstr = ""
-        maybe_list = []
-        for trainer in trainer_dict.keys():
-            if trainer_dict[trainer]['status']=='maybe':
-                maybe_list.append(trainer)
-        if ctx_maybecount > 0:
-            maybe_exstr = _(" including {trainer_list} and the people with them! Let them know if there is a group forming").format(trainer_list=", ".join(maybe_list))
-        await Meowth.send_message(ctx.message.channel, _("Meowth! {trainer_count} interested{including_string}!").format(trainer_count=str(ctx_maybecount), including_string=maybe_exstr))
-
-
-@Meowth.command(pass_context=True)
-async def otw(ctx):
-    """Lists the number and users who are on the way to a raid.
-
-    Usage: !otw
-    Works only in raid channels."""
-    await _otw(ctx)
-
-async def _otw(ctx):
-
-    if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
-        ctx_omwcount = 0
-
-        # Grab all trainers who are :omw: and sum
-        # up their counts
-        trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
-        for trainer in trainer_dict.values():
-            if trainer['status'] == "omw":
-                ctx_omwcount += trainer['count']
-
-        # If at least 1 person is on the way,
-        # add an extra message indicating who it is.
-        otw_exstr = ""
-        otw_list = []
-        for trainer in trainer_dict.keys():
-            if trainer_dict[trainer]['status']=='omw':
-                otw_list.append(trainer)
-        if ctx_omwcount > 0:
-            otw_exstr = _(" including {trainer_list} and the people with them! Be considerate and wait for them if possible").format(trainer_list=", ".join(otw_list))
-        await Meowth.send_message(ctx.message.channel, _("Meowth! {trainer_count} on the way{including_string}!").format(trainer_count=str(ctx_omwcount), including_string=otw_exstr))
-
-@Meowth.command(pass_context=True)
-async def waiting(ctx):
-    """List the number and users who are waiting at a raid.
-
-    Usage: !waiting
-    Works only in raid channels."""
-    await _waiting(ctx)
-
-async def _waiting(ctx):
-
-    if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
-        ctx_waitingcount = 0
-
-        # Grab all trainers who are :here: and sum
-        # up their counts
-        trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
-        for trainer in trainer_dict.values():
-            if trainer['status'] == "waiting":
-                ctx_waitingcount += trainer['count']
-
-        # If at least 1 person is waiting,
-        # add an extra message indicating who it is.
-        waiting_exstr = ""
-        waiting_list = []
-        for trainer in trainer_dict.keys():
-            if trainer_dict[trainer]['status']=='waiting':
-                waiting_list.append(trainer)
-        if ctx_waitingcount > 0:
-            waiting_exstr = _(" including {trainer_list} and the people with them! Be considerate and let them know if and when you'll be there").format(trainer_list=", ".join(waiting_list))
-        await Meowth.send_message(ctx.message.channel, _("Meowth! {trainer_count} waiting at the raid{including_string}!").format(trainer_count=str(ctx_waitingcount), including_string=waiting_exstr))
-
-@Meowth.command(pass_context=True)
-async def lists(ctx):
-    """Print all lists concerning a raid at once in raid channels and lists all active raids in city channels.
-
-    Usage: !lists
-    Works only in raid or city channels. Calls the interest, otw, and waiting lists. Also prints
-    the raid timer. In city channels, lists all active raids."""
-    activeraidnum = 0
-    if server_dict[ctx.message.server]['raidset'] == True:
-        if ctx.message.channel.name in server_dict[ctx.message.server]['city_channels'].keys():
-            await Meowth.send_message(ctx.message.channel, _("Current Raids in {0}:").format(ctx.message.channel.name.capitalize()))
-            for activeraid in server_dict[ctx.message.server]['raidchannel_dict']:
-                ctx_waitingcount = 0
-                ctx_omwcount = 0
-                ctx_maybecount = 0
-                for trainer in server_dict[ctx.message.server]['raidchannel_dict'][activeraid]['trainer_dict'].values():
-                    if trainer['status'] == "waiting":
-                        ctx_waitingcount += trainer['count']
-                    elif trainer['status'] == "omw":
-                        ctx_omwcount += trainer['count']
-                    elif trainer['status'] == "maybe":
-                        ctx_maybecount += trainer['count']
-                localexpire = time.gmtime(server_dict[ctx.message.channel.server]['raidchannel_dict'][activeraid]['exp'] + 3600 * server_dict[ctx.message.channel.server]['offset'])
-                if server_dict[ctx.message.server]['raidchannel_dict'][activeraid]['reportcity'] == ctx.message.channel.name and server_dict[ctx.message.server]['raidchannel_dict'][activeraid]['active'] and discord.utils.get(ctx.message.channel.server.channels, id=activeraid.id):
-                    await Meowth.send_message(ctx.message.channel, _("{0.mention} - interested = {1}, {2} = {3}, {4} = {5}, Ends at {6}").format(activeraid, ctx_maybecount, parse_emoji(ctx.message.server, config['omw_id']), ctx_omwcount, parse_emoji(ctx.message.server, config['here_id']), ctx_waitingcount, strftime("%I:%M", localexpire)))
-                    activeraidnum += 1
-            if activeraidnum == 0:
-                await Meowth.send_message(ctx.message.channel, _("Meowth! No active raids! Report one with **!raid <name> <location>**."))
-        elif ctx.message.channel in server_dict[ctx.message.channel.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
-            await _interest(ctx)
-            await _otw(ctx)
-            await _waiting(ctx)
-            await _timer(ctx)
-
-@Meowth.command(pass_context=True)
 async def starting(ctx):
     """Signal that a raid is starting.
 
@@ -1723,11 +1601,6 @@ async def on_message(message):
                     return
 
     await Meowth.process_commands(message)
-
-@Meowth.command(pass_context=True, hidden=True)
-async def interested(ctx):
-    if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
-        await Meowth.send_message(ctx.message.channel, content = _("Meowth! Hey {member}, I don't know if you meant **!maybe** to say that you are interested or **!interest** to see the other trainers interest").format(member=ctx.message.author.mention))
 
 @Meowth.command(pass_context=True)
 async def duplicate(ctx):
@@ -1882,12 +1755,13 @@ async def _exraid(message):
         raidmsg = _("""Meowth! {pokemon} EX raid reported by {member}! Details: {location_details}. Coordinate here!
 
 To update your status, choose from the following commands:
-**!maybe, !coming, !here, !cancel**
+**!interested, !coming, !here, !cancel**
 If you are bringing more than one trainer/account, add the number of accounts total on your first status update.
 Example: `!coming 5`
 
 To see the list of trainers who have given their status:
-**!interest, !otw, !waiting**
+**!list interested, !list coming, !list here**
+Alternatively **!list** by itself will show all of the above.
 
 **!location** will show the current raid location.
 **!location new <address>** will let you correct the raid address.
@@ -1985,11 +1859,11 @@ async def _raidegg(message):
 
             raidmsg = _("""Meowth! Level {level} raid egg reported by {member}! Details: {location_details}. Coordinate here!
 
-Message **!maybe** if you're interested in attending.
+Message **!interested** if you're interested in attending.
 If you are interested in bringing more than one trainer/account, add in the number at the end of the commend.
-Example: `!maybe 5`
+Example: `!interested 5`
 
-Use **!interest** to see the list of trainers who are interested.
+Use **!list interested** to see the list of trainers who are interested.
 
 **!location** will show the current raid location.
 **!location new <address>** will let you correct the raid address.
@@ -2088,12 +1962,13 @@ async def _eggtoraid(entered_raid, raid_channel):
     raidmsg = _("""Meowth! The egg hatched into a {pokemon} raid! Details: {location_details}. Coordinate here!
 
 To update your status, choose from the following commands:
-**!maybe, !coming, !here, !cancel**
+**!interested, !coming, !here, !cancel**
 If you are bringing more than one trainer/account, add the number of accounts total on your first status update.
 Example: `!coming 5`
 
 To see the list of trainers who have given their status:
-**!interest, !otw, !waiting**
+**!list interested, !list coming, !list here**
+Alternatively **!list** by itself will show all of the above.
 
 **!location** will show the current raid location.
 **!location new <address>** will let you correct the raid address.
@@ -2130,6 +2005,176 @@ This channel will be deleted five minutes after the timer expires.""").format(po
     await Meowth.send_message(raid_channel, content = _("Meowth! Trainers {trainer_list}: The raid egg has just hatched into a {pokemon} raid!\nYou're now able to update your status with !coming or !here. If you've changed your plans, use !cancel.").format(trainer_list=", ".join(maybe_list), pokemon=raid.mention), embed = raid_embed)
 
     event_loop.create_task(expiry_check(raid_channel))
+        
+
+@Meowth.group(pass_context=True)
+async def list(ctx):
+    """Print all lists concerning a raid at once in raid channels and lists all active raids in city channels.
+
+    Usage: !list
+    Works only in raid or city channels. Calls the interested, waiting, and here lists. Also prints
+    the raid timer. In city channels, lists all active raids."""
+    
+    if ctx.invoked_subcommand is None:
+        activeraidnum = 0
+        listmsg = ""
+        if server_dict[ctx.message.server]['raidset'] == True:
+            if ctx.message.channel.name in server_dict[ctx.message.server]['city_channels'].keys():
+                listmsg += _(("Current Raids for {0}:").format(ctx.message.channel.name.capitalize()))
+                for activeraid in server_dict[ctx.message.server]['raidchannel_dict']:
+                    ctx_waitingcount = 0
+                    ctx_omwcount = 0
+                    ctx_maybecount = 0
+                    for trainer in server_dict[ctx.message.server]['raidchannel_dict'][activeraid]['trainer_dict'].values():
+                        if trainer['status'] == "waiting":
+                            ctx_waitingcount += trainer['count']
+                        elif trainer['status'] == "omw":
+                            ctx_omwcount += trainer['count']
+                        elif trainer['status'] == "maybe":
+                            ctx_maybecount += trainer['count']
+                    localexpire = time.gmtime(server_dict[ctx.message.channel.server]['raidchannel_dict'][activeraid]['exp'] + 3600 * server_dict[ctx.message.channel.server]['offset'])
+                    if server_dict[ctx.message.server]['raidchannel_dict'][activeraid]['manual_timer'] == False:
+                        assumed_str = " (assumed)"
+                    else:
+                        assumed_str = ""
+                    if server_dict[ctx.message.server]['raidchannel_dict'][activeraid]['reportcity'] == ctx.message.channel.name and server_dict[ctx.message.server]['raidchannel_dict'][activeraid]['active'] and discord.utils.get(ctx.message.channel.server.channels, id=activeraid.id):
+                        listmsg += _(("\n{raidchannel} - {interestcount} interested, {comingcount} coming, {herecount} here. End time: {expiry}{manualtimer}").format(raidchannel=activeraid.mention, interestcount=ctx_maybecount, comingcount=ctx_omwcount, herecount=ctx_waitingcount, expiry=strftime("%I:%M", localexpire), manualtimer=assumed_str))
+                        activeraidnum += 1
+                if activeraidnum == 0:
+                    await Meowth.send_message(ctx.message.channel, _("Meowth! No active raids! Report one with **!raid <name> <location>**."))
+                    return
+
+            elif ctx.message.channel in server_dict[ctx.message.channel.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
+                if server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['type'] == 'egg':
+                    listmsg += await _interest(ctx)
+                    listmsg += "\n"
+                    listmsg += await print_raid_timer(ctx.message.channel)
+                    
+                else:
+                    listmsg += await _interest(ctx)
+                    listmsg += "\n" + await _otw(ctx)
+                    listmsg += "\n" + await _waiting(ctx)
+                    listmsg += "\n" + await print_raid_timer(ctx.message.channel)
+                    
+        await Meowth.send_message(ctx.message.channel, listmsg)
+
+@list.command(pass_context=True)
+async def interested(ctx):
+    """Lists the number and users who are interested in the raid.
+
+    Usage: !list interested
+    Works only in raid channels."""
+    listmsg = await _interest(ctx)
+    await Meowth.send_message(ctx.message.channel, listmsg)
+    
+@list.command(pass_context=True)
+async def coming(ctx):
+    """Lists the number and users who are coming to a raid.
+
+    Usage: !list coming
+    Works only in raid channels."""
+    listmsg = await _otw(ctx)
+    await Meowth.send_message(ctx.message.channel, listmsg)
+
+@list.command(pass_context=True)
+async def here(ctx):
+    """List the number and users who are present at a raid.
+
+    Usage: !list here
+    Works only in raid channels."""
+    listmsg = await _waiting(ctx)
+    await Meowth.send_message(ctx.message.channel, listmsg)
+
+async def _interest(ctx):
+
+    if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
+        ctx_maybecount = 0
+
+        # Grab all trainers who are maybe and sum
+        # up their counts
+        trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
+        for trainer in trainer_dict.values():
+            if trainer['status'] == "maybe":
+                ctx_maybecount += trainer['count']
+
+        # If at least 1 person is interested,
+        # add an extra message indicating who it is.
+        maybe_exstr = ""
+        maybe_list = []
+        for trainer in trainer_dict.keys():
+            if trainer_dict[trainer]['status']=='maybe':
+                maybe_list.append(trainer)
+        if ctx_maybecount > 0:
+            maybe_exstr = _(" including {trainer_list} and the people with them! Let them know if there is a group forming").format(trainer_list=", ".join(maybe_list))
+        listmsg = _(("Meowth! {trainer_count} interested{including_string}!").format(trainer_count=str(ctx_maybecount), including_string=maybe_exstr))
+        return listmsg
+
+async def _otw(ctx):
+
+    if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
+        ctx_omwcount = 0
+
+        # Grab all trainers who are :omw: and sum
+        # up their counts
+        trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
+        for trainer in trainer_dict.values():
+            if trainer['status'] == "omw":
+                ctx_omwcount += trainer['count']
+
+        # If at least 1 person is on the way,
+        # add an extra message indicating who it is.
+        otw_exstr = ""
+        otw_list = []
+        for trainer in trainer_dict.keys():
+            if trainer_dict[trainer]['status']=='omw':
+                otw_list.append(trainer)
+        if ctx_omwcount > 0:
+            otw_exstr = _(" including {trainer_list} and the people with them! Be considerate and wait for them if possible").format(trainer_list=", ".join(otw_list))
+        listmsg = _(("Meowth! {trainer_count} on the way{including_string}!").format(trainer_count=str(ctx_omwcount), including_string=otw_exstr))
+        return listmsg
+
+async def _waiting(ctx):
+
+    if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
+        ctx_waitingcount = 0
+
+        # Grab all trainers who are :here: and sum
+        # up their counts
+        trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
+        for trainer in trainer_dict.values():
+            if trainer['status'] == "waiting":
+                ctx_waitingcount += trainer['count']
+
+        # If at least 1 person is waiting,
+        # add an extra message indicating who it is.
+        waiting_exstr = ""
+        waiting_list = []
+        for trainer in trainer_dict.keys():
+            if trainer_dict[trainer]['status']=='waiting':
+                waiting_list.append(trainer)
+        if ctx_waitingcount > 0:
+            waiting_exstr = _(" including {trainer_list} and the people with them! Be considerate and let them know if and when you'll be there").format(trainer_list=", ".join(waiting_list))
+        listmsg = _(("Meowth! {trainer_count} waiting at the raid{including_string}!").format(trainer_count=str(ctx_waitingcount), including_string=waiting_exstr))
+        return listmsg
+
+@Meowth.command(pass_context=True, hidden=True)
+async def interest(ctx):
+    await Meowth.send_message(ctx.message.channel, _("Meowth! We've moved this command to **!list interested**."))
+    
+@Meowth.command(pass_context=True, hidden=True)
+async def otw(ctx):
+    await Meowth.send_message(ctx.message.channel, _("Meowth! We've moved this command to **!list coming**."))
+    
+@Meowth.command(pass_context=True, hidden=True)
+async def waiting(ctx):
+    await Meowth.send_message(ctx.message.channel, _("Meowth! We've moved this command to **!list here**."))
+
+@Meowth.command(pass_context=True, hidden=True)
+async def maybe(ctx):
+    await Meowth.send_message(ctx.message.channel, _("Meowth! We've moved this command to **!interested**."))
+
+
+
 
 
 

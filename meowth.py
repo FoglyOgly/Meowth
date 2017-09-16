@@ -1983,22 +1983,23 @@ Message **!starting** when the raid is beginning to clear the raid's 'here' list
 
 This channel will be deleted five minutes after the timer expires.""").format(pokemon=entered_raid.capitalize(), location_details=egg_address)
 
+    raid_message = await Meowth.edit_message(raid_message, new_content=raidmsg, embed=raid_embed)
+    egg_report = await Meowth.edit_message(egg_report, new_content=raidreportcontent, embed=raid_embed)
+    
     server_dict[raid_channel.server]['raidchannel_dict'][raid_channel] = {
-        'reportcity' : reportcity,
-        'trainer_dict' : trainer_dict,
-        'exp' : raidexp,
-        'manual_timer' : manual_timer,
-        'active' : True,
-        'raidmessage' : raid_message,
-        'raidreport' : egg_report,
-        'address' : egg_address,
-        'type' : 'raid',
-        'pokemon' : entered_raid,
-        'egglevel' : '0'
-        }
+    'reportcity' : reportcity,
+    'trainer_dict' : trainer_dict,
+    'exp' : raidexp,
+    'manual_timer' : manual_timer,
+    'active' : True,
+    'raidmessage' : raid_message,
+    'raidreport' : egg_report,
+    'address' : egg_address,
+    'type' : 'raid',
+    'pokemon' : entered_raid,
+    'egglevel' : '0'
+    }
 
-    await Meowth.edit_message(raid_message, new_content=raidmsg, embed=raid_embed)
-    await Meowth.edit_message(egg_report, new_content=raidreportcontent, embed=raid_embed)
     maybe_list = []
     trainer_dict = server_dict[raid_channel.server]['raidchannel_dict'][raid_channel]['trainer_dict']
     for trainer in trainer_dict.keys():

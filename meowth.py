@@ -1799,7 +1799,7 @@ This channel will be deleted in 2 days if an admin doesn't delete it manually be
 async def raidegg(ctx):
     """Report a raid egg.
 
-    Usage: !raidegg <level> <gym-team> <location> <minutes>
+    Usage: !raidegg <level> <location> <minutes>
 
     Meowth will give a map link to the entered location and create a channel for organising the coming raid in.
     Meowth will also provide info on the possible bosses that can hatch and their types.

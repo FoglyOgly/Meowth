@@ -1767,9 +1767,6 @@ Alternatively **!list** by itself will show all of the above.
 **!location new <address>** will let you correct the raid address.
 Sending a Google Maps link will also update the raid location.
 
-**!timer** will show the current raid time.
-**!timerset** will let you correct the raid countdown time.
-
 Message **!starting** when the raid is beginning to clear the raid's 'here' list.
 
 This channel will be deleted in 2 days if an admin doesn't delete it manually before then!""").format(pokemon=raid.mention, member=message.author.mention, location_details=raid_details)
@@ -1778,7 +1775,7 @@ This channel will be deleted in 2 days if an admin doesn't delete it manually be
         server_dict[message.server]['raidchannel_dict'][raid_channel] = {
             'reportcity' : message.channel.name,
             'trainer_dict' : {},
-            'exp' : time.time() + 50 * 60 * 60, # Two days from now
+            'exp' : time.time() + 72 * 60 * 60, # Three days from now
             'manual_timer' : False, # No one has explicitly set the timer, Meowth is just assuming 2 days
             'active' : True,
             'raidmessage' : raidmessage,
@@ -1946,7 +1943,7 @@ async def _eggtoraid(entered_raid, raid_channel):
                 await Meowth.send_message(raid_channel, _("Meowth! The Pokemon {pokemon} does not hatch from level {level} raid eggs!").format(pokemon=entered_raid.capitalize(), level=egglevel))
                 return
 
-    raid_channel_name = entered_raid + "-" + sanitize_channel_name(egg_address)
+    raid_channel_name = raid_channel.name.replace(('level-{egglevel}-egg').format(egglevel=egglevel),entered_raid)
     oldembed = raid_message.embeds[0]
     raid_gmaps_link = oldembed['url']
 

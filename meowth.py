@@ -550,7 +550,7 @@ We have made some changes to the server to make things easier with tracking bugs
 #request-list is a new channel that contains a shortlist of all considered feature proposals, and each of their details showing Pros/Cons, possible solutions and reactions to vote on what solution would best suit users.
 Feel free to take a look!
 
-Reconfigure shouldn't be necessary for this update."""
+**Reconfigure shouldn't be necessary for this update.**"""
         await Meowth.send_message(server.owner, reboot_msg)
         try:
             if server not in server_dict:

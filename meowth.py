@@ -277,9 +277,11 @@ async def expire_channel(channel):
             pass
         return
     else:
+        dupechannel = False
         server_dict[server]['raidchannel_dict'][channel]['active'] = False
         logger.info("Expire_Channel - Channel Expired - "+channel.name)
         if server_dict[server]['raidchannel_dict'][channel]['duplicate'] >= 3:
+            dupechannel = True
             server_dict[server]['raidchannel_dict'][channel]['duplicate'] = 0
             server_dict[server]['raidchannel_dict'][channel]['exp'] = time.time()
             await Meowth.send_message(channel, _("""This channel has been successfully reported as a duplicate and will be deleted in 1 minute. Check the channel list for the other raid channel to coordinate in!
@@ -300,6 +302,12 @@ To reactivate the channel, use !timerset to set the timer again."""))
 
         try:
             if server_dict[channel.server]['raidchannel_dict'][channel]['active'] == False:
+                if dupechannel:
+                    reportmsg = server_dict[channel.server]['raidchannel_dict'][channel]['raidreport']
+                    try:
+                        await Meowth.delete_message(reportmsg)
+                    except:
+                        pass
                 try:
                     del server_dict[channel.server]['raidchannel_dict'][channel]
                 except KeyError:
@@ -1635,6 +1643,7 @@ async def duplicate(ctx):
                 server_dict[server]['raidchannel_dict'][channel]['duplicate'] = dupecount
         
         dupecount += 1
+        server_dict[server]['raidchannel_dict'][channel]['duplicate'] = dupecount
         
         if dupecount >= 3:
             rusure = await Meowth.send_message(channel,_("Meowth! Are you sure you wish to remove this channel?"))
@@ -1650,6 +1659,8 @@ async def duplicate(ctx):
             if res.reaction.emoji == "❎":
                 await Meowth.delete_message(rusure)
                 confirmation = await Meowth.send_message(channel,_("Duplicate Report cancelled."))
+                dupecount = 2
+                server_dict[server]['raidchannel_dict'][channel]['duplicate'] = dupecount
                 await asyncio.sleep(10)
                 await Meowth.delete_message(confirmation)
                 return

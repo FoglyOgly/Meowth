@@ -102,7 +102,7 @@ def get_type(server, pkmn_number):
     types = type_list[pkmn_number]
     ret = []
     for type in types:
-        ret.append(config['type_id_dict'][type.lower()])
+        ret.append(parse_emoji(server, config['type_id_dict'][type.lower()]))
     return ret
 
 def get_name(pkmn_number):
@@ -280,6 +280,10 @@ async def expire_channel(channel):
         dupechannel = False
         server_dict[server]['raidchannel_dict'][channel]['active'] = False
         logger.info("Expire_Channel - Channel Expired - "+channel.name)
+        try:
+            testvar = server_dict[server]['raidchannel_dict'][channel]['duplicate']
+        except KeyError:
+            server_dict[server]['raidchannel_dict'][channel]['duplicate'] = 0
         if server_dict[server]['raidchannel_dict'][channel]['duplicate'] >= 3:
             dupechannel = True
             server_dict[server]['raidchannel_dict'][channel]['duplicate'] = 0

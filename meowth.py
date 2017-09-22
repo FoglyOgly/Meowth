@@ -1121,6 +1121,11 @@ async def _raid(message):
             return
 
         raid_details = " ".join(args_split)
+        raid_details = raid_details.strip()
+        if raid_details == '':
+            await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**"))
+            return
+            
         raid_gmaps_link = create_gmaps_query(raid_details, message.channel)
 
         raid_channel_name = entered_raid + "-" + sanitize_channel_name(raid_details)
@@ -1797,6 +1802,11 @@ async def _exraid(message):
             return
 
         raid_details = " ".join(args_split)
+        raid_details = raid_details.strip()
+        if raid_details == '':
+            await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!exraid <pokemon name> <location>**"))
+            return
+            
         raid_gmaps_link = create_gmaps_query(raid_details, message.channel)
 
         raid_channel_name = entered_raid + "-" + sanitize_channel_name(raid_details)
@@ -1897,6 +1907,11 @@ async def _raidegg(message):
             raidexp = False
 
         raid_details = " ".join(args_split)
+        raid_details = raid_details.strip()
+        if raid_details == '':
+            await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Use at least: **!raidegg <level> <location>**. Type !help raidegg for more info."))
+            return
+            
         raid_gmaps_link = create_gmaps_query(raid_details, message.channel)
 
         if egg_level > 5 or egg_level == 0:

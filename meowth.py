@@ -279,7 +279,7 @@ async def expire_channel(channel):
     else:
         server_dict[server]['raidchannel_dict'][channel]['active'] = False
         logger.info("Expire_Channel - Channel Expired - "+channel.name)
-        if server_dict[server]['raidchannel_dict'][channel]['duplicate'] >= 2:
+        if server_dict[server]['raidchannel_dict'][channel]['duplicate'] >= 3:
             server_dict[server]['raidchannel_dict'][channel]['duplicate'] = 0
             server_dict[server]['raidchannel_dict'][channel]['exp'] = time.time()
             await Meowth.send_message(channel, _("""This channel has been successfully reported as a duplicate and will be deleted in 1 minute. Check the channel list for the other raid channel to coordinate in!
@@ -1633,8 +1633,10 @@ async def duplicate(ctx):
             except KeyError:
                 dupecount = 0
                 server_dict[server]['raidchannel_dict'][channel]['duplicate'] = dupecount
-            
-        if dupecount >= 2:
+        
+        dupecount += 1
+        
+        if dupecount >= 3:
             rusure = await Meowth.send_message(channel,_("Meowth! Are you sure you wish to remove this channel?"))
             await Meowth.add_reaction(rusure,"✅") #checkmark
             await Meowth.add_reaction(rusure,"❎") #cross
@@ -1658,7 +1660,6 @@ async def duplicate(ctx):
                 await expire_channel(channel)
                 return
         else:
-            dupecount += 1
             server_dict[server]['raidchannel_dict'][channel]['duplicate'] = dupecount
             confirmation = await Meowth.send_message(channel,_("Duplicate report #{duplicate_report_count} received.").format(duplicate_report_count=dupecount))
             logger.info("Duplicate Report - "+ctx.message.channel.name+" - Report #"+dupecount+ "- Report by "+ctx.message.author.name)

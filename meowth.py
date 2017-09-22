@@ -1659,6 +1659,7 @@ async def duplicate(ctx):
             if res.reaction.emoji == "❎":
                 await Meowth.delete_message(rusure)
                 confirmation = await Meowth.send_message(channel,_("Duplicate Report cancelled."))
+                logger.info("Duplicate Report - Cancelled - "+channel.name+" - Report by "+author.name)
                 dupecount = 2
                 server_dict[server]['raidchannel_dict'][channel]['duplicate'] = dupecount
                 await asyncio.sleep(10)
@@ -1667,13 +1668,13 @@ async def duplicate(ctx):
             elif res.reaction.emoji == "✅":
                 await Meowth.delete_message(rusure)
                 await Meowth.send_message(channel,"Duplicate Confirmed")
-                logger.info("Duplicate Report - Channel Expired - "+ctx.message.channel.name+" - Last Report by "+ctx.message.author.name)
+                logger.info("Duplicate Report - Channel Expired - "+channel.name+" - Last Report by "+author.name)
                 await expire_channel(channel)
                 return
         else:
             server_dict[server]['raidchannel_dict'][channel]['duplicate'] = dupecount
             confirmation = await Meowth.send_message(channel,_("Duplicate report #{duplicate_report_count} received.").format(duplicate_report_count=dupecount))
-            logger.info("Duplicate Report - "+ctx.message.channel.name+" - Report #"+dupecount+ "- Report by "+ctx.message.author.name)
+            logger.info("Duplicate Report - "+channel.name+" - Report #"+dupecount+ "- Report by "+author.name)
             return
 
 @Meowth.group(pass_context=True)

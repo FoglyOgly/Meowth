@@ -534,25 +534,23 @@ async def on_ready():
         reboot_msg = """**Meowth! That's right! I've been updated!**
 
 **Changes:**
-    - Added !exraid command for mewtwo exclusive raids
-    - Added !raidegg command
-    - Updated raid and egg timers to 0-59 minutes
-    - Added !raid <pokemon> command within raidegg channels to update eggs to open raids.
-    - Added !raid assume <pokemon> command for level 5 raidegg channels to have raids auto-update to their selected open raid.
-    - Changed !maybe to !interested
-    - Changed !lists to !list
-    - Changed !interest, !otw, !waiting to !list interested, !list coming, !list here
-    - Tweaked list output in city channels
+    - !raidegg bug fixes.
+    - !raidegg allows !coming and !here for assumed eggs.
+    - !exraids extended to 72 hour expiry.
+    - !exraid no longer mentions !timer or !timerset usage in the top raid channel message.
+    - !duplicate fixed and updated to allow members with manage_channel permission to skip the 3-stage reporting.
+    - !duplicate now removes original raid report message on channel deletion.
+    - Raid channel names on conversion from eggs now only replace the 'level-x-egg', leaving the rest as-is even if edited manually.
     - General housekeeping and fixes
 
-The previous format for timers of H:MM is no longer supported. Please make sure to announce this change to members.
-Old usage: !raid blastoise starbucks 0:43
-New usage: !raid blastoise starbucks 43
+For help, feedback or suggestions head over to the Meowth server (invite code: hhVjAN8)
 
-For level 5 raid eggs, there's currently only 1 legendary for open, non-exclusive raids, so the !raid assume command can come in handy to pre-emptively tell the bot what to turn the egg channel into once it hatches.
-This doesn't work for lower level eggs, as there's no set pokemon for when they hatch.
+We have made some changes to the server to make things easier with tracking bugs and proposed features or changes.
+#known-issues now has a list of all bugs with a simple to understand status.
+#request-list is a new channel that contains a shortlist of all considered feature proposals, and each of their details showing Pros/Cons, possible solutions and reactions to vote on what solution would best suit users.
+Feel free to take a look!
 
-No reconfigure should be necessary this time!"""
+Reconfigure shouldn't be necessary for this update."""
         await Meowth.send_message(server.owner, reboot_msg)
         try:
             if server not in server_dict:

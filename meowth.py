@@ -1630,12 +1630,30 @@ async def duplicate(ctx):
     server = ctx.message.server
     
     if channel in server_dict[server]['raidchannel_dict'] and server_dict[server]['raidchannel_dict'][channel]['active']:
+        trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
+        
         can_manage = channel.permissions_for(author).manage_channels
         
         if can_manage:
             dupecount = 2
             server_dict[server]['raidchannel_dict'][channel]['duplicate'] = dupecount
         else:
+            if author in trainer_dict:
+                try:
+                    if trainer_dict[author]['dupereporter']:
+                        dupeauthmsg = await Meowth.send_message(channel,_("Meowth! You've already made a duplicate report for this raid!"))
+                        await asyncio.sleep(10)
+                        await Meowth.delete_message(dupeauthmsg)
+                        return
+                    else:
+                        trainer_dict[author]['dupereporter'] = True
+                except KeyError:
+                    trainer_dict[author]['dupereporter'] = True
+            else:
+                trainer_dict[author] = {
+                    'status' : '',
+                    'dupereporter' : True
+                    }
             try:
                 dupecount = server_dict[server]['raidchannel_dict'][channel]['duplicate']
             except KeyError:
@@ -1646,7 +1664,7 @@ async def duplicate(ctx):
         server_dict[server]['raidchannel_dict'][channel]['duplicate'] = dupecount
         
         if dupecount >= 3:
-            rusure = await Meowth.send_message(channel,_("Meowth! Are you sure you wish to remove this channel?"))
+            rusure = await Meowth.send_message(channel,_("Meowth! Are you sure you wish to remove this raid?"))
             await Meowth.add_reaction(rusure,"✅") #checkmark
             await Meowth.add_reaction(rusure,"❎") #cross
             def check(react,user):
@@ -1671,10 +1689,13 @@ async def duplicate(ctx):
                 logger.info("Duplicate Report - Channel Expired - "+channel.name+" - Last Report by "+author.name)
                 await expire_channel(channel)
                 return
+            else:
+                await Meowth.delete_message(rusure)
+                return
         else:
             server_dict[server]['raidchannel_dict'][channel]['duplicate'] = dupecount
-            confirmation = await Meowth.send_message(channel,_("Duplicate report #{duplicate_report_count} received.").format(duplicate_report_count=dupecount))
-            logger.info("Duplicate Report - "+channel.name+" - Report #"+dupecount+ "- Report by "+author.name)
+            confirmation = await Meowth.send_message(channel,_("Duplicate report #{duplicate_report_count} received.").format(duplicate_report_count=str(dupecount)))
+            logger.info("Duplicate Report - "+channel.name+" - Report #"+str(dupecount)+ "- Report by "+author.name)
             return
 
 @Meowth.group(pass_context=True)

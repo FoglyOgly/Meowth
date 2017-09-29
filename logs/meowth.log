@@ -1,0 +1,125 @@
+2017-09-29 12:31:47,331:WARNING:discord.client: PyNaCl is not installed, voice will NOT be supported
+2017-09-29 12:31:47,340:INFO:discord.client: on_ready has successfully been registered as an event
+2017-09-29 12:31:47,341:INFO:discord.client: on_server_join has successfully been registered as an event
+2017-09-29 12:31:47,341:INFO:discord.client: on_server_remove has successfully been registered as an event
+2017-09-29 12:31:47,341:INFO:discord.client: on_member_join has successfully been registered as an event
+2017-09-29 12:31:47,342:INFO:discord.client: on_message has successfully been registered as an event
+2017-09-29 12:31:47,343:INFO:discord.client: logging in using static token
+2017-09-29 12:31:47,793:INFO:discord.gateway: Created websocket connected to wss://gateway.discord.gg?encoding=json&v=6
+2017-09-29 12:31:47,798:INFO:discord.gateway: sent the identify payload to create the websocket
+2017-09-29 12:31:49,922:INFO:discord: Server_Cleanup ------ BEGIN ------
+2017-09-29 12:31:49,923:INFO:discord: Server_Cleanup - SAVING CHANGES
+2017-09-29 12:31:49,942:INFO:discord: Server_Cleanup ------ END ------
+2017-09-29 12:31:50,002:INFO:discord: Channel_Cleanup ------ BEGIN ------
+2017-09-29 12:31:50,002:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+2017-09-29 12:31:50,002:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-5-egg-test - CHECKING
+2017-09-29 12:31:50,002:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-5-egg-test - DOESN'T EXIST IN DISCORD
+2017-09-29 12:31:50,002:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-5-egg-test - CHECKING
+2017-09-29 12:31:50,002:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-5-egg-test - DOESN'T EXIST IN DISCORD
+2017-09-29 12:31:50,002:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:raikou-the-gas-lite - CHECKING
+2017-09-29 12:31:50,002:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:raikou-the-gas-lite - DOESN'T EXIST IN DISCORD
+2017-09-29 12:31:50,002:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:raikou-cityscape-mural - CHECKING
+2017-09-29 12:31:50,002:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:raikou-cityscape-mural - DOESN'T EXIST IN DISCORD
+2017-09-29 12:31:50,002:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-5-egg-pacific-wheel - CHECKING
+2017-09-29 12:31:50,002:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-5-egg-pacific-wheel - DOESN'T EXIST IN DISCORD
+2017-09-29 12:31:50,002:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:raikou-the-fountain-of-love - CHECKING
+2017-09-29 12:31:50,002:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:raikou-the-fountain-of-love - DOESN'T EXIST IN DISCORD
+2017-09-29 12:31:50,003:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:raikou-library-alehouse - CHECKING
+2017-09-29 12:31:50,003:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:raikou-library-alehouse - DOESN'T EXIST IN DISCORD
+2017-09-29 12:31:50,003:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-5-egg-test - CHECKING
+2017-09-29 12:31:50,003:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-5-egg-test - DOESN'T EXIST IN DISCORD
+2017-09-29 12:31:50,003:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-5-egg-test - CHECKING
+2017-09-29 12:31:50,003:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-5-egg-test - DOESN'T EXIST IN DISCORD
+2017-09-29 12:31:50,003:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-5-egg-iron-giraffes - CHECKING
+2017-09-29 12:31:50,003:INFO:discord: Expiry_Check - level-5-egg-iron-giraffes
+2017-09-29 12:31:50,004:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-5-egg-iron-giraffes
+2017-09-29 12:33:50,008:INFO:discord: Expire_Channel - Egg Auto Hatched - level-5-egg-iron-giraffes
+2017-09-29 12:33:51,211:INFO:discord: Expiry_Check - level-5-egg-iron-giraffes
+2017-09-29 12:33:51,212:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-5-egg-iron-giraffes
+2017-09-29 12:37:14,526:INFO:discord: Expiry_Check - raikou-odyssey-theater-ensemble
+2017-09-29 12:37:14,527:INFO:discord: Expire_Channel - Channel Added To Watchlist - raikou-odyssey-theater-ensemble
+2017-09-29 12:37:14,901:INFO:discord: Expiry_Check - level-5-egg-water-side-plaza
+2017-09-29 12:37:14,903:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-5-egg-water-side-plaza
+2017-09-29 12:47:02,183:INFO:discord: Expiry_Check - level-5-egg-10-commandments
+2017-09-29 12:47:02,184:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-5-egg-10-commandments
+2017-09-29 12:47:02,439:INFO:discord: Expiry_Check - level-5-egg-beauty-in-a-yellow-hat
+2017-09-29 12:47:02,440:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-5-egg-beauty-in-a-yellow-hat
+2017-09-29 12:51:59,121:INFO:discord: Expiry_Check - raikou-marina-knucklebone
+2017-09-29 12:51:59,121:INFO:discord: Expire_Channel - Channel Added To Watchlist - raikou-marina-knucklebone
+2017-09-29 12:51:59,216:INFO:discord: Expiry_Check - raikou-century-city-sculpture
+2017-09-29 12:51:59,217:INFO:discord: Expire_Channel - Channel Added To Watchlist - raikou-century-city-sculpture
+2017-09-29 12:56:58,971:INFO:discord: Expiry_Check - level-5-egg-birds-mural-at-campus-ctr-dr
+2017-09-29 12:56:58,971:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-5-egg-birds-mural-at-campus-ctr-dr
+2017-09-29 12:56:59,053:INFO:discord: Expiry_Check - raikou-penmar-park
+2017-09-29 12:56:59,054:INFO:discord: Expire_Channel - Channel Added To Watchlist - raikou-penmar-park
+2017-09-29 12:56:59,315:INFO:discord: Expiry_Check - raikou-meat-market-mural
+2017-09-29 12:56:59,316:INFO:discord: Expire_Channel - Channel Added To Watchlist - raikou-meat-market-mural
+2017-09-29 12:58:59,017:INFO:discord: Expire_Channel - Channel Expired And Removed From Watchlist - level-5-egg-birds-mural-at-campus-ctr-dr
+2017-09-29 12:58:59,018:INFO:discord: Expire_Channel - level-5-egg-birds-mural-at-campus-ctr-dr
+2017-09-29 12:58:59,018:INFO:discord: Expire_Channel - Channel Expired - level-5-egg-birds-mural-at-campus-ctr-dr
+2017-09-29 12:58:59,272:INFO:discord: Expiry_Check - level-5-egg-birds-mural-at-campus-ctr-dr
+2017-09-29 12:58:59,272:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-5-egg-birds-mural-at-campus-ctr-dr
+2017-09-29 13:01:50,048:INFO:discord: Server_Cleanup ------ BEGIN ------
+2017-09-29 13:01:50,048:INFO:discord: Server_Cleanup - SAVING CHANGES
+2017-09-29 13:01:50,072:INFO:discord: Server_Cleanup ------ END ------
+2017-09-29 13:01:59,353:INFO:discord: Expiry_Check - level-5-egg-carlyle-fountain
+2017-09-29 13:01:59,354:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-5-egg-carlyle-fountain
+2017-09-29 13:01:59,609:INFO:discord: Expiry_Check - raikou-inverted-fountain-of-ucla
+2017-09-29 13:01:59,609:INFO:discord: Expire_Channel - Channel Added To Watchlist - raikou-inverted-fountain-of-ucla
+2017-09-29 13:01:59,642:INFO:discord: Expiry_Check - level-5-egg-splits-radiation-1977
+2017-09-29 13:01:59,642:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-5-egg-splits-radiation-1977
+2017-09-29 13:02:14,976:INFO:discord: Expire_Channel - Egg Auto Hatched - level-5-egg-water-side-plaza
+2017-09-29 13:02:15,446:INFO:discord: Expiry_Check - level-5-egg-water-side-plaza
+2017-09-29 13:02:15,447:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-5-egg-water-side-plaza
+2017-09-29 13:05:59,131:INFO:discord: Expire_Channel - Channel Expired And Removed From Watchlist - raikou-marina-knucklebone
+2017-09-29 13:05:59,131:INFO:discord: Expire_Channel - raikou-marina-knucklebone
+2017-09-29 13:05:59,132:INFO:discord: Expire_Channel - Channel Expired - raikou-marina-knucklebone
+2017-09-29 13:05:59,132:INFO:discord: Expiry_Check - raikou-marina-knucklebone
+2017-09-29 13:05:59,132:INFO:discord: Expire_Channel - Channel Added To Watchlist - raikou-marina-knucklebone
+2017-09-29 13:07:00,804:INFO:discord: Expiry_Check - level-5-egg-76-prowash-beach-mural
+2017-09-29 13:07:00,805:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-5-egg-76-prowash-beach-mural
+2017-09-29 13:07:01,008:INFO:discord: Expiry_Check - level-5-egg-masonic-square-and-compasses
+2017-09-29 13:07:01,008:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-5-egg-masonic-square-and-compasses
+2017-09-29 13:10:59,177:INFO:discord: Expire_Channel - Channel Deleted - raikou-marina-knucklebone
+2017-09-29 13:11:14,603:INFO:discord: Expire_Channel - Channel Expired And Removed From Watchlist - raikou-odyssey-theater-ensemble
+2017-09-29 13:11:14,603:INFO:discord: Expire_Channel - raikou-odyssey-theater-ensemble
+2017-09-29 13:11:14,603:INFO:discord: Expire_Channel - Channel Expired - raikou-odyssey-theater-ensemble
+2017-09-29 13:11:14,603:INFO:discord: Expiry_Check - raikou-odyssey-theater-ensemble
+2017-09-29 13:11:14,603:INFO:discord: Expire_Channel - Channel Added To Watchlist - raikou-odyssey-theater-ensemble
+2017-09-29 13:12:02,552:INFO:discord: Expiry_Check - level-5-egg-los-angeles-post-office
+2017-09-29 13:12:02,552:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-5-egg-los-angeles-post-office
+2017-09-29 13:12:59,351:INFO:discord: Expire_Channel - Channel Expired And Removed From Watchlist - raikou-meat-market-mural
+2017-09-29 13:12:59,352:INFO:discord: Expire_Channel - raikou-meat-market-mural
+2017-09-29 13:12:59,352:INFO:discord: Expire_Channel - Channel Expired - raikou-meat-market-mural
+2017-09-29 13:12:59,352:INFO:discord: Expiry_Check - raikou-meat-market-mural
+2017-09-29 13:12:59,352:INFO:discord: Expire_Channel - Channel Added To Watchlist - raikou-meat-market-mural
+2017-09-29 13:13:59,031:INFO:discord: Expire_Channel - Channel Deleted - level-5-egg-birds-mural-at-campus-ctr-dr
+2017-09-29 13:16:14,636:INFO:discord: Expire_Channel - Channel Deleted - raikou-odyssey-theater-ensemble
+2017-09-29 13:17:59,367:INFO:discord: Expire_Channel - Channel Deleted - raikou-meat-market-mural
+2017-09-29 13:19:02,527:INFO:discord: Expire_Channel - Channel Expired And Removed From Watchlist - level-5-egg-beauty-in-a-yellow-hat
+2017-09-29 13:19:02,527:INFO:discord: Expire_Channel - level-5-egg-beauty-in-a-yellow-hat
+2017-09-29 13:19:02,527:INFO:discord: Expire_Channel - Channel Expired - level-5-egg-beauty-in-a-yellow-hat
+2017-09-29 13:19:02,861:INFO:discord: Expiry_Check - level-5-egg-beauty-in-a-yellow-hat
+2017-09-29 13:19:02,861:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-5-egg-beauty-in-a-yellow-hat
+2017-09-29 13:20:59,098:INFO:discord: Expire_Channel - Channel Expired And Removed From Watchlist - raikou-penmar-park
+2017-09-29 13:20:59,098:INFO:discord: Expire_Channel - raikou-penmar-park
+2017-09-29 13:20:59,098:INFO:discord: Expire_Channel - Channel Expired - raikou-penmar-park
+2017-09-29 13:20:59,098:INFO:discord: Expiry_Check - raikou-penmar-park
+2017-09-29 13:20:59,098:INFO:discord: Expire_Channel - Channel Added To Watchlist - raikou-penmar-park
+2017-09-29 13:22:04,872:INFO:discord: Expiry_Check - raikou-los-angeles-villa-getty-muse
+2017-09-29 13:22:04,873:INFO:discord: Expire_Channel - Channel Added To Watchlist - raikou-los-angeles-villa-getty-muse
+2017-09-29 13:22:05,054:INFO:discord: Expiry_Check - level-5-egg-george-washington-200th-birthday-plaque
+2017-09-29 13:22:05,054:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-5-egg-george-washington-200th-birthday-plaque
+2017-09-29 13:22:05,111:INFO:discord: Expiry_Check - level-5-egg-marcellus-bowling-green
+2017-09-29 13:22:05,112:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-5-egg-marcellus-bowling-green
+2017-09-29 13:25:59,059:INFO:discord: Expire_Channel - Channel Deleted - raikou-penmar-park
+2017-09-29 13:26:00,900:INFO:discord: Expire_Channel - Channel Expired And Removed From Watchlist - level-5-egg-76-prowash-beach-mural
+2017-09-29 13:26:00,901:INFO:discord: Expire_Channel - level-5-egg-76-prowash-beach-mural
+2017-09-29 13:26:00,901:INFO:discord: Expire_Channel - Channel Expired - level-5-egg-76-prowash-beach-mural
+2017-09-29 13:26:00,982:INFO:discord: Expiry_Check - level-5-egg-76-prowash-beach-mural
+2017-09-29 13:26:00,983:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-5-egg-76-prowash-beach-mural
+2017-09-29 13:26:59,760:INFO:discord: Expire_Channel - Channel Expired And Removed From Watchlist - raikou-inverted-fountain-of-ucla
+2017-09-29 13:26:59,761:INFO:discord: Expire_Channel - raikou-inverted-fountain-of-ucla
+2017-09-29 13:26:59,761:INFO:discord: Expiry_Check - raikou-inverted-fountain-of-ucla
+2017-09-29 13:27:08,395:INFO:discord: Expiry_Check - level-5-egg-f-and-s-fabrics
+2017-09-29 13:27:08,397:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-5-egg-f-and-s-fabrics

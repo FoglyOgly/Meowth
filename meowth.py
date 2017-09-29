@@ -2091,8 +2091,11 @@ Message **!starting** when the raid is beginning to clear the raid's 'here' list
 This channel will be deleted five minutes after the timer expires.""").format(pokemon=entered_raid.capitalize(), location_details=egg_address)
 
     try:
-        egg_report = await Meowth.edit_message(egg_report, new_content=raidreportcontent, embed=raid_embed)
         raid_message = await Meowth.edit_message(raid_message, new_content=raidmsg, embed=raid_embed)
+    except discord.errors.NotFound:
+        pass
+    try:
+        egg_report = await Meowth.edit_message(egg_report, new_content=raidreportcontent, embed=raid_embed)
     except discord.errors.NotFound:
         pass
 

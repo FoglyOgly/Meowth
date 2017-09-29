@@ -23,8 +23,8 @@ from io import BytesIO
 tessdata_dir_config = "--tessdata-dir 'C:\\Program Files (x86)\\Tesseract-OCR\\tessdata' "
 xtraconfig = "-l eng -c tessedit_char_blacklist=&|=+%#^*[]{};<> -psm 6"
 #if on Windows
-tesseract_config = tessdata_dir_config + xtraconfig
-#tesseract_config = xtraconfig
+#tesseract_config = tessdata_dir_config + xtraconfig
+tesseract_config = xtraconfig
 
 
 formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s')

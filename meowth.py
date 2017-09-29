@@ -1195,7 +1195,6 @@ This channel will be deleted five minutes after the timer expires.""").format(po
             'address' : raid_details,
             'type' : 'raid',
             'pokemon' : entered_raid,
-            'eggassume': False,
             'egglevel' : '0'
             }
 
@@ -1888,7 +1887,6 @@ This channel will be deleted in 2 days if an admin doesn't delete it manually be
             'address' : raid_details,
             'type' : 'exraid',
             'pokemon' : entered_raid,
-            'eggassume': False,
             'egglevel' : '0'
             }
 
@@ -2001,7 +1999,6 @@ When this egg raid expires, there will be 15 minutes to update it into an open r
                 'address' : raid_details,
                 'type' : 'egg',
                 'pokemon' : '',
-                'eggassume': False,
                 'egglevel' : egg_level
                 }
 
@@ -2035,7 +2032,6 @@ async def _eggassume(args, raid_channel):
                 return
 
     server_dict[raid_channel.server]['raidchannel_dict'][raid_channel]['pokemon'] = entered_raid
-    server_dict[raid_channel.server]['raidchannel_dict'][raid_channel]['eggassume'] = True
     raidrole = discord.utils.get(raid_channel.server.roles, name = entered_raid)
     await Meowth.send_message(raid_channel, _("Meowth! This egg will be assumed to be {pokemon} when it hatches!").format(pokemon=raidrole.mention))
     return
@@ -2116,7 +2112,6 @@ This channel will be deleted five minutes after the timer expires.""").format(po
     'address' : egg_address,
     'type' : 'raid',
     'pokemon' : entered_raid,
-    'eggassume': False,
     'egglevel' : '0'
     }
 
@@ -2168,7 +2163,7 @@ async def list(ctx):
                     return
 
             elif ctx.message.channel in server_dict[ctx.message.channel.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
-                if server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['type'] == 'egg' and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['eggassume'] == False:
+                if server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['type'] == 'egg' and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['pokemon'] == '':
                     listmsg += await _interest(ctx)
                     listmsg += "\n"
                     listmsg += await print_raid_timer(ctx.message.channel)

@@ -1228,11 +1228,6 @@ async def unwant(ctx):
                 await Meowth.send_message(ctx.message.channel, spellcheck(entered_unwant))
                 return
             else:
-                # Create role if it doesn't exist yet
-                if role is None:
-                    role = await Meowth.create_role(server = ctx.message.server, name = entered_unwant, hoist = False, mentionable = True)
-                    await asyncio.sleep(0.5)
-
                 # If user is not already wanting the Pokemon,
                 # print a less noisy message
                 if role not in ctx.message.author.roles:
@@ -1290,8 +1285,8 @@ async def _timerset(channel, exptime):
 
         try:
             s = exptime * 60
-            if s > 7200:
-                await Meowth.send_message(channel, _("Meowth...that's too long. {raidtype} haven't lasted longer than two hours...").format(raidtype=raidtype))
+            if s >= 3600:
+                await Meowth.send_message(channel, _("Meowth...that's too long. {raidtype} currently last no more than one hour...").format(raidtype=raidtype))
                 return
             if s < 0:
                 await Meowth.send_message(channel, _("Meowth...I can't do that! No negative numbers, please!"))

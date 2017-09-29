@@ -1642,6 +1642,8 @@ async def on_message(message):
                     await Meowth.send_message(message.channel, content = _("Meowth! Someone has suggested a different location for the raid! Trainers {trainer_list}: make sure you are headed to the right place!").format(trainer_list=", ".join(otw_list)), embed = newembed)
                     return
 
+    messagelist = message.content.split(" ")
+    message.content = messagelist.pop(0).lower() + " " + " ".join(messagelist)
     await Meowth.process_commands(message)
 
 @Meowth.command(pass_context=True)

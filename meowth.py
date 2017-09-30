@@ -380,7 +380,7 @@ async def channel_cleanup(loop=True):
                     #if the channel save data shows it's not an active raid
                     if serverdict_chtemp[server]['raidchannel_dict'][channel]['active'] == False:
 
-                        if serverdict_chtemp[server]['raidchannel_dict'][channel]['type'] != 'egg':
+                        if serverdict_chtemp[server]['raidchannel_dict'][channel]['type'] == 'egg':
 
                             #and if it has been expired for longer than 5 minutes already
                             if serverdict_chtemp[server]['raidchannel_dict'][channel]['exp'] < (time.time() - (15 * 60)):
@@ -392,7 +392,7 @@ async def channel_cleanup(loop=True):
                                 discord_channel_delete.append(channel)
 
                                 logger.info(log_str+" - 15+ MIN EXPIRY NONACTIVE EGG")
-
+                                continue
                         else:
                                 
                             #and if it has been expired for longer than 5 minutes already
@@ -406,6 +406,7 @@ async def channel_cleanup(loop=True):
 
                                 logger.info(log_str+" - 5+ MIN EXPIRY NONACTIVE RAID")
 
+                                continue
                     #if the channel save data shows it as an active raid still
                     elif serverdict_chtemp[server]['raidchannel_dict'][channel]['active'] == True:
                     
@@ -436,6 +437,7 @@ async def channel_cleanup(loop=True):
 
                             logger.info(log_str+" - 5+ MIN EXPIRY ACTIVE")
 
+                            continue
                         #or if the expiry time for the channel has already passed within 5 minutes
                         elif serverdict_chtemp[server]['raidchannel_dict'][channel]['exp'] <= time.time():
 
@@ -447,12 +449,14 @@ async def channel_cleanup(loop=True):
 
                             logger.info(log_str+" - RECENTLY EXPIRED")
 
+                            continue
                         else:
                             #if channel is still active, make sure it's expiry is being monitored
                             if channel not in active_raids:
                                 event_loop.create_task(expiry_check(channel))
                                 logger.info(log_str+" - MISSING FROM EXPIRY CHECK")
 
+                                continue
             #for every channel listed to have save data deleted
             for c in dict_channel_delete:
                 try:

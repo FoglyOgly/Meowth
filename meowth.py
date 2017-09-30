@@ -1236,6 +1236,9 @@ This channel will be deleted five minutes after the timer expires.""").format(po
             'pokemon' : entered_raid,
             'egglevel' : '0'
             }
+        raidtime = re.search('[01]:[0-5][0-9]', raid_details)
+        if raidtime:
+            await Meowth.send_message(raid_channel, "!timerset {0}".format(raidtime.group(0)))
 
         if raidexp:
             await _timerset(raid_channel,raidexp)

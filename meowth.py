@@ -589,9 +589,9 @@ async def on_ready():
     msg_success = 0
     msg_fail = 0
     servers = len(Meowth.servers)
-    
+    users = 0
     for server in Meowth.servers:
-        
+        users += len(server.members)
         try:
             if server not in server_dict:
                 server_dict[server] = {'want_channel_list': [], 'offset': 0, 'welcome': False, 'team': False, 'want': False, 'other': False, 'done': False, 'raidchannel_dict' : {}}
@@ -607,7 +607,7 @@ async def on_ready():
     
     if REBOOT:
         print(_("Reboot messages sent: {success_count} successful, {fail_count} failed.\n").format(success_count=msg_success,fail_count=msg_fail))
-    print(_("Meowth! That's right!\n\n{server_count} servers connected.").format(server_count=servers))
+    print(_("Meowth! That's right!\n\n{server_count} servers connected.\n{member_count} members found.").format(server_count=servers,member_count=users))
     await maint_start()
 
 

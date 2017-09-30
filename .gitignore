@@ -1,6 +1,5 @@
 
 *.bat
 config.json
-logs\meowth.log
 serverdict
 serverdict_backup

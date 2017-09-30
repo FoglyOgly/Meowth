@@ -1,4 +1,5 @@
 import os
+import sys
 import tempfile
 import asyncio
 import gettext
@@ -567,7 +568,9 @@ We have made some changes to the server to make things easier with tracking bugs
 Feel free to take a look!
 
 **Reconfigure shouldn't be necessary for this update.**"""
-        await Meowth.send_message(server.owner, reboot_msg)
+        if 'reboot' in sys.argv[1:]:
+            print("Reboot Message Sent")
+            await Meowth.send_message(server.owner, reboot_msg)
         try:
             if server not in server_dict:
                 server_dict[server] = {'want_channel_list': [], 'offset': 0, 'welcome': False, 'team': False, 'want': False, 'other': False, 'done': False, 'raidchannel_dict' : {}}

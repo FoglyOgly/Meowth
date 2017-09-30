@@ -23,8 +23,8 @@ tessdata_dir_config = "--tessdata-dir 'C:\\Program Files (x86)\\Tesseract-OCR\\t
 xtraconfig = "-l eng -c tessedit_char_blacklist=&|=+%#^*[]{};<> -psm 6"
 
 #if on Windows
-#tesseract_config = tessdata_dir_config + xtraconfig
-tesseract_config = xtraconfig
+tesseract_config = tessdata_dir_config + xtraconfig
+#tesseract_config = xtraconfig
 
 
 formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s')
@@ -1126,6 +1126,10 @@ async def _raid(message):
         if args_split[-1].isdigit():
             raidexp = args_split[-1]
             del args_split[-1]
+        elif ":" in args_split[-1]:
+            args_split[-1] = re.sub(r"[a-zA-Z]", "", args_split[-1])
+            raidexp = 60 * int(args_split[-1].split(":")[0]) + int(args_split[-1].split(":")[1])
+            del args_split[-1]
         else:
             raidexp = False
 
@@ -1214,30 +1218,29 @@ async def unwant(ctx):
     the server role for the Pokemon species."""
 
     if server_dict[ctx.message.server]['wantset'] == True:
-        entered_unwant = ctx.message.content[8:].lower()
-        role = discord.utils.get(ctx.message.server.roles, name=entered_unwant)
-        if entered_unwant not in pkmn_info['pokemon_list']:
-            await Meowth.send_message(ctx.message.channel, spellcheck(entered_unwant))
+        if server_dict[ctx.message.server]['want_channel_list'] and ctx.message.channel not in server_dict[ctx.message.server]['want_channel_list']:
+            await Meowth.send_message(ctx.message.channel, _("Meowth! Please use one of the following channels for **!unwant** commands: {want_channel_list}").format(want_channel_list=", ".join(i.mention for i in server_dict[ctx.message.server]['want_channel_list'])))
             return
         else:
-            # Create role if it doesn't exist yet
-            if role is None:
-                role = await Meowth.create_role(server = ctx.message.server, name = entered_unwant, hoist = False, mentionable = True)
-                await asyncio.sleep(0.5)
-
-            # If user is not already wanting the Pokemon,
-            # print a less noisy message
-            if role not in ctx.message.author.roles:
-                await Meowth.add_reaction(ctx.message, '✅')
-                #await Meowth.send_message(ctx.message.channel, content=_("Meowth! {member}, I already know you don't want {pokemon}!").format(member=ctx.message.author.mention, pokemon=entered_unwant.capitalize()))
+            entered_unwant = ctx.message.content[8:].lower()
+            role = discord.utils.get(ctx.message.server.roles, name=entered_unwant)
+            if entered_unwant not in pkmn_info['pokemon_list']:
+                await Meowth.send_message(ctx.message.channel, spellcheck(entered_unwant))
+                return
             else:
-                await Meowth.remove_roles(ctx.message.author, role)
-                unwant_number = pkmn_info['pokemon_list'].index(entered_unwant) + 1
-                await Meowth.add_reaction(ctx.message, '✅')
-                #unwant_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(unwant_number))
-                #unwant_embed = discord.Embed(colour=discord.Colour(0x2ecc71))
-                #unwant_embed.set_thumbnail(url=unwant_img_url)
-                #await Meowth.send_message(ctx.message.channel, content=_("Meowth! Got it! {member} no longer wants {pokemon}").format(member=ctx.message.author.mention, pokemon=entered_unwant.capitalize()),embed=unwant_embed)
+                # If user is not already wanting the Pokemon,
+                # print a less noisy message
+                if role not in ctx.message.author.roles:
+                    await Meowth.add_reaction(ctx.message, '✅')
+                    #await Meowth.send_message(ctx.message.channel, content=_("Meowth! {member}, I already know you don't want {pokemon}!").format(member=ctx.message.author.mention, pokemon=entered_unwant.capitalize()))
+                else:
+                    await Meowth.remove_roles(ctx.message.author, role)
+                    unwant_number = pkmn_info['pokemon_list'].index(entered_unwant) + 1
+                    await Meowth.add_reaction(ctx.message, '✅')
+                    #unwant_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(unwant_number))
+                    #unwant_embed = discord.Embed(colour=discord.Colour(0x2ecc71))
+                    #unwant_embed.set_thumbnail(url=unwant_img_url)
+                    #await Meowth.send_message(ctx.message.channel, content=_("Meowth! Got it! {member} no longer wants {pokemon}").format(member=ctx.message.author.mention, pokemon=entered_unwant.capitalize()),embed=unwant_embed)
 
 # Print raid timer
 async def print_raid_timer(channel):
@@ -1315,9 +1318,13 @@ async def timerset(ctx):
     Usage: !timerset <minutes>
     Works only in raid channels, can be set or overridden by anyone.
     Meowth displays the end time in HH:MM local time."""
+
     args = ctx.message.content.lstrip("!timerset ")
     exptime = args
-    if exptime.isdigit():
+    if ":" in args:
+        args = re.sub(r"[a-zA-Z]", "", args)
+        exptime = 60 * int(args.split(":")[0]) + int(args.split(":")[1])
+    if str(exptime).isdigit():
         await _timerset(ctx.message.channel, exptime)
     else:
         await Meowth.send_message(ctx.message.channel, _("Meowth... I couldn't understand your time format. Try again like this: !timerset <minutes>"))
@@ -1420,7 +1427,7 @@ async def interested(ctx):
             # by trying to convert each word to integer
             count = None
             duplicate = False
-            for word in ctx.message.content[7:].split():
+            for word in ctx.message.content[12:].split():
                 try:
                     newcount = int(word)
                     if not count:
@@ -1635,6 +1642,8 @@ async def on_message(message):
                     await Meowth.send_message(message.channel, content = _("Meowth! Someone has suggested a different location for the raid! Trainers {trainer_list}: make sure you are headed to the right place!").format(trainer_list=", ".join(otw_list)), embed = newembed)
                     return
 
+    messagelist = message.content.split(" ")
+    message.content = messagelist.pop(0).lower() + " " + " ".join(messagelist)
     await Meowth.process_commands(message)
 
 @Meowth.command(pass_context=True)
@@ -1921,6 +1930,10 @@ async def _raidegg(message):
         if args_split[-1].isdigit():
             raidexp = args_split[-1]
             del args_split[-1]
+        elif ":" in args_split[-1]:
+            args_split[-1] = re.sub(r"[a-zA-Z]", "", args_split[-1])
+            raidexp = 60 * int(args_split[-1].split(":")[0]) + int(args_split[-1].split(":")[1])
+            del args_split[-1]
         else:
             raidexp = False
 
@@ -2016,7 +2029,8 @@ async def _eggassume(args, raid_channel):
                 return
 
     server_dict[raid_channel.server]['raidchannel_dict'][raid_channel]['pokemon'] = entered_raid
-    await Meowth.send_message(raid_channel, _("Meowth! This egg will be assumed to be {pokemon} when it hatches!").format(pokemon=entered_raid.capitalize()))
+    raidrole = discord.utils.get(raid_channel.server.roles, name = entered_raid)
+    await Meowth.send_message(raid_channel, _("Meowth! This egg will be assumed to be {pokemon} when it hatches!").format(pokemon=raidrole.mention))
     return
 
 async def _eggtoraid(entered_raid, raid_channel):
@@ -2078,8 +2092,14 @@ Message **!starting** when the raid is beginning to clear the raid's 'here' list
 
 This channel will be deleted five minutes after the timer expires.""").format(pokemon=entered_raid.capitalize(), location_details=egg_address)
 
-    raid_message = await Meowth.edit_message(raid_message, new_content=raidmsg, embed=raid_embed)
-    egg_report = await Meowth.edit_message(egg_report, new_content=raidreportcontent, embed=raid_embed)
+    try:
+        raid_message = await Meowth.edit_message(raid_message, new_content=raidmsg, embed=raid_embed)
+    except discord.errors.NotFound:
+        pass
+    try:
+        egg_report = await Meowth.edit_message(egg_report, new_content=raidreportcontent, embed=raid_embed)
+    except discord.errors.NotFound:
+        pass
 
     server_dict[raid_channel.server]['raidchannel_dict'][raid_channel] = {
     'reportcity' : reportcity,
@@ -2143,7 +2163,7 @@ async def list(ctx):
                     return
 
             elif ctx.message.channel in server_dict[ctx.message.channel.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
-                if server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['type'] == 'egg':
+                if server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['type'] == 'egg' and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['pokemon'] == '':
                     listmsg += await _interest(ctx)
                     listmsg += "\n"
                     listmsg += await print_raid_timer(ctx.message.channel)
@@ -2274,56 +2294,56 @@ async def maybe(ctx):
 @Meowth.command(pass_context=True)
 async def invite(ctx):
     if ctx.message.attachments:
-            if 'https://cdn.discordapp.com' in ctx.message.attachments[0]['url']:
-                if 'png' in ctx.message.attachments[0]['url'] or 'jpg' in ctx.message.attachments[0]['url']:
-                    fd = requests.get(ctx.message.attachments[0]['url'])
-                    img = Image.open(BytesIO(fd.content))
-                    width, height = img.size
-                    new_height = 3500
-                    new_width  = int(new_height * width / height)
-                    img = img.resize((new_width, new_height), Image.BICUBIC)
-                    img = img.filter(ImageFilter.EDGE_ENHANCE)
-                    enh = ImageEnhance.Brightness(img)
-                    img = enh.enhance(0.4)
-                    enh = ImageEnhance.Contrast(img)
-                    img = enh.enhance(4)
-                    txt = pytesseract.image_to_string(img, config=tesseract_config)
-                    if 'EX Raid Battle' in txt:
-                        exraidlist = ''
-                        exraid_dict = {}
-                        exraidcount = 0
-                        for channel in server_dict[ctx.message.server]['raidchannel_dict']:
-                            if not discord.utils.get(ctx.message.server.channels, id = channel.id):
-                                continue
-                            if server_dict[ctx.message.server]['raidchannel_dict'][channel]['type'] == 'exraid':
-                                if channel.mention != '#deleted-channel':
-                                    exraidcount += 1
-                                    exraidlist += '\n' + str(exraidcount) + '.   ' + channel.mention
-                                    exraid_dict[str(exraidcount)] = channel
-                        if exraidcount > 0:
-                            await Meowth.send_message(ctx.message.channel, "Meowth! {0}, it looks like you've got an EX Raid invitation! The following {1} EX Raids have been reported: \n {2} \n Reply with the number of the EX Raid you have been invited to. If none of them match your invite, type 'N' and report it with !exraid".format(ctx.message.author.mention, str(exraidcount), exraidlist))
-                            reply = await Meowth.wait_for_message(author=ctx.message.author)
-                            if reply.content == 'N' or reply.content == 'n':
-                                await Meowth.send_message(ctx.message.channel, "Meowth! Be sure to report your EX Raid with `!exraid`!")
-                            elif not int(reply.content) or int(reply.content) > exraidcount:
-                                await Meowth.send_message(ctx.message.channel, "Meowth! I couldn't tell which EX Raid you meant! Try the `!invite` command again, and make sure you respond with the number of the channel that matches!")
-                            elif int(reply.content) <= exraidcount and int(reply.content) > 0:
-                                overwrite = discord.PermissionOverwrite()
-                                overwrite.send_messages = True
-                                overwrite.read_messages = True
-                                exraid_channel = exraid_dict[str(int(reply.content))]
-                                await Meowth.edit_channel_permissions(exraid_channel, ctx.message.author, overwrite)
-                                await Meowth.send_message(ctx.message.channel, "Meowth! Alright {0}, you can now send messages in {1}! Make sure you let the trainers in there know if you can make it to the EX Raid!".format(ctx.message.author.mention, exraid_channel.mention))
-                            else:
-                                await Meowth.send_message(ctx.message.channel, "Meowth! I couldn't understand your reply! Try the `!invite` command again!")
+        if 'https://cdn.discordapp.com' in ctx.message.attachments[0]['url']:
+            if 'png' in ctx.message.attachments[0]['url'].lower() or 'jpg' in ctx.message.attachments[0]['url'].lower():
+                fd = requests.get(ctx.message.attachments[0]['url'])
+                img = Image.open(BytesIO(fd.content))
+                width, height = img.size
+                new_height = 3500
+                new_width  = int(new_height * width / height)
+                img = img.resize((new_width, new_height), Image.BICUBIC)
+                img = img.filter(ImageFilter.EDGE_ENHANCE)
+                enh = ImageEnhance.Brightness(img)
+                img = enh.enhance(0.4)
+                enh = ImageEnhance.Contrast(img)
+                img = enh.enhance(4)
+                txt = pytesseract.image_to_string(img, config=tesseract_config)
+                if 'EX Raid Battle' or "This is a reward" or "Please visit the Gym" in txt:
+                    exraidlist = ''
+                    exraid_dict = {}
+                    exraidcount = 0
+                    for channel in server_dict[ctx.message.server]['raidchannel_dict']:
+                        if not discord.utils.get(ctx.message.server.channels, id = channel.id):
+                            continue
+                        if server_dict[ctx.message.server]['raidchannel_dict'][channel]['type'] == 'exraid':
+                            if channel.mention != '#deleted-channel':
+                                exraidcount += 1
+                                exraidlist += '\n' + str(exraidcount) + '.   ' + channel.mention
+                                exraid_dict[str(exraidcount)] = channel
+                    if exraidcount > 0:
+                        await Meowth.send_message(ctx.message.channel, "Meowth! {0}, it looks like you've got an EX Raid invitation! The following {1} EX Raids have been reported: \n {2} \n Reply with the number of the EX Raid you have been invited to. If none of them match your invite, type 'N' and report it with !exraid".format(ctx.message.author.mention, str(exraidcount), exraidlist))
+                        reply = await Meowth.wait_for_message(author=ctx.message.author)
+                        if reply.content.lower() == 'n':
+                            await Meowth.send_message(ctx.message.channel, "Meowth! Be sure to report your EX Raid with `!exraid`!")
+                        elif not reply.content.isdigit() or int(reply.content) > exraidcount:
+                            await Meowth.send_message(ctx.message.channel, "Meowth! I couldn't tell which EX Raid you meant! Try the `!invite` command again, and make sure you respond with the number of the channel that matches!")
+                        elif int(reply.content) <= exraidcount and int(reply.content) > 0:
+                            overwrite = discord.PermissionOverwrite()
+                            overwrite.send_messages = True
+                            overwrite.read_messages = True
+                            exraid_channel = exraid_dict[str(int(reply.content))]
+                            await Meowth.edit_channel_permissions(exraid_channel, ctx.message.author, overwrite)
+                            await Meowth.send_message(ctx.message.channel, "Meowth! Alright {0}, you can now send messages in {1}! Make sure you let the trainers in there know if you can make it to the EX Raid!".format(ctx.message.author.mention, exraid_channel.mention))
                         else:
-                            await Meowth.send_message(ctx.message.channel, "Meowth! No EX Raids have been reported in this server! Use `!exraid` to report one!")
+                            await Meowth.send_message(ctx.message.channel, "Meowth! I couldn't understand your reply! Try the `!invite` command again!")
                     else:
-                        await Meowth.send_message(ctx.message.channel, "Meowth! That doesn't look like an EX Raid invitation to me! If it is, please message an admin to get added to the EX Raid channel manually!")
+                        await Meowth.send_message(ctx.message.channel, "Meowth! No EX Raids have been reported in this server! Use `!exraid` to report one!")
                 else:
-                    await Meowth.send_message(ctx.message.channel, "Meowth! Your attachment was not a supported image format!")
+                    await Meowth.send_message(ctx.message.channel, "Meowth! That doesn't look like an EX Raid invitation to me! If it is, please message an admin to get added to the EX Raid channel manually!")
             else:
-                await Meowth.send_message(ctx.message.channel, "Meowth! Please upload your screenshot directly to Discord!")
+                await Meowth.send_message(ctx.message.channel, "Meowth! Your attachment was not a supported image format!")
+        else:
+            await Meowth.send_message(ctx.message.channel, "Meowth! Please upload your screenshot directly to Discord!")
     else:
         await Meowth.send_message(ctx.message.channel, "Meowth! You need to attach a screenshot of your invite to the message!")
 

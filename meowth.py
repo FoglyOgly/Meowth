@@ -361,7 +361,7 @@ async def channel_cleanup(loop=True):
 
             #check every raid channel data for each server
             for channel in serverdict_chtemp[server]['raidchannel_dict']:
-
+                log_str = "Channel_Cleanup - Server: "+server.name
                 log_str = log_str+": Channel:"+channel.name
                 logger.info(log_str+" - CHECKING")
 
@@ -395,18 +395,6 @@ async def channel_cleanup(loop=True):
                                 logger.info(log_str+" - 15+ MIN EXPIRY NONACTIVE EGG")
 
                         else:
-                            
-                            #if it's an exraid
-                            if serverdict_chtemp[server]['raidchannel_dict'][channel]['type'] is 'exraid':
-                                
-                                #check if it's expiry is not None
-                                if serverdict_chtemp[server]['raidchannel_dict'][channel]['exp'] is not None:
-                                    
-                                    #if so, set it to None (converting old exraid channels to new ones to prevent expiry)
-                                    try:
-                                        server_dict[server]['raidchannel_dict'][channel]['exp'] = None
-                                    except:
-                                        pass
                                 
                             #and if it has been expired for longer than 5 minutes already
                             if serverdict_chtemp[server]['raidchannel_dict'][channel]['exp'] < (time.time() - (5 * 60)):
@@ -421,9 +409,25 @@ async def channel_cleanup(loop=True):
 
                     #if the channel save data shows it as an active raid still
                     elif serverdict_chtemp[server]['raidchannel_dict'][channel]['active'] == True:
-
+                    
+                        #if it's an exraid
+                        if serverdict_chtemp[server]['raidchannel_dict'][channel]['type'] == 'exraid':
+                            
+                            #check if it's expiry is not None
+                            if serverdict_chtemp[server]['raidchannel_dict'][channel]['exp'] is not None:
+                                
+                                #if so, set it to None (converting old exraid channels to new ones to prevent expiry)
+                                try:
+                                    server_dict[server]['raidchannel_dict'][channel]['exp'] = None
+                                    logger.info(log_str+" - EXRAID - CONVERTED TO EXPIRY None")
+                                except:
+                                    pass
+                                    
+                            logger.info(log_str+" - EXRAID")
+                            continue
+                        
                         #and if it has been expired for longer than 5 minutes already
-                        if serverdict_chtemp[server]['raidchannel_dict'][channel]['exp'] < (time.time() - (5 * 60)):
+                        elif serverdict_chtemp[server]['raidchannel_dict'][channel]['exp'] < (time.time() - (5 * 60)):
 
                             #list the channel to be removed from save data
                             dict_channel_delete.append(channel)
@@ -447,10 +451,8 @@ async def channel_cleanup(loop=True):
                         else:
                             #if channel is still active, make sure it's expiry is being monitored
                             if channel not in active_raids:
-                                await expiry_check(channel)
+                                event_loop.create_task(expiry_check(channel))
                                 logger.info(log_str+" - MISSING FROM EXPIRY CHECK")
-
-                log_str = "Channel_Cleanup - Server: "+server.name
 
             #for every channel listed to have save data deleted
             for c in dict_channel_delete:
@@ -568,21 +570,20 @@ async def on_ready():
     reboot_msg = """**Meowth! That's right! I've been updated!**
 
 **Changes:**
-    - Raid eggs show !coming and !here output when !list is used.
+    - Raid eggs show !coming and !here when !list is used.
     - Old timer formats no longer break map links, and instead are accepted and parsed as valid times.
-    - !exraids no longer expire.
-    - !exraid no longer mentions !timer or !timerset usage in the top raid channel message.
-    - !duplicate fixed and updated to allow members with manage_channel permission to skip the 3-stage reporting.
-    - !duplicate now removes original raid report message on channel deletion.
-    - Raid channel names on conversion from eggs now only replace the 'level-x-egg', leaving the rest as-is even if edited manually.
-    - General housekeeping and fixes
-
-For help, feedback or suggestions head over to the Meowth server (invite code: hhVjAN8)
-
-We have made some changes to the server to make things easier with tracking bugs and proposed features or changes.
-#known-issues now has a list of all bugs with a simple to understand status.
-#request-list is a new channel that contains a shortlist of all considered feature proposals, and each of their details showing Pros/Cons, possible solutions and reactions to vote on what solution would best suit users.
-Feel free to take a look!
+    - EXraids no longer expire. 
+        - Existing EXraids will convert to no-expiry only if they're still active and have not expired yet.
+    - Shortcut commands for raid status updates are introduced:
+        - **!i** for !interested
+        - **!c** for !coming
+        - **!h** for !here
+    - EXraids invite checks should now work a bit better.
+    - Commands are no longer case sensitive (arguments still are). i.e. **!team mystic** = **!Team mystic** and **!TEAM mystic**, but not **!TEAM MYSTIC**
+    - Channel maintenance has been fixed up, so raid channels shouldn't stop working after reboots.
+        - If channels still don't get picked up after reboot, please let us know in detail on our server in #hosted-help. Provide both your server name and the channel name so we can look into it.
+    - These update messages should be reaching most server owners also now. We fixed a bug that was breaking Meowth from sending it to everyone.
+    - General housekeeping, spelling correction and bug fixes
 
 **Reconfigure shouldn't be necessary for this update.**"""
 
@@ -1303,12 +1304,6 @@ async def _timerset(channel, exptime):
     exptime = int(exptime)
     # Meowth saves the timer message in the channel's 'exp' field.
     if channel in server_dict[channel.server]['raidchannel_dict']:
-        try:
-            if server_dict[channel.server]['raidchannel_dict'][channel]['exraid'] == True:
-                await Meowth.send_message(channel, _("Timerset isn't supported for exraids. Please get a mod/admin to remove the channel if channel needs to be removed."))
-                return
-        except KeyError:
-            pass
 
         ticks = time.time()
 
@@ -1343,7 +1338,7 @@ async def _timerset(channel, exptime):
         timerstr = await print_raid_timer(channel)
         await Meowth.send_message(channel, timerstr)
         # Trigger expiry checking
-        await expiry_check(channel)
+        event_loop.create_task(expiry_check(channel))
 
 @Meowth.command(pass_context=True)
 async def timerset(ctx):
@@ -1352,16 +1347,22 @@ async def timerset(ctx):
     Usage: !timerset <minutes>
     Works only in raid channels, can be set or overridden by anyone.
     Meowth displays the end time in HH:MM local time."""
-
-    args = ctx.message.content.lstrip("!timerset ")
-    exptime = args
-    if ":" in args:
-        args = re.sub(r"[a-zA-Z]", "", args)
-        exptime = 60 * int(args.split(":")[0]) + int(args.split(":")[1])
-    if str(exptime).isdigit():
-        await _timerset(ctx.message.channel, exptime)
-    else:
-        await Meowth.send_message(ctx.message.channel, _("Meowth... I couldn't understand your time format. Try again like this: !timerset <minutes>"))
+    if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict']:
+        try:
+            if server_dict[ctx.message.channel.server]['raidchannel_dict'][ctx.message.channel]['type'] == 'exraid':
+                await Meowth.send_message(ctx.message.channel, _("Timerset isn't supported for exraids. Please get a mod/admin to remove the channel if channel needs to be removed."))
+                return
+        except KeyError:
+            pass
+        args = ctx.message.content.lstrip("!timerset ")
+        exptime = args
+        if ":" in args:
+            args = re.sub(r"[a-zA-Z]", "", args)
+            exptime = 60 * int(args.split(":")[0]) + int(args.split(":")[1])
+        if str(exptime).isdigit():
+            await _timerset(ctx.message.channel, exptime)
+        else:
+            await Meowth.send_message(ctx.message.channel, _("Meowth... I couldn't understand your time format. Try again like this: !timerset <minutes>"))
 
 @Meowth.command(pass_context=True)
 async def timer(ctx):
@@ -1370,14 +1371,12 @@ async def timer(ctx):
     Usage: !timer
     The expiry time should have been previously set with !timerset."""
     if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict']:
-        try:
-            if server_dict[channel.server]['raidchannel_dict'][channel]['exraid'] == True:
-                await Meowth.send_message(ctx.message.channel, _("Exraids don't expire. Please get a mod/admin to remove the channel if channel needs to be removed."))
-                return
-        except KeyError:
-            pass
-        timerstr = await print_raid_timer(ctx.message.channel)
-        await Meowth.send_message(ctx.message.channel, timerstr)
+        if server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['type'] == 'exraid':
+            await Meowth.send_message(ctx.message.channel, _("Exraids don't expire. Please get a mod/admin to remove the channel if channel needs to be removed."))
+            return
+        else:
+            timerstr = await print_raid_timer(ctx.message.channel)
+            await Meowth.send_message(ctx.message.channel, timerstr)
 
 """
 Behind-the-scenes functions for raid management.
@@ -2124,47 +2123,53 @@ async def list(ctx):
     the raid timer. In city channels, lists all active raids."""
 
     if ctx.invoked_subcommand is None:
-        activeraidnum = 0
-        listmsg = ""
-        if server_dict[ctx.message.server]['raidset'] == True:
-            if ctx.message.channel.name in server_dict[ctx.message.server]['city_channels'].keys():
-                listmsg += (_("Current Raids for {0}:").format(ctx.message.channel.name.capitalize()))
-                for activeraid in server_dict[ctx.message.server]['raidchannel_dict']:
-                    ctx_waitingcount = 0
-                    ctx_omwcount = 0
-                    ctx_maybecount = 0
-                    for trainer in server_dict[ctx.message.server]['raidchannel_dict'][activeraid]['trainer_dict'].values():
-                        if trainer['status'] == "waiting":
-                            ctx_waitingcount += trainer['count']
-                        elif trainer['status'] == "omw":
-                            ctx_omwcount += trainer['count']
-                        elif trainer['status'] == "maybe":
-                            ctx_maybecount += trainer['count']
-                    localexpire = time.gmtime(server_dict[ctx.message.channel.server]['raidchannel_dict'][activeraid]['exp'] + 3600 * server_dict[ctx.message.channel.server]['offset'])
-                    if server_dict[ctx.message.server]['raidchannel_dict'][activeraid]['manual_timer'] == False:
-                        assumed_str = " (assumed)"
+        if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] or ctx.message.channel.name in server_dict[ctx.message.server]['city_channels'].keys():
+            activeraidnum = 0
+            listmsg = ""
+            if server_dict[ctx.message.server]['raidset'] == True:
+                if ctx.message.channel.name in server_dict[ctx.message.server]['city_channels'].keys():
+                    listmsg += (_("Current Raids for {0}:").format(ctx.message.channel.name.capitalize()))
+                    for activeraid in server_dict[ctx.message.server]['raidchannel_dict']:
+                        ctx_waitingcount = 0
+                        ctx_omwcount = 0
+                        ctx_maybecount = 0
+                        for trainer in server_dict[ctx.message.server]['raidchannel_dict'][activeraid]['trainer_dict'].values():
+                            if trainer['status'] == "waiting":
+                                ctx_waitingcount += trainer['count']
+                            elif trainer['status'] == "omw":
+                                ctx_omwcount += trainer['count']
+                            elif trainer['status'] == "maybe":
+                                ctx_maybecount += trainer['count']
+                        if server_dict[ctx.message.channel.server]['raidchannel_dict'][activeraid]['type'] == 'exraid':
+                            localexpire = "No expiry"
+                            assumed_str = " (EXraid)"
+                        else:
+                            localexpire = strftime("%I:%M", time.gmtime(server_dict[ctx.message.channel.server]['raidchannel_dict'][activeraid]['exp'] + 3600 * server_dict[ctx.message.channel.server]['offset']))
+                            if server_dict[ctx.message.server]['raidchannel_dict'][activeraid]['manual_timer'] == False:
+                                assumed_str = " (assumed)"
+                            else:
+                                assumed_str = ""
+                        if server_dict[ctx.message.server]['raidchannel_dict'][activeraid]['reportcity'] == ctx.message.channel.name and server_dict[ctx.message.server]['raidchannel_dict'][activeraid]['active'] and discord.utils.get(ctx.message.channel.server.channels, id=activeraid.id):
+                            listmsg += (_("\n{raidchannel} - {interestcount} interested, {comingcount} coming, {herecount} here. End time: {expiry}{manualtimer}").format(raidchannel=activeraid.mention, interestcount=ctx_maybecount, comingcount=ctx_omwcount, herecount=ctx_waitingcount, expiry=localexpire, manualtimer=assumed_str))
+                            activeraidnum += 1
+                    if activeraidnum == 0:
+                        await Meowth.send_message(ctx.message.channel, _("Meowth! No active raids! Report one with **!raid <name> <location>**."))
+                        return
+
+                elif ctx.message.channel in server_dict[ctx.message.channel.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
+                    if server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['type'] == 'egg' and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['pokemon'] == '':
+                        listmsg += await _interest(ctx)
+                        listmsg += "\n"
+                        listmsg += await print_raid_timer(ctx.message.channel)
+
                     else:
-                        assumed_str = ""
-                    if server_dict[ctx.message.server]['raidchannel_dict'][activeraid]['reportcity'] == ctx.message.channel.name and server_dict[ctx.message.server]['raidchannel_dict'][activeraid]['active'] and discord.utils.get(ctx.message.channel.server.channels, id=activeraid.id):
-                        listmsg += (_("\n{raidchannel} - {interestcount} interested, {comingcount} coming, {herecount} here. End time: {expiry}{manualtimer}").format(raidchannel=activeraid.mention, interestcount=ctx_maybecount, comingcount=ctx_omwcount, herecount=ctx_waitingcount, expiry=strftime("%I:%M", localexpire), manualtimer=assumed_str))
-                        activeraidnum += 1
-                if activeraidnum == 0:
-                    await Meowth.send_message(ctx.message.channel, _("Meowth! No active raids! Report one with **!raid <name> <location>**."))
-                    return
+                        listmsg += await _interest(ctx)
+                        listmsg += "\n" + await _otw(ctx)
+                        listmsg += "\n" + await _waiting(ctx)
+                        if server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['type'] != 'exraid':
+                            listmsg += "\n" + await print_raid_timer(ctx.message.channel)
 
-            elif ctx.message.channel in server_dict[ctx.message.channel.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
-                if server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['type'] == 'egg' and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['pokemon'] == '':
-                    listmsg += await _interest(ctx)
-                    listmsg += "\n"
-                    listmsg += await print_raid_timer(ctx.message.channel)
-
-                else:
-                    listmsg += await _interest(ctx)
-                    listmsg += "\n" + await _otw(ctx)
-                    listmsg += "\n" + await _waiting(ctx)
-                    listmsg += "\n" + await print_raid_timer(ctx.message.channel)
-
-        await Meowth.send_message(ctx.message.channel, listmsg)
+            await Meowth.send_message(ctx.message.channel, listmsg)
 
 @list.command(pass_context=True)
 async def interested(ctx):

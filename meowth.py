@@ -188,7 +188,6 @@ def sanitize_channel_name(name):
     ret = re.sub(r"[^a-zA-Z0-9 _\-]", "", name)
     # Replace spaces with dashes
     ret = ret.replace(" ", "-")
-
     return ret
 
 # Given a string, if it fits the pattern :emoji name:,
@@ -1139,7 +1138,7 @@ async def _raid(message):
             else:
                 await Meowth.send_message(message.channel, _("Meowth! Please restrict raid reports to a city channel!"))
                 return
-        args = message.content.lstrip("!raid")
+        args = message.clean_content.lstrip("!raid")
         args_split = args.split(" ")
         del args_split[0]
         if fromegg is True:
@@ -1156,7 +1155,7 @@ async def _raid(message):
         elif len(args_split) <= 1:
             await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**"))
             return
-        entered_raid = args_split[0].lower()
+        entered_raid = re.sub("[\@]", "", args_split[0].lower())
         del args_split[0]
         if args_split[-1].isdigit():
             raidexp = args_split[-1]
@@ -1802,13 +1801,13 @@ async def _exraid(message):
         if message.channel.name not in server_dict[message.server]['city_channels'].keys():
             await Meowth.send_message(message.channel, _("Meowth! Please restrict raid reports to a city channel!"))
             return
-        args = message.content.lstrip("!exraid")
+        args = message.clean_content.lstrip("!exraid")
         args_split = args.split(" ")
         del args_split[0]
         if len(args_split) <= 1:
             await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!exraid <pokemon name> <location>**"))
             return
-        entered_raid = args_split[0].lower()
+        entered_raid = re.sub("[\@]", "", args_split[0].lower())
         del args_split[0]
         if entered_raid not in pkmn_info['pokemon_list']:
             await Meowth.send_message(message.channel, spellcheck(entered_raid))
@@ -1902,7 +1901,7 @@ async def _raidegg(message):
         if message.channel.name not in server_dict[message.server]['city_channels'].keys():
             await Meowth.send_message(message.channel, _("Meowth! Please restrict raid reports to a city channel!"))
             return
-        args = message.content.lstrip("!raidegg")
+        args = message.clean_content.lstrip("!raidegg")
         args_split = args.split(" ")
         del args_split[0]
         if len(args_split) <= 1:
@@ -2004,7 +2003,7 @@ async def _eggassume(args, raid_channel):
     if config['allow_assume'][egglevel] == "False":
         await Meowth.send_message(raid_channel, _("Meowth! **!raid assume** is not allowed in this level egg."))
         return
-    entered_raid = args.lstrip("assume").lstrip(" ").lower()
+    entered_raid = re.sub("[\@]", "", args.lstrip("assume").lstrip(" ").lower())
     if entered_raid not in pkmn_info['pokemon_list']:
         await Meowth.send_message(raid_channel, spellcheck(entered_raid))
         return

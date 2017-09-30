@@ -546,9 +546,12 @@ team_msg = " or ".join(["'!team {0}'".format(team) for team in config['team_dict
 
 @Meowth.event
 async def on_ready():
-    print(_("Meowth! That's right!")) #prints to the terminal or cmd prompt window upon successful connection to Discord
-    for server in Meowth.servers:
-        reboot_msg = """**Meowth! That's right! I've been updated!**
+    print(_("Starting up...")) #prints to the terminal or cmd prompt window upon successful connection to Discord
+    REBOOT = False
+    if 'reboot' in sys.argv[1:]:
+        REBOOT = True
+    
+    reboot_msg = """**Meowth! That's right! I've been updated!**
 
 **Changes:**
     - !raidegg bug fixes.
@@ -568,15 +571,29 @@ We have made some changes to the server to make things easier with tracking bugs
 Feel free to take a look!
 
 **Reconfigure shouldn't be necessary for this update.**"""
-        if 'reboot' in sys.argv[1:]:
-            print("Reboot Message Sent")
-            await Meowth.send_message(server.owner, reboot_msg)
+
+    msg_success = 0
+    msg_fail = 0
+    servers = len(Meowth.servers)
+    
+    for server in Meowth.servers:
+        
         try:
             if server not in server_dict:
                 server_dict[server] = {'want_channel_list': [], 'offset': 0, 'welcome': False, 'team': False, 'want': False, 'other': False, 'done': False, 'raidchannel_dict' : {}}
         except KeyError:
             server_dict[server] = {'want_channel_list': [], 'offset': 0, 'welcome': False, 'team': False, 'want': False, 'other': False, 'done': False, 'raidchannel_dict' : {}}
-
+            
+        if REBOOT:
+            try:
+                await Meowth.send_message(server.owner, reboot_msg)
+                msg_success += 1
+            except:
+                msg_fail += 1
+    
+    if REBOOT:
+        print(_("Reboot messages sent: {success_count} successful, {fail_count} failed.\n").format(success_count=msg_success,fail_count=msg_fail))
+    print(_("Meowth! That's right!\n\n{server_count} servers connected.").format(server_count=servers))
     await maint_start()
 
 

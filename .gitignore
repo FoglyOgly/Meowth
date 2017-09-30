@@ -1,2 +1,4 @@
 
 *.bat
+config.json
+config_blank.json

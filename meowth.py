@@ -8,6 +8,7 @@ import pickle
 import json
 import time
 import datetime
+import copy
 from time import strftime
 import logging
 import discord
@@ -257,18 +258,19 @@ async def expiry_check(channel):
         while True:
             try:
                 if server_dict[server]['raidchannel_dict'][channel]['active'] is True:
-                    if server_dict[server]['raidchannel_dict'][channel]['exp'] <= time.time():
-                        if server_dict[server]['raidchannel_dict'][channel]['type'] == 'egg':
-                            pokemon = server_dict[server]['raidchannel_dict'][channel]['pokemon']
-                            if pokemon != '':
-                                logger.info("Expire_Channel - Egg Auto Hatched - "+channel.name)
-                                active_raids.remove(channel)
-                                await _eggtoraid(pokemon, channel)
-                                continue
-                        event_loop.create_task(expire_channel(channel))
-                        active_raids.remove(channel)
-                        logger.info("Expire_Channel - Channel Expired And Removed From Watchlist - "+channel.name)
-                        break
+                    if server_dict[server]['raidchannel_dict'][channel]['exp'] is not None:
+                        if server_dict[server]['raidchannel_dict'][channel]['exp'] <= time.time():
+                            if server_dict[server]['raidchannel_dict'][channel]['type'] == 'egg':
+                                pokemon = server_dict[server]['raidchannel_dict'][channel]['pokemon']
+                                if pokemon != '':
+                                    logger.info("Expire_Channel - Egg Auto Hatched - "+channel.name)
+                                    active_raids.remove(channel)
+                                    await _eggtoraid(pokemon, channel)
+                                    continue
+                            event_loop.create_task(expire_channel(channel))
+                            active_raids.remove(channel)
+                            logger.info("Expire_Channel - Channel Expired And Removed From Watchlist - "+channel.name)
+                            break
             except KeyError:
                 pass
 
@@ -343,7 +345,7 @@ To reactivate the channel, use !timerset to set the timer again."""))
 async def channel_cleanup(loop=True):
     while True:
         global active_raids
-        serverdict_chtemp = server_dict
+        serverdict_chtemp = copy.deepcopy(server_dict)
         logger.info("Channel_Cleanup ------ BEGIN ------")
 
         #for every server in save data
@@ -393,7 +395,19 @@ async def channel_cleanup(loop=True):
                                 logger.info(log_str+" - 15+ MIN EXPIRY NONACTIVE EGG")
 
                         else:
-
+                            
+                            #if it's an exraid
+                            if serverdict_chtemp[server]['raidchannel_dict'][channel]['type'] is 'exraid':
+                                
+                                #check if it's expiry is not None
+                                if serverdict_chtemp[server]['raidchannel_dict'][channel]['exp'] is not None:
+                                    
+                                    #if so, set it to None (converting old exraid channels to new ones to prevent expiry)
+                                    try:
+                                        server_dict[server]['raidchannel_dict'][channel]['exp'] = None
+                                    except:
+                                        pass
+                                
                             #and if it has been expired for longer than 5 minutes already
                             if serverdict_chtemp[server]['raidchannel_dict'][channel]['exp'] < (time.time() - (5 * 60)):
 
@@ -479,7 +493,7 @@ async def channel_cleanup(loop=True):
 
 async def server_cleanup(loop=True):
     while True:
-        serverdict_srvtemp = server_dict
+        serverdict_srvtemp = copy.deepcopy(server_dict)
         logger.info("Server_Cleanup ------ BEGIN ------")
 
         serverdict_srvtemp = server_dict
@@ -554,9 +568,9 @@ async def on_ready():
     reboot_msg = """**Meowth! That's right! I've been updated!**
 
 **Changes:**
-    - !raidegg bug fixes.
-    - !raidegg allows !coming and !here for assumed eggs.
-    - !exraids extended to 72 hour expiry.
+    - Raid eggs show !coming and !here output when !list is used.
+    - Old timer formats no longer break map links, and instead are accepted and parsed as valid times.
+    - !exraids no longer expire.
     - !exraid no longer mentions !timer or !timerset usage in the top raid channel message.
     - !duplicate fixed and updated to allow members with manage_channel permission to skip the 3-stage reporting.
     - !duplicate now removes original raid report message on channel deletion.
@@ -1291,7 +1305,7 @@ async def _timerset(channel, exptime):
     if channel in server_dict[channel.server]['raidchannel_dict']:
         try:
             if server_dict[channel.server]['raidchannel_dict'][channel]['exraid'] == True:
-                await Meowth.send_message(channel, _("Timerset isn't supported for exraids. Please get a mod/admin to remove the channel if expiry is required early."))
+                await Meowth.send_message(channel, _("Timerset isn't supported for exraids. Please get a mod/admin to remove the channel if channel needs to be removed."))
                 return
         except KeyError:
             pass
@@ -1356,6 +1370,12 @@ async def timer(ctx):
     Usage: !timer
     The expiry time should have been previously set with !timerset."""
     if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict']:
+        try:
+            if server_dict[channel.server]['raidchannel_dict'][channel]['exraid'] == True:
+                await Meowth.send_message(ctx.message.channel, _("Exraids don't expire. Please get a mod/admin to remove the channel if channel needs to be removed."))
+                return
+        except KeyError:
+            pass
         timerstr = await print_raid_timer(ctx.message.channel)
         await Meowth.send_message(ctx.message.channel, timerstr)
 
@@ -1430,8 +1450,8 @@ async def _cancel(message):
         del trainer_dict[message.author.mention]
         server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict'] = trainer_dict
 
-@Meowth.command(pass_context=True)
-async def interested(ctx):
+@Meowth.command(pass_context=True,aliases=["i","maybe"])
+async def interested(ctx, *, count: str = None):
     """Indicate you are interested in the raid.
 
     Usage: !interested [message]
@@ -1440,35 +1460,22 @@ async def interested(ctx):
     and will assume you are a group with that many people."""
     if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
         trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
-        count = 1
-        space1 = ctx.message.content.find(" ")
-        if space1 != -1:
-            # Search for a number in the message
-            # by trying to convert each word to integer
-            count = None
-            duplicate = False
-            for word in ctx.message.content[12:].split():
-                try:
-                    newcount = int(word)
-                    if not count:
-                        count = newcount
-                    else:
-                        duplicate = True
-                except ValueError:
-                    pass
-            # If count wasn't set, we didn't find a number
-            if not count:
-                await Meowth.send_message(ctx.message.channel, _("Meowth! Exactly *how many* are interested? There wasn't a number anywhere in your message. Or, just say `!maybe` if you're by yourself."))
-                return
-            # Don't allow duplicates
-            if duplicate:
-                await Meowth.send_message(ctx.message.channel, _("Meowth...I got confused because there were several numbers in your message. I don't know which one is the right one."))
-                return
+        if count:
+            if count.isdigit():
+                count = int(count)
+            else:
+                await Meowth.send_message(ctx.message.channel, _("Meowth! I can't understand how many are in your group. Just say `!interested` if you're by yourself, or `!interested 5` for example if there's 5 in your group."))
+        else:
+            if ctx.message.author.mention in trainer_dict:
+                count = trainer_dict[ctx.message.author.mention]['count']
+            else:
+                count = 1
+        
         await _maybe(ctx.message, count)
 
 
-@Meowth.command(pass_context=True)
-async def coming(ctx):
+@Meowth.command(pass_context=True,aliases=["c"])
+async def coming(ctx, *, count: str = None):
     """Indicate you are on the way to a raid.
 
     Usage: !coming [message]
@@ -1485,42 +1492,24 @@ async def coming(ctx):
                     return
         except:
             pass
+            
         trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
-        count = 1
-        space1 = ctx.message.content.find(" ")
-        if space1 == -1:
-            # If there was a previous !maybe command, take the count from that
+        
+        if count:
+            if count.isdigit():
+                count = int(count)
+            else:
+                await Meowth.send_message(ctx.message.channel, _("Meowth! I can't understand how many are in your group. Just say `!coming` if you're by yourself, or `!coming 5` for example if there's 5 in your group."))
+        else:
             if ctx.message.author.mention in trainer_dict:
                 count = trainer_dict[ctx.message.author.mention]['count']
             else:
                 count = 1
-        if space1 != -1:
-            # Search for a number in the message
-            # by trying to convert each word to integer
-            count = None
-            duplicate = False
-            for word in ctx.message.content[8:].split():
-                try:
-                    newcount = int(word)
-                    if not count:
-                        count = newcount
-                    else:
-                        duplicate = True
-                except ValueError:
-                    pass
-            # If count wasn't set, we didn't find a number
-            if not count:
-                await Meowth.send_message(ctx.message.channel, _("Meowth! Exactly *how many* are coming? There wasn't a number anywhere in your message. Or, just say **!coming** if you're by yourself."))
-                return
-            # Don't allow duplicates
-            if duplicate:
-                await Meowth.send_message(ctx.message.channel, _("Meowth...I got confused because there were several numbers in your message. I don't know which one is the right one."))
-                return
 
         await _coming(ctx.message, count)
 
-@Meowth.command(pass_context=True)
-async def here(ctx):
+@Meowth.command(pass_context=True,aliases=["h"])
+async def here(ctx, *, count: str = None):
     """Indicate you have arrived at the raid.
 
     Usage: !here [message]
@@ -1539,37 +1528,18 @@ async def here(ctx):
             pass
 
         trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
-        # If no message, default count is 1
-        count = 1
-        space1 = ctx.message.content.find(" ")
-        if space1 == -1:
-            # If there was a previous !coming command, take the count from that
+        
+        if count:
+            if count.isdigit():
+                count = int(count)
+            else:
+                await Meowth.send_message(ctx.message.channel, _("Meowth! I can't understand how many are in your group. Just say `!here` if you're by yourself, or `!coming 5` for example if there's 5 in your group."))
+        else:
             if ctx.message.author.mention in trainer_dict:
                 count = trainer_dict[ctx.message.author.mention]['count']
             else:
                 count = 1
-        else:
-            # Search for a number in the message
-            # by trying to convert each word to integer
-            count = None
-            duplicate = False
-            for word in ctx.message.content[6:].split():
-                try:
-                    newcount = int(word)
-                    if not count:
-                        count = newcount
-                    else:
-                        duplicate = True
-                except ValueError:
-                    pass
-            # If count wasn't set, we didn't find a number
-            if not count:
-                await Meowth.send_message(ctx.message.channel, _("Meowth! Exactly *how many* are here? There wasn't a number anywhere in your message. Or, just say **!here** if you're by yourself."))
-                return
-            # Don't allow duplicates
-            if duplicate:
-                await Meowth.send_message(ctx.message.channel, _("Meowth...I got confused because there were several numbers in your message. I don't know which one is the right one."))
-                return
+
         await _here(ctx.message, count)
 
 @Meowth.command(pass_context=True)
@@ -1896,8 +1866,8 @@ This channel will be deleted in 2 days if an admin doesn't delete it manually be
         server_dict[message.server]['raidchannel_dict'][raid_channel] = {
             'reportcity' : message.channel.name,
             'trainer_dict' : {},
-            'exp' : time.time() + 72 * 60 * 60, # Three days from now
-            'manual_timer' : False, # No one has explicitly set the timer, Meowth is just assuming 2 days
+            'exp' : None, # No expiry
+            'manual_timer' : False,
             'active' : True,
             'raidmessage' : raidmessage,
             'raidreport' : raidreport,
@@ -1997,7 +1967,7 @@ Use **!list interested** to see the list of trainers who are interested.
 **!location new <address>** will let you correct the raid address.
 Sending a Google Maps link will also update the raid location.
 
-**!timer** will show how long until the egg catches into an open raid.
+**!timer** will show how long until the egg hatches into an open raid.
 **!timerset** will let you correct the egg countdown time.
 
 Message **!raid <pokemon>** to update this channel into an open raid.
@@ -2306,10 +2276,6 @@ async def otw(ctx):
 @Meowth.command(pass_context=True, hidden=True)
 async def waiting(ctx):
     await Meowth.send_message(ctx.message.channel, _("Meowth! We've moved this command to **!list here**."))
-
-@Meowth.command(pass_context=True, hidden=True)
-async def maybe(ctx):
-    await Meowth.send_message(ctx.message.channel, _("Meowth! We've moved this command to **!interested**."))
 
 @Meowth.command(pass_context=True)
 async def invite(ctx):

@@ -478,7 +478,7 @@ async def channel_cleanup(loop=True):
                 if channel_exists is not None:
 
                     #delete channel from discord
-                    await Meowth.delete_channel(channel)
+                    await Meowth.delete_channel(c)
 
             #for every channel listed to have recently expired
             for e in dict_expired_channel_list:

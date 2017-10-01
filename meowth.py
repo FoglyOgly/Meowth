@@ -393,8 +393,9 @@ async def channel_cleanup(loop=True):
 
                                 logger.info(log_str+" - 15+ MIN EXPIRY NONACTIVE EGG")
                                 continue
+
                         else:
-                                
+
                             #and if it has been expired for longer than 5 minutes already
                             if serverdict_chtemp[server]['raidchannel_dict'][channel]['exp'] < (time.time() - (5 * 60)):
 
@@ -405,27 +406,27 @@ async def channel_cleanup(loop=True):
                                 discord_channel_delete.append(channel)
 
                                 logger.info(log_str+" - 5+ MIN EXPIRY NONACTIVE RAID")
-
                                 continue
+
                     #if the channel save data shows it as an active raid still
                     elif serverdict_chtemp[server]['raidchannel_dict'][channel]['active'] == True:
-                    
+
                         #if it's an exraid
                         if serverdict_chtemp[server]['raidchannel_dict'][channel]['type'] == 'exraid':
-                            
+
                             #check if it's expiry is not None
                             if serverdict_chtemp[server]['raidchannel_dict'][channel]['exp'] is not None:
-                                
+
                                 #if so, set it to None (converting old exraid channels to new ones to prevent expiry)
                                 try:
                                     server_dict[server]['raidchannel_dict'][channel]['exp'] = None
                                     logger.info(log_str+" - EXRAID - CONVERTED TO EXPIRY None")
                                 except:
                                     pass
-                                    
+
                             logger.info(log_str+" - EXRAID")
                             continue
-                        
+
                         #and if it has been expired for longer than 5 minutes already
                         elif serverdict_chtemp[server]['raidchannel_dict'][channel]['exp'] < (time.time() - (5 * 60)):
 
@@ -436,8 +437,8 @@ async def channel_cleanup(loop=True):
                             discord_channel_delete.append(channel)
 
                             logger.info(log_str+" - 5+ MIN EXPIRY ACTIVE")
-
                             continue
+
                         #or if the expiry time for the channel has already passed within 5 minutes
                         elif serverdict_chtemp[server]['raidchannel_dict'][channel]['exp'] <= time.time():
 
@@ -448,15 +449,15 @@ async def channel_cleanup(loop=True):
                             dict_expired_channel_list.append(channel)
 
                             logger.info(log_str+" - RECENTLY EXPIRED")
-
                             continue
+
                         else:
                             #if channel is still active, make sure it's expiry is being monitored
                             if channel not in active_raids:
                                 event_loop.create_task(expiry_check(channel))
                                 logger.info(log_str+" - MISSING FROM EXPIRY CHECK")
-
                                 continue
+
             #for every channel listed to have save data deleted
             for c in dict_channel_delete:
                 try:
@@ -569,13 +570,13 @@ async def on_ready():
     REBOOT = False
     if 'reboot' in sys.argv[1:]:
         REBOOT = True
-    
+
     reboot_msg = """**Meowth! That's right! I've been updated!**
 
 **Changes:**
     - Raid eggs show !coming and !here when !list is used.
     - Old timer formats no longer break map links, and instead are accepted and parsed as valid times.
-    - EXraids no longer expire. 
+    - EXraids no longer expire.
         - Existing EXraids will convert to no-expiry only if they're still active and have not expired yet.
     - Shortcut commands for raid status updates are introduced:
         - **!i** for !interested
@@ -601,14 +602,14 @@ async def on_ready():
                 server_dict[server] = {'want_channel_list': [], 'offset': 0, 'welcome': False, 'team': False, 'want': False, 'other': False, 'done': False, 'raidchannel_dict' : {}}
         except KeyError:
             server_dict[server] = {'want_channel_list': [], 'offset': 0, 'welcome': False, 'team': False, 'want': False, 'other': False, 'done': False, 'raidchannel_dict' : {}}
-            
+
         if REBOOT:
             try:
                 await Meowth.send_message(server.owner, reboot_msg)
                 msg_success += 1
             except:
                 msg_fail += 1
-    
+
     if REBOOT:
         print(_("Reboot messages sent: {success_count} successful, {fail_count} failed.\n").format(success_count=msg_success,fail_count=msg_fail))
     print(_("Meowth! That's right!\n\n{server_count} servers connected.\n{member_count} members found.").format(server_count=servers,member_count=users))
@@ -1199,7 +1200,7 @@ async def _raid(message):
         raidreport = await Meowth.send_message(message.channel, content = _("Meowth! {pokemon} raid reported by {member}! Details: {location_details}. Coordinate in {raid_channel}").format(pokemon=entered_raid.capitalize(), member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention),embed=raid_embed)
         await asyncio.sleep(1) #Wait for the channel to be created.
 
-        raidmsg = _("""Meowth! {pokemon} raid reported by {member}! Details: {location_details}. Coordinate here!
+        raidmsg = _("""Meowth! {pokemon} raid reported by {member} in {citychannel}! Details: {location_details}. Coordinate here!
 
 To update your status, choose from the following commands:
 **!interested, !coming, !here, !cancel**
@@ -1219,7 +1220,7 @@ Sending a Google Maps link will also update the raid location.
 
 Message **!starting** when the raid is beginning to clear the raid's 'here' list.
 
-This channel will be deleted five minutes after the timer expires.""").format(pokemon=raid.mention, member=message.author.mention, location_details=raid_details)
+This channel will be deleted five minutes after the timer expires.""").format(pokemon=raid.mention, member=message.author.mention, citychannel=message.channel.mention, location_details=raid_details)
         raidmessage = await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)
 
         server_dict[message.server]['raidchannel_dict'][raid_channel] = {
@@ -1472,7 +1473,7 @@ async def interested(ctx, *, count: str = None):
                 count = trainer_dict[ctx.message.author.mention]['count']
             else:
                 count = 1
-        
+
         await _maybe(ctx.message, count)
 
 
@@ -1494,9 +1495,9 @@ async def coming(ctx, *, count: str = None):
                     return
         except:
             pass
-            
+
         trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
-        
+
         if count:
             if count.isdigit():
                 count = int(count)
@@ -1530,7 +1531,7 @@ async def here(ctx, *, count: str = None):
             pass
 
         trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
-        
+
         if count:
             if count.isdigit():
                 count = int(count)
@@ -1957,7 +1958,7 @@ async def _raidegg(message):
             raidreport = await Meowth.send_message(message.channel, content = _("Meowth! Level {level} raid egg reported by {member}! Details: {location_details}. Coordinate in {raid_channel}").format(level=egg_level, member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention),embed=raid_embed)
             await asyncio.sleep(1) #Wait for the channel to be created.
 
-            raidmsg = _("""Meowth! Level {level} raid egg reported by {member}! Details: {location_details}. Coordinate here!
+            raidmsg = _("""Meowth! Level {level} raid egg reported by {member} in {citychannel}! Details: {location_details}. Coordinate here!
 
 Message **!interested** if you're interested in attending.
 If you are interested in bringing more than one trainer/account, add in the number at the end of the commend.
@@ -1975,7 +1976,7 @@ Sending a Google Maps link will also update the raid location.
 Message **!raid <pokemon>** to update this channel into an open raid.
 Message **!raid assume <pokemon>** to have the channel auto-update into an open raid.
 
-When this egg raid expires, there will be 15 minutes to update it into an open raid before it'll be deleted.""").format(level=egg_level, member=message.author.mention, location_details=raid_details)
+When this egg raid expires, there will be 15 minutes to update it into an open raid before it'll be deleted.""").format(level=egg_level, member=message.author.mention, citychannel=message.channel.mention, location_details=raid_details)
             raidmessage = await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)
             server_dict[message.server]['raidchannel_dict'][raid_channel] = {
                 'reportcity' : message.channel.name,

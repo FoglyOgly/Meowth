@@ -34,10 +34,7 @@ def role_or_permissions(ctx, check, **perms):
 
 def serverowner_or_permissions(**perms):
     def predicate(ctx):
-        
-        server = ctx.message.server
-        owner = server.owner
-
+        owner = ctx.message.server.owner
         if ctx.message.author.id == owner.id:
             return True
 
@@ -46,6 +43,18 @@ def serverowner_or_permissions(**perms):
 
 def serverowner():
     return serverowner_or_permissions()
+
+def check_wantchannel(ctx):
+    if ctx.message.server is None:
+            return False
+    channel = ctx.message.channel
+    server = ctx.message.server
+    try:
+        want_channels = ctx.bot.server_dict[server]['want_channel_list']
+    except KeyError:
+        return False
+    if channel in want_channels:
+        return True
 
 def check_citychannel(ctx):
     if ctx.message.server is None:
@@ -71,20 +80,125 @@ def check_raidchannel(ctx):
     if channel in raid_channels:
         return True
 
+def check_eggchannel(ctx):
+    if ctx.message.server is None:
+        return False
+    channel = ctx.message.channel
+    server = ctx.message.server
+    try:
+        type = ctx.bot.server_dict[server]['raidchannel_dict'][channel]['type']
+    except KeyError:
+        return False
+    if type == 'egg':
+        return True
+
+def check_raidactive(ctx):
+    if ctx.message.server is None:
+        return False
+    channel = ctx.message.channel
+    server = ctx.message.server
+    try:
+        return ctx.bot.server_dict[server]['raidchannel_dict'][channel]['active']
+    except KeyError:
+        return False
+
+def check_raidset(ctx):
+    if ctx.message.server is None:
+        return False
+    server = ctx.message.server
+    try:
+        return ctx.bot.server_dict[server]['raidset']
+    except KeyError:
+        return False
+
+def check_wildset(ctx):
+    if ctx.message.server is None:
+        return False
+    server = ctx.message.server
+    try:
+        return ctx.bot.server_dict[server]['raidset']
+    except KeyError:
+        return False
+
+def check_wantset(ctx):
+    if ctx.message.server is None:
+        return False
+    server = ctx.message.server
+    try:
+        return ctx.bot.server_dict[server]['wantset']
+    except KeyError:
+        return False
+
+def check_teamset(ctx):
+    if ctx.message.server is None:
+        return False
+    server = ctx.message.server
+    try:
+        return ctx.bot.server_dict[server]['team']
+    except KeyError:
+        return False
+
+
+def teamset():
+    def predicate(ctx):
+        return check_teamset(ctx)
+    return commands.check(predicate)
+
+def wantset():
+    def predicate(ctx):
+        return check_wantset(ctx)
+    return commands.check(predicate)
+
+def wildset():
+    def predicate(ctx):
+        return check_wildset(ctx)
+    return commands.check(predicate)
+
+def raidset():
+    def predicate(ctx):
+        return check_raidset(ctx)
+    return commands.check(predicate)
+
 def citychannel():
     def predicate(ctx):
         return check_citychannel(ctx)
     return commands.check(predicate)
-
+    
+def wantchannel():
+    def predicate(ctx):
+        if check_wantset(ctx):
+            return check_wantchannel(ctx)
+    return commands.check(predicate)
+    
 def raidchannel():
     def predicate(ctx):
         return check_raidchannel(ctx)
+    return commands.check(predicate)
+
+def notraidchannel():
+    def predicate(ctx):
+        return not check_raidchannel(ctx)
+    return commands.check(predicate)
+    
+def activeraidchannel():
+    def predicate(ctx):
+        if check_raidchannel(ctx):
+            return check_raidactive(ctx)
     return commands.check(predicate)
 
 def cityraidchannel():
     def predicate(ctx):
         if check_raidchannel(ctx) == True:
             return True
+        elif check_citychannel(ctx) == True:
+            return True
+    return commands.check(predicate)
+
+def cityeggchannel():
+    def predicate(ctx):
+        if check_raidchannel(ctx) == True:
+            if check_eggchannel(ctx) == True:
+                return True
         elif check_citychannel(ctx) == True:
             return True
     return commands.check(predicate)

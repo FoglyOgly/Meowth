@@ -644,6 +644,7 @@ async def on_ready():
     await maint_start()
 
 
+
 @Meowth.event
 async def on_server_join(server):
     owner = server.owner
@@ -1217,7 +1218,6 @@ async def raid(ctx):
     Meowth's message will also include the type weaknesses of the boss.
 
     Finally, Meowth will create a separate channel for the raid report, for the purposes of organizing the raid."""
-
     await _raid(ctx.message)
 
 async def _raid(message):
@@ -2220,7 +2220,6 @@ async def location(ctx):
         newembed = discord.Embed(title=oldembed['title'],url=locurl,description=oldembed['description'],colour=discord.Colour(0x2ecc71))
         newembed.set_thumbnail(url=oldembed['thumbnail']['url'])
         await Meowth.send_message(channel, content = _("Meowth! Here's the current location for the raid!\nDetails:{location}").format(location = location), embed = newembed)
-
 
 @location.command(pass_context=True)
 @checks.activeraidchannel()

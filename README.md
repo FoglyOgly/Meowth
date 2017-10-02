@@ -33,18 +33,12 @@ https://www.python.org/downloads/release/python-350/
 
 Linux:
 ```bash
-python3 -m pip install -U discord.py
-python3 -m pip install pillow
-python3 -m pip install -U requests
-python3 -m pip install pytesseract
+python3 -m pip install -U discord.py pillow requests pytesseract
 ```
 
 Windows: 
 ```bash
-py -m pip install -U discord.py
-py -m pip install pillow
-py -m pip install -U requests
-py -m pip install pytesseract
+py -m pip install -U discord.py pillow requests pytesseract
 ```
 
 3. Download the files in this repository. The source code is in meowth.py and bot config is in config.json.

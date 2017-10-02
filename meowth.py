@@ -21,7 +21,7 @@ import pytesseract
 import requests
 from io import BytesIO
 import checks
-
+import hastebin
 
 tessdata_dir_config = "--tessdata-dir 'C:\\Program Files (x86)\\Tesseract-OCR\\tessdata' "
 xtraconfig = "-l eng -c tessedit_char_blacklist=&|=+%#^*[]{};<> -psm 6"
@@ -47,7 +47,19 @@ try:
 except OSError as exception:
     pass
 
+try:
+    os.remove('logs/meowth_backup.log')
+except OSError as e:
+    pass
+
+try:
+    os.rename('logs/meowth.log', 'logs/meowth_backup.log')
+except OSError:
+    pass
+
 logger = setup_logger('discord','logs/meowth.log',logging.INFO)
+
+
 
 Meowth = commands.Bot(command_prefix="!")
 
@@ -985,6 +997,17 @@ async def save(ctx):
     except Exception as err:
         print(_("Error occured while trying to save!"))
         print(err)
+
+@Meowth.command(pass_context=True, hidden=True)
+@commands.has_permissions(manage_server=True)
+async def outputlog(ctx):
+    """Get current Meowth log.
+
+    Usage: !outputlog
+    Output is a link to hastebin."""
+    with open('logs\meowth.log', 'r') as logfile:
+        logdata=logfile.read()
+    await Meowth.send_message(ctx.message.channel, hastebin.post(logdata))
 
 """
 
@@ -2441,6 +2464,7 @@ async def _invite(ctx):
             await Meowth.send_message(ctx.message.channel, "Meowth! Your attachment was not a supported image format!")
     else:
         await Meowth.send_message(ctx.message.channel, "Meowth! Please upload your screenshot directly to Discord!")
+
 
 @Meowth.event
 async def on_command_error(error, ctx):

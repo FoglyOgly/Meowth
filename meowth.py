@@ -542,6 +542,8 @@ async def reboot_msg(owners,loop=False,):
     - **!unwant all** has been added, so people can remove all their pokemon roles.
     - **!clearstatus** has been added for use in raid channels. This clears all status counts for that raid.
     - **!invite** now can be used seperately before uploading the image of your pass. Meowth will wait for 30 seconds after !invite is used.
+    - Raid timer will now show both 12hr and 24hr values.
+    - Fixed double expiry notices.
     - General housekeeping and spelling corrections.
     
 You may have experienced issues with !list
@@ -1346,7 +1348,7 @@ async def print_raid_timer(channel):
         if server_dict[channel.server]['raidchannel_dict'][channel]['manual_timer']:
             timerstr += _("Meowth! This {raidtype} will {raidaction} at {expiry_time}!").format(raidtype=raidtype,raidaction=raidaction,expiry_time=strftime("%I:%M", localexpire))
         else:
-            timerstr += _("Meowth! No one told me when the {raidtype} will {raidaction}, so I'm assuming it will {raidaction} at {expiry_time}!").format(raidtype=raidtype,raidaction=raidaction,expiry_time=strftime("%I:%M", localexpire))
+            timerstr += _("Meowth! No one told me when the {raidtype} will {raidaction}, so I'm assuming it will {raidaction} at {expiry_time} ({expiry_time24})!").format(raidtype=raidtype,raidaction=raidaction,expiry_time=strftime("%I:%M %p", localexpire),expiry_time24=strftime("%H:%M", localexpire))
 
     return timerstr
 
@@ -2029,6 +2031,7 @@ async def list(ctx):
                 ctx_waitingcount = 0
                 ctx_omwcount = 0
                 ctx_maybecount = 0
+                #sorted(type_eff.items(), key=lambda x: x[1], reverse=True)
                 if rc_d[r]['reportcity'] == cty and rc_d[r]['active'] and discord.utils.get(server.channels, id=r.id):
                     for trainer in rc_d[r]['trainer_dict'].values():
                         if trainer['status'] == "waiting":
@@ -2368,12 +2371,14 @@ async def invite(ctx):
         wait_msg = await Meowth.send_message(ctx.message.channel,_("Meowth! I'll wait for you to send your pass!"))
         def check(msg):
             if msg.channel == ctx.message.channel and ctx.message.author.id == msg.author.id:
-                return True
+                if msg.attachments:
+                    return True
         
         invitemsg = await Meowth.wait_for_message(author = ctx.message.author, check=check, timeout=30)
-        if invitemsg.attachments:
+        if invitemsg is not None:
             ctx.message = invitemsg
             await _invite(ctx)
+            return
         else:
             await Meowth.delete_message(wait_msg)
             await Meowth.send_message(ctx.message.channel, "Meowth! You took too long to show me a screenshot of your invite! Retry when you're ready.")

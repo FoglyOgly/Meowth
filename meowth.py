@@ -616,6 +616,7 @@ async def on_ready():
     await maint_start()
 
 
+
 @Meowth.event
 async def on_server_join(server):
     owner = server.owner
@@ -1045,6 +1046,7 @@ async def want(ctx):
     if server_dict[ctx.message.server]['wantset'] == True:
         if server_dict[ctx.message.server]['want_channel_list'] and ctx.message.channel not in server_dict[ctx.message.server]['want_channel_list']:
             await Meowth.send_message(ctx.message.channel, _("Meowth! Please use one of the following channels for **!want** commands: {want_channel_list}").format(want_channel_list=", ".join(i.mention for i in server_dict[ctx.message.server]['want_channel_list'])))
+
             return
         else:
             entered_want = ctx.message.content[6:].lower()
@@ -1103,7 +1105,6 @@ async def _wild(message):
                         return
             wild_gmaps_link = create_gmaps_query(wild_details, message.channel)
 
-
         if entered_wild not in pkmn_info['pokemon_list']:
             await Meowth.send_message(message.channel, spellcheck(entered_wild))
             return
@@ -1120,7 +1121,6 @@ async def _wild(message):
     else:
         await Meowth.send_message(message.channel, _("Meowth! **!wild** commands have been disabled."))
 
-
 @Meowth.command(pass_context=True)
 async def raid(ctx):
     """Report an ongoing raid.
@@ -1131,7 +1131,6 @@ async def raid(ctx):
     Meowth's message will also include the type weaknesses of the boss.
 
     Finally, Meowth will create a separate channel for the raid report, for the purposes of organizing the raid."""
-
     await _raid(ctx.message)
 
 async def _raid(message):
@@ -1374,6 +1373,9 @@ async def timer(ctx):
 
     Usage: !timer
     The expiry time should have been previously set with !timerset."""
+    await _timer(ctx)
+
+async def _timer(ctx):
     if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict']:
         if server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['type'] == 'exraid':
             await Meowth.send_message(ctx.message.channel, _("Exraids don't expire. Please get a mod/admin to remove the channel if channel needs to be removed."))
@@ -2227,7 +2229,6 @@ async def _interest(ctx):
         return listmsg
 
 async def _otw(ctx):
-
     if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
         ctx_omwcount = 0
 
@@ -2251,7 +2252,6 @@ async def _otw(ctx):
         return listmsg
 
 async def _waiting(ctx):
-
     if ctx.message.channel in server_dict[ctx.message.server]['raidchannel_dict'] and server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['active']:
         ctx_waitingcount = 0
 

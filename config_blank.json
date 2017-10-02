@@ -1,0 +1,54 @@
+{
+"//": "Configuration file for Meowth Discord bot.",
+
+
+"//": "Server information",
+
+"//": "Language you want for Meowth.",
+"//": "fr, en",
+"bot-language": "en",
+"pokemon-language": "en",
+
+"//": "Bot token ID, needed for authentication.",
+"//": "This is found on the app page when you click to reveal the bot user's token",
+"bot_token": "yourtoken",
+
+"//": "Define Meowth's master (that's you).",
+"//": "Meowth will only take admin commands from this user",
+"master": "yourusername#yourid",
+
+"//": "Limit egg assumed hatches to certain egg levels.",
+"allow_assume": {"5": "True", "4": "False", "3": "False", "2": "False", "1": "False"},
+
+"//": "Define your server's emoji strings here.",
+
+"//": "Emoji for team assignments",
+"team_dict": {"mystic": "<:mystic:350686962388303873>", "valor": "<:valor:350686957820706816>", "instinct": "<:instinct:350686957703135232>"},
+
+"//": "Emoji for raid organization",
+"omw_id": ":omw:",
+"here_id": ":here:",
+                      
+"//": "Emoji for Pokemon types.",
+"type_id_dict": {
+    "normal"   : "<:normal:350686939965554689>",
+    "fire"     : "<:fire1:350686939378221057>",
+    "water"    : "<:water:350686939571290112>",
+    "electric" : "<:electric:350686938178650113>",
+    "grass"    : "<:grass:350686939504050180>",
+    "ice"      : "<:ice:350686939667496961>",
+    "fighting" : "<:fighting:350686939466432523>",
+    "poison"   : "<:poison:350686939449393180>",
+    "ground"   : "<:ground:350686938983956480>",
+    "flying"   : "<:flying:350686937050513418>",
+    "psychic"  : "<:psychic:350686937754894347>",
+    "bug"      : "<:bug1:350686933732687872>",
+    "rock"     : "<:rock:350686939520696321>",
+    "ghost"    : "<:ghost1:350686939462107146>",
+    "dragon"   : "<:dragon:350686936949587978>",
+    "dark"     : "<:dark:350686934881927169>",
+    "steel"    : "<:steel:350686939919155201>",
+    "fairy"    : "<:fairy:350686936698060812>"
+}
+
+}

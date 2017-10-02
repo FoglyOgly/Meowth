@@ -1,2 +1,8 @@
 
 *.bat
+config.json
+serverdict_backup
+
+serverdict
+serverdict_blank
+

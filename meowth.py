@@ -2178,24 +2178,30 @@ async def duplicate(ctx):
 
         res = await Meowth.wait_for_reaction(['✅','❎'], message=rusure, check=check, timeout=60)
 
-        if res.reaction.emoji == "❎":
+        if res is not None:
+            if res.reaction.emoji == "❎":
+                await Meowth.delete_message(rusure)
+                confirmation = await Meowth.send_message(channel,_("Duplicate Report cancelled."))
+                logger.info("Duplicate Report - Cancelled - "+channel.name+" - Report by "+author.name)
+                dupecount = 2
+                server_dict[server]['raidchannel_dict'][channel]['duplicate'] = dupecount
+                await asyncio.sleep(10)
+                await Meowth.delete_message(confirmation)
+                return
+            elif res.reaction.emoji == "✅":
+                await Meowth.delete_message(rusure)
+                await Meowth.send_message(channel,"Duplicate Confirmed")
+                logger.info("Duplicate Report - Channel Expired - "+channel.name+" - Last Report by "+author.name)
+                await expire_channel(channel)
+                return
+        else:
             await Meowth.delete_message(rusure)
-            confirmation = await Meowth.send_message(channel,_("Duplicate Report cancelled."))
-            logger.info("Duplicate Report - Cancelled - "+channel.name+" - Report by "+author.name)
+            confirmation = await Meowth.send_message(channel,_("Duplicate Report Timed Out."))
+            logger.info("Duplicate Report - Timeout - "+channel.name+" - Report by "+author.name)
             dupecount = 2
             server_dict[server]['raidchannel_dict'][channel]['duplicate'] = dupecount
             await asyncio.sleep(10)
             await Meowth.delete_message(confirmation)
-            return
-        elif res.reaction.emoji == "✅":
-            await Meowth.delete_message(rusure)
-            await Meowth.send_message(channel,"Duplicate Confirmed")
-            logger.info("Duplicate Report - Channel Expired - "+channel.name+" - Last Report by "+author.name)
-            await expire_channel(channel)
-            return
-        else:
-            await Meowth.delete_message(rusure)
-            return
     else:
         rc_d['duplicate'] = dupecount
         confirmation = await Meowth.send_message(channel,_("Duplicate report #{duplicate_report_count} received.").format(duplicate_report_count=str(dupecount)))

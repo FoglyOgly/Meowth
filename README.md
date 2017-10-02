@@ -29,7 +29,7 @@ If you want to tinker with Meowth yourself, you can still download this repo, ma
 1. Install Python 3.5. 
 https://www.python.org/downloads/release/python-350/
 
-2. Install the packaged needed to run meowth: discord.py, Pillow, pytesseract:
+2. Install the packages needed to run meowth: discord.py, Pillow, pytesseract:
 
 Linux:
 ```bash

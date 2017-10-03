@@ -67,7 +67,7 @@ py -m pip install -U discord.py pillow requests pytesseract hastebin.py
 10. Simply type !configure in your server to start the configuration process.
 
 ## Directions for using Meowth:
-Note: avoid punctuation of any kind inside commands. The <> in these instructions are there for decoration
+Note: Avoid punctuation inside commands. The <> in these instructions are there for decoration.
 
 ### General Commands:
 

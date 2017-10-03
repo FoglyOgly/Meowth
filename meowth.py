@@ -367,7 +367,6 @@ async def channel_cleanup(loop=True):
     while True:
         global active_raids
         serverdict_chtemp = copy.deepcopy(server_dict)
-        discord_channels = Meowth.get_all_channels()
         logger.info("Channel_Cleanup ------ BEGIN ------")
 
         #for every server in save data
@@ -387,7 +386,7 @@ async def channel_cleanup(loop=True):
                 log_str = log_str+": Channel:"+channel.name
                 logger.info(log_str+" - CHECKING")
 
-                channelmatch = discord.utils.get(discord_channels, server__id=server.id, id=channel.id)
+                channelmatch = Meowth.get_channel(channel.id)
 
                 if channelmatch is None:
                     #list channel for deletion from save data

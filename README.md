@@ -15,7 +15,7 @@ Meowth is now able to handle being on multiple servers of any size in any part o
 
 ## Directions for inviting a remotely hosted Meowth to your server:
 Note: You must have manage_server permissions to invite.
-1. Follow this link: https://discordapp.com/oauth2/authorize?client_id=346759953006198784&scope=bot&permissions=268822608
+1. Use [THIS LINK](https://discordapp.com/oauth2/authorize?client_id=346759953006198784&scope=bot&permissions=268822608) to invite Meowth.   
 2. Select your server.
 3. In your server, type !configure.
 4. Meowth will DM you and ask you some questions about your time zone, what functions you want to enable, what channels you want to restrict certain functions to, and what locations to insert to Google Maps queries (these are channel-specific). 

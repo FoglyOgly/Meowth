@@ -84,10 +84,9 @@ Note: avoid punctuation of any kind inside commands. The <> in these instruction
 
 | Commands | Requirements  | Description |
 | -------- |:-------------:| ------------|
-| **!want**  | - | Shows commands you can use in that channel, with descriptions. |
-| **!unwant**  | - | Let's users set their team role. |
-| **!unwant all**  | - | Saves the save data to file. |
-| **!unwant all**  | - | Saves the save data to file. |
+| **!want**  | - | Adds a Pokemon to your notification roles. |
+| **!unwant**  | - | Removes a Pokemon from your notification roles. |
+| **!unwant all**  | - | Removes all Pokemon from your notification roles. |
 | **!wild**  | *Region Channel* | Reports a wild pokemon, notifying people who want it. |
 
 

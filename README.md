@@ -77,7 +77,7 @@ Note: avoid punctuation of any kind inside commands. The <> in these instruction
 | **!help**  | - | Shows commands you can use in that channel, with descriptions. |
 | **!team**  | - | Let's users set their team role. |
 | **!save**  | *Owner Only* | Saves the save data to file. |
-| **!exit**  | *Owner Only* | Saves the save data to file. |
+| **!exit**  | *Owner Only* | Saves the save data to file and quits the script. |
 | **!outputlog**  | *Server Manager Only* | Uploads the log file to hastebin and replies with the link. |
 
 ### Pokemon Notification Commands:

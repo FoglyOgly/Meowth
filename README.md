@@ -70,38 +70,55 @@ https://discordapp.com/oauth2/authorize?client_id=<CLIENT_ID>&scope=bot&permissi
 ## Directions for using Meowth:
 Note: avoid punctuation of any kind inside commands. The <> in these instructions are there for decoration
 
-1. !raid <teamname> - Adds you to a team role on the server. These roles should be created beforehand.
+### General Commands:
 
-2. !want <pokemonname> - Adds a pokemon role to you so you'll be mentioned on reports. Meowth will create a role if none exists.
+| Commands | Requirements  | Description |
+| -------- |:-------------:| ------------|
+| **!help**  | - | Shows commands you can use in that channel, with descriptions. |
+| **!team**  | - | Let's users set their team role. |
+| **!save**  | *Owner Only* | Saves the save data to file. |
+| **!exit**  | *Owner Only* | Saves the save data to file. |
+| **!outputlog**  | *Server Manager Only* | Uploads the log file to hastebin and replies with the link. |
 
-3. !wild <pokemonname> <location> - Meowth will @mention <pokemonname> and include a Google Maps link to <location>. If <location> is blank, Meowth will ask for more details.
+### Pokemon Notification Commands:
 
-4. !raid <pokemonname> <location> <time remaining> - Mentions the pokemon role, gives a google maps link o creates a new channel by the name of
-#<pokemonname>-<location>. The message shows type effectiveness against the Pokemon. The raid channel will automatically delete after <time remaining> has expired. If <time remaining> is not given or is given in a format other than H:MM, Meowth will assume a two-hour time remaining and ask you to use !timerset.
+| Commands | Requirements  | Description |
+| -------- |:-------------:| ------------|
+| **!want**  | - | Shows commands you can use in that channel, with descriptions. |
+| **!unwant**  | - | Let's users set their team role. |
+| **!unwant all**  | - | Saves the save data to file. |
+| **!unwant all**  | - | Saves the save data to file. |
+| **!wild**  | *Region Channel* | Reports a wild pokemon, notifying people who want it. |
 
-5. !coming/!here - In a raid channel, this will tell Meowth that you are on your way to or at a raid. If you have multiple trainers with you, add a number, such as !coming <number>.
 
-6. !cancel - In a raid channel, this will tell Meowth to remove you from the on the way or waiting lists. The !cancel command removes you from either list if you are on one.
+### Raid Commands:
 
-7. !otw/!waiting/!lists - In a raid channel, these commands tell Meowth to list and mention the trainers who said they were on the way
-or at a raid. It also includes the total number. !lists shows all member statuses.
-
-8. !starting - in a raid channel, this command tells Meowth to delete the !waiting list for that raid. Meowth will mention the
-users and ask them to respond with !here if they are still waiting.
-
-9. !timerset H:MM - in a raid channel, this tells Meowth how long is remaining on the raid. Meowth will send a message notifying
-the time at which the raid will end. Also overwrites any previously used !timerset command for that raid.
-
-10. !timer - in a raid channel, tells Meowth to resend the message from the last !timerset command. Prevents unnecessary
-scrolling.
-
+| Commands | Requirements  | Description |
+| -------- |:-------------:| ------------|
+| **!raid**  | *Region Channel* | Creates an open raid channel. |
+| **!exraid**  | *Region Channel* | Creates an exraid channel. |
+| **!invite**  | *Region Channel* | Check attached pass for entry to exraids. |
+| **!raidegg**  | *Region Channel* | Creates a raid egg channel. |
+| **!raid**  | *Raid Egg Channel* | Converts raid egg to an open raid. |
+| **!timer**  | *Raid Channel* | Shows the expiry time for the raid. |
+| **!timerset**  | *Raid Channel* | Set the expiry time for the raid. |
+| **!location**  | *Raid Channel* | Shows the raid location. |
+| **!location new**  | *Raid Channel* | Sets the raid location. |
+| **!interested**  | *Raid Channel* | Sets your status for the raid to 'interested'. |
+| **!coming**  | *Raid Channel* | Sets your status for the raid to 'coming'. |
+| **!here** | *Raid Channel* | Sets your status for the raid to 'here'. |
+| **!starting**  | *Raid Channel* | Clears all members with 'here' status, announce raid battle start. |
+| **!cancel**  | *Raid Channel* | Cancel your status. |
+| **!clearstatus**  | *Server Manager/Raid Channel* | Cancel everyone's status. |
+| **!list**  | *Raid Channel* | Lists all member status' for the raid. |
+| **!list interested** | *Raid Channel* | Lists 'interested' members for the raid. |
+| **!list coming**  | *Raid Channel* | Lists 'coming' members for the raid. |
+| **!list here** | *Raid Channel* | Lists 'here' members for the raid. |
+| **!duplicate** | *Raid Channel* | Reports the raid as a duplicate channel. |
 
 ## General notes on Meowth:
 
-Meowth relies completely on user reports of raids, wild spawns, on the way to a raid, at a raid, and starting a raid. Meowth
-was designed as an alternative to Discord bots that use scanners and other illegitimate sources of information about Pokemon Go.
-As a result, Meowth works only as well as the users who use it. As there are 10+ ways of interacting with Meowth, there
-can be a bit of a rough learning period, but it quickly becomes worth it.
+Meowth relies completely on users for reports. Meowth was designed as an alternative to Discord bots that use scanners and other illegitimate sources of information about Pokemon Go. As a result, Meowth works only as well as the users who use it. As there are 10+ ways of interacting with Meowth, there can be a bit of a rough learning period, but it quickly becomes worth it.
 
 ## Known issues:
 

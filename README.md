@@ -18,7 +18,7 @@ Note: You must have manage_server permissions to invite.
 1. Use [THIS LINK](https://discordapp.com/oauth2/authorize?client_id=346759953006198784&scope=bot&permissions=268822608) to invite Meowth.   
 2. Select your server.
 3. In your server, type !configure.
-4. Meowth will DM you and ask you some questions about your time zone, what functions you want to enable, what channels you want to restrict certain functions to, and what locations to insert to Google Maps queries (these are channel-specific). 
+4. Meowth will DM you to setup your server. Be sure to read the prompts properly.
 5. That's it! Enjoy!
 
 You can join the Meowth server here for updates, setup help, feature requests, or just to test out the bot before you add it. https://discord.gg/hhVjAN8 

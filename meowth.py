@@ -387,7 +387,9 @@ async def channel_cleanup(loop=True):
                 log_str = log_str+": Channel:"+channel.name
                 logger.info(log_str+" - CHECKING")
 
-                if channel not in discord_channels:
+                channelmatch = discord.utils.get(discord_channels, server__id=server.id, id=channel.id)
+
+                if channelmatch is None:
                     #list channel for deletion from save data
                     dict_channel_delete.append(channel)
                     logger.info(log_str+" - DOESN'T EXIST IN DISCORD")

@@ -1273,12 +1273,18 @@ async def _raid(message):
         return
     entered_raid = re.sub("[\@]", "", args_split[0].lower())
     del args_split[0]
-    if args_split[-1].isdigit():
-        raidexp = args_split[-1]
-        del args_split[-1]
+
     elif ":" in args_split[-1]:
         args_split[-1] = re.sub(r"[a-zA-Z]", "", args_split[-1])
-        raidexp = 60 * int(args_split[-1].split(":")[0]) + int(args_split[-1].split(":")[1])
+        if args_split[-1].split(":")[0] == "":
+            endhours = 0
+        else:
+            endhours = int(args_split[-1].split(":")[0])
+        if args_split[-1].split(":")[1] == "":
+            endmins = 0
+        else:
+            endmins = int(args_split[-1].split(":")[1])
+        raidexp = 60 * endhours + endmins
         del args_split[-1]
     else:
         raidexp = False
@@ -1431,12 +1437,20 @@ async def timerset(ctx):
     except KeyError:
         pass
     args = ctx.message.content.lstrip("!timerset ")
-    exptime = args
-    if ":" in args:
-        args = re.sub(r"[a-zA-Z]", "", args)
-        exptime = 60 * int(args.split(":")[0]) + int(args.split(":")[1])
-    if str(exptime).isdigit():
-        await _timerset(ctx.message.channel, exptime)
+    if args.isdigit():
+        raidexp = args
+    elif ":" in args:
+        time = args
+        h,m = re.sub(r"[a-zA-Z]", "", time).split(":",maxsplit=1)
+        if h is "": h = "0"
+        if m is "": m = "0"
+        if h.isdigit() and m.isdigit():
+            raidexp = 60 * int(h) + int(m)
+        else:
+            await Meowth.send_message(ctx.message.channel, "Meowth! I couldn't understand your time format. Try again like this: !timerset <minutes>")
+            return
+    if str(raidexp).isdigit():
+        await _timerset(ctx.message.channel, raidexp)
     else:
         await Meowth.send_message(ctx.message.channel, _("Meowth... I couldn't understand your time format. Try again like this: !timerset <minutes>"))
 
@@ -1701,12 +1715,17 @@ async def _raidegg(message):
         await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Use at least: **!raidegg <level> <location>**. Type !help raidegg for more info."))
         return
 
-    if args_split[-1].isdigit():
-        raidexp = args_split[-1]
-        del args_split[-1]
     elif ":" in args_split[-1]:
         args_split[-1] = re.sub(r"[a-zA-Z]", "", args_split[-1])
-        raidexp = 60 * int(args_split[-1].split(":")[0]) + int(args_split[-1].split(":")[1])
+        if args_split[-1].split(":")[0] == "":
+            endhours = 0
+        else:
+            endhours = int(args_split[-1].split(":")[0])
+        if args_split[-1].split(":")[1] == "":
+            endmins = 0
+        else:
+            endmins = int(args_split[-1].split(":")[1])
+        raidexp = 60 * endhours + endmins
         del args_split[-1]
     else:
         raidexp = False
@@ -1802,6 +1821,9 @@ async def _eggassume(args, raid_channel):
 
     eggdetails['pokemon'] = entered_raid
     raidrole = discord.utils.get(raid_channel.server.roles, name = entered_raid)
+    if raidrole is None:
+        raidrole = await Meowth.create_role(server = raid_channel.server, name = entered_raid, hoist = False, mentionable = True)
+        await asyncio.sleep(0.5)
     await Meowth.send_message(raid_channel, _("Meowth! This egg will be assumed to be {pokemon} when it hatches!").format(pokemon=raidrole.mention))
     return
 
@@ -1811,9 +1833,11 @@ async def _eggtoraid(entered_raid, raid_channel):
     manual_timer = eggdetails['manual_timer']
     trainer_dict = eggdetails['trainer_dict']
     reportcity = eggdetails['reportcity']
+    reportcitychannel = discord.utils.get(raid_channel.server.channels, name=reportcity)
     egg_address = eggdetails['address']
     egg_report = eggdetails['raidreport']
     raid_message = eggdetails['raidmessage']
+    raid_messageauthor = raid_message.mentions[0]
     raidexp = eggdetails['exp'] + 60 * 60
     if entered_raid not in pkmn_info['pokemon_list']:
         await Meowth.send_message(raid_channel, spellcheck(entered_raid))
@@ -1842,7 +1866,7 @@ async def _eggtoraid(entered_raid, raid_channel):
     raid_embed.set_thumbnail(url=raid_img_url)
     raidreportcontent = _("Meowth! The egg has hatched into a {pokemon} raid! Details: {location_details}. Coordinate in {raid_channel}").format(pokemon=entered_raid.capitalize(), location_details=egg_address, raid_channel=raid_channel.mention)
     await Meowth.edit_channel(raid_channel, name=raid_channel_name)
-    raidmsg = _("""Meowth! The egg hatched into a {pokemon} raid! Details: {location_details}. Coordinate here!
+    raidmsg = _("""Meowth! The egg reported by {member} in {citychannel} hatched into a {pokemon} raid! Details: {location_details}. Coordinate here!
 
 To update your status, choose from the following commands:
 **!interested, !coming, !here, !cancel**
@@ -1862,7 +1886,7 @@ Sending a Google Maps link will also update the raid location.
 
 Message **!starting** when the raid is beginning to clear the raid's 'here' list.
 
-This channel will be deleted five minutes after the timer expires.""").format(pokemon=entered_raid.capitalize(), location_details=egg_address)
+This channel will be deleted five minutes after the timer expires.""").format(member= raid_messageauthor.mention, citychannel=reportcitychannel.mention, pokemon=entered_raid.capitalize(), location_details=egg_address)
 
     try:
         raid_message = await Meowth.edit_message(raid_message, new_content=raidmsg, embed=raid_embed)

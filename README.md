@@ -108,6 +108,7 @@ Note: avoid punctuation of any kind inside commands. The <> in these instruction
 | **!starting**  | *Raid Channel* | Clears all members with 'here' status, announce raid battle start. |
 | **!cancel**  | *Raid Channel* | Cancel your status. |
 | **!clearstatus**  | *Server Manager/Raid Channel* | Cancel everyone's status. |
+| **!list**  | *Region Channel* | Lists all raids from that region channel. |
 | **!list**  | *Raid Channel* | Lists all member status' for the raid. |
 | **!list interested** | *Raid Channel* | Lists 'interested' members for the raid. |
 | **!list coming**  | *Raid Channel* | Lists 'coming' members for the raid. |

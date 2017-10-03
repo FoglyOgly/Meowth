@@ -386,7 +386,7 @@ async def channel_cleanup(loop=True):
                 log_str = "Channel_Cleanup - Server: "+server.name
                 log_str = log_str+": Channel:"+channel.name
                 logger.info(log_str+" - CHECKING")
-                
+
                 if channel not in discord_channels:
                     #list channel for deletion from save data
                     dict_channel_delete.append(channel)
@@ -557,7 +557,7 @@ async def reboot_msg(owners,loop=False,):
     - Raid timer will now show both 12hr and 24hr values.
     - Fixed double expiry notices.
     - General housekeeping and spelling corrections.
-    
+
 You may have experienced issues with !list
 not working in certain raid channels and
 report channels.
@@ -600,7 +600,7 @@ async def maint_start():
         logger.info("Maintenance Tasts Started")
     except KeyboardInterrupt as e:
         tasks.cancel()
-    
+
 event_loop = asyncio.get_event_loop()
 
 """
@@ -927,7 +927,7 @@ async def on_member_join(member):
     server = member.server
     if server_dict[server]['done'] == False or server_dict[server]['welcome'] == False:
         return
-        
+
     # Build welcome message
 
     admin_message = _(" If you have any questions just ask an admin.")
@@ -1366,10 +1366,10 @@ async def print_raid_timer(channel):
         raidtype = "raid"
         raidaction = "end"
     if not server_dict[channel.server]['raidchannel_dict'][channel]['active']:
-        timerstr += _("Meowth! This {raidtype}'s timer has already expired as of {expiry_time}!").format(raidtype=raidtype,expiry_time=strftime("%I:%M", localexpire))
+        timerstr += _("Meowth! This {raidtype}'s timer has already expired as of {expiry_time} ({expiry_time24})!").format(raidtype=raidtype,expiry_time=strftime("%I:%M %p", localexpire),expiry_time24=strftime("%H:%M", localexpire))
     else:
         if server_dict[channel.server]['raidchannel_dict'][channel]['manual_timer']:
-            timerstr += _("Meowth! This {raidtype} will {raidaction} at {expiry_time}!").format(raidtype=raidtype,raidaction=raidaction,expiry_time=strftime("%I:%M", localexpire))
+            timerstr += _("Meowth! This {raidtype} will {raidaction} at {expiry_time} ({expiry_time24})!").format(raidtype=raidtype,raidaction=raidaction,expiry_time=strftime("%I:%M %p", localexpire),expiry_time24=strftime("%H:%M", localexpire))
         else:
             timerstr += _("Meowth! No one told me when the {raidtype} will {raidaction}, so I'm assuming it will {raidaction} at {expiry_time} ({expiry_time24})!").format(raidtype=raidtype,raidaction=raidaction,expiry_time=strftime("%I:%M %p", localexpire),expiry_time24=strftime("%H:%M", localexpire))
 
@@ -1506,7 +1506,7 @@ async def _cancel(message):
         t_dict = server_dict[server]['raidchannel_dict'][channel]['trainer_dict'][author.mention]
     except KeyError:
         await Meowth.send_message(channel, _("Meowth! {member} has no status to cancel!").format(member=author.mention))
-        
+
     if t_dict['status'] == "maybe":
         if t_dict['count'] == 1:
             await Meowth.send_message(channel, _("Meowth! {member} is no longer interested!").format(member=author.mention))
@@ -2049,7 +2049,7 @@ async def list(ctx):
             cty = channel.name
             rc_d = server_dict[server]['raidchannel_dict']
             listmsg += (_("Current Raids for {0}:").format(cty.capitalize()))
-            
+
             for r in server_dict[server]['raidchannel_dict']:
                 ctx_waitingcount = 0
                 ctx_omwcount = 0
@@ -2323,7 +2323,7 @@ async def _interest(ctx):
     if ctx_maybecount > 0:
         maybe_exstr = _(" including {trainer_list} and the people with them! Let them know if there is a group forming").format(trainer_list=", ".join(maybe_list))
     listmsg = (_("Meowth! {trainer_count} interested{including_string}!").format(trainer_count=str(ctx_maybecount), including_string=maybe_exstr))
-    
+
     return listmsg
 
 async def _otw(ctx):
@@ -2402,7 +2402,7 @@ async def invite(ctx):
             if msg.channel == ctx.message.channel and ctx.message.author.id == msg.author.id:
                 if msg.attachments:
                     return True
-        
+
         invitemsg = await Meowth.wait_for_message(author = ctx.message.author, check=check, timeout=30)
         if invitemsg is not None:
             ctx.message = invitemsg

@@ -59,7 +59,7 @@ py -m pip install -U discord.py pillow requests pytesseract hastebin.py
 10. Go back to your Discord application page and copy the Client ID.
 
 11. Go to the following link, replacing <CLIENT_ID> with the Client ID you copied.
-https://discordapp.com/oauth2/authorize?client_id=<CLIENT_ID>&scope=bot&permissions=268822608
+`https://discordapp.com/oauth2/authorize?client_id=<CLIENT_ID>&scope=bot&permissions=268822608`
 
 12. Select the server you want to add Meowth to and complete the prompts. If you get to an empty screen and didn't get to see the Google new reCaptcha tickbox, disable your adblocker.
 

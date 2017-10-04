@@ -1282,7 +1282,7 @@ async def wild(ctx):
 
 async def _wild(message, bot):
     if bot == "":
-        args = message.clean_content.lstrip("!wild ")
+        args = message.clean_content.lstrip("!wild")[1:]
         huntrexp = ""
     else:
         args = bot.lstrip("!wild ").split("|")[0]

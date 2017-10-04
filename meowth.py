@@ -693,6 +693,72 @@ async def on_server_remove(server):
 
 @Meowth.command(pass_context=True, hidden=True)
 @commands.has_permissions(manage_server=True)
+async def changelog(ctx):
+    await Meowth.delete_message(ctx.message)
+    await Meowth.send_message(ctx.message.channel, _("Meowth! I've been updated, {default_role}!").format(default_role=ctx.message.server.default_role))
+    changes_msg1 = """**Changelog**
+
+-----------------------------------------------
+**Global Changes**
+-----------------------------------------------
+1) Backend has been rewritten to be more stable with the cleanup of channels and other admin/helper functions. Makes life easier for the server owner.
+
+2) **!duplicate** has been rewritten to be more stable and will now ask last reporter for confirmation
+
+3) GymHuntrBot and HuntrBot integration has been rewritten to better handle duplicates and logic on how to deal with raid eggs has been added.
+
+4) Time remaining in **!raid, !raidegg, !timerset** can be input as <minutes remaining> (15) OR <time remaining> (0:15)
+
+5) Minor text fixes
+-----------------------------------------------
+**New Commands**
+-----------------------------------------------
+1) **!raidegg** - Usage: **!raidegg <level> <location> <time until hatch>** Example: !raidegg 2 downtown 15
+- Creates a temporary channel to coordinate for new egg spawns
+- Use **!raid <pokemon>** within raid channel once egg hatches to update to an active raid channel
+- Use **!raid assume <pokemon>** within raid channel to have the channel auto-update to a raid channel, currently only supported for Level 5 raid eggs
+- Only **!maybe** will work in raid eggs, unless it is an assumed egg, to avoid people leaving if it isn’t the wanted boss
+
+2) **!exraid** - Usage: **!exraid <pokemon> <location>** Example: !exraid Mewtwo downtown
+- Creates a temporary channel to coordinate for an EX Raid that lasts for three days"""
+    changes_msg2 = """3) **!invite** [Experimental]
+A totally automated way for your users to gain access to a previously reported exraid channel. Here's how it works...
+- A user receives an EX Raid invitation.
+- User uploads a screenshot of the invite to the Discord server, with the message **!invite** (the message and attached image must be sent together)
+- Using dark magic developed by Google, Meowth reads the text in the image, searching for the phrase 'EX Raid Battle'
+- If Meowth finds the keyphrase in the image, it responds to the user with a list of previously reported EX Raids and prompts the user to select the matching channel.
+- User selects the channel and Meowth grants read and send messages permissions to that channel. If the user's raid has not been reported, they can simply type 'N' to report their own (they will have to go through the **!invite** process again.
+- If Meowth doesn't find the keyphrase, it’ll say so. If the user sends an erroneous reply, it'll say that too. If no EX raids have been reported, it'll say that too.
+
+4) **!lists** has been renamed to **!list**. **!list** alone will function the same as the old **!lists** in city channels (active raid list) and in raid channels (status lists), but there is now **!list interested, !list coming, !list here** to see those specific lists. **!interest, !otw, !waiting** have been removed.
+
+5) **!location** - Will send raid location if sent within raid channels
+- **!location new <address>** will change the raid location. Sending a Google Maps link will also correct the location as before"""
+    changes_msg3 = """-----------------------------------------------
+**Other Commands** - Just for reference
+-----------------------------------------------
+**!want** - A command for declaring a Pokemon species the user wants. Usage: **!want <pokemon>**
+**!unwant** - A command for removing the !want for a Pokemon. Usage: **!unwant <pokemon>**
+**!wild** - Report a wild Pokemon spawn location. Usage: **!wild <pokemon> <location>**
+**!raid** - Report an ongoing raid. Usage: **!raid <pokemon> <location> <time remaining>**
+**!raidegg** - Report a raid egg. Usage: **!raidegg <level> <location> <time until hatch>**
+**!exraid** - Report an upcoming EX raid. Usage: **!exraid <pokemon> <location>**
+**!maybe**- Indicate you are interested in the raid. Usage: **!maybe <number of accounts *optional*>**
+**!coming** - Indicate you are on the way to a raid. Usage: **!coming <number of accounts *optional*>**
+**!here** - Indicate you have arrived at the raid. Usage: **!here <number of accounts *optional*>**
+**!cancel** - Indicate you are no longer interested in a raid and clears whatever your status is. Usage: **!cancel**
+**!timerset** - Set the remaining duration on a raid. Usage: **!timerset <time remaining>**
+**!timer** - Have Meowth resend the expire time message for a raid. Usage: **!timer**
+**!starting** - Signal that a raid is starting. Usage: **!starting**
+**!location** - Get raid location. Usage: **!location**. Use **!location new <address>** to change location
+**!duplicate** - A command to report a raid channel as a duplicate. Usage: **!duplicate** (requires three users to remove)
+**!invite** - Grants access to EX Raid channels. Usage: **!invite** WITH attached invite screenshot"""
+    await Meowth.send_message(ctx.message.channel, changes_msg1)
+    await Meowth.send_message(ctx.message.channel, changes_msg2)
+    await Meowth.send_message(ctx.message.channel, changes_msg3)
+
+@Meowth.command(pass_context=True, hidden=True)
+@commands.has_permissions(manage_server=True)
 async def configure(ctx):
     server = ctx.message.server
     owner = ctx.message.author
@@ -1217,8 +1283,10 @@ async def wild(ctx):
 async def _wild(message, bot):
     if bot == "":
         args = message.clean_content.lstrip("!wild ")
+        huntrexp = ""
     else:
-        args = bot.lstrip("!wild ")
+        args = bot.lstrip("!wild ").split("|")[0]
+        huntrexp = bot.lstrip("!wild ").split("|")[1]
     args_split = args.split(" ")
     if len(args_split) <= 1:
         await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**"))
@@ -1239,7 +1307,12 @@ async def _wild(message, bot):
                     return
             else:
                 spelltwo = spellcheck(entered_wild2).split('"')[3]
-        wild_gmaps_link = create_gmaps_query(wild_details, message.channel)
+
+        if bot == "":
+            wild_gmaps_link = create_gmaps_query(wild_details, message.channel)
+        else:
+            wild_gmaps_link = "https://www.google.com/maps/dir/Current+Location/{0}".format(wild_details)
+
 
     if entered_wild not in pkmn_info['pokemon_list']:
         await Meowth.send_message(message.channel, content=_('Meowth! I think you misspelled <pokemon name>. Did you mean "{one}" or "{two}"?').format(one=spellone, two=spelltwo))
@@ -1251,7 +1324,12 @@ async def _wild(message, bot):
             await asyncio.sleep(0.5)
         wild_number = pkmn_info['pokemon_list'].index(entered_wild) + 1
         wild_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(wild_number))
-        wild_embed = discord.Embed(title=_("Meowth! Click here for directions to the wild {pokemon}!").format(pokemon=entered_wild.capitalize()),url=wild_gmaps_link,description=_("This is just my best guess!"),colour=discord.Colour(0x2ecc71))
+
+        if bot == "":
+            wild_embed = discord.Embed(title=_("Meowth! Click here for directions to the wild {pokemon}!").format(pokemon=entered_wild.capitalize()),url=wild_gmaps_link,description=_("This is just my best guess!"),colour=discord.Colour(0x2ecc71))
+        else:
+            wild_embed = discord.Embed(title=_("Meowth! Click here for directions to the wild {pokemon}!").format(pokemon=entered_wild.capitalize()),url=wild_gmaps_link,description=_("Click above for exact directions!\n\nThis {pokemon} despawns in {huntrexp}").format(pokemon=entered_wild.capitalize(), huntrexp=huntrexp),colour=discord.Colour(0x2ecc71))
+
         wild_embed.set_thumbnail(url=wild_img_url)
         await Meowth.send_message(message.channel, content=_("Meowth! Wild {pokemon} reported by {member}! Details: {location_details}").format(pokemon=wild.mention, member=message.author.mention, location_details=wild_details),embed=wild_embed)
 
@@ -1626,7 +1704,8 @@ async def on_message(message):
         if message.embeds:
             hlocation = message.embeds[0]['url'].split("#")[1]
             hpokeid = message.embeds[0]['title'].split(" ")[2]
-            bot = "!wild {0} {1}".format(hpokeid, hlocation)
+            hexpire = message.embeds[0]['description'].split(": ")[1][:-1]
+            bot = "!wild {0} {1}|{2}".format(hpokeid, hlocation, hexpire)
             await Meowth.delete_message(message)
             await _wild(message, bot)
             return

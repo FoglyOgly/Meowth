@@ -327,8 +327,12 @@ If this was in error, reset the raid with **!timerset**"""))
             delete_time = server_dict[server]['raidchannel_dict'][channel]['exp'] + (1 * 60) - time.time()
         elif server_dict[server]['raidchannel_dict'][channel]['type'] == 'egg':
             if not alreadyexpired:
-                await Meowth.send_message(channel, _("""This channel timer has expired! The channel has been deactivated and will be deleted in 15 minutes.
-To reactivate the channel, use !raid <pokemon> update the raid, or use !timerset to set the timer again."""))
+                maybe_list = []
+                trainer_dict = server_dict[channel.server]['raidchannel_dict'][channel]['trainer_dict']
+                for trainer in trainer_dict.keys():
+                    if trainer_dict[trainer]['status']=='maybe':
+                        maybe_list.append(trainer)
+                await Meowth.send_message(channel, _("""**This egg has hatched!**\n\n...or the time has just expired. Trainers {trainer_list}: Update the raid to the pokemon that hatched using **!raid <pokemon>** or reset the hatch timer with **!timerset**. This channel will be deactivated until I get an update and I'll delete it in 15 minutes if I don't hear anything.""").format(trainer_list=", ".join(maybe_list)))
             delete_time = server_dict[server]['raidchannel_dict'][channel]['exp'] + (15 * 60) - time.time()
         else:
             if not alreadyexpired:
@@ -1537,7 +1541,7 @@ async def _cancel(message):
             await Meowth.send_message(channel, _("Meowth! {member} is no longer on their way!").format(member=author.mention))
         else:
             await Meowth.send_message(channel, _("Meowth! {member} and their total of {trainer_count} trainers are no longer on their way!").format(member=author.mention, trainer_count=t_dict['count']))
-    del server_dict[server]['raidchannel_dict'][channel]['trainer_dict'][author.mention]
+    t_dict['status'] = None
 
 @Meowth.event
 async def on_message(message):
@@ -1911,13 +1915,12 @@ This channel will be deleted five minutes after the timer expires.""").format(me
     'egglevel' : '0'
     }
 
-    maybe_list = []
+    trainer_list = []
     trainer_dict = server_dict[raid_channel.server]['raidchannel_dict'][raid_channel]['trainer_dict']
     for trainer in trainer_dict.keys():
-        if trainer_dict[trainer]['status']=='maybe':
-            maybe_list.append(trainer)
-    await Meowth.send_message(raid_channel, content = _("Meowth! Trainers {trainer_list}: The raid egg has just hatched into a {pokemon} raid!\nYou're now able to update your status with !coming or !here. If you've changed your plans, use !cancel.").format(trainer_list=", ".join(maybe_list), pokemon=raid.mention), embed = raid_embed)
-
+        if trainer_dict[trainer]['status'] =='maybe' or trainer_dict[trainer]['status'] =='omw' or trainer_dict[trainer]['status'] =='waiting':
+            trainer_list.append(trainer)
+    await Meowth.send_message(raid_channel, content = _("Meowth! Trainers {trainer_list}: The raid egg has just hatched into a {pokemon} raid!\nYou're now able to update your status with !coming or !here. If you've changed your plans, use !cancel.").format(trainer_list=", ".join(trainer_list), pokemon=raid.mention), embed = raid_embed)
     event_loop.create_task(expiry_check(raid_channel))
 
 

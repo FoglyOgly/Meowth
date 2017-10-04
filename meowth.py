@@ -2222,7 +2222,7 @@ async def starting(ctx):
         starting_str = _("Meowth! How can you start when there's no one waiting at this raid!?")
     await Meowth.send_message(ctx.message.channel, starting_str)
 
-@Meowth.group(pass_context=True)
+@Meowth.group(pass_context=True,aliases=["lists"])
 @checks.cityraidchannel()
 @checks.raidset()
 async def list(ctx):

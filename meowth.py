@@ -1282,11 +1282,11 @@ async def wild(ctx):
 
 async def _wild(message, bot):
     if bot == "":
-        args = message.clean_content.lstrip("!wild")[1:]
+        args = message.clean_content[6:]
         huntrexp = ""
     else:
-        args = bot.lstrip("!wild ").split("|")[0]
-        huntrexp = bot.lstrip("!wild ").split("|")[1]
+        args = bot.split("|")[0][6:]
+        huntrexp = bot.split("|")[1]
     args_split = args.split(" ")
     if len(args_split) <= 1:
         await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**"))
@@ -1357,10 +1357,10 @@ async def _raid(message, bot):
             await Meowth.send_message(message.channel, _("Meowth! Please restrict raid reports to a city channel!"))
             return
     if bot == "":
-        args = message.clean_content.lstrip("!raid")
+        args = message.clean_content[5:]
         gymhuntrgps = ""
     else:
-        args = bot.split("|")[0].lstrip("!raid")
+        args = bot.split("|")[0][5:]
         gymhuntrgps = bot.split("|")[1]
     args_split = args.split(" ")
     del args_split[0]
@@ -1544,7 +1544,7 @@ async def timerset(ctx):
             return
     except KeyError:
         pass
-    args = ctx.message.content.lstrip("!timerset ")
+    args = ctx.message.content[10:]
     if args.isdigit():
         raidexp = args
     elif ":" in args:
@@ -1663,15 +1663,14 @@ async def on_message(message):
                 bot = "!raid {0} {1} {2}:{3}|{4}".format(ghpokeid, ghgym, ghhour, ghminute, ghgps)
                 await Meowth.delete_message(message)
                 for channel in server_dict[message.server]['raidchannel_dict']:
-                    if server_dict[message.server]['raidchannel_dict'][channel]['type'] == 'egg':
+                    try:
                         if server_dict[message.server]['raidchannel_dict'][channel]['gymhuntrgps'] == ghgps:
-                            await _eggtoraid(ghpokeid.lower(), channel)
+                            if server_dict[message.server]['raidchannel_dict'][channel]['type'] == 'egg':
+                                await _eggtoraid(ghpokeid.lower(), channel)
                             ghduplicate = True
                             break
-                    elif server_dict[message.server]['raidchannel_dict'][channel]['type'] == 'raid':
-                        if server_dict[message.server]['raidchannel_dict'][channel]['gymhuntrgps'] == ghgps:
-                            ghduplicate = True
-                            break
+                    except KeyError:
+                        pass
                 if ghduplicate == False:
                     await _raid(message, bot)
                 return
@@ -1687,14 +1686,12 @@ async def on_message(message):
                 bot = "!raidegg {0} {1} {2}:{3}|{4}".format(ghegglevel, ghgym, ghhour, ghminute, ghgps)
                 await Meowth.delete_message(message)
                 for channel in server_dict[message.server]['raidchannel_dict']:
-                    if server_dict[message.server]['raidchannel_dict'][channel]['type'] == 'egg':
+                    try:
                         if server_dict[message.server]['raidchannel_dict'][channel]['gymhuntrgps'] == ghgps:
                             ghduplicate = True
                             break
-                    elif server_dict[message.server]['raidchannel_dict'][channel]['type'] == 'raid':
-                        if server_dict[message.server]['raidchannel_dict'][channel]['gymhuntrgps'] == ghgps:
-                            ghduplicate = True
-                            break
+                    except KeyError:
+                        pass
                 if ghduplicate == False:
                     await _raidegg(message, bot)
                 return
@@ -1774,7 +1771,7 @@ async def exraid(ctx):
     await _exraid(ctx.message)
 
 async def _exraid(message):
-    args = message.clean_content.lstrip("!exraid")
+    args = message.clean_content[8:]
     args_split = args.split(" ")
     del args_split[0]
     if len(args_split) <= 1:
@@ -1865,10 +1862,10 @@ async def raidegg(ctx):
 
 async def _raidegg(message, bot):
     if bot == "":
-        args = message.clean_content.lstrip("!raidegg")
+        args = message.clean_content[8:]
         gymhuntrgps = ""
     else:
-        args = bot.split("|")[0].lstrip("!raidegg")
+        args = bot.split("|")[0][8:]
         gymhuntrgps = bot.split("|")[1]
     args_split = args.split(" ")
     del args_split[0]

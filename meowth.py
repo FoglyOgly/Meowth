@@ -558,8 +558,6 @@ async def reboot_msg(owners,loop=False,):
     - Command checks have been remodelled, resulting in **!help** showing only relevant commands based on context.
     - **!unwant all** has been added, so people can remove all their pokemon roles.
     - **!clearstatus** has been added for use in raid channels. This clears all status counts for that raid.
-    - **!invite** now can be used seperately before uploading the image of your pass. Meowth will wait for 30 seconds after **!invite** is used.
-    - Raid timer will now show both 12hr and 24hr values.
     - **!invite** now can be used seperately before uploading the image of your pass. Meowth will wait for 30 seconds after !invite is used.
     - General housekeeping and spelling corrections.
 
@@ -1266,8 +1264,12 @@ async def _raid(message):
     del args_split[0]
     if fromegg is True:
         if args_split[0] == 'assume':
-            await _eggassume(" ".join(args_split), message.channel)
-            return
+            if server_dict[message.channel.server]['raidchannel_dict'][message.channel]['active'] == False:
+                await _eggtoraid(args_split[1], message.channel)
+                return
+            else:
+                await _eggassume(" ".join(args_split), message.channel)
+                return
         else:
             if server_dict[message.channel.server]['raidchannel_dict'][message.channel]['active'] == False:
                 await _eggtoraid(" ".join(args_split), message.channel)

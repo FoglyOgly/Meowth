@@ -560,7 +560,7 @@ async def reboot_msg(owners,loop=False,):
     - **!clearstatus** has been added for use in raid channels. This clears all status counts for that raid.
     - **!invite** now can be used seperately before uploading the image of your pass. Meowth will wait for 30 seconds after **!invite** is used.
     - Raid timer will now show both 12hr and 24hr values.
-    - Fixed double expiry notices.
+    - **!invite** now can be used seperately before uploading the image of your pass. Meowth will wait for 30 seconds after !invite is used.
     - General housekeeping and spelling corrections.
 
 You may have experienced issues with **!list**
@@ -702,7 +702,7 @@ async def configure(ctx):
             server_dict_temp['team']=False
             await Meowth.send_message(owner, _("**Team Assignments disabled!**\n---"))
             break
-        elif teamreply.content.lower == "cancel":
+        elif teamreply.content.lower() == "cancel":
             await Meowth.send_message(owner, _("**CONFIG CANCELLED!**\nNo changes have been made."))
             return
         else:
@@ -729,7 +729,7 @@ async def configure(ctx):
                 elif " " in welcomechannelreply.content.lower():
                     await Meowth.send_message(owner, _("Channel names can't contain spaces, sorry. Please double check the name and send your response again."))
                     continue
-                elif welcomechannelreply.content.lower == "cancel":
+                elif welcomechannelreply.content.lower() == "cancel":
                     await Meowth.send_message(owner, _("**CONFIG CANCELLED!**\nNo changes have been made."))
                     return
                 else:
@@ -748,7 +748,7 @@ async def configure(ctx):
             server_dict_temp['welcome'] = False
             await Meowth.send_message(owner, _("**Welcome Message disabled!**\n---"))
             break
-        elif welcomereply.content.lower == "cancel":
+        elif welcomereply.content.lower() == "cancel":
             await Meowth.send_message(owner, _("**CONFIG CANCELLED!**\nNo changes have been made."))
             return
         else:
@@ -914,7 +914,7 @@ async def configure(ctx):
             server_dict_temp['done']=True
             await Meowth.send_message(owner, _("**Main Functions disabled**\n---"))
             break
-        elif otherreply.content.lower == "cancel":
+        elif otherreply.content.lower() == "cancel":
             await Meowth.send_message(owner, _("**CONFIG CANCELLED!**\nNo changes have been made."))
             return
         else:

@@ -555,10 +555,12 @@ async def reboot_msg(owners,loop=False,):
 **Changes:**
     - **!list** and status update bug should be fixed.
     - Old timer formats no longer break map links, and instead are accepted and parsed as valid times.
-    - Command checks have been remodelled, resulting in !help showing only relevant commands based on context.
+    - Command checks have been remodelled, resulting in **!help** showing only relevant commands based on context.
     - **!unwant all** has been added, so people can remove all their pokemon roles.
     - **!clearstatus** has been added for use in raid channels. This clears all status counts for that raid.
-    - **!invite** now can be used seperately before uploading the image of your pass. Meowth will wait for 30 seconds after !invite is used.
+    - **!invite** now can be used seperately before uploading the image of your pass. Meowth will wait for 30 seconds after **!invite** is used.
+    - Raid timer will now show both 12hr and 24hr values.
+    - Fixed double expiry notices.
     - General housekeeping and spelling corrections.
 
 You may have experienced issues with **!list**

@@ -44,7 +44,7 @@ Windows:
 py -m pip install -U discord.py pillow requests pytesseract hastebin.py
 ```
 Tesseract-OCR has to be installed with a standard binary installer on Windows.
-Get the installer [HERE](https://cygwin.com/cgi-bin2/package-grep.cgi?grep=tesseract&arch=x86_64)
+Get the installer [HERE](https://github.com/tesseract-ocr/tesseract/wiki/Downloads)
 
 3. Download the files in this repository. The source code is in meowth.py and bot config is in config.json.
 

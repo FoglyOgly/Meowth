@@ -36,12 +36,15 @@ https://www.python.org/downloads/release/python-350/
 Linux:
 ```bash
 python3 -m pip install -U discord.py pillow requests pytesseract hastebin.py
+sudo apt-get install tesseract-ocr tesseract-ocr-eng
 ```
 
 Windows:
 ```bash
 py -m pip install -U discord.py pillow requests pytesseract hastebin.py
 ```
+Tesseract-OCR has to be installed with a standard binary installer on Windows.
+Get the installer [HERE](https://cygwin.com/cgi-bin2/package-grep.cgi?grep=tesseract&arch=x86_64)
 
 3. Download the files in this repository. The source code is in meowth.py and bot config is in config.json.
 

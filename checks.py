@@ -116,7 +116,7 @@ def check_wildset(ctx):
         return False
     server = ctx.message.server
     try:
-        return ctx.bot.server_dict[server]['raidset']
+        return ctx.bot.server_dict[server]['wildset']
     except KeyError:
         return False
 
@@ -163,13 +163,13 @@ def citychannel():
     def predicate(ctx):
         return check_citychannel(ctx)
     return commands.check(predicate)
-    
+
 def wantchannel():
     def predicate(ctx):
         if check_wantset(ctx):
             return check_wantchannel(ctx)
     return commands.check(predicate)
-    
+
 def raidchannel():
     def predicate(ctx):
         return check_raidchannel(ctx)
@@ -179,7 +179,7 @@ def notraidchannel():
     def predicate(ctx):
         return not check_raidchannel(ctx)
     return commands.check(predicate)
-    
+
 def activeraidchannel():
     def predicate(ctx):
         if check_raidchannel(ctx):

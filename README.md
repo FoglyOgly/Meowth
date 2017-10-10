@@ -3,7 +3,7 @@ A Discord helper bot for Pokemon Go communities.
 
 Meowth is a Discord bot written in Python 3.5 using version 0.16.8 of the discord.py library.
 
-## Meowth 2.0 is here! 
+## Meowth 2.0 is here!
 
 Meowth is now able to handle being on multiple servers of any size in any part of the world and can be invited to your server without having to install Python or run anything on a local machine yourself. The configuration process is now handled completely on Discord via DM with the server owner. First, a list of current features:
 
@@ -20,13 +20,15 @@ Note: You must have manage_server permissions to invite.
 4. Meowth will DM you to setup your server. Be sure to read the prompts properly.
 5. That's it! Enjoy!
 
-You can join the Meowth server here for updates, setup help, feature requests, or just to test out the bot before you add it. https://discord.gg/hhVjAN8 
+
+You can join the Meowth server here for updates, setup help, feature requests, or just to test out the bot before you add it. https://discord.gg/hhVjAN8
 
 If you want to tinker with Meowth yourself, you can still download this repo, make whatever changes you want (or keep everything if you want) and run Meowth locally. The configure process is the same except you'll have to use your own bot token.
 
 ## Directions for installing and running the bot on your server:
 
-1. Install Python 3.5. 
+
+1. Install Python 3.5.
 https://www.python.org/downloads/release/python-350/
 
 2. Install the packages needed to run meowth:
@@ -34,24 +36,27 @@ https://www.python.org/downloads/release/python-350/
 Linux:
 ```bash
 python3 -m pip install -U discord.py pillow requests pytesseract hastebin.py
+sudo apt-get install tesseract-ocr tesseract-ocr-eng
 ```
 
-Windows: 
+Windows:
 ```bash
 py -m pip install -U discord.py pillow requests pytesseract hastebin.py
 ```
+Tesseract-OCR has to be installed with a standard binary installer on Windows.
+Get the installer [HERE](https://github.com/tesseract-ocr/tesseract/wiki/Downloads)
 
 3. Download the files in this repository. The source code is in meowth.py and bot config is in config.json.
 
-4. Go to https://discordapp.com/developers/applications/me#top and create a new app. 
+4. Go to https://discordapp.com/developers/applications/me#top and create a new app.
 
-5. Name it and upload the avatar of your choice. 
+5. Name it and upload the avatar of your choice.
 
 6. Create a bot user for your app and reveal the bot token to copy it.
 
 7. Open config.json in a text editor (a good one to use is Notepad++) and paste the bot token into the value for "bot_token", replacing the "yourtoken" string.
 
-8. Replace the "master" value in config.json with your full discord username with the 4 digits after the hash. 
+8. Replace the "master" value in config.json with your full discord username with the 4 digits after the hash.
 
 9. Run meowth.py from the command prompt or terminal window. If successful, it should show "Meowth! That's right!".
 
@@ -62,7 +67,7 @@ py -m pip install -U discord.py pillow requests pytesseract hastebin.py
 
 12. Select the server you want to add Meowth to and complete the prompts. If you get to an empty screen and didn't get to see the Google new reCaptcha tickbox, disable your adblocker.
 
-9. The bot should now have sent you DM in Discord. Add the team roles: mystic, instinct and valor. Ensure they're below the bot role in the server role hierarchy. 
+9. The bot should now have sent you DM in Discord. Add the team roles: mystic, instinct and valor. Ensure they're below the bot role in the server role hierarchy.
 
 10. Simply type !configure in your server to start the configuration process.
 
@@ -122,6 +127,3 @@ Meowth relies completely on users for reports. Meowth was designed as an alterna
 ## Known issues:
 
 Compatibility with Python 3.6 on Mac OS X requires running "Install Certificates.command" in the Python 3.6 folder. Incompatible with discord.py 1.0
-
-
-

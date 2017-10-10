@@ -279,7 +279,7 @@ async def expiry_check(channel):
                                 if pokemon != '':
                                     logger.info("Expire_Channel - Egg Auto Hatched - "+channel.name)
                                     active_raids.remove(channel)
-                                    await _eggtoraid(pokemon, channel)
+                                    await _eggtoraid(pokemon.lower(), channel)
                                     continue
                             event_loop.create_task(expire_channel(channel))
                             active_raids.remove(channel)
@@ -1265,14 +1265,14 @@ async def _raid(message):
     if fromegg is True:
         if args_split[0] == 'assume':
             if server_dict[message.channel.server]['raidchannel_dict'][message.channel]['active'] == False:
-                await _eggtoraid(args_split[1], message.channel)
+                await _eggtoraid(args_split[1].lower(), message.channel)
                 return
             else:
                 await _eggassume(" ".join(args_split), message.channel)
                 return
         else:
             if server_dict[message.channel.server]['raidchannel_dict'][message.channel]['active'] == False:
-                await _eggtoraid(" ".join(args_split), message.channel)
+                await _eggtoraid(" ".join(args_split).lower(), message.channel)
                 return
             else:
                 await Meowth.send_message(message.channel, _("Meowth! Please wait until the egg has hatched before changing it to an open raid!"))

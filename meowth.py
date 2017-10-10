@@ -2086,7 +2086,7 @@ async def list(ctx):
             activeraidnum = 0
             cty = channel.name
             rc_d = server_dict[server]['raidchannel_dict']
-            listmsg += (_("Current Raids for {0}:").format(cty.capitalize()))
+            listmsg += (_("Meowth! Current Raids for {0}:").format(cty.capitalize()))
 
             for r in server_dict[server]['raidchannel_dict']:
                 ctx_waitingcount = 0

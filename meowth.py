@@ -278,7 +278,7 @@ async def expiry_check(channel):
                                 if pokemon != '':
                                     logger.info("Expire_Channel - Egg Auto Hatched - "+channel.name)
                                     active_raids.remove(channel)
-                                    await _eggtoraid(pokemon, channel)
+                                    await _eggtoraid(pokemon.lower(), channel)
                                     continue
                             event_loop.create_task(expire_channel(channel))
                             active_raids.remove(channel)
@@ -1366,11 +1366,15 @@ async def _raid(message, bot):
     del args_split[0]
     if fromegg is True:
         if args_split[0] == 'assume':
-            await _eggassume(" ".join(args_split), message.channel)
-            return
+            if server_dict[message.channel.server]['raidchannel_dict'][message.channel]['active'] == False:
+                await _eggtoraid(args_split[1].lower(), message.channel)
+                return
+            else:
+                await _eggassume(" ".join(args_split), message.channel)
+                return
         else:
             if server_dict[message.channel.server]['raidchannel_dict'][message.channel]['active'] == False:
-                await _eggtoraid(" ".join(args_split), message.channel)
+                await _eggtoraid(" ".join(args_split).lower(), message.channel)
                 return
             else:
                 await Meowth.send_message(message.channel, _("Meowth! Please wait until the egg has hatched before changing it to an open raid!"))
@@ -1665,9 +1669,9 @@ async def on_message(message):
                 for channel in server_dict[message.server]['raidchannel_dict']:
                     try:
                         if server_dict[message.server]['raidchannel_dict'][channel]['gymhuntrgps'] == ghgps:
+                            ghduplicate = True
                             if server_dict[message.server]['raidchannel_dict'][channel]['type'] == 'egg':
                                 await _eggtoraid(ghpokeid.lower(), channel)
-                            ghduplicate = True
                             break
                     except KeyError:
                         pass
@@ -2072,7 +2076,8 @@ Message **!starting** when the raid is beginning to clear the raid's 'here' list
     'address' : egg_address,
     'type' : 'raid',
     'pokemon' : entered_raid,
-    'egglevel' : '0'
+    'egglevel' : '0',
+    'gymhuntrgps' : gymhuntrgps
     }
 
     trainer_list = []
@@ -2237,7 +2242,7 @@ async def list(ctx):
             activeraidnum = 0
             cty = channel.name
             rc_d = server_dict[server]['raidchannel_dict']
-            listmsg += (_("Current Raids for {0}:").format(cty.capitalize()))
+            listmsg += (_("Meowth! Current Raids for {0}:").format(cty.capitalize()))
 
             for r in server_dict[server]['raidchannel_dict']:
                 ctx_waitingcount = 0
@@ -2435,8 +2440,12 @@ async def location(ctx):
         raidmsg = rc_d[channel]['raidmessage']
         location = rc_d[channel]['address']
         report_city = rc_d[channel]['reportcity']
+        gymhuntrgps = rc_d[channel]['gymhuntrgps']
         report_channel = discord.utils.get(server.channels, name=report_city)
-        locurl = create_gmaps_query(location, report_channel)
+        if gymhuntrgps == "":
+            locurl = create_gmaps_query(location, report_channel)
+        else:
+            locurl = "https://www.google.com/maps/dir/Current+Location/{0}".format(gymhuntrgps)
         oldembed = raidmsg.embeds[0]
         newembed = discord.Embed(title=oldembed['title'],url=locurl,description=oldembed['description'],colour=discord.Colour(0x2ecc71))
         newembed.set_thumbnail(url=oldembed['thumbnail']['url'])

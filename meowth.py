@@ -1014,8 +1014,9 @@ async def outputlog(ctx):
 
     Usage: !outputlog
     Output is a link to hastebin."""
-    with open('logs\meowth.log', 'r') as logfile:
+    with open('logs/meowth.log', 'r') as logfile:
         logdata=logfile.read()
+    logdata = logdata.encode('ascii', errors='replace').decode('utf-8')
     await Meowth.send_message(ctx.message.channel, hastebin.post(logdata))
 
 

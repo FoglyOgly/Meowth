@@ -54,7 +54,7 @@ Get the installer [HERE](https://github.com/tesseract-ocr/tesseract/wiki/Downloa
 
 6. Create a bot user for your app and reveal the bot token to copy it.
 
-7. Open config.json in a text editor (a good one to use is Notepad++) and paste the bot token into the value for "bot_token", replacing the "yourtoken" string.
+7. Copy config_blank.json and rename to config.json. Open config.json in a text editor (a good one to use is Notepad++) and paste the bot token into the value for "bot_token", replacing the "yourtoken" string.
 
 8. Replace the "master" value in config.json with your full discord username with the 4 digits after the hash.
 

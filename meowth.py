@@ -63,9 +63,24 @@ logger = setup_logger('discord','logs/meowth.log',logging.INFO)
 
 Meowth = commands.Bot(command_prefix="!")
 
-with open("serverdict", "rb") as fd:
-    Meowth.server_dict = pickle.load(fd)
-    server_dict = Meowth.server_dict
+try:
+    with open("serverdict", "rb") as fd:
+        Meowth.server_dict = pickle.load(fd)
+    logger.info("Serverdict Loaded Successfully")
+except OSError:
+    logger.info("Serverdict Not Found - Looking for Backup")
+    try:
+        with open("serverdict_backup", "rb") as fd:
+            Meowth.server_dict = pickle.load(fd)
+        logger.info("Serverdict Backup Loaded Successfully")
+    except OSError:
+        logger.info("Serverdict Backup Not Found - Creating New Serverdict")
+        Meowth.server_dict = {}
+        with open("serverdict", "wb") as fd:
+            pickle.dump(Meowth.server_dict, fd)
+        logger.info("Serverdict Created")
+
+server_dict = Meowth.server_dict
 
 config = {}
 pkmn_info = {}

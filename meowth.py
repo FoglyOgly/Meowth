@@ -278,11 +278,17 @@ async def expiry_check(channel):
                                 pokemon = server_dict[server]['raidchannel_dict'][channel]['pokemon']
                                 if pokemon != '':
                                     logger.info("Expire_Channel - Egg Auto Hatched - "+channel.name)
-                                    active_raids.remove(channel)
+                                    try:
+                                        active_raids.remove(channel)
+                                    except ValueError:
+                                        logger.info("Expire_Channel - Channel Removal From ActiveRaid Failed - Not in List - "+channel.name)
                                     await _eggtoraid(pokemon.lower(), channel)
                                     break
                             event_loop.create_task(expire_channel(channel))
-                            active_raids.remove(channel)
+                            try:
+                                active_raids.remove(channel)
+                            except ValueError:
+                                logger.info("Expire_Channel - Channel Removal From ActiveRaid Failed - Not in List - "+channel.name)
                             logger.info("Expire_Channel - Channel Expired And Removed From Watchlist - "+channel.name)
                             break
             except KeyError:

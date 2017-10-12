@@ -280,7 +280,7 @@ async def expiry_check(channel):
                                     logger.info("Expire_Channel - Egg Auto Hatched - "+channel.name)
                                     active_raids.remove(channel)
                                     await _eggtoraid(pokemon.lower(), channel)
-                                    continue
+                                    break
                             event_loop.create_task(expire_channel(channel))
                             active_raids.remove(channel)
                             logger.info("Expire_Channel - Channel Expired And Removed From Watchlist - "+channel.name)

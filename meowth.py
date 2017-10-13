@@ -1752,8 +1752,8 @@ async def on_message(message):
                     oldembed = oldraidmsg.embeds[0]
                     newembed = discord.Embed(title=oldembed['title'],url=newloc,description=oldembed['description'],colour=discord.Colour(0x2ecc71))
                     newembed.set_thumbnail(url=oldembed['thumbnail']['url'])
-                    await Meowth.edit_message(oldraidmsg, new_content=oldraidmsg.content, embed=newembed)
-                    await Meowth.edit_message(oldreportmsg, new_content=oldreportmsg.content, embed=newembed)
+                    newraidmsg = await Meowth.edit_message(oldraidmsg, new_content=oldraidmsg.content, embed=newembed)
+                    newreportmsg = await Meowth.edit_message(oldreportmsg, new_content=oldreportmsg.content, embed=newembed)
                     otw_list = []
                     trainer_dict = server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']
                     for trainer in trainer_dict.keys():
@@ -2450,7 +2450,7 @@ async def location(ctx):
         gymhuntrgps = rc_d[channel]['gymhuntrgps']
         report_channel = discord.utils.get(server.channels, name=report_city)
         if gymhuntrgps == "":
-            locurl = create_gmaps_query(location, report_channel)
+            locurl = oldembed['url']
         else:
             locurl = "https://www.google.com/maps/dir/Current+Location/{0}".format(gymhuntrgps)
         oldembed = raidmsg.embeds[0]

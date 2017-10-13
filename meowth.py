@@ -278,11 +278,17 @@ async def expiry_check(channel):
                                 pokemon = server_dict[server]['raidchannel_dict'][channel]['pokemon']
                                 if pokemon != '':
                                     logger.info("Expire_Channel - Egg Auto Hatched - "+channel.name)
-                                    active_raids.remove(channel)
+                                    try:
+                                        active_raids.remove(channel)
+                                    except ValueError:
+                                        logger.info("Expire_Channel - Channel Removal From ActiveRaid Failed - Not in List - "+channel.name)
                                     await _eggtoraid(pokemon.lower(), channel)
-                                    continue
+                                    break
                             event_loop.create_task(expire_channel(channel))
-                            active_raids.remove(channel)
+                            try:
+                                active_raids.remove(channel)
+                            except ValueError:
+                                logger.info("Expire_Channel - Channel Removal From ActiveRaid Failed - Not in List - "+channel.name)
                             logger.info("Expire_Channel - Channel Expired And Removed From Watchlist - "+channel.name)
                             break
             except KeyError:
@@ -1581,6 +1587,7 @@ async def on_message(message):
                         newloc = message.content[newlocindex:]
                     else:
                         newloc = message.content[newlocindex:newlocend+1]
+                    server_dict[message.server]['raidchannel_dict'][message.channel]['address'] = newloc
                     oldraidmsg = server_dict[message.server]['raidchannel_dict'][message.channel]['raidmessage']
                     oldreportmsg = server_dict[message.server]['raidchannel_dict'][message.channel]['raidreport']
                     oldembed = oldraidmsg.embeds[0]
@@ -2285,11 +2292,17 @@ async def location(ctx):
         location = rc_d[channel]['address']
         report_city = rc_d[channel]['reportcity']
         report_channel = discord.utils.get(server.channels, name=report_city)
-        locurl = create_gmaps_query(location, report_channel)
+        if "maps" in location:
+            locurl = location
+        else:
+            locurl = create_gmaps_query(location, report_channel)
         oldembed = raidmsg.embeds[0]
         newembed = discord.Embed(title=oldembed['title'],url=locurl,description=oldembed['description'],colour=discord.Colour(0x2ecc71))
         newembed.set_thumbnail(url=oldembed['thumbnail']['url'])
-        await Meowth.send_message(channel, content = _("Meowth! Here's the current location for the raid!\nDetails:{location}").format(location = location), embed = newembed)
+        if "maps" in location:
+            await Meowth.send_message(channel, content = _("Meowth! Here's the current location for the raid!"), embed = newembed)
+        else:
+            await Meowth.send_message(channel, content = _("Meowth! Here's the current location for the raid!\nDetails:{location}").format(location = location), embed = newembed)
 
 @location.command(pass_context=True)
 @checks.activeraidchannel()
@@ -2319,10 +2332,12 @@ async def new(ctx):
                 newloc = message.content[newlocindex:]
             else:
                 newloc = message.content[newlocindex:newlocend+1]
+            server_dict[message.server]['raidchannel_dict'][message.channel]['address'] = newloc
         else:
             newloc = create_gmaps_query(details, report_channel)
+            server_dict[message.server]['raidchannel_dict'][message.channel]['address'] = details
 
-        server_dict[message.server]['raidchannel_dict'][message.channel]['address'] = details
+        oldraidmsg = server_dict[message.server]['raidchannel_dict'][message.channel]['raidmessage']
         oldraidmsg = server_dict[message.server]['raidchannel_dict'][message.channel]['raidmessage']
         oldreportmsg = server_dict[message.server]['raidchannel_dict'][message.channel]['raidreport']
         oldembed = oldraidmsg.embeds[0]

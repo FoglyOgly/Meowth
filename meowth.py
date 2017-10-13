@@ -1587,7 +1587,6 @@ async def on_message(message):
                         newloc = message.content[newlocindex:]
                     else:
                         newloc = message.content[newlocindex:newlocend+1]
-                    server_dict[message.server]['raidchannel_dict'][message.channel]['address'] = newloc
                     oldraidmsg = server_dict[message.server]['raidchannel_dict'][message.channel]['raidmessage']
                     oldreportmsg = server_dict[message.server]['raidchannel_dict'][message.channel]['raidreport']
                     oldembed = oldraidmsg.embeds[0]
@@ -2292,17 +2291,11 @@ async def location(ctx):
         location = rc_d[channel]['address']
         report_city = rc_d[channel]['reportcity']
         report_channel = discord.utils.get(server.channels, name=report_city)
-        if "maps" in location:
-            locurl = location
-        else:
-            locurl = create_gmaps_query(location, report_channel)
+        locurl = create_gmaps_query(location, report_channel)
         oldembed = raidmsg.embeds[0]
         newembed = discord.Embed(title=oldembed['title'],url=locurl,description=oldembed['description'],colour=discord.Colour(0x2ecc71))
         newembed.set_thumbnail(url=oldembed['thumbnail']['url'])
-        if "maps" in location:
-            await Meowth.send_message(channel, content = _("Meowth! Here's the current location for the raid!"), embed = newembed)
-        else:
-            await Meowth.send_message(channel, content = _("Meowth! Here's the current location for the raid!\nDetails:{location}").format(location = location), embed = newembed)
+        await Meowth.send_message(channel, content = _("Meowth! Here's the current location for the raid!\nDetails:{location}").format(location = location), embed = newembed)
 
 @location.command(pass_context=True)
 @checks.activeraidchannel()
@@ -2332,12 +2325,10 @@ async def new(ctx):
                 newloc = message.content[newlocindex:]
             else:
                 newloc = message.content[newlocindex:newlocend+1]
-            server_dict[message.server]['raidchannel_dict'][message.channel]['address'] = newloc
         else:
             newloc = create_gmaps_query(details, report_channel)
-            server_dict[message.server]['raidchannel_dict'][message.channel]['address'] = details
 
-        oldraidmsg = server_dict[message.server]['raidchannel_dict'][message.channel]['raidmessage']
+        server_dict[message.server]['raidchannel_dict'][message.channel]['address'] = details
         oldraidmsg = server_dict[message.server]['raidchannel_dict'][message.channel]['raidmessage']
         oldreportmsg = server_dict[message.server]['raidchannel_dict'][message.channel]['raidreport']
         oldembed = oldraidmsg.embeds[0]

@@ -2449,11 +2449,11 @@ async def location(ctx):
         report_city = rc_d[channel]['reportcity']
         gymhuntrgps = rc_d[channel]['gymhuntrgps']
         report_channel = discord.utils.get(server.channels, name=report_city)
+        oldembed = raidmsg.embeds[0]
         if gymhuntrgps == "":
             locurl = oldembed['url']
         else:
             locurl = "https://www.google.com/maps/dir/Current+Location/{0}".format(gymhuntrgps)
-        oldembed = raidmsg.embeds[0]
         newembed = discord.Embed(title=oldembed['title'],url=locurl,description=oldembed['description'],colour=discord.Colour(0x2ecc71))
         newembed.set_thumbnail(url=oldembed['thumbnail']['url'])
         await Meowth.send_message(channel, content = _("Meowth! Here's the current location for the raid!\nDetails:{location}").format(location = location), embed = newembed)

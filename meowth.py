@@ -1006,7 +1006,27 @@ async def exit(ctx):
     except Exception as err:
         print(_("Error occured while trying to save!"))
         print(err)
-    quit()
+
+    await Meowth.send_message(ctx.message.channel,"Shutting down...")
+    Meowth._shutdown_mode = 0
+    await Meowth.logout()
+
+@Meowth.command(pass_context=True)
+@checks.is_owner()
+async def restart(ctx):
+    """Exit after saving.
+
+    Usage: !exit.
+    Calls the save function and quits the script."""
+    try:
+        await _save()
+    except Exception as err:
+        print(_("Error occured while trying to save!"))
+        print(err)
+
+    await Meowth.send_message(ctx.message.channel,"Restarting...")
+    Meowth._shutdown_mode = 26
+    await Meowth.logout()
 
 @Meowth.command(pass_context=True)
 @checks.is_owner()
@@ -2538,4 +2558,20 @@ async def on_command_error(error, ctx):
     else:
         logger.exception(type(error).__name__, exc_info=error)
 
-Meowth.run(config['bot_token'])
+try:
+    event_loop.run_until_complete(Meowth.start(config['bot_token']))
+except discord.LoginFailure:
+    logger.critical("Invalid token")
+    event_loop.run_until_complete(Meowth.logout())
+    Meowth._shutdown_mode = 0
+except KeyboardInterrupt:
+    logger.info("Keyboard interrupt detected. Quitting...")
+    event_loop.run_until_complete(Meowth.logout())
+    Meowth._shutdown_mode = 0
+except Exception as e:
+    logger.critical("Fatal exception", exc_info=e)
+    event_loop.run_until_complete(Meowth.logout())
+finally:
+    pass
+
+sys.exit(Meowth._shutdown_mode)

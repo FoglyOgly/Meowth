@@ -35,13 +35,13 @@ https://www.python.org/downloads/release/python-350/
 
 Linux:
 ```bash
-python3 -m pip install -U discord.py pillow requests pytesseract hastebin.py
+python3 -m pip install -U discord.py pillow requests pytesseract hastebin.py fuzzywuzzy
 sudo apt-get install tesseract-ocr tesseract-ocr-eng
 ```
 
 Windows:
 ```bash
-py -m pip install -U discord.py pillow requests pytesseract hastebin.py
+py -m pip install -U discord.py pillow requests pytesseract hastebin.py fuzzywuzzy
 ```
 Tesseract-OCR has to be installed with a standard binary installer on Windows.
 Get the installer [HERE](https://github.com/tesseract-ocr/tesseract/wiki/Downloads)

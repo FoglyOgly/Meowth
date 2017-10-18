@@ -28,20 +28,17 @@ If you want to tinker with Meowth yourself, you can still download this repo, ma
 ## Directions for installing and running the bot on your server:
 
 
-1. Install Python 3.5.
+1. Install Python 3.5 and ensure PIP is also installed with it.
 https://www.python.org/downloads/release/python-350/
 
-2. Install the packages needed to run meowth:
-
+2. Install the packages needed to run meowth by running install.py:
 Linux:
 ```bash
-python3 -m pip install -U discord.py pillow requests pytesseract hastebin.py
-sudo apt-get install tesseract-ocr tesseract-ocr-eng
+python3 install.py
 ```
-
 Windows:
 ```bash
-py -m pip install -U discord.py pillow requests pytesseract hastebin.py
+py install.py
 ```
 Tesseract-OCR has to be installed with a standard binary installer on Windows.
 Get the installer [HERE](https://github.com/tesseract-ocr/tesseract/wiki/Downloads)

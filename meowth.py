@@ -296,14 +296,14 @@ async def expiry_check(channel):
                                     try:
                                         active_raids.remove(channel)
                                     except ValueError:
-                                        logger.info("Expire_Channel - Channel Removal From ActiveRaid Failed - Not in List - "+channel.name)
+                                        logger.info("Expire_Channel - Channel Removal From Active Raid Failed - Not in List - "+channel.name)
                                     await _eggtoraid(pokemon.lower(), channel)
                                     break
                             event_loop.create_task(expire_channel(channel))
                             try:
                                 active_raids.remove(channel)
                             except ValueError:
-                                logger.info("Expire_Channel - Channel Removal From ActiveRaid Failed - Not in List - "+channel.name)
+                                logger.info("Expire_Channel - Channel Removal From Active Raid Failed - Not in List - "+channel.name)
                             logger.info("Expire_Channel - Channel Expired And Removed From Watchlist - "+channel.name)
                             break
             except KeyError:
@@ -1659,35 +1659,35 @@ async def exraid(ctx):
     Meowth's message will also include the type weaknesses of the boss.
 
     Finally, Meowth will create a separate channel for the raid report, for the purposes of organizing the raid."""
+    await _exraid(ctx)
 
-    await _exraid(ctx.message)
-
-async def _exraid(message):
+async def _exraid(ctx):
+    message = ctx.message
+    channel = message.channel
     args = message.clean_content[8:]
     args_split = args.split(" ")
-    del args_split[0]
     if len(args_split) <= 1:
-        await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!exraid <pokemon name> <location>**"))
+        await Meowth.send_message(channel, _("Meowth! Give more details when reporting! Usage: **!exraid <pokemon name> <location>**"))
         return
     entered_raid = re.sub("[\@]", "", args_split[0].lower())
     del args_split[0]
     if entered_raid not in pkmn_info['pokemon_list']:
-        await Meowth.send_message(message.channel, spellcheck(entered_raid))
+        await Meowth.send_message(channel, spellcheck(entered_raid))
         return
     if entered_raid not in pkmn_info['raid_list'] and entered_raid in pkmn_info['pokemon_list']:
-        await Meowth.send_message(message.channel, _("Meowth! The Pokemon {pokemon} does not appear in raids!").format(pokemon=entered_raid.capitalize()))
+        await Meowth.send_message(channel, _("Meowth! The Pokemon {pokemon} does not appear in raids!").format(pokemon=entered_raid.capitalize()))
         return
 
     raid_details = " ".join(args_split)
     raid_details = raid_details.strip()
     if raid_details == '':
-        await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!exraid <pokemon name> <location>**"))
+        await Meowth.send_message(channel, _("Meowth! Give more details when reporting! Usage: **!exraid <pokemon name> <location>**"))
         return
 
-    raid_gmaps_link = create_gmaps_query(raid_details, message.channel)
+    raid_gmaps_link = create_gmaps_query(raid_details, channel)
 
     raid_channel_name = entered_raid + "-" + sanitize_channel_name(raid_details)
-    raid_channel_overwrites = message.channel.overwrites
+    raid_channel_overwrites = channel.overwrites
     meowth_overwrite = (Meowth.user, discord.PermissionOverwrite(send_messages = True))
     for overwrite in raid_channel_overwrites:
         overwrite[1].send_messages = False
@@ -1700,7 +1700,7 @@ async def _exraid(message):
     raid_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(raid_number))
     raid_embed = discord.Embed(title=_("Meowth! Click here for directions to the EX raid!"),url=raid_gmaps_link,description=_("Weaknesses: {weakness_list}").format(weakness_list=weakness_to_str(message.server, get_weaknesses(entered_raid))),colour=discord.Colour(0x2ecc71))
     raid_embed.set_thumbnail(url=raid_img_url)
-    raidreport = await Meowth.send_message(message.channel, content = _("Meowth! {pokemon} EX raid reported by {member}! Details: {location_details}. Send proof of your invite to this EX raid to an admin and coordinate in {raid_channel}").format(pokemon=entered_raid.capitalize(), member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention),embed=raid_embed)
+    raidreport = await Meowth.send_message(channel, content = _("Meowth! {pokemon} EX raid reported by {member}! Details: {location_details}. Send proof of your invite to this EX raid to an admin and coordinate in {raid_channel}").format(pokemon=entered_raid.capitalize(), member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention),embed=raid_embed)
     await asyncio.sleep(1) #Wait for the channel to be created.
 
     raidmsg = _("""Meowth! {pokemon} EX raid reported by {member} in {citychannel}! Details: {location_details}. Coordinate here!
@@ -1720,11 +1720,11 @@ Sending a Google Maps link will also update the raid location.
 
 Message **!starting** when the raid is beginning to clear the raid's 'here' list.
 
-This channel needs to be manually deleted!""").format(pokemon=raid.mention, member=message.author.mention, citychannel=message.channel.mention, location_details=raid_details)
+This channel needs to be manually deleted!""").format(pokemon=raid.mention, member=message.author.mention, citychannel=channel.mention, location_details=raid_details)
     raidmessage = await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)
 
     server_dict[message.server]['raidchannel_dict'][raid_channel] = {
-        'reportcity' : message.channel.name,
+        'reportcity' : channel.name,
         'trainer_dict' : {},
         'exp' : None, # No expiry
         'manual_timer' : False,

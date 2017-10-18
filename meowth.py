@@ -1392,7 +1392,7 @@ This channel will be deleted five minutes after the timer expires.""").format(po
         }
 
     if raidexp:
-        await _timerset(raid_channel,raidexp)
+        await _timerset(ctx,raidexp)
     else:
         await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left on the raid using **!timerset <minutes>** so others can check it with **!timer**.").format(member=message.author.mention))
 
@@ -1420,20 +1420,23 @@ async def print_raid_timer(channel):
     return timerstr
 
 
-async def _timerset(channel, exptime):
+async def _timerset(ctx, exptime):
+    message = ctx.message
+    channel = message.channel
+    server = message.server
     exptime = int(exptime)
     # Meowth saves the timer message in the channel's 'exp' field.
 
     ticks = time.time()
 
-    if server_dict[channel.server]['raidchannel_dict'][channel]['type'] == 'egg':
+    if checks.check_eggchannel(ctx):
         raidtype = "Eggs"
     else:
         raidtype = "Raids"
 
     try:
         s = exptime * 60
-        if s >= 3600:
+        if s > 3600:
             await Meowth.send_message(channel, _("Meowth...that's too long. {raidtype} currently last no more than one hour...").format(raidtype=raidtype))
             return
         if s < 0:
@@ -1446,13 +1449,13 @@ async def _timerset(channel, exptime):
 
 
     # Update timestamp
-    server_dict[channel.server]['raidchannel_dict'][channel]['exp'] = expire
+    server_dict[server]['raidchannel_dict'][channel]['exp'] = expire
     # Reactivate channel
-    if not server_dict[channel.server]['raidchannel_dict'][channel]['active']:
+    if not server_dict[server]['raidchannel_dict'][channel]['active']:
         await Meowth.send_message(channel, "The channel has been reactivated.")
-    server_dict[channel.server]['raidchannel_dict'][channel]['active'] = True
+    server_dict[server]['raidchannel_dict'][channel]['active'] = True
     # Mark that timer has been manually set
-    server_dict[channel.server]['raidchannel_dict'][channel]['manual_timer'] = True
+    server_dict[server]['raidchannel_dict'][channel]['manual_timer'] = True
     # Send message
     timerstr = await print_raid_timer(channel)
     await Meowth.send_message(channel, timerstr)
@@ -1461,24 +1464,22 @@ async def _timerset(channel, exptime):
 
 @Meowth.command(pass_context=True)
 @checks.raidchannel()
-async def timerset(ctx):
+async def timerset(ctx,timer):
     """Set the remaining duration on a raid.
 
     Usage: !timerset <minutes>
     Works only in raid channels, can be set or overridden by anyone.
     Meowth displays the end time in HH:MM local time."""
     try:
-        if server_dict[ctx.message.channel.server]['raidchannel_dict'][ctx.message.channel]['type'] == 'exraid':
+        if checks.check_exraidchannel(ctx):
             await Meowth.send_message(ctx.message.channel, _("Timerset isn't supported for exraids. Please get a mod/admin to remove the channel if channel needs to be removed."))
             return
     except KeyError:
         pass
-    args = ctx.message.content[10:]
-    if args.isdigit():
-        raidexp = args
-    elif ":" in args:
-        time = args
-        h,m = re.sub(r"[a-zA-Z]", "", time).split(":",maxsplit=1)
+    if timer.isdigit():
+        raidexp = timer
+    elif ":" in timer:
+        h,m = re.sub(r"[a-zA-Z]", "", timer).split(":",maxsplit=1)
         if h is "": h = "0"
         if m is "": m = "0"
         if h.isdigit() and m.isdigit():
@@ -1486,8 +1487,11 @@ async def timerset(ctx):
         else:
             await Meowth.send_message(ctx.message.channel, "Meowth! I couldn't understand your time format. Try again like this: **!timerset <minutes>**")
             return
+    else:
+        raise commands.BadArgument(_("{entered_time} is not a valid time").format(entered_time=timer))
+        return
     if str(raidexp).isdigit():
-        await _timerset(ctx.message.channel, raidexp)
+        await _timerset(ctx, raidexp)
     else:
         await Meowth.send_message(ctx.message.channel, _("Meowth... I couldn't understand your time format. Try again like this: **!timerset <minutes>**"))
 
@@ -1498,7 +1502,7 @@ async def timer(ctx):
 
     Usage: !timer
     The expiry time should have been previously set with !timerset."""
-    if server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['type'] == 'exraid':
+    if checks.check_exraidchannel(ctx):
         await Meowth.send_message(ctx.message.channel, _("Exraids don't expire. Please get a mod/admin to remove the channel if channel needs to be removed."))
         return
     else:
@@ -1832,7 +1836,7 @@ When this egg raid expires, there will be 15 minutes to update it into an open r
             }
 
         if raidexp:
-            await _timerset(raid_channel,raidexp)
+            await _timerset(ctx,raidexp)
         else:
             await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left on the raid using **!timerset <minutes>** so others can check it with **!timer**.").format(member=message.author.mention))
 
@@ -2532,9 +2536,13 @@ async def _invite(ctx):
 async def on_command_error(error, ctx):
     channel = ctx.message.channel
     if isinstance(error, commands.MissingRequiredArgument):
-        await Meowth.send_cmd_help(ctx)
+        pages = Meowth.formatter.format_help_for(ctx,ctx.command)
+        for page in pages:
+            await Meowth.send_message(ctx.message.channel, page)
     elif isinstance(error, commands.BadArgument):
-        await Meowth.send_cmd_help(ctx)
+        pages = Meowth.formatter.format_help_for(ctx,ctx.command)
+        for page in pages:
+            await Meowth.send_message(ctx.message.channel, page)
     elif isinstance(error, commands.CommandNotFound):
         pass
     elif isinstance(error, commands.CheckFailure):

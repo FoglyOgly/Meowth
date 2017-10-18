@@ -574,9 +574,10 @@ async def reboot_msg(owners,loop=False,):
     reboot_msg = """**Meowth! That's right! I've been updated!**
 
 **Changes:**
-    - The bug for **!exraid** ignoring the first word after the command should be fixed.
     - We are testing out a new launcher for Meowth that should help it get itself back online in the event of a crash.
-    - Backend general cleanup
+    - The bug for **!exraid** ignoring the first word after the command should be fixed.
+    - Fixed the bot not providing help when certain commands are used incorrectly
+    - Backend upgrades
 
 **Reconfigure shouldn't be necessary for this update.**"""
     logger.info("Reboot Messages ------ BEGIN ------")

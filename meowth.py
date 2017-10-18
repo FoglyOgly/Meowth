@@ -1784,7 +1784,6 @@ async def exraid(ctx):
 async def _exraid(message):
     args = message.clean_content[8:]
     args_split = args.split(" ")
-    del args_split[0]
     if len(args_split) <= 1:
         await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!exraid <pokemon name> <location>**"))
         return
@@ -2250,7 +2249,6 @@ async def list(ctx):
             cty = channel.name
             rc_d = server_dict[server]['raidchannel_dict']
             listmsg += (_("Meowth! Current Raids for {0}:").format(cty.capitalize()))
-
             for r in server_dict[server]['raidchannel_dict']:
                 ctx_waitingcount = 0
                 ctx_omwcount = 0
@@ -2449,11 +2447,11 @@ async def location(ctx):
         report_city = rc_d[channel]['reportcity']
         gymhuntrgps = rc_d[channel]['gymhuntrgps']
         report_channel = discord.utils.get(server.channels, name=report_city)
+        oldembed = raidmsg.embeds[0]
         if gymhuntrgps == "":
             locurl = oldembed['url']
         else:
             locurl = "https://www.google.com/maps/dir/Current+Location/{0}".format(gymhuntrgps)
-        oldembed = raidmsg.embeds[0]
         newembed = discord.Embed(title=oldembed['title'],url=locurl,description=oldembed['description'],colour=discord.Colour(0x2ecc71))
         newembed.set_thumbnail(url=oldembed['thumbnail']['url'])
         await Meowth.send_message(channel, content = _("Meowth! Here's the current location for the raid!\nDetails:{location}").format(location = location), embed = newembed)

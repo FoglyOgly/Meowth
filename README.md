@@ -32,6 +32,7 @@ If you want to tinker with Meowth yourself, you can still download this repo, ma
 https://www.python.org/downloads/release/python-350/
 
 2. Install the packages needed to run meowth by running install.py:
+
 Linux:
 ```bash
 python3 install.py

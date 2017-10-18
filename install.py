@@ -28,11 +28,12 @@ def pip_install(packages):
         pip.main(['install',package])
 
 if __name__ == '__main__':
-    if platform.startswith == 'linux':
+    print(str(platform))
+    if platform == "linux" or platform == "linux2":
         apt_install(_apt_req_)
     pip_install(_pip_req_)
-    if platform == 'windows':
-        print("Please install Tesseract OCR with the installer for Windows by visiting:\nhttps://github.com/tesseract-ocr/tesseract/wiki/Downloads")
-    if platform == 'darwin':
-        print("Python packages installed. Please ensure Tesseract OCR for OSX is installed manually.")
+    if platform == "win32":
+        print("\n\nPlease install Tesseract OCR with the installer for Windows by visiting:\nhttps://github.com/tesseract-ocr/tesseract/wiki/Downloads")
+    if platform == "darwin":
+        print("\n\nPython packages installed. Please ensure Tesseract OCR for OSX is installed manually.")
     print("Requirements installation is now complete.")

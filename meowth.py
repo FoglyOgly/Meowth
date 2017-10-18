@@ -1013,7 +1013,7 @@ async def exit(ctx):
 
 @Meowth.command(pass_context=True)
 @checks.is_owner()
-async def restart(ctx):
+async def restart(ctx,*args):
     """Exit after saving.
 
     Usage: !exit.
@@ -1024,8 +1024,13 @@ async def restart(ctx):
         print(_("Error occured while trying to save!"))
         print(err)
 
+    if "announce" in args:
+        shutdown_code = 27
+    else:
+        shutdown_code = 26
     await Meowth.send_message(ctx.message.channel,"Restarting...")
-    Meowth._shutdown_mode = 26
+
+    Meowth._shutdown_mode = shutdown_code
     await Meowth.logout()
 
 @Meowth.command(pass_context=True)

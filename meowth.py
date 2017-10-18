@@ -574,30 +574,9 @@ async def reboot_msg(owners,loop=False,):
     reboot_msg = """**Meowth! That's right! I've been updated!**
 
 **Changes:**
-    - **!list** and status update bug should be fixed.
-    - Old timer formats no longer break map links, and instead are accepted and parsed as valid times.
-    - Command checks have been remodelled, resulting in **!help** showing only relevant commands based on context.
-    - **!unwant all** has been added, so people can remove all their pokemon roles.
-    - **!clearstatus** has been added for use in raid channels. This clears all status counts for that raid.
-    - **!invite** now can be used seperately before uploading the image of your pass. Meowth will wait for 30 seconds after !invite is used.
-    - General housekeeping and spelling corrections.
-
-You may have experienced issues with **!list**
-not working in certain raid channels and
-report channels.
-
-This was due to a bug that allowed incorrect
-values for **!interested**, **!coming** and **!here**
-status updates.
-
-If you still have a raid channel that has
-the **!list** command not working (such as an
-EXRaid) you can resolve them by using
-**!clearstatus**. This will clear all status
-values, including the incorrect ones.
-
-Only members who hold the **manage_server**
-permission are able to use this new command.
+    - The bug for **!exraid** ignoring the first word after the command should be fixed.
+    - We are testing out a new launcher for Meowth that should help it get itself back online in the event of a crash.
+    - Backend general cleanup
 
 **Reconfigure shouldn't be necessary for this update.**"""
     logger.info("Reboot Messages ------ BEGIN ------")

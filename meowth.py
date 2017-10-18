@@ -600,7 +600,7 @@ async def maint_start():
     try:
         event_loop.create_task(server_cleanup())
         event_loop.create_task(channel_cleanup())
-        logger.info("Maintenance Tasts Started")
+        logger.info("Maintenance Tasks Started")
     except KeyboardInterrupt as e:
         tasks.cancel()
 

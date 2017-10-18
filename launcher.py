@@ -32,8 +32,14 @@ def run_meowth(autorestart):
             if code == 0:
                 break
             elif code == 26:
+                #standard restart
                 print("Restarting Meowth\n")
                 cmd = (interpreter, "meowth.py")
+                continue
+            elif code == 27:
+                #announce on restart
+                print("Restarting Meowth\n")
+                cmd = (interpreter, "meowth.py", "reboot")
                 continue
             else:
                 if not autorestart:

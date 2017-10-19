@@ -63,9 +63,24 @@ logger = setup_logger('discord','logs/meowth.log',logging.INFO)
 
 Meowth = commands.Bot(command_prefix="!")
 
-with open("serverdict", "rb") as fd:
-    Meowth.server_dict = pickle.load(fd)
-    server_dict = Meowth.server_dict
+try:
+    with open("serverdict", "rb") as fd:
+        Meowth.server_dict = pickle.load(fd)
+    logger.info("Serverdict Loaded Successfully")
+except OSError:
+    logger.info("Serverdict Not Found - Looking for Backup")
+    try:
+        with open("serverdict_backup", "rb") as fd:
+            Meowth.server_dict = pickle.load(fd)
+        logger.info("Serverdict Backup Loaded Successfully")
+    except OSError:
+        logger.info("Serverdict Backup Not Found - Creating New Serverdict")
+        Meowth.server_dict = {}
+        with open("serverdict", "wb") as fd:
+            pickle.dump(Meowth.server_dict, fd)
+        logger.info("Serverdict Created")
+
+server_dict = Meowth.server_dict
 
 config = {}
 pkmn_info = {}
@@ -281,14 +296,14 @@ async def expiry_check(channel):
                                     try:
                                         active_raids.remove(channel)
                                     except ValueError:
-                                        logger.info("Expire_Channel - Channel Removal From ActiveRaid Failed - Not in List - "+channel.name)
+                                        logger.info("Expire_Channel - Channel Removal From Active Raid Failed - Not in List - "+channel.name)
                                     await _eggtoraid(pokemon.lower(), channel)
                                     break
                             event_loop.create_task(expire_channel(channel))
                             try:
                                 active_raids.remove(channel)
                             except ValueError:
-                                logger.info("Expire_Channel - Channel Removal From ActiveRaid Failed - Not in List - "+channel.name)
+                                logger.info("Expire_Channel - Channel Removal From Active Raid Failed - Not in List - "+channel.name)
                             logger.info("Expire_Channel - Channel Expired And Removed From Watchlist - "+channel.name)
                             break
             except KeyError:
@@ -559,30 +574,10 @@ async def reboot_msg(owners,loop=False,):
     reboot_msg = """**Meowth! That's right! I've been updated!**
 
 **Changes:**
-    - **!list** and status update bug should be fixed.
-    - Old timer formats no longer break map links, and instead are accepted and parsed as valid times.
-    - Command checks have been remodelled, resulting in **!help** showing only relevant commands based on context.
-    - **!unwant all** has been added, so people can remove all their pokemon roles.
-    - **!clearstatus** has been added for use in raid channels. This clears all status counts for that raid.
-    - **!invite** now can be used seperately before uploading the image of your pass. Meowth will wait for 30 seconds after !invite is used.
-    - General housekeeping and spelling corrections.
-
-You may have experienced issues with **!list**
-not working in certain raid channels and
-report channels.
-
-This was due to a bug that allowed incorrect
-values for **!interested**, **!coming** and **!here**
-status updates.
-
-If you still have a raid channel that has
-the **!list** command not working (such as an
-EXRaid) you can resolve them by using
-**!clearstatus**. This will clear all status
-values, including the incorrect ones.
-
-Only members who hold the **manage_server**
-permission are able to use this new command.
+    - We are testing out a new launcher for Meowth that should help it get itself back online in the event of a crash.
+    - The bug for **!exraid** ignoring the first word after the command should be fixed.
+    - Fixed the bot not providing help when certain commands are used incorrectly
+    - Backend upgrades
 
 **Reconfigure shouldn't be necessary for this update.**"""
     logger.info("Reboot Messages ------ BEGIN ------")
@@ -606,7 +601,7 @@ async def maint_start():
     try:
         event_loop.create_task(server_cleanup())
         event_loop.create_task(channel_cleanup())
-        logger.info("Maintenance Tasts Started")
+        logger.info("Maintenance Tasks Started")
     except KeyboardInterrupt as e:
         tasks.cancel()
 
@@ -991,7 +986,32 @@ async def exit(ctx):
     except Exception as err:
         print(_("Error occured while trying to save!"))
         print(err)
-    quit()
+
+    await Meowth.send_message(ctx.message.channel,"Shutting down...")
+    Meowth._shutdown_mode = 0
+    await Meowth.logout()
+
+@Meowth.command(pass_context=True)
+@checks.is_owner()
+async def restart(ctx,*args):
+    """Exit after saving.
+
+    Usage: !exit.
+    Calls the save function and quits the script."""
+    try:
+        await _save()
+    except Exception as err:
+        print(_("Error occured while trying to save!"))
+        print(err)
+
+    if "announce" in args:
+        shutdown_code = 27
+    else:
+        shutdown_code = 26
+    await Meowth.send_message(ctx.message.channel,"Restarting...")
+
+    Meowth._shutdown_mode = shutdown_code
+    await Meowth.logout()
 
 @Meowth.command(pass_context=True)
 @checks.is_owner()
@@ -1014,7 +1034,7 @@ async def outputlog(ctx):
 
     Usage: !outputlog
     Output is a link to hastebin."""
-    with open('logs\meowth.log', 'r') as logfile:
+    with open('logs/meowth.log', 'r') as logfile:
         logdata=logfile.read()
     logdata = logdata.encode('ascii', errors='replace').decode('utf-8')
     await Meowth.send_message(ctx.message.channel, hastebin.post(logdata))
@@ -1373,7 +1393,7 @@ This channel will be deleted five minutes after the timer expires.""").format(po
         }
 
     if raidexp:
-        await _timerset(raid_channel,raidexp)
+        await _timerset(ctx,raidexp)
     else:
         await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left on the raid using **!timerset <minutes>** so others can check it with **!timer**.").format(member=message.author.mention))
 
@@ -1401,20 +1421,23 @@ async def print_raid_timer(channel):
     return timerstr
 
 
-async def _timerset(channel, exptime):
+async def _timerset(ctx, exptime):
+    message = ctx.message
+    channel = message.channel
+    server = message.server
     exptime = int(exptime)
     # Meowth saves the timer message in the channel's 'exp' field.
 
     ticks = time.time()
 
-    if server_dict[channel.server]['raidchannel_dict'][channel]['type'] == 'egg':
+    if checks.check_eggchannel(ctx):
         raidtype = "Eggs"
     else:
         raidtype = "Raids"
 
     try:
         s = exptime * 60
-        if s >= 3600:
+        if s > 3600:
             await Meowth.send_message(channel, _("Meowth...that's too long. {raidtype} currently last no more than one hour...").format(raidtype=raidtype))
             return
         if s < 0:
@@ -1427,13 +1450,13 @@ async def _timerset(channel, exptime):
 
 
     # Update timestamp
-    server_dict[channel.server]['raidchannel_dict'][channel]['exp'] = expire
+    server_dict[server]['raidchannel_dict'][channel]['exp'] = expire
     # Reactivate channel
-    if not server_dict[channel.server]['raidchannel_dict'][channel]['active']:
+    if not server_dict[server]['raidchannel_dict'][channel]['active']:
         await Meowth.send_message(channel, "The channel has been reactivated.")
-    server_dict[channel.server]['raidchannel_dict'][channel]['active'] = True
+    server_dict[server]['raidchannel_dict'][channel]['active'] = True
     # Mark that timer has been manually set
-    server_dict[channel.server]['raidchannel_dict'][channel]['manual_timer'] = True
+    server_dict[server]['raidchannel_dict'][channel]['manual_timer'] = True
     # Send message
     timerstr = await print_raid_timer(channel)
     await Meowth.send_message(channel, timerstr)
@@ -1442,24 +1465,22 @@ async def _timerset(channel, exptime):
 
 @Meowth.command(pass_context=True)
 @checks.raidchannel()
-async def timerset(ctx):
+async def timerset(ctx,timer):
     """Set the remaining duration on a raid.
 
     Usage: !timerset <minutes>
     Works only in raid channels, can be set or overridden by anyone.
     Meowth displays the end time in HH:MM local time."""
     try:
-        if server_dict[ctx.message.channel.server]['raidchannel_dict'][ctx.message.channel]['type'] == 'exraid':
+        if checks.check_exraidchannel(ctx):
             await Meowth.send_message(ctx.message.channel, _("Timerset isn't supported for exraids. Please get a mod/admin to remove the channel if channel needs to be removed."))
             return
     except KeyError:
         pass
-    args = ctx.message.content[10:]
-    if args.isdigit():
-        raidexp = args
-    elif ":" in args:
-        time = args
-        h,m = re.sub(r"[a-zA-Z]", "", time).split(":",maxsplit=1)
+    if timer.isdigit():
+        raidexp = timer
+    elif ":" in timer:
+        h,m = re.sub(r"[a-zA-Z]", "", timer).split(":",maxsplit=1)
         if h is "": h = "0"
         if m is "": m = "0"
         if h.isdigit() and m.isdigit():
@@ -1467,8 +1488,11 @@ async def timerset(ctx):
         else:
             await Meowth.send_message(ctx.message.channel, "Meowth! I couldn't understand your time format. Try again like this: **!timerset <minutes>**")
             return
+    else:
+        raise commands.BadArgument(_("{entered_time} is not a valid time").format(entered_time=timer))
+        return
     if str(raidexp).isdigit():
-        await _timerset(ctx.message.channel, raidexp)
+        await _timerset(ctx, raidexp)
     else:
         await Meowth.send_message(ctx.message.channel, _("Meowth... I couldn't understand your time format. Try again like this: **!timerset <minutes>**"))
 
@@ -1479,7 +1503,7 @@ async def timer(ctx):
 
     Usage: !timer
     The expiry time should have been previously set with !timerset."""
-    if server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['type'] == 'exraid':
+    if checks.check_exraidchannel(ctx):
         await Meowth.send_message(ctx.message.channel, _("Exraids don't expire. Please get a mod/admin to remove the channel if channel needs to be removed."))
         return
     else:
@@ -1621,35 +1645,35 @@ async def exraid(ctx):
     Meowth's message will also include the type weaknesses of the boss.
 
     Finally, Meowth will create a separate channel for the raid report, for the purposes of organizing the raid."""
+    await _exraid(ctx)
 
-    await _exraid(ctx.message)
-
-async def _exraid(message):
+async def _exraid(ctx):
+    message = ctx.message
+    channel = message.channel
     args = message.clean_content[8:]
     args_split = args.split(" ")
-    del args_split[0]
     if len(args_split) <= 1:
-        await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!exraid <pokemon name> <location>**"))
+        await Meowth.send_message(channel, _("Meowth! Give more details when reporting! Usage: **!exraid <pokemon name> <location>**"))
         return
     entered_raid = re.sub("[\@]", "", args_split[0].lower())
     del args_split[0]
     if entered_raid not in pkmn_info['pokemon_list']:
-        await Meowth.send_message(message.channel, spellcheck(entered_raid))
+        await Meowth.send_message(channel, spellcheck(entered_raid))
         return
     if entered_raid not in pkmn_info['raid_list'] and entered_raid in pkmn_info['pokemon_list']:
-        await Meowth.send_message(message.channel, _("Meowth! The Pokemon {pokemon} does not appear in raids!").format(pokemon=entered_raid.capitalize()))
+        await Meowth.send_message(channel, _("Meowth! The Pokemon {pokemon} does not appear in raids!").format(pokemon=entered_raid.capitalize()))
         return
 
     raid_details = " ".join(args_split)
     raid_details = raid_details.strip()
     if raid_details == '':
-        await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!exraid <pokemon name> <location>**"))
+        await Meowth.send_message(channel, _("Meowth! Give more details when reporting! Usage: **!exraid <pokemon name> <location>**"))
         return
 
-    raid_gmaps_link = create_gmaps_query(raid_details, message.channel)
+    raid_gmaps_link = create_gmaps_query(raid_details, channel)
 
     raid_channel_name = entered_raid + "-" + sanitize_channel_name(raid_details)
-    raid_channel_overwrites = message.channel.overwrites
+    raid_channel_overwrites = channel.overwrites
     meowth_overwrite = (Meowth.user, discord.PermissionOverwrite(send_messages = True))
     for overwrite in raid_channel_overwrites:
         overwrite[1].send_messages = False
@@ -1662,7 +1686,7 @@ async def _exraid(message):
     raid_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(raid_number))
     raid_embed = discord.Embed(title=_("Meowth! Click here for directions to the EX raid!"),url=raid_gmaps_link,description=_("Weaknesses: {weakness_list}").format(weakness_list=weakness_to_str(message.server, get_weaknesses(entered_raid))),colour=discord.Colour(0x2ecc71))
     raid_embed.set_thumbnail(url=raid_img_url)
-    raidreport = await Meowth.send_message(message.channel, content = _("Meowth! {pokemon} EX raid reported by {member}! Details: {location_details}. Send proof of your invite to this EX raid to an admin and coordinate in {raid_channel}").format(pokemon=entered_raid.capitalize(), member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention),embed=raid_embed)
+    raidreport = await Meowth.send_message(channel, content = _("Meowth! {pokemon} EX raid reported by {member}! Details: {location_details}. Send proof of your invite to this EX raid to an admin and coordinate in {raid_channel}").format(pokemon=entered_raid.capitalize(), member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention),embed=raid_embed)
     await asyncio.sleep(1) #Wait for the channel to be created.
 
     raidmsg = _("""Meowth! {pokemon} EX raid reported by {member} in {citychannel}! Details: {location_details}. Coordinate here!
@@ -1682,11 +1706,11 @@ Sending a Google Maps link will also update the raid location.
 
 Message **!starting** when the raid is beginning to clear the raid's 'here' list.
 
-This channel needs to be manually deleted!""").format(pokemon=raid.mention, member=message.author.mention, citychannel=message.channel.mention, location_details=raid_details)
+This channel needs to be manually deleted!""").format(pokemon=raid.mention, member=message.author.mention, citychannel=channel.mention, location_details=raid_details)
     raidmessage = await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)
 
     server_dict[message.server]['raidchannel_dict'][raid_channel] = {
-        'reportcity' : message.channel.name,
+        'reportcity' : channel.name,
         'trainer_dict' : {},
         'exp' : None, # No expiry
         'manual_timer' : False,
@@ -1815,7 +1839,7 @@ When this egg raid expires, there will be 15 minutes to update it into an open r
             }
 
         if raidexp:
-            await _timerset(raid_channel,raidexp)
+            await _timerset(ctx,raidexp)
         else:
             await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left on the raid using **!timerset <minutes>** so others can check it with **!timer**.").format(member=message.author.mention))
 
@@ -2515,9 +2539,13 @@ async def _invite(ctx):
 async def on_command_error(error, ctx):
     channel = ctx.message.channel
     if isinstance(error, commands.MissingRequiredArgument):
-        await Meowth.send_cmd_help(ctx)
+        pages = Meowth.formatter.format_help_for(ctx,ctx.command)
+        for page in pages:
+            await Meowth.send_message(ctx.message.channel, page)
     elif isinstance(error, commands.BadArgument):
-        await Meowth.send_cmd_help(ctx)
+        pages = Meowth.formatter.format_help_for(ctx,ctx.command)
+        for page in pages:
+            await Meowth.send_message(ctx.message.channel, page)
     elif isinstance(error, commands.CommandNotFound):
         pass
     elif isinstance(error, commands.CheckFailure):
@@ -2525,4 +2553,20 @@ async def on_command_error(error, ctx):
     else:
         logger.exception(type(error).__name__, exc_info=error)
 
-Meowth.run(config['bot_token'])
+try:
+    event_loop.run_until_complete(Meowth.start(config['bot_token']))
+except discord.LoginFailure:
+    logger.critical("Invalid token")
+    event_loop.run_until_complete(Meowth.logout())
+    Meowth._shutdown_mode = 0
+except KeyboardInterrupt:
+    logger.info("Keyboard interrupt detected. Quitting...")
+    event_loop.run_until_complete(Meowth.logout())
+    Meowth._shutdown_mode = 0
+except Exception as e:
+    logger.critical("Fatal exception", exc_info=e)
+    event_loop.run_until_complete(Meowth.logout())
+finally:
+    pass
+
+sys.exit(Meowth._shutdown_mode)

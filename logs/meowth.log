@@ -1,1 +1,58 @@
-
+2017-10-19 08:03:26,821:WARNING:discord.client: PyNaCl is not installed, voice will NOT be supported
+2017-10-19 08:03:26,837:INFO:discord: Serverdict Loaded Successfully
+2017-10-19 08:03:26,837:INFO:discord.client: on_ready has successfully been registered as an event
+2017-10-19 08:03:26,837:INFO:discord.client: on_server_join has successfully been registered as an event
+2017-10-19 08:03:26,837:INFO:discord.client: on_server_remove has successfully been registered as an event
+2017-10-19 08:03:26,837:INFO:discord.client: on_member_join has successfully been registered as an event
+2017-10-19 08:03:26,837:INFO:discord.client: on_message has successfully been registered as an event
+2017-10-19 08:03:26,837:INFO:discord.client: on_command_error has successfully been registered as an event
+2017-10-19 08:03:26,837:INFO:discord.client: logging in using static token
+2017-10-19 08:03:27,521:INFO:discord.gateway: Created websocket connected to wss://gateway.discord.gg?encoding=json&v=6
+2017-10-19 08:03:27,521:INFO:discord.gateway: sent the identify payload to create the websocket
+2017-10-19 08:03:29,685:INFO:discord: Maintenance Tasks Started
+2017-10-19 08:03:29,758:INFO:discord: Server_Cleanup ------ BEGIN ------
+2017-10-19 08:03:29,758:INFO:discord: Server_Cleanup - SAVING CHANGES
+2017-10-19 08:03:29,806:INFO:discord: Server_Cleanup ------ END ------
+2017-10-19 08:03:29,857:INFO:discord: Channel_Cleanup ------ BEGIN ------
+2017-10-19 08:03:29,857:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+2017-10-19 08:03:29,857:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:muk-test - CHECKING
+2017-10-19 08:03:29,857:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:muk-test - EXISTS IN DISCORD
+2017-10-19 08:03:29,857:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:muk-test - MISSING FROM EXPIRY CHECK
+2017-10-19 08:03:29,857:INFO:discord: Channel_Cleanup - SAVING CHANGES
+2017-10-19 08:03:29,869:INFO:discord: Channel_Cleanup ------ END ------
+2017-10-19 08:03:29,873:INFO:discord: Expiry_Check - muk-test
+2017-10-19 08:03:29,873:INFO:discord: Expire_Channel - Channel Added To Watchlist - muk-test
+2017-10-19 08:03:37,326:INFO:discord: Expiry_Check - level-4-egg-test
+2017-10-19 08:03:37,326:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-4-egg-test
+2017-10-19 08:05:39,696:INFO:discord: Expiry_Check - muk-test
+2017-10-19 08:05:47,815:INFO:discord: Expiry_Check - level-4-egg-test
+2017-10-19 08:05:59,930:INFO:discord: Expire_Channel - Channel Expired And Removed From Watchlist - muk-test
+2017-10-19 08:05:59,930:INFO:discord: Expire_Channel - muk-test
+2017-10-19 08:05:59,930:INFO:discord: Expire_Channel - Channel Expired - muk-test
+2017-10-19 08:06:07,339:INFO:discord: Expire_Channel - Channel Expired And Removed From Watchlist - level-4-egg-test
+2017-10-19 08:06:07,339:INFO:discord: Expire_Channel - level-4-egg-test
+2017-10-19 08:06:07,339:INFO:discord: Expire_Channel - Channel Expired - level-4-egg-test
+2017-10-19 08:06:30,578:INFO:discord.gateway: Websocket closed with 1006 (), attempting a reconnect.
+2017-10-19 08:06:30,578:INFO:discord.client: Got ResumeWebSocket
+2017-10-19 08:06:30,918:INFO:discord.gateway: Created websocket connected to wss://gateway.discord.gg?encoding=json&v=6
+2017-10-19 08:06:30,934:INFO:discord.gateway: sent the resume payload to create the websocket
+2017-10-19 08:10:39,943:INFO:discord: Expire_Channel - Channel Deleted - muk-test
+2017-10-19 08:13:29,930:INFO:discord: Channel_Cleanup ------ BEGIN ------
+2017-10-19 08:13:29,930:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+2017-10-19 08:13:29,930:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-4-egg-test - CHECKING
+2017-10-19 08:13:29,930:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-4-egg-test - EXISTS IN DISCORD
+2017-10-19 08:13:29,930:INFO:discord: Channel_Cleanup - SAVING CHANGES
+2017-10-19 08:13:29,963:INFO:discord: Channel_Cleanup ------ END ------
+2017-10-19 08:17:26,902:INFO:discord: Expiry_Check - level-5-egg-test
+2017-10-19 08:17:26,902:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-5-egg-test
+2017-10-19 08:17:34,249:INFO:discord: Expiry_Check - level-5-egg-test
+2017-10-19 08:17:56,899:INFO:discord: Expire_Channel - Egg Auto Hatched - level-5-egg-test
+2017-10-19 08:17:57,584:INFO:discord: Expiry_Check - level-5-egg-test
+2017-10-19 08:17:57,584:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-5-egg-test
+2017-10-19 08:18:40,743:INFO:discord.http: A rate limit bucket has been exhausted (bucket: POST:352788338035523584:None:/channels/{channel_id}/messages, retry: 5.0).
+2017-10-19 08:18:46,924:INFO:discord.http: A rate limit bucket has been exhausted (bucket: POST:352788338035523584:None:/channels/{channel_id}/messages, retry: 5.0).
+2017-10-19 08:20:10,535:INFO:discord: Expiry_Check - entei-test
+2017-10-19 08:20:27,626:INFO:discord: Expire_Channel - Channel Expired And Removed From Watchlist - level-5-egg-test
+2017-10-19 08:20:27,626:INFO:discord: Expire_Channel - level-5-egg-test
+2017-10-19 08:20:27,626:INFO:discord: Expire_Channel - Channel Expired - level-5-egg-test
+2017-10-19 08:20:47,629:INFO:discord: Expire_Channel - Channel Deleted - level-4-egg-test

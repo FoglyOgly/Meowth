@@ -1593,8 +1593,10 @@ async def on_message(message):
                     oldembed = oldraidmsg.embeds[0]
                     newembed = discord.Embed(title=oldembed['title'],url=newloc,description=oldembed['description'],colour=discord.Colour(0x2ecc71))
                     newembed.set_thumbnail(url=oldembed['thumbnail']['url'])
-                    await Meowth.edit_message(oldraidmsg, new_content=oldraidmsg.content, embed=newembed)
-                    await Meowth.edit_message(oldreportmsg, new_content=oldreportmsg.content, embed=newembed)
+                    newraidmsg = await Meowth.edit_message(oldraidmsg, new_content=oldraidmsg.content, embed=newembed)
+                    newreportmsg = await Meowth.edit_message(oldreportmsg, new_content=oldreportmsg.content, embed=newembed)
+                    server_dict[message.server]['raidchannel_dict'][message.channel]['raidmessage'] = newraidmsg
+                    server_dict[message.server]['raidchannel_dict'][message.channel]['raidreport'] = newreportmsg
                     otw_list = []
                     trainer_dict = server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']
                     for trainer in trainer_dict.keys():
@@ -2292,8 +2294,8 @@ async def location(ctx):
         location = rc_d[channel]['address']
         report_city = rc_d[channel]['reportcity']
         report_channel = discord.utils.get(server.channels, name=report_city)
-        locurl = create_gmaps_query(location, report_channel)
         oldembed = raidmsg.embeds[0]
+        locurl = oldembed['url']
         newembed = discord.Embed(title=oldembed['title'],url=locurl,description=oldembed['description'],colour=discord.Colour(0x2ecc71))
         newembed.set_thumbnail(url=oldembed['thumbnail']['url'])
         await Meowth.send_message(channel, content = _("Meowth! Here's the current location for the raid!\nDetails:{location}").format(location = location), embed = newembed)

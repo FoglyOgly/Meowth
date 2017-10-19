@@ -1275,9 +1275,10 @@ async def raid(ctx):
     Meowth's message will also include the type weaknesses of the boss.
 
     Finally, Meowth will create a separate channel for the raid report, for the purposes of organizing the raid."""
-    await _raid(ctx.message)
+    await _raid(ctx)
 
-async def _raid(message):
+async def _raid(ctx):
+    message = ctx.message
     fromegg = False
     if message.channel.name not in server_dict[message.server]['city_channels'].keys():
         if message.channel in server_dict[message.channel.server]['raidchannel_dict'] and server_dict[message.channel.server]['raidchannel_dict'][message.channel]['type'] == 'egg':
@@ -1617,8 +1618,10 @@ async def on_message(message):
                     oldembed = oldraidmsg.embeds[0]
                     newembed = discord.Embed(title=oldembed['title'],url=newloc,description=oldembed['description'],colour=discord.Colour(0x2ecc71))
                     newembed.set_thumbnail(url=oldembed['thumbnail']['url'])
-                    await Meowth.edit_message(oldraidmsg, new_content=oldraidmsg.content, embed=newembed)
-                    await Meowth.edit_message(oldreportmsg, new_content=oldreportmsg.content, embed=newembed)
+                    newraidmsg = await Meowth.edit_message(oldraidmsg, new_content=oldraidmsg.content, embed=newembed)
+                    newreportmsg = await Meowth.edit_message(oldreportmsg, new_content=oldreportmsg.content, embed=newembed)
+                    server_dict[message.server]['raidchannel_dict'][message.channel]['raidmessage'] = newraidmsg
+                    server_dict[message.server]['raidchannel_dict'][message.channel]['raidreport'] = newreportmsg
                     otw_list = []
                     trainer_dict = server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']
                     for trainer in trainer_dict.keys():
@@ -1737,9 +1740,10 @@ async def raidegg(ctx):
     <level> - Required. Level of the egg. Levels are from 1 to 5.
     <location> - Required. Address/Location of the gym.
     <minutes-remaining> - Not required. Time remaining until the egg hatches into an open raid. 1-60 minutes will be accepted. If not provided, 1 hour is assumed. Whole numbers only."""
-    await _raidegg(ctx.message)
+    await _raidegg(ctx)
 
-async def _raidegg(message):
+async def _raidegg(ctx):
+    message = ctx.message
     args = message.clean_content[8:]
     args_split = args.split(" ")
     del args_split[0]
@@ -2316,8 +2320,8 @@ async def location(ctx):
         location = rc_d[channel]['address']
         report_city = rc_d[channel]['reportcity']
         report_channel = discord.utils.get(server.channels, name=report_city)
-        locurl = create_gmaps_query(location, report_channel)
         oldembed = raidmsg.embeds[0]
+        locurl = oldembed['url']
         newembed = discord.Embed(title=oldembed['title'],url=locurl,description=oldembed['description'],colour=discord.Colour(0x2ecc71))
         newembed.set_thumbnail(url=oldembed['thumbnail']['url'])
         await Meowth.send_message(channel, content = _("Meowth! Here's the current location for the raid!\nDetails:{location}").format(location = location), embed = newembed)

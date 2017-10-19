@@ -1275,9 +1275,10 @@ async def raid(ctx):
     Meowth's message will also include the type weaknesses of the boss.
 
     Finally, Meowth will create a separate channel for the raid report, for the purposes of organizing the raid."""
-    await _raid(ctx.message)
+    await _raid(ctx)
 
-async def _raid(message):
+async def _raid(ctx):
+    message = ctx.message
     fromegg = False
     if message.channel.name not in server_dict[message.server]['city_channels'].keys():
         if message.channel in server_dict[message.channel.server]['raidchannel_dict'] and server_dict[message.channel.server]['raidchannel_dict'][message.channel]['type'] == 'egg':
@@ -1739,9 +1740,10 @@ async def raidegg(ctx):
     <level> - Required. Level of the egg. Levels are from 1 to 5.
     <location> - Required. Address/Location of the gym.
     <minutes-remaining> - Not required. Time remaining until the egg hatches into an open raid. 1-60 minutes will be accepted. If not provided, 1 hour is assumed. Whole numbers only."""
-    await _raidegg(ctx.message)
+    await _raidegg(ctx)
 
-async def _raidegg(message):
+async def _raidegg(ctx):
+    message = ctx.message
     args = message.clean_content[8:]
     args_split = args.split(" ")
     del args_split[0]

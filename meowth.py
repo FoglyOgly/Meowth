@@ -1684,7 +1684,7 @@ async def on_message(message):
                     except KeyError:
                         pass
                 if ghduplicate == False:
-                    await _raid(ctx, bot)
+                    await _raid(message, bot)
                 return
             elif len(message.embeds[0]['title'].split(" ")) == 6:
                 ghduplicate = False
@@ -1705,7 +1705,7 @@ async def on_message(message):
                     except KeyError:
                         pass
                 if ghduplicate == False:
-                    await _raidegg(ctx, bot)
+                    await _raidegg(message, bot)
                 return
             return
         return

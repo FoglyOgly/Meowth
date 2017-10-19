@@ -1,4 +1,4 @@
-# Meowth
+# Meowth (with Huntr integration by Doonce)
 A Discord helper bot for Pokemon Go communities.
 
 Meowth is a Discord bot written in Python 3.5 using version 0.16.8 of the discord.py library.
@@ -12,7 +12,7 @@ Meowth is now able to handle being on multiple servers of any size in any part o
 3. Raid reporting: Report either !raidegg, !raid or !exraid on the server to have meowth create channels to organise in. Certain commands can be used within raid channels, such as updating your stauts with !interested, !coming and !here. Users can easily determine the status of involved members with the !list command. Meowth also queries Google Maps to get a guess of the raid location (no access to the game means no list of gyms), or you can paste a maps link in the channel after creation to update it to exact coordinates.
 4. Optional team management and new member welcome functions.
 
-## Directions for inviting a remotely hosted Meowth to your server:
+## Directions for inviting a remotely hosted Meowth to your server (without Huntr integration):
 Note: You must have manage_server permissions to invite.
 1. Use [THIS LINK](https://discordapp.com/oauth2/authorize?client_id=346759953006198784&scope=bot&permissions=268822608) to invite Meowth.   
 2. Select your server.
@@ -25,7 +25,7 @@ You can join the Meowth server here for updates, setup help, feature requests, o
 
 If you want to tinker with Meowth yourself, you can still download this repo, make whatever changes you want (or keep everything if you want) and run Meowth locally. The configure process is the same except you'll have to use your own bot token.
 
-## Directions for installing and running the bot on your server:
+## Directions for installing and running the bot on your server (with Huntr integration):
 
 
 1. Install Python 3.5 and ensure PIP is also installed with it.

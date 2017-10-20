@@ -1525,7 +1525,7 @@ async def timerset(ctx,timer):
     except KeyError:
         pass
 
-    raidtype = server_dict[server]['raidchannel_dict'][channel]['type']
+    raidtype = checks.check_raidtype(ctx)
 
     if timer.isdigit():
         raidexp = timer

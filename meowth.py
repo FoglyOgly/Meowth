@@ -59,8 +59,6 @@ except OSError:
 
 logger = setup_logger('discord','logs/meowth.log',logging.INFO)
 
-
-
 Meowth = commands.Bot(command_prefix="!")
 
 try:
@@ -274,8 +272,6 @@ def spellcheck(word):
         return _("Meowth! \"{entered_word}\" is not a Pokemon! Did you mean \"{corrected_word}\"?").format(entered_word=word, corrected_word=spelling.correction(word))
     else:
         return _("Meowth! \"{entered_word}\" is not a Pokemon! Check your spelling!").format(entered_word=word)
-
-
 
 async def expiry_check(channel):
     logger.info("Expiry_Check - "+channel.name)
@@ -568,6 +564,13 @@ async def server_cleanup(loop=True):
         await asyncio.sleep(1800)#1800 default
         continue
 
+async def _print(owner,message):
+    if 'launcher' in sys.argv[1:]:
+        if 'debug' not in sys.argv[1:]:
+            await Meowth.send_message(owner,message)
+    print(message)
+    logger.info(message)
+
 async def reboot_msg(owners,loop=False,):
     msg_success = 0
     msg_fail = 0
@@ -594,7 +597,7 @@ async def reboot_msg(owners,loop=False,):
         await asyncio.sleep(0.5)#0.5 default
         continue
     logger.info("Reboot Messages ------ END ------")
-    print(_("\nReboot messages sent: {success_count} successful, {fail_count} failed.").format(success_count=msg_success,fail_count=msg_fail))
+    await _print(Meowth.owner,_("\nReboot messages sent: {success_count} successful, {fail_count} failed.").format(success_count=msg_success,fail_count=msg_fail))
     return
 
 async def maint_start():
@@ -632,10 +635,10 @@ The trainer_dict contains "trainer" elements, which have the following fields:
 
 team_msg = " or ".join(["'!team {0}'".format(team) for team in config['team_dict'].keys()])
 
-
 @Meowth.event
 async def on_ready():
-    print(_("Starting up...")) #prints to the terminal or cmd prompt window upon successful connection to Discord
+    Meowth.owner = discord.utils.get(Meowth.get_all_members(),id=config["master"])
+    await _print(Meowth.owner,_("Starting up...")) #prints to the terminal or cmd prompt window upon successful connection to Discord
     REBOOT = False
     if 'reboot' in sys.argv[1:]:
         REBOOT = True
@@ -654,7 +657,7 @@ async def on_ready():
 
         owners.append(server.owner)
 
-    print(_("Meowth! That's right!\n\n{server_count} servers connected.\n{member_count} members found.").format(server_count=servers,member_count=users))
+    await _print(Meowth.owner,_("Meowth! That's right!\n\n{server_count} servers connected.\n{member_count} members found.").format(server_count=servers,member_count=users))
 
     if REBOOT:
         event_loop.create_task(reboot_msg(owners))
@@ -947,8 +950,9 @@ async def on_member_join(member):
     else:
         default = discord.utils.get(server.channels, name = server_dict[server]['welcomechan'])
         if not default:
-            print(_("WARNING: no default channel configured. Unable to send welcome message."))
-        await Meowth.send_message(default, welcomemessage.format(server_name=server.name, new_member_name=member.mention))
+            pass
+        else:
+            await Meowth.send_message(default, welcomemessage.format(server_name=server.name, new_member_name=member.mention))
 
 
 """
@@ -984,8 +988,8 @@ async def exit(ctx):
     try:
         await _save()
     except Exception as err:
-        print(_("Error occured while trying to save!"))
-        print(err)
+        await _print(Meowth.owner,_("Error occured while trying to save!"))
+        await _print(Meowth.owner,err)
 
     await Meowth.send_message(ctx.message.channel,"Shutting down...")
     Meowth._shutdown_mode = 0
@@ -1001,8 +1005,8 @@ async def restart(ctx,*args):
     try:
         await _save()
     except Exception as err:
-        print(_("Error occured while trying to save!"))
-        print(err)
+        await _print(Meowth.owner,_("Error occured while trying to save!"))
+        await _print(Meowth.owner,err)
 
     if "announce" in args:
         shutdown_code = 27
@@ -1024,8 +1028,8 @@ async def save(ctx):
         await _save()
         logger.info("CONFIG SAVED")
     except Exception as err:
-        print(_("Error occured while trying to save!"))
-        print(err)
+        await _print(Meowth.owner,_("Error occured while trying to save!"))
+        await _print(Meowth.owner,err)
 
 @Meowth.command(pass_context=True, hidden=True)
 @commands.has_permissions(manage_server=True)
@@ -1087,7 +1091,7 @@ async def team(ctx):
                 return
         # If the role isn't valid, something is misconfigured, so fire a warning.
         else:
-            print(_("WARNING: Role {team_role} in team_dict not configured as a role on the server!").format(team_role=team))
+            await Meowth.send_message(ctx.message.channel,_("Meowth! {team_role} is not configured as a role on this server. Please contact an admin for assistance.").format(team_role=team))
     # Check if team is one of the three defined in the team_dict
 
     if entered_team not in config['team_dict'].keys():

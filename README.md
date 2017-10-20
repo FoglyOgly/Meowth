@@ -83,10 +83,12 @@ If successful, it should show "Meowth! That's right!".
 ### Launcher Reference:
 Arguments:
 ```
---help, -h      show this help message and exit
---start, -s     Starts Meowth
---announce, -a  Announces Update/Reboot Message to all server owners.
---auto-restart  Auto-Restarts Meowth in case of a crash.
+  --help, -h          Show the help message
+  --start, -s         Starts Meowth
+  --announce, -a      Announces Update/Reboot Message to all server owners.
+  --auto-restart, -r  Auto-Restarts Meowth in case of a crash.
+  --debug, -d         Prevents output being sent to Discord DM, as restarting
+                      could occur often.
 ```
 
 Launch Meowth normally:
@@ -94,14 +96,19 @@ Launch Meowth normally:
 python3 launcher.py -s
 ```
 
+Launch Meowth in debug mode if working on code changes:
+```bash
+python3 launcher.py -s -d
+```
+
 Launch Meowth with Auto-Restart:
 ```bash
-python3 launcher.py -s --auto-restart
+python3 launcher.py -s -r
 ```
 
 Launch Meowth with Auto-Restart, and send Update message to all server owners:
 ```bash
-python launcher.py -s -a --auto-restart
+python launcher.py -s -r -a
 ```
 
 ## Directions for using Meowth:

@@ -262,7 +262,7 @@ def create_gmaps_query(details, channel):
 
 	#look for lat/long coordinates in the location details. If provided, 
 	#then channel location hints are not needed in the  maps query
-	if re.match (r'-?\d{1,2}\.?\d*,\s+-?\d{1,3}\.?\d*', details): #regex looks for lat/long in the format similar to 42.434546, -83.985195. 
+	if re.match (r'^\s*-?\d{1,2}\.?\d*,\s+-?\d{1,3}\.?\d*\s*$', details): #regex looks for lat/long in the format similar to 42.434546, -83.985195. 
 		return "https://www.google.com/maps/search/?api=1&query={0}".format('+'.join(details_list))
 			
 			

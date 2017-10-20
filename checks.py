@@ -2,7 +2,7 @@ from discord.ext import commands
 import discord.utils
 
 def is_owner_check(ctx):
-    author = str(ctx.message.author)
+    author = str(ctx.message.author.id)
     owner = ctx.bot.config['master']
     return author == owner
 
@@ -147,6 +147,16 @@ def check_teamset(ctx):
     server = ctx.message.server
     try:
         return ctx.bot.server_dict[server]['team']
+    except KeyError:
+        return False
+
+def check_raidtype(ctx):
+    if ctx.message.server is None:
+        return False
+    server = ctx.message.server
+    channel = ctx.message.channel
+    try:
+        return ctx.bot.server_dict[server]['raidchannel_dict'][channel]['type']
     except KeyError:
         return False
 

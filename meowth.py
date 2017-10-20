@@ -1394,7 +1394,7 @@ This channel will be deleted five minutes after the timer expires.""").format(po
         }
 
     if raidexp:
-        await _timerset(ctx,raidexp)
+        await _timerset(raid_channel,raidexp)
     else:
         await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left on the raid using **!timerset <minutes>** so others can check it with **!timer**.").format(member=message.author.mention))
 
@@ -1422,16 +1422,14 @@ async def print_raid_timer(channel):
     return timerstr
 
 
-async def _timerset(ctx, exptime):
-    message = ctx.message
-    channel = message.channel
-    server = message.server
+async def _timerset(raidchannel, exptime):
+    server = raidchannel.server
     exptime = int(exptime)
     # Meowth saves the timer message in the channel's 'exp' field.
 
     ticks = time.time()
 
-    if checks.check_eggchannel(ctx):
+    if server_dict[server]['raidchannel_dict'][raidchannel]['type'] == 'egg':
         raidtype = "Eggs"
     else:
         raidtype = "Raids"
@@ -1451,18 +1449,18 @@ async def _timerset(ctx, exptime):
 
 
     # Update timestamp
-    server_dict[server]['raidchannel_dict'][channel]['exp'] = expire
+    server_dict[server]['raidchannel_dict'][raidchannel]['exp'] = expire
     # Reactivate channel
-    if not server_dict[server]['raidchannel_dict'][channel]['active']:
-        await Meowth.send_message(channel, "The channel has been reactivated.")
-    server_dict[server]['raidchannel_dict'][channel]['active'] = True
+    if not server_dict[server]['raidchannel_dict'][raidchannel]['active']:
+        await Meowth.send_message(raidchannel, "The channel has been reactivated.")
+    server_dict[server]['raidchannel_dict'][raidchannel]['active'] = True
     # Mark that timer has been manually set
-    server_dict[server]['raidchannel_dict'][channel]['manual_timer'] = True
+    server_dict[server]['raidchannel_dict'][raidchannel]['manual_timer'] = True
     # Send message
-    timerstr = await print_raid_timer(channel)
-    await Meowth.send_message(channel, timerstr)
+    timerstr = await print_raid_timer(raidchannel)
+    await Meowth.send_message(raidchannel, timerstr)
     # Trigger expiry checking
-    event_loop.create_task(expiry_check(channel))
+    event_loop.create_task(expiry_check(raidchannel))
 
 @Meowth.command(pass_context=True)
 @checks.raidchannel()
@@ -1493,7 +1491,7 @@ async def timerset(ctx,timer):
         raise commands.BadArgument(_("{entered_time} is not a valid time").format(entered_time=timer))
         return
     if str(raidexp).isdigit():
-        await _timerset(ctx, raidexp)
+        await _timerset(ctx.message.channel, raidexp)
     else:
         await Meowth.send_message(ctx.message.channel, _("Meowth... I couldn't understand your time format. Try again like this: **!timerset <minutes>**"))
 
@@ -1841,9 +1839,9 @@ When this egg raid expires, there will be 15 minutes to update it into an open r
             }
 
         if raidexp:
-            await _timerset(ctx,raidexp)
+            await _timerset(raid_channel,raidexp)
         else:
-            await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left on the raid using **!timerset <minutes>** so others can check it with **!timer**.").format(member=message.author.mention))
+            await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset <minutes>** so others can check it with **!timer**.").format(member=message.author.mention))
 
         event_loop.create_task(expiry_check(raid_channel))
 

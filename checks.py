@@ -2,7 +2,7 @@ from discord.ext import commands
 import discord.utils
 
 def is_owner_check(ctx):
-    author = str(ctx.message.author)
+    author = str(ctx.message.author.id)
     owner = ctx.bot.config['master']
     return author == owner
 

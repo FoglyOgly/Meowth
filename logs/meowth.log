@@ -1,58 +1,133 @@
-2017-10-19 08:03:26,821:WARNING:discord.client: PyNaCl is not installed, voice will NOT be supported
-2017-10-19 08:03:26,837:INFO:discord: Serverdict Loaded Successfully
-2017-10-19 08:03:26,837:INFO:discord.client: on_ready has successfully been registered as an event
-2017-10-19 08:03:26,837:INFO:discord.client: on_server_join has successfully been registered as an event
-2017-10-19 08:03:26,837:INFO:discord.client: on_server_remove has successfully been registered as an event
-2017-10-19 08:03:26,837:INFO:discord.client: on_member_join has successfully been registered as an event
-2017-10-19 08:03:26,837:INFO:discord.client: on_message has successfully been registered as an event
-2017-10-19 08:03:26,837:INFO:discord.client: on_command_error has successfully been registered as an event
-2017-10-19 08:03:26,837:INFO:discord.client: logging in using static token
-2017-10-19 08:03:27,521:INFO:discord.gateway: Created websocket connected to wss://gateway.discord.gg?encoding=json&v=6
-2017-10-19 08:03:27,521:INFO:discord.gateway: sent the identify payload to create the websocket
-2017-10-19 08:03:29,685:INFO:discord: Maintenance Tasks Started
-2017-10-19 08:03:29,758:INFO:discord: Server_Cleanup ------ BEGIN ------
-2017-10-19 08:03:29,758:INFO:discord: Server_Cleanup - SAVING CHANGES
-2017-10-19 08:03:29,806:INFO:discord: Server_Cleanup ------ END ------
-2017-10-19 08:03:29,857:INFO:discord: Channel_Cleanup ------ BEGIN ------
-2017-10-19 08:03:29,857:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
-2017-10-19 08:03:29,857:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:muk-test - CHECKING
-2017-10-19 08:03:29,857:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:muk-test - EXISTS IN DISCORD
-2017-10-19 08:03:29,857:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:muk-test - MISSING FROM EXPIRY CHECK
-2017-10-19 08:03:29,857:INFO:discord: Channel_Cleanup - SAVING CHANGES
-2017-10-19 08:03:29,869:INFO:discord: Channel_Cleanup ------ END ------
-2017-10-19 08:03:29,873:INFO:discord: Expiry_Check - muk-test
-2017-10-19 08:03:29,873:INFO:discord: Expire_Channel - Channel Added To Watchlist - muk-test
-2017-10-19 08:03:37,326:INFO:discord: Expiry_Check - level-4-egg-test
-2017-10-19 08:03:37,326:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-4-egg-test
-2017-10-19 08:05:39,696:INFO:discord: Expiry_Check - muk-test
-2017-10-19 08:05:47,815:INFO:discord: Expiry_Check - level-4-egg-test
-2017-10-19 08:05:59,930:INFO:discord: Expire_Channel - Channel Expired And Removed From Watchlist - muk-test
-2017-10-19 08:05:59,930:INFO:discord: Expire_Channel - muk-test
-2017-10-19 08:05:59,930:INFO:discord: Expire_Channel - Channel Expired - muk-test
-2017-10-19 08:06:07,339:INFO:discord: Expire_Channel - Channel Expired And Removed From Watchlist - level-4-egg-test
-2017-10-19 08:06:07,339:INFO:discord: Expire_Channel - level-4-egg-test
-2017-10-19 08:06:07,339:INFO:discord: Expire_Channel - Channel Expired - level-4-egg-test
-2017-10-19 08:06:30,578:INFO:discord.gateway: Websocket closed with 1006 (), attempting a reconnect.
-2017-10-19 08:06:30,578:INFO:discord.client: Got ResumeWebSocket
-2017-10-19 08:06:30,918:INFO:discord.gateway: Created websocket connected to wss://gateway.discord.gg?encoding=json&v=6
-2017-10-19 08:06:30,934:INFO:discord.gateway: sent the resume payload to create the websocket
-2017-10-19 08:10:39,943:INFO:discord: Expire_Channel - Channel Deleted - muk-test
-2017-10-19 08:13:29,930:INFO:discord: Channel_Cleanup ------ BEGIN ------
-2017-10-19 08:13:29,930:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
-2017-10-19 08:13:29,930:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-4-egg-test - CHECKING
-2017-10-19 08:13:29,930:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-4-egg-test - EXISTS IN DISCORD
-2017-10-19 08:13:29,930:INFO:discord: Channel_Cleanup - SAVING CHANGES
-2017-10-19 08:13:29,963:INFO:discord: Channel_Cleanup ------ END ------
-2017-10-19 08:17:26,902:INFO:discord: Expiry_Check - level-5-egg-test
-2017-10-19 08:17:26,902:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-5-egg-test
-2017-10-19 08:17:34,249:INFO:discord: Expiry_Check - level-5-egg-test
-2017-10-19 08:17:56,899:INFO:discord: Expire_Channel - Egg Auto Hatched - level-5-egg-test
-2017-10-19 08:17:57,584:INFO:discord: Expiry_Check - level-5-egg-test
-2017-10-19 08:17:57,584:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-5-egg-test
-2017-10-19 08:18:40,743:INFO:discord.http: A rate limit bucket has been exhausted (bucket: POST:352788338035523584:None:/channels/{channel_id}/messages, retry: 5.0).
-2017-10-19 08:18:46,924:INFO:discord.http: A rate limit bucket has been exhausted (bucket: POST:352788338035523584:None:/channels/{channel_id}/messages, retry: 5.0).
-2017-10-19 08:20:10,535:INFO:discord: Expiry_Check - entei-test
-2017-10-19 08:20:27,626:INFO:discord: Expire_Channel - Channel Expired And Removed From Watchlist - level-5-egg-test
-2017-10-19 08:20:27,626:INFO:discord: Expire_Channel - level-5-egg-test
-2017-10-19 08:20:27,626:INFO:discord: Expire_Channel - Channel Expired - level-5-egg-test
-2017-10-19 08:20:47,629:INFO:discord: Expire_Channel - Channel Deleted - level-4-egg-test
+2017-10-20 15:11:23,585:WARNING:discord.client: PyNaCl is not installed, voice will NOT be supported
+2017-10-20 15:11:23,589:INFO:discord: Serverdict Loaded Successfully
+2017-10-20 15:11:23,594:INFO:discord.client: on_ready has successfully been registered as an event
+2017-10-20 15:11:23,594:INFO:discord.client: on_server_join has successfully been registered as an event
+2017-10-20 15:11:23,594:INFO:discord.client: on_server_remove has successfully been registered as an event
+2017-10-20 15:11:23,594:INFO:discord.client: on_member_join has successfully been registered as an event
+2017-10-20 15:11:23,595:INFO:discord.client: on_message has successfully been registered as an event
+2017-10-20 15:11:23,597:INFO:discord.client: on_command_error has successfully been registered as an event
+2017-10-20 15:11:23,597:INFO:discord.client: logging in using static token
+2017-10-20 15:11:24,499:INFO:discord.gateway: Created websocket connected to wss://gateway.discord.gg?encoding=json&v=6
+2017-10-20 15:11:24,499:INFO:discord.gateway: sent the identify payload to create the websocket
+2017-10-20 15:11:27,426:INFO:discord: Starting up...
+2017-10-20 15:11:27,750:INFO:discord: Meowth! That's right!
+
+1 servers connected.
+14 members found.
+2017-10-20 15:11:27,750:INFO:discord: Maintenance Tasks Started
+2017-10-20 15:11:27,787:INFO:discord: Server_Cleanup ------ BEGIN ------
+2017-10-20 15:11:27,787:INFO:discord: Server_Cleanup - SAVING CHANGES
+2017-10-20 15:11:27,802:INFO:discord: Server_Cleanup ------ END ------
+2017-10-20 15:11:27,842:INFO:discord: Channel_Cleanup ------ BEGIN ------
+2017-10-20 15:11:27,842:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+2017-10-20 15:11:27,842:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-2-egg-venice-beach-freak-show - CHECKING
+2017-10-20 15:11:27,842:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-2-egg-venice-beach-freak-show - EXISTS IN DISCORD
+2017-10-20 15:11:27,842:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exeggutor-lincoln-bust-and-quote - CHECKING
+2017-10-20 15:11:27,843:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exeggutor-lincoln-bust-and-quote - EXISTS IN DISCORD
+2017-10-20 15:11:27,843:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exeggutor-lincoln-bust-and-quote - 5+ MIN EXPIRY NONACTIVE RAID
+2017-10-20 15:11:27,843:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-lmu-st-ignatius-del-loyola - CHECKING
+2017-10-20 15:11:27,843:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-lmu-st-ignatius-del-loyola - EXISTS IN DISCORD
+2017-10-20 15:11:27,843:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-lmu-st-ignatius-del-loyola - 5+ MIN EXPIRY NONACTIVE RAID
+2017-10-20 15:11:27,843:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:bayleef-veterans-memorial-building-vm - CHECKING
+2017-10-20 15:11:27,843:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:bayleef-veterans-memorial-building-vm - EXISTS IN DISCORD
+2017-10-20 15:11:27,843:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:bayleef-veterans-memorial-building-vm - 5+ MIN EXPIRY NONACTIVE RAID
+2017-10-20 15:11:27,843:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-1-egg-fountain-at-ritz-carlton - CHECKING
+2017-10-20 15:11:27,844:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-1-egg-fountain-at-ritz-carlton - EXISTS IN DISCORD
+2017-10-20 15:11:27,844:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:vaporeon-corner-mural - CHECKING
+2017-10-20 15:11:27,844:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:vaporeon-corner-mural - EXISTS IN DISCORD
+2017-10-20 15:11:27,844:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:vaporeon-corner-mural - 5+ MIN EXPIRY NONACTIVE RAID
+2017-10-20 15:11:27,844:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:flareon-north-venice-baseball-park - CHECKING
+2017-10-20 15:11:27,844:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:flareon-north-venice-baseball-park - EXISTS IN DISCORD
+2017-10-20 15:11:27,844:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:flareon-north-venice-baseball-park - 5+ MIN EXPIRY NONACTIVE RAID
+2017-10-20 15:11:27,844:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-5-egg-star-bridge - CHECKING
+2017-10-20 15:11:27,844:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-5-egg-star-bridge - EXISTS IN DISCORD
+2017-10-20 15:11:27,845:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-2-egg-rmf-graffiti-mural - CHECKING
+2017-10-20 15:11:27,845:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-2-egg-rmf-graffiti-mural - EXISTS IN DISCORD
+2017-10-20 15:11:27,845:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:magmar-the-tower-fountain - CHECKING
+2017-10-20 15:11:27,845:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:magmar-the-tower-fountain - EXISTS IN DISCORD
+2017-10-20 15:11:27,845:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:magmar-the-tower-fountain - 5+ MIN EXPIRY NONACTIVE RAID
+2017-10-20 15:11:27,845:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:electabuzz-los-angeles---westwood-cemetery - CHECKING
+2017-10-20 15:11:27,845:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:electabuzz-los-angeles---westwood-cemetery - EXISTS IN DISCORD
+2017-10-20 15:11:27,845:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:electabuzz-los-angeles---westwood-cemetery - 5+ MIN EXPIRY NONACTIVE RAID
+2017-10-20 15:11:27,845:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:alakazam-sunset-recreational-park - CHECKING
+2017-10-20 15:11:27,846:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:alakazam-sunset-recreational-park - EXISTS IN DISCORD
+2017-10-20 15:11:27,846:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:alakazam-sunset-recreational-park - 5+ MIN EXPIRY NONACTIVE RAID
+2017-10-20 15:11:27,846:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exeggutor-cutting-corners - CHECKING
+2017-10-20 15:11:27,846:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exeggutor-cutting-corners - EXISTS IN DISCORD
+2017-10-20 15:11:27,846:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exeggutor-cutting-corners - 5+ MIN EXPIRY NONACTIVE RAID
+2017-10-20 15:11:27,846:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:machamp-ben-hogan-memorial - CHECKING
+2017-10-20 15:11:27,846:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:machamp-ben-hogan-memorial - EXISTS IN DISCORD
+2017-10-20 15:11:27,846:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:machamp-ben-hogan-memorial - 5+ MIN EXPIRY NONACTIVE RAID
+2017-10-20 15:11:27,846:INFO:discord: Channel_Cleanup - Channel Savedata Cleared - exeggutor-lincoln-bust-and-quote
+2017-10-20 15:11:27,846:INFO:discord: Channel_Cleanup - Channel Deleted - exeggutor-lincoln-bust-and-quote
+2017-10-20 15:11:27,847:INFO:discord: Channel_Cleanup - Channel Savedata Cleared - entei-lmu-st-ignatius-del-loyola
+2017-10-20 15:11:27,847:INFO:discord: Channel_Cleanup - Channel Deleted - entei-lmu-st-ignatius-del-loyola
+2017-10-20 15:11:27,847:INFO:discord: Channel_Cleanup - Channel Savedata Cleared - bayleef-veterans-memorial-building-vm
+2017-10-20 15:11:27,847:INFO:discord: Channel_Cleanup - Channel Deleted - bayleef-veterans-memorial-building-vm
+2017-10-20 15:11:27,847:INFO:discord: Channel_Cleanup - Channel Savedata Cleared - vaporeon-corner-mural
+2017-10-20 15:11:27,847:INFO:discord: Channel_Cleanup - Channel Deleted - vaporeon-corner-mural
+2017-10-20 15:11:27,847:INFO:discord: Channel_Cleanup - Channel Savedata Cleared - flareon-north-venice-baseball-park
+2017-10-20 15:11:27,847:INFO:discord: Channel_Cleanup - Channel Deleted - flareon-north-venice-baseball-park
+2017-10-20 15:11:27,847:INFO:discord: Channel_Cleanup - Channel Savedata Cleared - magmar-the-tower-fountain
+2017-10-20 15:11:27,848:INFO:discord: Channel_Cleanup - Channel Deleted - magmar-the-tower-fountain
+2017-10-20 15:11:27,848:INFO:discord: Channel_Cleanup - Channel Savedata Cleared - electabuzz-los-angeles---westwood-cemetery
+2017-10-20 15:11:27,848:INFO:discord: Channel_Cleanup - Channel Deleted - electabuzz-los-angeles---westwood-cemetery
+2017-10-20 15:11:27,848:INFO:discord: Channel_Cleanup - Channel Savedata Cleared - alakazam-sunset-recreational-park
+2017-10-20 15:11:27,848:INFO:discord: Channel_Cleanup - Channel Deleted - alakazam-sunset-recreational-park
+2017-10-20 15:11:27,848:INFO:discord: Channel_Cleanup - Channel Savedata Cleared - exeggutor-cutting-corners
+2017-10-20 15:11:27,848:INFO:discord: Channel_Cleanup - Channel Deleted - exeggutor-cutting-corners
+2017-10-20 15:11:27,848:INFO:discord: Channel_Cleanup - Channel Savedata Cleared - machamp-ben-hogan-memorial
+2017-10-20 15:11:27,848:INFO:discord: Channel_Cleanup - Channel Deleted - machamp-ben-hogan-memorial
+2017-10-20 15:11:28,922:INFO:discord: Channel_Cleanup - Channel Deleted - exeggutor-lincoln-bust-and-quote
+2017-10-20 15:11:29,473:INFO:discord: Channel_Cleanup - Channel Deleted - entei-lmu-st-ignatius-del-loyola
+2017-10-20 15:11:30,100:INFO:discord: Channel_Cleanup - Channel Deleted - bayleef-veterans-memorial-building-vm
+2017-10-20 15:11:30,673:INFO:discord: Channel_Cleanup - Channel Deleted - vaporeon-corner-mural
+2017-10-20 15:11:30,741:INFO:discord: Channel_Cleanup - Channel Deleted - flareon-north-venice-baseball-park
+2017-10-20 15:11:31,347:INFO:discord: Channel_Cleanup - Channel Deleted - magmar-the-tower-fountain
+2017-10-20 15:11:31,878:INFO:discord: Channel_Cleanup - Channel Deleted - electabuzz-los-angeles---westwood-cemetery
+2017-10-20 15:11:32,403:INFO:discord: Channel_Cleanup - Channel Deleted - alakazam-sunset-recreational-park
+2017-10-20 15:11:32,944:INFO:discord: Channel_Cleanup - Channel Deleted - exeggutor-cutting-corners
+2017-10-20 15:11:33,481:INFO:discord: Channel_Cleanup - Channel Deleted - machamp-ben-hogan-memorial
+2017-10-20 15:11:33,481:INFO:discord: Channel_Cleanup - SAVING CHANGES
+2017-10-20 15:11:33,493:INFO:discord: Channel_Cleanup ------ END ------
+2017-10-20 15:14:53,736:INFO:discord: Expiry_Check - entei-star-bridge
+2017-10-20 15:14:53,736:INFO:discord: Expire_Channel - Channel Added To Watchlist - entei-star-bridge
+2017-10-20 15:14:58,814:INFO:discord.http: A rate limit bucket has been exhausted (bucket: PUT:371006497515110412:None:/channels/{channel_id}/messages/{message_id}/reactions/{emoji}/@me, retry: 0.25).
+2017-10-20 15:14:59,155:INFO:discord.http: A rate limit bucket has been exhausted (bucket: PUT:371006497515110412:None:/channels/{channel_id}/messages/{message_id}/reactions/{emoji}/@me, retry: 0.25).
+2017-10-20 15:15:00,329:INFO:discord: Duplicate Report - Channel Expired - entei-star-bridge - Last Report by BrenenP
+2017-10-20 15:15:00,329:INFO:discord: Expire_Channel - entei-star-bridge
+2017-10-20 15:15:00,330:INFO:discord: Expire_Channel - Channel Expired - entei-star-bridge
+2017-10-20 15:15:57,207:INFO:discord: Expiry_Check - muk-rmf-graffiti-mural
+2017-10-20 15:15:57,207:INFO:discord: Expire_Channel - Channel Added To Watchlist - muk-rmf-graffiti-mural
+2017-10-20 15:15:59,575:INFO:discord.http: A rate limit bucket has been exhausted (bucket: PUT:371006500669358101:None:/channels/{channel_id}/messages/{message_id}/reactions/{emoji}/@me, retry: 0.25).
+2017-10-20 15:15:59,886:INFO:discord.http: A rate limit bucket has been exhausted (bucket: PUT:371006500669358101:None:/channels/{channel_id}/messages/{message_id}/reactions/{emoji}/@me, retry: 0.25).
+2017-10-20 15:16:01,306:INFO:discord: Duplicate Report - Channel Expired - muk-rmf-graffiti-mural - Last Report by BrenenP
+2017-10-20 15:16:01,306:INFO:discord: Expire_Channel - muk-rmf-graffiti-mural
+2017-10-20 15:16:01,306:INFO:discord: Expire_Channel - Channel Expired - muk-rmf-graffiti-mural
+2017-10-20 15:16:02,130:INFO:discord: Expiry_Check - entei-star-bridge
+2017-10-20 15:17:02,255:INFO:discord: Expiry_Check - muk-rmf-graffiti-mural
+2017-10-20 15:17:44,147:INFO:discord: Expiry_Check - muk-rmf-graffiti-mural
+2017-10-20 15:17:57,241:INFO:discord: Expire_Channel - Channel Expired And Removed From Watchlist - muk-rmf-graffiti-mural
+2017-10-20 15:17:57,241:INFO:discord: Expire_Channel - muk-rmf-graffiti-mural
+2017-10-20 15:17:57,241:INFO:discord: Expire_Channel - Channel Expired - muk-rmf-graffiti-mural
+2017-10-20 15:21:33,521:INFO:discord: Channel_Cleanup ------ BEGIN ------
+2017-10-20 15:21:33,521:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+2017-10-20 15:21:33,521:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-2-egg-venice-beach-freak-show - CHECKING
+2017-10-20 15:21:33,521:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-2-egg-venice-beach-freak-show - DOESN'T EXIST IN DISCORD
+2017-10-20 15:21:33,521:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-1-egg-fountain-at-ritz-carlton - CHECKING
+2017-10-20 15:21:33,521:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-1-egg-fountain-at-ritz-carlton - DOESN'T EXIST IN DISCORD
+2017-10-20 15:21:33,521:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-5-egg-star-bridge - CHECKING
+2017-10-20 15:21:33,521:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-5-egg-star-bridge - EXISTS IN DISCORD
+2017-10-20 15:21:33,521:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-2-egg-rmf-graffiti-mural - CHECKING
+2017-10-20 15:21:33,521:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-2-egg-rmf-graffiti-mural - EXISTS IN DISCORD
+2017-10-20 15:21:33,521:INFO:discord: Channel_Cleanup - Channel Savedata Cleared - level-2-egg-venice-beach-freak-show
+2017-10-20 15:21:33,521:INFO:discord: Channel_Cleanup - Channel Deleted - level-2-egg-venice-beach-freak-show
+2017-10-20 15:21:33,521:INFO:discord: Channel_Cleanup - Channel Savedata Cleared - level-1-egg-fountain-at-ritz-carlton
+2017-10-20 15:21:33,521:INFO:discord: Channel_Cleanup - Channel Deleted - level-1-egg-fountain-at-ritz-carlton
+2017-10-20 15:21:33,521:INFO:discord: Channel_Cleanup - SAVING CHANGES
+2017-10-20 15:21:33,536:INFO:discord: Channel_Cleanup ------ END ------
+2017-10-20 15:22:43,971:INFO:discord: Expire_Channel - Channel Deleted - muk-rmf-graffiti-mural
+2017-10-20 15:23:47,613:INFO:discord: Expiry_Check - entei-star-bridge
+2017-10-20 15:23:53,826:INFO:discord: Expire_Channel - Channel Expired And Removed From Watchlist - entei-star-bridge
+2017-10-20 15:23:53,826:INFO:discord: Expire_Channel - entei-star-bridge
+2017-10-20 15:23:53,826:INFO:discord: Expire_Channel - Channel Expired - entei-star-bridge

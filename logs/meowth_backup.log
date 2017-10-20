@@ -1,70 +1,16 @@
-2017-10-19 08:01:43,258:WARNING:discord.client: PyNaCl is not installed, voice will NOT be supported
-2017-10-19 08:01:43,274:INFO:discord: Serverdict Loaded Successfully
-2017-10-19 08:01:43,295:INFO:discord.client: on_ready has successfully been registered as an event
-2017-10-19 08:01:43,295:INFO:discord.client: on_server_join has successfully been registered as an event
-2017-10-19 08:01:43,295:INFO:discord.client: on_server_remove has successfully been registered as an event
-2017-10-19 08:01:43,296:INFO:discord.client: on_member_join has successfully been registered as an event
-2017-10-19 08:01:43,296:INFO:discord.client: on_message has successfully been registered as an event
-2017-10-19 08:01:43,296:INFO:discord.client: on_command_error has successfully been registered as an event
-2017-10-19 08:01:43,296:INFO:discord.client: logging in using static token
-2017-10-19 08:01:44,531:INFO:discord.gateway: Created websocket connected to wss://gateway.discord.gg?encoding=json&v=6
-2017-10-19 08:01:44,599:INFO:discord.gateway: sent the identify payload to create the websocket
-2017-10-19 08:01:46,686:INFO:discord: Maintenance Tasks Started
-2017-10-19 08:01:46,746:INFO:discord: Server_Cleanup ------ BEGIN ------
-2017-10-19 08:01:46,746:INFO:discord: Server_Cleanup - SAVING CHANGES
-2017-10-19 08:01:46,762:INFO:discord: Server_Cleanup ------ END ------
-2017-10-19 08:01:46,831:INFO:discord: Channel_Cleanup ------ BEGIN ------
-2017-10-19 08:01:46,831:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
-2017-10-19 08:01:46,831:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:muk-test - CHECKING
-2017-10-19 08:01:46,831:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:muk-test - DOESN'T EXIST IN DISCORD
-2017-10-19 08:01:46,831:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:muk-test - CHECKING
-2017-10-19 08:01:46,831:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:muk-test - DOESN'T EXIST IN DISCORD
-2017-10-19 08:01:46,831:INFO:discord: Channel_Cleanup - Channel Savedata Cleared - muk-test
-2017-10-19 08:01:46,831:INFO:discord: Channel_Cleanup - Channel Deleted - muk-test
-2017-10-19 08:01:46,831:INFO:discord: Channel_Cleanup - Channel Savedata Cleared - muk-test
-2017-10-19 08:01:46,831:INFO:discord: Channel_Cleanup - Channel Deleted - muk-test
-2017-10-19 08:01:46,831:INFO:discord: Channel_Cleanup - SAVING CHANGES
-2017-10-19 08:01:46,843:INFO:discord: Channel_Cleanup ------ END ------
-2017-10-19 08:02:13,158:INFO:discord: Expiry_Check - muk-test
-2017-10-19 08:02:13,158:INFO:discord: Expire_Channel - Channel Added To Watchlist - muk-test
-2017-10-19 08:02:19,190:ERROR:discord: CommandInvokeError
-Traceback (most recent call last):
-  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 50, in wrapped
-    ret = yield from coro(*args, **kwargs)
-  File "meowth.py", line 1918, in raidegg
-    await _raidegg(ctx, bot)
-  File "meowth.py", line 1921, in _raidegg
-    message = ctx.message
-NameError: name 'ctx' is not defined
+2017-10-20 15:09:11,132:WARNING:discord.client: PyNaCl is not installed, voice will NOT be supported
+2017-10-20 15:09:11,136:INFO:discord: Serverdict Loaded Successfully
+2017-10-20 15:09:11,140:INFO:discord.client: on_ready has successfully been registered as an event
+2017-10-20 15:09:11,140:INFO:discord.client: on_server_join has successfully been registered as an event
+2017-10-20 15:09:11,140:INFO:discord.client: on_server_remove has successfully been registered as an event
+2017-10-20 15:09:11,140:INFO:discord.client: on_member_join has successfully been registered as an event
+2017-10-20 15:09:11,140:INFO:discord.client: on_message has successfully been registered as an event
+2017-10-20 15:09:11,140:INFO:discord.client: on_command_error has successfully been registered as an event
+2017-10-20 15:09:11,140:INFO:discord.client: logging in using static token
+2017-10-20 15:09:11,573:INFO:discord.gateway: Created websocket connected to wss://gateway.discord.gg?encoding=json&v=6
+2017-10-20 15:09:11,573:INFO:discord.gateway: sent the identify payload to create the websocket
+2017-10-20 15:09:13,834:INFO:discord: Starting up...
+2017-10-20 15:09:13,968:INFO:discord: Meowth! That's right!
 
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\bot.py", line 846, in process_commands
-    yield from command.invoke(ctx)
-  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 374, in invoke
-    yield from injected(*ctx.args, **ctx.kwargs)
-  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 54, in wrapped
-    raise CommandInvokeError(e) from e
-discord.ext.commands.errors.CommandInvokeError: Command raised an exception: NameError: name 'ctx' is not defined
-2017-10-19 08:02:38,141:ERROR:discord: CommandInvokeError
-Traceback (most recent call last):
-  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 50, in wrapped
-    ret = yield from coro(*args, **kwargs)
-  File "meowth.py", line 1918, in raidegg
-    await _raidegg(ctx, bot)
-  File "meowth.py", line 1921, in _raidegg
-    message = ctx.message
-NameError: name 'ctx' is not defined
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\bot.py", line 846, in process_commands
-    yield from command.invoke(ctx)
-  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 374, in invoke
-    yield from injected(*ctx.args, **ctx.kwargs)
-  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 54, in wrapped
-    raise CommandInvokeError(e) from e
-discord.ext.commands.errors.CommandInvokeError: Command raised an exception: NameError: name 'ctx' is not defined
-2017-10-19 08:02:50,727:INFO:discord: Expiry_Check - muk-test
+1 servers connected.
+14 members found.

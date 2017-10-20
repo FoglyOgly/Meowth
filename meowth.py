@@ -393,7 +393,7 @@ To reactivate the channel, use !timerset to set the timer again."""))
                         await Meowth.edit_channel_permissions(channel, channel.server.default_role, overwrite=discord.PermissionOverwrite(read_messages=False))
                         if "Meowth" not in overwrite[0].name:
                             await Meowth.delete_channel_permissions(channel, overwrite[0])
-                    await Meowth.send_message(channel, "The channel has been removed from view for everybody but Meowth and server owner to protect from future GymHuntr duplicates. It will be removed on its own, please do not remove it and just ignore what happens in this channel.")
+                    await Meowth.send_message(channel, "-----------------------------------------------\n**The channel has been removed from view for everybody but Meowth and server owner to protect from future GymHuntr duplicates. It will be removed on its own, please do not remove it. Just ignore what happens in this channel.**\n-----------------------------------------------")
                     deltime = ((gymhuntrexp - time.time()) / 60) + 10
                     await _timerset(channel, deltime)
         except:
@@ -580,6 +580,13 @@ async def server_cleanup(loop=True):
         await asyncio.sleep(1800)#1800 default
         continue
 
+async def _print(owner,message):
+    if 'launcher' in sys.argv[1:]:
+        if 'debug' not in sys.argv[1:]:
+            await Meowth.send_message(owner,message)
+    print(message)
+    logger.info(message)
+
 async def reboot_msg(owners,loop=False,):
     msg_success = 0
     msg_fail = 0
@@ -626,7 +633,7 @@ permission are able to use this new command.
         await asyncio.sleep(0.5)#0.5 default
         continue
     logger.info("Reboot Messages ------ END ------")
-    print(_("\nReboot messages sent: {success_count} successful, {fail_count} failed.").format(success_count=msg_success,fail_count=msg_fail))
+    await _print(Meowth.owner,_("\nReboot messages sent: {success_count} successful, {fail_count} failed.").format(success_count=msg_success,fail_count=msg_fail))
     return
 
 async def maint_start():
@@ -667,7 +674,8 @@ team_msg = " or ".join(["'!team {0}'".format(team) for team in config['team_dict
 
 @Meowth.event
 async def on_ready():
-    print(_("Starting up...")) #prints to the terminal or cmd prompt window upon successful connection to Discord
+    Meowth.owner = discord.utils.get(Meowth.get_all_members(),id=config["master"])
+    await _print(Meowth.owner,_("Starting up...")) #prints to the terminal or cmd prompt window upon successful connection to Discord
     REBOOT = False
     if 'reboot' in sys.argv[1:]:
         REBOOT = True
@@ -686,7 +694,7 @@ async def on_ready():
 
         owners.append(server.owner)
 
-    print(_("Meowth! That's right!\n\n{server_count} servers connected.\n{member_count} members found.").format(server_count=servers,member_count=users))
+    await _print(Meowth.owner,_("Meowth! That's right!\n\n{server_count} servers connected.\n{member_count} members found.").format(server_count=servers,member_count=users))
 
     if REBOOT:
         event_loop.create_task(reboot_msg(owners))
@@ -1001,8 +1009,9 @@ async def on_member_join(member):
     else:
         default = discord.utils.get(server.channels, name = server_dict[server]['welcomechan'])
         if not default:
-            print(_("WARNING: no default channel configured. Unable to send welcome message."))
-        await Meowth.send_message(default, welcomemessage.format(server_name=server.name, new_member_name=member.mention))
+            pass
+        else:
+            await Meowth.send_message(default, welcomemessage.format(server_name=server.name, new_member_name=member.mention))
 
 
 """
@@ -1038,8 +1047,8 @@ async def exit(ctx):
     try:
         await _save()
     except Exception as err:
-        print(_("Error occured while trying to save!"))
-        print(err)
+        await _print(Meowth.owner,_("Error occured while trying to save!"))
+        await _print(Meowth.owner,err)
 
     await Meowth.send_message(ctx.message.channel,"Shutting down...")
     Meowth._shutdown_mode = 0
@@ -1055,8 +1064,8 @@ async def restart(ctx,*args):
     try:
         await _save()
     except Exception as err:
-        print(_("Error occured while trying to save!"))
-        print(err)
+        await _print(Meowth.owner,_("Error occured while trying to save!"))
+        await _print(Meowth.owner,err)
 
     if "announce" in args:
         shutdown_code = 27
@@ -1078,8 +1087,8 @@ async def save(ctx):
         await _save()
         logger.info("CONFIG SAVED")
     except Exception as err:
-        print(_("Error occured while trying to save!"))
-        print(err)
+        await _print(Meowth.owner,_("Error occured while trying to save!"))
+        await _print(Meowth.owner,err)
 
 @Meowth.command(pass_context=True, hidden=True)
 @commands.has_permissions(manage_server=True)
@@ -1498,79 +1507,72 @@ async def print_raid_timer(channel):
     return timerstr
 
 
-async def _timerset(channel, exptime):
-    exptime = int(exptime)
-    # Meowth saves the timer message in the channel's 'exp' field.
-
-    ticks = time.time()
-
-    if server_dict[channel.server]['raidchannel_dict'][channel]['type'] == 'egg':
-        raidtype = "Eggs"
-    else:
-        raidtype = "Raids"
-
-    try:
-        s = exptime * 60
-        if s > 7200:
-            await Meowth.send_message(channel, _("Meowth...that's too long. {raidtype} haven't lasted longer than two hours...").format(raidtype=raidtype))
-            return
-        if s < 0:
-            await Meowth.send_message(channel, _("Meowth...I can't do that! No negative numbers, please!"))
-            return
-    except:
-        await Meowth.send_message(channel, _("Meowth...I couldn't understand your time format..."))
-        return
-    expire = ticks + s
-
-
-    # Update timestamp
-    server_dict[channel.server]['raidchannel_dict'][channel]['exp'] = expire
-    # Reactivate channel
-    if not server_dict[channel.server]['raidchannel_dict'][channel]['active']:
-        await Meowth.send_message(channel, "The channel has been reactivated.")
-    server_dict[channel.server]['raidchannel_dict'][channel]['active'] = True
-    # Mark that timer has been manually set
-    server_dict[channel.server]['raidchannel_dict'][channel]['manual_timer'] = True
-    # Send message
-    timerstr = await print_raid_timer(channel)
-    await Meowth.send_message(channel, timerstr)
-    # Trigger expiry checking
-    event_loop.create_task(expiry_check(channel))
-
 @Meowth.command(pass_context=True)
 @checks.raidchannel()
-async def timerset(ctx):
+async def timerset(ctx,timer):
     """Set the remaining duration on a raid.
 
     Usage: !timerset <minutes>
     Works only in raid channels, can be set or overridden by anyone.
     Meowth displays the end time in HH:MM local time."""
+    message = ctx.message
+    channel = message.channel
+    server = message.server
     try:
-        if server_dict[ctx.message.channel.server]['raidchannel_dict'][ctx.message.channel]['type'] == 'exraid':
-            await Meowth.send_message(ctx.message.channel, _("Timerset isn't supported for exraids. Please get a mod/admin to remove the channel if channel needs to be removed."))
+        if checks.check_exraidchannel(ctx):
+            await Meowth.send_message(channel, _("Timerset isn't supported for exraids. Please get a mod/admin to remove the channel if channel needs to be removed."))
             return
     except KeyError:
         pass
-    args = ctx.message.content[10:]
-    if args.isdigit():
-        raidexp = args
-    elif ":" in args:
-        time = args
-        h,m = re.sub(r"[a-zA-Z]", "", time).split(":",maxsplit=1)
+
+    raidtype = server_dict[server]['raidchannel_dict'][channel]['type']
+
+    if timer.isdigit():
+        raidexp = timer
+    elif ":" in timer:
+        h,m = re.sub(r"[a-zA-Z]", "", timer).split(":",maxsplit=1)
         if h is "": h = "0"
         if m is "": m = "0"
         if h.isdigit() and m.isdigit():
             raidexp = 60 * int(h) + int(m)
         else:
-            await Meowth.send_message(ctx.message.channel, "Meowth! I couldn't understand your time format. Try again like this: **!timerset <minutes>**")
+            await Meowth.send_message(channel, "Meowth! I couldn't understand your time format. Try again like this: **!timerset <minutes>**")
             return
     else:
-        await Meowth.send_message(ctx.message.channel, "Meowth! I couldn't understand your time format. Try again like this: **!timerset <minutes>**")
+        await Meowth.send_message(channel, "Meowth! I couldn't understand your time format. Try again like this: **!timerset <minutes>**")
         return
+
+    try:
+        s = int(raidexp) * 60
+        if s > 3600:
+            await Meowth.send_message(channel, _("Meowth...that's too long. {raidtype}s currently last no more than one hour...").format(raidtype=raidtype.capitalize()))
+            return
+    except:
+        return
+
     if str(raidexp).isdigit():
-        await _timerset(ctx.message.channel, raidexp)
-    else:
-        await Meowth.send_message(ctx.message.channel, _("Meowth... I couldn't understand your time format. Try again like this: **!timerset <minutes>**"))
+        await _timerset(channel, raidexp)
+
+async def _timerset(raidchannel, exptime):
+    server = raidchannel.server
+    exptime = int(exptime)
+    # Meowth saves the timer message in the channel's 'exp' field.
+
+    expire = time.time() + (exptime * 60)
+
+    # Update timestamp
+    server_dict[server]['raidchannel_dict'][raidchannel]['exp'] = expire
+    # Reactivate channel
+    if not server_dict[server]['raidchannel_dict'][raidchannel]['active']:
+        await Meowth.send_message(raidchannel, "The channel has been reactivated.")
+    server_dict[server]['raidchannel_dict'][raidchannel]['active'] = True
+    # Mark that timer has been manually set
+    server_dict[server]['raidchannel_dict'][raidchannel]['manual_timer'] = True
+    # Send message
+    timerstr = await print_raid_timer(raidchannel)
+    await Meowth.send_message(raidchannel, timerstr)
+    # Trigger expiry checking
+    event_loop.create_task(expiry_check(raidchannel))
 
 @Meowth.command(pass_context=True)
 @checks.raidchannel()
@@ -1975,7 +1977,7 @@ When this egg raid expires, there will be 15 minutes to update it into an open r
         if raidexp:
             await _timerset(raid_channel,raidexp)
         else:
-            await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left on the raid using **!timerset <minutes>** so others can check it with **!timer**.").format(member=message.author.mention))
+            await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset <minutes>** so others can check it with **!timer**.").format(member=message.author.mention))
         if bot:
             await Meowth.send_message(raid_channel, "This egg was reported by GymHuntrBot. If it is a duplicate of a raid already reported by a human, I can delete it with three **!duplicate** messages.")
 

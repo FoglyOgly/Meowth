@@ -54,7 +54,7 @@ Get the installer [HERE](https://github.com/tesseract-ocr/tesseract/wiki/Downloa
 
 7. Copy config_blank.json and rename to config.json. Open config.json in a text editor (a good one to use is Notepad++) and paste the bot token into the value for "bot_token", replacing the "yourtoken" string.
 
-8. Replace the "master" value in config.json with your full discord username with the 4 digits after the hash.
+8. Replace the "master" value in config.json with your user ID from discord.
 
 9. Run the launcher from the command prompt or terminal window:
 
@@ -83,10 +83,12 @@ If successful, it should show "Meowth! That's right!".
 ### Launcher Reference:
 Arguments:
 ```
---help, -h      show this help message and exit
---start, -s     Starts Meowth
---announce, -a  Announces Update/Reboot Message to all server owners.
---auto-restart  Auto-Restarts Meowth in case of a crash.
+  --help, -h          Show the help message
+  --start, -s         Starts Meowth
+  --announce, -a      Announces Update/Reboot Message to all server owners.
+  --auto-restart, -r  Auto-Restarts Meowth in case of a crash.
+  --debug, -d         Prevents output being sent to Discord DM, as restarting
+                      could occur often.
 ```
 
 Launch Meowth normally:
@@ -94,25 +96,39 @@ Launch Meowth normally:
 python3 launcher.py -s
 ```
 
+Launch Meowth in debug mode if working on code changes:
+```bash
+python3 launcher.py -s -d
+```
+
 Launch Meowth with Auto-Restart:
 ```bash
-python3 launcher.py -s --auto-restart
+python3 launcher.py -s -r
 ```
 
 Launch Meowth with Auto-Restart, and send Update message to all server owners:
 ```bash
-python launcher.py -s -a --auto-restart
+python launcher.py -s -r -a
+```
+
+Launch Meowth on a remote server, keeping the script alive after closing the session and outputting console to a file:
+```bash
+nohup python3 launcher.py -s -r 1> logs/out.log 2>&1 &
 ```
 
 ## Directions for using Meowth:
-Note: Avoid punctuation inside commands. The <> in these instructions are there for decoration.
+Note: Avoid punctuation inside commands.
+
+Arguments within \< \> are required.<br/>
+Arguments within \[ \] are optional.<br/>
+pkmn = Pokemon
 
 ### General Commands:
 
 | Commands | Requirements  | Description |
 | -------- |:-------------:| ------------|
-| **!help**  | - | Shows commands you can use in that channel, with descriptions. |
-| **!team**  | - | Let's users set their team role. |
+| **!help** \[command\] | - | Shows bot/command help, with descriptions. |
+| **!team** \<team\> | - | Let's users set their team role. |
 | **!save**  | *Owner Only* | Saves the save data to file. |
 | **!exit**  | *Owner Only* | Saves the save data to file and shutdown Meowth. |
 | **!restart**  | *Owner Only* | Saves the save data to file and restarts Meowth. |
@@ -123,32 +139,32 @@ Note: Avoid punctuation inside commands. The <> in these instructions are there 
 
 | Commands | Requirements  | Description |
 | -------- |:-------------:| ------------|
-| **!want**  | - | Adds a Pokemon to your notification roles. |
-| **!unwant**  | - | Removes a Pokemon from your notification roles. |
+| **!want** \<pkmn\> | - | Adds a Pokemon to your notification roles. |
+| **!unwant** \<pkmn\> | - | Removes a Pokemon from your notification roles. |
 | **!unwant all**  | - | Removes all Pokemon from your notification roles. |
-| **!wild**  | *Region Channel* | Reports a wild pokemon, notifying people who want it. |
+| **!wild** \<pkmn\> \<location\> | *Region Channel* | Reports a wild pokemon, notifying people who want it. |
 
 
 ### Raid Commands:
 
 | Commands | Requirements  | Description |
 | -------- |:-------------:| ------------|
-| **!raid**  | *Region Channel* | Creates an open raid channel. |
-| **!exraid**  | *Region Channel* | Creates an exraid channel. |
+| **!raid** \<pkmn\> \<place\> \[timer\] | *Region Channel* | Creates an open raid channel. |
+| **!exraid** \<pkmn\> \<place\> | *Region Channel* | Creates an exraid channel. |
 | **!invite**  | *Region Channel* | Check attached pass for entry to exraids. |
-| **!raidegg**  | *Region Channel* | Creates a raid egg channel. |
-| **!raid**  | *Raid Egg Channel* | Converts raid egg to an open raid. |
-| **!timer**  | *Raid Channel* | Shows the expiry time for the raid. |
-| **!timerset**  | *Raid Channel* | Set the expiry time for the raid. |
-| **!location**  | *Raid Channel* | Shows the raid location. |
-| **!location new**  | *Raid Channel* | Sets the raid location. |
-| **!interested**  | *Raid Channel* | Sets your status for the raid to 'interested'. |
-| **!coming**  | *Raid Channel* | Sets your status for the raid to 'coming'. |
-| **!here** | *Raid Channel* | Sets your status for the raid to 'here'. |
-| **!starting**  | *Raid Channel* | Clears all members with 'here' status, announce raid battle start. |
+| **!raidegg** \<level\> \<place\> \[timer\] | *Region Channel* | Creates a raid egg channel. |
+| **!raid** \<pkmn\> | *Raid Egg Channel* | Converts raid egg to an open raid. |
+| **!timer** | *Raid Channel* | Shows the expiry time for the raid. |
+| **!timerset** \<timer\> | *Raid Channel* | Set the expiry time for the raid. |
+| **!location** | *Raid Channel* | Shows the raid location. |
+| **!location new** \<place/map\> | *Raid Channel* | Sets the raid location. |
+| **!interested** \[number\] | *Raid Channel* | Sets your status for the raid to 'interested'. |
+| **!coming** \[number\] | *Raid Channel* | Sets your status for the raid to 'coming'. |
+| **!here** \[number\] | *Raid Channel* | Sets your status for the raid to 'here'. |
+| **!starting** | *Raid Channel* | Clears all members 'here', announce raid start. |
 | **!cancel**  | *Raid Channel* | Cancel your status. |
-| **!clearstatus**  | *Server Manager/Raid Channel* | Cancel everyone's status. |
-| **!list**  | *Region Channel* | Lists all raids from that region channel. |
+| **!clearstatus**  | *Server Manager<br/>Raid Channel* | Cancel everyone's status. |
+| **!list** | *Region Channel* | Lists all raids from that region channel. |
 | **!list**  | *Raid Channel* | Lists all member status' for the raid. |
 | **!list interested** | *Raid Channel* | Lists 'interested' members for the raid. |
 | **!list coming**  | *Raid Channel* | Lists 'coming' members for the raid. |

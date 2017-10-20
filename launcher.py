@@ -9,7 +9,7 @@ def parse_cli_args():
     parser = argparse.ArgumentParser(description="Meowth Launcher - Pokemon Go Bot for Discord")
     parser.add_argument("--start","-s",help="Starts Meowth",action="store_true")
     parser.add_argument("--announce","-a",help="Announces Update/Reboot Message to all server owners.",action="store_true")
-    parser.add_argument("--auto-restart",help="Auto-Restarts Meowth in case of a crash.",action="store_true")
+    parser.add_argument("--auto-restart","-r",help="Auto-Restarts Meowth in case of a crash.",action="store_true")
     return parser.parse_args()
 
 def run_meowth(autorestart):
@@ -18,9 +18,9 @@ def run_meowth(autorestart):
         raise RuntimeError("Python could not be found")
 
     if args.announce:
-        cmd = (interpreter, "meowth.py", "reboot")
+        cmd = (interpreter, "meowth.py", "reboot", "launcher")
     else:
-        cmd = (interpreter, "meowth.py")
+        cmd = (interpreter, "meowth.py", "launcher")
 
     while True:
         try:
@@ -33,17 +33,25 @@ def run_meowth(autorestart):
                 break
             elif code == 26:
                 #standard restart
-                print("Restarting Meowth\n")
-                cmd = (interpreter, "meowth.py")
+                print("")
+                print("Restarting Meowth")
+                print("")
+                cmd = (interpreter, "meowth.py", "launcher")
                 continue
             elif code == 27:
                 #announce on restart
-                print("Restarting Meowth\n")
-                cmd = (interpreter, "meowth.py", "reboot")
+                print("")
+                print("Restarting Meowth")
+                print("")
+                cmd = (interpreter, "meowth.py", "reboot", "launcher")
                 continue
             else:
                 if not autorestart:
                     break
+                print("")
+                print("Restarting Meowth from crash")
+                print("")
+                cmd = (interpreter, "meowth.py", "launcher")
 
     print("Meowth has closed. Exit code: {exit_code}".format(exit_code=code))
 

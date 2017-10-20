@@ -92,6 +92,18 @@ def check_eggchannel(ctx):
     if type == 'egg':
         return True
 
+def check_exraidchannel(ctx):
+    if ctx.message.server is None:
+        return False
+    channel = ctx.message.channel
+    server = ctx.message.server
+    try:
+        type = ctx.bot.server_dict[server]['raidchannel_dict'][channel]['type']
+    except KeyError:
+        return False
+    if type == 'exraid':
+        return True
+
 def check_raidactive(ctx):
     if ctx.message.server is None:
         return False
@@ -137,7 +149,6 @@ def check_teamset(ctx):
         return ctx.bot.server_dict[server]['team']
     except KeyError:
         return False
-
 
 def teamset():
     def predicate(ctx):

@@ -566,7 +566,8 @@ async def server_cleanup(loop=True):
 
 async def _print(owner,message):
     if 'launcher' in sys.argv[1:]:
-        await Meowth.send_message(owner,message)
+        if 'debug' not in sys.argv[1:]:
+            await Meowth.send_message(owner,message)
     print(message)
     logger.info(message)
 

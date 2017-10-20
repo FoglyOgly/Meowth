@@ -119,8 +119,8 @@ nohup python3 launcher.py -s -r 1> logs/out.log 2>&1 &
 ## Directions for using Meowth:
 Note: Avoid punctuation inside commands.
 
-Arguments within \< \> are required.
-Arguments within \[ \] are optional.
+Arguments within \< \> are required.<br/>
+Arguments within \[ \] are optional.<br/>
 pkmn = Pokemon
 
 ### General Commands:

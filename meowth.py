@@ -1450,10 +1450,10 @@ async def timerset(ctx,timer):
         if h.isdigit() and m.isdigit():
             raidexp = 60 * int(h) + int(m)
         else:
-            await Meowth.send_message(channel, "Meowth! I couldn't understand your time format. Try again like this: **!timerset <minutes>0**")
+            await Meowth.send_message(channel, "Meowth! I couldn't understand your time format. Try again like this: **!timerset <minutes>**")
             return
     else:
-        await Meowth.send_message(channel, "Meowth! I couldn't understand your time format. Try again like this: **!timerset <minutes>1**")
+        await Meowth.send_message(channel, "Meowth! I couldn't understand your time format. Try again like this: **!timerset <minutes>**")
         return
 
     try:

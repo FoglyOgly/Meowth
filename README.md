@@ -111,6 +111,11 @@ Launch Meowth with Auto-Restart, and send Update message to all server owners:
 python launcher.py -s -r -a
 ```
 
+Launch Meowth on a remote server, keeping the script alive after closing the session and outputting console to a file:
+```bash
+nohup python3 launcher.py -s -r 1> logs/out.log 2>&1 &
+``` 
+
 ## Directions for using Meowth:
 Note: Avoid punctuation inside commands. The <> in these instructions are there for decoration.
 

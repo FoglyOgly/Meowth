@@ -20,26 +20,29 @@ Note: You must have manage_server permissions to invite.
 4. Meowth will DM you to setup your server. Be sure to read the prompts properly.
 5. That's it! Enjoy!
 
+
 You can join the Meowth server here for updates, setup help, feature requests, or just to test out the bot before you add it. https://discord.gg/hhVjAN8
 
 If you want to tinker with Meowth yourself, you can still download this repo, make whatever changes you want (or keep everything if you want) and run Meowth locally. The configure process is the same except you'll have to use your own bot token.
 
 ## Directions for installing and running the bot on your server:
 
-1. Install Python 3.5.
+
+1. Install Python 3.5 and ensure PIP is also installed with it.
 https://www.python.org/downloads/release/python-350/
 
-2. Install the packages needed to run meowth:
+2. Install the packages needed to run meowth by running install.py:
 
 Linux:
 ```bash
-python3 -m pip install -U discord.py pillow requests pytesseract hastebin.py
+python3 install.py
 ```
-
 Windows:
 ```bash
-py -m pip install -U discord.py pillow requests pytesseract hastebin.py
+py install.py
 ```
+Tesseract-OCR has to be installed with a standard binary installer on Windows.
+Get the installer [HERE](https://github.com/tesseract-ocr/tesseract/wiki/Downloads)
 
 3. Download the files in this repository. The source code is in meowth.py and bot config is in config.json.
 
@@ -49,11 +52,22 @@ py -m pip install -U discord.py pillow requests pytesseract hastebin.py
 
 6. Create a bot user for your app and reveal the bot token to copy it.
 
-7. Open config.json in a text editor (a good one to use is Notepad++) and paste the bot token into the value for "bot_token", replacing the "yourtoken" string.
+7. Copy config_blank.json and rename to config.json. Open config.json in a text editor (a good one to use is Notepad++) and paste the bot token into the value for "bot_token", replacing the "yourtoken" string.
 
 8. Replace the "master" value in config.json with your full discord username with the 4 digits after the hash.
 
-9. Run meowth.py from the command prompt or terminal window. If successful, it should show "Meowth! That's right!".
+9. Run the launcher from the command prompt or terminal window:
+
+Linux:
+```bash
+python3 launcher.py -s
+```
+Windows:
+```bash
+py launcher.py -s
+```
+
+If successful, it should show "Meowth! That's right!".
 
 10. Go back to your Discord application page and copy the Client ID.
 
@@ -66,6 +80,30 @@ py -m pip install -U discord.py pillow requests pytesseract hastebin.py
 
 10. Simply type !configure in your server to start the configuration process.
 
+### Launcher Reference:
+Arguments:
+```
+--help, -h      show this help message and exit
+--start, -s     Starts Meowth
+--announce, -a  Announces Update/Reboot Message to all server owners.
+--auto-restart  Auto-Restarts Meowth in case of a crash.
+```
+
+Launch Meowth normally:
+```bash
+python3 launcher.py -s
+```
+
+Launch Meowth with Auto-Restart:
+```bash
+python3 launcher.py -s --auto-restart
+```
+
+Launch Meowth with Auto-Restart, and send Update message to all server owners:
+```bash
+python launcher.py -s -a --auto-restart
+```
+
 ## Directions for using Meowth:
 Note: Avoid punctuation inside commands. The <> in these instructions are there for decoration.
 
@@ -76,7 +114,9 @@ Note: Avoid punctuation inside commands. The <> in these instructions are there 
 | **!help**  | - | Shows commands you can use in that channel, with descriptions. |
 | **!team**  | - | Let's users set their team role. |
 | **!save**  | *Owner Only* | Saves the save data to file. |
-| **!exit**  | *Owner Only* | Saves the save data to file and quits the script. |
+| **!exit**  | *Owner Only* | Saves the save data to file and shutdown Meowth. |
+| **!restart**  | *Owner Only* | Saves the save data to file and restarts Meowth. |
+| **!restart announce**  | *Owner Only* | Saves the save data to file, restarts Meowth and sends announcement. |
 | **!outputlog**  | *Server Manager Only* | Uploads the log file to hastebin and replies with the link. |
 
 ### Pokemon Notification Commands:

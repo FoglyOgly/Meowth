@@ -2494,7 +2494,7 @@ async def _invite(ctx):
             enh = ImageEnhance.Contrast(img)
             img = enh.enhance(4)
             txt = pytesseract.image_to_string(img, config=tesseract_config)
-            if 'EX Raid Battle' or "This is a reward" or "Please visit the Gym" in txt:
+            if 'EX Raid Battle' in txt or "This is a reward" in txt or "Please visit the Gym" in txt:
                 exraidlist = ''
                 exraid_dict = {}
                 exraidcount = 0

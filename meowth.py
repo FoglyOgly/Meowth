@@ -633,7 +633,7 @@ The trainer_dict contains "trainer" elements, which have the following fields:
 'count'  : the number of trainers in the party
 """
 
-team_msg = " or ".join(["'!team {0}'".format(team) for team in config['team_dict'].keys()])
+team_msg = " or ".join(["`!team {0}`".format(team) for team in config['team_dict'].keys()])
 
 @Meowth.event
 async def on_ready():
@@ -941,7 +941,7 @@ async def on_member_join(member):
 
     welcomemessage = _("Meowth! Welcome to {server_name}, {new_member_name}! ")
     if server_dict[server]['team'] == True:
-        welcomemessage += _("Set your team by typing {team_command} without quotations.").format(team_command=team_msg)
+        welcomemessage += _("Set your team by typing {team_command}.").format(team_command=team_msg)
     welcomemessage += admin_message
 
     if server_dict[server]['welcomechan'] == "dm":

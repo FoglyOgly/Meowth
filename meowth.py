@@ -1868,6 +1868,7 @@ async def _eggassume(args, raid_channel):
         raidrole = await Meowth.create_role(server = raid_channel.server, name = entered_raid, hoist = False, mentionable = True)
         await asyncio.sleep(0.5)
     await Meowth.send_message(raid_channel, _("Meowth! This egg will be assumed to be {pokemon} when it hatches!").format(pokemon=raidrole.mention))
+    server_dict[raid_channel.server]['raidchannel_dict'][raid_channel] = eggdetails
     return
 
 async def _eggtoraid(entered_raid, raid_channel):

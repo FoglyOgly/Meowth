@@ -1,7 +1,7 @@
 # Meowth
 A Discord helper bot for Pokemon Go communities.
 
-Meowth is a Discord bot written in Python 3.5 using version 0.16.8 of the discord.py library.
+Meowth is a Discord bot written in Python 3.5 using version 0.16.12 of the discord.py library.
 
 ## Meowth 2.0 is here!
 
@@ -133,6 +133,7 @@ pkmn = Pokemon
 | **!exit**  | *Owner Only* | Saves the save data to file and shutdown Meowth. |
 | **!restart**  | *Owner Only* | Saves the save data to file and restarts Meowth. |
 | **!restart announce**  | *Owner Only* | Saves the save data to file, restarts Meowth and sends announcement. |
+| **!welcome** \[@member\] | *Owner Only* | Sends the welcome message to either user or mentioned member. |
 | **!outputlog**  | *Server Manager Only* | Uploads the log file to hastebin and replies with the link. |
 
 ### Pokemon Notification Commands:

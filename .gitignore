@@ -1,5 +1,6 @@
 
 *.bat
 config.json
-serverdict_backup
-serverdict
+data/serverdict_backup
+data/serverdict
+

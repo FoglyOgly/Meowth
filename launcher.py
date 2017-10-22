@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import sys
 import os
 import subprocess
@@ -18,8 +20,8 @@ def run_meowth(autorestart):
     if interpreter is None:
         raise RuntimeError("Python could not be found")
 
-    std_cmd = [interpreter, "meowth.py", "launcher"]
-    ann_cmd = [interpreter, "meowth.py", "reboot", "launcher"]
+    std_cmd = [interpreter, "meowth", "launcher"]
+    ann_cmd = [interpreter, "meowth", "reboot", "launcher"]
     if args.announce:
         cmd = ann_cmd
     else:

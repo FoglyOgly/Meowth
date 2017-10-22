@@ -1,5 +1,6 @@
 from discord.ext import commands
 import discord.utils
+import errors
 
 def is_owner_check(ctx):
     author = str(ctx.message.author.id)
@@ -150,16 +151,6 @@ def check_teamset(ctx):
     except KeyError:
         return False
 
-def check_raidtype(ctx):
-    if ctx.message.server is None:
-        return False
-    server = ctx.message.server
-    channel = ctx.message.channel
-    try:
-        return ctx.bot.server_dict[server]['raidchannel_dict'][channel]['type']
-    except KeyError:
-        return False
-
 def teamset():
     def predicate(ctx):
         return check_teamset(ctx)
@@ -222,4 +213,5 @@ def cityeggchannel():
                 return True
         elif check_citychannel(ctx) == True:
             return True
+        raise errors.NonRegionEggChannel()
     return commands.check(predicate)

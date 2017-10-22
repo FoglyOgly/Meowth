@@ -64,7 +64,7 @@ except OSError:
 logger = setup_logger('discord','logs/meowth.log',logging.INFO)
 
 Meowth = commands.Bot(command_prefix="!")
-custom_error_handling(Meowth)
+custom_error_handling(Meowth,logger)
 
 try:
     with open(r"data\serverdict", "rb") as fd:

@@ -7,7 +7,7 @@ class NonRegionEggChannel(CommandError):
     is attempted outside of one"""
     pass
 
-def custom_error_handling(bot):
+def custom_error_handling(bot,logger):
     @bot.event
     async def on_command_error(error, ctx):
         channel = ctx.message.channel

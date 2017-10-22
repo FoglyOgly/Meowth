@@ -1,6 +1,6 @@
 
 *.bat
 config.json
-meowth/data/serverdict_backup
-meowth/data/serverdict
+data/serverdict_backup
+data/serverdict
 

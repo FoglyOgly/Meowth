@@ -24,7 +24,7 @@ import requests
 from io import BytesIO
 import checks
 import hastebin
-from operator import itemgetter   
+from operator import itemgetter
 
 tessdata_dir_config = "--tessdata-dir 'C:\\Program Files (x86)\\Tesseract-OCR\\tessdata' "
 xtraconfig = "-l eng -c tessedit_char_blacklist=&|=+%#^*[]{};<> -psm 6"
@@ -933,10 +933,9 @@ async def configure(ctx):
     server_dict[server] = server_dict_temp
     await Meowth.send_message(owner, _("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again."))
 
-"""Welcome message to the server and some basic instructions."""
-
 @Meowth.event
 async def on_member_join(member):
+    """Welcome message to the server and some basic instructions."""
     server = member.server
     if server_dict[server]['done'] == False or server_dict[server]['welcome'] == False:
         return
@@ -1282,8 +1281,8 @@ async def _wild(message):
         wild_embed.set_thumbnail(url=wild_img_url)
         await Meowth.send_message(message.channel, content=_("Meowth! Wild {pokemon} reported by {member}! Details: {location_details}").format(pokemon=wild.mention, member=message.author.mention, location_details=wild_details),embed=wild_embed)
 
-@Meowth.command(pass_context=True)
 @checks.cityeggchannel()
+@Meowth.command(pass_context=True)
 @checks.raidset()
 async def raid(ctx):
     """Report an ongoing raid.
@@ -1330,7 +1329,7 @@ async def _raid(message):
     del args_split[0]
 
     if args_split[-1].isdigit():
-        raidexp = args_split[-1]
+        raidexp = int(args_split[-1])
         del args_split[-1]
     elif ":" in args_split[-1]:
         args_split[-1] = re.sub(r"[a-zA-Z]", "", args_split[-1])
@@ -1346,6 +1345,11 @@ async def _raid(message):
         del args_split[-1]
     else:
         raidexp = False
+
+    if raidexp:
+        if _timercheck(raidexp):
+            await Meowth.send_message(message.channel, _("Meowth...that's too long. Raids currently last no more than one hour..."))
+            return
 
     if entered_raid not in pkmn_info['pokemon_list']:
         await Meowth.send_message(message.channel, spellcheck(entered_raid))
@@ -1458,10 +1462,13 @@ async def timerset(ctx,timer):
     except KeyError:
         pass
 
-    raidtype = server_dict[server]['raidchannel_dict'][channel]['type']
+    if server_dict[server]['raidchannel_dict'][channel]['type'] == 'egg':
+        raidtype = "Raid Egg"
+    else:
+        raidtype = "Raid"
 
     if timer.isdigit():
-        raidexp = timer
+        raidexp = int(timer)
     elif ":" in timer:
         h,m = re.sub(r"[a-zA-Z]", "", timer).split(":",maxsplit=1)
         if h is "": h = "0"
@@ -1475,16 +1482,15 @@ async def timerset(ctx,timer):
         await Meowth.send_message(channel, "Meowth! I couldn't understand your time format. Try again like this: **!timerset <minutes>**")
         return
 
-    try:
-        s = int(raidexp) * 60
-        if s > 3600:
-            await Meowth.send_message(channel, _("Meowth...that's too long. {raidtype}s currently last no more than one hour...").format(raidtype=raidtype.capitalize()))
-            return
-    except:
+    if _timercheck(raidexp):
+        await Meowth.send_message(channel, _("Meowth...that's too long. {raidtype}s currently last no more than one hour...").format(raidtype=raidtype.capitalize()))
         return
 
-    if str(raidexp).isdigit():
-        await _timerset(channel, raidexp)
+    await _timerset(channel, raidexp)
+
+def _timercheck(time):
+    maxtime = 60
+    return time > maxtime
 
 async def _timerset(raidchannel, exptime):
     server = raidchannel.server
@@ -1769,7 +1775,7 @@ async def _raidegg(message):
         return
 
     if args_split[-1].isdigit():
-        raidexp = args_split[-1]
+        raidexp = int(args_split[-1])
         del args_split[-1]
     elif ":" in args_split[-1]:
         args_split[-1] = re.sub(r"[a-zA-Z]", "", args_split[-1])
@@ -1786,7 +1792,10 @@ async def _raidegg(message):
     else:
         raidexp = False
 
-
+    if raidexp:
+        if _timercheck(raidexp):
+            await Meowth.send_message(message.channel, _("Meowth...that's too long. Raid Eggs currently last no more than one hour..."))
+            return
 
     raid_details = " ".join(args_split)
     raid_details = raid_details.strip()

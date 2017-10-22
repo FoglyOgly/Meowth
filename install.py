@@ -36,4 +36,4 @@ if __name__ == '__main__':
         print("\n\nPlease install Tesseract OCR with the installer for Windows by visiting:\nhttps://github.com/tesseract-ocr/tesseract/wiki/Downloads")
     if platform == "darwin":
         print("\n\nPython packages installed. Please ensure Tesseract OCR for OSX is installed manually.")
-    print("Requirements installation is now complete.")
+    print("\nRequirements installation is now complete.")

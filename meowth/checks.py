@@ -1,5 +1,6 @@
 from discord.ext import commands
 import discord.utils
+import errors
 
 def is_owner_check(ctx):
     author = str(ctx.message.author.id)
@@ -222,4 +223,5 @@ def cityeggchannel():
                 return True
         elif check_citychannel(ctx) == True:
             return True
+        raise errors.NonRegionEggChannel()
     return commands.check(predicate)

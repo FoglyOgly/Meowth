@@ -22,6 +22,8 @@ import requests
 from io import BytesIO
 import checks
 import hastebin
+from operator import itemgetter
+from errors import custom_error_handling
 
 tessdata_dir_config = "--tessdata-dir 'C:\\Program Files (x86)\\Tesseract-OCR\\tessdata' "
 xtraconfig = "-l eng -c tessedit_char_blacklist=&|=+%#^*[]{};<> -psm 6"
@@ -60,21 +62,22 @@ except OSError:
 logger = setup_logger('discord','logs/meowth.log',logging.INFO)
 
 Meowth = commands.Bot(command_prefix="!")
+custom_error_handling(Meowth,logger)
 
 try:
-    with open("serverdict", "rb") as fd:
+    with open(r"data\serverdict", "rb") as fd:
         Meowth.server_dict = pickle.load(fd)
     logger.info("Serverdict Loaded Successfully")
 except OSError:
     logger.info("Serverdict Not Found - Looking for Backup")
     try:
-        with open("serverdict_backup", "rb") as fd:
+        with open(r"data\serverdict_backup", "rb") as fd:
             Meowth.server_dict = pickle.load(fd)
         logger.info("Serverdict Backup Loaded Successfully")
     except OSError:
         logger.info("Serverdict Backup Not Found - Creating New Serverdict")
         Meowth.server_dict = {}
-        with open("serverdict", "wb") as fd:
+        with open(r"data\serverdict", "wb") as fd:
             pickle.dump(Meowth.server_dict, fd)
         logger.info("Serverdict Created")
 
@@ -100,25 +103,25 @@ def load_config():
     global raid_info
 
     # Load configuration
-    with open(os.path.join(script_path, "config.json"), "r") as fd:
+    with open("config.json", "r") as fd:
         config = json.load(fd)
 
     # Set up message catalog access
     language = gettext.translation('meowth', localedir='locale', languages=[config['bot-language']])
     language.install()
     pokemon_language = [config['pokemon-language']]
-    pokemon_path_source = "locale/{0}/pkmn.json".format(config['pokemon-language'])
+    pokemon_path_source = r"locale\{0}\pkmn.json".format(config['pokemon-language'])
 
     # Load Pokemon list and raid info
-    with open(os.path.join(script_path, pokemon_path_source), "r") as fd:
+    with open(pokemon_path_source, "r") as fd:
         pkmn_info = json.load(fd)
-    with open(os.path.join(script_path, "raid_info.json"), "r") as fd:
+    with open(r"data\raid_info.json", "r") as fd:
         raid_info = json.load(fd)
 
     # Load type information
-    with open(os.path.join(script_path, "type_chart.json"), "r") as fd:
+    with open(r"data\type_chart.json", "r") as fd:
         type_chart = json.load(fd)
-    with open(os.path.join(script_path, "type_list.json"), "r") as fd:
+    with open(r"data\type_list.json", "r") as fd:
         type_list = json.load(fd)
 
     # Set spelling dictionary to our list of Pokemon
@@ -846,6 +849,9 @@ async def configure(ctx):
                     server_dict_temp['wantset']=False
                     await Meowth.send_message(owner, _("**Pokemon Notifications disabled**\n---"))
                     break
+                elif wantchs.content.lower() == "cancel":
+                    await Meowth.send_message(owner, _("**CONFIG CANCELLED!**\nNo changes have been made."))
+                    return
                 else:
                     want_list = wantchs.content.lower().split(', ')
                     server_channel_list = []
@@ -927,10 +933,9 @@ async def configure(ctx):
     server_dict[server] = server_dict_temp
     await Meowth.send_message(owner, _("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again."))
 
-"""Welcome message to the server and some basic instructions."""
-
 @Meowth.event
 async def on_member_join(member):
+    """Welcome message to the server and some basic instructions."""
     server = member.server
     if server_dict[server]['done'] == False or server_dict[server]['welcome'] == False:
         return
@@ -962,21 +967,20 @@ Admin commands
 """
 
 async def _save():
-    with tempfile.NamedTemporaryFile(
-        'wb', dir=os.path.dirname('serverdict'), delete=False) as tf:
+    with tempfile.NamedTemporaryFile('wb', dir=os.path.dirname(r'data\serverdict'), delete=False) as tf:
         pickle.dump(server_dict, tf)
         tempname = tf.name
     try:
-        os.remove('serverdict_backup')
+        os.remove(r'data\serverdict_backup')
     except OSError as e:
         pass
     try:
-        os.rename('serverdict', 'serverdict_backup')
+        os.rename(r'data\serverdict', r'data\serverdict_backup')
     except OSError as e:
         if e.errno != errno.ENOENT:
             raise
 
-    os.rename(tempname, 'serverdict')
+    os.rename(tempname, r'data\serverdict')
 
 @Meowth.command(pass_context=True)
 @checks.is_owner()
@@ -998,10 +1002,11 @@ async def exit(ctx):
 @Meowth.command(pass_context=True)
 @checks.is_owner()
 async def restart(ctx,*args):
-    """Exit after saving.
+    """Restart after saving.
 
-    Usage: !exit.
-    Calls the save function and quits the script."""
+    Usage: !restart [announce].
+    Calls the save function and restarts Meowth.
+    If 'announce' argument used, """
     try:
         await _save()
     except Exception as err:
@@ -1043,6 +1048,15 @@ async def outputlog(ctx):
     logdata = logdata.encode('ascii', errors='replace').decode('utf-8')
     await Meowth.send_message(ctx.message.channel, hastebin.post(logdata))
 
+@Meowth.command(pass_context=True)
+@checks.is_owner()
+async def welcome(ctx, user: discord.Member = None):
+    """Test welcome on yourself or mentioned member.
+
+    Usage: !welcome [@member]"""
+    if not user:
+        user = ctx.message.author
+    await on_member_join(user)
 
 """
 
@@ -1267,8 +1281,8 @@ async def _wild(message):
         wild_embed.set_thumbnail(url=wild_img_url)
         await Meowth.send_message(message.channel, content=_("Meowth! Wild {pokemon} reported by {member}! Details: {location_details}").format(pokemon=wild.mention, member=message.author.mention, location_details=wild_details),embed=wild_embed)
 
-@Meowth.command(pass_context=True)
 @checks.cityeggchannel()
+@Meowth.command(pass_context=True)
 @checks.raidset()
 async def raid(ctx):
     """Report an ongoing raid.
@@ -1315,7 +1329,7 @@ async def _raid(message):
     del args_split[0]
 
     if args_split[-1].isdigit():
-        raidexp = args_split[-1]
+        raidexp = int(args_split[-1])
         del args_split[-1]
     elif ":" in args_split[-1]:
         args_split[-1] = re.sub(r"[a-zA-Z]", "", args_split[-1])
@@ -1331,6 +1345,11 @@ async def _raid(message):
         del args_split[-1]
     else:
         raidexp = False
+
+    if raidexp:
+        if _timercheck(raidexp):
+            await Meowth.send_message(message.channel, _("Meowth...that's too long. Raids currently last no more than one hour..."))
+            return
 
     if entered_raid not in pkmn_info['pokemon_list']:
         await Meowth.send_message(message.channel, spellcheck(entered_raid))
@@ -1415,7 +1434,7 @@ async def print_raid_timer(channel):
         raidtype = "raid"
         raidaction = "end"
     if not server_dict[channel.server]['raidchannel_dict'][channel]['active']:
-        timerstr += _("Meowth! This {raidtype}'s timer has already expired as of {expiry_time} ({expiry_time24})!").format(raidtype=raidtype,expiry_time=strftime("%I:%M %p", localexpire),expiry_time24=strftime("%H:%M", localexpire))
+        timerstr += _("Meowth! This {raidtype}'s timer has already expired as of {expiry_time} ({expiry_time24})!").format(raidtype=raidtype,expiry_time=strftime("%I:%M%p", localexpire),expiry_time24=strftime("%H:%M", localexpire))
     else:
         if server_dict[channel.server]['raidchannel_dict'][channel]['manual_timer']:
             timerstr += _("Meowth! This {raidtype} will {raidaction} at {expiry_time} ({expiry_time24})!").format(raidtype=raidtype,raidaction=raidaction,expiry_time=strftime("%I:%M %p", localexpire),expiry_time24=strftime("%H:%M", localexpire))
@@ -1443,10 +1462,17 @@ async def timerset(ctx,timer):
     except KeyError:
         pass
 
+<<<<<<< HEAD:meowth.py
     raidtype = checks.check_raidtype(ctx)
+=======
+    if server_dict[server]['raidchannel_dict'][channel]['type'] == 'egg':
+        raidtype = "Raid Egg"
+    else:
+        raidtype = "Raid"
+>>>>>>> 7ca3524c2568fd116143b68cf543bbf6efdee9cd:meowth/__main__.py
 
     if timer.isdigit():
-        raidexp = timer
+        raidexp = int(timer)
     elif ":" in timer:
         h,m = re.sub(r"[a-zA-Z]", "", timer).split(":",maxsplit=1)
         if h is "": h = "0"
@@ -1460,16 +1486,15 @@ async def timerset(ctx,timer):
         await Meowth.send_message(channel, "Meowth! I couldn't understand your time format. Try again like this: **!timerset <minutes>**")
         return
 
-    try:
-        s = int(raidexp) * 60
-        if s > 3600:
-            await Meowth.send_message(channel, _("Meowth...that's too long. {raidtype}s currently last no more than one hour...").format(raidtype=raidtype.capitalize()))
-            return
-    except:
+    if _timercheck(raidexp):
+        await Meowth.send_message(channel, _("Meowth...that's too long. {raidtype}s currently last no more than one hour...").format(raidtype=raidtype.capitalize()))
         return
 
-    if str(raidexp).isdigit():
-        await _timerset(channel, raidexp)
+    await _timerset(channel, raidexp)
+
+def _timercheck(time):
+    maxtime = 60
+    return time > maxtime
 
 async def _timerset(raidchannel, exptime):
     server = raidchannel.server
@@ -1754,7 +1779,7 @@ async def _raidegg(message):
         return
 
     if args_split[-1].isdigit():
-        raidexp = args_split[-1]
+        raidexp = int(args_split[-1])
         del args_split[-1]
     elif ":" in args_split[-1]:
         args_split[-1] = re.sub(r"[a-zA-Z]", "", args_split[-1])
@@ -1771,7 +1796,10 @@ async def _raidegg(message):
     else:
         raidexp = False
 
-
+    if raidexp:
+        if _timercheck(raidexp):
+            await Meowth.send_message(message.channel, _("Meowth...that's too long. Raid Eggs currently last no more than one hour..."))
+            return
 
     raid_details = " ".join(args_split)
     raid_details = raid_details.strip()
@@ -2117,38 +2145,81 @@ async def list(ctx):
             activeraidnum = 0
             cty = channel.name
             rc_d = server_dict[server]['raidchannel_dict']
-            listmsg += (_("Meowth! Current Raids for {0}:").format(cty.capitalize()))
 
-            for r in server_dict[server]['raidchannel_dict']:
+            raid_dict = {}
+            egg_dict = {}
+            exraid_list = []
+            for r in rc_d:
+                if rc_d[r]['reportcity'] == cty and rc_d[r]['active'] and discord.utils.get(server.channels, id=r.id):
+                    exp = rc_d[r]['exp']
+                    type = rc_d[r]['type']
+                    if type == 'egg':
+                        egg_dict[r] = exp
+                    elif type == 'exraid':
+                        exraid_list.append(r)
+                    else:
+                        raid_dict[r] = exp
+
+                    activeraidnum += 1
+
+            def list_output(r):
+                output = ""
                 ctx_waitingcount = 0
                 ctx_omwcount = 0
                 ctx_maybecount = 0
-                #sorted(type_eff.items(), key=lambda x: x[1], reverse=True)
-                if rc_d[r]['reportcity'] == cty and rc_d[r]['active'] and discord.utils.get(server.channels, id=r.id):
-                    for trainer in rc_d[r]['trainer_dict'].values():
-                        if trainer['status'] == "waiting":
-                            ctx_waitingcount += trainer['count']
-                        elif trainer['status'] == "omw":
-                            ctx_omwcount += trainer['count']
-                        elif trainer['status'] == "maybe":
-                            ctx_maybecount += trainer['count']
-                    if rc_d[r]['type'] == 'exraid':
-                        localexpire = "No expiry"
-                        assumed_str = " (EXraid)"
+                for trainer in rc_d[r]['trainer_dict'].values():
+                    if trainer['status'] == "waiting":
+                        ctx_waitingcount += trainer['count']
+                    elif trainer['status'] == "omw":
+                        ctx_omwcount += trainer['count']
+                    elif trainer['status'] == "maybe":
+                        ctx_maybecount += trainer['count']
+                if rc_d[r]['type'] == 'exraid':
+                    expirytext = ""
+                else:
+                    expiry_time = time.gmtime(rc_d[r]['exp'] + 3600 * server_dict[server]['offset'])
+                    localexpire = strftime("%I:%M%p", expiry_time)
+                    localexpire24 = strftime("%H:%M", expiry_time)
+                    if rc_d[r]['manual_timer'] == False:
+                        assumed_str = " (assumed)"
                     else:
-                        localexpire = strftime("%I:%M", time.gmtime(rc_d[r]['exp'] + 3600 * server_dict[server]['offset']))
-                        if rc_d[r]['manual_timer'] == False:
-                            assumed_str = " (assumed)"
-                        else:
-                            assumed_str = ""
-                    listmsg += (_("\n{raidchannel} - {interestcount} interested, {comingcount} coming, {herecount} here. End time: {expiry}{manualtimer}").format(raidchannel=r.mention, interestcount=ctx_maybecount, comingcount=ctx_omwcount, herecount=ctx_waitingcount, expiry=localexpire, manualtimer=assumed_str))
-                    activeraidnum += 1
+                        assumed_str = ""
+                    if rc_d[r]['type'] == 'egg':
+                        expirytext = " - Hatches: {expiry} ({expiry24hr}){is_assumed}".format(expiry=localexpire, expiry24hr=localexpire24, is_assumed=assumed_str)
+                    else:
+                        expirytext = " - Expiry: {expiry} ({expiry24hr}){is_assumed}".format(expiry=localexpire, expiry24hr=localexpire24, is_assumed=assumed_str)
+                output += (_("    {raidchannel}{expiry_text}\n").format(raidchannel=r.mention, expiry_text=expirytext))
+                output += (_("    {interestcount} interested, {comingcount} coming, {herecount} here.\n").format(raidchannel=r.mention, interestcount=ctx_maybecount, comingcount=ctx_omwcount, herecount=ctx_waitingcount))
+                return output
+
+            if activeraidnum:
+                listmsg += (_("**Meowth! Here's the current raids for {0}**\n\n").format(cty.capitalize()))
+
+            if raid_dict:
+                listmsg += (_("**Active Raids:**\n").format(cty.capitalize()))
+                for r,e in sorted(raid_dict.items(), key=itemgetter(1)):
+                    listmsg += list_output(r)
+                listmsg += "\n"
+
+            if egg_dict:
+                listmsg += (_("**Raid Eggs:**\n").format(cty.capitalize()))
+                for r,e in sorted(egg_dict.items(), key=itemgetter(1)):
+                    listmsg += list_output(r)
+                listmsg += "\n"
+
+            if exraid_list:
+                listmsg += (_("**EXRaids:**\n").format(cty.capitalize()))
+                for r in exraid_list:
+                    listmsg += list_output(r)
+
             if activeraidnum == 0:
                 await Meowth.send_message(channel, _("Meowth! No active raids! Report one with **!raid <name> <location>**."))
                 return
             else:
                 await Meowth.send_message(channel, listmsg)
                 return
+
+
 
         if checks.check_raidchannel(ctx):
             if checks.check_raidactive(ctx):
@@ -2532,24 +2603,6 @@ async def _invite(ctx):
             await Meowth.send_message(ctx.message.channel, "Meowth! Your attachment was not a supported image format!")
     else:
         await Meowth.send_message(ctx.message.channel, "Meowth! Please upload your screenshot directly to Discord!")
-
-@Meowth.event
-async def on_command_error(error, ctx):
-    channel = ctx.message.channel
-    if isinstance(error, commands.MissingRequiredArgument):
-        pages = Meowth.formatter.format_help_for(ctx,ctx.command)
-        for page in pages:
-            await Meowth.send_message(ctx.message.channel, page)
-    elif isinstance(error, commands.BadArgument):
-        pages = Meowth.formatter.format_help_for(ctx,ctx.command)
-        for page in pages:
-            await Meowth.send_message(ctx.message.channel, page)
-    elif isinstance(error, commands.CommandNotFound):
-        pass
-    elif isinstance(error, commands.CheckFailure):
-        pass
-    else:
-        logger.exception(type(error).__name__, exc_info=error)
 
 try:
     event_loop.run_until_complete(Meowth.start(config['bot_token']))

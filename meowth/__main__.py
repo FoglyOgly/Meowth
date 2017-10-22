@@ -25,6 +25,7 @@ from io import BytesIO
 import checks
 import hastebin
 from operator import itemgetter
+from errors import custom_error_handling
 
 tessdata_dir_config = "--tessdata-dir 'C:\\Program Files (x86)\\Tesseract-OCR\\tessdata' "
 xtraconfig = "-l eng -c tessedit_char_blacklist=&|=+%#^*[]{};<> -psm 6"
@@ -63,6 +64,7 @@ except OSError:
 logger = setup_logger('discord','logs/meowth.log',logging.INFO)
 
 Meowth = commands.Bot(command_prefix="!")
+custom_error_handling(Meowth)
 
 try:
     with open(r"data\serverdict", "rb") as fd:
@@ -2599,24 +2601,6 @@ async def _invite(ctx):
             await Meowth.send_message(ctx.message.channel, "Meowth! Your attachment was not a supported image format!")
     else:
         await Meowth.send_message(ctx.message.channel, "Meowth! Please upload your screenshot directly to Discord!")
-
-@Meowth.event
-async def on_command_error(error, ctx):
-    channel = ctx.message.channel
-    if isinstance(error, commands.MissingRequiredArgument):
-        pages = Meowth.formatter.format_help_for(ctx,ctx.command)
-        for page in pages:
-            await Meowth.send_message(ctx.message.channel, page)
-    elif isinstance(error, commands.BadArgument):
-        pages = Meowth.formatter.format_help_for(ctx,ctx.command)
-        for page in pages:
-            await Meowth.send_message(ctx.message.channel, page)
-    elif isinstance(error, commands.CommandNotFound):
-        pass
-    elif isinstance(error, commands.CheckFailure):
-        pass
-    else:
-        logger.exception(type(error).__name__, exc_info=error)
 
 try:
     event_loop.run_until_complete(Meowth.start(config['bot_token']))

@@ -65,19 +65,19 @@ logger = setup_logger('discord','logs/meowth.log',logging.INFO)
 Meowth = commands.Bot(command_prefix="!")
 
 try:
-    with open("serverdict", "rb") as fd:
+    with open(r"data\serverdict", "rb") as fd:
         Meowth.server_dict = pickle.load(fd)
     logger.info("Serverdict Loaded Successfully")
 except OSError:
     logger.info("Serverdict Not Found - Looking for Backup")
     try:
-        with open("serverdict_backup", "rb") as fd:
+        with open(r"data\serverdict_backup", "rb") as fd:
             Meowth.server_dict = pickle.load(fd)
         logger.info("Serverdict Backup Loaded Successfully")
     except OSError:
         logger.info("Serverdict Backup Not Found - Creating New Serverdict")
         Meowth.server_dict = {}
-        with open("serverdict", "wb") as fd:
+        with open(r"data\serverdict", "wb") as fd:
             pickle.dump(Meowth.server_dict, fd)
         logger.info("Serverdict Created")
 
@@ -849,6 +849,9 @@ async def configure(ctx):
                     server_dict_temp['wantset']=False
                     await Meowth.send_message(owner, _("**Pokemon Notifications disabled**\n---"))
                     break
+                elif wantchs.content.lower() == "cancel":
+                    await Meowth.send_message(owner, _("**CONFIG CANCELLED!**\nNo changes have been made."))
+                    return
                 else:
                     want_list = wantchs.content.lower().split(', ')
                     server_channel_list = []
@@ -965,21 +968,20 @@ Admin commands
 """
 
 async def _save():
-    with tempfile.NamedTemporaryFile(
-        'wb', dir=os.path.dirname('serverdict'), delete=False) as tf:
+    with tempfile.NamedTemporaryFile('wb', dir=os.path.dirname(r'data\serverdict'), delete=False) as tf:
         pickle.dump(server_dict, tf)
         tempname = tf.name
     try:
-        os.remove('serverdict_backup')
+        os.remove(r'data\serverdict_backup')
     except OSError as e:
         pass
     try:
-        os.rename('serverdict', 'serverdict_backup')
+        os.rename(r'data\serverdict', r'data\serverdict_backup')
     except OSError as e:
         if e.errno != errno.ENOENT:
             raise
 
-    os.rename(tempname, 'serverdict')
+    os.rename(tempname, r'data\serverdict')
 
 @Meowth.command(pass_context=True)
 @checks.is_owner()
@@ -1001,10 +1003,11 @@ async def exit(ctx):
 @Meowth.command(pass_context=True)
 @checks.is_owner()
 async def restart(ctx,*args):
-    """Exit after saving.
+    """Restart after saving.
 
-    Usage: !exit.
-    Calls the save function and quits the script."""
+    Usage: !restart [announce].
+    Calls the save function and restarts Meowth.
+    If 'announce' argument used, """
     try:
         await _save()
     except Exception as err:
@@ -1046,6 +1049,15 @@ async def outputlog(ctx):
     logdata = logdata.encode('ascii', errors='replace').decode('utf-8')
     await Meowth.send_message(ctx.message.channel, hastebin.post(logdata))
 
+@Meowth.command(pass_context=True)
+@checks.is_owner()
+async def welcome(ctx, user: discord.Member = None):
+    """Test welcome on yourself or mentioned member.
+
+    Usage: !welcome [@member]"""
+    if not user:
+        user = ctx.message.author
+    await on_member_join(user)
 
 """
 

@@ -134,6 +134,7 @@ pkmn = Pokemon
 | **!restart**  | *Owner Only* | Saves the save data to file and restarts Meowth. |
 | **!restart announce**  | *Owner Only* | Saves the save data to file, restarts Meowth and sends announcement. |
 | **!outputlog**  | *Server Manager Only* | Uploads the log file to hastebin and replies with the link. |
+| **!welcome** \[@member\] | *Server Manager Only* | Uploads the log file to hastebin and replies with the link. |
 
 ### Pokemon Notification Commands:
 

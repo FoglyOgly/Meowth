@@ -1099,7 +1099,7 @@ End admin commands
 
 @Meowth.command(pass_context=True)
 async def about(ctx):
-    """Shows info about Red"""
+    """Shows info about Meowth"""
     author_repo = "https://github.com/FoglyOgly"
     author_name = "FoglyOgly"
     bot_repo = author_repo + "/Meowth"

@@ -463,6 +463,9 @@ async def channel_cleanup(loop=True):
                                 logger.info(log_str+" - 5+ MIN EXPIRY NONACTIVE RAID")
                                 continue
 
+                        event_loop.create_task(expiry_check(channel))
+                        logger.info(log_str+" - = RECENTLY EXPIRED NONACTIVE RAID")
+
                     #if the channel save data shows it as an active raid still
                     elif serverdict_chtemp[server]['raidchannel_dict'][channel]['active'] == True:
 

@@ -415,7 +415,6 @@ async def channel_cleanup(loop=True):
             #clear channel lists
             dict_channel_delete = []
             discord_channel_delete =[]
-            dict_expired_channel_list = []
 
             #check every raid channel data for each server
             for channel in serverdict_chtemp[server]['raidchannel_dict']:
@@ -463,7 +462,7 @@ async def channel_cleanup(loop=True):
                                 logger.info(log_str+" - 5+ MIN EXPIRY NONACTIVE RAID")
                                 continue
 
-                        event_loop.create_task(expiry_check(channel))
+                        event_loop.create_task(expire_channel(channel))
                         logger.info(log_str+" - = RECENTLY EXPIRED NONACTIVE RAID")
 
                     #if the channel save data shows it as an active raid still
@@ -501,7 +500,7 @@ async def channel_cleanup(loop=True):
                         elif serverdict_chtemp[server]['raidchannel_dict'][channel]['exp'] <= time.time():
 
                             #list the channel to be sent to the channel expiry function
-                            dict_expired_channel_list.append(channel)
+                            event_loop.create_task(expire_channel(e))
 
                             logger.info(log_str+" - RECENTLY EXPIRED")
                             continue
@@ -539,10 +538,6 @@ async def channel_cleanup(loop=True):
                 except:
                     logger.info("Channel_Cleanup - Channel Deletion Failure - " + c.name)
                     pass
-
-            #for every channel listed to have recently expired
-            for e in dict_expired_channel_list:
-                event_loop.create_task(expire_channel(e))
 
         #save server_dict changes after cleanup
         logger.info("Channel_Cleanup - SAVING CHANGES")

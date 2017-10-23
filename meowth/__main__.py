@@ -2254,7 +2254,7 @@ async def list(ctx):
                 await Meowth.send_message(channel, listmsg)
                 return
 
-                
+
 
         if checks.check_raidchannel(ctx):
             if checks.check_raidactive(ctx):

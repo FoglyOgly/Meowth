@@ -8,6 +8,7 @@ import pickle
 import json
 import time
 import datetime
+from dateutil.relativedelta import relativedelta
 import copy
 from time import strftime
 import logging
@@ -624,6 +625,7 @@ team_msg = " or ".join(["`!team {0}`".format(team) for team in config['team_dict
 async def on_ready():
     Meowth.owner = discord.utils.get(Meowth.get_all_members(),id=config["master"])
     await _print(Meowth.owner,_("Starting up...")) #prints to the terminal or cmd prompt window upon successful connection to Discord
+    Meowth.uptime = datetime.datetime.now()
     owners = []
     msg_success = 0
     msg_fail = 0
@@ -1106,6 +1108,23 @@ async def about(ctx):
     server_url = "https://discord.gg/hhVjAN8"
     owner = Meowth.owner
     channel = ctx.message.channel
+    time_start = Meowth.uptime
+    time_now = datetime.datetime.now()
+    ut = (relativedelta(time_now,time_start))
+    ut.years, ut.months, ut.days, ut.hours, ut.minutes
+    if ut.years >= 1:
+        uptime = "{yr}y {mth}m {day}d {hr}:{min}".format(yr=ut.years,mth=ut.months,day=ut.days,hr=ut.hours,min=ut.minutes)
+    if ut.months >= 1:
+        uptime = "{mth}m {day}d {hr}:{min}".format(mth=ut.months,day=ut.days,hr=ut.hours,min=ut.minutes)
+    if ut.days >= 1:
+        uptime = "{day} days {hr} hrs {min} mins".format(day=ut.days,hr=ut.hours,min=ut.minutes)
+    if ut.hours >= 1:
+        uptime = "{hr} hrs {min} mins {sec} secs".format(hr=ut.hours,min=ut.minutes,sec=ut.seconds)
+    else:
+        uptime = "{min} mins {sec} secs".format(min=ut.minutes,sec=ut.seconds)
+        
+        
+    
 
     about = (
         "I'm Meowth! A Pokemon Go helper bot for Discord!\n\n"
@@ -1124,6 +1143,8 @@ async def about(ctx):
     embed.add_field(name="Owner", value=owner)
     embed.add_field(name="Servers", value=server_count)
     embed.add_field(name="Members", value=member_count)
+    embed.add_field(name="Uptime", value=uptime)
+    
     embed.set_footer(text="For support, contact us on our Discord server. Invite Code: hhVjAN8")
 
     try:
@@ -1402,7 +1423,7 @@ async def _raid(message):
     else:
         raidexp = False
 
-    if raidexp:
+    if raidexp is not False:
         if _timercheck(raidexp):
             await Meowth.send_message(message.channel, _("Meowth...that's too long. Raids currently last no more than one hour..."))
             return
@@ -1471,7 +1492,7 @@ This channel will be deleted five minutes after the timer expires.""").format(po
         'egglevel' : '0'
         }
 
-    if raidexp:
+    if raidexp is not False:
         await _timerset(raid_channel,raidexp)
     else:
         await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left on the raid using **!timerset <minutes>** so others can check it with **!timer**.").format(member=message.author.mention))
@@ -1848,7 +1869,7 @@ async def _raidegg(message):
     else:
         raidexp = False
 
-    if raidexp:
+    if raidexp is not False:
         if _timercheck(raidexp):
             await Meowth.send_message(message.channel, _("Meowth...that's too long. Raid Eggs currently last no more than one hour..."))
             return
@@ -1915,7 +1936,7 @@ When this egg raid expires, there will be 15 minutes to update it into an open r
             'egglevel' : egg_level
             }
 
-        if raidexp:
+        if raidexp is not False:
             await _timerset(raid_channel,raidexp)
         else:
             await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset <minutes>** so others can check it with **!timer**.").format(member=message.author.mention))

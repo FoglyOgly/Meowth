@@ -1,147 +1,44 @@
-2017-10-22 17:02:53,646:WARNING:discord.client: PyNaCl is not installed, voice will NOT be supported
-2017-10-22 17:02:53,646:INFO:discord.client: on_command_error has successfully been registered as an event
-2017-10-22 17:02:53,648:INFO:discord: Serverdict Loaded Successfully
-2017-10-22 17:02:53,650:INFO:discord.client: on_ready has successfully been registered as an event
-2017-10-22 17:02:53,650:INFO:discord.client: on_server_join has successfully been registered as an event
-2017-10-22 17:02:53,650:INFO:discord.client: on_server_remove has successfully been registered as an event
-2017-10-22 17:02:53,650:INFO:discord.client: on_member_join has successfully been registered as an event
-2017-10-22 17:02:53,650:INFO:discord.client: on_message has successfully been registered as an event
-2017-10-22 17:02:53,650:INFO:discord.client: logging in using static token
-2017-10-22 17:02:54,188:INFO:discord.gateway: Created websocket connected to wss://gateway.discord.gg?encoding=json&v=6
-2017-10-22 17:02:54,189:INFO:discord.gateway: sent the identify payload to create the websocket
-2017-10-22 17:02:56,522:INFO:discord: Starting up...
-2017-10-22 17:02:56,718:INFO:discord: Meowth! That's right!
+2017-10-23 11:32:24,055:WARNING:discord.client: PyNaCl is not installed, voice will NOT be supported
+2017-10-23 11:32:24,055:INFO:discord.client: on_command_error has successfully been registered as an event
+2017-10-23 11:32:24,055:INFO:discord: Serverdict Loaded Successfully
+2017-10-23 11:32:24,055:INFO:discord.client: on_ready has successfully been registered as an event
+2017-10-23 11:32:24,055:INFO:discord.client: on_server_join has successfully been registered as an event
+2017-10-23 11:32:24,055:INFO:discord.client: on_server_remove has successfully been registered as an event
+2017-10-23 11:32:24,055:INFO:discord.client: on_member_join has successfully been registered as an event
+2017-10-23 11:32:24,055:INFO:discord.client: on_message has successfully been registered as an event
+2017-10-23 11:32:24,055:INFO:discord.client: logging in using static token
+2017-10-23 11:32:24,501:INFO:discord.gateway: Created websocket connected to wss://gateway.discord.gg?encoding=json&v=6
+2017-10-23 11:32:24,501:INFO:discord.gateway: sent the identify payload to create the websocket
+2017-10-23 11:32:26,560:INFO:discord: Starting up...
+2017-10-23 11:32:26,561:INFO:discord: Meowth! That's right!
 
 1 servers connected.
 14 members found.
-2017-10-22 17:02:56,718:INFO:discord: Maintenance Tasks Started
-2017-10-22 17:02:56,727:INFO:discord: Server_Cleanup ------ BEGIN ------
-2017-10-22 17:02:56,727:INFO:discord: Server_Cleanup - SAVING CHANGES
-2017-10-22 17:02:56,742:INFO:discord: Server_Cleanup ------ END ------
-2017-10-22 17:02:56,752:INFO:discord: Channel_Cleanup ------ BEGIN ------
-2017-10-22 17:02:56,753:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
-2017-10-22 17:02:56,753:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:muk-tet - CHECKING
-2017-10-22 17:02:56,753:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:muk-tet - EXISTS IN DISCORD
-2017-10-22 17:02:56,753:INFO:discord: Channel_Cleanup - SAVING CHANGES
-2017-10-22 17:02:56,768:INFO:discord: Channel_Cleanup ------ END ------
-2017-10-22 17:10:20,268:INFO:discord: Expiry_Check - level-2-egg-venice-beach-freak-show
-2017-10-22 17:10:20,268:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-2-egg-venice-beach-freak-show
-2017-10-22 17:10:20,500:INFO:discord: Expiry_Check - level-1-egg-mt-olive-lutheran-church
-2017-10-22 17:10:20,500:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-1-egg-mt-olive-lutheran-church
-2017-10-22 17:10:21,170:INFO:discord: Expiry_Check - level-2-egg-venice-beach-freak-show
-2017-10-22 17:10:21,355:INFO:discord: Expiry_Check - level-1-egg-mt-olive-lutheran-church
-2017-10-22 17:12:54,252:INFO:discord: Channel_Cleanup ------ BEGIN ------
-2017-10-22 17:12:54,252:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
-2017-10-22 17:12:54,252:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:muk-tet - CHECKING
-2017-10-22 17:12:54,252:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:muk-tet - EXISTS IN DISCORD
-2017-10-22 17:12:54,252:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:muk-tet - 5+ MIN EXPIRY NONACTIVE RAID
-2017-10-22 17:12:54,252:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-2-egg-venice-beach-freak-show - CHECKING
-2017-10-22 17:12:54,252:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-2-egg-venice-beach-freak-show - EXISTS IN DISCORD
-2017-10-22 17:12:54,252:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-1-egg-mt-olive-lutheran-church - CHECKING
-2017-10-22 17:12:54,252:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-1-egg-mt-olive-lutheran-church - EXISTS IN DISCORD
-2017-10-22 17:12:54,252:INFO:discord: Channel_Cleanup - Channel Savedata Cleared - muk-tet
-2017-10-22 17:12:54,252:INFO:discord: Channel_Cleanup - Channel Deleted - muk-tet
-2017-10-22 17:12:54,506:INFO:discord: Channel_Cleanup - Channel Deleted - muk-tet
-2017-10-22 17:12:54,506:INFO:discord: Channel_Cleanup - SAVING CHANGES
-2017-10-22 17:12:54,533:INFO:discord: Channel_Cleanup ------ END ------
-2017-10-22 17:12:59,964:INFO:discord: Expiry_Check - level-3-egg-creative-space
-2017-10-22 17:12:59,964:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-3-egg-creative-space
-2017-10-22 17:13:00,113:INFO:discord: Expiry_Check - level-3-egg-creative-space
-2017-10-22 17:13:00,333:INFO:discord: Expiry_Check - level-4-egg-shaarei-am-wall
-2017-10-22 17:13:00,333:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-4-egg-shaarei-am-wall
-2017-10-22 17:13:00,464:INFO:discord: Expiry_Check - level-4-egg-shaarei-am-wall
-2017-10-22 17:15:28,475:INFO:discord.http: A rate limit bucket has been exhausted (bucket: PUT:371767243643682826:None:/channels/{channel_id}/messages/{message_id}/reactions/{emoji}/@me, retry: 0.25).
-2017-10-22 17:15:28,796:INFO:discord.http: A rate limit bucket has been exhausted (bucket: PUT:371767243643682826:None:/channels/{channel_id}/messages/{message_id}/reactions/{emoji}/@me, retry: 0.25).
-2017-10-22 17:15:30,054:INFO:discord: Duplicate Report - Channel Expired - level-2-egg-venice-beach-freak-show - Last Report by BrenenP
-2017-10-22 17:15:30,054:INFO:discord: Expire_Channel - level-2-egg-venice-beach-freak-show
-2017-10-22 17:15:30,054:INFO:discord: Expire_Channel - Channel Expired - level-2-egg-venice-beach-freak-show
-2017-10-22 17:15:34,897:INFO:discord: Expiry_Check - level-1-egg-mt-olive-lutheran-church
-2017-10-22 17:15:50,572:INFO:discord: Expire_Channel - Channel Expired And Removed From Watchlist - level-1-egg-mt-olive-lutheran-church
-2017-10-22 17:15:50,572:INFO:discord: Expire_Channel - level-1-egg-mt-olive-lutheran-church
-2017-10-22 17:15:50,572:INFO:discord: Expire_Channel - Channel Expired - level-1-egg-mt-olive-lutheran-church
-2017-10-22 17:15:52,819:INFO:discord: Expiry_Check - magikarp-mt-olive-lutheran-church
-2017-10-22 17:15:52,819:INFO:discord: Expire_Channel - Channel Added To Watchlist - magikarp-mt-olive-lutheran-church
-2017-10-22 17:16:03,155:INFO:discord: Expiry_Check - magikarp-mt-olive-lutheran-church
-2017-10-22 17:16:14,618:INFO:discord.http: A rate limit bucket has been exhausted (bucket: POST:371767916347260928:None:/channels/{channel_id}/messages, retry: 1.0).
-2017-10-22 17:16:22,821:INFO:discord: Expire_Channel - Channel Expired And Removed From Watchlist - magikarp-mt-olive-lutheran-church
-2017-10-22 17:16:22,821:INFO:discord: Expire_Channel - magikarp-mt-olive-lutheran-church
-2017-10-22 17:16:22,821:INFO:discord: Expire_Channel - Channel Expired - magikarp-mt-olive-lutheran-church
-2017-10-22 17:16:26,199:INFO:discord: Expiry_Check - level-5-egg-test
-2017-10-22 17:16:26,200:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-5-egg-test
-2017-10-22 17:16:26,200:INFO:discord: Expiry_Check - level-5-egg-test
-2017-10-22 17:16:31,136:INFO:discord: Expiry_Check - level-2-egg-venice-beach-freak-show
-2017-10-22 17:16:59,300:INFO:discord: Expiry_Check - level-3-egg-creative-space
-2017-10-22 17:17:00,019:INFO:discord: Expire_Channel - Channel Expired And Removed From Watchlist - level-3-egg-creative-space
-2017-10-22 17:17:00,019:INFO:discord: Expire_Channel - level-3-egg-creative-space
-2017-10-22 17:17:00,019:INFO:discord: Expire_Channel - Channel Expired - level-3-egg-creative-space
-2017-10-22 17:17:04,029:INFO:discord: Expiry_Check - level-4-egg-shaarei-am-wall
-2017-10-22 17:17:26,222:INFO:discord: Expire_Channel - Egg Auto Hatched - level-5-egg-test
-2017-10-22 17:17:26,785:INFO:discord: Expiry_Check - level-5-egg-test
-2017-10-22 17:17:26,785:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-5-egg-test
-2017-10-22 17:17:30,386:INFO:discord: Expire_Channel - Channel Expired And Removed From Watchlist - level-4-egg-shaarei-am-wall
-2017-10-22 17:17:30,386:INFO:discord: Expire_Channel - level-4-egg-shaarei-am-wall
-2017-10-22 17:17:30,386:INFO:discord: Expire_Channel - Channel Expired - level-4-egg-shaarei-am-wall
-2017-10-22 17:17:30,717:INFO:discord: Expiry_Check - entei-test
-2017-10-22 17:17:56,797:INFO:discord: Expire_Channel - Channel Expired And Removed From Watchlist - level-5-egg-test
-2017-10-22 17:17:56,797:INFO:discord: Expire_Channel - level-5-egg-test
-2017-10-22 17:17:56,797:INFO:discord: Expire_Channel - Channel Expired - level-5-egg-test
-2017-10-22 17:18:19,201:INFO:discord: Expiry_Check - entei-wave-mosaic
-2017-10-22 17:18:19,201:INFO:discord: Expire_Channel - Channel Added To Watchlist - entei-wave-mosaic
-2017-10-22 17:18:19,383:INFO:discord: Expiry_Check - entei-wave-mosaic
-2017-10-22 17:18:19,448:INFO:discord: Expiry_Check - level-5-egg-teena-marie-mural
-2017-10-22 17:18:19,448:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-5-egg-teena-marie-mural
-2017-10-22 17:18:19,570:INFO:discord: Expiry_Check - level-5-egg-teena-marie-mural
-2017-10-22 17:18:19,728:INFO:discord: Expiry_Check - level-5-egg-anchor-fountain
-2017-10-22 17:18:19,728:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-5-egg-anchor-fountain
-2017-10-22 17:18:19,869:INFO:discord: Expiry_Check - level-5-egg-anchor-fountain
-2017-10-22 17:18:19,922:INFO:discord: Expiry_Check - level-1-egg-breakwater-fountain
-2017-10-22 17:18:19,922:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-1-egg-breakwater-fountain
-2017-10-22 17:18:20,016:INFO:discord: Expiry_Check - level-1-egg-breakwater-fountain
-2017-10-22 17:19:30,441:INFO:discord: Expiry_Check - level-1-egg-breakwater-fountain
-2017-10-22 17:19:34,389:INFO:discord: Expiry_Check - level-5-egg-anchor-fountain
-2017-10-22 17:19:37,943:INFO:discord: Expiry_Check - level-5-egg-teena-marie-mural
-2017-10-22 17:19:42,509:INFO:discord: Expiry_Check - entei-wave-mosaic
-2017-10-22 17:19:49,199:INFO:discord: Expire_Channel - Channel Expired And Removed From Watchlist - entei-wave-mosaic
-2017-10-22 17:19:49,199:INFO:discord: Expire_Channel - entei-wave-mosaic
-2017-10-22 17:19:49,199:INFO:discord: Expire_Channel - Channel Expired - entei-wave-mosaic
-2017-10-22 17:19:49,439:INFO:discord: Expire_Channel - Channel Expired And Removed From Watchlist - level-5-egg-teena-marie-mural
-2017-10-22 17:19:49,439:INFO:discord: Expire_Channel - level-5-egg-teena-marie-mural
-2017-10-22 17:19:49,439:INFO:discord: Expire_Channel - Channel Expired - level-5-egg-teena-marie-mural
-2017-10-22 17:19:49,733:INFO:discord: Expire_Channel - Channel Expired And Removed From Watchlist - level-5-egg-anchor-fountain
-2017-10-22 17:19:49,733:INFO:discord: Expire_Channel - level-5-egg-anchor-fountain
-2017-10-22 17:19:49,733:INFO:discord: Expire_Channel - Channel Expired - level-5-egg-anchor-fountain
-2017-10-22 17:19:49,926:INFO:discord: Expire_Channel - Channel Expired And Removed From Watchlist - level-1-egg-breakwater-fountain
-2017-10-22 17:19:49,926:INFO:discord: Expire_Channel - level-1-egg-breakwater-fountain
-2017-10-22 17:19:49,926:INFO:discord: Expire_Channel - Channel Expired - level-1-egg-breakwater-fountain
-2017-10-22 17:20:42,949:INFO:discord: Expiry_Check - level-2-egg-venice-beach-freak-show
-2017-10-22 17:20:50,360:INFO:discord: Expire_Channel - Channel Expired And Removed From Watchlist - level-2-egg-venice-beach-freak-show
-2017-10-22 17:20:50,360:INFO:discord: Expire_Channel - level-2-egg-venice-beach-freak-show
-2017-10-22 17:20:50,360:INFO:discord: Expire_Channel - Channel Expired - level-2-egg-venice-beach-freak-show
-2017-10-22 17:21:02,741:INFO:discord: Expire_Channel - Channel Deleted - magikarp-mt-olive-lutheran-church
-2017-10-22 17:22:21,529:INFO:discord: Expiry_Check - muk-venice-beach-freak-show
-2017-10-22 17:22:21,529:INFO:discord: Expire_Channel - Channel Added To Watchlist - muk-venice-beach-freak-show
-2017-10-22 17:22:23,931:INFO:discord: Expiry_Check - muk-venice-beach-freak-show
-2017-10-22 17:22:30,776:INFO:discord: Expire_Channel - Channel Deleted - level-5-egg-test
-2017-10-22 17:22:51,527:INFO:discord: Expire_Channel - Channel Expired And Removed From Watchlist - muk-venice-beach-freak-show
-2017-10-22 17:22:51,527:INFO:discord: Expire_Channel - muk-venice-beach-freak-show
-2017-10-22 17:22:51,527:INFO:discord: Expire_Channel - Channel Expired - muk-venice-beach-freak-show
-2017-10-22 17:22:54,549:INFO:discord: Channel_Cleanup ------ BEGIN ------
-2017-10-22 17:22:54,549:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
-2017-10-22 17:22:54,549:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-2-egg-venice-beach-freak-show - CHECKING
-2017-10-22 17:22:54,549:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-2-egg-venice-beach-freak-show - EXISTS IN DISCORD
-2017-10-22 17:22:54,549:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-3-egg-creative-space - CHECKING
-2017-10-22 17:22:54,549:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-3-egg-creative-space - EXISTS IN DISCORD
-2017-10-22 17:22:54,549:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-4-egg-shaarei-am-wall - CHECKING
-2017-10-22 17:22:54,549:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-4-egg-shaarei-am-wall - EXISTS IN DISCORD
-2017-10-22 17:22:54,549:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-wave-mosaic - CHECKING
-2017-10-22 17:22:54,549:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-wave-mosaic - EXISTS IN DISCORD
-2017-10-22 17:22:54,549:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-5-egg-teena-marie-mural - CHECKING
-2017-10-22 17:22:54,549:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-5-egg-teena-marie-mural - EXISTS IN DISCORD
-2017-10-22 17:22:54,549:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-5-egg-anchor-fountain - CHECKING
-2017-10-22 17:22:54,549:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-5-egg-anchor-fountain - EXISTS IN DISCORD
-2017-10-22 17:22:54,549:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-1-egg-breakwater-fountain - CHECKING
-2017-10-22 17:22:54,549:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-1-egg-breakwater-fountain - EXISTS IN DISCORD
-2017-10-22 17:22:54,549:INFO:discord: Channel_Cleanup - SAVING CHANGES
-2017-10-22 17:22:54,549:INFO:discord: Channel_Cleanup ------ END ------
-2017-10-22 17:24:42,530:INFO:discord: Expire_Channel - Channel Deleted - entei-wave-mosaic
-2017-10-22 17:27:24,131:INFO:discord: Expire_Channel - Channel Deleted - muk-venice-beach-freak-show
+2017-10-23 11:32:26,562:INFO:discord: Maintenance Tasks Started
+2017-10-23 11:32:26,570:INFO:discord: Server_Cleanup ------ BEGIN ------
+2017-10-23 11:32:26,570:INFO:discord: Server_Cleanup - SAVING CHANGES
+2017-10-23 11:32:26,578:INFO:discord: Server_Cleanup ------ END ------
+2017-10-23 11:32:26,586:INFO:discord: Channel_Cleanup ------ BEGIN ------
+2017-10-23 11:32:26,586:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+2017-10-23 11:32:26,586:INFO:discord: Channel_Cleanup - SAVING CHANGES
+2017-10-23 11:32:26,594:INFO:discord: Channel_Cleanup ------ END ------
+2017-10-23 11:42:26,616:INFO:discord: Channel_Cleanup ------ BEGIN ------
+2017-10-23 11:42:26,616:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+2017-10-23 11:42:26,616:INFO:discord: Channel_Cleanup - SAVING CHANGES
+2017-10-23 11:42:26,632:INFO:discord: Channel_Cleanup ------ END ------
+2017-10-23 11:44:34,535:INFO:discord: Expiry_Check - level-5-egg-test
+2017-10-23 11:44:34,535:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-5-egg-test
+2017-10-23 11:44:34,535:INFO:discord: Expiry_Check - level-5-egg-test
+2017-10-23 11:44:38,021:INFO:discord: Expiry_Check - level-5-egg-test
+2017-10-23 11:45:04,527:INFO:discord: Expire_Channel - Channel Expired And Removed From Watchlist - level-5-egg-test
+2017-10-23 11:45:04,527:INFO:discord: Expire_Channel - level-5-egg-test
+2017-10-23 11:45:04,528:INFO:discord: Expire_Channel - Channel Expired - level-5-egg-test
+2017-10-23 11:52:26,634:INFO:discord: Channel_Cleanup ------ BEGIN ------
+2017-10-23 11:52:26,634:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+2017-10-23 11:52:26,634:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-5-egg-test - CHECKING
+2017-10-23 11:52:26,634:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-5-egg-test - EXISTS IN DISCORD
+2017-10-23 11:52:26,634:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-5-egg-test - = RECENTLY EXPIRED NONACTIVE RAID
+2017-10-23 11:52:26,650:INFO:discord: Channel_Cleanup - SAVING CHANGES
+2017-10-23 11:52:26,650:INFO:discord: Channel_Cleanup ------ END ------
+2017-10-23 11:52:26,650:INFO:discord: Expire_Channel - level-5-egg-test
+2017-10-23 11:52:26,650:INFO:discord: Expire_Channel - Channel Expired - level-5-egg-test

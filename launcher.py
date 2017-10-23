@@ -10,7 +10,6 @@ import argparse
 def parse_cli_args():
     parser = argparse.ArgumentParser(description="Meowth Launcher - Pokemon Go Bot for Discord")
     parser.add_argument("--start","-s",help="Starts Meowth",action="store_true")
-    parser.add_argument("--announce","-a",help="Announces Update/Reboot Message to all server owners.",action="store_true")
     parser.add_argument("--auto-restart","-r",help="Auto-Restarts Meowth in case of a crash.",action="store_true")
     parser.add_argument("--debug","-d",help="Prevents output being sent to Discord DM, as restarting could occur often.",action="store_true")
     return parser.parse_args()
@@ -20,12 +19,7 @@ def run_meowth(autorestart):
     if interpreter is None:
         raise RuntimeError("Python could not be found")
 
-    std_cmd = [interpreter, "meowth", "launcher"]
-    ann_cmd = [interpreter, "meowth", "reboot", "launcher"]
-    if args.announce:
-        cmd = ann_cmd
-    else:
-        cmd = std_cmd
+    cmd = [interpreter, "meowth", "launcher"]
 
     while True:
         if args.debug:
@@ -43,14 +37,6 @@ def run_meowth(autorestart):
                 print("")
                 print("Restarting Meowth")
                 print("")
-                cmd = std_cmd
-                continue
-            elif code == 27:
-                #announce on restart
-                print("")
-                print("Restarting Meowth")
-                print("")
-                cmd = ann_cmd
                 continue
             else:
                 if not autorestart:
@@ -58,7 +44,6 @@ def run_meowth(autorestart):
                 print("")
                 print("Restarting Meowth from crash")
                 print("")
-                cmd = std_cmd
 
     print("Meowth has closed. Exit code: {exit_code}".format(exit_code=code))
 

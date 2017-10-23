@@ -61,7 +61,16 @@ except OSError:
 
 logger = setup_logger('discord','logs/meowth.log',logging.INFO)
 
-Meowth = commands.Bot(command_prefix="!")
+def _get_prefix(bot,message):
+    server = message.server
+    try:
+         set_prefix = bot.server_dict[server]["prefix"]
+    except KeyError:
+        set_prefix = None
+    default_prefix = bot.config["default_prefix"]
+    return set_prefix or default_prefix
+
+Meowth = commands.Bot(command_prefix=_get_prefix)
 custom_error_handling(Meowth,logger)
 
 try:
@@ -140,6 +149,9 @@ Helper functions
 ======================
 
 """
+def _set_prefix(bot,server,prefix):
+    bot.server_dict[server]["prefix"] = prefix
+
 # Given a Pokemon name, return a list of its
 # weaknesses as defined in the type chart
 def get_type(server, pkmn_number):
@@ -591,35 +603,6 @@ async def _print(owner,message):
     print(message)
     logger.info(message)
 
-async def reboot_msg(owners,loop=False,):
-    msg_success = 0
-    msg_fail = 0
-    reboot_msg = """**Meowth! That's right! I've been updated!**
-
-**Changes:**
-    - We are testing out a new launcher for Meowth that should help it get itself back online in the event of a crash.
-    - The bug for **!exraid** ignoring the first word after the command should be fixed.
-    - Fixed the bot not providing help when certain commands are used incorrectly
-    - Backend upgrades
-
-**Reconfigure shouldn't be necessary for this update.**"""
-    logger.info("Reboot Messages ------ BEGIN ------")
-    for o in owners:
-        try:
-            await Meowth.send_message(o, reboot_msg)
-            msg_success += 1
-            logger.info("Reboot Message - SENT - "+o.name)
-        except:
-            msg_fail += 1
-            logger.info("Reboot Message - FAILED - "+o.name)
-
-        #step through slowly to prevent rate limits
-        await asyncio.sleep(0.5)#0.5 default
-        continue
-    logger.info("Reboot Messages ------ END ------")
-    await _print(Meowth.owner,_("\nReboot messages sent: {success_count} successful, {fail_count} failed.").format(success_count=msg_success,fail_count=msg_fail))
-    return
-
 async def maint_start():
     try:
         event_loop.create_task(server_cleanup())
@@ -659,9 +642,6 @@ team_msg = " or ".join(["`!team {0}`".format(team) for team in config['team_dict
 async def on_ready():
     Meowth.owner = discord.utils.get(Meowth.get_all_members(),id=config["master"])
     await _print(Meowth.owner,_("Starting up...")) #prints to the terminal or cmd prompt window upon successful connection to Discord
-    REBOOT = False
-    if 'reboot' in sys.argv[1:]:
-        REBOOT = True
     owners = []
     msg_success = 0
     msg_fail = 0
@@ -678,9 +658,6 @@ async def on_ready():
         owners.append(server.owner)
 
     await _print(Meowth.owner,_("Meowth! That's right!\n\n{server_count} servers connected.\n{member_count} members found.").format(server_count=servers,member_count=users))
-
-    if REBOOT:
-        event_loop.create_task(reboot_msg(owners))
 
     await maint_start()
 
@@ -1018,25 +995,20 @@ async def exit(ctx):
 
 @Meowth.command(pass_context=True)
 @checks.is_owner()
-async def restart(ctx,*args):
+async def restart(ctx):
     """Restart after saving.
 
-    Usage: !restart [announce].
-    Calls the save function and restarts Meowth.
-    If 'announce' argument used, """
+    Usage: !restart.
+    Calls the save function and restarts Meowth."""
     try:
         await _save()
     except Exception as err:
         await _print(Meowth.owner,_("Error occured while trying to save!"))
         await _print(Meowth.owner,err)
 
-    if "announce" in args:
-        shutdown_code = 27
-    else:
-        shutdown_code = 26
     await Meowth.send_message(ctx.message.channel,"Restarting...")
 
-    Meowth._shutdown_mode = shutdown_code
+    Meowth._shutdown_mode = 26
     await Meowth.logout()
 
 @Meowth.command(pass_context=True)
@@ -1075,15 +1047,115 @@ async def welcome(ctx, user: discord.Member = None):
         user = ctx.message.author
     await on_member_join(user)
 
+@Meowth.group(pass_context=True, name="set")
+@commands.has_permissions(manage_server=True)
+async def _set(ctx):
+    """Changes a setting."""
+    if ctx.invoked_subcommand is None:
+        pages = bot.formatter.format_help_for(ctx,ctx.command)
+        for page in pages:
+            await bot.send_message(ctx.message.channel, page)
+
+@_set.command(pass_context=True)
+@commands.has_permissions(manage_server=True)
+async def prefix(ctx,prefix=None):
+    """Changes server prefix."""
+    if prefix == "clear":
+        prefix=None
+    _set_prefix(Meowth,ctx.message.server,prefix)
+    if prefix:
+        await Meowth.send_message(ctx.message.channel,"Prefix has been set to: `{}`".format(prefix))
+    else:
+        default_prefix = Meowth.config["default_prefix"]
+        await Meowth.send_message(ctx.message.channel,"Prefix has been reset to default: `{}`".format(default_prefix))
+
+@Meowth.group(pass_context=True, name="get")
+async def _get(ctx):
+    """Get a setting value"""
+    if ctx.invoked_subcommand is None:
+        pages = bot.formatter.format_help_for(ctx,ctx.command)
+        for page in pages:
+            await bot.send_message(ctx.message.channel, page)
+
+@_get.command(pass_context=True)
+@commands.has_permissions(manage_server=True)
+async def prefix(ctx):
+    """Get server prefix."""
+    prefix = _get_prefix(Meowth,ctx.message)
+    await Meowth.send_message(ctx.message.channel,"Prefix for this server is: `{}`".format(prefix))
+
+@Meowth.command(pass_context=True)
+@checks.is_owner()
+async def announce(ctx,*,message:str):
+    """Sends a DM to all server owners."""
+    failed = 0
+    sent = 0
+    count = 0
+    for server in Meowth.servers:
+        destination = server.owner
+        e = discord.Embed(colour=discord.Colour.light_grey(), description=message)
+        title = "Announcement"
+        e.set_footer(text="For support, contact us on our Discord server. Invite Code: hhVjAN8")
+        if Meowth.user.avatar_url:
+            e.set_author(name=title, icon_url=Meowth.user.avatar_url)
+        else:
+            e.set_author(name=title)
+        try:
+            await Meowth.send_message(destination,embed=e)
+        except:
+            failed += 1
+            logger.info("Announcement Delivery Failure: {} - {}".format(destination.name,server.name))
+        else:
+            sent += 1
+        count += 1
+
+    await Meowth.send_message(ctx.message.channel,"Announcement sent to {} server owners: {} successful, {} failed.".format(count, sent, failed))
+
 """
 
 End admin commands
 
 """
+@Meowth.command(pass_context=True)
+async def about(ctx):
+    """Shows info about Meowth"""
+    author_repo = "https://github.com/FoglyOgly"
+    author_name = "FoglyOgly"
+    huntr_repo = "https://github.com/doonce/Meowth"
+    huntr_name = "BrenenP"
+    bot_repo = author_repo + "/Meowth"
+    server_url = "https://discord.gg/hhVjAN8"
+    owner = Meowth.owner
+    channel = ctx.message.channel
+
+    about = (
+        "I'm Meowth! A Pokemon Go helper bot for Discord!\n\n"
+        "I'm made by [{author_name}]({author_repo}) and improvements have been contributed by many other people also.\n\n"
+        "Huntr integration was implemented by [{huntr_name}]({huntr_repo}).\n\n"
+        "[Join our server]({server_invite}) if you have any questions or feedback.\n\n"
+        "".format(author_name=author_name,author_repo=author_repo,huntr_name=huntr_name,huntr_repo=huntr_repo,server_invite=server_url))
+
+    member_count = 0
+    server_count = 0
+    for server in Meowth.servers:
+        server_count += 1
+        member_count += len(server.members)
+
+    embed = discord.Embed(colour=discord.Colour.orange(),icon_url=Meowth.user.avatar_url)
+    embed.add_field(name="About Meowth", value=about, inline=False)
+    embed.add_field(name="Owner", value=owner)
+    embed.add_field(name="Servers", value=server_count)
+    embed.add_field(name="Members", value=member_count)
+    embed.set_footer(text="For support, contact us on our Discord server. Invite Code: hhVjAN8")
+
+    try:
+        await Meowth.send_message(channel,embed=embed)
+    except discord.HTTPException:
+        await Meowth.send_message(channel,"I need the `Embed links` permission to send this")
 
 @Meowth.command(pass_context = True)
 @checks.teamset()
-@checks.notraidchannel()
+@checks.nonraidchannel()
 async def team(ctx):
     """Set your team role.
 
@@ -1140,7 +1212,8 @@ async def team(ctx):
 
 @Meowth.command(pass_context = True)
 @checks.wantset()
-@checks.notraidchannel()
+@checks.nonraidchannel()
+@checks.wantchannel()
 async def want(ctx):
     """Add a Pokemon to your wanted list.
 
@@ -1154,35 +1227,34 @@ async def want(ctx):
     message = ctx.message
     server = message.server
     channel = message.channel
-    if checks.check_wantchannel(ctx):
-        entered_want = message.content[6:].lower()
-        if entered_want not in pkmn_info['pokemon_list']:
-            await Meowth.send_message(channel, spellcheck(entered_want))
-            return
-        role = discord.utils.get(server.roles, name=entered_want)
-        # Create role if it doesn't exist yet
-        if role is None:
-            role = await Meowth.create_role(server = server, name = entered_want, hoist = False, mentionable = True)
-            await asyncio.sleep(0.5)
+    entered_want = message.content[6:].lower()
+    if entered_want not in pkmn_info['pokemon_list']:
+        await Meowth.send_message(channel, spellcheck(entered_want))
+        return
+    role = discord.utils.get(server.roles, name=entered_want)
+    # Create role if it doesn't exist yet
+    if role is None:
+        role = await Meowth.create_role(server = server, name = entered_want, hoist = False, mentionable = True)
+        await asyncio.sleep(0.5)
 
-        # If user is already wanting the Pokemon,
-        # print a less noisy message
-        if role in ctx.message.author.roles:
-            await Meowth.send_message(channel, content=_("Meowth! {member}, I already know you want {pokemon}!").format(member=ctx.message.author.mention, pokemon=entered_want.capitalize()))
-        else:
-            await Meowth.add_roles(ctx.message.author, role)
-            want_number = pkmn_info['pokemon_list'].index(entered_want) + 1
-            want_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(want_number)) #This part embeds the sprite
-            want_embed = discord.Embed(colour=server.me.colour)
-            want_embed.set_thumbnail(url=want_img_url)
-            await Meowth.send_message(channel, content=_("Meowth! Got it! {member} wants {pokemon}").format(member=ctx.message.author.mention, pokemon=entered_want.capitalize()),embed=want_embed)
+    # If user is already wanting the Pokemon,
+    # print a less noisy message
+    if role in ctx.message.author.roles:
+        await Meowth.add_reaction(ctx.message, '✅')
+        #await Meowth.send_message(channel, content=_("Meowth! {member}, I already know you want {pokemon}!").format(member=ctx.message.author.mention, pokemon=entered_want.capitalize()))
     else:
-        want_channels = server_dict[server]['want_channel_list']
-        await ctx.bot.send_message(channel, "Meowth! Please use one of the following channels for **!want** commands: {want_channel_list}".format(want_channel_list=", ".join(c.mention for c in want_channels)))
+        await Meowth.add_roles(ctx.message.author, role)
+        want_number = pkmn_info['pokemon_list'].index(entered_want) + 1
+        await Meowth.add_reaction(ctx.message, '✅')
+        #want_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(want_number)) #This part embeds the sprite
+        #want_embed = discord.Embed(colour=server.me.colour)
+        #want_embed.set_thumbnail(url=want_img_url)
+        #await Meowth.send_message(channel, content=_("Meowth! Got it! {member} wants {pokemon}").format(member=ctx.message.author.mention, pokemon=entered_want.capitalize()),embed=want_embed)
 
 @Meowth.group(pass_context=True)
 @checks.wantset()
-@checks.notraidchannel()
+@checks.nonraidchannel()
+@checks.wantchannel()
 async def unwant(ctx):
     """Remove a Pokemon from your wanted list.
 
@@ -1195,29 +1267,25 @@ async def unwant(ctx):
     server = message.server
     channel = message.channel
     if ctx.invoked_subcommand is None:
-        if checks.check_wantchannel(ctx):
-            entered_unwant = ctx.message.content[8:].lower()
-            role = discord.utils.get(ctx.message.server.roles, name=entered_unwant)
-            if entered_unwant not in pkmn_info['pokemon_list']:
-                await Meowth.send_message(ctx.message.channel, spellcheck(entered_unwant))
-                return
-            else:
-                # If user is not already wanting the Pokemon,
-                # print a less noisy message
-                if role not in ctx.message.author.roles:
-                    await Meowth.add_reaction(ctx.message, '✅')
-                else:
-                    await Meowth.remove_roles(ctx.message.author, role)
-                    unwant_number = pkmn_info['pokemon_list'].index(entered_unwant) + 1
-                    await Meowth.add_reaction(ctx.message, '✅')
-
+        entered_unwant = ctx.message.content[8:].lower()
+        role = discord.utils.get(ctx.message.server.roles, name=entered_unwant)
+        if entered_unwant not in pkmn_info['pokemon_list']:
+            await Meowth.send_message(ctx.message.channel, spellcheck(entered_unwant))
+            return
         else:
-            want_channels = server_dict[server]['want_channel_list']
-            await ctx.bot.send_message(channel, "Meowth! Please use one of the following channels for **!unwant** commands: {want_channel_list}".format(want_channel_list=", ".join(c.mention for c in want_channels)))
+            # If user is not already wanting the Pokemon,
+            # print a less noisy message
+            if role not in ctx.message.author.roles:
+                await Meowth.add_reaction(ctx.message, '✅')
+            else:
+                await Meowth.remove_roles(ctx.message.author, role)
+                unwant_number = pkmn_info['pokemon_list'].index(entered_unwant) + 1
+                await Meowth.add_reaction(ctx.message, '✅')
 
 @unwant.command(pass_context=True)
 @checks.wantset()
-@checks.notraidchannel()
+@checks.nonraidchannel()
+@checks.wantchannel()
 async def all(ctx):
     """Remove all Pokemon from your wanted list.
 
@@ -1230,30 +1298,24 @@ async def all(ctx):
     server = message.server
     channel = message.channel
     author = message.author
-    if checks.check_wantchannel(ctx):
-        await Meowth.send_typing(ctx.message.channel)
-        count = 0
-        roles = author.roles
-        remove_roles = []
-        for role in roles:
-            if role.name in pkmn_info['pokemon_list']:
-                remove_roles.append(role)
-                count += 1
-            continue
-        await Meowth.remove_roles(author, *remove_roles)
-        if count == 0:
-            await Meowth.send_message(ctx.message.channel, content=_("{0}, you have no pokemon in your want list.").format(ctx.message.author.mention, count))
-        await Meowth.send_message(ctx.message.channel, content=_("{0}, I've removed {1} pokemon from your want list.").format(ctx.message.author.mention, count))
-        return
-
-    else:
-        want_channels = server_dict[server]['want_channel_list']
-        await ctx.bot.send_message(channel, "Meowth! Please use one of the following channels for **!unwant** commands: {want_channel_list}".format(want_channel_list=", ".join(c.mention for c in want_channels)))
-
+    await Meowth.send_typing(ctx.message.channel)
+    count = 0
+    roles = author.roles
+    remove_roles = []
+    for role in roles:
+        if role.name in pkmn_info['pokemon_list']:
+            remove_roles.append(role)
+            count += 1
+        continue
+    await Meowth.remove_roles(author, *remove_roles)
+    if count == 0:
+        await Meowth.send_message(ctx.message.channel, content=_("{0}, you have no pokemon in your want list.").format(ctx.message.author.mention, count))
+    await Meowth.send_message(ctx.message.channel, content=_("{0}, I've removed {1} pokemon from your want list.").format(ctx.message.author.mention, count))
+    return
 
 @Meowth.command(pass_context = True)
-@checks.citychannel()
 @checks.wildset()
+@checks.citychannel()
 async def wild(ctx):
     """Report a wild Pokemon spawn location.
 

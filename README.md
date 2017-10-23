@@ -85,7 +85,6 @@ Arguments:
 ```
   --help, -h          Show the help message
   --start, -s         Starts Meowth
-  --announce, -a      Announces Update/Reboot Message to all server owners.
   --auto-restart, -r  Auto-Restarts Meowth in case of a crash.
   --debug, -d         Prevents output being sent to Discord DM, as restarting
                       could occur often.
@@ -106,16 +105,6 @@ Launch Meowth with Auto-Restart:
 python3 launcher.py -s -r
 ```
 
-Launch Meowth with Auto-Restart, and send Update message to all server owners:
-```bash
-python launcher.py -s -r -a
-```
-
-Launch Meowth on a remote server, keeping the script alive after closing the session and outputting console to a file:
-```bash
-nohup python3 launcher.py -s -r 1> logs/out.log 2>&1 &
-``` 
-
 ## Directions for using Meowth:
 Note: Avoid punctuation inside commands.
 
@@ -128,11 +117,12 @@ pkmn = Pokemon
 | Commands | Requirements  | Description |
 | -------- |:-------------:| ------------|
 | **!help** \[command\] | - | Shows bot/command help, with descriptions. |
+| **!about** | - | Shows info about Meowth. |
 | **!team** \<team\> | - | Let's users set their team role. |
 | **!save**  | *Owner Only* | Saves the save data to file. |
 | **!exit**  | *Owner Only* | Saves the save data to file and shutdown Meowth. |
 | **!restart**  | *Owner Only* | Saves the save data to file and restarts Meowth. |
-| **!restart announce**  | *Owner Only* | Saves the save data to file, restarts Meowth and sends announcement. |
+| **!announce** \[msg\] | *Owner Only* | Sends announcement message to server owners. |
 | **!welcome** \[@member\] | *Owner Only* | Sends the welcome message to either user or mentioned member. |
 | **!outputlog**  | *Server Manager Only* | Uploads the log file to hastebin and replies with the link. |
 

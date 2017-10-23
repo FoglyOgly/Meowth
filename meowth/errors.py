@@ -67,8 +67,6 @@ def custom_error_handling(bot,logger):
         elif isinstance(error, commands.CheckFailure):
             pass
 
-
-
         elif isinstance(error, TeamSetCheckFail):
             msg = "Meowth! Team Management is not enabled on this server. **!{cmd_name}** is unable to be used.".format(cmd_name=ctx.command.name)
             await bot.send_message(ctx.message.channel,msg)

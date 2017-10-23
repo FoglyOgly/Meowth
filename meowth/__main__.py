@@ -1405,7 +1405,7 @@ async def _raid(message):
     else:
         raidexp = False
 
-    if raidexp:
+    if raidexp is not False:
         if _timercheck(raidexp):
             await Meowth.send_message(message.channel, _("Meowth...that's too long. Raids currently last no more than one hour..."))
             return
@@ -1474,7 +1474,7 @@ This channel will be deleted five minutes after the timer expires.""").format(po
         'egglevel' : '0'
         }
 
-    if raidexp:
+    if raidexp is not False:
         await _timerset(raid_channel,raidexp)
     else:
         await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left on the raid using **!timerset <minutes>** so others can check it with **!timer**.").format(member=message.author.mention))
@@ -1851,7 +1851,7 @@ async def _raidegg(message):
     else:
         raidexp = False
 
-    if raidexp:
+    if raidexp is not False:
         if _timercheck(raidexp):
             await Meowth.send_message(message.channel, _("Meowth...that's too long. Raid Eggs currently last no more than one hour..."))
             return
@@ -1918,7 +1918,7 @@ When this egg raid expires, there will be 15 minutes to update it into an open r
             'egglevel' : egg_level
             }
 
-        if raidexp:
+        if raidexp is not False:
             await _timerset(raid_channel,raidexp)
         else:
             await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset <minutes>** so others can check it with **!timer**.").format(member=message.author.mention))

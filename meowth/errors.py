@@ -158,7 +158,7 @@ def custom_error_handling(bot,logger):
             msg = "Meowth! Please use **!{cmd_name}** in either a Raid Egg channel or one of the following region channels:".format(cmd_name=ctx.command.name)
             city_channels = bot.server_dict[server]['city_channels']
             for c in city_channels:
-                channel = discord.utils.get(server.channels,id=c.id)
+                channel = discord.utils.get(server.channels,name=c)
                 msg += "\n" + channel.mention
             await bot.send_message(ctx.message.channel,msg)
             pass

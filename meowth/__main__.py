@@ -290,41 +290,6 @@ async def expiry_check(channel):
                         if server_dict[server]['raidchannel_dict'][channel]['exp'] <= time.time():
                             if server_dict[server]['raidchannel_dict'][channel]['type'] == 'egg':
                                 pokemon = server_dict[server]['raidchannel_dict'][channel]['pokemon']
-                                if pokemon != '':
-                                    logger.info("Expire_Channel - Egg Auto Hatched - "+channel.name)
-                                    try:
-                                        active_raids.remove(channel)
-                                    except ValueError:
-                                        logger.info("Expire_Channel - Channel Removal From Active Raid Failed - Not in List - "+channel.name)
-                                    await _eggtoraid(pokemon.lower(), channel)
-                                    break
-                            event_loop.create_task(expire_channel(channel))
-                            try:
-                                active_raids.remove(channel)
-                            except ValueError:
-                                logger.info("Expire_Channel - Channel Removal From Active Raid Failed - Not in List - "+channel.name)
-                            logger.info("Expire_Channel - Channel Expired And Removed From Watchlist - "+channel.name)
-                            break
-            except KeyError:
-                pass
-
-            await asyncio.sleep(30)
-            continue
-
-async def expiry_check(channel):
-    logger.info("Expiry_Check - "+channel.name)
-    server = channel.server
-    global active_raids
-    if channel not in active_raids:
-        active_raids.append(channel)
-        logger.info("Expire_Channel - Channel Added To Watchlist - "+channel.name)
-        while True:
-            try:
-                if server_dict[server]['raidchannel_dict'][channel]['active'] is True:
-                    if server_dict[server]['raidchannel_dict'][channel]['exp'] is not None:
-                        if server_dict[server]['raidchannel_dict'][channel]['exp'] <= time.time():
-                            if server_dict[server]['raidchannel_dict'][channel]['type'] == 'egg':
-                                pokemon = server_dict[server]['raidchannel_dict'][channel]['pokemon']
                                 if pokemon:
                                     logger.info("Expire_Channel - Egg Auto Hatched - "+channel.name)
                                     try:
@@ -472,7 +437,7 @@ async def channel_cleanup(loop=True):
 
                         if serverdict_chtemp[server]['raidchannel_dict'][channel]['type'] == 'egg':
 
-                            #and if it has been expired for longer than 5 minutes already
+                            #and if it has been expired for longer than 15 minutes already
                             if serverdict_chtemp[server]['raidchannel_dict'][channel]['exp'] < (time.time() - (15 * 60)):
 
                                 #list the channel to be removed from save data
@@ -497,6 +462,10 @@ async def channel_cleanup(loop=True):
 
                                 logger.info(log_str+" - 5+ MIN EXPIRY NONACTIVE RAID")
                                 continue
+
+                        event_loop.create_task(expire_channel(channel))
+                        logger.info(log_str+" - = RECENTLY EXPIRED NONACTIVE RAID")
+
 
                     #if the channel save data shows it as an active raid still
                     elif serverdict_chtemp[server]['raidchannel_dict'][channel]['active'] == True:

@@ -163,49 +163,67 @@ def check_raidtype(ctx):
 
 def teamset():
     def predicate(ctx):
-        return check_teamset(ctx)
+        if check_teamset(ctx):
+            return True
+        raise errors.TeamSetCheckFail()
     return commands.check(predicate)
 
 def wantset():
     def predicate(ctx):
-        return check_wantset(ctx)
+        if check_wantset(ctx):
+            return True
+        raise errors.WantSetCheckFail()
     return commands.check(predicate)
 
 def wildset():
     def predicate(ctx):
-        return check_wildset(ctx)
+        if check_wildset(ctx):
+            return True
+        raise errors.WildSetCheckFail()
     return commands.check(predicate)
 
 def raidset():
     def predicate(ctx):
-        return check_raidset(ctx)
+        if check_raidset(ctx):
+            return True
+        raise errors.RaidSetCheckFail()
     return commands.check(predicate)
 
 def citychannel():
     def predicate(ctx):
-        return check_citychannel(ctx)
+        if check_citychannel(ctx):
+            return True
+        raise errors.CityChannelCheckFail()
     return commands.check(predicate)
 
 def wantchannel():
     def predicate(ctx):
         if check_wantset(ctx):
-            return check_wantchannel(ctx)
+            if check_wantchannel(ctx):
+                return True
+        raise errors.WantChannelCheckFail()
     return commands.check(predicate)
 
 def raidchannel():
     def predicate(ctx):
-        return check_raidchannel(ctx)
+        if check_raidchannel(ctx):
+            return True
+        raise errors.RaidChannelCheckFail()
     return commands.check(predicate)
 
-def notraidchannel():
+def nonraidchannel():
     def predicate(ctx):
-        return not check_raidchannel(ctx)
+        if not check_raidchannel(ctx):
+            return True
+        raise errors.NonRaidChannelCheckFail()
     return commands.check(predicate)
 
 def activeraidchannel():
     def predicate(ctx):
         if check_raidchannel(ctx):
-            return check_raidactive(ctx)
+            if check_raidactive(ctx):
+                return True
+        raise errors.ActiveRaidChannelCheckFail()
     return commands.check(predicate)
 
 def cityraidchannel():
@@ -214,6 +232,7 @@ def cityraidchannel():
             return True
         elif check_citychannel(ctx) == True:
             return True
+        raise errors.CityRaidChannelCheckFail()
     return commands.check(predicate)
 
 def cityeggchannel():
@@ -223,5 +242,5 @@ def cityeggchannel():
                 return True
         elif check_citychannel(ctx) == True:
             return True
-        raise errors.NonRegionEggChannel()
+        raise errors.RegionEggChannelCheckFail()
     return commands.check(predicate)

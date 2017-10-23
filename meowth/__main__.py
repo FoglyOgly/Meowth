@@ -61,7 +61,16 @@ except OSError:
 
 logger = setup_logger('discord','logs/meowth.log',logging.INFO)
 
-Meowth = commands.Bot(command_prefix="!")
+def _get_prefix(bot,message):
+    server = message.server
+    try:
+        set_prefix = bot.server_dict[server]["prefix"]
+    except KeyError:
+        set_prefix = None
+    default_prefix = bot.config["default_prefix"]
+    return set_prefix or default_prefix
+
+Meowth = commands.Bot(command_prefix=_get_prefix)
 custom_error_handling(Meowth,logger)
 
 try:
@@ -140,6 +149,10 @@ Helper functions
 ======================
 
 """
+        
+def _set_prefix(bot,server,prefix):
+    bot.server_dict[server]["prefix"] = prefix
+
 # Given a Pokemon name, return a list of its
 # weaknesses as defined in the type chart
 def get_type(server, pkmn_number):
@@ -1058,6 +1071,43 @@ async def welcome(ctx, user: discord.Member = None):
         user = ctx.message.author
     await on_member_join(user)
 
+@Meowth.group(pass_context=True, name="set")
+@commands.has_permissions(manage_server=True)
+async def _set(ctx):
+    """Changes a setting."""
+    if ctx.invoked_subcommand is None:
+        pages = bot.formatter.format_help_for(ctx,ctx.command)
+        for page in pages:
+            await bot.send_message(ctx.message.channel, page)
+
+@_set.command(pass_context=True)
+@commands.has_permissions(manage_server=True)
+async def prefix(ctx,prefix=None):
+    """Changes server prefix."""
+    if prefix == "clear":
+        prefix=None
+    _set_prefix(Meowth,ctx.message.server,prefix)
+    if prefix:
+        await Meowth.send_message(ctx.message.channel,"Prefix has been set to: `{}`".format(prefix))
+    else:
+        default_prefix = Meowth.config["default_prefix"]
+        await Meowth.send_message(ctx.message.channel,"Prefix has been reset to default: `{}`".format(default_prefix))
+
+@Meowth.group(pass_context=True, name="get")
+async def _get(ctx):
+    """Get a setting value"""
+    if ctx.invoked_subcommand is None:
+        pages = bot.formatter.format_help_for(ctx,ctx.command)
+        for page in pages:
+            await bot.send_message(ctx.message.channel, page)
+
+@_get.command(pass_context=True)
+@commands.has_permissions(manage_server=True)
+async def prefix(ctx):
+    """Get server prefix."""
+    prefix = _get_prefix(Meowth,ctx.message)
+    await Meowth.send_message(ctx.message.channel,"Prefix for this server is: `{}`".format(prefix))
+
 """
 
 End admin commands
@@ -1066,7 +1116,7 @@ End admin commands
 
 @Meowth.command(pass_context = True)
 @checks.teamset()
-@checks.notraidchannel()
+@checks.nonraidchannel()
 async def team(ctx):
     """Set your team role.
 
@@ -1123,7 +1173,8 @@ async def team(ctx):
 
 @Meowth.command(pass_context = True)
 @checks.wantset()
-@checks.notraidchannel()
+@checks.nonraidchannel()
+@checks.wantchannel()
 async def want(ctx):
     """Add a Pokemon to your wanted list.
 
@@ -1137,35 +1188,32 @@ async def want(ctx):
     message = ctx.message
     server = message.server
     channel = message.channel
-    if checks.check_wantchannel(ctx):
-        entered_want = message.content[6:].lower()
-        if entered_want not in pkmn_info['pokemon_list']:
-            await Meowth.send_message(channel, spellcheck(entered_want))
-            return
-        role = discord.utils.get(server.roles, name=entered_want)
-        # Create role if it doesn't exist yet
-        if role is None:
-            role = await Meowth.create_role(server = server, name = entered_want, hoist = False, mentionable = True)
-            await asyncio.sleep(0.5)
+    entered_want = message.content[6:].lower()
+    if entered_want not in pkmn_info['pokemon_list']:
+        await Meowth.send_message(channel, spellcheck(entered_want))
+        return
+    role = discord.utils.get(server.roles, name=entered_want)
+    # Create role if it doesn't exist yet
+    if role is None:
+        role = await Meowth.create_role(server = server, name = entered_want, hoist = False, mentionable = True)
+        await asyncio.sleep(0.5)
 
-        # If user is already wanting the Pokemon,
-        # print a less noisy message
-        if role in ctx.message.author.roles:
-            await Meowth.send_message(channel, content=_("Meowth! {member}, I already know you want {pokemon}!").format(member=ctx.message.author.mention, pokemon=entered_want.capitalize()))
-        else:
-            await Meowth.add_roles(ctx.message.author, role)
-            want_number = pkmn_info['pokemon_list'].index(entered_want) + 1
-            want_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(want_number)) #This part embeds the sprite
-            want_embed = discord.Embed(colour=server.me.colour)
-            want_embed.set_thumbnail(url=want_img_url)
-            await Meowth.send_message(channel, content=_("Meowth! Got it! {member} wants {pokemon}").format(member=ctx.message.author.mention, pokemon=entered_want.capitalize()),embed=want_embed)
+    # If user is already wanting the Pokemon,
+    # print a less noisy message
+    if role in ctx.message.author.roles:
+        await Meowth.send_message(channel, content=_("Meowth! {member}, I already know you want {pokemon}!").format(member=ctx.message.author.mention, pokemon=entered_want.capitalize()))
     else:
-        want_channels = server_dict[server]['want_channel_list']
-        await ctx.bot.send_message(channel, "Meowth! Please use one of the following channels for **!want** commands: {want_channel_list}".format(want_channel_list=", ".join(c.mention for c in want_channels)))
+        await Meowth.add_roles(ctx.message.author, role)
+        want_number = pkmn_info['pokemon_list'].index(entered_want) + 1
+        want_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(want_number)) #This part embeds the sprite
+        want_embed = discord.Embed(colour=server.me.colour)
+        want_embed.set_thumbnail(url=want_img_url)
+        await Meowth.send_message(channel, content=_("Meowth! Got it! {member} wants {pokemon}").format(member=ctx.message.author.mention, pokemon=entered_want.capitalize()),embed=want_embed)
 
 @Meowth.group(pass_context=True)
 @checks.wantset()
-@checks.notraidchannel()
+@checks.nonraidchannel()
+@checks.wantchannel()
 async def unwant(ctx):
     """Remove a Pokemon from your wanted list.
 
@@ -1178,29 +1226,25 @@ async def unwant(ctx):
     server = message.server
     channel = message.channel
     if ctx.invoked_subcommand is None:
-        if checks.check_wantchannel(ctx):
-            entered_unwant = ctx.message.content[8:].lower()
-            role = discord.utils.get(ctx.message.server.roles, name=entered_unwant)
-            if entered_unwant not in pkmn_info['pokemon_list']:
-                await Meowth.send_message(ctx.message.channel, spellcheck(entered_unwant))
-                return
-            else:
-                # If user is not already wanting the Pokemon,
-                # print a less noisy message
-                if role not in ctx.message.author.roles:
-                    await Meowth.add_reaction(ctx.message, '✅')
-                else:
-                    await Meowth.remove_roles(ctx.message.author, role)
-                    unwant_number = pkmn_info['pokemon_list'].index(entered_unwant) + 1
-                    await Meowth.add_reaction(ctx.message, '✅')
-
+        entered_unwant = ctx.message.content[8:].lower()
+        role = discord.utils.get(ctx.message.server.roles, name=entered_unwant)
+        if entered_unwant not in pkmn_info['pokemon_list']:
+            await Meowth.send_message(ctx.message.channel, spellcheck(entered_unwant))
+            return
         else:
-            want_channels = server_dict[server]['want_channel_list']
-            await ctx.bot.send_message(channel, "Meowth! Please use one of the following channels for **!unwant** commands: {want_channel_list}".format(want_channel_list=", ".join(c.mention for c in want_channels)))
+            # If user is not already wanting the Pokemon,
+            # print a less noisy message
+            if role not in ctx.message.author.roles:
+                await Meowth.add_reaction(ctx.message, '✅')
+            else:
+                await Meowth.remove_roles(ctx.message.author, role)
+                unwant_number = pkmn_info['pokemon_list'].index(entered_unwant) + 1
+                await Meowth.add_reaction(ctx.message, '✅')
 
 @unwant.command(pass_context=True)
 @checks.wantset()
-@checks.notraidchannel()
+@checks.nonraidchannel()
+@checks.wantchannel()
 async def all(ctx):
     """Remove all Pokemon from your wanted list.
 
@@ -1213,30 +1257,25 @@ async def all(ctx):
     server = message.server
     channel = message.channel
     author = message.author
-    if checks.check_wantchannel(ctx):
-        await Meowth.send_typing(ctx.message.channel)
-        count = 0
-        roles = author.roles
-        remove_roles = []
-        for role in roles:
-            if role.name in pkmn_info['pokemon_list']:
-                remove_roles.append(role)
-                count += 1
-            continue
-        await Meowth.remove_roles(author, *remove_roles)
-        if count == 0:
-            await Meowth.send_message(ctx.message.channel, content=_("{0}, you have no pokemon in your want list.").format(ctx.message.author.mention, count))
-        await Meowth.send_message(ctx.message.channel, content=_("{0}, I've removed {1} pokemon from your want list.").format(ctx.message.author.mention, count))
-        return
-
-    else:
-        want_channels = server_dict[server]['want_channel_list']
-        await ctx.bot.send_message(channel, "Meowth! Please use one of the following channels for **!unwant** commands: {want_channel_list}".format(want_channel_list=", ".join(c.mention for c in want_channels)))
+    await Meowth.send_typing(ctx.message.channel)
+    count = 0
+    roles = author.roles
+    remove_roles = []
+    for role in roles:
+        if role.name in pkmn_info['pokemon_list']:
+            remove_roles.append(role)
+            count += 1
+        continue
+    await Meowth.remove_roles(author, *remove_roles)
+    if count == 0:
+        await Meowth.send_message(ctx.message.channel, content=_("{0}, you have no pokemon in your want list.").format(ctx.message.author.mention, count))
+    await Meowth.send_message(ctx.message.channel, content=_("{0}, I've removed {1} pokemon from your want list.").format(ctx.message.author.mention, count))
+    return
 
 
 @Meowth.command(pass_context = True)
-@checks.citychannel()
 @checks.wildset()
+@checks.citychannel()
 async def wild(ctx):
     """Report a wild Pokemon spawn location.
 

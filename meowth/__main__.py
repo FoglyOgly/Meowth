@@ -422,11 +422,9 @@ async def channel_cleanup(loop=True):
                     #if the channel save data shows it's not an active raid
                     if serverdict_chtemp[server]['raidchannel_dict'][channel]['active'] == False:
                         
-                        dict_expired_channel_list.append(channel)                        
-
                         if serverdict_chtemp[server]['raidchannel_dict'][channel]['type'] == 'egg':
 
-                            #and if it has been expired for longer than 5 minutes already
+                            #and if it has been expired for longer than 15 minutes already
                             if serverdict_chtemp[server]['raidchannel_dict'][channel]['exp'] < (time.time() - (15 * 60)):
 
                                 #list the channel to be removed from save data
@@ -451,6 +449,9 @@ async def channel_cleanup(loop=True):
 
                                 logger.info(log_str+" - 5+ MIN EXPIRY NONACTIVE RAID")
                                 continue
+                                
+                        event_loop.create_task(expire_channel(channel))
+                        logger.info(log_str+" - = RECENTLY EXPIRED NONACTIVE RAID")                             
 
                     #if the channel save data shows it as an active raid still
                     elif serverdict_chtemp[server]['raidchannel_dict'][channel]['active'] == True:

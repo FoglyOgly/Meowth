@@ -1,41 +1,28 @@
-2017-10-23 11:55:26,500:WARNING:discord.client: PyNaCl is not installed, voice will NOT be supported
-2017-10-23 11:55:26,500:INFO:discord.client: on_command_error has successfully been registered as an event
-2017-10-23 11:55:26,516:INFO:discord: Serverdict Loaded Successfully
-2017-10-23 11:55:26,537:INFO:discord.client: on_ready has successfully been registered as an event
-2017-10-23 11:55:26,537:INFO:discord.client: on_server_join has successfully been registered as an event
-2017-10-23 11:55:26,537:INFO:discord.client: on_server_remove has successfully been registered as an event
-2017-10-23 11:55:26,553:INFO:discord.client: on_member_join has successfully been registered as an event
-2017-10-23 11:55:26,553:INFO:discord.client: on_message has successfully been registered as an event
-2017-10-23 11:55:26,553:INFO:discord.client: logging in using static token
-2017-10-23 11:55:27,086:INFO:discord.gateway: Created websocket connected to wss://gateway.discord.gg?encoding=json&v=6
-2017-10-23 11:55:27,086:INFO:discord.gateway: sent the identify payload to create the websocket
-2017-10-23 11:55:29,378:INFO:discord: Starting up...
-2017-10-23 11:55:29,380:INFO:discord: Meowth! That's right!
+2017-10-23 15:18:06,682:WARNING:discord.client: PyNaCl is not installed, voice will NOT be supported
+2017-10-23 15:18:06,683:INFO:discord.client: on_command_error has successfully been registered as an event
+2017-10-23 15:18:06,685:INFO:discord: Serverdict Loaded Successfully
+2017-10-23 15:18:06,729:INFO:discord.client: on_ready has successfully been registered as an event
+2017-10-23 15:18:06,730:INFO:discord.client: on_server_join has successfully been registered as an event
+2017-10-23 15:18:06,730:INFO:discord.client: on_server_remove has successfully been registered as an event
+2017-10-23 15:18:06,730:INFO:discord.client: on_member_join has successfully been registered as an event
+2017-10-23 15:18:06,731:INFO:discord.client: on_message has successfully been registered as an event
+2017-10-23 15:18:06,732:INFO:discord.client: logging in using static token
+2017-10-23 15:18:07,249:INFO:discord.gateway: Created websocket connected to wss://gateway.discord.gg?encoding=json&v=6
+2017-10-23 15:18:07,250:INFO:discord.gateway: sent the identify payload to create the websocket
+2017-10-23 15:18:09,294:INFO:discord: Starting up...
+2017-10-23 15:18:09,295:INFO:discord: Meowth! That's right!
 
 1 servers connected.
 14 members found.
-2017-10-23 11:55:29,380:INFO:discord: Maintenance Tasks Started
-2017-10-23 11:55:29,396:INFO:discord: Server_Cleanup ------ BEGIN ------
-2017-10-23 11:55:29,396:INFO:discord: Server_Cleanup - SAVING CHANGES
-2017-10-23 11:55:29,406:INFO:discord: Server_Cleanup ------ END ------
-2017-10-23 11:55:29,423:INFO:discord: Channel_Cleanup ------ BEGIN ------
-2017-10-23 11:55:29,423:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
-2017-10-23 11:55:29,423:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-5-egg-test - CHECKING
-2017-10-23 11:55:29,423:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-5-egg-test - EXISTS IN DISCORD
-2017-10-23 11:55:29,423:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:level-5-egg-test - = RECENTLY EXPIRED NONACTIVE RAID
-2017-10-23 11:55:29,424:INFO:discord: Channel_Cleanup - SAVING CHANGES
-2017-10-23 11:55:29,433:INFO:discord: Channel_Cleanup ------ END ------
-2017-10-23 11:55:29,433:INFO:discord: Expire_Channel - level-5-egg-test
-2017-10-23 11:55:29,433:INFO:discord: Expire_Channel - Channel Expired - level-5-egg-test
-2017-10-23 11:59:37,950:INFO:discord: Expire_Channel - Channel Deleted - level-5-egg-test
-2017-10-23 12:01:29,854:INFO:discord.http: A rate limit bucket has been exhausted (bucket: POST:352788338035523584:None:/channels/{channel_id}/messages, retry: 1.0).
-2017-10-23 12:05:29,442:INFO:discord: Channel_Cleanup ------ BEGIN ------
-2017-10-23 12:05:29,442:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
-2017-10-23 12:05:29,442:INFO:discord: Channel_Cleanup - SAVING CHANGES
-2017-10-23 12:05:29,450:INFO:discord: Channel_Cleanup ------ END ------
-2017-10-23 12:09:08,283:INFO:discord: Expiry_Check - level-4-egg-palisades-park-statue-of-santa-monica
-2017-10-23 12:09:08,284:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-4-egg-palisades-park-statue-of-santa-monica
-2017-10-23 12:09:08,369:INFO:discord: Expiry_Check - level-3-egg-black-tower-sculptures
-2017-10-23 12:09:08,369:INFO:discord: Expire_Channel - Channel Added To Watchlist - level-3-egg-black-tower-sculptures
-2017-10-23 12:09:08,383:INFO:discord: Expiry_Check - level-4-egg-palisades-park-statue-of-santa-monica
-2017-10-23 12:09:08,461:INFO:discord: Expiry_Check - level-3-egg-black-tower-sculptures
+2017-10-23 15:18:09,295:INFO:discord: Maintenance Tasks Started
+2017-10-23 15:18:09,302:INFO:discord: Server_Cleanup ------ BEGIN ------
+2017-10-23 15:18:09,302:INFO:discord: Server_Cleanup - SAVING CHANGES
+2017-10-23 15:18:09,312:INFO:discord: Server_Cleanup ------ END ------
+2017-10-23 15:18:09,321:INFO:discord: Channel_Cleanup ------ BEGIN ------
+2017-10-23 15:18:09,321:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+2017-10-23 15:18:09,321:INFO:discord: Channel_Cleanup - SAVING CHANGES
+2017-10-23 15:18:09,329:INFO:discord: Channel_Cleanup ------ END ------
+2017-10-23 15:28:09,343:INFO:discord: Channel_Cleanup ------ BEGIN ------
+2017-10-23 15:28:09,344:INFO:discord: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+2017-10-23 15:28:09,344:INFO:discord: Channel_Cleanup - SAVING CHANGES
+2017-10-23 15:28:09,353:INFO:discord: Channel_Cleanup ------ END ------

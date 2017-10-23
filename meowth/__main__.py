@@ -488,7 +488,7 @@ async def channel_cleanup(loop=True):
                         elif serverdict_chtemp[server]['raidchannel_dict'][channel]['exp'] <= time.time():
 
                             #list the channel to be sent to the channel expiry function
-                            dict_expired_channel_list.append(channel)
+                            event_loop.create_task(expire_channel(channel))
 
                             logger.info(log_str+" - RECENTLY EXPIRED")
                             continue
@@ -526,10 +526,6 @@ async def channel_cleanup(loop=True):
                 except:
                     logger.info("Channel_Cleanup - Channel Deletion Failure - " + c.name)
                     pass
-
-            #for every channel listed to have recently expired
-            for e in dict_expired_channel_list:
-                event_loop.create_task(expire_channel(e))
 
         #save server_dict changes after cleanup
         logger.info("Channel_Cleanup - SAVING CHANGES")

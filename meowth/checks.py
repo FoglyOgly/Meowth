@@ -151,6 +151,16 @@ def check_teamset(ctx):
     except KeyError:
         return False
 
+def check_raidtype(ctx):
+    if ctx.message.server is None:
+        return False
+    server = ctx.message.server
+    channel = ctx.message.channel
+    try:
+        return ctx.bot.server_dict[server]['raidchannel_dict'][channel]['type']
+    except KeyError:
+        return False
+
 def teamset():
     def predicate(ctx):
         return check_teamset(ctx)

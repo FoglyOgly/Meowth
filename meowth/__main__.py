@@ -1073,7 +1073,7 @@ async def announce(ctx,*,message:str):
     count = 0
     for server in Meowth.servers:
         destination = server.owner
-        e = discord.Embed(colour=discord.Colour.light_grey(), description=message)
+        e = discord.Embed(colour=discord.Colour.lighter_grey(), description=message)
         title = "Announcement"
         e.set_footer(text="For support, contact us on our Discord server. Invite Code: hhVjAN8")
         if Meowth.user.avatar_url:

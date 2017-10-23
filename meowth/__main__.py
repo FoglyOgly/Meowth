@@ -421,6 +421,8 @@ async def channel_cleanup(loop=True):
                     logger.info(log_str+" - EXISTS IN DISCORD")
                     #if the channel save data shows it's not an active raid
                     if serverdict_chtemp[server]['raidchannel_dict'][channel]['active'] == False:
+                        
+                        dict_expired_channel_list.append(channel)                        
 
                         if serverdict_chtemp[server]['raidchannel_dict'][channel]['type'] == 'egg':
 

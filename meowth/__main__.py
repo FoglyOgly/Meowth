@@ -1114,11 +1114,11 @@ async def about(ctx):
     ut.years, ut.months, ut.days, ut.hours, ut.minutes
     if ut.years >= 1:
         uptime = "{yr}y {mth}m {day}d {hr}:{min}".format(yr=ut.years,mth=ut.months,day=ut.days,hr=ut.hours,min=ut.minutes)
-    if ut.months >= 1:
+    elif ut.months >= 1:
         uptime = "{mth}m {day}d {hr}:{min}".format(mth=ut.months,day=ut.days,hr=ut.hours,min=ut.minutes)
-    if ut.days >= 1:
+    elif ut.days >= 1:
         uptime = "{day} days {hr} hrs {min} mins".format(day=ut.days,hr=ut.hours,min=ut.minutes)
-    if ut.hours >= 1:
+    elif ut.hours >= 1:
         uptime = "{hr} hrs {min} mins {sec} secs".format(hr=ut.hours,min=ut.minutes,sec=ut.seconds)
     else:
         uptime = "{min} mins {sec} secs".format(min=ut.minutes,sec=ut.seconds)

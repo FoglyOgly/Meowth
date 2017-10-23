@@ -1461,14 +1461,10 @@ async def timerset(ctx,timer):
     except KeyError:
         pass
 
-<<<<<<< HEAD:meowth.py
-    raidtype = checks.check_raidtype(ctx)
-=======
     if server_dict[server]['raidchannel_dict'][channel]['type'] == 'egg':
         raidtype = "Raid Egg"
     else:
         raidtype = "Raid"
->>>>>>> 7ca3524c2568fd116143b68cf543bbf6efdee9cd:meowth/__main__.py
 
     if timer.isdigit():
         raidexp = int(timer)

@@ -1064,8 +1064,15 @@ async def prefix(ctx,prefix=None):
     """Changes server prefix."""
     if prefix == "clear":
         prefix=None
+
+    if prefix is not None:
+        if len(prefix) > 1:
+            await Meowth.send_message(ctx.message.channel,"Prefix can only be 1 character in length. Please try again.".format(prefix))
+            return
+
     _set_prefix(Meowth,ctx.message.server,prefix)
-    if prefix:
+
+    if prefix is not None:
         await Meowth.send_message(ctx.message.channel,"Prefix has been set to: `{}`".format(prefix))
     else:
         default_prefix = Meowth.config["default_prefix"]

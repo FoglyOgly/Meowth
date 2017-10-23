@@ -436,7 +436,7 @@ async def channel_cleanup(loop=True):
 
                         if serverdict_chtemp[server]['raidchannel_dict'][channel]['type'] == 'egg':
 
-                            #and if it has been expired for longer than 5 minutes already
+                            #and if it has been expired for longer than 15 minutes already
                             if serverdict_chtemp[server]['raidchannel_dict'][channel]['exp'] < (time.time() - (15 * 60)):
 
                                 #list the channel to be removed from save data
@@ -585,35 +585,6 @@ async def _print(owner,message):
     print(message)
     logger.info(message)
 
-async def reboot_msg(owners,loop=False,):
-    msg_success = 0
-    msg_fail = 0
-    reboot_msg = """**Meowth! That's right! I've been updated!**
-
-**Changes:**
-    - We are testing out a new launcher for Meowth that should help it get itself back online in the event of a crash.
-    - The bug for **!exraid** ignoring the first word after the command should be fixed.
-    - Fixed the bot not providing help when certain commands are used incorrectly
-    - Backend upgrades
-
-**Reconfigure shouldn't be necessary for this update.**"""
-    logger.info("Reboot Messages ------ BEGIN ------")
-    for o in owners:
-        try:
-            await Meowth.send_message(o, reboot_msg)
-            msg_success += 1
-            logger.info("Reboot Message - SENT - "+o.name)
-        except:
-            msg_fail += 1
-            logger.info("Reboot Message - FAILED - "+o.name)
-
-        #step through slowly to prevent rate limits
-        await asyncio.sleep(0.5)#0.5 default
-        continue
-    logger.info("Reboot Messages ------ END ------")
-    await _print(Meowth.owner,_("\nReboot messages sent: {success_count} successful, {fail_count} failed.").format(success_count=msg_success,fail_count=msg_fail))
-    return
-
 async def maint_start():
     try:
         event_loop.create_task(server_cleanup())
@@ -653,9 +624,6 @@ team_msg = " or ".join(["`!team {0}`".format(team) for team in config['team_dict
 async def on_ready():
     Meowth.owner = discord.utils.get(Meowth.get_all_members(),id=config["master"])
     await _print(Meowth.owner,_("Starting up...")) #prints to the terminal or cmd prompt window upon successful connection to Discord
-    REBOOT = False
-    if 'reboot' in sys.argv[1:]:
-        REBOOT = True
     owners = []
     msg_success = 0
     msg_fail = 0
@@ -673,12 +641,7 @@ async def on_ready():
 
     await _print(Meowth.owner,_("Meowth! That's right!\n\n{server_count} servers connected.\n{member_count} members found.").format(server_count=servers,member_count=users))
 
-    if REBOOT:
-        event_loop.create_task(reboot_msg(owners))
-
     await maint_start()
-
-
 
 @Meowth.event
 async def on_server_join(server):
@@ -1012,25 +975,20 @@ async def exit(ctx):
 
 @Meowth.command(pass_context=True)
 @checks.is_owner()
-async def restart(ctx,*args):
+async def restart(ctx):
     """Restart after saving.
 
-    Usage: !restart [announce].
-    Calls the save function and restarts Meowth.
-    If 'announce' argument used, """
+    Usage: !restart.
+    Calls the save function and restarts Meowth."""
     try:
         await _save()
     except Exception as err:
         await _print(Meowth.owner,_("Error occured while trying to save!"))
         await _print(Meowth.owner,err)
 
-    if "announce" in args:
-        shutdown_code = 27
-    else:
-        shutdown_code = 26
     await Meowth.send_message(ctx.message.channel,"Restarting...")
 
-    Meowth._shutdown_mode = shutdown_code
+    Meowth._shutdown_mode = 26
     await Meowth.logout()
 
 @Meowth.command(pass_context=True)
@@ -1106,11 +1064,72 @@ async def prefix(ctx):
     prefix = _get_prefix(Meowth,ctx.message)
     await Meowth.send_message(ctx.message.channel,"Prefix for this server is: `{}`".format(prefix))
 
+@Meowth.command(pass_context=True)
+@checks.is_owner()
+async def announce(ctx,*,message:str):
+    """Sends a DM to all server owners."""
+    failed = 0
+    sent = 0
+    count = 0
+    for server in Meowth.servers:
+        destination = server.owner
+        e = discord.Embed(colour=discord.Colour.red(), description=message)
+        title = "Announcement"
+        e.set_footer(text="For support, contact us on our Discord server. Invite Code: hhVjAN8")
+        if Meowth.user.avatar_url:
+            e.set_author(name=title, icon_url=Meowth.user.avatar_url)
+        else:
+            e.set_author(name=title)
+        try:
+            await Meowth.send_message(destination,embed=e)
+        except:
+            failed += 1
+            logger.info("Announcement Delivery Failure: {} - {}".format(destination.name,server.name))
+        else:
+            sent += 1
+        count += 1
+    
+    await Meowth.send_message(ctx.message.channel,"Announcement sent to {} server owners: {} successful, {} failed.".format(count, sent, failed))
+
 """
 
 End admin commands
 
 """
+
+@Meowth.command(pass_context=True)
+async def about(ctx):
+    """Shows info about Red"""
+    author_repo = "https://github.com/FoglyOgly"
+    author_name = "FoglyOgly"
+    bot_repo = author_repo + "/Meowth"
+    server_url = "https://discord.gg/hhVjAN8"
+    owner = Meowth.owner
+    channel = ctx.message.channel
+
+    about = (
+        "I'm Meowth! A Pokemon Go helper bot for Discord!\n\n"
+        "I'm made by [{author_name}]({author_repo}) and improvements have been contributed by many other people also.\n\n"
+        "[Join our server]({server_invite}) if you have any questions or feedback.\n\n"
+        "".format(author_name=author_name,author_repo=author_repo,server_invite=server_url))
+
+    member_count = 0
+    server_count = 0
+    for server in Meowth.servers:
+        server_count += 1
+        member_count += len(server.members)
+
+    embed = discord.Embed(colour=discord.Colour.orange(),icon_url=Meowth.user.avatar_url)
+    embed.add_field(name="About Meowth", value=about, inline=False)
+    embed.add_field(name="Owner", value=owner)
+    embed.add_field(name="Servers", value=server_count)
+    embed.add_field(name="Members", value=member_count)
+    embed.set_footer(text="For support, contact us on our Discord server. Invite Code: hhVjAN8")
+
+    try:
+        await Meowth.send_message(channel,embed=embed)
+    except discord.HTTPException:
+        await Meowth.send_message(channel,"I need the `Embed links` permission to send this")
 
 @Meowth.command(pass_context = True)
 @checks.teamset()

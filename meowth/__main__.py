@@ -1252,7 +1252,7 @@ async def want(ctx):
     channel = message.channel
     want_split = message.clean_content.lower().split()
     del want_split[0]
-    entered_want = want_split[0]
+    entered_want = " ".join(want_split)]
     if entered_want not in pkmn_info['pokemon_list']:
         await Meowth.send_message(channel, spellcheck(entered_want))
         return
@@ -1292,7 +1292,7 @@ async def unwant(ctx):
     if ctx.invoked_subcommand is None:
         unwant_split = message.clean_content.lower().split()
         del unwant_split[0]
-        entered_unwant = unwant_split[0]
+        entered_unwant = " ".join(unwant_split)
         role = discord.utils.get(server.roles, name=entered_unwant)
         if entered_unwant not in pkmn_info['pokemon_list']:
             await Meowth.send_message(channel, spellcheck(entered_unwant))

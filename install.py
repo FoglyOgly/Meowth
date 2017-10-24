@@ -15,7 +15,7 @@ _pip_req_= [
     "requests>=2.18.4",
     "pytesseract>=0.1.7",
     "hastebin.py>=0.2",
-    "dateutil>=2.6.1"
+    "python-dateutil>=2.6.1"
 ]
 
 def apt_install(packages):

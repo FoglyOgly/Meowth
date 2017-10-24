@@ -1866,7 +1866,6 @@ async def raidegg(ctx):
 async def _raidegg(message):
     raidegg_split = message.clean_content.lower().split()
     del raidegg_split[0]
-    print(raidegg_split)
     if len(raidegg_split) <= 1:
         await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!raidegg <level> <location>**"))
         return

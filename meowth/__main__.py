@@ -1065,11 +1065,6 @@ async def prefix(ctx,prefix=None):
     if prefix == "clear":
         prefix=None
 
-    if prefix is not None:
-        if len(prefix) > 1:
-            await Meowth.send_message(ctx.message.channel,"Prefix can only be 1 character in length. Please try again.".format(prefix))
-            return
-
     _set_prefix(Meowth,ctx.message.server,prefix)
 
     if prefix is not None:
@@ -1221,8 +1216,9 @@ async def team(ctx):
         await Meowth.send_message(ctx.message.channel, _("Meowth! My roles are ranked lower than the following team roles: **{higher_roles_list}**\nPlease get an admin to move my roles above them!").format(higher_roles_list=', '.join(high_roles)))
         return
 
-    role = None
-    entered_team = ctx.message.content[6:].lower()
+    team_split = ctx.message.clean_content.lower().split()
+    del team_split[0]
+    entered_team = team_split[0]
     role = discord.utils.get(ctx.message.server.roles, name=entered_team)
 
     # Check if user already belongs to a team role by
@@ -1272,7 +1268,9 @@ async def want(ctx):
     message = ctx.message
     server = message.server
     channel = message.channel
-    entered_want = message.content[6:].lower()
+    want_split = message.clean_content.lower().split()
+    del want_split[0]
+    entered_want = " ".join(want_split)
     if entered_want not in pkmn_info['pokemon_list']:
         await Meowth.send_message(channel, spellcheck(entered_want))
         return
@@ -1285,12 +1283,12 @@ async def want(ctx):
     # If user is already wanting the Pokemon,
     # print a less noisy message
     if role in ctx.message.author.roles:
-        await Meowth.add_reaction(ctx.message, '✅')
+        await Meowth.add_reaction(message, '✅')
         #await Meowth.send_message(channel, content=_("Meowth! {member}, I already know you want {pokemon}!").format(member=ctx.message.author.mention, pokemon=entered_want.capitalize()))
     else:
-        await Meowth.add_roles(ctx.message.author, role)
+        await Meowth.add_roles(message.author, role)
         want_number = pkmn_info['pokemon_list'].index(entered_want) + 1
-        await Meowth.add_reaction(ctx.message, '✅')
+        await Meowth.add_reaction(message, '✅')
         #want_img_url = "http://floatzel.net/pokemon/black-white/sprites/images/{0}.png".format(str(want_number)) #This part embeds the sprite
         #want_embed = discord.Embed(colour=server.me.colour)
         #want_embed.set_thumbnail(url=want_img_url)
@@ -1312,20 +1310,22 @@ async def unwant(ctx):
     server = message.server
     channel = message.channel
     if ctx.invoked_subcommand is None:
-        entered_unwant = ctx.message.content[8:].lower()
-        role = discord.utils.get(ctx.message.server.roles, name=entered_unwant)
+        unwant_split = message.clean_content.lower().split()
+        del unwant_split[0]
+        entered_unwant = " ".join(unwant_split)
+        role = discord.utils.get(server.roles, name=entered_unwant)
         if entered_unwant not in pkmn_info['pokemon_list']:
-            await Meowth.send_message(ctx.message.channel, spellcheck(entered_unwant))
+            await Meowth.send_message(message.channel, spellcheck(entered_unwant))
             return
         else:
             # If user is not already wanting the Pokemon,
             # print a less noisy message
             if role not in ctx.message.author.roles:
-                await Meowth.add_reaction(ctx.message, '✅')
+                await Meowth.add_reaction(message, '✅')
             else:
-                await Meowth.remove_roles(ctx.message.author, role)
+                await Meowth.remove_roles(message.author, role)
                 unwant_number = pkmn_info['pokemon_list'].index(entered_unwant) + 1
-                await Meowth.add_reaction(ctx.message, '✅')
+                await Meowth.add_reaction(message, '✅')
 
 @unwant.command(pass_context=True)
 @checks.wantset()
@@ -1372,17 +1372,17 @@ async def wild(ctx):
 
 async def _wild(message, huntr):
     if not huntr:
-        args = message.clean_content[6:]
+        wild_split = message.clean_content.lower().split()
         huntrexp = ""
     else:
-        args = huntr.split("|")[0][6:]
+        wild_split = huntr.split("|")[0].lower().split()
         huntrexp = huntr.split("|")[1]
-    args_split = args.split(" ")
-    if len(args_split) <= 1:
+    del wild_split[0]
+    if len(wild_split) <= 1:
         await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**"))
         return
     else:
-        content = args.lower()
+        content = " ".join(wild_split)
         entered_wild = content.split(' ',1)[0]
         spellone = spellcheck(entered_wild).split('"')[3]
         wild_details = content.split(' ',1)[1]
@@ -1447,50 +1447,48 @@ async def _raid(message, huntr):
             await Meowth.send_message(message.channel, _("Meowth! Please restrict raid reports to a city channel!"))
             return
     if not huntr:
-        args = message.clean_content[5:]
+        raid_split = message.clean_content.lower().split()
         gymhuntrgps = False
     else:
-        args = huntr.split("|")[0][5:]
+        raid_split = huntr.split("|")[0].lower().split()
         gymhuntrgps = huntr.split("|")[1]
-
-    args_split = args.split(" ")
-    del args_split[0]
+    del raid_split[0]
     if fromegg is True:
-        if args_split[0] == 'assume':
+        if raid_split[0] == 'assume':
             if server_dict[message.channel.server]['raidchannel_dict'][message.channel]['active'] == False:
-                await _eggtoraid(args_split[1].lower(), message.channel)
+                await _eggtoraid(raid_split[1].lower(), message.channel)
                 return
             else:
-                await _eggassume(" ".join(args_split), message.channel)
+                await _eggassume(" ".join(raid_split), message.channel)
                 return
         else:
             if server_dict[message.channel.server]['raidchannel_dict'][message.channel]['active'] == False:
-                await _eggtoraid(" ".join(args_split).lower(), message.channel)
+                await _eggtoraid(" ".join(raid_split).lower(), message.channel)
                 return
             else:
                 await Meowth.send_message(message.channel, _("Meowth! Please wait until the egg has hatched before changing it to an open raid!"))
                 return
-    elif len(args_split) <= 1:
+    elif len(raid_split) <= 1:
         await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**"))
         return
-    entered_raid = re.sub("[\@]", "", args_split[0].lower())
-    del args_split[0]
+    entered_raid = re.sub("[\@]", "", raid_split[0].lower())
+    del raid_split[0]
 
-    if args_split[-1].isdigit():
-        raidexp = int(args_split[-1])
-        del args_split[-1]
-    elif ":" in args_split[-1]:
-        args_split[-1] = re.sub(r"[a-zA-Z]", "", args_split[-1])
-        if args_split[-1].split(":")[0] == "":
+    if raid_split[-1].isdigit():
+        raidexp = int(raid_split[-1])
+        del raid_split[-1]
+    elif ":" in raid_split[-1]:
+        raid_split[-1] = re.sub(r"[a-zA-Z]", "", raid_split[-1])
+        if raid_split[-1].split(":")[0] == "":
             endhours = 0
         else:
-            endhours = int(args_split[-1].split(":")[0])
-        if args_split[-1].split(":")[1] == "":
+            endhours = int(raid_split[-1].split(":")[0])
+        if raid_split[-1].split(":")[1] == "":
             endmins = 0
         else:
-            endmins = int(args_split[-1].split(":")[1])
+            endmins = int(raid_split[-1].split(":")[1])
         raidexp = 60 * endhours + endmins
-        del args_split[-1]
+        del raid_split[-1]
     else:
         raidexp = False
 
@@ -1506,7 +1504,7 @@ async def _raid(message, huntr):
         await Meowth.send_message(message.channel, _("Meowth! The Pokemon {pokemon} does not appear in raids!").format(pokemon=entered_raid.capitalize()))
         return
 
-    raid_details = " ".join(args_split)
+    raid_details = " ".join(raid_split)
     raid_details = raid_details.strip()
     if raid_details == '':
         await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**"))
@@ -1871,13 +1869,13 @@ async def exraid(ctx):
 async def _exraid(ctx):
     message = ctx.message
     channel = message.channel
-    args = message.clean_content[8:]
-    args_split = args.split(" ")
-    if len(args_split) <= 1:
+    exraid_split = message.clean_content.lower().split()
+    del exraid_split[0]
+    if len(exraid_split) <= 1:
         await Meowth.send_message(channel, _("Meowth! Give more details when reporting! Usage: **!exraid <pokemon name> <location>**"))
         return
-    entered_raid = re.sub("[\@]", "", args_split[0].lower())
-    del args_split[0]
+    entered_raid = re.sub("[\@]", "", exraid_split[0].lower())
+    del exraid_split[0]
     if entered_raid not in pkmn_info['pokemon_list']:
         await Meowth.send_message(channel, spellcheck(entered_raid))
         return
@@ -1885,7 +1883,7 @@ async def _exraid(ctx):
         await Meowth.send_message(channel, _("Meowth! The Pokemon {pokemon} does not appear in raids!").format(pokemon=entered_raid.capitalize()))
         return
 
-    raid_details = " ".join(args_split)
+    raid_details = " ".join(exraid_split)
     raid_details = raid_details.strip()
     if raid_details == '':
         await Meowth.send_message(channel, _("Meowth! Give more details when reporting! Usage: **!exraid <pokemon name> <location>**"))
@@ -1966,39 +1964,38 @@ async def raidegg(ctx):
 
 async def _raidegg(message, huntr):
     if not huntr:
-        args = message.clean_content[8:]
+        raidegg_split = message.clean_content.lower().split()
         gymhuntrgps = False
     else:
-        args = huntr.split("|")[0][8:]
+        raidegg_split = huntr.split("|")[0].lower().split()
         gymhuntrgps = huntr.split("|")[1]
-    args_split = args.split(" ")
-    del args_split[0]
-    if len(args_split) <= 1:
+    del raidegg_split[0]
+    if len(raidegg_split) <= 1:
         await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!raidegg <level> <location>**"))
         return
 
-    if args_split[0].isdigit():
-        egg_level = int(args_split[0])
-        del args_split[0]
+    if raidegg_split[0].isdigit():
+        egg_level = int(raidegg_split[0])
+        del raidegg_split[0]
     else:
         await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Use at least: **!raidegg <level> <location>**. Type **!help** raidegg for more info."))
         return
 
-    if args_split[-1].isdigit():
-        raidexp = int(args_split[-1])
-        del args_split[-1]
-    elif ":" in args_split[-1]:
-        args_split[-1] = re.sub(r"[a-zA-Z]", "", args_split[-1])
-        if args_split[-1].split(":")[0] == "":
+    if raidegg_split[-1].isdigit():
+        raidexp = int(raidegg_split[-1])
+        del raidegg_split[-1]
+    elif ":" in raidegg_split[-1]:
+        raidegg_split[-1] = re.sub(r"[a-zA-Z]", "", raidegg_split[-1])
+        if raidegg_split[-1].split(":")[0] == "":
             endhours = 0
         else:
-            endhours = int(args_split[-1].split(":")[0])
-        if args_split[-1].split(":")[1] == "":
+            endhours = int(raidegg_split[-1].split(":")[0])
+        if raidegg_split[-1].split(":")[1] == "":
             endmins = 0
         else:
-            endmins = int(args_split[-1].split(":")[1])
+            endmins = int(raidegg_split[-1].split(":")[1])
         raidexp = 60 * endhours + endmins
-        del args_split[-1]
+        del raidegg_split[-1]
     else:
         raidexp = False
 
@@ -2007,7 +2004,7 @@ async def _raidegg(message, huntr):
             await Meowth.send_message(message.channel, _("Meowth...that's too long. Raid Eggs currently last no more than one hour..."))
             return
 
-    raid_details = " ".join(args_split)
+    raid_details = " ".join(raidegg_split)
     raid_details = raid_details.strip()
     if raid_details == '':
         await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Use at least: **!raidegg <level> <location>**. Type **!help** raidegg for more info."))
@@ -2605,15 +2602,17 @@ async def new(ctx):
     Works only in raid channels. Changes the google map links."""
 
     message = ctx.message
-    space1 = message.content.find(" ",13)
-    if space1 == -1:
+    location_split = message.content.lower().split()
+    del location_split[0]
+    del location_split[0]
+    if len(location_split) < 1:
         await Meowth.send_message(message.channel, _("Meowth! We're missing the new location details! Usage: **!location new <new address>**"))
         return
     else:
         report_city = server_dict[message.server]['raidchannel_dict'][message.channel]['reportcity']
         report_channel = discord.utils.get(message.server.channels, name=report_city)
 
-        details = message.content[space1:]
+        details = " ".join(location_split)
         if "/maps" in message.content:
             mapsindex = message.content.find("/maps")
             newlocindex = message.content.rfind("http", 0, mapsindex)

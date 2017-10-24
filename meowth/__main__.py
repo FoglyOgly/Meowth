@@ -8,6 +8,7 @@ import pickle
 import json
 import time
 import datetime
+from dateutil.relativedelta import relativedelta
 import copy
 from time import strftime
 import logging
@@ -627,6 +628,7 @@ team_msg = " or ".join(["`!team {0}`".format(team) for team in config['team_dict
 async def on_ready():
     Meowth.owner = discord.utils.get(Meowth.get_all_members(),id=config["master"])
     await _print(Meowth.owner,_("Starting up...")) #prints to the terminal or cmd prompt window upon successful connection to Discord
+    Meowth.uptime = datetime.datetime.now()
     owners = []
     msg_success = 0
     msg_fail = 0
@@ -1045,8 +1047,15 @@ async def prefix(ctx,prefix=None):
     """Changes server prefix."""
     if prefix == "clear":
         prefix=None
-    _set_prefix(Meowth,ctx.message.server,prefix)
-    if prefix:
+
+    if prefix is not None:
+        if len(prefix) > 1:
+            await Meowth.send_message(ctx.message.channel,"Prefix can only be 1 character in length. Please try again.".format(prefix))
+            return
+
+    _set_prefix(Meowth,ctx.message.server,prefix)  
+
+    if prefix is not None:
         await Meowth.send_message(ctx.message.channel,"Prefix has been set to: `{}`".format(prefix))
     else:
         default_prefix = Meowth.config["default_prefix"]
@@ -1100,6 +1109,39 @@ End admin commands
 
 """
 
+async def _uptime(bot):
+    """Shows info about Meowth"""
+    time_start = bot.uptime
+    time_now = datetime.datetime.now()
+    ut = (relativedelta(time_now,time_start))
+    ut.years, ut.months, ut.days, ut.hours, ut.minutes
+    if ut.years >= 1:
+        uptime = "{yr}y {mth}m {day}d {hr}:{min}".format(yr=ut.years,mth=ut.months,day=ut.days,hr=ut.hours,min=ut.minutes)
+    elif ut.months >= 1:
+        uptime = "{mth}m {day}d {hr}:{min}".format(mth=ut.months,day=ut.days,hr=ut.hours,min=ut.minutes)
+    elif ut.days >= 1:
+        uptime = "{day} days {hr} hrs {min} mins".format(day=ut.days,hr=ut.hours,min=ut.minutes)
+    elif ut.hours >= 1:
+        uptime = "{hr} hrs {min} mins {sec} secs".format(hr=ut.hours,min=ut.minutes,sec=ut.seconds)
+    else:
+        uptime = "{min} mins {sec} secs".format(min=ut.minutes,sec=ut.seconds)
+
+    return uptime
+
+@Meowth.command(pass_context=True, name="uptime")
+async def cmd_uptime(ctx):
+    """Shows Meowth's uptime"""
+    server = ctx.message.server
+    channel = ctx.message.channel
+    embed_colour = server.me.colour or discord.Colour.lighter_grey()
+    uptime_str = await _uptime(Meowth)
+    embed = discord.Embed(colour=embed_colour,icon_url=Meowth.user.avatar_url)
+    embed.add_field(name="Uptime", value=uptime_str)
+    try:
+        await Meowth.send_message(channel,embed=embed)
+    except discord.HTTPException:
+        await Meowth.send_message(channel,"I need the `Embed links` permission to send this")
+
 @Meowth.command(pass_context=True)
 async def about(ctx):
     """Shows info about Meowth"""
@@ -1109,6 +1151,8 @@ async def about(ctx):
     server_url = "https://discord.gg/hhVjAN8"
     owner = Meowth.owner
     channel = ctx.message.channel
+    uptime_str = await _uptime(Meowth)
+    embed_colour = ctx.message.server.me.colour or discord.Colour.lighter_grey()
 
     about = (
         "I'm Meowth! A Pokemon Go helper bot for Discord!\n\n"
@@ -1122,11 +1166,12 @@ async def about(ctx):
         server_count += 1
         member_count += len(server.members)
 
-    embed = discord.Embed(colour=discord.Colour.orange(),icon_url=Meowth.user.avatar_url)
+    embed = discord.Embed(colour=embed_colour,icon_url=Meowth.user.avatar_url)
     embed.add_field(name="About Meowth", value=about, inline=False)
     embed.add_field(name="Owner", value=owner)
     embed.add_field(name="Servers", value=server_count)
     embed.add_field(name="Members", value=member_count)
+    embed.add_field(name="Uptime", value=uptime_str)
     embed.set_footer(text="For support, contact us on our Discord server. Invite Code: hhVjAN8")
 
     try:

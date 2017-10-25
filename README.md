@@ -1,4 +1,4 @@
-# Meowth (with Huntr Integration by BrenenP)
+# Meowth (with Huntr Integration by Doonce)
 A Discord helper bot for Pokemon Go communities.
 
 Meowth is a Discord bot written in Python 3.5 using version 0.16.12 of the discord.py library.

@@ -52,11 +52,18 @@ Get the installer [HERE](https://github.com/tesseract-ocr/tesseract/wiki/Downloa
 
 6. Create a bot user for your app and reveal the bot token to copy it.
 
-7. Copy config_blank.json and rename to config.json. Open config.json in a text editor (a good one to use is Notepad++) and paste the bot token into the value for "bot_token", replacing the "yourtoken" string.
+7. Copy config_blank.json and rename to config.json. 
 
-8. Replace the "master" value in config.json with your user ID from discord.
+8. Open config.json in a text editor (a good one to use is Notepad++) and paste the bot token into the value for "bot_token", replacing the "yourtoken" string.
 
-9. Run the launcher from the command prompt or terminal window:
+9. Replace the "master" value in config.json with your user ID from discord.
+
+10. Go to the following link, replacing <CLIENT_ID> with the Client ID you copied.
+`https://discordapp.com/oauth2/authorize?client_id=<CLIENT_ID>&scope=bot&permissions=268822608`
+
+11. Select the server you want to add Meowth to and complete the prompts. If you get to an empty screen and didn't get to see the Google new reCaptcha tickbox, disable your adblocker.
+
+12. Run the launcher from the command prompt or terminal window:
 
 Linux:
 ```bash
@@ -69,23 +76,17 @@ py launcher.py -s
 
 If successful, it should show "Meowth! That's right!".
 
-10. Go back to your Discord application page and copy the Client ID.
+13. Go back to your Discord application page and copy the Client ID.
 
-11. Go to the following link, replacing <CLIENT_ID> with the Client ID you copied.
-`https://discordapp.com/oauth2/authorize?client_id=<CLIENT_ID>&scope=bot&permissions=268822608`
+14. The bot should have sent you DM in Discord. Add the team roles: mystic, instinct and valor. Ensure they're below the bot role in the server role hierarchy.
 
-12. Select the server you want to add Meowth to and complete the prompts. If you get to an empty screen and didn't get to see the Google new reCaptcha tickbox, disable your adblocker.
-
-9. The bot should now have sent you DM in Discord. Add the team roles: mystic, instinct and valor. Ensure they're below the bot role in the server role hierarchy.
-
-10. Simply type !configure in your server to start the configuration process.
+15. Simply type !configure in your server to start the configuration process.
 
 ### Launcher Reference:
 Arguments:
 ```
   --help, -h          Show the help message
   --start, -s         Starts Meowth
-  --announce, -a      Announces Update/Reboot Message to all server owners.
   --auto-restart, -r  Auto-Restarts Meowth in case of a crash.
   --debug, -d         Prevents output being sent to Discord DM, as restarting
                       could occur often.
@@ -106,16 +107,6 @@ Launch Meowth with Auto-Restart:
 python3 launcher.py -s -r
 ```
 
-Launch Meowth with Auto-Restart, and send Update message to all server owners:
-```bash
-python launcher.py -s -r -a
-```
-
-Launch Meowth on a remote server, keeping the script alive after closing the session and outputting console to a file:
-```bash
-nohup python3 launcher.py -s -r 1> logs/out.log 2>&1 &
-``` 
-
 ## Directions for using Meowth:
 Note: Avoid punctuation inside commands.
 
@@ -128,11 +119,12 @@ pkmn = Pokemon
 | Commands | Requirements  | Description |
 | -------- |:-------------:| ------------|
 | **!help** \[command\] | - | Shows bot/command help, with descriptions. |
+| **!about** | - | Shows info about Meowth. |
 | **!team** \<team\> | - | Let's users set their team role. |
 | **!save**  | *Owner Only* | Saves the save data to file. |
 | **!exit**  | *Owner Only* | Saves the save data to file and shutdown Meowth. |
 | **!restart**  | *Owner Only* | Saves the save data to file and restarts Meowth. |
-| **!restart announce**  | *Owner Only* | Saves the save data to file, restarts Meowth and sends announcement. |
+| **!announce** \[msg\] | *Owner Only* | Sends announcement message to server owners. |
 | **!welcome** \[@member\] | *Owner Only* | Sends the welcome message to either user or mentioned member. |
 | **!outputlog**  | *Server Manager Only* | Uploads the log file to hastebin and replies with the link. |
 

@@ -2180,7 +2180,7 @@ This channel will be deleted five minutes after the timer expires.""").format(me
     for trainer in trainer_dict.keys():
         if trainer_dict[trainer]['status'] =='maybe' or trainer_dict[trainer]['status'] =='omw' or trainer_dict[trainer]['status'] =='waiting':
             trainer_list.append(trainer)
-    await Meowth.send_message(raid_channel, content = _("Meowth! Trainers {trainer_list}: The raid egg has just hatched into a {pokemon} raid!\nYou're now able to update your status with **!coming** or **!here**. If you've changed your plans, use **!cancel**.").format(trainer_list=", ".join(trainer_list), pokemon=raid.mention), embed = raid_embed)
+    await Meowth.send_message(raid_channel, content = _("Meowth! Trainers {trainer_list}: The raid egg has just hatched into a {pokemon} raid!\nIf you couldn't before, you're now able to update your status with **!coming** or **!here**. If you've changed your plans, use **!cancel**.").format(trainer_list=", ".join(trainer_list), pokemon=raid.mention), embed = raid_embed)
 
     event_loop.create_task(expiry_check(raid_channel))
 
@@ -2583,7 +2583,9 @@ async def location(ctx):
         locurl = oldembed['url']
         newembed = discord.Embed(title=oldembed['title'],url=locurl,description=oldembed['description'],colour=server.me.colour)
         newembed.set_thumbnail(url=oldembed['thumbnail']['url'])
-        await Meowth.send_message(channel, content = _("Meowth! Here's the current location for the raid!\nDetails:{location}").format(location = location), embed = newembed)
+        locationmsg = await Meowth.send_message(channel, content = _("Meowth! Here's the current location for the raid!\nDetails:{location}").format(location = location), embed = newembed)
+        await asyncio.sleep(60)
+        await Meowth.delete_message(locationmsg)
 
 @location.command(pass_context=True)
 @checks.activeraidchannel()

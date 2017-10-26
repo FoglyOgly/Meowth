@@ -1101,10 +1101,10 @@ async def announce(ctx,*,announce=None):
         return True
     reaction_list = ['❔','✅','❎']
     owner_msg_add = ""
-    if checks.is_owner():
+    if checks.is_owner_check(ctx):
         owner_msg_add = "🌎 to send it to all servers, "
-        reaction_list.append('🌎')
-    rusure = await Meowth.send_message(channel,_("That's what you sent, does it look good? React with {}❔ to send to another channel, ✅ to send it to this channel, or ❎ to cancel").format())
+        reaction_list.insert(0,'🌎')
+    rusure = await Meowth.send_message(channel,_("That's what you sent, does it look good? React with {}❔ to send to another channel, ✅ to send it to this channel, or ❎ to cancel").format(owner_msg_add))
     for r in reaction_list:
         await asyncio.sleep(0.25)
         await Meowth.add_reaction(rusure,r)

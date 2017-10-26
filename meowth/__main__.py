@@ -1142,7 +1142,6 @@ async def announce(ctx,*,announce=None):
                 sendchannel = commands.ChannelConverter(ctx, str(channelmsg.content).strip()).convert()
             except commands.BadArgument:
                 sendchannel = None
-            print(sendchannel)
             if channelmsg is not None and sendchannel is not None:
                 announcement = await Meowth.send_message(sendchannel, embed=embeddraft)
                 confirmation = await Meowth.send_message(channel,_("Announcement Sent."))

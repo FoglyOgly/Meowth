@@ -1089,6 +1089,11 @@ async def announce(ctx,*,announce=None):
         else:
             confirmation = await Meowth.send_message(channel, "Meowth! You took too long to send me your announcement! Retry when you're ready.")
     embeddraft = discord.Embed(colour=server.me.colour, description=announce)
+    title = "Announcement"
+    if Meowth.user.avatar_url:
+        embeddraft.set_author(name=title, icon_url=Meowth.user.avatar_url)
+    else:
+        embeddraft.set_author(name=title)
     draft = await Meowth.send_message(channel,embed=embeddraft)
     def check(react,user):
         if user.id is not author.id:
@@ -1098,11 +1103,15 @@ async def announce(ctx,*,announce=None):
         return True
     if checks.is_owner():
         rusure = await Meowth.send_message(channel,_("That's what you sent, does it look good? React with 🌎 to send it to all servers, ❔ to send to another channel, ✅ to send it to this channel, or ❎ to cancel"))
+        await asyncio.sleep(0.25)
         await Meowth.add_reaction(rusure,"🌎") #globe
     else:
         rusure = await Meowth.send_message(channel,_("That's what you sent, does it look good? React with ❔ to send to another channel, ✅ to send it to this channel, or ❎ to cancel"))
+    await asyncio.sleep(0.25)
     await Meowth.add_reaction(rusure,"❔") #question
+    await asyncio.sleep(0.25)
     await Meowth.add_reaction(rusure,"✅") #checkmark
+    await asyncio.sleep(0.25)
     await Meowth.add_reaction(rusure,"❎") #cross
     res = await Meowth.wait_for_reaction(['🌎','❔','✅','❎'], message=rusure, check=check, timeout=60)
     if res is not None:
@@ -1136,15 +1145,10 @@ async def announce(ctx,*,announce=None):
             count = 0
             for server in Meowth.servers:
                 destination = server.owner
-                e = discord.Embed(colour=discord.Colour.light_grey(), description=announce)
-                title = "Announcement"
-                e.set_footer(text="For support, contact us on our Discord server. Invite Code: hhVjAN8")
-                if Meowth.user.avatar_url:
-                    e.set_author(name=title, icon_url=Meowth.user.avatar_url)
-                else:
-                    e.set_author(name=title)
+                embeddraft.set_footer(text="For support, contact us on our Discord server. Invite Code: hhVjAN8")
+                embeddraft.colour = discord.Colour.lighter_grey()
                 try:
-                    await Meowth.send_message(destination,embed=e)
+                    await Meowth.send_message(destination,embed=embeddraft)
                 except:
                     failed += 1
                     logger.info("Announcement Delivery Failure: {} - {}".format(destination.name,server.name))
@@ -1154,7 +1158,6 @@ async def announce(ctx,*,announce=None):
                 confirmation = await Meowth.send_message(channel,"Announcement sent to {} server owners: {} successful, {} failed.".format(count, sent, failed))
         await asyncio.sleep(10)
         await Meowth.delete_message(confirmation)
-        return
     else:
         await Meowth.delete_message(rusure)
         confirmation = await Meowth.send_message(channel,_("Announcement Timed Out."))
@@ -2497,7 +2500,9 @@ async def duplicate(ctx):
 
     if dupecount >= 3:
         rusure = await Meowth.send_message(channel,_("Meowth! Are you sure you wish to remove this raid?"))
+        await asyncio.sleep(0.25)
         await Meowth.add_reaction(rusure,"✅") #checkmark
+        await asyncio.sleep(0.25)
         await Meowth.add_reaction(rusure,"❎") #cross
         def check(react,user):
             if user.id != author.id:

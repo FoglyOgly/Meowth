@@ -1129,7 +1129,7 @@ async def announce(ctx,*,announce=None):
             await Meowth.delete_message(rusure)
             channelwait = await Meowth.send_message(channel, "What channel would you like me to send it to?")
             channelmsg = await Meowth.wait_for_message(author=ctx.message.author, timeout=60)
-            sendchannel = discord.utils.get(server.channels, name = channelmsg.content)
+            sendchannel = discord.utils.get(server.channels, name = channelmsg.clean_content.strip())
             print(channelmsg.content)
             print(sendchannel)
             if channelmsg is not None and sendchannel is not None:

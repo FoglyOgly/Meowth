@@ -65,7 +65,7 @@ logger = setup_logger('discord','logs/meowth.log',logging.INFO)
 def _get_prefix(bot,message):
     server = message.server
     try:
-         set_prefix = bot.server_dict[server]["prefix"]
+        set_prefix = bot.server_dict[server]["prefix"]
     except KeyError:
         set_prefix = None
     default_prefix = bot.config["default_prefix"]

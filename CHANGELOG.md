@@ -37,6 +37,8 @@ Raid channels that recently expired may not have been picked up properly when Me
 
 9. Backend has had a restructure and tidy.
 
+10. `!announce` command has been added. Use this to announce to your server. [2.14.5]
+
 ### Changes in 2.13
 
 

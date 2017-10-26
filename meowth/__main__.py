@@ -1088,32 +1088,97 @@ async def prefix(ctx):
     prefix = _get_prefix(Meowth,ctx.message)
     await Meowth.send_message(ctx.message.channel,"Prefix for this server is: `{}`".format(prefix))
 
-@Meowth.command(pass_context=True)
-@checks.is_owner()
-async def announce(ctx,*,message:str):
-    """Sends a DM to all server owners."""
-    failed = 0
-    sent = 0
-    count = 0
-    for server in Meowth.servers:
-        destination = server.owner
-        e = discord.Embed(colour=discord.Colour.light_grey(), description=message)
-        title = "Announcement"
-        e.set_footer(text="For support, contact us on our Discord server. Invite Code: hhVjAN8")
-        if Meowth.user.avatar_url:
-            e.set_author(name=title, icon_url=Meowth.user.avatar_url)
-        else:
-            e.set_author(name=title)
-        try:
-            await Meowth.send_message(destination,embed=e)
-        except:
-            failed += 1
-            logger.info("Announcement Delivery Failure: {} - {}".format(destination.name,server.name))
-        else:
-            sent += 1
-        count += 1
 
-    await Meowth.send_message(ctx.message.channel,"Announcement sent to {} server owners: {} successful, {} failed.".format(count, sent, failed))
+
+@Meowth.command(pass_context=True)
+@commands.has_permissions(manage_server=True)
+async def announce(ctx,*,announce=None):
+    """Repeats your message in an embed from Meowth"""
+    message = ctx.message
+    channel = message.channel
+    server = message.server
+    author = message.author
+    if announce is None:
+        announcewait = await Meowth.send_message(channel, "I'll wait for your announcement!")
+        announcemsg = await Meowth.wait_for_message(author=ctx.message.author, timeout=60)
+        await Meowth.delete_message(announcewait)
+        if announcemsg is not None:
+            announce = announcemsg.content
+            await Meowth.delete_message(announcemsg)
+        else:
+            confirmation = await Meowth.send_message(channel, "Meowth! You took too long to send me your announcement! Retry when you're ready.")
+    embeddraft = discord.Embed(colour=server.me.colour, description=announce)
+    title = "Announcement"
+    if Meowth.user.avatar_url:
+        embeddraft.set_author(name=title, icon_url=Meowth.user.avatar_url)
+    else:
+        embeddraft.set_author(name=title)
+    draft = await Meowth.send_message(channel,embed=embeddraft)
+    def check(react,user):
+        if user.id is not author.id:
+            return False
+        return True
+    reaction_list = ['❔','✅','❎']
+    owner_msg_add = ""
+    if checks.is_owner_check(ctx):
+        owner_msg_add = "🌎 to send it to all servers, "
+        reaction_list.insert(0,'🌎')
+    rusure = await Meowth.send_message(channel,_("That's what you sent, does it look good? React with {}❔ to send to another channel, ✅ to send it to this channel, or ❎ to cancel").format(owner_msg_add))
+    for r in reaction_list:
+        await asyncio.sleep(0.25)
+        await Meowth.add_reaction(rusure,r)
+    res = await Meowth.wait_for_reaction(reaction_list, message=rusure, check=check, timeout=60)
+    if res is not None:
+        await Meowth.delete_message(rusure)
+        if res.reaction.emoji == "❎":
+            confirmation = await Meowth.send_message(channel,_("Announcement Cancelled."))
+            await Meowth.delete_message(draft)
+        elif res.reaction.emoji == "✅":
+            confirmation = await Meowth.send_message(channel,_("Announcement Sent."))
+        elif res.reaction.emoji == "❔":
+            channelwait = await Meowth.send_message(channel, "What channel would you like me to send it to?")
+            channelmsg = await Meowth.wait_for_message(author=ctx.message.author, timeout=60)
+            try:
+                sendchannel = commands.ChannelConverter(ctx, str(channelmsg.content).strip()).convert()
+            except commands.BadArgument:
+                sendchannel = None
+            print(sendchannel)
+            if channelmsg is not None and sendchannel is not None:
+                announcement = await Meowth.send_message(sendchannel, embed=embeddraft)
+                confirmation = await Meowth.send_message(channel,_("Announcement Sent."))
+            elif sendchannel is None:
+                confirmation = await Meowth.send_message(channel, "Meowth! That channel doesn't exist! Retry when you're ready.")
+            else:
+                confirmation = await Meowth.send_message(channel, "Meowth! You took too long to send me your announcement! Retry when you're ready.")
+            await Meowth.delete_message(channelwait)
+            await Meowth.delete_message(channelmsg)
+            await Meowth.delete_message(draft)
+        elif res.reaction.emoji == "🌎" and checks.is_owner_check(ctx):
+            failed = 0
+            sent = 0
+            count = 0
+            for server in Meowth.servers:
+                destination = server.owner
+                embeddraft.set_footer(text="For support, contact us on our Discord server. Invite Code: hhVjAN8")
+                embeddraft.colour = discord.Colour.lighter_grey()
+                try:
+                    await Meowth.send_message(destination,embed=embeddraft)
+                except:
+                    failed += 1
+                    logger.info("Announcement Delivery Failure: {} - {}".format(destination.name,server.name))
+                else:
+                    sent += 1
+                count += 1
+                confirmation = await Meowth.send_message(channel,"Announcement sent to {} server owners: {} successful, {} failed.".format(count, sent, failed))
+        await asyncio.sleep(10)
+        await Meowth.delete_message(confirmation)
+    else:
+        await Meowth.delete_message(rusure)
+        confirmation = await Meowth.send_message(channel,_("Announcement Timed Out."))
+        await asyncio.sleep(10)
+        await Meowth.delete_message(confirmation)
+    await asyncio.sleep(30)
+    await Meowth.delete_message(message)
 
 """
 
@@ -1320,7 +1385,7 @@ async def unwant(ctx):
         else:
             # If user is not already wanting the Pokemon,
             # print a less noisy message
-            if role not in ctx.message.author.roles:
+            if role not in message.author.roles:
                 await Meowth.add_reaction(message, '✅')
             else:
                 await Meowth.remove_roles(message.author, role)
@@ -2188,7 +2253,7 @@ Message **!starting** when the raid is beginning to clear the raid's 'here' list
     for trainer in trainer_dict.keys():
         if trainer_dict[trainer]['status'] =='maybe' or trainer_dict[trainer]['status'] =='omw' or trainer_dict[trainer]['status'] =='waiting':
             trainer_list.append(trainer)
-    await Meowth.send_message(raid_channel, content = _("Meowth! Trainers {trainer_list}: The raid egg has just hatched into a {pokemon} raid!\nYou're now able to update your status with **!coming** or **!here**. If you've changed your plans, use **!cancel**.").format(trainer_list=", ".join(trainer_list), pokemon=raid.mention), embed = raid_embed)
+    await Meowth.send_message(raid_channel, content = _("Meowth! Trainers {trainer_list}: The raid egg has just hatched into a {pokemon} raid!\nIf you couldn't before, you're now able to update your status with **!coming** or **!here**. If you've changed your plans, use **!cancel**.").format(trainer_list=", ".join(trainer_list), pokemon=raid.mention), embed = raid_embed)
 
     event_loop.create_task(expiry_check(raid_channel))
 
@@ -2532,7 +2597,9 @@ async def duplicate(ctx):
 
     if dupecount >= 3:
         rusure = await Meowth.send_message(channel,_("Meowth! Are you sure you wish to remove this raid?"))
+        await asyncio.sleep(0.25)
         await Meowth.add_reaction(rusure,"✅") #checkmark
+        await asyncio.sleep(0.25)
         await Meowth.add_reaction(rusure,"❎") #cross
         def check(react,user):
             if user.id != author.id:
@@ -2591,7 +2658,9 @@ async def location(ctx):
         locurl = oldembed['url']
         newembed = discord.Embed(title=oldembed['title'],url=locurl,description=oldembed['description'],colour=server.me.colour)
         newembed.set_thumbnail(url=oldembed['thumbnail']['url'])
-        await Meowth.send_message(channel, content = _("Meowth! Here's the current location for the raid!\nDetails:{location}").format(location = location), embed = newembed)
+        locationmsg = await Meowth.send_message(channel, content = _("Meowth! Here's the current location for the raid!\nDetails:{location}").format(location = location), embed = newembed)
+        await asyncio.sleep(60)
+        await Meowth.delete_message(locationmsg)
 
 @location.command(pass_context=True)
 @checks.activeraidchannel()

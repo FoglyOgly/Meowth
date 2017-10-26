@@ -1098,22 +1098,17 @@ async def announce(ctx,*,announce=None):
     def check(react,user):
         if user.id is not author.id:
             return False
-        elif user.id is not Meowth.owner.id and react.emoji is '🌎':
-            return False
         return True
+    reaction_list = ['❔','✅','❎']
+    owner_msg_add = ""
     if checks.is_owner():
-        rusure = await Meowth.send_message(channel,_("That's what you sent, does it look good? React with 🌎 to send it to all servers, ❔ to send to another channel, ✅ to send it to this channel, or ❎ to cancel"))
+        owner_msg_add = "🌎 to send it to all servers, "
+        reaction_list.append('🌎')
+    rusure = await Meowth.send_message(channel,_("That's what you sent, does it look good? React with {}❔ to send to another channel, ✅ to send it to this channel, or ❎ to cancel").format())
+    for r in reaction_list:
         await asyncio.sleep(0.25)
-        await Meowth.add_reaction(rusure,"🌎") #globe
-    else:
-        rusure = await Meowth.send_message(channel,_("That's what you sent, does it look good? React with ❔ to send to another channel, ✅ to send it to this channel, or ❎ to cancel"))
-    await asyncio.sleep(0.25)
-    await Meowth.add_reaction(rusure,"❔") #question
-    await asyncio.sleep(0.25)
-    await Meowth.add_reaction(rusure,"✅") #checkmark
-    await asyncio.sleep(0.25)
-    await Meowth.add_reaction(rusure,"❎") #cross
-    res = await Meowth.wait_for_reaction(['🌎','❔','✅','❎'], message=rusure, check=check, timeout=60)
+        await Meowth.add_reaction(rusure,r)
+    res = await Meowth.wait_for_reaction(reaction_list, message=rusure, check=check, timeout=60)
     if res is not None:
         await Meowth.delete_message(rusure)
         if res.reaction.emoji == "❎":
@@ -1139,7 +1134,7 @@ async def announce(ctx,*,announce=None):
             await Meowth.delete_message(channelwait)
             await Meowth.delete_message(channelmsg)
             await Meowth.delete_message(draft)
-        elif res.reaction.emoji == "🌎" and checks.is_owner():
+        elif res.reaction.emoji == "🌎" and checks.is_owner_check(ctx):
             failed = 0
             sent = 0
             count = 0

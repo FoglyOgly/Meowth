@@ -1073,14 +1073,13 @@ async def prefix(ctx):
 
 @Meowth.command(pass_context=True)
 @commands.has_permissions(manage_server=True)
-async def announce(ctx):
+async def announce(ctx,*,announce=None):
     """Repeats your message in an embed from Meowth"""
     message = ctx.message
     channel = message.channel
     server = message.server
     author = message.author
-    await Meowth.delete_message(message)
-    if len(message.content.split()) <= 1:
+    if announce is None:
         announcewait = await Meowth.send_message(channel, "I'll wait for your announcement!")
         announcemsg = await Meowth.wait_for_message(author=ctx.message.author, timeout=60)
         if announcemsg is not None:
@@ -1094,30 +1093,24 @@ async def announce(ctx):
             await Meowth.delete_message(confirmation)
             return
     else:
-        announcemsg = message.content.split()
-        del announcemsg[0]
-        announce = " ".join(announcemsg)
+        announcemsg = announce
     embeddraft = discord.Embed(colour=server.me.colour, description=announce)
     draft = await Meowth.send_message(channel,embed=embeddraft)
+    def check(react,user):
+        if user.id is not author.id:
+            return False
+        elif user.id is not Meowth.owner.id and react.emoji is '🌎':
+            return False
+        return True
     if checks.is_owner():
-        rusure = await Meowth.send_message(channel,_("That's what you sent, does it look good? React with 🌎 to send it to all servers, ✅ to send it to this channel, or ❎ to cancel"))
+        rusure = await Meowth.send_message(channel,_("That's what you sent, does it look good? React with 🌎 to send it to all servers, ❔ to send to another channel, ✅ to send it to this channel, or ❎ to cancel"))
         await Meowth.add_reaction(rusure,"🌎") #globe
-        await Meowth.add_reaction(rusure,"✅") #checkmark
-        await Meowth.add_reaction(rusure,"❎") #cross
-        def check(react,user):
-            if user.id != author.id:
-                return False
-            return True
-        res = await Meowth.wait_for_reaction(['🌎','✅','❎'], message=rusure, check=check, timeout=60)
     else:
-        rusure = await Meowth.send_message(channel,_("That's what you sent, does it look good? React with ✅ to send it to this channel, or ❎ to cancel"))
-        await Meowth.add_reaction(rusure,"✅") #checkmark
-        await Meowth.add_reaction(rusure,"❎") #cross
-        def check(react,user):
-            if user.id != author.id:
-                return False
-            return True
-        res = await Meowth.wait_for_reaction(['✅','❎'], message=rusure, check=check, timeout=60)
+        rusure = await Meowth.send_message(channel,_("That's what you sent, does it look good? React with ❔ to send to another channel, ✅ to send it to this channel, or ❎ to cancel"))
+    await Meowth.add_reaction(rusure,"❔") #question
+    await Meowth.add_reaction(rusure,"✅") #checkmark
+    await Meowth.add_reaction(rusure,"❎") #cross
+    res = await Meowth.wait_for_reaction(['🌎','❔','✅','❎'], message=rusure, check=check, timeout=60)
     if res is not None:
         if res.reaction.emoji == "❎":
             await Meowth.delete_message(rusure)
@@ -1132,6 +1125,37 @@ async def announce(ctx):
             await asyncio.sleep(5)
             await Meowth.delete_message(confirmation)
             return
+        elif res.reaction.emoji == "❔":
+            await Meowth.delete_message(rusure)
+            channelwait = await Meowth.send_message(channel, "What channel would you like me to send it to?")
+            channelmsg = await Meowth.wait_for_message(author=ctx.message.author, timeout=60)
+            sendchannel = discord.utils.get(server.channels, name = channelmsg.content)
+            print(channelmsg.content)
+            print(sendchannel)
+            if channelmsg is not None and sendchannel is not None:
+                await Meowth.delete_message(channelwait)
+                await Meowth.delete_message(channelmsg)
+                await Meowth.delete_message(draft)
+                announcement = await Meowth.send_message(sendchannel, embed=embeddraft)
+                confirmation = await Meowth.send_message(channel,_("Announcement Sent."))
+                await asyncio.sleep(5)
+                await Meowth.delete_message(confirmation)
+                return
+            elif sendchannel is None:
+                await Meowth.delete_message(channelwait)
+                await Meowth.delete_message(channelmsg)
+                await Meowth.delete_message(draft)
+                confirmation = await Meowth.send_message(channel, "Meowth! That channel doesn't exist! Retry when you're ready.")
+                await asyncio.sleep(10)
+                await Meowth.delete_message(confirmation)
+            else:
+                await Meowth.delete_message(channelwait)
+                await Meowth.delete_message(channelmsg)
+                await Meowth.delete_message(draft)
+                confirmation = await Meowth.send_message(channel, "Meowth! You took too long to send me your announcement! Retry when you're ready.")
+                await asyncio.sleep(10)
+                await Meowth.delete_message(confirmation)
+                return
         elif res.reaction.emoji == "🌎" and checks.is_owner():
             await Meowth.delete_message(rusure)
             failed = 0
@@ -1163,6 +1187,9 @@ async def announce(ctx):
         confirmation = await Meowth.send_message(channel,_("Announcement Timed Out."))
         await asyncio.sleep(5)
         await Meowth.delete_message(confirmation)
+    await asyncio.sleep(30)
+    await Meowth.delete_message(message)
+
 
 """
 

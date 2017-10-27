@@ -695,12 +695,13 @@ async def configure(ctx):
             await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="I'm sorry I don't understand. Please reply with either **N** to disable, or **Y** to enable."))
             continue
     #configure welcome
-    await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="I can welcome new members to the server with a short message. Here is an example:").set_author(name="Welcome Message", icon_url=Meowth.user.avatar_url))
+    welcomeconfig = "I can welcome new members to the server with a short message. Here is an example:\n\n"
     if server_dict_temp['team'] == True:
-        await Meowth.send_message(owner, _("Meowth! Welcome to {server_name}, {owner_name.mention}! Set your team by typing '**!team mystic**' or '**!team valor**' or '**!team instinct**' without quotations. If you have any questions just ask an admin.").format(server_name=server.name, owner_name=owner))
+        welcomeconfig += _("Meowth! Welcome to {server_name}, {owner_name.mention}! Set your team by typing '**!team mystic**' or '**!team valor**' or '**!team instinct**' without quotations. If you have any questions just ask an admin.").format(server_name=server.name, owner_name=owner)
     else:
-        await Meowth.send_message(owner, _("Meowth! Welcome to {server_name}, {owner_name.mention}! If you have any questions just ask an admin.").format(server_name=server, owner_name=owner))
-    await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="This welcome message can be in a specific channel or a direct message. If you have a bot that handles this already, you may want to disable this feature.\n\nRespond with: **N** to disable, **Y** to enable:").set_author(name="Welcome Message", icon_url=Meowth.user.avatar_url))
+        welcomeconfig += _("Meowth! Welcome to {server_name}, {owner_name.mention}! If you have any questions just ask an admin.").format(server_name=server, owner_name=owner)
+    welcomeconfig += "\n\nThis welcome message can be in a specific channel or a direct message. If you have a bot that handles this already, you may want to disable this feature.\n\nRespond with: **N** to disable, **Y** to enable:"
+    await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=welcomeconfig).set_author(name="Welcome Message", icon_url=Meowth.user.avatar_url))
     while True:
         welcomereply = await Meowth.wait_for_message(author = owner, check=lambda message: message.server is None)
         if welcomereply.content.lower() == "y":

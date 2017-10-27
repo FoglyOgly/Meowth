@@ -39,6 +39,8 @@ Raid channels that recently expired may not have been picked up properly when Me
 
 10. `!announce` command has been added. Use this to announce to your server. [2.14.5]
 
+11. Spruced up the `!configure` process. More to come. [2.14.6]
+
 ### Changes in 2.13
 
 

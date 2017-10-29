@@ -11,7 +11,7 @@ import datetime
 from dateutil.relativedelta import relativedelta
 import copy
 from time import strftime
-import logging
+from meowth.logs import init_loggers
 import discord
 from discord.ext import commands
 import spelling
@@ -34,33 +34,7 @@ if os.name == 'nt':
 else:
     tesseract_config = xtraconfig
 
-formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s')
-def setup_logger(name, log_file, level):
-
-    logger = logging.getLogger(name)
-    logger.setLevel(level)
-    handler = logging.FileHandler(log_file, encoding='utf-8', mode='w')
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-
-    return logger
-
-try:
-    os.makedirs("logs")
-except OSError as exception:
-    pass
-
-try:
-    os.remove('logs/meowth_backup.log')
-except OSError as e:
-    pass
-
-try:
-    os.rename('logs/meowth.log', 'logs/meowth_backup.log')
-except OSError:
-    pass
-
-logger = setup_logger('discord','logs/meowth.log',logging.INFO)
+logger = init_loggers()
 
 def _get_prefix(bot,message):
     server = message.server

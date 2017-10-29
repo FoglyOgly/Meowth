@@ -65,7 +65,6 @@ def custom_error_handling(bot,logger):
             pages = bot.formatter.format_help_for(ctx,ctx.command)
             for page in pages:
                 await bot.send_message(ctx.message.channel, page)
-                print("Bad arg: "+str(ctx.args)+"\n"+str(error))
 
         elif isinstance(error, commands.CommandNotFound):
             pass

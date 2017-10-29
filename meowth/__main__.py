@@ -150,7 +150,7 @@ Helper functions
 ======================
 
 """
-        
+
 def _set_prefix(bot,server,prefix):
     bot.server_dict[server]["prefix"] = prefix
 
@@ -465,6 +465,7 @@ async def channel_cleanup(loop=True):
 
                         event_loop.create_task(expire_channel(channel))
                         logger.info(log_str+" - = RECENTLY EXPIRED NONACTIVE RAID")
+                        continue
 
                     #if the channel save data shows it as an active raid still
                     elif serverdict_chtemp[server]['raidchannel_dict'][channel]['active'] == True:
@@ -1050,7 +1051,7 @@ async def prefix(ctx,prefix=None):
             await Meowth.send_message(ctx.message.channel,"Prefix can only be 1 character in length. Please try again.".format(prefix))
             return
 
-    _set_prefix(Meowth,ctx.message.server,prefix)  
+    _set_prefix(Meowth,ctx.message.server,prefix)
 
     if prefix is not None:
         await Meowth.send_message(ctx.message.channel,"Prefix has been set to: `{}`".format(prefix))
@@ -1097,7 +1098,7 @@ async def announce(ctx,*,message:str):
         else:
             sent += 1
         count += 1
-    
+
     await Meowth.send_message(ctx.message.channel,"Announcement sent to {} server owners: {} successful, {} failed.".format(count, sent, failed))
 
 """

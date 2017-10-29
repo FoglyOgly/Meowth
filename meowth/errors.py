@@ -51,54 +51,15 @@ class RegionEggChannelCheckFail(CommandError):
     """Exception raised checks.cityeggchannel fails"""
     pass
 
-def missing_arg_msg(ctx):
-    prefix = ctx.prefix.replace(ctx.bot.user.mention, '@' + ctx.bot.user.name)
-    command = ctx.invoked_with
-    callback = ctx.command.callback
-    sig = list(signature(callback).parameters.keys())
-    args, varargs, varkw, defaults, kwonlyargs, kwonlydefaults, annotations = getfullargspec(callback)
-
-    rq_args = []
-    nr_args = []
-
-    #get required args
-    if defaults:
-        rqargs = args[:-len(defaults)]
-    else:
-        rqargs = args
-    if varargs:
-        if varargs != "args":
-            rqargs.append(varargs)
-    print("\n\nMissing Args Error Details:")
-    print("  args: "+str(args))
-    print("  varargs: "+str(varargs))
-    print("  varkw: "+str(varkw))
-    print("  defaults: "+str(defaults))
-    print("  kwonlyargs: "+str(kwonlyargs))
-    print("  kwonlydefaults: "+str(kwonlydefaults))
-    print("  annotations: "+str(annotations))
-
-    arg_num = len(ctx.args)-1
-
-    sig.remove('ctx')
-    args_missing = sig[arg_num:]
-    msg = "Meowth! I'm missing some details! Usage: {prefix}{command}".format(prefix=prefix,command=command)
-
-    for a in sig:
-        if a in args_missing:
-            msg+=" **<"+a+">**"
-        else:
-            msg+=" <"+a+">"
-
-    return msg
-
 def custom_error_handling(bot,logger):
     @bot.event
     async def on_command_error(error, ctx):
         channel = ctx.message.channel
 
         if isinstance(error, commands.MissingRequiredArgument):
-            await bot.send_message(ctx.message.channel, missing_arg_msg(ctx))
+            pages = bot.formatter.format_help_for(ctx,ctx.command)
+            for page in pages:
+                await bot.send_message(ctx.message.channel, page)
 
         elif isinstance(error, commands.BadArgument):
             pages = bot.formatter.format_help_for(ctx,ctx.command)

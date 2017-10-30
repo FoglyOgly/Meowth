@@ -439,9 +439,6 @@ async def channel_cleanup(loop=True):
 
                         event_loop.create_task(expire_channel(channel))
                         logger.info(log_str+" - = RECENTLY EXPIRED NONACTIVE RAID")
-
-                        event_loop.create_task(expire_channel(channel))
-                        logger.info(log_str+" - = RECENTLY EXPIRED NONACTIVE RAID")
                         continue
 
                     #if the channel save data shows it as an active raid still
@@ -1027,7 +1024,6 @@ async def prefix(ctx,prefix=None):
         if len(prefix) > 1:
             await Meowth.send_message(ctx.message.channel,"Prefix can only be 1 character in length. Please try again.".format(prefix))
             return
-
 
     _set_prefix(Meowth,ctx.message.server,prefix)
 

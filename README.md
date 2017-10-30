@@ -52,18 +52,11 @@ Get the installer [HERE](https://github.com/tesseract-ocr/tesseract/wiki/Downloa
 
 6. Create a bot user for your app and reveal the bot token to copy it.
 
-7. Copy config_blank.json and rename to config.json. 
+7. Copy config_blank.json and rename to config.json. Open config.json in a text editor (a good one to use is Notepad++) and paste the bot token into the value for "bot_token", replacing the "yourtoken" string.
 
-8. Open config.json in a text editor (a good one to use is Notepad++) and paste the bot token into the value for "bot_token", replacing the "yourtoken" string.
+8. Replace the "master" value in config.json with your user ID from discord.
 
-9. Replace the "master" value in config.json with your user ID from discord.
-
-10. Go to the following link, replacing <CLIENT_ID> with the Client ID you copied.
-`https://discordapp.com/oauth2/authorize?client_id=<CLIENT_ID>&scope=bot&permissions=268822608`
-
-11. Select the server you want to add Meowth to and complete the prompts. If you get to an empty screen and didn't get to see the Google new reCaptcha tickbox, disable your adblocker.
-
-12. Run the launcher from the command prompt or terminal window:
+9. Run the launcher from the command prompt or terminal window:
 
 Linux:
 ```bash
@@ -76,11 +69,16 @@ py launcher.py -s
 
 If successful, it should show "Meowth! That's right!".
 
-13. Go back to your Discord application page and copy the Client ID.
+10. Go back to your Discord application page and copy the Client ID.
 
-14. The bot should have sent you DM in Discord. Add the team roles: mystic, instinct and valor. Ensure they're below the bot role in the server role hierarchy.
+11. Go to the following link, replacing <CLIENT_ID> with the Client ID you copied.
+`https://discordapp.com/oauth2/authorize?client_id=<CLIENT_ID>&scope=bot&permissions=268822608`
 
-15. Simply type !configure in your server to start the configuration process.
+12. Select the server you want to add Meowth to and complete the prompts. If you get to an empty screen and didn't get to see the Google new reCaptcha tickbox, disable your adblocker.
+
+9. The bot should now have sent you DM in Discord. Add the team roles: mystic, instinct and valor. Ensure they're below the bot role in the server role hierarchy.
+
+10. Simply type !configure in your server to start the configuration process.
 
 ### Launcher Reference:
 Arguments:

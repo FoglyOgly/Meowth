@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 from discord.ext.commands.errors import CommandError
-from inspect import signature, getfullargspec
 
 class TeamSetCheckFail(CommandError):
     """Exception raised checks.teamset fails"""
@@ -28,10 +27,6 @@ class WantChannelCheckFail(CommandError):
     pass
 
 class RaidChannelCheckFail(CommandError):
-    """Exception raised checks.raidchannel fails"""
-    pass
-
-class EggChannelCheckFail(CommandError):
     """Exception raised checks.raidchannel fails"""
     pass
 
@@ -94,15 +89,11 @@ def custom_error_handling(bot,logger):
 
         elif isinstance(error, CityChannelCheckFail):
             server = ctx.message.server
-            msg = "Meowth! Please use **!{cmd_name}** in ".format(cmd_name=ctx.command.name)
+            msg = "Meowth! Please use **!{cmd_name}** in one of the following region channels:".format(cmd_name=ctx.command.name)
             city_channels = bot.server_dict[server]['city_channels']
-            if len(city_channels) > 10:
-                msg+="a Region report channel."
-            else:
-                msg+="one of the following region channels:"
-                for c in city_channels:
-                    channel = discord.utils.get(server.channels,name=c)
-                    msg += "\n" + channel.mention
+            for c in city_channels:
+                channel = discord.utils.get(server.channels,name=c)
+                msg += "\n" + channel.mention
             await bot.send_message(ctx.message.channel,msg)
             pass
 
@@ -127,29 +118,11 @@ def custom_error_handling(bot,logger):
 
         elif isinstance(error, RaidChannelCheckFail):
             server = ctx.message.server
-            msg = "Meowth! Please use **!{cmd_name}** in a Raid channel. Use **!list** in any ".format(cmd_name=ctx.command.name)
+            msg = "Meowth! Please use **!{cmd_name}** in a Raid channel. Use **!list** in any of the following region channels to see active raids:".format(cmd_name=ctx.command.name)
             city_channels = bot.server_dict[server]['city_channels']
-            if len(city_channels) > 10:
-                msg+="Region report channel to see active raids."
-            else:
-                msg+="of the following Region channels to see active raids:"
-                for c in city_channels:
-                    channel = discord.utils.get(server.channels,name=c)
-                    msg += "\n" + channel.mention
-            await bot.send_message(ctx.message.channel,msg)
-            pass
-
-        elif isinstance(error, RaidChannelCheckFail):
-            server = ctx.message.server
-            msg = "Meowth! Please use **!{cmd_name}** in an Egg channel. Use **!list** in any ".format(cmd_name=ctx.command.name)
-            city_channels = bot.server_dict[server]['city_channels']
-            if len(city_channels) > 10:
-                msg+="Region report channel to see active raids."
-            else:
-                msg+="of the following Region channels to see active raids:"
-                for c in city_channels:
-                    channel = discord.utils.get(server.channels,name=c)
-                    msg += "\n" + channel.mention
+            for c in city_channels:
+                channel = discord.utils.get(server.channels,name=c)
+                msg += "\n" + channel.mention
             await bot.send_message(ctx.message.channel,msg)
             pass
 
@@ -160,43 +133,31 @@ def custom_error_handling(bot,logger):
 
         elif isinstance(error, ActiveRaidChannelCheckFail):
             server = ctx.message.server
-            msg = "Meowth! Please use **!{cmd_name}** in an Active Raid channel. Use **!list** in any ".format(cmd_name=ctx.command.name)
+            msg = "Meowth! Please use **!{cmd_name}** in an Active Raid channel. Use **!list** in any of the following region channels to see active raids:".format(cmd_name=ctx.command.name)
             city_channels = bot.server_dict[server]['city_channels']
-            if len(city_channels) > 10:
-                msg+="Region report channel to see active raids."
-            else:
-                msg+="of the following Region channels to see active raids:"
-                for c in city_channels:
-                    channel = discord.utils.get(server.channels,name=c)
-                    msg += "\n" + channel.mention
+            for c in city_channels:
+                channel = discord.utils.get(server.channels,name=c)
+                msg += "\n" + channel.mention
             await bot.send_message(ctx.message.channel,msg)
             pass
 
         elif isinstance(error, CityRaidChannelCheckFail):
             server = ctx.message.server
-            msg = "Meowth! Please use **!{cmd_name}** in either a Raid channel or ".format(cmd_name=ctx.command.name)
+            msg = "Meowth! Please use **!{cmd_name}** in either a Raid channel or one of the following region channels:".format(cmd_name=ctx.command.name)
             city_channels = bot.server_dict[server]['city_channels']
-            if len(city_channels) > 10:
-                msg+="a Region report channel."
-            else:
-                msg+="one of the following region channels:"
-                for c in city_channels:
-                    channel = discord.utils.get(server.channels,name=c)
-                    msg += "\n" + channel.mention
+            for c in city_channels:
+                channel = discord.utils.get(server.channels,name=c)
+                msg += "\n" + channel.mention
             await bot.send_message(ctx.message.channel,msg)
             pass
 
         elif isinstance(error, RegionEggChannelCheckFail):
             server = ctx.message.server
-            msg = "Meowth! Please use **!{cmd_name}** in either a Raid Egg channel or ".format(cmd_name=ctx.command.name)
+            msg = "Meowth! Please use **!{cmd_name}** in either a Raid Egg channel or one of the following region channels:".format(cmd_name=ctx.command.name)
             city_channels = bot.server_dict[server]['city_channels']
-            if len(city_channels) > 10:
-                msg+="a Region report channel."
-            else:
-                msg+="one of the following region channels:"
-                for c in city_channels:
-                    channel = discord.utils.get(server.channels,name=c)
-                    msg += "\n" + channel.mention
+            for c in city_channels:
+                channel = discord.utils.get(server.channels,name=c)
+                msg += "\n" + channel.mention
             await bot.send_message(ctx.message.channel,msg)
             pass
 

@@ -1295,7 +1295,7 @@ async def want(ctx):
     channel = message.channel
     want_split = message.clean_content.lower().split()
     del want_split[0]
-    entered_want = " ".join(want_split)]
+    entered_want = " ".join(want_split)
     if entered_want not in pkmn_info['pokemon_list']:
         await Meowth.send_message(channel, spellcheck(entered_want))
         return

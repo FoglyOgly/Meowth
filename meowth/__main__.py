@@ -2245,7 +2245,7 @@ async def _eggtoraid(entered_raid, raid_channel):
         raid_messageauthor = raid_message.mentions[0]
     except IndexError:
         raid_messageauthor = "<@"+raid_message.raw_mentions[0]+">"
-        logger.info("Hatching Mention Failed - Trying alternative method: {} ({}) - {}".format(raid_channel.name,raid_channel.id,raid_channel.server.name))
+        logger.info("Hatching Mention Failed - Trying alternative method: channel: {} (id: {}) - server: {}".format(raid_channel.name,raid_channel.id,raid_channel.server.name))
     gymhuntrgps = eggdetails['gymhuntrgps']
     raidexp = eggdetails['exp'] + 60 * 60
     if entered_raid not in pkmn_info['pokemon_list']:

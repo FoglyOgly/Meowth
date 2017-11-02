@@ -404,7 +404,7 @@ To reactivate the channel, use !timerset to set the timer again."""))
                 elif gymhuntrdupe == True:
                     for overwrite in channel.overwrites:
                         await Meowth.edit_channel_permissions(channel, channel.server.default_role, overwrite=discord.PermissionOverwrite(read_messages=False))
-                        if "Meowth" not in overwrite[0].name:
+                        if server.me.top_role.name not in overwrite[0].name and server.me.name not in overwrite[0].name:
                             await Meowth.delete_channel_permissions(channel, overwrite[0])
                     await Meowth.send_message(channel, "-----------------------------------------------\n**The channel has been removed from view for everybody but Meowth and server owner to protect from future GymHuntr duplicates. It will be removed on its own, please do not remove it. Just ignore what happens in this channel.**\n-----------------------------------------------")
                     deltime = ((gymhuntrexp - time.time()) / 60) + 10

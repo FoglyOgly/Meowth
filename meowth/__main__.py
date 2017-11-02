@@ -684,11 +684,6 @@ async def on_server_remove(server):
 
 @Meowth.command(pass_context=True, hidden=True)
 @commands.has_permissions(manage_server=True)
-async def reset(ctx):
-    server_dict[ctx.message.server] = {'want_channel_list': [], 'offset': 0, 'welcome': False, 'welcomechan': '', 'wantset': False, 'raidset': False, 'wildset': False, 'team': False, 'want': False, 'other': False, 'done': False, 'raidchannel_dict' : {}}
-
-@Meowth.command(pass_context=True, hidden=True)
-@commands.has_permissions(manage_server=True)
 async def configure(ctx):
     server = ctx.message.server
     owner = ctx.message.author

@@ -465,9 +465,7 @@ async def channel_cleanup(loop=True):
 
                         event_loop.create_task(expire_channel(channel))
                         logger.info(log_str+" - = RECENTLY EXPIRED NONACTIVE RAID")
-
-                        event_loop.create_task(expire_channel(channel))
-                        logger.info(log_str+" - = RECENTLY EXPIRED NONACTIVE RAID")
+                        continue
 
                     #if the channel save data shows it as an active raid still
                     elif serverdict_chtemp[server]['raidchannel_dict'][channel]['active'] == True:
@@ -1372,7 +1370,7 @@ async def want(ctx):
     channel = message.channel
     want_split = message.clean_content.lower().split()
     del want_split[0]
-    entered_want = " ".join(want_split)]
+    entered_want = " ".join(want_split)
     if entered_want not in pkmn_info['pokemon_list']:
         await Meowth.send_message(channel, spellcheck(entered_want))
         return

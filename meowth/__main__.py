@@ -11,7 +11,7 @@ import datetime
 from dateutil.relativedelta import relativedelta
 import copy
 from time import strftime
-from meowth.logs import init_loggers
+from logs import init_loggers
 import discord
 from discord.ext import commands
 import spelling

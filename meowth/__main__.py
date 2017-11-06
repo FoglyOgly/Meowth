@@ -520,7 +520,7 @@ async def channel_cleanup(loop=True):
         try:
             await _save()
         except Exception as err:
-            logger.info("Channel_Cleanup - SAVING FAILED")
+            logger.info("Channel_Cleanup - SAVING FAILED" + err)
         logger.info("Channel_Cleanup ------ END ------")
 
         await asyncio.sleep(600)#600 default
@@ -555,7 +555,7 @@ async def server_cleanup(loop=True):
         try:
             await _save()
         except Exception as err:
-            logger.info("Server_Cleanup - SAVING FAILED")
+            logger.info("Server_Cleanup - SAVING FAILED" + err)
         logger.info("Server_Cleanup ------ END ------")
         await asyncio.sleep(1800)#1800 default
         continue

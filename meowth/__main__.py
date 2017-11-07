@@ -1549,8 +1549,8 @@ async def _raid(message):
         raidexp = False
 
     if raidexp is not False:
-        if _timercheck(raidexp):
-            await Meowth.send_message(message.channel, _("Meowth...that's too long. Raids currently last no more than one hour..."))
+        if _timercheck(raidexp, 45):
+            await Meowth.send_message(message.channel, _("Meowth...that's too long. Raids currently last no more than 45 minutes..."))
             return
 
     if entered_raid not in pkmn_info['pokemon_list']:
@@ -1666,8 +1666,10 @@ async def timerset(ctx,timer):
 
     if server_dict[server]['raidchannel_dict'][channel]['type'] == 'egg':
         raidtype = "Raid Egg"
+        maxtime = 60
     else:
         raidtype = "Raid"
+        maxtime = 45
 
     if timer.isdigit():
         raidexp = int(timer)
@@ -1684,14 +1686,13 @@ async def timerset(ctx,timer):
         await Meowth.send_message(channel, "Meowth! I couldn't understand your time format. Try again like this: **!timerset <minutes>**")
         return
 
-    if _timercheck(raidexp):
-        await Meowth.send_message(channel, _("Meowth...that's too long. {raidtype}s currently last no more than one hour...").format(raidtype=raidtype.capitalize()))
+    if _timercheck(raidexp, maxtime):
+        await Meowth.send_message(channel, _("Meowth...that's too long. {raidtype}s currently last no more than {maxtime} minutes...").format(raidtype=raidtype.capitalize(), maxtime=str(maxtime)))
         return
 
     await _timerset(channel, raidexp)
 
-def _timercheck(time):
-    maxtime = 60
+def _timercheck(time, maxtime):
     return time > maxtime
 
 async def _timerset(raidchannel, exptime):
@@ -1994,7 +1995,7 @@ async def _raidegg(message):
         raidexp = False
 
     if raidexp is not False:
-        if _timercheck(raidexp):
+        if _timercheck(raidexp, 60):
             await Meowth.send_message(message.channel, _("Meowth...that's too long. Raid Eggs currently last no more than one hour..."))
             return
 

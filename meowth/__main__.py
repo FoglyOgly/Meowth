@@ -2275,7 +2275,7 @@ This channel needs to be manually deleted!""").format(pokemon=entered_raid.capit
             if get_number(entered_raid) not in raid_info['raid_eggs'][egglevel]['pokemon']:
                 await Meowth.send_message(raid_channel, _("Meowth! The Pokemon {pokemon} does not hatch from level {level} raid eggs!").format(pokemon=entered_raid.capitalize(), level=egglevel))
                 return
-    raid_channel_name = raid_channel.name.replace(('exraid-egg'),entered_raid)    
+    raid_channel_name = entered_raid + "-" + sanitize_channel_name(egg_address)
     oldembed = raid_message.embeds[0]
     raid_gmaps_link = oldembed['url']
     raid = discord.utils.get(raid_channel.server.roles, name = entered_raid)

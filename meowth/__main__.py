@@ -1972,20 +1972,20 @@ async def _exraid(ctx):
     message = ctx.message
     channel = message.channel
     fromegg = False
-    exraidegg_split = message.clean_content.lower().split()
-    del exraidegg_split[0]
+    exraid_split = message.clean_content.lower().split()
+    del exraid_split[0]
     if message.channel in server_dict[message.channel.server]['raidchannel_dict'] and server_dict[message.channel.server]['raidchannel_dict'][message.channel]['type'] == 'exraid' and server_dict[message.channel.server]['raidchannel_dict'][message.channel]['pokemon'] == '':
         fromegg = True
     if fromegg is True:
-        await _eggtoraid(" ".join(exraidegg_split).lower(), message.channel)
+        await _eggtoraid(" ".join(exraid_split).lower(), message.channel)
         return
-    if len(exraidegg_split) <= 0:
-        await Meowth.send_message(channel, _("Meowth! Give more details when reporting! Usage: **!exraidegg <location>**"))
+    if len(exraid_split) <= 0:
+        await Meowth.send_message(channel, _("Meowth! Give more details when reporting! Usage: **!exraid <location>**"))
         return
-    raid_details = " ".join(exraidegg_split)
+    raid_details = " ".join(exraid_split)
     raid_details = raid_details.strip()
     if raid_details == '':
-        await Meowth.send_message(channel, _("Meowth! Give more details when reporting! Usage: **!exraidegg <location>**"))
+        await Meowth.send_message(channel, _("Meowth! Give more details when reporting! Usage: **!exraid <location>**"))
         return
 
     raid_gmaps_link = create_gmaps_query(raid_details, message.channel)
@@ -2275,7 +2275,7 @@ This channel needs to be manually deleted!""").format(pokemon=entered_raid.capit
             if get_number(entered_raid) not in raid_info['raid_eggs'][egglevel]['pokemon']:
                 await Meowth.send_message(raid_channel, _("Meowth! The Pokemon {pokemon} does not hatch from level {level} raid eggs!").format(pokemon=entered_raid.capitalize(), level=egglevel))
                 return
-    raid_channel_name = entered_raid + "-" + sanitize_channel_name(egg_address)
+    raid_channel_name = raid_channel.name.replace(('exraid-egg'),entered_raid)    
     oldembed = raid_message.embeds[0]
     raid_gmaps_link = oldembed['url']
     raid = discord.utils.get(raid_channel.server.roles, name = entered_raid)

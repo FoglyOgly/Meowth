@@ -1606,7 +1606,7 @@ This channel will be deleted five minutes after the timer expires.""").format(po
     server_dict[message.server]['raidchannel_dict'][raid_channel] = {
         'reportcity' : message.channel.name,
         'trainer_dict' : {},
-        'exp' : time.time() + 60 * 60, # One hour from now
+        'exp' : time.time() + 45 * 60, # 45 mins from now
         'manual_timer' : False, # No one has explicitly set the timer, Meowth is just assuming 2 hours
         'active' : True,
         'raidmessage' : raidmessage,

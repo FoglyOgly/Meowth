@@ -1642,7 +1642,7 @@ This channel will be deleted five minutes after the timer expires.""").format(po
     server_dict[message.server]['raidchannel_dict'][raid_channel] = {
         'reportcity' : message.channel.name,
         'trainer_dict' : {},
-        'exp' : time.time() + 60 * 60, # One hour from now
+        'exp' : time.time() + 45 * 60, # 45 mins from now
         'manual_timer' : False, # No one has explicitly set the timer, Meowth is just assuming 2 hours
         'active' : True,
         'raidmessage' : raidmessage,
@@ -2217,7 +2217,7 @@ async def _eggtoraid(entered_raid, raid_channel):
         raid_messageauthor = "<@"+raid_message.raw_mentions[0]+">"
         logger.info("Hatching Mention Failed - Trying alternative method: channel: {} (id: {}) - server: {}".format(raid_channel.name,raid_channel.id,raid_channel.server.name))
     gymhuntrgps = eggdetails['gymhuntrgps']
-    raidexp = eggdetails['exp'] + 60 * 60
+    raidexp = eggdetails['exp'] + 45 * 60
     if entered_raid not in pkmn_info['pokemon_list']:
         await Meowth.send_message(raid_channel, spellcheck(entered_raid))
         return

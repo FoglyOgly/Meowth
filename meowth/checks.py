@@ -234,3 +234,13 @@ def cityeggchannel():
             return True
         raise errors.RegionEggChannelCheckFail()
     return commands.check(predicate)
+
+def cityexraidchannel():
+    def predicate(ctx):
+        if check_raidchannel(ctx) == True:
+            if check_exraidchannel(ctx) == True:
+                return True
+        elif check_citychannel(ctx) == True:
+            return True
+        raise errors.RegionExRaidChannelCheckFail()
+    return commands.check(predicate)

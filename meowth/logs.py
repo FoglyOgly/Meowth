@@ -23,7 +23,7 @@ def init_loggers():
     stdout_handler.setFormatter(meowth_format)
     logger.setLevel(logging.INFO)
 
-    logfile_path = 'logs/meowth.log'
+    logfile_path = 'logs/log.txt'
     fhandler = logging.handlers.RotatingFileHandler(
         filename=str(logfile_path), encoding='utf-8', mode='a',
         maxBytes=400000, backupCount=20)

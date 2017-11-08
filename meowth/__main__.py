@@ -1184,7 +1184,7 @@ async def announce(ctx,*,announce=None):
                 else:
                     sent += 1
                 count += 1
-                confirmation = await Meowth.send_message(channel,"Announcement sent to {} server owners: {} successful, {} failed.".format(count, sent, failed))
+            confirmation = await Meowth.send_message(channel,"Announcement sent to {} server owners: {} successful, {} failed.".format(count, sent, failed))
         await asyncio.sleep(10)
         await Meowth.delete_message(confirmation)
     else:

@@ -885,7 +885,7 @@ async def configure(ctx):
                 server_channel_list = []
                 for channel in server.channels:
                     server_channel_list.append(channel.name)
-                diff = set(wantlist) - set(server_channel_list)
+                diff = set(want_list) - set(server_channel_list)
                 if not diff:
                     server_dict_temp['wantset']=True
                     await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.green(), description="Pokemon Notifications enabled"))

@@ -49,20 +49,20 @@ Meowth = commands.Bot(command_prefix=_get_prefix)
 custom_error_handling(Meowth,logger)
 
 try:
-    with open(r"data\serverdict", "rb") as fd:
+    with open(os.path.join('data', 'serverdict'), "rb") as fd:
         Meowth.server_dict = pickle.load(fd)
     logger.info("Serverdict Loaded Successfully")
 except OSError:
     logger.info("Serverdict Not Found - Looking for Backup")
     try:
-        with open(r"data\serverdict_backup", "rb") as fd:
+        with open(os.path.join('data', 'serverdict_backup'), "rb") as fd:
             Meowth.server_dict = pickle.load(fd)
         logger.info("Serverdict Backup Loaded Successfully")
     except OSError:
         logger.info("Serverdict Backup Not Found - Creating New Serverdict")
         Meowth.server_dict = {}
-        with open(r"data\serverdict", "wb") as fd:
-            pickle.dump(Meowth.server_dict, fd)
+        with open(os.path.join('data', 'serverdict'), "wb") as fd:
+            pickle.dump(Meowth.server_dict, fd, -1)
         logger.info("Serverdict Created")
 
 server_dict = Meowth.server_dict
@@ -94,18 +94,18 @@ def load_config():
     language = gettext.translation('meowth', localedir='locale', languages=[config['bot-language']])
     language.install()
     pokemon_language = [config['pokemon-language']]
-    pokemon_path_source = r"locale\{0}\pkmn.json".format(config['pokemon-language'])
+    pokemon_path_source = os.path.join('locale', '{0}', 'pkmn.json').format(config['pokemon-language'])
 
     # Load Pokemon list and raid info
     with open(pokemon_path_source, "r") as fd:
         pkmn_info = json.load(fd)
-    with open(r"data\raid_info.json", "r") as fd:
+    with open(os.path.join('data', 'raid_info.json'), "r") as fd:
         raid_info = json.load(fd)
 
     # Load type information
-    with open(r"data\type_chart.json", "r") as fd:
+    with open(os.path.join('data', 'type_chart.json'), "r") as fd:
         type_chart = json.load(fd)
-    with open(r"data\type_list.json", "r") as fd:
+    with open(os.path.join('data', 'type_list.json'), "r") as fd:
         type_list = json.load(fd)
 
     # Set spelling dictionary to our list of Pokemon
@@ -981,20 +981,19 @@ Admin commands
 """
 
 async def _save():
-    with tempfile.NamedTemporaryFile('wb', dir=os.path.dirname(r'data\serverdict'), delete=False) as tf:
-        pickle.dump(server_dict, tf)
+    with tempfile.NamedTemporaryFile('wb', dir=os.path.dirname(os.path.join('data', 'serverdict')), delete=False) as tf:
+        pickle.dump(server_dict, tf, -1)
         tempname = tf.name
     try:
-        os.remove(r'data\serverdict_backup')
+        os.remove(os.path.join('data', 'serverdict_backup'))
     except OSError as e:
         pass
     try:
-        os.rename(r'data\serverdict', r'data\serverdict_backup')
+        os.rename(os.path.join('data', 'serverdict'), os.path.join('data', 'serverdict_backup'))
     except OSError as e:
         if e.errno != errno.ENOENT:
             raise
-
-    os.rename(tempname, r'data\serverdict')
+    os.rename(tempname, os.path.join('data', 'serverdict'))
 
 @Meowth.command(pass_context=True)
 @checks.is_owner()
@@ -1027,7 +1026,6 @@ async def restart(ctx):
         await _print(Meowth.owner,err)
 
     await Meowth.send_message(ctx.message.channel,"Restarting...")
-
     Meowth._shutdown_mode = 26
     await Meowth.logout()
 
@@ -1052,7 +1050,7 @@ async def outputlog(ctx):
 
     Usage: !outputlog
     Output is a link to hastebin."""
-    with open('logs/meowth.log', 'r') as logfile:
+    with open(os.path.join('logs', 'meowth.log'), 'r') as logfile:
         logdata=logfile.read()
     logdata = logdata.encode('ascii', errors='replace').decode('utf-8')
     await Meowth.send_message(ctx.message.channel, hastebin.post(logdata))
@@ -1116,7 +1114,7 @@ async def announce(ctx,*,announce=None):
     author = message.author
     if announce is None:
         announcewait = await Meowth.send_message(channel, "I'll wait for your announcement!")
-        announcemsg = await Meowth.wait_for_message(author=ctx.message.author, timeout=60)
+        announcemsg = await Meowth.wait_for_message(author=ctx.message.author, timeout=180)
         await Meowth.delete_message(announcewait)
         if announcemsg is not None:
             announce = announcemsg.content
@@ -1606,7 +1604,7 @@ This channel will be deleted five minutes after the timer expires.""").format(po
     server_dict[message.server]['raidchannel_dict'][raid_channel] = {
         'reportcity' : message.channel.name,
         'trainer_dict' : {},
-        'exp' : time.time() + 45 * 60, # 45 mins from now
+        'exp' : time.time() + 45 * 60, # 45 minutes from now
         'manual_timer' : False, # No one has explicitly set the timer, Meowth is just assuming 2 hours
         'active' : True,
         'raidmessage' : raidmessage,
@@ -1621,7 +1619,6 @@ This channel will be deleted five minutes after the timer expires.""").format(po
         await _timerset(raid_channel,raidexp)
     else:
         await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left on the raid using **!timerset <minutes>** so others can check it with **!timer**.").format(member=message.author.mention))
-
     event_loop.create_task(expiry_check(raid_channel))
 
 # Print raid timer

@@ -2226,7 +2226,7 @@ async def _eggtoraid(entered_raid, raid_channel):
 
 
     if eggdetails['type'] == "egg":
-        raidexp = eggdetails['exp'] + 60 * 60
+        raidexp = eggdetails['exp'] + 45 * 60
         hatchtype = "raid"
         raidreportcontent = _("Meowth! The egg has hatched into a {pokemon} raid! Details: {location_details}. Coordinate in {raid_channel}").format(pokemon=entered_raid.capitalize(), location_details=egg_address, raid_channel=raid_channel.mention)
         raidmsg = _("""Meowth! The egg reported by {member} in {citychannel} hatched into a {pokemon} raid! Details: {location_details}. Coordinate here!

@@ -2044,7 +2044,7 @@ This channel needs to be manually deleted!""").format(member=message.author.ment
         'raidmessage' : raidmessage,
         'raidreport' : raidreport,
         'address' : raid_details,
-        'type' : 'exraid',
+        'type' : 'egg',
         'pokemon' : '',
         'egglevel' : 'EX',
         'gymhuntrgps' : False
@@ -2238,7 +2238,7 @@ async def _eggtoraid(entered_raid, raid_channel):
     gymhuntrgps = eggdetails['gymhuntrgps']
 
 
-    if eggdetails['type'] == "egg":
+    if eggdetails['egglevel'].isdigit():
         raidexp = eggdetails['exp'] + 45 * 60
         hatchtype = "raid"
         raidreportcontent = _("Meowth! The egg has hatched into a {pokemon} raid! Details: {location_details}. Coordinate in {raid_channel}").format(pokemon=entered_raid.capitalize(), location_details=egg_address, raid_channel=raid_channel.mention)
@@ -2255,7 +2255,7 @@ Sometimes I'm not great at directions, but I'll correct my directions if anybody
 You can set the time remaining with **!timerset <minutes>** and access this with **!timer**.
 
 Message **!starting** when the raid is beginning to clear the raid's 'here' list.""").format(member= raid_messageauthor.mention, citychannel=reportcitychannel.mention, pokemon=entered_raid.capitalize(), location_details=egg_address)
-    elif eggdetails['type'] == "exraid":
+    elif eggdetails['egglevel'] == "EX":
         raidexp = None
         hatchtype = "exraid"
         raidreportcontent = _("Meowth! The EX egg has hatched into a {pokemon} raid! Details: {location_details}. Use the **!invite** command to gain access and coordinate in {raid_channel}").format(pokemon=entered_raid.capitalize(), location_details=egg_address, raid_channel=raid_channel.mention)
@@ -2336,7 +2336,7 @@ This channel needs to be manually deleted!""").format(pokemon=entered_raid.capit
     for trainer in trainer_dict.keys():
         if trainer_dict[trainer]['status'] =='maybe' or trainer_dict[trainer]['status'] =='omw' or trainer_dict[trainer]['status'] =='waiting':
             trainer_list.append(trainer)
-    if len(raid_info['raid_eggs']['EX']['pokemon']) > 1 or eggdetails['type'] == "egg":
+    if len(raid_info['raid_eggs']['EX']['pokemon']) > 1 or eggdetails['egglevel'].isdigit():
         await Meowth.send_message(raid_channel, content = _("Meowth! Trainers {trainer_list}: The raid egg has just hatched into a {pokemon} raid!\nIf you couldn't before, you're now able to update your status with **!coming** or **!here**. If you've changed your plans, use **!cancel**.").format(trainer_list=", ".join(trainer_list), pokemon=raid.mention), embed = raid_embed)
 
     event_loop.create_task(expiry_check(raid_channel))

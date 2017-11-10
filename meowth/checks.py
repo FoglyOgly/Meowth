@@ -151,16 +151,6 @@ def check_teamset(ctx):
     except KeyError:
         return False
 
-def check_raidtype(ctx):
-    if ctx.message.server is None:
-        return False
-    server = ctx.message.server
-    channel = ctx.message.channel
-    try:
-        return ctx.bot.server_dict[server]['raidchannel_dict'][channel]['type']
-    except KeyError:
-        return False
-
 def teamset():
     def predicate(ctx):
         if check_teamset(ctx):
@@ -211,6 +201,13 @@ def raidchannel():
         raise errors.RaidChannelCheckFail()
     return commands.check(predicate)
 
+def exraidchannel():
+    def predicate(ctx):
+        if check_exraidchannel(ctx):
+            return True
+        raise errors.ExRaidChannelCheckFail()
+    return commands.check(predicate)
+
 def nonraidchannel():
     def predicate(ctx):
         if not check_raidchannel(ctx):
@@ -243,4 +240,14 @@ def cityeggchannel():
         elif check_citychannel(ctx) == True:
             return True
         raise errors.RegionEggChannelCheckFail()
+    return commands.check(predicate)
+
+def cityexraidchannel():
+    def predicate(ctx):
+        if check_raidchannel(ctx) == True:
+            if check_exraidchannel(ctx) == True:
+                return True
+        elif check_citychannel(ctx) == True:
+            return True
+        raise errors.RegionExRaidChannelCheckFail()
     return commands.check(predicate)

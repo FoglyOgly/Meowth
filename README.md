@@ -1,4 +1,4 @@
-# Meowth (with Huntr Integration by Doonce)
+# Meowth
 A Discord helper bot for Pokemon Go communities.
 
 Meowth is a Discord bot written in Python 3.5 using version 0.16.12 of the discord.py library.
@@ -12,7 +12,7 @@ Meowth is now able to handle being on multiple servers of any size in any part o
 3. Raid reporting: Report either !raidegg, !raid or !exraid on the server to have meowth create channels to organise in. Certain commands can be used within raid channels, such as updating your stauts with !interested, !coming and !here. Users can easily determine the status of involved members with the !list command. Meowth also queries Google Maps to get a guess of the raid location (no access to the game means no list of gyms), or you can paste a maps link in the channel after creation to update it to exact coordinates.
 4. Optional team management and new member welcome functions.
 
-## Directions for inviting a remotely hosted Meowth to your server (without Huntr integration):
+## Directions for inviting a remotely hosted Meowth to your server:
 Note: You must have manage_server permissions to invite.
 1. Use [THIS LINK](https://discordapp.com/oauth2/authorize?client_id=346759953006198784&scope=bot&permissions=268822608) to invite Meowth.   
 2. Select your server.
@@ -25,7 +25,7 @@ You can join the Meowth server here for updates, setup help, feature requests, o
 
 If you want to tinker with Meowth yourself, you can still download this repo, make whatever changes you want (or keep everything if you want) and run Meowth locally. The configure process is the same except you'll have to use your own bot token.
 
-## Directions for installing and running the bot on your server (with Huntr Integration):
+## Directions for installing and running the bot on your server:
 
 
 1. Install Python 3.5 and ensure PIP is also installed with it.
@@ -52,18 +52,11 @@ Get the installer [HERE](https://github.com/tesseract-ocr/tesseract/wiki/Downloa
 
 6. Create a bot user for your app and reveal the bot token to copy it.
 
-7. Copy config_blank.json and rename to config.json. 
+7. Copy config_blank.json and rename to config.json. Open config.json in a text editor (a good one to use is Notepad++) and paste the bot token into the value for "bot_token", replacing the "yourtoken" string.
 
-8. Open config.json in a text editor (a good one to use is Notepad++) and paste the bot token into the value for "bot_token", replacing the "yourtoken" string.
+8. Replace the "master" value in config.json with your user ID from discord.
 
-9. Replace the "master" value in config.json with your user ID from discord.
-
-10. Go to the following link, replacing <CLIENT_ID> with the Client ID you copied.
-`https://discordapp.com/oauth2/authorize?client_id=<CLIENT_ID>&scope=bot&permissions=268822608`
-
-11. Select the server you want to add Meowth to and complete the prompts. If you get to an empty screen and didn't get to see the Google new reCaptcha tickbox, disable your adblocker.
-
-12. Run the launcher from the command prompt or terminal window:
+9. Run the launcher from the command prompt or terminal window:
 
 Linux:
 ```bash
@@ -76,11 +69,16 @@ py launcher.py -s
 
 If successful, it should show "Meowth! That's right!".
 
-13. Go back to your Discord application page and copy the Client ID.
+10. Go back to your Discord application page and copy the Client ID.
 
-14. The bot should have sent you DM in Discord. Add the team roles: mystic, instinct and valor. Ensure they're below the bot role in the server role hierarchy.
+11. Go to the following link, replacing <CLIENT_ID> with the Client ID you copied.
+`https://discordapp.com/oauth2/authorize?client_id=<CLIENT_ID>&scope=bot&permissions=268822608`
 
-15. Simply type !configure in your server to start the configuration process.
+12. Select the server you want to add Meowth to and complete the prompts. If you get to an empty screen and didn't get to see the Google new reCaptcha tickbox, disable your adblocker.
+
+9. The bot should now have sent you DM in Discord. Add the team roles: mystic, instinct and valor. Ensure they're below the bot role in the server role hierarchy.
+
+10. Simply type !configure in your server to start the configuration process.
 
 ### Launcher Reference:
 Arguments:

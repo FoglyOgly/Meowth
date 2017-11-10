@@ -50,6 +50,10 @@ class RegionExRaidChannelCheckFail(CommandError):
     """Exception raised checks.cityeggchannel fails"""
     pass
 
+class ExRaidChannelCheckFail(CommandError):
+    """Exception raised checks.cityeggchannel fails"""
+    pass
+
 def custom_error_handling(bot,logger):
     @bot.event
     async def on_command_error(error, ctx):
@@ -170,6 +174,16 @@ def custom_error_handling(bot,logger):
         elif isinstance(error, RegionExRaidChannelCheckFail):
             server = ctx.message.server
             msg = "Meowth! Please use **!{cmd_name}** in either a EX Raid channel or one of the following region channels:".format(cmd_name=ctx.command.name)
+            city_channels = bot.server_dict[server]['city_channels']
+            for c in city_channels:
+                channel = discord.utils.get(server.channels,name=c)
+                msg += "\n" + channel.mention
+            await bot.send_message(ctx.message.channel,msg)
+            pass
+
+        elif isinstance(error, ExRaidChannelCheckFail):
+            server = ctx.message.server
+            msg = "Meowth! Please use **!{cmd_name}** in a EX Raid channel. Use **!list** in any of the following region channels to see active raids:".format(cmd_name=ctx.command.name)
             city_channels = bot.server_dict[server]['city_channels']
             for c in city_channels:
                 channel = discord.utils.get(server.channels,name=c)

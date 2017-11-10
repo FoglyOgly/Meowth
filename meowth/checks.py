@@ -201,6 +201,13 @@ def raidchannel():
         raise errors.RaidChannelCheckFail()
     return commands.check(predicate)
 
+def exraidchannel():
+    def predicate(ctx):
+        if check_exraidchannel(ctx):
+            return True
+        raise errors.ExRaidChannelCheckFail()
+    return commands.check(predicate)
+
 def nonraidchannel():
     def predicate(ctx):
         if not check_raidchannel(ctx):

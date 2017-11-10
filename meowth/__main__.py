@@ -1996,7 +1996,7 @@ async def _exraid(ctx):
     for p in egg_info['pokemon']:
         p_name = get_name(p)
         p_type = get_type(message.server,p)
-        boss_list.append(p_name+" "+''.join(p_type))
+        boss_list.append(p_name+" ("+str(p)+") "+''.join(p_type))
     raid_channel_name = "exraid-egg-" + sanitize_channel_name(raid_details)
     raid_channel_overwrites = channel.overwrites
     meowth_overwrite = (Meowth.user, discord.PermissionOverwrite(send_messages = True))
@@ -2136,7 +2136,7 @@ async def _raidegg(message, huntr):
         for p in egg_info['pokemon']:
             p_name = get_name(p)
             p_type = get_type(message.server,p)
-            boss_list.append(p_name+" "+''.join(p_type))
+            boss_list.append(p_name+" ("+str(p)+") "+''.join(p_type))
         raid_channel_name = "level-" + egg_level + "-egg-" + sanitize_channel_name(raid_details)
         raid_channel = await Meowth.create_channel(message.server, raid_channel_name, *message.channel.overwrites)
         raid_img_url = "https://raw.githubusercontent.com/apavlinovic/pokemon-go-imagery/master/images/{}".format(str(egg_img))

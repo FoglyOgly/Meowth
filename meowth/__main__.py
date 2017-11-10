@@ -1648,9 +1648,8 @@ async def print_raid_timer(channel):
     return timerstr
 
 
-@Meowth.command(pass_context=True)
-@checks.raidchannel()
-async def timerset(ctx,timer):
+@Meowth.group(pass_context=True)
+async def timerset(ctx):
     """Set the remaining duration on a raid.
 
     Usage: !timerset <minutes>
@@ -1659,40 +1658,56 @@ async def timerset(ctx,timer):
     message = ctx.message
     channel = message.channel
     server = message.server
-    try:
-        if checks.check_exraidchannel(ctx):
-            await Meowth.send_message(channel, _("Timerset isn't supported for exraids. Please get a mod/admin to remove the channel if channel needs to be removed."))
-            return
-    except KeyError:
-        pass
-
-    if server_dict[server]['raidchannel_dict'][channel]['type'] == 'egg':
-        raidtype = "Raid Egg"
-        maxtime = 60
-    else:
-        raidtype = "Raid"
-        maxtime = 45
-
-    if timer.isdigit():
-        raidexp = int(timer)
-    elif ":" in timer:
-        h,m = re.sub(r"[a-zA-Z]", "", timer).split(":",maxsplit=1)
-        if h is "": h = "0"
-        if m is "": m = "0"
-        if h.isdigit() and m.isdigit():
-            raidexp = 60 * int(h) + int(m)
+    timer = message.clean_content.lower().split()[1]
+    if ctx.invoked_subcommand is None and checks.check_raidactive(ctx):
+        try:
+            if checks.check_exraidchannel(ctx):
+                await Meowth.send_message(channel, _("Timerset isn't supported for exraids. Please get a mod/admin to remove the channel if channel needs to be removed."))
+                return
+        except KeyError:
+            pass
+        if server_dict[server]['raidchannel_dict'][channel]['type'] == 'egg':
+            raidtype = "Raid Egg"
+            maxtime = 60
+        else:
+            raidtype = "Raid"
+            maxtime = 45
+        if timer.isdigit():
+            raidexp = int(timer)
+        elif ":" in timer:
+            h,m = re.sub(r"[a-zA-Z]", "", timer).split(":",maxsplit=1)
+            if h is "": h = "0"
+            if m is "": m = "0"
+            if h.isdigit() and m.isdigit():
+                raidexp = 60 * int(h) + int(m)
+            else:
+                await Meowth.send_message(channel, "Meowth! I couldn't understand your time format. Try again like this: **!timerset <minutes>**")
+                return
         else:
             await Meowth.send_message(channel, "Meowth! I couldn't understand your time format. Try again like this: **!timerset <minutes>**")
             return
-    else:
-        await Meowth.send_message(channel, "Meowth! I couldn't understand your time format. Try again like this: **!timerset <minutes>**")
-        return
+        if _timercheck(raidexp, maxtime):
+            await Meowth.send_message(channel, _("Meowth...that's too long. {raidtype}s currently last no more than {maxtime} minutes...").format(raidtype=raidtype.capitalize(), maxtime=str(maxtime)))
+            return
+        await _timerset(channel, raidexp)
 
-    if _timercheck(raidexp, maxtime):
-        await Meowth.send_message(channel, _("Meowth...that's too long. {raidtype}s currently last no more than {maxtime} minutes...").format(raidtype=raidtype.capitalize(), maxtime=str(maxtime)))
-        return
-
-    await _timerset(channel, raidexp)
+@timerset.command(pass_context=True)
+@checks.exraidchannel()
+async def ex(ctx,date,timeofday,ampm):
+    message = ctx.message
+    channel = message.channel
+    server = message.server
+    now = datetime.datetime.now()
+    exdays = int(date.split("/")[1]) - int(now.day) * 24 * 60
+    if ampm == "AM":
+        exhours = int(timeofday.split(":")[0])
+    elif ampm == "PM":
+        exhours = (int(timeofday.split(":")[0]) + 12)
+    exminutes = int(timeofday.split(":")[1])
+    end = datetime.datetime(year=now.year, month=int(date.split("/")[0]), day=int(date.split("/")[1]), hour=exhours, minute=exminutes)
+    diff = end - now
+    total = round(diff.total_seconds() / 60)
+    await _timerset(channel, total)
 
 def _timercheck(time, maxtime):
     return time > maxtime

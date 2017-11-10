@@ -2170,9 +2170,9 @@ Message **!starting** when the raid is beginning to clear the raid's 'here' list
 This channel will be deleted five minutes after the timer expires.""").format(member= raid_messageauthor.mention, citychannel=reportcitychannel.mention, pokemon=entered_raid.capitalize(), location_details=egg_address)
     elif eggdetails['egglevel'] == "EX":
         if len(raid_info['raid_eggs']['EX']['pokemon']) > 1:
-            raidexp = 45 * 60
+            raidexp = eggdetails['exp'] + 45 * 60
         else:
-            raidexp = time.time() + 24 * 60 * 60 * 10
+            raidexp = eggdetails['exp'] + 24 * 60 * 60 * 10
             hatchtype = "exraid"
         raidreportcontent = _("Meowth! The EX egg has hatched into a {pokemon} raid! Details: {location_details}. Use the **!invite** command to gain access and coordinate in {raid_channel}").format(pokemon=entered_raid.capitalize(), location_details=egg_address, raid_channel=raid_channel.mention)
         raidmsg = _("""Meowth! {pokemon} EX raid reported by {member} in {citychannel}! Details: {location_details}. Coordinate here!

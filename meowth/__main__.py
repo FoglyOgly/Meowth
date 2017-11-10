@@ -1655,6 +1655,7 @@ async def print_raid_timer(channel):
 
 
 @Meowth.group(pass_context=True)
+@checks.raidchannel()
 async def timerset(ctx):
     """Set the remaining duration on a raid.
 
@@ -1700,20 +1701,24 @@ async def timerset(ctx):
 @timerset.command(pass_context=True)
 @checks.exraidchannel()
 async def ex(ctx,date,timeofday,ampm):
-    message = ctx.message
-    channel = message.channel
-    server = message.server
-    now = datetime.datetime.now()
-    exdays = int(date.split("/")[1]) - int(now.day) * 24 * 60
-    if ampm == "AM":
-        exhours = int(timeofday.split(":")[0])
-    elif ampm == "PM":
-        exhours = (int(timeofday.split(":")[0]) + 12)
-    exminutes = int(timeofday.split(":")[1])
-    end = datetime.datetime(year=now.year, month=int(date.split("/")[0]), day=int(date.split("/")[1]), hour=exhours, minute=exminutes)
-    diff = end - now
-    total = round(diff.total_seconds() / 60)
-    await _timerset(channel, total)
+    if checks.check_eggchannel(ctx):
+        message = ctx.message
+        channel = message.channel
+        server = message.server
+        now = datetime.datetime.now()
+        exdays = int(date.split("/")[1]) - int(now.day) * 24 * 60
+        if ampm == "AM":
+            exhours = int(timeofday.split(":")[0])
+        elif ampm == "PM":
+            exhours = (int(timeofday.split(":")[0]) + 12)
+        exminutes = int(timeofday.split(":")[1])
+        end = datetime.datetime(year=now.year, month=int(date.split("/")[0]), day=int(date.split("/")[1]), hour=exhours, minute=exminutes)
+        diff = end - now
+        total = round(diff.total_seconds() / 60)
+        await _timerset(channel, total)
+    else:
+        await Meowth.send_message(channel, _("Timerset isn't supported for exraids. Please get a mod/admin to remove the channel if channel needs to be removed."))
+
 
 def _timercheck(time, maxtime):
     return time > maxtime

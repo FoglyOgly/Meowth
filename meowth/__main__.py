@@ -1998,7 +1998,11 @@ async def _exraid(ctx):
         p_type = get_type(message.server,p)
         boss_list.append(p_name+" "+''.join(p_type))
     raid_channel_name = "exraid-egg-" + sanitize_channel_name(raid_details)
-    raid_channel = await Meowth.create_channel(message.server, raid_channel_name, *message.channel.overwrites)
+    raid_channel_overwrites = channel.overwrites
+    meowth_overwrite = (Meowth.user, discord.PermissionOverwrite(send_messages = True))
+    for overwrite in raid_channel_overwrites:
+        overwrite[1].send_messages = False
+    raid_channel = await Meowth.create_channel(message.server, raid_channel_name, *raid_channel_overwrites, meowth_overwrite)    
     raid_img_url = "https://raw.githubusercontent.com/apavlinovic/pokemon-go-imagery/master/images/{}".format(str(egg_img))
     raid_embed = discord.Embed(title=_("Meowth! Click here for directions to the coming raid!"),url=raid_gmaps_link,colour=message.server.me.colour)
     if len(egg_info['pokemon']) > 1:

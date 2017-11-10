@@ -1876,7 +1876,7 @@ async def _exraid(ctx):
     fromegg = False
     exraid_split = message.clean_content.lower().split()
     del exraid_split[0]
-    if message.channel in server_dict[message.channel.server]['raidchannel_dict'] and server_dict[message.channel.server]['raidchannel_dict'][message.channel]['type'] == 'exraid' and server_dict[message.channel.server]['raidchannel_dict'][message.channel]['pokemon'] == '':
+    if message.channel in server_dict[message.channel.server]['raidchannel_dict'] and server_dict[message.channel.server]['raidchannel_dict'][message.channel]['type'] == 'egg' and server_dict[message.channel.server]['raidchannel_dict'][message.channel]['pokemon'] == '':
         fromegg = True
     if fromegg is True:
         await _eggtoraid(" ".join(exraid_split).lower(), message.channel)

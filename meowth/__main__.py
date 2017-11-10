@@ -1946,7 +1946,7 @@ This channel needs to be manually deleted!""").format(member=message.author.ment
         'raidmessage' : raidmessage,
         'raidreport' : raidreport,
         'address' : raid_details,
-        'type' : 'exraid',
+        'type' : 'egg',
         'pokemon' : '',
         'egglevel' : 'EX'
         }
@@ -2126,7 +2126,7 @@ async def _eggtoraid(entered_raid, raid_channel):
         raid_messageauthor = "<@"+raid_message.raw_mentions[0]+">"
         logger.info("Hatching Mention Failed - Trying alternative method: channel: {} (id: {}) - server: {} | Attempted mention: {}...".format(raid_channel.name,raid_channel.id,raid_channel.server.name,raid_message.content[:125]))
 
-    if eggdetails['type'] == "egg":
+    if eggdetails['egglevel'].isdigit():
         raidexp = eggdetails['exp'] + 45 * 60
         hatchtype = "raid"
         raidreportcontent = _("Meowth! The egg has hatched into a {pokemon} raid! Details: {location_details}. Coordinate in {raid_channel}").format(pokemon=entered_raid.capitalize(), location_details=egg_address, raid_channel=raid_channel.mention)
@@ -2151,7 +2151,7 @@ Sending a Google Maps link will also update the raid location.
 Message **!starting** when the raid is beginning to clear the raid's 'here' list.
 
 This channel will be deleted five minutes after the timer expires.""").format(member= raid_messageauthor.mention, citychannel=reportcitychannel.mention, pokemon=entered_raid.capitalize(), location_details=egg_address)
-    elif eggdetails['type'] == "exraid":
+    elif eggdetails['egglevel'] == "EX":
         raidexp = None
         hatchtype = "exraid"
         raidreportcontent = _("Meowth! The EX egg has hatched into a {pokemon} raid! Details: {location_details}. Use the **!invite** command to gain access and coordinate in {raid_channel}").format(pokemon=entered_raid.capitalize(), location_details=egg_address, raid_channel=raid_channel.mention)

@@ -1955,7 +1955,7 @@ This channel needs to be manually deleted!""").format(member=message.author.ment
     server_dict[message.server]['raidchannel_dict'][raid_channel] = {
         'reportcity' : channel.name,
         'trainer_dict' : {},
-        'exp' : None, # No expiry
+        'exp' : time.time() + 24 * 60 * 60 * 10, #10 days from now
         'manual_timer' : False,
         'active' : True,
         'raidmessage' : raidmessage,

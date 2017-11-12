@@ -1365,7 +1365,7 @@ async def want(ctx):
     else:
         await Meowth.add_roles(ctx.message.author, role)
         want_number = pkmn_info['pokemon_list'].index(entered_want) + 1
-        want_img_url = "https://raw.githubusercontent.com/FoglyOgly/Meowth/master/pokegifs/{}.gif".format(entered_want) #This part embeds the sprite
+        want_img_url = "https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn/{0}_.png".format(str(want_number).zfill(3)) #This part embeds the sprite
         want_embed = discord.Embed(colour=server.me.colour)
         want_embed.set_thumbnail(url=want_img_url)
         await Meowth.send_message(channel, content=_("Meowth! Got it! {member} wants {pokemon}").format(member=ctx.message.author.mention, pokemon=entered_want.capitalize()),embed=want_embed)
@@ -1478,7 +1478,7 @@ async def _wild(message):
             wild = await Meowth.create_role(server = message.server, name = entered_wild, hoist = False, mentionable = True)
             await asyncio.sleep(0.5)
         wild_number = pkmn_info['pokemon_list'].index(entered_wild) + 1
-        wild_img_url = "https://raw.githubusercontent.com/FoglyOgly/Meowth/master/pokegifs/{}.gif".format(entered_wild)
+        wild_img_url = "https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn/{0}_.png".format(str(wild_number).zfill(3))
         wild_embed = discord.Embed(title=_("Meowth! Click here for my directions to the wild {pokemon}!").format(pokemon=entered_wild.capitalize()),description=_("Ask {author} if my directions aren't perfect!").format(author=message.author.name),url=wild_gmaps_link,colour=message.server.me.colour)
         wild_embed.add_field(name="**Details:**", value=_("{pokemon} ({pokemonnumber}) {type}").format(pokemon=entered_wild.capitalize(),pokemonnumber=str(wild_number),type="".join(get_type(message.server, wild_number)),inline=True))
         wild_embed.set_footer(text=_("Reported by @{author}").format(author=message.author.name), icon_url=message.author.avatar_url)
@@ -1574,7 +1574,7 @@ async def _raid(message):
         raid = await Meowth.create_role(server = message.server, name = entered_raid, hoist = False, mentionable = True)
         await asyncio.sleep(0.5)
     raid_number = pkmn_info['pokemon_list'].index(entered_raid) + 1
-    raid_img_url = "https://raw.githubusercontent.com/FoglyOgly/Meowth/master/pokegifs/{}.gif".format(entered_raid)
+    raid_img_url = "https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn//{0}_.png".format(str(raid_number).zfill(3))
     raid_embed = discord.Embed(title=_("Meowth! Click here for directions to the raid!"),url=raid_gmaps_link,colour=message.server.me.colour)
     raid_embed.add_field(name="**Details:**", value=_("{pokemon} ({pokemonnumber}) {type}").format(pokemon=entered_raid.capitalize(),pokemonnumber=str(raid_number),type="".join(get_type(message.server, raid_number)),inline=True))
     raid_embed.add_field(name="**Weaknesses:**", value=_("{weakness_list}").format(weakness_list=weakness_to_str(message.server, get_weaknesses(entered_raid))),inline=True)
@@ -1905,7 +1905,7 @@ async def _exraid(ctx):
     for overwrite in raid_channel_overwrites:
         overwrite[1].send_messages = False
     raid_channel = await Meowth.create_channel(message.server, raid_channel_name, *raid_channel_overwrites, meowth_overwrite)
-    raid_img_url = "https://raw.githubusercontent.com/apavlinovic/pokemon-go-imagery/master/images/{}".format(str(egg_img))
+    raid_img_url = "https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/eggs/{}".format(str(egg_img))
     raid_embed = discord.Embed(title=_("Meowth! Click here for directions to the coming raid!"),url=raid_gmaps_link,colour=message.server.me.colour)
     if len(egg_info['pokemon']) > 1:
         raid_embed.add_field(name="**Possible Bosses:**", value=_("{bosslist1}").format(bosslist1="\n".join(boss_list[::2])), inline=True)
@@ -2031,7 +2031,7 @@ async def _raidegg(message):
             boss_list.append(p_name+" ("+str(p)+") "+''.join(p_type))
         raid_channel_name = "level-" + egg_level + "-egg-" + sanitize_channel_name(raid_details)
         raid_channel = await Meowth.create_channel(message.server, raid_channel_name, *message.channel.overwrites)
-        raid_img_url = "https://raw.githubusercontent.com/apavlinovic/pokemon-go-imagery/master/images/{}".format(str(egg_img))
+        raid_img_url = "https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn/{}".format(str(egg_img))
         raid_embed = discord.Embed(title=_("Meowth! Click here for directions to the coming raid!"),url=raid_gmaps_link,colour=message.server.me.colour)
         raid_embed.add_field(name="**Possible Bosses:**", value=_("{bosslist1}").format(bosslist1="\n".join(boss_list[::2])), inline=True)
         raid_embed.add_field(name="\u200b", value=_("{bosslist2}").format(bosslist2="\n".join(boss_list[1::2])), inline=True)
@@ -2194,7 +2194,7 @@ This channel needs to be manually deleted!""").format(pokemon=entered_raid.capit
         raid = await Meowth.create_role(server = raid_channel.server, name = entered_raid, hoist = False, mentionable = True)
         await asyncio.sleep(0.5)
     raid_number = pkmn_info['pokemon_list'].index(entered_raid) + 1
-    raid_img_url = "https://raw.githubusercontent.com/FoglyOgly/Meowth/master/pokegifs/{}.gif".format(entered_raid)
+    raid_img_url = "https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn/{0}_.png".format(str(raid_number).zfill(3))
     raid_embed = discord.Embed(title=_("Meowth! Click here for directions to the raid!"),url=raid_gmaps_link,colour=raid_channel.server.me.colour)
     raid_embed.add_field(name="**Details:**", value=_("{pokemon} ({pokemonnumber}) {type}").format(pokemon=entered_raid.capitalize(),pokemonnumber=str(raid_number),type="".join(get_type(raid_channel.server, raid_number)),inline=True))
     raid_embed.add_field(name="**Weaknesses:**", value=_("{weakness_list}").format(weakness_list=weakness_to_str(raid_channel.server, get_weaknesses(entered_raid))),inline=True)

@@ -1967,7 +1967,7 @@ This channel needs to be manually deleted!""").format(member=message.author.ment
         'raidmessage' : raidmessage,
         'raidreport' : raidreport,
         'address' : raid_details,
-        'type' : 'exraid',
+        'type' : 'egg',
         'pokemon' : '',
         'egglevel' : 'EX'
         }

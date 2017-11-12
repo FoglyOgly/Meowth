@@ -3,32 +3,32 @@
     "raid_eggs": {
         "1": {
             "egg": "normal",
-            "egg_img": "ic_raid_egg_normal.png",
+            "egg_img": "1.png",
             "pokemon": [2,5,8,11]
         },
         "2": {
             "egg": "normal",
-            "egg_img": "ic_raid_egg_normal.png",
+            "egg_img": "2.png",
             "pokemon": [28,73,82,91,105,302]
         },
         "3": {
             "egg": "rare",
-            "egg_img": "ic_raid_egg_rare.png",
+            "egg_img": "3.png",
             "pokemon": [38,65,68,94,123,137,139]
         },
         "4": {
             "egg": "rare",
-            "egg_img": "ic_raid_egg_rare.png",
+            "egg_img": "4.png",
             "pokemon": [31,34,62,71,76,131,143,248]
         },
         "5": {
             "egg": "legendary",
-            "egg_img": "ic_raid_egg_legendary.png",
+            "egg_img": "5.png",
             "pokemon": [150,243,244,245]
         },
         "EX": {
             "egg": "EX",
-            "egg_img": "Item_1403.png",
+            "egg_img": "EX.png",
             "pokemon": [150]
         }
     }

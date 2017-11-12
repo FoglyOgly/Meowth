@@ -25,6 +25,11 @@
             "egg": "legendary",
             "egg_img": "ic_raid_egg_legendary.png",
             "pokemon": [150,243,244,245]
+        },
+        "EX": {
+            "egg": "EX",
+            "egg_img": "Item_1403.png",
+            "pokemon": [150]
         }
     }
 }

@@ -1654,9 +1654,9 @@ async def print_raid_timer(channel):
     return timerstr
 
 
-@Meowth.group(pass_context=True)
+@Meowth.group(pass_context=True, invoke_without_command=True)
 @checks.raidchannel()
-async def timerset(ctx):
+async def timerset(ctx,timer):
     """Set the remaining duration on a raid.
 
     Usage: !timerset <minutes>
@@ -1665,7 +1665,6 @@ async def timerset(ctx):
     message = ctx.message
     channel = message.channel
     server = message.server
-    timer = message.clean_content.lower().split()[1]
     if ctx.invoked_subcommand is None and checks.check_raidactive(ctx):
         try:
             if checks.check_exraidchannel(ctx):
@@ -1714,7 +1713,7 @@ async def ex(ctx):
         except ValueError:
             await Meowth.send_message(channel, _("Your timer wasn't formatted correctly, the correct format for the current time is: **{}**. Change your **!timerset ex** to match this format and try again.").format(now.strftime('%B %d %I:%M %p')))
         diff = end - now
-        total = round(diff.total_seconds() / 60)
+        total = diff.total_seconds() / 60
         await _timerset(channel, total)
     else:
         await Meowth.send_message(channel, _("Timerset isn't supported for exraids. Please get a mod/admin to remove the channel if channel needs to be removed."))
@@ -1724,7 +1723,6 @@ def _timercheck(time, maxtime):
 
 async def _timerset(raidchannel, exptime):
     server = raidchannel.server
-    exptime = int(exptime)
     # Meowth saves the timer message in the channel's 'exp' field.
 
     expire = time.time() + (exptime * 60)

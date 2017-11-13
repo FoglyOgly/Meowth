@@ -1898,8 +1898,20 @@ async def _exraid(ctx):
     if message.channel in server_dict[message.channel.server]['raidchannel_dict'] and server_dict[message.channel.server]['raidchannel_dict'][message.channel]['type'] == 'egg' and server_dict[message.channel.server]['raidchannel_dict'][message.channel]['pokemon'] == '':
         fromegg = True
     if fromegg is True:
-        await _eggtoraid(" ".join(exraid_split).lower(), message.channel)
-        return
+        if exraid_split[0] == 'assume':
+            if server_dict[message.channel.server]['raidchannel_dict'][message.channel]['active'] == False:
+                await _eggtoraid(" ".join(exraid_split).lower(), message.channel)
+                return
+            else:
+                await _eggassume(" ".join(exraid_split), message.channel)
+                return
+        else:
+            if server_dict[message.channel.server]['raidchannel_dict'][message.channel]['active'] == False:
+                await _eggtoraid(" ".join(exraid_split).lower(), message.channel)
+                return
+            else:
+                await Meowth.send_message(message.channel, _("Meowth! Please wait until the egg has hatched before changing it to an open raid!"))
+                return
     if len(exraid_split) <= 0:
         await Meowth.send_message(channel, _("Meowth! Give more details when reporting! Usage: **!exraid <location>**"))
         return
@@ -1972,6 +1984,7 @@ This channel needs to be manually deleted!""").format(member=message.author.ment
 
     if len(egg_info['pokemon']) == 1:
         await _eggtoraid(get_name(egg_info['pokemon'][0]).lower(), raid_channel)
+    await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset ex <date and time>** so others can check it with **!timer**. **<date and time>** should look like this {format}, but set it to the date and time your invitation has.").format(member=message.author.mention, format=datetime.datetime.now().strftime('%B %d %I:%M %p')))
 
     event_loop.create_task(expiry_check(raid_channel))
 
@@ -2175,7 +2188,7 @@ This channel will be deleted five minutes after the timer expires.""").format(me
             raidexp = eggdetails['exp'] + 45 * 60
         else:
             raidexp = eggdetails['exp'] + 24 * 60 * 60 * 10
-            hatchtype = "exraid"
+        hatchtype = "exraid"
         raidreportcontent = _("Meowth! The EX egg has hatched into a {pokemon} raid! Details: {location_details}. Use the **!invite** command to gain access and coordinate in {raid_channel}").format(pokemon=entered_raid.capitalize(), location_details=egg_address, raid_channel=raid_channel.mention)
         raidmsg = _("""Meowth! {pokemon} EX raid reported by {member} in {citychannel}! Details: {location_details}. Coordinate here!
 

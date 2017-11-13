@@ -1703,7 +1703,10 @@ async def ex(ctx):
         except ValueError:
             await Meowth.send_message(channel, _("Meowth! Your timer wasn't formatted correctly, the correct format for the current time is: **{}**. Change your **!timerset ex** to match this format and try again.").format(now.strftime('%B %d %I:%M %p')))
         diff = end - now
-        total = diff.total_seconds() / 60
+        if server_dict[channel.server]['raidchannel_dict'][channel]['type'] == "exraid":
+            total = (diff.total_seconds() / 60) + 45
+        else:
+            total = (diff.total_seconds() / 60)
         if now <= end:
             await _timerset(channel, total)
         elif now >= end:

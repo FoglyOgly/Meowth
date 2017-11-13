@@ -1693,7 +1693,7 @@ async def ex(ctx):
     message = ctx.message
     channel = message.channel
     server = message.server
-    if checks.check_eggchannel(ctx):
+    if checks.check_eggchannel(ctx) or len(raid_info['raid_eggs']['EX']['pokemon']) == 1:
         now = datetime.datetime.now()
         timer_split = message.clean_content.lower().split()
         del timer_split[0]
@@ -1706,7 +1706,7 @@ async def ex(ctx):
         total = diff.total_seconds() / 60
         await _timerset(channel, total)
     else:
-        await Meowth.send_message(channel, _("Timerset isn't supported for exraids. Did you mean **!timerset ex**?"))
+        await Meowth.send_message(channel, _("Timerset isn't supported for exraids after they have hatched."))
 
 def _timercheck(time, maxtime):
     return time > maxtime

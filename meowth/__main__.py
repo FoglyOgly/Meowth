@@ -1668,7 +1668,7 @@ async def timerset(ctx,timer):
     if ctx.invoked_subcommand is None and checks.check_raidactive(ctx):
         try:
             if checks.check_exraidchannel(ctx):
-                await Meowth.send_message(channel, _("Timerset isn't supported for exraids. Please get a mod/admin to remove the channel if channel needs to be removed."))
+                await Meowth.send_message(channel, _("Timerset isn't supported for exraids. Did you mean **!timerset ex**?"))
                 return
         except KeyError:
             pass
@@ -1716,7 +1716,7 @@ async def ex(ctx):
         total = diff.total_seconds() / 60
         await _timerset(channel, total)
     else:
-        await Meowth.send_message(channel, _("Timerset isn't supported for exraids. Please get a mod/admin to remove the channel if channel needs to be removed."))
+        await Meowth.send_message(channel, _("Timerset isn't supported for exraids. Did you mean **!timerset ex**?"))
 
 def _timercheck(time, maxtime):
     return time > maxtime

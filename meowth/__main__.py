@@ -1630,7 +1630,7 @@ async def print_raid_timer(channel):
     if not server_dict[channel.server]['raidchannel_dict'][channel]['active']:
         timerstr += _("Meowth! This {raidtype}'s timer has already expired as of {expiry_time} ({expiry_time24})!").format(raidtype=raidtype,expiry_time=strftime("%I:%M%p", localexpire),expiry_time24=strftime("%H:%M", localexpire))
     else:
-        if server_dict[channel.server]['raidchannel_dict'][channel]['egglevel'] == "EX":
+        if server_dict[channel.server]['raidchannel_dict'][channel]['egglevel'] == "EX" or server_dict[channel.server]['raidchannel_dict'][channel]['type'] == "exraid" :
             if server_dict[channel.server]['raidchannel_dict'][channel]['manual_timer']:
                 timerstr += _("Meowth! This {raidtype} will {raidaction} on {expiry_day} at {expiry_time} ({expiry_time24})!").format(raidtype=raidtype,raidaction=raidaction,expiry_day=strftime("%B %d",localexpire),expiry_time=strftime("%I:%M %p", localexpire),expiry_time24=strftime("%H:%M", localexpire))
             else:
@@ -1701,12 +1701,15 @@ async def ex(ctx):
         try:
             end = datetime.datetime.strptime(" ".join(timer_split)+" "+str(now.year), '%B %d %I:%M %p %Y')
         except ValueError:
-            await Meowth.send_message(channel, _("Your timer wasn't formatted correctly, the correct format for the current time is: **{}**. Change your **!timerset ex** to match this format and try again.").format(now.strftime('%B %d %I:%M %p')))
+            await Meowth.send_message(channel, _("Meowth! Your timer wasn't formatted correctly, the correct format for the current time is: **{}**. Change your **!timerset ex** to match this format and try again.").format(now.strftime('%B %d %I:%M %p')))
         diff = end - now
         total = diff.total_seconds() / 60
-        await _timerset(channel, total)
+        if now <= end:
+            await _timerset(channel, total)
+        elif now >= end:
+            await Meowth.send_message(channel, _("Meowth! Please enter a time in the future."))
     else:
-        await Meowth.send_message(channel, _("Timerset isn't supported for exraids after they have hatched."))
+        await Meowth.send_message(channel, _("Meowth! Timerset isn't supported for exraids after they have hatched."))
 
 def _timercheck(time, maxtime):
     return time > maxtime

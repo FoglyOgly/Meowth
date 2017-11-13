@@ -855,3 +855,1079 @@ discord.ext.commands.errors.CommandInvokeError: Command raised an exception: Key
 [10/11/2017 15:01] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
 [10/11/2017 15:01] INFO __main__ expiry_check 268: Expiry_Check - entei-test
 [10/11/2017 15:01] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - entei-test
+[12/11/2017 15:47] INFO __main__ <module> 54: Serverdict Loaded Successfully
+[12/11/2017 15:47] INFO __main__ _print 568: Starting up...
+[12/11/2017 15:47] INFO __main__ _print 568: Meowth! That's right!
+
+1 servers connected.
+13 members found.
+[12/11/2017 15:47] INFO __main__ maint_start 574: Maintenance Tasks Started
+[12/11/2017 15:47] INFO __main__ server_cleanup 532: Server_Cleanup ------ BEGIN ------
+[12/11/2017 15:47] INFO __main__ server_cleanup 554: Server_Cleanup - SAVING CHANGES
+[12/11/2017 15:47] INFO __main__ server_cleanup 559: Server_Cleanup ------ END ------
+[12/11/2017 15:47] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[12/11/2017 15:47] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[12/11/2017 15:47] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[12/11/2017 15:47] INFO __main__ channel_cleanup 405: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - DOESN'T EXIST IN DISCORD
+[12/11/2017 15:47] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - CHECKING
+[12/11/2017 15:47] INFO __main__ channel_cleanup 405: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - DOESN'T EXIST IN DISCORD
+[12/11/2017 15:47] INFO __main__ channel_cleanup 496: Channel_Cleanup - Channel Savedata Cleared - exraid-egg-test
+[12/11/2017 15:47] INFO __main__ channel_cleanup 503: Channel_Cleanup - Channel Deleted - exraid-egg-test
+[12/11/2017 15:47] INFO __main__ channel_cleanup 496: Channel_Cleanup - Channel Savedata Cleared - entei-test
+[12/11/2017 15:47] INFO __main__ channel_cleanup 503: Channel_Cleanup - Channel Deleted - entei-test
+[12/11/2017 15:47] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[12/11/2017 15:47] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[12/11/2017 15:47] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[12/11/2017 15:47] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - exraid-egg-test
+[12/11/2017 15:49] INFO __main__ <module> 54: Serverdict Loaded Successfully
+[12/11/2017 15:49] INFO __main__ _print 568: Starting up...
+[12/11/2017 15:49] INFO __main__ _print 568: Meowth! That's right!
+
+1 servers connected.
+13 members found.
+[12/11/2017 15:49] INFO __main__ maint_start 574: Maintenance Tasks Started
+[12/11/2017 15:49] INFO __main__ server_cleanup 532: Server_Cleanup ------ BEGIN ------
+[12/11/2017 15:49] INFO __main__ server_cleanup 554: Server_Cleanup - SAVING CHANGES
+[12/11/2017 15:49] INFO __main__ server_cleanup 559: Server_Cleanup ------ END ------
+[12/11/2017 15:49] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[12/11/2017 15:49] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[12/11/2017 15:49] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[12/11/2017 15:49] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[12/11/2017 15:49] INFO __main__ channel_cleanup 456: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXRAID - CONVERTED TO EXPIRY None
+[12/11/2017 15:49] INFO __main__ channel_cleanup 460: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXRAID
+[12/11/2017 15:49] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[12/11/2017 15:49] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[12/11/2017 15:52] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[12/11/2017 15:52] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - exraid-egg-test
+[12/11/2017 15:52] ERROR errors on_command_error 195: CommandInvokeError
+Traceback (most recent call last):
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 50, in wrapped
+    ret = yield from coro(*args, **kwargs)
+  File "meowth\__main__.py", line 1716, in ex
+    diff = end - now
+UnboundLocalError: local variable 'end' referenced before assignment
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\bot.py", line 846, in process_commands
+    yield from command.invoke(ctx)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 634, in invoke
+    yield from ctx.invoked_subcommand.invoke(ctx)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 374, in invoke
+    yield from injected(*ctx.args, **ctx.kwargs)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 54, in wrapped
+    raise CommandInvokeError(e) from e
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: UnboundLocalError: local variable 'end' referenced before assignment
+[12/11/2017 15:53] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[12/11/2017 15:53] INFO __main__ expiry_check 294: Expire_Channel - Channel Expired And Removed From Watchlist - exraid-egg-test
+[12/11/2017 15:53] INFO __main__ expire_channel 305: Expire_Channel - exraid-egg-test
+[12/11/2017 15:53] INFO __main__ expire_channel 323: Expire_Channel - Channel Expired - exraid-egg-test
+[12/11/2017 15:55] INFO __main__ <module> 54: Serverdict Loaded Successfully
+[12/11/2017 15:55] INFO __main__ _print 568: Starting up...
+[12/11/2017 15:55] INFO __main__ _print 568: Meowth! That's right!
+
+1 servers connected.
+13 members found.
+[12/11/2017 15:55] INFO __main__ maint_start 574: Maintenance Tasks Started
+[12/11/2017 15:55] INFO __main__ server_cleanup 532: Server_Cleanup ------ BEGIN ------
+[12/11/2017 15:55] INFO __main__ server_cleanup 554: Server_Cleanup - SAVING CHANGES
+[12/11/2017 15:55] INFO __main__ server_cleanup 559: Server_Cleanup ------ END ------
+[12/11/2017 15:55] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[12/11/2017 15:55] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[12/11/2017 15:55] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[12/11/2017 15:55] INFO __main__ channel_cleanup 405: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - DOESN'T EXIST IN DISCORD
+[12/11/2017 15:55] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[12/11/2017 15:55] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[12/11/2017 15:55] INFO __main__ channel_cleanup 441: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - = RECENTLY EXPIRED NONACTIVE RAID
+[12/11/2017 15:55] INFO __main__ channel_cleanup 496: Channel_Cleanup - Channel Savedata Cleared - exraid-egg-test
+[12/11/2017 15:55] INFO __main__ channel_cleanup 503: Channel_Cleanup - Channel Deleted - exraid-egg-test
+[12/11/2017 15:55] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[12/11/2017 15:55] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[12/11/2017 15:55] INFO __main__ expire_channel 305: Expire_Channel - exraid-egg-test
+[12/11/2017 15:55] INFO __main__ expire_channel 323: Expire_Channel - Channel Expired - exraid-egg-test
+[12/11/2017 15:55] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[12/11/2017 15:55] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - exraid-egg-test
+[12/11/2017 15:56] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[12/11/2017 15:56] INFO __main__ expiry_check 294: Expire_Channel - Channel Expired And Removed From Watchlist - exraid-egg-test
+[12/11/2017 15:56] INFO __main__ expire_channel 305: Expire_Channel - exraid-egg-test
+[12/11/2017 15:56] INFO __main__ expire_channel 323: Expire_Channel - Channel Expired - exraid-egg-test
+[12/11/2017 15:56] INFO __main__ expire_channel 373: Expire_Channel - Channel Deleted - exraid-egg-test
+[12/11/2017 15:56] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[12/11/2017 15:56] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - exraid-egg-test
+[12/11/2017 15:57] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[12/11/2017 15:57] INFO __main__ expiry_check 294: Expire_Channel - Channel Expired And Removed From Watchlist - exraid-egg-test
+[12/11/2017 15:57] INFO __main__ expire_channel 305: Expire_Channel - exraid-egg-test
+[12/11/2017 15:57] INFO __main__ expire_channel 323: Expire_Channel - Channel Expired - exraid-egg-test
+[12/11/2017 15:58] INFO __main__ <module> 54: Serverdict Loaded Successfully
+[12/11/2017 15:58] INFO __main__ _print 568: Starting up...
+[12/11/2017 15:58] INFO __main__ _print 568: Meowth! That's right!
+
+1 servers connected.
+13 members found.
+[12/11/2017 15:58] INFO __main__ maint_start 574: Maintenance Tasks Started
+[12/11/2017 15:58] INFO __main__ server_cleanup 532: Server_Cleanup ------ BEGIN ------
+[12/11/2017 15:58] INFO __main__ server_cleanup 554: Server_Cleanup - SAVING CHANGES
+[12/11/2017 15:58] INFO __main__ server_cleanup 559: Server_Cleanup ------ END ------
+[12/11/2017 15:58] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[12/11/2017 15:58] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[12/11/2017 15:58] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[12/11/2017 15:58] INFO __main__ channel_cleanup 405: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - DOESN'T EXIST IN DISCORD
+[12/11/2017 15:58] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[12/11/2017 15:58] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[12/11/2017 15:58] INFO __main__ channel_cleanup 441: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - = RECENTLY EXPIRED NONACTIVE RAID
+[12/11/2017 15:58] INFO __main__ channel_cleanup 496: Channel_Cleanup - Channel Savedata Cleared - exraid-egg-test
+[12/11/2017 15:58] INFO __main__ channel_cleanup 503: Channel_Cleanup - Channel Deleted - exraid-egg-test
+[12/11/2017 15:58] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[12/11/2017 15:58] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[12/11/2017 15:58] INFO __main__ expire_channel 305: Expire_Channel - exraid-egg-test
+[12/11/2017 15:58] INFO __main__ expire_channel 323: Expire_Channel - Channel Expired - exraid-egg-test
+[12/11/2017 15:58] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[12/11/2017 15:58] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - exraid-egg-test
+[12/11/2017 15:58] INFO __main__ expiry_check 294: Expire_Channel - Channel Expired And Removed From Watchlist - exraid-egg-test
+[12/11/2017 15:58] INFO __main__ expire_channel 305: Expire_Channel - exraid-egg-test
+[12/11/2017 15:58] INFO __main__ expire_channel 323: Expire_Channel - Channel Expired - exraid-egg-test
+[12/11/2017 16:08] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[12/11/2017 16:08] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[12/11/2017 16:08] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[12/11/2017 16:08] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[12/11/2017 16:08] INFO __main__ channel_cleanup 441: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - = RECENTLY EXPIRED NONACTIVE RAID
+[12/11/2017 16:08] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[12/11/2017 16:08] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[12/11/2017 16:08] INFO __main__ expire_channel 305: Expire_Channel - exraid-egg-test
+[12/11/2017 16:08] INFO __main__ expire_channel 323: Expire_Channel - Channel Expired - exraid-egg-test
+[13/11/2017 06:56] INFO __main__ <module> 54: Serverdict Loaded Successfully
+[13/11/2017 06:56] INFO __main__ _print 568: Starting up...
+[13/11/2017 06:56] INFO __main__ _print 568: Meowth! That's right!
+
+1 servers connected.
+13 members found.
+[13/11/2017 06:56] INFO __main__ maint_start 574: Maintenance Tasks Started
+[13/11/2017 06:56] INFO __main__ server_cleanup 532: Server_Cleanup ------ BEGIN ------
+[13/11/2017 06:56] INFO __main__ server_cleanup 554: Server_Cleanup - SAVING CHANGES
+[13/11/2017 06:56] INFO __main__ server_cleanup 559: Server_Cleanup ------ END ------
+[13/11/2017 06:56] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 06:56] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 06:56] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 06:56] INFO __main__ channel_cleanup 405: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - DOESN'T EXIST IN DISCORD
+[13/11/2017 06:56] INFO __main__ channel_cleanup 496: Channel_Cleanup - Channel Savedata Cleared - exraid-egg-test
+[13/11/2017 06:56] INFO __main__ channel_cleanup 503: Channel_Cleanup - Channel Deleted - exraid-egg-test
+[13/11/2017 06:56] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 06:56] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[13/11/2017 06:56] INFO __main__ expiry_check 268: Expiry_Check - entei-test
+[13/11/2017 06:56] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - entei-test
+[13/11/2017 06:56] ERROR errors on_command_error 195: CommandInvokeError
+Traceback (most recent call last):
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 50, in wrapped
+    ret = yield from coro(*args, **kwargs)
+  File "meowth\__main__.py", line 1668, in timerset
+    timer = message.clean_content.lower().split()[1]
+IndexError: list index out of range
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\bot.py", line 846, in process_commands
+    yield from command.invoke(ctx)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 630, in invoke
+    yield from injected(*ctx.args, **ctx.kwargs)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 54, in wrapped
+    raise CommandInvokeError(e) from e
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: IndexError: list index out of range
+[13/11/2017 06:58] INFO __main__ <module> 54: Serverdict Loaded Successfully
+[13/11/2017 06:58] INFO __main__ _print 568: Starting up...
+[13/11/2017 06:58] INFO __main__ _print 568: Meowth! That's right!
+
+1 servers connected.
+13 members found.
+[13/11/2017 06:58] INFO __main__ maint_start 574: Maintenance Tasks Started
+[13/11/2017 06:58] INFO __main__ server_cleanup 532: Server_Cleanup ------ BEGIN ------
+[13/11/2017 06:58] INFO __main__ server_cleanup 554: Server_Cleanup - SAVING CHANGES
+[13/11/2017 06:58] INFO __main__ server_cleanup 559: Server_Cleanup ------ END ------
+[13/11/2017 06:58] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 06:58] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 06:58] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - CHECKING
+[13/11/2017 06:58] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - EXISTS IN DISCORD
+[13/11/2017 06:58] INFO __main__ channel_cleanup 488: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - MISSING FROM EXPIRY CHECK
+[13/11/2017 06:58] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 06:58] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[13/11/2017 06:58] INFO __main__ expiry_check 268: Expiry_Check - entei-test
+[13/11/2017 06:58] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - entei-test
+[13/11/2017 07:02] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[13/11/2017 07:02] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - exraid-egg-test
+[13/11/2017 07:04] INFO __main__ <module> 54: Serverdict Loaded Successfully
+[13/11/2017 07:04] INFO __main__ _print 568: Starting up...
+[13/11/2017 07:04] INFO __main__ _print 568: Meowth! That's right!
+
+1 servers connected.
+13 members found.
+[13/11/2017 07:04] INFO __main__ maint_start 574: Maintenance Tasks Started
+[13/11/2017 07:04] INFO __main__ server_cleanup 532: Server_Cleanup ------ BEGIN ------
+[13/11/2017 07:04] INFO __main__ server_cleanup 554: Server_Cleanup - SAVING CHANGES
+[13/11/2017 07:04] INFO __main__ server_cleanup 559: Server_Cleanup ------ END ------
+[13/11/2017 07:04] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 07:04] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 07:04] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - CHECKING
+[13/11/2017 07:04] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - EXISTS IN DISCORD
+[13/11/2017 07:04] INFO __main__ channel_cleanup 488: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - MISSING FROM EXPIRY CHECK
+[13/11/2017 07:04] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 07:04] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[13/11/2017 07:04] INFO __main__ channel_cleanup 488: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - MISSING FROM EXPIRY CHECK
+[13/11/2017 07:04] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 07:04] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[13/11/2017 07:04] INFO __main__ expiry_check 268: Expiry_Check - entei-test
+[13/11/2017 07:04] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - entei-test
+[13/11/2017 07:04] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[13/11/2017 07:04] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - exraid-egg-test
+[13/11/2017 07:14] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 07:14] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 07:14] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - CHECKING
+[13/11/2017 07:14] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - EXISTS IN DISCORD
+[13/11/2017 07:14] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 07:14] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[13/11/2017 07:14] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 07:14] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[13/11/2017 07:17] INFO __main__ <module> 54: Serverdict Loaded Successfully
+[13/11/2017 07:18] INFO __main__ <module> 54: Serverdict Loaded Successfully
+[13/11/2017 07:18] INFO __main__ _print 568: Starting up...
+[13/11/2017 07:18] INFO __main__ _print 568: Meowth! That's right!
+
+1 servers connected.
+13 members found.
+[13/11/2017 07:18] INFO __main__ maint_start 574: Maintenance Tasks Started
+[13/11/2017 07:18] INFO __main__ server_cleanup 532: Server_Cleanup ------ BEGIN ------
+[13/11/2017 07:18] INFO __main__ server_cleanup 554: Server_Cleanup - SAVING CHANGES
+[13/11/2017 07:18] INFO __main__ server_cleanup 559: Server_Cleanup ------ END ------
+[13/11/2017 07:18] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 07:18] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 07:18] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - CHECKING
+[13/11/2017 07:18] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - EXISTS IN DISCORD
+[13/11/2017 07:18] INFO __main__ channel_cleanup 488: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - MISSING FROM EXPIRY CHECK
+[13/11/2017 07:18] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 07:18] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[13/11/2017 07:18] INFO __main__ channel_cleanup 488: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - MISSING FROM EXPIRY CHECK
+[13/11/2017 07:18] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 07:18] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[13/11/2017 07:18] INFO __main__ expiry_check 268: Expiry_Check - entei-test
+[13/11/2017 07:18] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - entei-test
+[13/11/2017 07:18] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[13/11/2017 07:18] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - exraid-egg-test
+[13/11/2017 07:22] INFO __main__ <module> 54: Serverdict Loaded Successfully
+[13/11/2017 07:22] INFO __main__ _print 568: Starting up...
+[13/11/2017 07:22] INFO __main__ _print 568: Meowth! That's right!
+
+1 servers connected.
+13 members found.
+[13/11/2017 07:22] INFO __main__ maint_start 574: Maintenance Tasks Started
+[13/11/2017 07:22] INFO __main__ server_cleanup 532: Server_Cleanup ------ BEGIN ------
+[13/11/2017 07:22] INFO __main__ server_cleanup 554: Server_Cleanup - SAVING CHANGES
+[13/11/2017 07:22] INFO __main__ server_cleanup 559: Server_Cleanup ------ END ------
+[13/11/2017 07:22] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 07:22] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 07:22] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - CHECKING
+[13/11/2017 07:22] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - EXISTS IN DISCORD
+[13/11/2017 07:22] INFO __main__ channel_cleanup 488: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - MISSING FROM EXPIRY CHECK
+[13/11/2017 07:22] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 07:22] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[13/11/2017 07:22] INFO __main__ channel_cleanup 488: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - MISSING FROM EXPIRY CHECK
+[13/11/2017 07:22] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 07:22] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[13/11/2017 07:22] INFO __main__ expiry_check 268: Expiry_Check - entei-test
+[13/11/2017 07:22] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - entei-test
+[13/11/2017 07:22] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[13/11/2017 07:22] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - exraid-egg-test
+[13/11/2017 07:23] ERROR errors on_command_error 195: CommandInvokeError
+Traceback (most recent call last):
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 50, in wrapped
+    ret = yield from coro(*args, **kwargs)
+  File "meowth\__main__.py", line 1717, in ex
+    diff = end - now
+UnboundLocalError: local variable 'end' referenced before assignment
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\bot.py", line 846, in process_commands
+    yield from command.invoke(ctx)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 634, in invoke
+    yield from ctx.invoked_subcommand.invoke(ctx)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 374, in invoke
+    yield from injected(*ctx.args, **ctx.kwargs)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 54, in wrapped
+    raise CommandInvokeError(e) from e
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: UnboundLocalError: local variable 'end' referenced before assignment
+[13/11/2017 07:24] INFO __main__ <module> 54: Serverdict Loaded Successfully
+[13/11/2017 07:24] INFO __main__ _print 568: Starting up...
+[13/11/2017 07:24] INFO __main__ _print 568: Meowth! That's right!
+
+1 servers connected.
+13 members found.
+[13/11/2017 07:24] INFO __main__ maint_start 574: Maintenance Tasks Started
+[13/11/2017 07:24] INFO __main__ server_cleanup 532: Server_Cleanup ------ BEGIN ------
+[13/11/2017 07:24] INFO __main__ server_cleanup 554: Server_Cleanup - SAVING CHANGES
+[13/11/2017 07:24] INFO __main__ server_cleanup 559: Server_Cleanup ------ END ------
+[13/11/2017 07:24] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 07:24] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 07:24] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - CHECKING
+[13/11/2017 07:24] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - EXISTS IN DISCORD
+[13/11/2017 07:24] INFO __main__ channel_cleanup 488: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - MISSING FROM EXPIRY CHECK
+[13/11/2017 07:24] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 07:24] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[13/11/2017 07:24] INFO __main__ channel_cleanup 488: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - MISSING FROM EXPIRY CHECK
+[13/11/2017 07:24] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 07:24] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[13/11/2017 07:24] INFO __main__ expiry_check 268: Expiry_Check - entei-test
+[13/11/2017 07:24] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - entei-test
+[13/11/2017 07:24] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[13/11/2017 07:24] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - exraid-egg-test
+[13/11/2017 07:30] ERROR errors on_command_error 195: CommandInvokeError
+Traceback (most recent call last):
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 50, in wrapped
+    ret = yield from coro(*args, **kwargs)
+  File "meowth\__main__.py", line 1715, in ex
+    diff = end - now
+UnboundLocalError: local variable 'end' referenced before assignment
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\bot.py", line 846, in process_commands
+    yield from command.invoke(ctx)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 634, in invoke
+    yield from ctx.invoked_subcommand.invoke(ctx)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 374, in invoke
+    yield from injected(*ctx.args, **ctx.kwargs)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 54, in wrapped
+    raise CommandInvokeError(e) from e
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: UnboundLocalError: local variable 'end' referenced before assignment
+[13/11/2017 07:34] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 07:34] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 07:34] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - CHECKING
+[13/11/2017 07:34] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - EXISTS IN DISCORD
+[13/11/2017 07:34] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 07:34] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[13/11/2017 07:34] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 07:34] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[13/11/2017 07:39] INFO __main__ <module> 54: Serverdict Loaded Successfully
+[13/11/2017 07:39] INFO __main__ _print 568: Starting up...
+[13/11/2017 07:39] INFO __main__ _print 568: Meowth! That's right!
+
+1 servers connected.
+13 members found.
+[13/11/2017 07:39] INFO __main__ maint_start 574: Maintenance Tasks Started
+[13/11/2017 07:39] INFO __main__ server_cleanup 532: Server_Cleanup ------ BEGIN ------
+[13/11/2017 07:39] INFO __main__ server_cleanup 554: Server_Cleanup - SAVING CHANGES
+[13/11/2017 07:39] INFO __main__ server_cleanup 559: Server_Cleanup ------ END ------
+[13/11/2017 07:39] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 07:39] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 07:39] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - CHECKING
+[13/11/2017 07:39] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - EXISTS IN DISCORD
+[13/11/2017 07:39] INFO __main__ channel_cleanup 488: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - MISSING FROM EXPIRY CHECK
+[13/11/2017 07:39] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 07:39] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[13/11/2017 07:39] INFO __main__ channel_cleanup 488: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - MISSING FROM EXPIRY CHECK
+[13/11/2017 07:39] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 07:39] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[13/11/2017 07:39] INFO __main__ expiry_check 268: Expiry_Check - entei-test
+[13/11/2017 07:39] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - entei-test
+[13/11/2017 07:39] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[13/11/2017 07:39] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - exraid-egg-test
+[13/11/2017 07:39] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[13/11/2017 07:40] INFO __main__ expiry_check 294: Expire_Channel - Channel Expired And Removed From Watchlist - exraid-egg-test
+[13/11/2017 07:40] INFO __main__ expire_channel 305: Expire_Channel - exraid-egg-test
+[13/11/2017 07:40] INFO __main__ expire_channel 323: Expire_Channel - Channel Expired - exraid-egg-test
+[13/11/2017 07:41] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[13/11/2017 07:41] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - exraid-egg-test
+[13/11/2017 07:41] INFO __main__ expiry_check 294: Expire_Channel - Channel Expired And Removed From Watchlist - entei-test
+[13/11/2017 07:41] INFO __main__ expire_channel 305: Expire_Channel - entei-test
+[13/11/2017 07:41] INFO __main__ expire_channel 323: Expire_Channel - Channel Expired - entei-test
+[13/11/2017 07:41] INFO __main__ <module> 54: Serverdict Loaded Successfully
+[13/11/2017 07:41] INFO __main__ _print 568: Starting up...
+[13/11/2017 07:41] INFO __main__ _print 568: Meowth! That's right!
+
+1 servers connected.
+13 members found.
+[13/11/2017 07:41] INFO __main__ maint_start 574: Maintenance Tasks Started
+[13/11/2017 07:41] INFO __main__ server_cleanup 532: Server_Cleanup ------ BEGIN ------
+[13/11/2017 07:41] INFO __main__ server_cleanup 554: Server_Cleanup - SAVING CHANGES
+[13/11/2017 07:41] INFO __main__ server_cleanup 559: Server_Cleanup ------ END ------
+[13/11/2017 07:41] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 07:41] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 07:41] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - CHECKING
+[13/11/2017 07:41] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - EXISTS IN DISCORD
+[13/11/2017 07:41] INFO __main__ channel_cleanup 441: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - = RECENTLY EXPIRED NONACTIVE RAID
+[13/11/2017 07:41] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 07:41] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[13/11/2017 07:41] INFO __main__ channel_cleanup 488: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - MISSING FROM EXPIRY CHECK
+[13/11/2017 07:41] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 07:41] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[13/11/2017 07:41] INFO __main__ expire_channel 305: Expire_Channel - entei-test
+[13/11/2017 07:41] INFO __main__ expire_channel 323: Expire_Channel - Channel Expired - entei-test
+[13/11/2017 07:41] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[13/11/2017 07:41] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - exraid-egg-test
+[13/11/2017 07:42] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[13/11/2017 07:42] INFO __main__ expiry_check 294: Expire_Channel - Channel Expired And Removed From Watchlist - exraid-egg-test
+[13/11/2017 07:42] INFO __main__ expire_channel 305: Expire_Channel - exraid-egg-test
+[13/11/2017 07:42] INFO __main__ expire_channel 323: Expire_Channel - Channel Expired - exraid-egg-test
+[13/11/2017 07:42] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[13/11/2017 07:42] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - exraid-egg-test
+[13/11/2017 07:42] INFO __main__ expiry_check 294: Expire_Channel - Channel Expired And Removed From Watchlist - exraid-egg-test
+[13/11/2017 07:42] INFO __main__ expire_channel 305: Expire_Channel - exraid-egg-test
+[13/11/2017 07:42] INFO __main__ expire_channel 323: Expire_Channel - Channel Expired - exraid-egg-test
+[13/11/2017 07:42] INFO __main__ <module> 54: Serverdict Loaded Successfully
+[13/11/2017 07:42] INFO __main__ _print 568: Starting up...
+[13/11/2017 07:42] INFO __main__ _print 568: Meowth! That's right!
+
+1 servers connected.
+13 members found.
+[13/11/2017 07:42] INFO __main__ maint_start 574: Maintenance Tasks Started
+[13/11/2017 07:43] INFO __main__ server_cleanup 532: Server_Cleanup ------ BEGIN ------
+[13/11/2017 07:43] INFO __main__ server_cleanup 554: Server_Cleanup - SAVING CHANGES
+[13/11/2017 07:43] INFO __main__ server_cleanup 559: Server_Cleanup ------ END ------
+[13/11/2017 07:43] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 07:43] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 07:43] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - CHECKING
+[13/11/2017 07:43] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - EXISTS IN DISCORD
+[13/11/2017 07:43] INFO __main__ channel_cleanup 441: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - = RECENTLY EXPIRED NONACTIVE RAID
+[13/11/2017 07:43] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 07:43] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[13/11/2017 07:43] INFO __main__ channel_cleanup 441: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - = RECENTLY EXPIRED NONACTIVE RAID
+[13/11/2017 07:43] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 07:43] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[13/11/2017 07:43] INFO __main__ expire_channel 305: Expire_Channel - entei-test
+[13/11/2017 07:43] INFO __main__ expire_channel 323: Expire_Channel - Channel Expired - entei-test
+[13/11/2017 07:43] INFO __main__ expire_channel 305: Expire_Channel - exraid-egg-test
+[13/11/2017 07:43] INFO __main__ expire_channel 323: Expire_Channel - Channel Expired - exraid-egg-test
+[13/11/2017 07:43] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[13/11/2017 07:43] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - exraid-egg-test
+[13/11/2017 07:43] INFO __main__ expiry_check 294: Expire_Channel - Channel Expired And Removed From Watchlist - exraid-egg-test
+[13/11/2017 07:43] INFO __main__ expire_channel 305: Expire_Channel - exraid-egg-test
+[13/11/2017 07:43] INFO __main__ expire_channel 323: Expire_Channel - Channel Expired - exraid-egg-test
+[13/11/2017 07:43] INFO __main__ <module> 54: Serverdict Loaded Successfully
+[13/11/2017 07:43] INFO __main__ _print 568: Starting up...
+[13/11/2017 07:43] INFO __main__ _print 568: Meowth! That's right!
+
+1 servers connected.
+13 members found.
+[13/11/2017 07:43] INFO __main__ maint_start 574: Maintenance Tasks Started
+[13/11/2017 07:43] INFO __main__ server_cleanup 532: Server_Cleanup ------ BEGIN ------
+[13/11/2017 07:43] INFO __main__ server_cleanup 554: Server_Cleanup - SAVING CHANGES
+[13/11/2017 07:43] INFO __main__ server_cleanup 559: Server_Cleanup ------ END ------
+[13/11/2017 07:43] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 07:43] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 07:43] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - CHECKING
+[13/11/2017 07:43] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - EXISTS IN DISCORD
+[13/11/2017 07:43] INFO __main__ channel_cleanup 441: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - = RECENTLY EXPIRED NONACTIVE RAID
+[13/11/2017 07:43] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 07:43] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[13/11/2017 07:43] INFO __main__ channel_cleanup 441: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - = RECENTLY EXPIRED NONACTIVE RAID
+[13/11/2017 07:43] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 07:43] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[13/11/2017 07:43] INFO __main__ expire_channel 305: Expire_Channel - entei-test
+[13/11/2017 07:43] INFO __main__ expire_channel 323: Expire_Channel - Channel Expired - entei-test
+[13/11/2017 07:43] INFO __main__ expire_channel 305: Expire_Channel - exraid-egg-test
+[13/11/2017 07:43] INFO __main__ expire_channel 323: Expire_Channel - Channel Expired - exraid-egg-test
+[13/11/2017 07:44] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[13/11/2017 07:44] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - exraid-egg-test
+[13/11/2017 07:44] INFO __main__ expiry_check 294: Expire_Channel - Channel Expired And Removed From Watchlist - exraid-egg-test
+[13/11/2017 07:44] INFO __main__ expire_channel 305: Expire_Channel - exraid-egg-test
+[13/11/2017 07:44] INFO __main__ expire_channel 323: Expire_Channel - Channel Expired - exraid-egg-test
+[13/11/2017 07:44] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[13/11/2017 07:44] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - exraid-egg-test
+[13/11/2017 07:45] INFO __main__ expiry_check 294: Expire_Channel - Channel Expired And Removed From Watchlist - exraid-egg-test
+[13/11/2017 07:45] INFO __main__ expire_channel 305: Expire_Channel - exraid-egg-test
+[13/11/2017 07:45] INFO __main__ expire_channel 323: Expire_Channel - Channel Expired - exraid-egg-test
+[13/11/2017 07:46] INFO __main__ expire_channel 373: Expire_Channel - Channel Deleted - entei-test
+[13/11/2017 07:46] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[13/11/2017 07:46] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - exraid-egg-test
+[13/11/2017 07:46] INFO __main__ expiry_check 294: Expire_Channel - Channel Expired And Removed From Watchlist - exraid-egg-test
+[13/11/2017 07:46] INFO __main__ expire_channel 305: Expire_Channel - exraid-egg-test
+[13/11/2017 07:46] INFO __main__ expire_channel 323: Expire_Channel - Channel Expired - exraid-egg-test
+[13/11/2017 07:48] INFO __main__ <module> 54: Serverdict Loaded Successfully
+[13/11/2017 07:49] INFO __main__ _print 568: Starting up...
+[13/11/2017 07:49] INFO __main__ _print 568: Meowth! That's right!
+
+1 servers connected.
+13 members found.
+[13/11/2017 07:49] INFO __main__ maint_start 574: Maintenance Tasks Started
+[13/11/2017 07:49] INFO __main__ server_cleanup 532: Server_Cleanup ------ BEGIN ------
+[13/11/2017 07:49] INFO __main__ server_cleanup 554: Server_Cleanup - SAVING CHANGES
+[13/11/2017 07:49] INFO __main__ server_cleanup 559: Server_Cleanup ------ END ------
+[13/11/2017 07:49] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 07:49] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 07:49] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 07:49] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[13/11/2017 07:49] INFO __main__ channel_cleanup 441: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - = RECENTLY EXPIRED NONACTIVE RAID
+[13/11/2017 07:49] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 07:49] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[13/11/2017 07:49] INFO __main__ expire_channel 305: Expire_Channel - exraid-egg-test
+[13/11/2017 07:49] INFO __main__ expire_channel 323: Expire_Channel - Channel Expired - exraid-egg-test
+[13/11/2017 07:49] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[13/11/2017 07:49] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - exraid-egg-test
+[13/11/2017 07:49] INFO __main__ expiry_check 268: Expiry_Check - entei-test
+[13/11/2017 07:49] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - entei-test
+[13/11/2017 07:49] INFO __main__ expiry_check 268: Expiry_Check - entei-test
+[13/11/2017 07:50] INFO __main__ expiry_check 268: Expiry_Check - entei-test
+[13/11/2017 07:50] INFO __main__ expiry_check 268: Expiry_Check - entei-test
+[13/11/2017 07:50] INFO __main__ expiry_check 268: Expiry_Check - entei-test
+[13/11/2017 07:51] INFO __main__ expiry_check 294: Expire_Channel - Channel Expired And Removed From Watchlist - exraid-egg-test
+[13/11/2017 07:51] INFO __main__ expire_channel 305: Expire_Channel - exraid-egg-test
+[13/11/2017 07:51] INFO __main__ expire_channel 323: Expire_Channel - Channel Expired - exraid-egg-test
+[13/11/2017 07:54] ERROR errors on_command_error 195: CommandInvokeError
+Traceback (most recent call last):
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 50, in wrapped
+    ret = yield from coro(*args, **kwargs)
+  File "meowth\__main__.py", line 1891, in exraid
+  File "meowth\__main__.py", line 1902, in _exraid
+    return
+  File "meowth\__main__.py", line 2245, in _eggtoraid
+    'pokemon' : entered_raid,
+UnboundLocalError: local variable 'hatchtype' referenced before assignment
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\bot.py", line 846, in process_commands
+    yield from command.invoke(ctx)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 374, in invoke
+    yield from injected(*ctx.args, **ctx.kwargs)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 54, in wrapped
+    raise CommandInvokeError(e) from e
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: UnboundLocalError: local variable 'hatchtype' referenced before assignment
+[13/11/2017 07:56] INFO __main__ <module> 54: Serverdict Loaded Successfully
+[13/11/2017 07:56] INFO __main__ _print 568: Starting up...
+[13/11/2017 07:56] INFO __main__ _print 568: Meowth! That's right!
+
+1 servers connected.
+13 members found.
+[13/11/2017 07:56] INFO __main__ maint_start 574: Maintenance Tasks Started
+[13/11/2017 07:56] INFO __main__ server_cleanup 532: Server_Cleanup ------ BEGIN ------
+[13/11/2017 07:56] INFO __main__ server_cleanup 554: Server_Cleanup - SAVING CHANGES
+[13/11/2017 07:56] INFO __main__ server_cleanup 559: Server_Cleanup ------ END ------
+[13/11/2017 07:56] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 07:56] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 07:56] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 07:56] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[13/11/2017 07:56] INFO __main__ channel_cleanup 441: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - = RECENTLY EXPIRED NONACTIVE RAID
+[13/11/2017 07:56] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - CHECKING
+[13/11/2017 07:56] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - EXISTS IN DISCORD
+[13/11/2017 07:56] INFO __main__ channel_cleanup 488: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - MISSING FROM EXPIRY CHECK
+[13/11/2017 07:56] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 07:56] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[13/11/2017 07:56] INFO __main__ expire_channel 305: Expire_Channel - exraid-egg-test
+[13/11/2017 07:56] INFO __main__ expire_channel 323: Expire_Channel - Channel Expired - exraid-egg-test
+[13/11/2017 07:56] INFO __main__ expiry_check 268: Expiry_Check - entei-test
+[13/11/2017 07:56] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - entei-test
+[13/11/2017 07:56] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[13/11/2017 07:56] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - exraid-egg-test
+[13/11/2017 07:59] INFO __main__ <module> 54: Serverdict Loaded Successfully
+[13/11/2017 07:59] INFO __main__ _print 568: Starting up...
+[13/11/2017 07:59] INFO __main__ _print 568: Meowth! That's right!
+
+1 servers connected.
+13 members found.
+[13/11/2017 07:59] INFO __main__ maint_start 574: Maintenance Tasks Started
+[13/11/2017 07:59] INFO __main__ server_cleanup 532: Server_Cleanup ------ BEGIN ------
+[13/11/2017 07:59] INFO __main__ server_cleanup 554: Server_Cleanup - SAVING CHANGES
+[13/11/2017 07:59] INFO __main__ server_cleanup 559: Server_Cleanup ------ END ------
+[13/11/2017 07:59] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 07:59] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 07:59] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 07:59] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[13/11/2017 07:59] INFO __main__ channel_cleanup 441: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - = RECENTLY EXPIRED NONACTIVE RAID
+[13/11/2017 07:59] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - CHECKING
+[13/11/2017 07:59] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - EXISTS IN DISCORD
+[13/11/2017 07:59] INFO __main__ channel_cleanup 488: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:entei-test - MISSING FROM EXPIRY CHECK
+[13/11/2017 07:59] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 07:59] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[13/11/2017 07:59] INFO __main__ channel_cleanup 456: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXRAID - CONVERTED TO EXPIRY None
+[13/11/2017 07:59] INFO __main__ channel_cleanup 460: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXRAID
+[13/11/2017 07:59] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 07:59] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[13/11/2017 07:59] INFO __main__ expire_channel 305: Expire_Channel - exraid-egg-test
+[13/11/2017 07:59] INFO __main__ expire_channel 323: Expire_Channel - Channel Expired - exraid-egg-test
+[13/11/2017 07:59] INFO __main__ expiry_check 268: Expiry_Check - entei-test
+[13/11/2017 07:59] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - entei-test
+[13/11/2017 08:00] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[13/11/2017 08:00] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - exraid-egg-test
+[13/11/2017 08:00] INFO __main__ expiry_check 294: Expire_Channel - Channel Expired And Removed From Watchlist - entei-test
+[13/11/2017 08:00] INFO __main__ expire_channel 305: Expire_Channel - entei-test
+[13/11/2017 08:00] INFO __main__ expire_channel 323: Expire_Channel - Channel Expired - entei-test
+[13/11/2017 08:00] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[13/11/2017 08:01] INFO __main__ expiry_check 294: Expire_Channel - Channel Expired And Removed From Watchlist - exraid-egg-test
+[13/11/2017 08:01] INFO __main__ expire_channel 305: Expire_Channel - exraid-egg-test
+[13/11/2017 08:01] INFO __main__ expire_channel 323: Expire_Channel - Channel Expired - exraid-egg-test
+[13/11/2017 08:05] INFO __main__ expire_channel 373: Expire_Channel - Channel Deleted - entei-test
+[13/11/2017 08:05] INFO __main__ <module> 54: Serverdict Loaded Successfully
+[13/11/2017 08:05] INFO __main__ _print 568: Starting up...
+[13/11/2017 08:05] INFO __main__ _print 568: Meowth! That's right!
+
+1 servers connected.
+13 members found.
+[13/11/2017 08:05] INFO __main__ maint_start 574: Maintenance Tasks Started
+[13/11/2017 08:05] INFO __main__ server_cleanup 532: Server_Cleanup ------ BEGIN ------
+[13/11/2017 08:05] INFO __main__ server_cleanup 554: Server_Cleanup - SAVING CHANGES
+[13/11/2017 08:05] INFO __main__ server_cleanup 559: Server_Cleanup ------ END ------
+[13/11/2017 08:05] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 08:05] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 08:05] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 08:05] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[13/11/2017 08:05] INFO __main__ channel_cleanup 441: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - = RECENTLY EXPIRED NONACTIVE RAID
+[13/11/2017 08:05] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 08:05] INFO __main__ channel_cleanup 405: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - DOESN'T EXIST IN DISCORD
+[13/11/2017 08:05] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 08:05] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[13/11/2017 08:05] INFO __main__ channel_cleanup 456: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXRAID - CONVERTED TO EXPIRY None
+[13/11/2017 08:05] INFO __main__ channel_cleanup 460: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXRAID
+[13/11/2017 08:05] INFO __main__ channel_cleanup 496: Channel_Cleanup - Channel Savedata Cleared - exraid-egg-test
+[13/11/2017 08:05] INFO __main__ channel_cleanup 503: Channel_Cleanup - Channel Deleted - exraid-egg-test
+[13/11/2017 08:05] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 08:05] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[13/11/2017 08:05] INFO __main__ expire_channel 305: Expire_Channel - exraid-egg-test
+[13/11/2017 08:05] INFO __main__ expire_channel 323: Expire_Channel - Channel Expired - exraid-egg-test
+[13/11/2017 08:05] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[13/11/2017 08:05] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - exraid-egg-test
+[13/11/2017 08:06] INFO __main__ expire_channel 373: Expire_Channel - Channel Deleted - exraid-egg-test
+[13/11/2017 08:07] CRITICAL __main__ <module> 2898: Fatal exception
+Traceback (most recent call last):
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\aiohttp\connector.py", line 601, in _create_direct_connection
+    local_addr=self._local_addr)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\asyncio\base_events.py", line 777, in create_connection
+    raise exceptions[0]
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\asyncio\base_events.py", line 764, in create_connection
+    yield from self.sock_connect(sock, address)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\asyncio\selector_events.py", line 451, in sock_connect
+    return (yield from fut)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\asyncio\selector_events.py", line 481, in _sock_connect_cb
+    raise OSError(err, 'Connect call failed %s' % (address,))
+OSError: [Errno 10065] Connect call failed ('104.16.59.5', 443)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\aiohttp\connector.py", line 304, in connect
+    yield from self._create_connection(req)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\aiohttp\connector.py", line 578, in _create_connection
+    transport, proto = yield from self._create_direct_connection(req)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\aiohttp\connector.py", line 624, in _create_direct_connection
+    (req.host, req.port, exc.strerror)) from exc
+aiohttp.errors.ClientOSError: [Errno 10065] Can not connect to discordapp.com:443 [Connect call failed ('104.16.59.5', 443)]
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "meowth\__main__.py", line 2888, in <module>
+    event_loop.run_until_complete(Meowth.start(config['bot_token']))
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\asyncio\base_events.py", line 467, in run_until_complete
+    return future.result()
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\client.py", line 491, in start
+    yield from self.connect()
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\client.py", line 452, in connect
+    self.ws = yield from DiscordWebSocket.from_client(self, resume=resume)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\gateway.py", line 203, in from_client
+    gateway = yield from client.http.get_gateway()
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\http.py", line 633, in get_gateway
+    data = yield from self.request(Route('GET', '/gateway'))
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\http.py", line 137, in request
+    r = yield from self.session.request(method, url, **kwargs)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\aiohttp\client.py", line 555, in __iter__
+    resp = yield from self._coro
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\aiohttp\client.py", line 198, in _request
+    conn = yield from self._connector.connect(req)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\aiohttp\connector.py", line 314, in connect
+    .format(key, exc.strerror)) from exc
+aiohttp.errors.ClientOSError: [Errno 10065] Cannot connect to host discordapp.com:443 ssl:True [Can not connect to discordapp.com:443 [Connect call failed ('104.16.59.5', 443)]]
+[13/11/2017 08:10] INFO __main__ <module> 54: Serverdict Loaded Successfully
+[13/11/2017 08:10] INFO __main__ _print 568: Starting up...
+[13/11/2017 08:10] INFO __main__ _print 568: Meowth! That's right!
+
+1 servers connected.
+13 members found.
+[13/11/2017 08:10] INFO __main__ maint_start 574: Maintenance Tasks Started
+[13/11/2017 08:10] INFO __main__ server_cleanup 532: Server_Cleanup ------ BEGIN ------
+[13/11/2017 08:10] INFO __main__ server_cleanup 554: Server_Cleanup - SAVING CHANGES
+[13/11/2017 08:10] INFO __main__ server_cleanup 559: Server_Cleanup ------ END ------
+[13/11/2017 08:10] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 08:10] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 08:10] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 08:10] INFO __main__ channel_cleanup 405: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - DOESN'T EXIST IN DISCORD
+[13/11/2017 08:10] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 08:10] INFO __main__ channel_cleanup 405: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - DOESN'T EXIST IN DISCORD
+[13/11/2017 08:10] INFO __main__ channel_cleanup 496: Channel_Cleanup - Channel Savedata Cleared - exraid-egg-test
+[13/11/2017 08:10] INFO __main__ channel_cleanup 503: Channel_Cleanup - Channel Deleted - exraid-egg-test
+[13/11/2017 08:10] INFO __main__ channel_cleanup 496: Channel_Cleanup - Channel Savedata Cleared - exraid-egg-test
+[13/11/2017 08:10] INFO __main__ channel_cleanup 503: Channel_Cleanup - Channel Deleted - exraid-egg-test
+[13/11/2017 08:10] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 08:10] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[13/11/2017 08:10] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[13/11/2017 08:10] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - exraid-egg-test
+[13/11/2017 08:11] ERROR errors on_command_error 195: CommandInvokeError
+Traceback (most recent call last):
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 50, in wrapped
+    ret = yield from coro(*args, **kwargs)
+  File "meowth\__main__.py", line 1890, in exraid
+    await _exraid(ctx)
+  File "meowth\__main__.py", line 1901, in _exraid
+    if raid_split[0] == 'assume':
+NameError: name 'raid_split' is not defined
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\bot.py", line 846, in process_commands
+    yield from command.invoke(ctx)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 374, in invoke
+    yield from injected(*ctx.args, **ctx.kwargs)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 54, in wrapped
+    raise CommandInvokeError(e) from e
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: NameError: name 'raid_split' is not defined
+[13/11/2017 08:12] INFO __main__ <module> 54: Serverdict Loaded Successfully
+[13/11/2017 08:13] INFO __main__ _print 568: Starting up...
+[13/11/2017 08:13] INFO __main__ _print 568: Meowth! That's right!
+
+1 servers connected.
+13 members found.
+[13/11/2017 08:13] INFO __main__ maint_start 574: Maintenance Tasks Started
+[13/11/2017 08:13] INFO __main__ server_cleanup 532: Server_Cleanup ------ BEGIN ------
+[13/11/2017 08:13] INFO __main__ server_cleanup 554: Server_Cleanup - SAVING CHANGES
+[13/11/2017 08:13] INFO __main__ server_cleanup 559: Server_Cleanup ------ END ------
+[13/11/2017 08:13] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 08:13] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 08:13] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 08:13] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[13/11/2017 08:13] INFO __main__ channel_cleanup 488: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - MISSING FROM EXPIRY CHECK
+[13/11/2017 08:13] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 08:13] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[13/11/2017 08:13] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[13/11/2017 08:13] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - exraid-egg-test
+[13/11/2017 08:13] ERROR errors on_command_error 195: CommandInvokeError
+Traceback (most recent call last):
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 50, in wrapped
+    ret = yield from coro(*args, **kwargs)
+  File "meowth\__main__.py", line 1890, in exraid
+    await _exraid(ctx)
+  File "meowth\__main__.py", line 1906, in _exraid
+    await _eggassume(" ".join(exraid_split), message.channel)
+  File "meowth\__main__.py", line 2120, in _eggassume
+    if config['allow_assume'][egglevel] == "False":
+KeyError: 'EX'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\bot.py", line 846, in process_commands
+    yield from command.invoke(ctx)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 374, in invoke
+    yield from injected(*ctx.args, **ctx.kwargs)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 54, in wrapped
+    raise CommandInvokeError(e) from e
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: KeyError: 'EX'
+[13/11/2017 08:14] INFO __main__ <module> 54: Serverdict Loaded Successfully
+[13/11/2017 08:14] INFO __main__ _print 568: Starting up...
+[13/11/2017 08:14] INFO __main__ _print 568: Meowth! That's right!
+
+1 servers connected.
+13 members found.
+[13/11/2017 08:14] INFO __main__ maint_start 574: Maintenance Tasks Started
+[13/11/2017 08:14] INFO __main__ server_cleanup 532: Server_Cleanup ------ BEGIN ------
+[13/11/2017 08:14] INFO __main__ server_cleanup 554: Server_Cleanup - SAVING CHANGES
+[13/11/2017 08:14] INFO __main__ server_cleanup 559: Server_Cleanup ------ END ------
+[13/11/2017 08:14] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 08:14] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 08:14] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 08:14] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[13/11/2017 08:14] INFO __main__ channel_cleanup 488: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - MISSING FROM EXPIRY CHECK
+[13/11/2017 08:14] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 08:14] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[13/11/2017 08:14] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[13/11/2017 08:14] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - exraid-egg-test
+[13/11/2017 08:14] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[13/11/2017 08:15] INFO __main__ expiry_check 282: Expire_Channel - Egg Auto Hatched - exraid-egg-test
+[13/11/2017 08:24] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 08:24] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 08:24] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 08:24] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[13/11/2017 08:24] INFO __main__ channel_cleanup 456: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXRAID - CONVERTED TO EXPIRY None
+[13/11/2017 08:24] INFO __main__ channel_cleanup 460: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXRAID
+[13/11/2017 08:24] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 08:24] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[13/11/2017 08:34] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 08:34] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 08:34] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 08:34] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[13/11/2017 08:34] INFO __main__ channel_cleanup 460: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXRAID
+[13/11/2017 08:34] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 08:34] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[13/11/2017 08:44] INFO __main__ server_cleanup 532: Server_Cleanup ------ BEGIN ------
+[13/11/2017 08:44] INFO __main__ server_cleanup 554: Server_Cleanup - SAVING CHANGES
+[13/11/2017 08:44] INFO __main__ server_cleanup 559: Server_Cleanup ------ END ------
+[13/11/2017 08:44] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 08:44] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 08:44] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 08:44] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[13/11/2017 08:44] INFO __main__ channel_cleanup 460: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXRAID
+[13/11/2017 08:44] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 08:44] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[13/11/2017 10:02] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 10:02] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 10:02] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 10:02] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[13/11/2017 10:02] INFO __main__ channel_cleanup 460: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXRAID
+[13/11/2017 10:02] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 10:02] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[13/11/2017 10:02] INFO __main__ server_cleanup 532: Server_Cleanup ------ BEGIN ------
+[13/11/2017 10:02] INFO __main__ server_cleanup 554: Server_Cleanup - SAVING CHANGES
+[13/11/2017 10:02] INFO __main__ server_cleanup 559: Server_Cleanup ------ END ------
+[13/11/2017 10:02] CRITICAL __main__ <module> 2899: Fatal exception
+Traceback (most recent call last):
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\aiohttp\connector.py", line 601, in _create_direct_connection
+    local_addr=self._local_addr)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\asyncio\base_events.py", line 777, in create_connection
+    raise exceptions[0]
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\asyncio\base_events.py", line 764, in create_connection
+    yield from self.sock_connect(sock, address)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\asyncio\selector_events.py", line 451, in sock_connect
+    return (yield from fut)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\asyncio\selector_events.py", line 481, in _sock_connect_cb
+    raise OSError(err, 'Connect call failed %s' % (address,))
+OSError: [Errno 10051] Connect call failed ('104.16.58.5', 443)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\aiohttp\connector.py", line 304, in connect
+    yield from self._create_connection(req)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\aiohttp\connector.py", line 578, in _create_connection
+    transport, proto = yield from self._create_direct_connection(req)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\aiohttp\connector.py", line 624, in _create_direct_connection
+    (req.host, req.port, exc.strerror)) from exc
+aiohttp.errors.ClientOSError: [Errno 10051] Can not connect to discordapp.com:443 [Connect call failed ('104.16.58.5', 443)]
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "meowth\__main__.py", line 2889, in <module>
+    event_loop.run_until_complete(Meowth.start(config['bot_token']))
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\asyncio\base_events.py", line 467, in run_until_complete
+    return future.result()
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\client.py", line 491, in start
+    yield from self.connect()
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\client.py", line 452, in connect
+    self.ws = yield from DiscordWebSocket.from_client(self, resume=resume)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\gateway.py", line 203, in from_client
+    gateway = yield from client.http.get_gateway()
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\http.py", line 633, in get_gateway
+    data = yield from self.request(Route('GET', '/gateway'))
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\http.py", line 137, in request
+    r = yield from self.session.request(method, url, **kwargs)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\aiohttp\client.py", line 555, in __iter__
+    resp = yield from self._coro
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\aiohttp\client.py", line 198, in _request
+    conn = yield from self._connector.connect(req)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\aiohttp\connector.py", line 314, in connect
+    .format(key, exc.strerror)) from exc
+aiohttp.errors.ClientOSError: [Errno 10051] Cannot connect to host discordapp.com:443 ssl:True [Can not connect to discordapp.com:443 [Connect call failed ('104.16.58.5', 443)]]
+[13/11/2017 10:14] INFO __main__ <module> 54: Serverdict Loaded Successfully
+[13/11/2017 10:14] INFO __main__ _print 568: Starting up...
+[13/11/2017 10:14] INFO __main__ _print 568: Meowth! That's right!
+
+1 servers connected.
+13 members found.
+[13/11/2017 10:14] INFO __main__ maint_start 574: Maintenance Tasks Started
+[13/11/2017 10:14] INFO __main__ server_cleanup 532: Server_Cleanup ------ BEGIN ------
+[13/11/2017 10:14] INFO __main__ server_cleanup 554: Server_Cleanup - SAVING CHANGES
+[13/11/2017 10:14] INFO __main__ server_cleanup 559: Server_Cleanup ------ END ------
+[13/11/2017 10:14] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 10:14] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 10:14] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 10:14] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[13/11/2017 10:14] INFO __main__ channel_cleanup 460: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXRAID
+[13/11/2017 10:14] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 10:14] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[13/11/2017 10:14] ERROR errors on_command_error 195: CommandInvokeError
+Traceback (most recent call last):
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 50, in wrapped
+    ret = yield from coro(*args, **kwargs)
+  File "meowth\__main__.py", line 1751, in timer
+    timerstr = await print_raid_timer(ctx.message.channel)
+  File "meowth\__main__.py", line 1631, in print_raid_timer
+    localexpiresecs = server_dict[channel.server]['raidchannel_dict'][channel]['exp'] + 3600 * server_dict[channel.server]['offset']
+TypeError: unsupported operand type(s) for +: 'NoneType' and 'float'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\bot.py", line 846, in process_commands
+    yield from command.invoke(ctx)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 374, in invoke
+    yield from injected(*ctx.args, **ctx.kwargs)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 54, in wrapped
+    raise CommandInvokeError(e) from e
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: TypeError: unsupported operand type(s) for +: 'NoneType' and 'float'
+[13/11/2017 10:14] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[13/11/2017 10:14] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - exraid-egg-test
+[13/11/2017 10:16] CRITICAL __main__ <module> 2899: Fatal exception
+Traceback (most recent call last):
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\aiohttp\connector.py", line 601, in _create_direct_connection
+    local_addr=self._local_addr)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\asyncio\base_events.py", line 777, in create_connection
+    raise exceptions[0]
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\asyncio\base_events.py", line 764, in create_connection
+    yield from self.sock_connect(sock, address)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\asyncio\selector_events.py", line 451, in sock_connect
+    return (yield from fut)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\asyncio\selector_events.py", line 481, in _sock_connect_cb
+    raise OSError(err, 'Connect call failed %s' % (address,))
+OSError: [Errno 10065] Connect call failed ('104.16.59.5', 443)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\aiohttp\connector.py", line 304, in connect
+    yield from self._create_connection(req)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\aiohttp\connector.py", line 578, in _create_connection
+    transport, proto = yield from self._create_direct_connection(req)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\aiohttp\connector.py", line 624, in _create_direct_connection
+    (req.host, req.port, exc.strerror)) from exc
+aiohttp.errors.ClientOSError: [Errno 10065] Can not connect to discordapp.com:443 [Connect call failed ('104.16.59.5', 443)]
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "meowth\__main__.py", line 2889, in <module>
+    event_loop.run_until_complete(Meowth.start(config['bot_token']))
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\asyncio\base_events.py", line 467, in run_until_complete
+    return future.result()
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\client.py", line 491, in start
+    yield from self.connect()
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\client.py", line 452, in connect
+    self.ws = yield from DiscordWebSocket.from_client(self, resume=resume)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\gateway.py", line 203, in from_client
+    gateway = yield from client.http.get_gateway()
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\http.py", line 633, in get_gateway
+    data = yield from self.request(Route('GET', '/gateway'))
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\http.py", line 137, in request
+    r = yield from self.session.request(method, url, **kwargs)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\aiohttp\client.py", line 555, in __iter__
+    resp = yield from self._coro
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\aiohttp\client.py", line 198, in _request
+    conn = yield from self._connector.connect(req)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\aiohttp\connector.py", line 314, in connect
+    .format(key, exc.strerror)) from exc
+aiohttp.errors.ClientOSError: [Errno 10065] Cannot connect to host discordapp.com:443 ssl:True [Can not connect to discordapp.com:443 [Connect call failed ('104.16.59.5', 443)]]
+[13/11/2017 12:38] INFO __main__ <module> 54: Serverdict Loaded Successfully
+[13/11/2017 12:38] INFO __main__ _print 568: Starting up...
+[13/11/2017 12:38] INFO __main__ _print 568: Meowth! That's right!
+
+1 servers connected.
+13 members found.
+[13/11/2017 12:38] INFO __main__ maint_start 574: Maintenance Tasks Started
+[13/11/2017 12:38] INFO __main__ server_cleanup 532: Server_Cleanup ------ BEGIN ------
+[13/11/2017 12:38] INFO __main__ server_cleanup 554: Server_Cleanup - SAVING CHANGES
+[13/11/2017 12:38] INFO __main__ server_cleanup 559: Server_Cleanup ------ END ------
+[13/11/2017 12:38] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 12:38] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 12:38] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 12:38] INFO __main__ channel_cleanup 405: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - DOESN'T EXIST IN DISCORD
+[13/11/2017 12:38] INFO __main__ channel_cleanup 496: Channel_Cleanup - Channel Savedata Cleared - exraid-egg-test
+[13/11/2017 12:38] INFO __main__ channel_cleanup 503: Channel_Cleanup - Channel Deleted - exraid-egg-test
+[13/11/2017 12:38] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 12:38] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[13/11/2017 12:38] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[13/11/2017 12:38] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - exraid-egg-test
+[13/11/2017 12:39] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[13/11/2017 12:40] INFO __main__ expiry_check 294: Expire_Channel - Channel Expired And Removed From Watchlist - exraid-egg-test
+[13/11/2017 12:40] INFO __main__ expire_channel 305: Expire_Channel - exraid-egg-test
+[13/11/2017 12:40] INFO __main__ expire_channel 323: Expire_Channel - Channel Expired - exraid-egg-test
+[13/11/2017 12:48] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 12:48] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 12:48] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 12:48] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[13/11/2017 12:48] INFO __main__ channel_cleanup 456: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXRAID - CONVERTED TO EXPIRY None
+[13/11/2017 12:48] INFO __main__ channel_cleanup 460: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXRAID
+[13/11/2017 12:48] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 12:48] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[13/11/2017 12:50] ERROR errors on_command_error 195: CommandInvokeError
+Traceback (most recent call last):
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 50, in wrapped
+    ret = yield from coro(*args, **kwargs)
+  File "meowth\__main__.py", line 1751, in timer
+    timerstr = await print_raid_timer(ctx.message.channel)
+  File "meowth\__main__.py", line 1631, in print_raid_timer
+    localexpiresecs = server_dict[channel.server]['raidchannel_dict'][channel]['exp'] + 3600 * server_dict[channel.server]['offset']
+TypeError: unsupported operand type(s) for +: 'NoneType' and 'float'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\bot.py", line 846, in process_commands
+    yield from command.invoke(ctx)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 374, in invoke
+    yield from injected(*ctx.args, **ctx.kwargs)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 54, in wrapped
+    raise CommandInvokeError(e) from e
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: TypeError: unsupported operand type(s) for +: 'NoneType' and 'float'
+[13/11/2017 12:54] INFO __main__ <module> 54: Serverdict Loaded Successfully
+[13/11/2017 12:54] INFO __main__ _print 568: Starting up...
+[13/11/2017 12:54] INFO __main__ _print 568: Meowth! That's right!
+
+1 servers connected.
+13 members found.
+[13/11/2017 12:54] INFO __main__ maint_start 574: Maintenance Tasks Started
+[13/11/2017 12:54] INFO __main__ server_cleanup 532: Server_Cleanup ------ BEGIN ------
+[13/11/2017 12:54] INFO __main__ server_cleanup 554: Server_Cleanup - SAVING CHANGES
+[13/11/2017 12:54] INFO __main__ server_cleanup 559: Server_Cleanup ------ END ------
+[13/11/2017 12:54] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 12:54] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 12:54] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 12:54] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[13/11/2017 12:54] INFO __main__ channel_cleanup 460: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXRAID
+[13/11/2017 12:54] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 12:54] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[13/11/2017 12:54] ERROR errors on_command_error 195: CommandInvokeError
+Traceback (most recent call last):
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 50, in wrapped
+    ret = yield from coro(*args, **kwargs)
+  File "meowth\__main__.py", line 1752, in timer
+    timerstr = await print_raid_timer(ctx.message.channel)
+  File "meowth\__main__.py", line 1632, in print_raid_timer
+    localexpiresecs = server_dict[channel.server]['raidchannel_dict'][channel]['exp'] + 3600 * server_dict[channel.server]['offset']
+TypeError: unsupported operand type(s) for +: 'NoneType' and 'float'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\bot.py", line 846, in process_commands
+    yield from command.invoke(ctx)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 374, in invoke
+    yield from injected(*ctx.args, **ctx.kwargs)
+  File "C:\Users\Brenen\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\ext\commands\core.py", line 54, in wrapped
+    raise CommandInvokeError(e) from e
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: TypeError: unsupported operand type(s) for +: 'NoneType' and 'float'
+[13/11/2017 13:04] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 13:04] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 13:04] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 13:04] INFO __main__ channel_cleanup 408: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXISTS IN DISCORD
+[13/11/2017 13:04] INFO __main__ channel_cleanup 460: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - EXRAID
+[13/11/2017 13:04] INFO __main__ channel_cleanup 519: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 13:04] INFO __main__ channel_cleanup 524: Channel_Cleanup ------ END ------
+[13/11/2017 13:07] INFO __main__ <module> 54: Serverdict Loaded Successfully
+[13/11/2017 13:07] INFO __main__ _print 558: Starting up...
+[13/11/2017 13:07] INFO __main__ _print 558: Meowth! That's right!
+
+1 servers connected.
+13 members found.
+[13/11/2017 13:07] INFO __main__ maint_start 564: Maintenance Tasks Started
+[13/11/2017 13:07] INFO __main__ server_cleanup 522: Server_Cleanup ------ BEGIN ------
+[13/11/2017 13:07] INFO __main__ server_cleanup 544: Server_Cleanup - SAVING CHANGES
+[13/11/2017 13:07] INFO __main__ server_cleanup 549: Server_Cleanup ------ END ------
+[13/11/2017 13:07] INFO __main__ channel_cleanup 382: Channel_Cleanup ------ BEGIN ------
+[13/11/2017 13:07] INFO __main__ channel_cleanup 388: Channel_Cleanup - Server: TEST WV Pokemon Go - BEGIN CHECKING SERVER
+[13/11/2017 13:07] INFO __main__ channel_cleanup 398: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - CHECKING
+[13/11/2017 13:07] INFO __main__ channel_cleanup 405: Channel_Cleanup - Server: TEST WV Pokemon Go: Channel:exraid-egg-test - DOESN'T EXIST IN DISCORD
+[13/11/2017 13:07] INFO __main__ channel_cleanup 486: Channel_Cleanup - Channel Savedata Cleared - exraid-egg-test
+[13/11/2017 13:07] INFO __main__ channel_cleanup 493: Channel_Cleanup - Channel Deleted - exraid-egg-test
+[13/11/2017 13:07] INFO __main__ channel_cleanup 509: Channel_Cleanup - SAVING CHANGES
+[13/11/2017 13:07] INFO __main__ channel_cleanup 514: Channel_Cleanup ------ END ------
+[13/11/2017 13:08] INFO __main__ expiry_check 268: Expiry_Check - exraid-egg-test
+[13/11/2017 13:08] INFO __main__ expiry_check 273: Expire_Channel - Channel Added To Watchlist - exraid-egg-test

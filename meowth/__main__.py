@@ -447,16 +447,6 @@ async def channel_cleanup(loop=True):
                         #if it's an exraid
                         if serverdict_chtemp[server]['raidchannel_dict'][channel]['type'] == 'exraid':
 
-                            #check if it's expiry is not None
-                            if serverdict_chtemp[server]['raidchannel_dict'][channel]['exp'] is not None:
-
-                                #if so, set it to None (converting old exraid channels to new ones to prevent expiry)
-                                try:
-                                    server_dict[server]['raidchannel_dict'][channel]['exp'] = None
-                                    logger.info(log_str+" - EXRAID - CONVERTED TO EXPIRY None")
-                                except:
-                                    pass
-
                             logger.info(log_str+" - EXRAID")
                             continue
 
@@ -1491,7 +1481,7 @@ async def _wild(message):
 async def raid(ctx):
     """Report an ongoing raid.
 
-    Usage: !raid <species> <location>
+    Usage: !raid <species> <location> [minutes]
     Meowth will insert the details (really just everything after the species name) into a
     Google maps link and post the link to the same channel the report was made in.
     Meowth's message will also include the type weaknesses of the boss.
@@ -1963,9 +1953,7 @@ Alternatively **!list** by itself will show all of the above.
 **!location new <address>** will let you correct the raid address.
 Sending a Google Maps link will also update the raid location.
 
-Message **!starting** when the raid is beginning to clear the raid's 'here' list.
-
-This channel needs to be manually deleted!""").format(member=message.author.mention, citychannel=channel.mention, location_details=raid_details)
+Message **!starting** when the raid is beginning to clear the raid's 'here' list.""").format(member=message.author.mention, citychannel=channel.mention, location_details=raid_details)
     raidmessage = await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)
 
     server_dict[message.server]['raidchannel_dict'][raid_channel] = {
@@ -1994,7 +1982,7 @@ This channel needs to be manually deleted!""").format(member=message.author.ment
 async def raidegg(ctx):
     """Report a raid egg.
 
-    Usage: !raidegg <level> <location> <minutes>
+    Usage: !raidegg <level> <location> [minutes]
 
     Meowth will give a map link to the entered location and create a channel for organising the coming raid in.
     Meowth will also provide info on the possible bosses that can hatch and their types.
@@ -2187,7 +2175,7 @@ This channel will be deleted five minutes after the timer expires.""").format(me
         if len(raid_info['raid_eggs']['EX']['pokemon']) > 1:
             raidexp = eggdetails['exp'] + 45 * 60
         else:
-            raidexp = eggdetails['exp'] + 24 * 60 * 60 * 10
+            raidexp = time.time() + 24 * 60 * 60 * 10
         hatchtype = "exraid"
         raidreportcontent = _("Meowth! The EX egg has hatched into a {pokemon} raid! Details: {location_details}. Use the **!invite** command to gain access and coordinate in {raid_channel}").format(pokemon=entered_raid.capitalize(), location_details=egg_address, raid_channel=raid_channel.mention)
         raidmsg = _("""Meowth! {pokemon} EX raid reported by {member} in {citychannel}! Details: {location_details}. Coordinate here!
@@ -2205,9 +2193,7 @@ Alternatively **!list** by itself will show all of the above.
 **!location new <address>** will let you correct the raid address.
 Sending a Google Maps link will also update the raid location.
 
-Message **!starting** when the raid is beginning to clear the raid's 'here' list.
-
-This channel needs to be manually deleted!""").format(pokemon=entered_raid.capitalize(), member=raid_messageauthor.mention, citychannel=reportcitychannel.mention, location_details=egg_address)
+Message **!starting** when the raid is beginning to clear the raid's 'here' list.""").format(pokemon=entered_raid.capitalize(), member=raid_messageauthor.mention, citychannel=reportcitychannel.mention, location_details=egg_address)
 
 
     if entered_raid not in pkmn_info['pokemon_list']:

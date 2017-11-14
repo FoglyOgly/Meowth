@@ -1097,7 +1097,10 @@ async def prefix(ctx):
 @Meowth.command(pass_context=True)
 @commands.has_permissions(manage_server=True)
 async def announce(ctx,*,announce=None):
-    """Repeats your message in an embed from Meowth"""
+    """Repeats your message in an embed from Meowth.
+
+    Usage: !announce [announcement]
+    If the announcement isn't added at the same time as the command, Meowth will wait 3 minutes for a followup message containing the announcement.""
     message = ctx.message
     channel = message.channel
     server = message.server
@@ -2805,7 +2808,7 @@ async def waiting(ctx):
 async def invite(ctx):
     """Join an EXraid by showing your invite.
 
-    Usage: !invite *image attachment*
+    Usage: !invite [image attachment]
     If the image isn't added at the same time as the command, Meowth will wait 30 seconds for a followup message containing the image."""
     if ctx.message.attachments:
         await _invite(ctx)

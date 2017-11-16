@@ -340,7 +340,8 @@ If this was in error, reset the raid with **!timerset**"""))
                 trainer_dict = server_dict[channel.server]['raidchannel_dict'][channel]['trainer_dict']
                 for trainer in trainer_dict.keys():
                     if trainer_dict[trainer]['status']=='maybe':
-                        maybe_list.append(trainer)
+                        user = await Meowth.get_user_info(trainer)
+                        maybe_list.append(user.mention)
                 await Meowth.send_message(channel, _("""**This egg has hatched!**\n\n...or the time has just expired. Trainers {trainer_list}: Update the raid to the pokemon that hatched using **!raid <pokemon>** or reset the hatch timer with **!timerset**. This channel will be deactivated until I get an update and I'll delete it in 15 minutes if I don't hear anything.""").format(trainer_list=", ".join(maybe_list)))
             delete_time = server_dict[server]['raidchannel_dict'][channel]['exp'] + (15 * 60) - time.time()
         else:
@@ -1101,7 +1102,7 @@ async def announce(ctx,*,announce=None):
     """Repeats your message in an embed from Meowth.
 
     Usage: !announce [announcement]
-    If the announcement isn't added at the same time as the command, Meowth will wait 3 minutes for a followup message containing the announcement.""
+    If the announcement isn't added at the same time as the command, Meowth will wait 3 minutes for a followup message containing the announcement."""
     message = ctx.message
     channel = message.channel
     server = message.server
@@ -1763,10 +1764,10 @@ async def _maybe(message, count):
     else:
         await Meowth.send_message(message.channel, _("Meowth! {member} is interested with a total of {trainer_count} trainers!").format(member=message.author.mention, trainer_count=count))
     # Add trainer name to trainer list
-    if message.author.mention not in server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']:
-        trainer_dict[message.author.mention] = {}
-    trainer_dict[message.author.mention]['status'] = "maybe"
-    trainer_dict[message.author.mention]['count'] = count
+    if message.author.id not in server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']:
+        trainer_dict[message.author.id] = {}
+    trainer_dict[message.author.id]['status'] = "maybe"
+    trainer_dict[message.author.id]['count'] = count
     server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict'] = trainer_dict
 
 async def _coming(message, count):
@@ -1777,10 +1778,10 @@ async def _coming(message, count):
     else:
         await Meowth.send_message(message.channel, _("Meowth! {member} is on the way with a total of {trainer_count} trainers!").format(member=message.author.mention, trainer_count=count))
     # Add trainer name to trainer list
-    if message.author.mention not in trainer_dict:
-        trainer_dict[message.author.mention] = {}
-    trainer_dict[message.author.mention]['status'] = "omw"
-    trainer_dict[message.author.mention]['count'] = count
+    if message.author.id not in trainer_dict:
+        trainer_dict[message.author.id] = {}
+    trainer_dict[message.author.id]['status'] = "omw"
+    trainer_dict[message.author.id]['count'] = count
     server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict'] = trainer_dict
 
 
@@ -1791,10 +1792,10 @@ async def _here(message, count):
     else:
         await Meowth.send_message(message.channel, _("Meowth! {member} is at the raid with a total of {trainer_count} trainers!").format(member=message.author.mention, trainer_count=count))
     # Add trainer name to trainer list
-    if message.author.mention not in trainer_dict:
-        trainer_dict[message.author.mention] = {}
-    trainer_dict[message.author.mention]['status'] = "waiting"
-    trainer_dict[message.author.mention]['count'] = count
+    if message.author.id not in trainer_dict:
+        trainer_dict[message.author.id] = {}
+    trainer_dict[message.author.id]['status'] = "waiting"
+    trainer_dict[message.author.id]['count'] = count
     server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict'] = trainer_dict
 
 async def _cancel(message):
@@ -1802,7 +1803,7 @@ async def _cancel(message):
     channel = message.channel
     server = message.server
     try:
-        t_dict = server_dict[server]['raidchannel_dict'][channel]['trainer_dict'][author.mention]
+        t_dict = server_dict[server]['raidchannel_dict'][channel]['trainer_dict'][author.id]
     except KeyError:
         await Meowth.send_message(channel, _("Meowth! {member} has no status to cancel!").format(member=author.mention))
         return
@@ -1831,8 +1832,8 @@ async def on_message(message):
         if raid_status is not None:
             if server_dict[message.server]['raidchannel_dict'][message.channel]['active']:
                 trainer_dict = server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']
-                if message.author.mention in trainer_dict:
-                    count = trainer_dict[message.author.mention]['count']
+                if message.author.id in trainer_dict:
+                    count = trainer_dict[message.author.id]['count']
                 else:
                     count = 1
                 omw_emoji = parse_emoji(message.server, config['omw_id'])
@@ -1868,7 +1869,8 @@ async def on_message(message):
                     trainer_dict = server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']
                     for trainer in trainer_dict.keys():
                         if trainer_dict[trainer]['status']=='omw':
-                            otw_list.append(trainer)
+                            user = await Meowth.get_user_info(trainer)
+                            otw_list.append(user.mention)
                     await Meowth.send_message(message.channel, content = _("Meowth! Someone has suggested a different location for the raid! Trainers {trainer_list}: make sure you are headed to the right place!").format(trainer_list=", ".join(otw_list)), embed = newembed)
                     return
 
@@ -2260,7 +2262,8 @@ Message **!starting** when the raid is beginning to clear the raid's 'here' list
     trainer_dict = server_dict[raid_channel.server]['raidchannel_dict'][raid_channel]['trainer_dict']
     for trainer in trainer_dict.keys():
         if trainer_dict[trainer]['status'] =='maybe' or trainer_dict[trainer]['status'] =='omw' or trainer_dict[trainer]['status'] =='waiting':
-            trainer_list.append(trainer)
+            user = await Meowth.get_user_info(trainer)
+            trainer_list.append(user.mention)
     if len(raid_info['raid_eggs']['EX']['pokemon']) > 1 or eggdetails['egglevel'].isdigit():
         await Meowth.send_message(raid_channel, content = _("Meowth! Trainers {trainer_list}: The raid egg has just hatched into a {pokemon} raid!\nIf you couldn't before, you're now able to update your status with **!coming** or **!here**. If you've changed your plans, use **!cancel**.").format(trainer_list=", ".join(trainer_list), pokemon=raid.mention), embed = raid_embed)
 
@@ -2282,8 +2285,8 @@ async def interested(ctx, *, count: str = None):
             await Meowth.send_message(ctx.message.channel, _("Meowth! I can't understand how many are in your group. Just say **!interested** if you're by yourself, or **!interested 5** for example if there are 5 in your group."))
             return
     else:
-        if ctx.message.author.mention in trainer_dict:
-            count = trainer_dict[ctx.message.author.mention]['count']
+        if ctx.message.author.id in trainer_dict:
+            count = trainer_dict[ctx.message.author.id]['count']
         else:
             count = 1
 
@@ -2318,8 +2321,8 @@ async def coming(ctx, *, count: str = None):
             await Meowth.send_message(ctx.message.channel, _("Meowth! I can't understand how many are in your group. Just say **!coming** if you're by yourself, or **!coming 5** for example if there are 5 in your group."))
             return
     else:
-        if ctx.message.author.mention in trainer_dict:
-            count = trainer_dict[ctx.message.author.mention]['count']
+        if ctx.message.author.id in trainer_dict:
+            count = trainer_dict[ctx.message.author.id]['count']
         else:
             count = 1
 
@@ -2353,8 +2356,8 @@ async def here(ctx, *, count: str = None):
             await Meowth.send_message(ctx.message.channel, _("Meowth! I can't understand how many are in your group. Just say **!here** if you're by yourself, or **!coming 5** for example if there are 5 in your group."))
             return
     else:
-        if ctx.message.author.mention in trainer_dict:
-            count = trainer_dict[ctx.message.author.mention]['count']
+        if ctx.message.author.id in trainer_dict:
+            count = trainer_dict[ctx.message.author.id]['count']
         else:
             count = 1
 
@@ -2386,7 +2389,8 @@ async def starting(ctx):
     # Add all waiting trainers to the starting list
     for trainer in trainer_dict:
         if trainer_dict[trainer]['status'] == "waiting":
-            ctx_startinglist.append(trainer)
+            user = await Meowth.get_user_info(trainer)
+            ctx_startinglist.append(user.mention)
 
     # Go back and delete the trainers from the waiting list
     for trainer in ctx_startinglist:
@@ -2577,19 +2581,19 @@ async def duplicate(ctx):
         dupecount = 2
         rc_d['duplicate'] = dupecount
     else:
-        if author in t_dict:
+        if author.id in t_dict:
             try:
-                if t_dict[author]['dupereporter']:
+                if t_dict[author.id]['dupereporter']:
                     dupeauthmsg = await Meowth.send_message(channel,_("Meowth! You've already made a duplicate report for this raid!"))
                     await asyncio.sleep(10)
                     await Meowth.delete_message(dupeauthmsg)
                     return
                 else:
-                    t_dict[author]['dupereporter'] = True
+                    t_dict[author.id]['dupereporter'] = True
             except KeyError:
-                t_dict[author]['dupereporter'] = True
+                t_dict[author.id]['dupereporter'] = True
         else:
-            t_dict[author] = {
+            t_dict[author.id] = {
                 'status' : '',
                 'dupereporter' : True
                 }
@@ -2715,15 +2719,16 @@ async def new(ctx):
         otw_list = []
         trainer_dict = server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']
         for trainer in trainer_dict.keys():
-            if trainer_dict[trainer]['status']=='omw':
-                otw_list.append(trainer)
+            user = await Meowth.get_user_info(trainer)
+            if trainer_dict[user.id]['status']=='omw':
+                otw_list.append(user.mention)
         await Meowth.send_message(message.channel, content = _("Meowth! Someone has suggested a different location for the raid! Trainers {trainer_list}: make sure you are headed to the right place!").format(trainer_list=", ".join(otw_list)), embed = newembed)
         return
 
 async def _interest(ctx):
-
     ctx_maybecount = 0
-
+    tzlocal = tz.tzoffset(None, server_dict[ctx.message.channel.server]['offset']*3600)
+    now = datetime.datetime.now().replace(tzinfo=tzlocal)
     # Grab all trainers who are maybe and sum
     # up their counts
     trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
@@ -2735,11 +2740,17 @@ async def _interest(ctx):
     # add an extra message indicating who it is.
     maybe_exstr = ""
     maybe_list = []
+    name_list = []
     for trainer in trainer_dict.keys():
         if trainer_dict[trainer]['status']=='maybe':
-            maybe_list.append(trainer)
+            user = await Meowth.get_user_info(trainer)
+            name_list.append("**"+user.name+"**")
+            maybe_list.append(user.mention)
     if ctx_maybecount > 0:
-        maybe_exstr = _(" including {trainer_list} and the people with them! Let them know if there is a group forming").format(trainer_list=", ".join(maybe_list))
+        if now.time() >= datetime.time(5,0).replace(tzinfo=tzlocal) and now.time() <= datetime.time(21,0).replace(tzinfo=tzlocal):
+            maybe_exstr = _(" including {trainer_list} and the people with them! Let them know if there is a group forming").format(trainer_list=", ".join(maybe_list))
+        else:
+            maybe_exstr = _(" including {trainer_list} and the people with them! Let them know if there is a group forming").format(trainer_list=", ".join(name_list))
     listmsg = (_("Meowth! {trainer_count} interested{including_string}!").format(trainer_count=str(ctx_maybecount), including_string=maybe_exstr))
 
     return listmsg
@@ -2747,7 +2758,8 @@ async def _interest(ctx):
 async def _otw(ctx):
 
     ctx_omwcount = 0
-
+    tzlocal = tz.tzoffset(None, server_dict[ctx.message.channel.server]['offset']*3600)
+    now = datetime.datetime.now().replace(tzinfo=tzlocal)
     # Grab all trainers who are :omw: and sum
     # up their counts
     trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
@@ -2759,18 +2771,25 @@ async def _otw(ctx):
     # add an extra message indicating who it is.
     otw_exstr = ""
     otw_list = []
+    name_list = []
     for trainer in trainer_dict.keys():
         if trainer_dict[trainer]['status']=='omw':
-            otw_list.append(trainer)
+            user = await Meowth.get_user_info(trainer)
+            name_list.append("**"+user.name+"**")
+            otw_list.append(user.mention)
     if ctx_omwcount > 0:
-        otw_exstr = _(" including {trainer_list} and the people with them! Be considerate and wait for them if possible").format(trainer_list=", ".join(otw_list))
+        if now.time() >= datetime.time(5,0).replace(tzinfo=tzlocal) and now.time() <= datetime.time(21,0).replace(tzinfo=tzlocal):
+            otw_exstr = _(" including {trainer_list} and the people with them! Be considerate and wait for them if possible").format(trainer_list=", ".join(otw_list))
+        else:
+            otw_exstr = _(" including {trainer_list} and the people with them! Be considerate and wait for them if possible").format(trainer_list=", ".join(name_list))
     listmsg = (_("Meowth! {trainer_count} on the way{including_string}!").format(trainer_count=str(ctx_omwcount), including_string=otw_exstr))
     return listmsg
 
 async def _waiting(ctx):
 
     ctx_waitingcount = 0
-
+    tzlocal = tz.tzoffset(None, server_dict[ctx.message.channel.server]['offset']*3600)
+    now = datetime.datetime.now().replace(tzinfo=tzlocal)
     # Grab all trainers who are :here: and sum
     # up their counts
     trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
@@ -2782,11 +2801,17 @@ async def _waiting(ctx):
     # add an extra message indicating who it is.
     waiting_exstr = ""
     waiting_list = []
+    name_list = []
     for trainer in trainer_dict.keys():
         if trainer_dict[trainer]['status']=='waiting':
-            waiting_list.append(trainer)
+            user = await Meowth.get_user_info(trainer)
+            name_list.append("**"+user.name+"**")
+            waiting_list.append(user.mention)
     if ctx_waitingcount > 0:
-        waiting_exstr = _(" including {trainer_list} and the people with them! Be considerate and let them know if and when you'll be there").format(trainer_list=", ".join(waiting_list))
+        if now.time() >= datetime.time(5,0).replace(tzinfo=tzlocal) and now.time() <= datetime.time(21,0).replace(tzinfo=tzlocal):
+            waiting_exstr = _(" including {trainer_list} and the people with them! Be considerate and let them know if and when you'll be there").format(trainer_list=", ".join(waiting_list))
+        else:
+            waiting_exstr = _(" including {trainer_list} and the people with them! Be considerate and let them know if and when you'll be there").format(trainer_list=", ".join(name_list))
     listmsg = (_("Meowth! {trainer_count} waiting at the raid{including_string}!").format(trainer_count=str(ctx_waitingcount), including_string=waiting_exstr))
     return listmsg
 

@@ -9,6 +9,7 @@ import json
 import time
 import datetime
 from dateutil.relativedelta import relativedelta
+from dateutil import tz
 import copy
 from time import strftime
 from logs import init_loggers
@@ -1696,13 +1697,14 @@ async def ex(ctx):
     message = ctx.message
     channel = message.channel
     server = message.server
+    tzlocal = tz.tzoffset(None, server_dict[server]['offset']*3600)
     if checks.check_eggchannel(ctx) or len(raid_info['raid_eggs']['EX']['pokemon']) == 1:
         now = datetime.datetime.now()
         timer_split = message.clean_content.lower().split()
         del timer_split[0]
         del timer_split[0]
         try:
-            end = datetime.datetime.strptime(" ".join(timer_split)+" "+str(now.year), '%B %d %I:%M %p %Y')
+            end = datetime.datetime.strptime(" ".join(timer_split)+" "+str(now.year), '%B %d %I:%M %p %Y').replace(tzinfo=tzlocal)
         except ValueError:
             await Meowth.send_message(channel, _("Meowth! Your timer wasn't formatted correctly, the correct format for the current time is: **{}**. Change your **!timerset ex** to match this format and try again.").format(now.strftime('%B %d %I:%M %p')))
         diff = end - now

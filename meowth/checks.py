@@ -99,18 +99,11 @@ def check_exraidchannel(ctx):
     channel = ctx.message.channel
     server = ctx.message.server
     try:
-<<<<<<< HEAD
-        type = ctx.bot.server_dict[server]['raidchannel_dict'][channel]['type']
-    except KeyError:
-        return False
-    if type == 'exraid':
-=======
         level = ctx.bot.server_dict[server]['raidchannel_dict'][channel]['egglevel']
         type = ctx.bot.server_dict[server]['raidchannel_dict'][channel]['type']
     except KeyError:
         return False
     if level == 'EX' or type == 'exraid':
->>>>>>> 87c9c1c153c4562d8fba2ceb6a00e16a63b8d385
         return True
 
 def check_raidactive(ctx):

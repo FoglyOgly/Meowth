@@ -21,11 +21,7 @@
 "master": "000000000000000000",
 
 "//": "Limit egg assumed hatches to certain egg levels.",
-<<<<<<< HEAD:config_blank.json
-"allow_assume": {"5": "True", "4": "False", "3": "False", "2": "False", "1": "False"},
-=======
-"allow_assume": {"EX": "True", "5": "True", "4": "False", "3": "False", "2": "False", "1": "False"},
->>>>>>> 87c9c1c153c4562d8fba2ceb6a00e16a63b8d385:config_blank.json
+"allow_assume": {"EX": "False", "5": "True", "4": "False", "3": "False", "2": "False", "1": "False"},
 
 "//": "Define your server's emoji strings here.",
 

@@ -1,11 +1,6 @@
 import sys
-<<<<<<< HEAD
-import logging.handlers
-import logging
-=======
 import logging
 import logging.handlers
->>>>>>> 87c9c1c153c4562d8fba2ceb6a00e16a63b8d385
 
 def init_loggers():
     # d.py stuff
@@ -38,8 +33,4 @@ def init_loggers():
 
     # logger.addHandler(stdout_handler)
 
-<<<<<<< HEAD
     return logger
-=======
-    return logger
->>>>>>> 87c9c1c153c4562d8fba2ceb6a00e16a63b8d385

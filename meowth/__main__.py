@@ -2383,6 +2383,7 @@ async def starting(ctx):
     for a second group must reannounce with the :here: emoji or !here."""
 
     ctx_startinglist = []
+    id_startinglist = []
 
     trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
 
@@ -2391,9 +2392,9 @@ async def starting(ctx):
         if trainer_dict[trainer]['status'] == "waiting":
             user = await Meowth.get_user_info(trainer)
             ctx_startinglist.append(user.mention)
-
+            id_startinglist.append(user.id)
     # Go back and delete the trainers from the waiting list
-    for trainer in ctx_startinglist:
+    for trainer in id_startinglist:
         del trainer_dict[trainer]
     server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict'] = trainer_dict
 

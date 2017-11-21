@@ -9,6 +9,7 @@ import json
 import time
 import datetime
 from dateutil.relativedelta import relativedelta
+from dateutil import tz
 import copy
 from time import strftime
 from logs import init_loggers
@@ -339,13 +340,14 @@ If this was in error, reset the raid with **!timerset**"""))
                 trainer_dict = server_dict[channel.server]['raidchannel_dict'][channel]['trainer_dict']
                 for trainer in trainer_dict.keys():
                     if trainer_dict[trainer]['status']=='maybe':
-                        maybe_list.append(trainer)
+                        user = await Meowth.get_user_info(trainer)
+                        maybe_list.append(user.mention)
                 await Meowth.send_message(channel, _("""**This egg has hatched!**\n\n...or the time has just expired. Trainers {trainer_list}: Update the raid to the pokemon that hatched using **!raid <pokemon>** or reset the hatch timer with **!timerset**. This channel will be deactivated until I get an update and I'll delete it in 15 minutes if I don't hear anything.""").format(trainer_list=", ".join(maybe_list)))
             delete_time = server_dict[server]['raidchannel_dict'][channel]['exp'] + (15 * 60) - time.time()
         else:
             if not alreadyexpired:
                 await Meowth.send_message(channel, _("""This channel timer has expired! The channel has been deactivated and will be deleted in 5 minutes.
-To reactivate the channel, use !timerset to set the timer again."""))
+To reactivate the channel, use **!timerset** to set the timer again."""))
             delete_time = server_dict[server]['raidchannel_dict'][channel]['exp'] + (5 * 60) - time.time()
         await asyncio.sleep(delete_time)
         # If the channel has already been deleted from the dict, someone
@@ -446,16 +448,6 @@ async def channel_cleanup(loop=True):
 
                         #if it's an exraid
                         if serverdict_chtemp[server]['raidchannel_dict'][channel]['type'] == 'exraid':
-
-                            #check if it's expiry is not None
-                            if serverdict_chtemp[server]['raidchannel_dict'][channel]['exp'] is not None:
-
-                                #if so, set it to None (converting old exraid channels to new ones to prevent expiry)
-                                try:
-                                    server_dict[server]['raidchannel_dict'][channel]['exp'] = None
-                                    logger.info(log_str+" - EXRAID - CONVERTED TO EXPIRY None")
-                                except:
-                                    pass
 
                             logger.info(log_str+" - EXRAID")
                             continue
@@ -600,7 +592,7 @@ The trainer_dict contains "trainer" elements, which have the following fields:
 'count'  : the number of trainers in the party
 """
 
-team_msg = " or ".join(["**!team {0}**".format(team) for team in config['team_dict'].keys()])
+team_msg = " or ".join(["`!team {0}`".format(team) for team in config['team_dict'].keys()])
 
 @Meowth.event
 async def on_ready():
@@ -1107,7 +1099,10 @@ async def prefix(ctx):
 @Meowth.command(pass_context=True)
 @commands.has_permissions(manage_server=True)
 async def announce(ctx,*,announce=None):
-    """Repeats your message in an embed from Meowth"""
+    """Repeats your message in an embed from Meowth.
+
+    Usage: !announce [announcement]
+    If the announcement isn't added at the same time as the command, Meowth will wait 3 minutes for a followup message containing the announcement."""
     message = ctx.message
     channel = message.channel
     server = message.server
@@ -1491,7 +1486,7 @@ async def _wild(message):
 async def raid(ctx):
     """Report an ongoing raid.
 
-    Usage: !raid <species> <location>
+    Usage: !raid <species> <location> [minutes]
     Meowth will insert the details (really just everything after the species name) into a
     Google maps link and post the link to the same channel the report was made in.
     Meowth's message will also include the type weaknesses of the boss.
@@ -1574,7 +1569,7 @@ async def _raid(message):
         raid = await Meowth.create_role(server = message.server, name = entered_raid, hoist = False, mentionable = True)
         await asyncio.sleep(0.5)
     raid_number = pkmn_info['pokemon_list'].index(entered_raid) + 1
-    raid_img_url = "https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn//{0}_.png".format(str(raid_number).zfill(3))
+    raid_img_url = "https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn/{0}_.png".format(str(raid_number).zfill(3))
     raid_embed = discord.Embed(title=_("Meowth! Click here for directions to the raid!"),url=raid_gmaps_link,colour=message.server.me.colour)
     raid_embed.add_field(name="**Details:**", value=_("{pokemon} ({pokemonnumber}) {type}").format(pokemon=entered_raid.capitalize(),pokemonnumber=str(raid_number),type="".join(get_type(message.server, raid_number)),inline=True))
     raid_embed.add_field(name="**Weaknesses:**", value=_("{weakness_list}").format(weakness_list=weakness_to_str(message.server, get_weaknesses(entered_raid))),inline=True)
@@ -1640,10 +1635,16 @@ async def print_raid_timer(channel):
     if not server_dict[channel.server]['raidchannel_dict'][channel]['active']:
         timerstr += _("Meowth! This {raidtype}'s timer has already expired as of {expiry_time} ({expiry_time24})!").format(raidtype=raidtype,expiry_time=strftime("%I:%M%p", localexpire),expiry_time24=strftime("%H:%M", localexpire))
     else:
-        if server_dict[channel.server]['raidchannel_dict'][channel]['manual_timer']:
-            timerstr += _("Meowth! This {raidtype} will {raidaction} at {expiry_time} ({expiry_time24})!").format(raidtype=raidtype,raidaction=raidaction,expiry_time=strftime("%I:%M %p", localexpire),expiry_time24=strftime("%H:%M", localexpire))
+        if server_dict[channel.server]['raidchannel_dict'][channel]['egglevel'] == "EX" or server_dict[channel.server]['raidchannel_dict'][channel]['type'] == "exraid" :
+            if server_dict[channel.server]['raidchannel_dict'][channel]['manual_timer']:
+                timerstr += _("Meowth! This {raidtype} will {raidaction} on {expiry_day} at {expiry_time} ({expiry_time24})!").format(raidtype=raidtype,raidaction=raidaction,expiry_day=strftime("%B %d",localexpire),expiry_time=strftime("%I:%M %p", localexpire),expiry_time24=strftime("%H:%M", localexpire))
+            else:
+                timerstr += _("Meowth! No one told me when the {raidtype} will {raidaction}, so I'm assuming it will {raidaction} on {expiry_day} at {expiry_time} ({expiry_time24})!").format(raidtype=raidtype,raidaction=raidaction,expiry_day=strftime("%B %d",localexpire),expiry_time=strftime("%I:%M %p", localexpire),expiry_time24=strftime("%H:%M", localexpire))
         else:
-            timerstr += _("Meowth! No one told me when the {raidtype} will {raidaction}, so I'm assuming it will {raidaction} at {expiry_time} ({expiry_time24})!").format(raidtype=raidtype,raidaction=raidaction,expiry_time=strftime("%I:%M %p", localexpire),expiry_time24=strftime("%H:%M", localexpire))
+            if server_dict[channel.server]['raidchannel_dict'][channel]['manual_timer']:
+                timerstr += _("Meowth! This {raidtype} will {raidaction} at {expiry_time} ({expiry_time24})!").format(raidtype=raidtype,raidaction=raidaction,expiry_time=strftime("%I:%M %p", localexpire),expiry_time24=strftime("%H:%M", localexpire))
+            else:
+                timerstr += _("Meowth! No one told me when the {raidtype} will {raidaction}, so I'm assuming it will {raidaction} at {expiry_time} ({expiry_time24})!").format(raidtype=raidtype,raidaction=raidaction,expiry_time=strftime("%I:%M %p", localexpire),expiry_time24=strftime("%H:%M", localexpire))
 
     return timerstr
 
@@ -1659,40 +1660,50 @@ async def timerset(ctx,timer):
     message = ctx.message
     channel = message.channel
     server = message.server
-    try:
-        if checks.check_exraidchannel(ctx):
-            await Meowth.send_message(channel, _("Timerset isn't supported for exraids. Please get a mod/admin to remove the channel if channel needs to be removed."))
-            return
-    except KeyError:
-        pass
-
-    if server_dict[server]['raidchannel_dict'][channel]['type'] == 'egg':
-        raidtype = "Raid Egg"
-        maxtime = 60
-    else:
-        raidtype = "Raid"
-        maxtime = 45
-
-    if timer.isdigit():
-        raidexp = int(timer)
-    elif ":" in timer:
-        h,m = re.sub(r"[a-zA-Z]", "", timer).split(":",maxsplit=1)
-        if h is "": h = "0"
-        if m is "": m = "0"
-        if h.isdigit() and m.isdigit():
-            raidexp = 60 * int(h) + int(m)
+    if checks.check_raidactive(ctx) and not checks.check_exraidchannel(ctx):
+        if server_dict[server]['raidchannel_dict'][channel]['type'] == 'egg':
+            raidtype = "Raid Egg"
+            maxtime = 60
+        else:
+            raidtype = "Raid"
+            maxtime = 45
+        if timer.isdigit():
+            raidexp = int(timer)
+        elif ":" in timer:
+            h,m = re.sub(r"[a-zA-Z]", "", timer).split(":",maxsplit=1)
+            if h is "": h = "0"
+            if m is "": m = "0"
+            if h.isdigit() and m.isdigit():
+                raidexp = 60 * int(h) + int(m)
+            else:
+                await Meowth.send_message(channel, "Meowth! I couldn't understand your time format. Try again like this: **!timerset <minutes>**")
+                return
         else:
             await Meowth.send_message(channel, "Meowth! I couldn't understand your time format. Try again like this: **!timerset <minutes>**")
             return
-    else:
-        await Meowth.send_message(channel, "Meowth! I couldn't understand your time format. Try again like this: **!timerset <minutes>**")
-        return
+        if _timercheck(raidexp, maxtime):
+            await Meowth.send_message(channel, _("Meowth...that's too long. {raidtype}s currently last no more than {maxtime} minutes...").format(raidtype=raidtype.capitalize(), maxtime=str(maxtime)))
+            return
+        await _timerset(channel, raidexp)
 
-    if _timercheck(raidexp, maxtime):
-        await Meowth.send_message(channel, _("Meowth...that's too long. {raidtype}s currently last no more than {maxtime} minutes...").format(raidtype=raidtype.capitalize(), maxtime=str(maxtime)))
-        return
-
-    await _timerset(channel, raidexp)
+    if checks.check_exraidchannel(ctx):
+        if checks.check_eggchannel(ctx):
+            tzlocal = tz.tzoffset(None, server_dict[server]['offset']*3600)
+            now = datetime.datetime.now()
+            timer_split = message.clean_content.lower().split()
+            del timer_split[0]
+            try:
+                end = datetime.datetime.strptime(" ".join(timer_split)+" "+str(now.year), '%m/%d %I:%M %p %Y').replace(tzinfo=tzlocal)
+            except ValueError:
+                await Meowth.send_message(channel, _("Meowth! Your timer wasn't formatted correctly. Change your **!timerset** to match the format on your EX Raid invite and try again."))
+            diff = end - now
+            total = (diff.total_seconds() / 60)
+            if now <= end:
+                await _timerset(channel, total)
+            elif now > end:
+                await Meowth.send_message(channel, _("Meowth! Please enter a time in the future."))
+        else:
+            await Meowth.send_message(channel, _("Meowth! Timerset isn't supported for exraids after they have hatched."))
 
 def _timercheck(time, maxtime):
     return time > maxtime
@@ -1725,12 +1736,8 @@ async def timer(ctx):
 
     Usage: !timer
     The expiry time should have been previously set with !timerset."""
-    if checks.check_exraidchannel(ctx):
-        await Meowth.send_message(ctx.message.channel, _("Exraids don't expire. Please get a mod/admin to remove the channel if channel needs to be removed."))
-        return
-    else:
-        timerstr = await print_raid_timer(ctx.message.channel)
-        await Meowth.send_message(ctx.message.channel, timerstr)
+    timerstr = await print_raid_timer(ctx.message.channel)
+    await Meowth.send_message(ctx.message.channel, timerstr)
 
 """
 Behind-the-scenes functions for raid management.
@@ -1743,10 +1750,10 @@ async def _maybe(message, count):
     else:
         await Meowth.send_message(message.channel, _("Meowth! {member} is interested with a total of {trainer_count} trainers!").format(member=message.author.mention, trainer_count=count))
     # Add trainer name to trainer list
-    if message.author.mention not in server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']:
-        trainer_dict[message.author.mention] = {}
-    trainer_dict[message.author.mention]['status'] = "maybe"
-    trainer_dict[message.author.mention]['count'] = count
+    if message.author.id not in server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']:
+        trainer_dict[message.author.id] = {}
+    trainer_dict[message.author.id]['status'] = "maybe"
+    trainer_dict[message.author.id]['count'] = count
     server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict'] = trainer_dict
 
 async def _coming(message, count):
@@ -1757,10 +1764,10 @@ async def _coming(message, count):
     else:
         await Meowth.send_message(message.channel, _("Meowth! {member} is on the way with a total of {trainer_count} trainers!").format(member=message.author.mention, trainer_count=count))
     # Add trainer name to trainer list
-    if message.author.mention not in trainer_dict:
-        trainer_dict[message.author.mention] = {}
-    trainer_dict[message.author.mention]['status'] = "omw"
-    trainer_dict[message.author.mention]['count'] = count
+    if message.author.id not in trainer_dict:
+        trainer_dict[message.author.id] = {}
+    trainer_dict[message.author.id]['status'] = "omw"
+    trainer_dict[message.author.id]['count'] = count
     server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict'] = trainer_dict
 
 
@@ -1771,10 +1778,10 @@ async def _here(message, count):
     else:
         await Meowth.send_message(message.channel, _("Meowth! {member} is at the raid with a total of {trainer_count} trainers!").format(member=message.author.mention, trainer_count=count))
     # Add trainer name to trainer list
-    if message.author.mention not in trainer_dict:
-        trainer_dict[message.author.mention] = {}
-    trainer_dict[message.author.mention]['status'] = "waiting"
-    trainer_dict[message.author.mention]['count'] = count
+    if message.author.id not in trainer_dict:
+        trainer_dict[message.author.id] = {}
+    trainer_dict[message.author.id]['status'] = "waiting"
+    trainer_dict[message.author.id]['count'] = count
     server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict'] = trainer_dict
 
 async def _cancel(message):
@@ -1782,7 +1789,7 @@ async def _cancel(message):
     channel = message.channel
     server = message.server
     try:
-        t_dict = server_dict[server]['raidchannel_dict'][channel]['trainer_dict'][author.mention]
+        t_dict = server_dict[server]['raidchannel_dict'][channel]['trainer_dict'][author.id]
     except KeyError:
         await Meowth.send_message(channel, _("Meowth! {member} has no status to cancel!").format(member=author.mention))
         return
@@ -1811,8 +1818,8 @@ async def on_message(message):
         if raid_status is not None:
             if server_dict[message.server]['raidchannel_dict'][message.channel]['active']:
                 trainer_dict = server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']
-                if message.author.mention in trainer_dict:
-                    count = trainer_dict[message.author.mention]['count']
+                if message.author.id in trainer_dict:
+                    count = trainer_dict[message.author.id]['count']
                 else:
                     count = 1
                 omw_emoji = parse_emoji(message.server, config['omw_id'])
@@ -1848,7 +1855,8 @@ async def on_message(message):
                     trainer_dict = server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']
                     for trainer in trainer_dict.keys():
                         if trainer_dict[trainer]['status']=='omw':
-                            otw_list.append(trainer)
+                            user = await Meowth.get_user_info(trainer)
+                            otw_list.append(user.mention)
                     await Meowth.send_message(message.channel, content = _("Meowth! Someone has suggested a different location for the raid! Trainers {trainer_list}: make sure you are headed to the right place!").format(trainer_list=", ".join(otw_list)), embed = newembed)
                     return
 
@@ -1862,7 +1870,7 @@ async def on_message(message):
 async def exraid(ctx):
     """Report an upcoming EX raid.
 
-    Usage: !exraid <species> <location>
+    Usage: !exraid <location>
     Meowth will insert the details (really just everything after the species name) into a
     Google maps link and post the link to the same channel the report was made in.
     Meowth's message will also include the type weaknesses of the boss.
@@ -1876,11 +1884,6 @@ async def _exraid(ctx):
     fromegg = False
     exraid_split = message.clean_content.lower().split()
     del exraid_split[0]
-    if message.channel in server_dict[message.channel.server]['raidchannel_dict'] and server_dict[message.channel.server]['raidchannel_dict'][message.channel]['type'] == 'egg' and server_dict[message.channel.server]['raidchannel_dict'][message.channel]['pokemon'] == '':
-        fromegg = True
-    if fromegg is True:
-        await _eggtoraid(" ".join(exraid_split).lower(), message.channel)
-        return
     if len(exraid_split) <= 0:
         await Meowth.send_message(channel, _("Meowth! Give more details when reporting! Usage: **!exraid <location>**"))
         return
@@ -1899,7 +1902,7 @@ async def _exraid(ctx):
         p_name = get_name(p)
         p_type = get_type(message.server,p)
         boss_list.append(p_name+" ("+str(p)+") "+''.join(p_type))
-    raid_channel_name = "exraid-egg-" + sanitize_channel_name(raid_details)
+    raid_channel_name = "ex-raid-egg-" + sanitize_channel_name(raid_details)
     raid_channel_overwrites = channel.overwrites
     meowth_overwrite = (Meowth.user, discord.PermissionOverwrite(send_messages = True))
     for overwrite in raid_channel_overwrites:
@@ -1932,9 +1935,7 @@ Alternatively **!list** by itself will show all of the above.
 **!location new <address>** will let you correct the raid address.
 Sending a Google Maps link will also update the raid location.
 
-Message **!starting** when the raid is beginning to clear the raid's 'here' list.
-
-This channel needs to be manually deleted!""").format(member=message.author.mention, citychannel=channel.mention, location_details=raid_details)
+Message **!starting** when the raid is beginning to clear the raid's 'here' list.""").format(member=message.author.mention, citychannel=channel.mention, location_details=raid_details)
     raidmessage = await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)
 
     server_dict[message.server]['raidchannel_dict'][raid_channel] = {
@@ -1951,8 +1952,8 @@ This channel needs to be manually deleted!""").format(member=message.author.ment
         'egglevel' : 'EX'
         }
 
-    if len(egg_info['pokemon']) == 1:
-        await _eggtoraid(get_name(egg_info['pokemon'][0]).lower(), raid_channel)
+
+    await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time the EX Raid begins using **!timerset <date and time>** so others can check it with **!timer**. **<date and time>** should look exactly as it appears on your invitation.").format(member=message.author.mention))
 
     event_loop.create_task(expiry_check(raid_channel))
 
@@ -1962,7 +1963,7 @@ This channel needs to be manually deleted!""").format(member=message.author.ment
 async def raidegg(ctx):
     """Report a raid egg.
 
-    Usage: !raidegg <level> <location> <minutes>
+    Usage: !raidegg <level> <location> [minutes]
 
     Meowth will give a map link to the entered location and create a channel for organising the coming raid in.
     Meowth will also provide info on the possible bosses that can hatch and their types.
@@ -2152,7 +2153,7 @@ Message **!starting** when the raid is beginning to clear the raid's 'here' list
 
 This channel will be deleted five minutes after the timer expires.""").format(member= raid_messageauthor.mention, citychannel=reportcitychannel.mention, pokemon=entered_raid.capitalize(), location_details=egg_address)
     elif eggdetails['egglevel'] == "EX":
-        raidexp = None
+        raidexp = eggdetails['exp'] + 45 * 60
         hatchtype = "exraid"
         raidreportcontent = _("Meowth! The EX egg has hatched into a {pokemon} raid! Details: {location_details}. Use the **!invite** command to gain access and coordinate in {raid_channel}").format(pokemon=entered_raid.capitalize(), location_details=egg_address, raid_channel=raid_channel.mention)
         raidmsg = _("""Meowth! {pokemon} EX raid reported by {member} in {citychannel}! Details: {location_details}. Coordinate here!
@@ -2170,9 +2171,7 @@ Alternatively **!list** by itself will show all of the above.
 **!location new <address>** will let you correct the raid address.
 Sending a Google Maps link will also update the raid location.
 
-Message **!starting** when the raid is beginning to clear the raid's 'here' list.
-
-This channel needs to be manually deleted!""").format(pokemon=entered_raid.capitalize(), member=raid_messageauthor.mention, citychannel=reportcitychannel.mention, location_details=egg_address)
+Message **!starting** when the raid is beginning to clear the raid's 'here' list.""").format(pokemon=entered_raid.capitalize(), member=raid_messageauthor.mention, citychannel=reportcitychannel.mention, location_details=egg_address)
 
 
     if entered_raid not in pkmn_info['pokemon_list']:
@@ -2228,7 +2227,8 @@ This channel needs to be manually deleted!""").format(pokemon=entered_raid.capit
     trainer_dict = server_dict[raid_channel.server]['raidchannel_dict'][raid_channel]['trainer_dict']
     for trainer in trainer_dict.keys():
         if trainer_dict[trainer]['status'] =='maybe' or trainer_dict[trainer]['status'] =='omw' or trainer_dict[trainer]['status'] =='waiting':
-            trainer_list.append(trainer)
+            user = await Meowth.get_user_info(trainer)
+            trainer_list.append(user.mention)
     if len(raid_info['raid_eggs']['EX']['pokemon']) > 1 or eggdetails['egglevel'].isdigit():
         await Meowth.send_message(raid_channel, content = _("Meowth! Trainers {trainer_list}: The raid egg has just hatched into a {pokemon} raid!\nIf you couldn't before, you're now able to update your status with **!coming** or **!here**. If you've changed your plans, use **!cancel**.").format(trainer_list=", ".join(trainer_list), pokemon=raid.mention), embed = raid_embed)
 
@@ -2250,8 +2250,8 @@ async def interested(ctx, *, count: str = None):
             await Meowth.send_message(ctx.message.channel, _("Meowth! I can't understand how many are in your group. Just say **!interested** if you're by yourself, or **!interested 5** for example if there are 5 in your group."))
             return
     else:
-        if ctx.message.author.mention in trainer_dict:
-            count = trainer_dict[ctx.message.author.mention]['count']
+        if ctx.message.author.id in trainer_dict:
+            count = trainer_dict[ctx.message.author.id]['count']
         else:
             count = 1
 
@@ -2286,8 +2286,8 @@ async def coming(ctx, *, count: str = None):
             await Meowth.send_message(ctx.message.channel, _("Meowth! I can't understand how many are in your group. Just say **!coming** if you're by yourself, or **!coming 5** for example if there are 5 in your group."))
             return
     else:
-        if ctx.message.author.mention in trainer_dict:
-            count = trainer_dict[ctx.message.author.mention]['count']
+        if ctx.message.author.id in trainer_dict:
+            count = trainer_dict[ctx.message.author.id]['count']
         else:
             count = 1
 
@@ -2321,8 +2321,8 @@ async def here(ctx, *, count: str = None):
             await Meowth.send_message(ctx.message.channel, _("Meowth! I can't understand how many are in your group. Just say **!here** if you're by yourself, or **!coming 5** for example if there are 5 in your group."))
             return
     else:
-        if ctx.message.author.mention in trainer_dict:
-            count = trainer_dict[ctx.message.author.mention]['count']
+        if ctx.message.author.id in trainer_dict:
+            count = trainer_dict[ctx.message.author.id]['count']
         else:
             count = 1
 
@@ -2348,16 +2348,19 @@ async def starting(ctx):
     for a second group must reannounce with the :here: emoji or !here."""
 
     ctx_startinglist = []
+    id_startinglist = []
 
     trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
 
     # Add all waiting trainers to the starting list
     for trainer in trainer_dict:
         if trainer_dict[trainer]['status'] == "waiting":
-            ctx_startinglist.append(trainer)
+            user = await Meowth.get_user_info(trainer)
+            ctx_startinglist.append(user.mention)
+            id_startinglist.append(trainer)
 
     # Go back and delete the trainers from the waiting list
-    for trainer in ctx_startinglist:
+    for trainer in id_startinglist:
         del trainer_dict[trainer]
     server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict'] = trainer_dict
 
@@ -2545,19 +2548,19 @@ async def duplicate(ctx):
         dupecount = 2
         rc_d['duplicate'] = dupecount
     else:
-        if author in t_dict:
+        if author.id in t_dict:
             try:
-                if t_dict[author]['dupereporter']:
+                if t_dict[author.id]['dupereporter']:
                     dupeauthmsg = await Meowth.send_message(channel,_("Meowth! You've already made a duplicate report for this raid!"))
                     await asyncio.sleep(10)
                     await Meowth.delete_message(dupeauthmsg)
                     return
                 else:
-                    t_dict[author]['dupereporter'] = True
+                    t_dict[author.id]['dupereporter'] = True
             except KeyError:
-                t_dict[author]['dupereporter'] = True
+                t_dict[author.id]['dupereporter'] = True
         else:
-            t_dict[author] = {
+            t_dict[author.id] = {
                 'status' : '',
                 'dupereporter' : True
                 }
@@ -2683,15 +2686,16 @@ async def new(ctx):
         otw_list = []
         trainer_dict = server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']
         for trainer in trainer_dict.keys():
-            if trainer_dict[trainer]['status']=='omw':
-                otw_list.append(trainer)
+            user = await Meowth.get_user_info(trainer)
+            if trainer_dict[user.id]['status']=='omw':
+                otw_list.append(user.mention)
         await Meowth.send_message(message.channel, content = _("Meowth! Someone has suggested a different location for the raid! Trainers {trainer_list}: make sure you are headed to the right place!").format(trainer_list=", ".join(otw_list)), embed = newembed)
         return
 
 async def _interest(ctx):
-
     ctx_maybecount = 0
-
+    tzlocal = tz.tzoffset(None, server_dict[ctx.message.channel.server]['offset']*3600)
+    now = datetime.datetime.now().replace(tzinfo=tzlocal)
     # Grab all trainers who are maybe and sum
     # up their counts
     trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
@@ -2703,11 +2707,17 @@ async def _interest(ctx):
     # add an extra message indicating who it is.
     maybe_exstr = ""
     maybe_list = []
+    name_list = []
     for trainer in trainer_dict.keys():
         if trainer_dict[trainer]['status']=='maybe':
-            maybe_list.append(trainer)
+            user = await Meowth.get_user_info(trainer)
+            name_list.append("**"+user.name+"**")
+            maybe_list.append(user.mention)
     if ctx_maybecount > 0:
-        maybe_exstr = _(" including {trainer_list} and the people with them! Let them know if there is a group forming").format(trainer_list=", ".join(maybe_list))
+        if now.time().replace(tzinfo=tzlocal) >= datetime.time(5,0).replace(tzinfo=tzlocal) and now.time().replace(tzinfo=tzlocal) <= datetime.time(21,0).replace(tzinfo=tzlocal):
+            maybe_exstr = _(" including {trainer_list} and the people with them! Let them know if there is a group forming").format(trainer_list=", ".join(maybe_list))
+        else:
+            maybe_exstr = _(" including {trainer_list} and the people with them! Let them know if there is a group forming").format(trainer_list=", ".join(name_list))
     listmsg = (_("Meowth! {trainer_count} interested{including_string}!").format(trainer_count=str(ctx_maybecount), including_string=maybe_exstr))
 
     return listmsg
@@ -2715,7 +2725,8 @@ async def _interest(ctx):
 async def _otw(ctx):
 
     ctx_omwcount = 0
-
+    tzlocal = tz.tzoffset(None, server_dict[ctx.message.channel.server]['offset']*3600)
+    now = datetime.datetime.now().replace(tzinfo=tzlocal)
     # Grab all trainers who are :omw: and sum
     # up their counts
     trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
@@ -2727,18 +2738,25 @@ async def _otw(ctx):
     # add an extra message indicating who it is.
     otw_exstr = ""
     otw_list = []
+    name_list = []
     for trainer in trainer_dict.keys():
         if trainer_dict[trainer]['status']=='omw':
-            otw_list.append(trainer)
+            user = await Meowth.get_user_info(trainer)
+            name_list.append("**"+user.name+"**")
+            otw_list.append(user.mention)
     if ctx_omwcount > 0:
-        otw_exstr = _(" including {trainer_list} and the people with them! Be considerate and wait for them if possible").format(trainer_list=", ".join(otw_list))
+        if now.time().replace(tzinfo=tzlocal) >= datetime.time(5,0).replace(tzinfo=tzlocal) and now.time().replace(tzinfo=tzlocal) <= datetime.time(21,0).replace(tzinfo=tzlocal):
+            otw_exstr = _(" including {trainer_list} and the people with them! Be considerate and wait for them if possible").format(trainer_list=", ".join(otw_list))
+        else:
+            otw_exstr = _(" including {trainer_list} and the people with them! Be considerate and wait for them if possible").format(trainer_list=", ".join(name_list))
     listmsg = (_("Meowth! {trainer_count} on the way{including_string}!").format(trainer_count=str(ctx_omwcount), including_string=otw_exstr))
     return listmsg
 
 async def _waiting(ctx):
 
     ctx_waitingcount = 0
-
+    tzlocal = tz.tzoffset(None, server_dict[ctx.message.channel.server]['offset']*3600)
+    now = datetime.datetime.now().replace(tzinfo=tzlocal)
     # Grab all trainers who are :here: and sum
     # up their counts
     trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
@@ -2750,11 +2768,17 @@ async def _waiting(ctx):
     # add an extra message indicating who it is.
     waiting_exstr = ""
     waiting_list = []
+    name_list = []
     for trainer in trainer_dict.keys():
         if trainer_dict[trainer]['status']=='waiting':
-            waiting_list.append(trainer)
+            user = await Meowth.get_user_info(trainer)
+            name_list.append("**"+user.name+"**")
+            waiting_list.append(user.mention)
     if ctx_waitingcount > 0:
-        waiting_exstr = _(" including {trainer_list} and the people with them! Be considerate and let them know if and when you'll be there").format(trainer_list=", ".join(waiting_list))
+        if now.time().replace(tzinfo=tzlocal) >= datetime.time(5,0).replace(tzinfo=tzlocal) and now.time().replace(tzinfo=tzlocal) <= datetime.time(21,0).replace(tzinfo=tzlocal):
+            waiting_exstr = _(" including {trainer_list} and the people with them! Be considerate and let them know if and when you'll be there").format(trainer_list=", ".join(waiting_list))
+        else:
+            waiting_exstr = _(" including {trainer_list} and the people with them! Be considerate and let them know if and when you'll be there").format(trainer_list=", ".join(name_list))
     listmsg = (_("Meowth! {trainer_count} waiting at the raid{including_string}!").format(trainer_count=str(ctx_waitingcount), including_string=waiting_exstr))
     return listmsg
 
@@ -2778,7 +2802,7 @@ async def waiting(ctx):
 async def invite(ctx):
     """Join an EXraid by showing your invite.
 
-    Usage: !invite *image attachment*
+    Usage: !invite [image attachment]
     If the image isn't added at the same time as the command, Meowth will wait 30 seconds for a followup message containing the image."""
     if ctx.message.attachments:
         await _invite(ctx)
@@ -2820,7 +2844,7 @@ async def _invite(ctx):
                 for channel in server_dict[ctx.message.server]['raidchannel_dict']:
                     if not discord.utils.get(ctx.message.server.channels, id = channel.id):
                         continue
-                    if server_dict[ctx.message.server]['raidchannel_dict'][channel]['type'] == 'exraid':
+                    if server_dict[ctx.message.server]['raidchannel_dict'][channel]['egglevel'] == 'EX' or server_dict[ctx.message.server]['raidchannel_dict'][channel]['type'] == 'exraid':
                         if channel.mention != '#deleted-channel':
                             exraidcount += 1
                             exraidlist += '\n' + str(exraidcount) + '.   ' + channel.mention

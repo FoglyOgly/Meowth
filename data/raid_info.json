@@ -24,7 +24,7 @@
         "5": {
             "egg": "legendary",
             "egg_img": "5.png",
-            "pokemon": [150,243,244,245]
+            "pokemon": [243,244,245]
         },
         "EX": {
             "egg": "EX",

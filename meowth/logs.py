@@ -1,6 +1,6 @@
 import sys
-import logging.handlers
 import logging
+import logging.handlers
 
 def init_loggers():
     # d.py stuff

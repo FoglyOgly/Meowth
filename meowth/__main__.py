@@ -1344,8 +1344,12 @@ async def want(ctx):
     want_split = message.clean_content.lower().split()
     del want_split[0]
     entered_want = " ".join(want_split)
-    if entered_want not in pkmn_info['pokemon_list']:
-        await Meowth.send_message(channel, spellcheck(entered_want))
+    rgx = r"[^a-zA-Z0-9]"
+    pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", entered_want)), None)
+    if pkmn_match:
+        entered_want = pkmn_match
+    else:
+        await Meowth.send_message(message.channel, spellcheck(entered_want))
         return
     role = discord.utils.get(server.roles, name=entered_want)
     # Create role if it doesn't exist yet

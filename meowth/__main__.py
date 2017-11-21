@@ -1560,7 +1560,7 @@ async def _raid(message):
         await Meowth.send_message(message.channel, spellcheck(entered_raid))
         return
     
-    raid_match = next((p for p in pkmn_info['raid_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", entered_raid)), None]
+    raid_match = next((p for p in pkmn_info['raid_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", entered_raid)), None)
     if not raid_match:
         await Meowth.send_message(message.channel, _("Meowth! The Pokemon {pokemon} does not appear in raids!").format(pokemon=entered_raid.capitalize()))
         return

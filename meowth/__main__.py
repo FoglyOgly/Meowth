@@ -1699,7 +1699,7 @@ async def timerset(ctx,timer):
     if checks.check_exraidchannel(ctx):
         if checks.check_eggchannel(ctx):
             tzlocal = tz.tzoffset(None, server_dict[server]['offset']*3600)
-            now = datetime.datetime.now()
+            now = datetime.datetime.now(tzlocal)
             timer_split = message.clean_content.lower().split()
             del timer_split[0]
             try:

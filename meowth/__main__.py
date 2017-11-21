@@ -1478,7 +1478,7 @@ async def _wild(message):
         else:
             await Meowth.send_message(message.channel, spellcheck(entered_wild))
             return
-    
+
         wild = discord.utils.get(message.server.roles, name = entered_wild)
         if wild is None:
             wild = await Meowth.create_role(server = message.server, name = entered_wild, hoist = False, mentionable = True)
@@ -1566,7 +1566,7 @@ async def _raid(message):
     else:
         await Meowth.send_message(message.channel, spellcheck(entered_raid))
         return
-    
+
     raid_match = next((p for p in pkmn_info['raid_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", entered_raid)), None)
     if not raid_match:
         await Meowth.send_message(message.channel, _("Meowth! The Pokemon {pokemon} does not appear in raids!").format(pokemon=entered_raid.capitalize()))
@@ -1971,7 +1971,7 @@ Message **!starting** when the raid is beginning to clear the raid's 'here' list
     if len(raid_info['raid_eggs']['EX']['pokemon']) == 1:
         server_dict[message.server]['raidchannel_dict'][raid_channel]['pokemon'] = get_name(raid_info['raid_eggs']['EX']['pokemon'][0])
     tzlocal = tz.tzoffset(None, server_dict[message.server]['offset']*3600)
-    await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset ex <date and time>** so others can check it with **!timer**. **<date and time>** should look like this **{format}**, but set it to the date and time your invitation has.").format(member=message.author.mention, format=datetime.datetime.now(tzlocal).strftime('%m/%d %I:%M %p')))
+    await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset <date and time>** so others can check it with **!timer**. **<date and time>** should look like this **{format}**, but set it to the date and time your invitation has.").format(member=message.author.mention, format=datetime.datetime.now(tzlocal).strftime('%m/%d %I:%M %p')))
     event_loop.create_task(expiry_check(raid_channel))
 
 @Meowth.command(pass_context=True)
@@ -2650,7 +2650,9 @@ async def location(ctx):
         report_channel = discord.utils.get(server.channels, name=report_city)
         oldembed = raidmsg.embeds[0]
         locurl = oldembed['url']
-        newembed = discord.Embed(title=oldembed['title'],url=locurl,description=oldembed['description'],colour=server.me.colour)
+        newembed = discord.Embed(title=oldembed['title'],url=locurl,colour=server.me.colour)
+        newembed.add_field(name=oldembed['fields'][0]['name'],value=oldembed['fields'][0]['value'],inline=True)
+        newembed.add_field(name=oldembed['fields'][1]['name'],value=oldembed['fields'][1]['value'],inline=True)
         newembed.set_thumbnail(url=oldembed['thumbnail']['url'])
         locationmsg = await Meowth.send_message(channel, content = _("Meowth! Here's the current location for the raid!\nDetails:{location}").format(location = location), embed = newembed)
         await asyncio.sleep(60)
@@ -2693,7 +2695,9 @@ async def new(ctx):
         oldraidmsg = server_dict[message.server]['raidchannel_dict'][message.channel]['raidmessage']
         oldreportmsg = server_dict[message.server]['raidchannel_dict'][message.channel]['raidreport']
         oldembed = oldraidmsg.embeds[0]
-        newembed = discord.Embed(title=oldembed['title'],url=newloc,description=oldembed['description'],colour=message.server.me.colour)
+        newembed = discord.Embed(title=oldembed['title'],url=newloc,colour=message.server.me.colour)
+        newembed.add_field(name=oldembed['fields'][0]['name'],value=oldembed['fields'][0]['value'],inline=True)
+        newembed.add_field(name=oldembed['fields'][1]['name'],value=oldembed['fields'][1]['value'],inline=True)
         newembed.set_thumbnail(url=oldembed['thumbnail']['url'])
         newraidmsg = await Meowth.edit_message(oldraidmsg, new_content=oldraidmsg.content, embed=newembed)
         newreportmsg = await Meowth.edit_message(oldreportmsg, new_content=oldreportmsg.content, embed=newembed)

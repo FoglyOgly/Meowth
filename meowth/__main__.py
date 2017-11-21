@@ -2875,10 +2875,10 @@ async def _invite(ctx):
         await Meowth.send_message(ctx.message.channel, "Meowth! Please upload your screenshot directly to Discord!")
 
 def recover():
-    for server in serverdict.keys():
-        for channel in serverdict[server]['raidchannel_dict']:
-            for trainer in serverdict[server]['raidchannel_dict'][channel]['trainer_dict']:
-                serverdict[server]['raidchannel_dict'][channel]['trainer_dict'][trainer] = re.sub('[^0-9]', '', trainer)
+    for server in server_dict.keys():
+        for channel in server_dict[server]['raidchannel_dict']:
+            for trainer in server_dict[server]['raidchannel_dict'][channel]['trainer_dict']:
+                server_dict[server]['raidchannel_dict'][channel]['trainer_dict'][trainer] = re.sub('[^0-9]', '', trainer)
 
 recover()
 

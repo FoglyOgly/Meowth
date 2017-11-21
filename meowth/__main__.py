@@ -1464,10 +1464,14 @@ async def _wild(message):
         wild_gmaps_link = create_gmaps_query(wild_details, message.channel)
 
 
-    if entered_wild not in pkmn_info['pokemon_list']:
-        await Meowth.send_message(message.channel, spellcheck(entered_wild))
-        return
-    else:
+        rgx = r"[^a-zA-Z0-9]"
+        pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", entered_wild)), None)
+        if pkmn_match:
+            entered_wild = pkmn_match
+        else:
+            await Meowth.send_message(message.channel, spellcheck(entered_wild))
+            return
+    
         wild = discord.utils.get(message.server.roles, name = entered_wild)
         if wild is None:
             wild = await Meowth.create_role(server = message.server, name = entered_wild, hoist = False, mentionable = True)
@@ -1548,10 +1552,16 @@ async def _raid(message):
             await Meowth.send_message(message.channel, _("Meowth...that's too long. Raids currently last no more than 45 minutes..."))
             return
 
-    if entered_raid not in pkmn_info['pokemon_list']:
+    rgx = r"[^a-zA-Z0-9]"
+    pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", entered_raid)), None)
+    if pkmn_match:
+        entered_raid = pkmn_match
+    else:
         await Meowth.send_message(message.channel, spellcheck(entered_raid))
         return
-    if entered_raid not in pkmn_info['raid_list'] and entered_raid in pkmn_info['pokemon_list']:
+    
+    raid_match = next((p for p in pkmn_info['raid_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", entered_raid)), None]
+    if not raid_match:
         await Meowth.send_message(message.channel, _("Meowth! The Pokemon {pokemon} does not appear in raids!").format(pokemon=entered_raid.capitalize()))
         return
 

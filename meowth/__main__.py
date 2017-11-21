@@ -1957,7 +1957,7 @@ Message **!starting** when the raid is beginning to clear the raid's 'here' list
     server_dict[message.server]['raidchannel_dict'][raid_channel] = {
         'reportcity' : channel.name,
         'trainer_dict' : {},
-        'exp' : None, # No expiry
+        'exp' : time.time() + 14*24*60*60, # No expiry
         'manual_timer' : False,
         'active' : True,
         'raidmessage' : raidmessage,

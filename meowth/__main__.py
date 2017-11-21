@@ -1720,7 +1720,6 @@ def _timercheck(time, maxtime):
 
 async def _timerset(raidchannel, exptime):
     server = raidchannel.server
-    exptime = int(exptime)
     # Meowth saves the timer message in the channel's 'exp' field.
 
     expire = time.time() + (exptime * 60)

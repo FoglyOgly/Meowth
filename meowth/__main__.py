@@ -2883,6 +2883,12 @@ async def _invite(ctx):
     else:
         await Meowth.send_message(ctx.message.channel, "Meowth! Please upload your screenshot directly to Discord!")
 
+@Meowth.command(pass_context=True)
+@checks.is_owner()
+async def raid_json_reload(ctx):
+    with open(os.path.join('data', 'raid_info.json'), "r") as fd:
+        raid_info = json.load(fd)
+
 def recover():
     for server in server_dict.keys():
         for channel in server_dict[server]['raidchannel_dict']:

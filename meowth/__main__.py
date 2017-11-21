@@ -2874,6 +2874,14 @@ async def _invite(ctx):
     else:
         await Meowth.send_message(ctx.message.channel, "Meowth! Please upload your screenshot directly to Discord!")
 
+def recover():
+    for server in serverdict.keys():
+        for channel in serverdict[server]['raidchannel_dict']:
+            for trainer in serverdict[server]['raidchannel_dict'][channel]['trainer_dict']:
+                serverdict[server]['raidchannel_dict'][channel]['trainer_dict'][trainer] = re.sub('[^0-9]', '', trainer)
+
+recover()
+
 try:
     event_loop.run_until_complete(Meowth.start(config['bot_token']))
 except discord.LoginFailure:

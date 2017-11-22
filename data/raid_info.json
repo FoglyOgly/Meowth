@@ -4,7 +4,7 @@
         "1": {
             "egg": "normal",
             "egg_img": "1.png",
-            "pokemon": [2,5,8,11]
+            "pokemon": [2,5,8,11,129]
         },
         "2": {
             "egg": "normal",

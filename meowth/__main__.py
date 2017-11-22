@@ -1840,11 +1840,25 @@ async def on_message(message):
                     count = 1
                 omw_emoji = parse_emoji(message.server, config['omw_id'])
                 if message.content.startswith(omw_emoji):
+                    try:
+                        if server_dict[message.server]['raidchannel_dict'][message.channel]['type'] == "egg":
+                            if server_dict[message.server]['raidchannel_dict'][message.channel]['pokemon'] == "":
+                                await Meowth.send_message(message.channel, _("Meowth! Please wait until the raid egg has hatched before announcing you're coming or present."))
+                                return
+                    except:
+                        pass
                     emoji_count = message.content.count(omw_emoji)
                     await _coming(message, emoji_count)
                     return
                 here_emoji = parse_emoji(message.server, config['here_id'])
                 if message.content.startswith(here_emoji):
+                    try:
+                        if server_dict[message.server]['raidchannel_dict'][message.channel]['type'] == "egg":
+                            if server_dict[message.server]['raidchannel_dict'][message.channel]['pokemon'] == "":
+                                await Meowth.send_message(message.channel, _("Meowth! Please wait until the raid egg has hatched before announcing you're coming or present."))
+                                return
+                    except:
+                        pass
                     emoji_count = message.content.count(here_emoji)
                     await _here(message, emoji_count)
                     return

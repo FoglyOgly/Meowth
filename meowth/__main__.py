@@ -1487,7 +1487,7 @@ async def _wild(message):
         wild_img_url = "https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn/{0}_.png".format(str(wild_number).zfill(3))
         wild_embed = discord.Embed(title=_("Meowth! Click here for my directions to the wild {pokemon}!").format(pokemon=entered_wild.capitalize()),description=_("Ask {author} if my directions aren't perfect!").format(author=message.author.name),url=wild_gmaps_link,colour=message.server.me.colour)
         wild_embed.add_field(name="**Details:**", value=_("{pokemon} ({pokemonnumber}) {type}").format(pokemon=entered_wild.capitalize(),pokemonnumber=str(wild_number),type="".join(get_type(message.server, wild_number)),inline=True))
-        wild_embed.set_footer(text=_("Reported by @{author}").format(author=message.author.name), icon_url=message.author.avatar_url)
+        wild_embed.set_footer(text=_("Reported by @{author}").format(author=message.author.display_name), icon_url=_("https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}.{format}?size={size}".format(user=message.author, format="jpg", size=32)))
         wild_embed.set_thumbnail(url=wild_img_url)
         await Meowth.send_message(message.channel, content=_("Meowth! Wild {pokemon} reported by {member}! Details: {location_details}").format(pokemon=wild.mention, member=message.author.mention, location_details=wild_details),embed=wild_embed)
 
@@ -1590,7 +1590,7 @@ async def _raid(message):
     raid_embed = discord.Embed(title=_("Meowth! Click here for directions to the raid!"),url=raid_gmaps_link,colour=message.server.me.colour)
     raid_embed.add_field(name="**Details:**", value=_("{pokemon} ({pokemonnumber}) {type}").format(pokemon=entered_raid.capitalize(),pokemonnumber=str(raid_number),type="".join(get_type(message.server, raid_number)),inline=True))
     raid_embed.add_field(name="**Weaknesses:**", value=_("{weakness_list}").format(weakness_list=weakness_to_str(message.server, get_weaknesses(entered_raid))),inline=True)
-    raid_embed.set_footer(text=_("Reported by @{author}").format(author=message.author.name), icon_url=message.author.avatar_url)
+    raid_embed.set_footer(text=_("Reported by @{author}").format(author=message.author.display_name), icon_url=_("https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}.{format}?size={size}".format(user=message.author, format="jpg", size=32)))
     raid_embed.set_thumbnail(url=raid_img_url)
     raidreport = await Meowth.send_message(message.channel, content = _("Meowth! {pokemon} raid reported by {member}! Details: {location_details}. Coordinate in {raid_channel}").format(pokemon=entered_raid.capitalize(), member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention),embed=raid_embed)
     await asyncio.sleep(1) #Wait for the channel to be created.
@@ -1933,7 +1933,7 @@ async def _exraid(ctx):
         raid_embed.add_field(name="\u200b", value=_("{bosslist2}").format(bosslist2="\n".join(boss_list[1::2])), inline=True)
     else:
         raid_embed.add_field(name="**Possible Bosses:**", value=_("{bosslist}").format(bosslist="".join(boss_list)), inline=True)
-    raid_embed.set_footer(text=_("Reported by @{author}").format(author=message.author.name), icon_url=message.author.avatar_url)
+    raid_embed.set_footer(text=_("Reported by @{author}").format(author=message.author.display_name), icon_url=_("https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}.{format}?size={size}".format(user=message.author, format="jpg", size=32)))
     raid_embed.set_thumbnail(url=raid_img_url)
     raidreport = await Meowth.send_message(channel, content = _("Meowth! EX raid egg reported by {member}! Details: {location_details}. Use the **!invite** command to gain access and coordinate in {raid_channel}").format(member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention),embed=raid_embed)
     await asyncio.sleep(1) #Wait for the channel to be created.
@@ -2055,7 +2055,7 @@ async def _raidegg(message):
         raid_embed = discord.Embed(title=_("Meowth! Click here for directions to the coming raid!"),url=raid_gmaps_link,colour=message.server.me.colour)
         raid_embed.add_field(name="**Possible Bosses:**", value=_("{bosslist1}").format(bosslist1="\n".join(boss_list[::2])), inline=True)
         raid_embed.add_field(name="\u200b", value=_("{bosslist2}").format(bosslist2="\n".join(boss_list[1::2])), inline=True)
-        raid_embed.set_footer(text=_("Reported by @{author}").format(author=message.author.name), icon_url=message.author.avatar_url)
+        raid_embed.set_footer(text=_("Reported by @{author}").format(author=message.author.display_name), icon_url=_("https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}.{format}?size={size}".format(user=message.author, format="jpg", size=32)))
         raid_embed.set_thumbnail(url=raid_img_url)
         raidreport = await Meowth.send_message(message.channel, content = _("Meowth! Level {level} raid egg reported by {member}! Details: {location_details}. Coordinate in {raid_channel}").format(level=egg_level, member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention),embed=raid_embed)
         await asyncio.sleep(1) #Wait for the channel to be created.
@@ -2216,7 +2216,7 @@ Message **!starting** when the raid is beginning to clear the raid's 'here' list
     raid_embed = discord.Embed(title=_("Meowth! Click here for directions to the raid!"),url=raid_gmaps_link,colour=raid_channel.server.me.colour)
     raid_embed.add_field(name="**Details:**", value=_("{pokemon} ({pokemonnumber}) {type}").format(pokemon=entered_raid.capitalize(),pokemonnumber=str(raid_number),type="".join(get_type(raid_channel.server, raid_number)),inline=True))
     raid_embed.add_field(name="**Weaknesses:**", value=_("{weakness_list}").format(weakness_list=weakness_to_str(raid_channel.server, get_weaknesses(entered_raid))),inline=True)
-    raid_embed.set_footer(text=_("Reported by @{author}").format(author=raid_messageauthor.name), icon_url=raid_messageauthor.avatar_url)
+    raid_embed.set_footer(text=_("Reported by @{author}").format(author=raid_messageauthor.display_name), icon_url=_("https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}.{format}?size={size}".format(user=raid_messageauthor, format="jpg", size=32)))
     raid_embed.set_thumbnail(url=raid_img_url)
     await Meowth.edit_channel(raid_channel, name=raid_channel_name)
     try:

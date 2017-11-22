@@ -1677,7 +1677,7 @@ async def timerset(ctx,timer):
     message = ctx.message
     channel = message.channel
     server = message.server
-    if checks.check_raidactive(ctx) and not checks.check_exraidchannel(ctx):
+    if not checks.check_exraidchannel(ctx):
         if server_dict[server]['raidchannel_dict'][channel]['type'] == 'egg':
             raidtype = "Raid Egg"
             maxtime = 60

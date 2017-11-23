@@ -2919,13 +2919,6 @@ async def raid_json_reload(ctx):
     with open(os.path.join('data', 'raid_info.json'), "r") as fd:
         raid_info = json.load(fd)
 
-def recover():
-    for server in server_dict.keys():
-        for channel in server_dict[server]['raidchannel_dict']:
-            for trainer in server_dict[server]['raidchannel_dict'][channel]['trainer_dict']:
-                server_dict[server]['raidchannel_dict'][channel]['trainer_dict'][trainer] = re.sub('[^0-9]', '', trainer)
-
-recover()
 
 try:
     event_loop.run_until_complete(Meowth.start(config['bot_token']))

@@ -1948,6 +1948,7 @@ async def _exraid(ctx):
         raid_embed.add_field(name="\u200b", value=_("{bosslist2}").format(bosslist2="\n".join(boss_list[1::2])), inline=True)
     else:
         raid_embed.add_field(name="**Possible Bosses:**", value=_("{bosslist}").format(bosslist="".join(boss_list)), inline=True)
+        raid_embed.add_field(name="\u200b", value="\u200b", inline=True)
     raid_embed.set_footer(text=_("Reported by @{author}").format(author=message.author.display_name), icon_url=_("https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}.{format}?size={size}".format(user=message.author, format="jpg", size=32)))
     raid_embed.set_thumbnail(url=raid_img_url)
     raidreport = await Meowth.send_message(channel, content = _("Meowth! EX raid egg reported by {member}! Details: {location_details}. Use the **!invite** command to gain access and coordinate in {raid_channel}").format(member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention),embed=raid_embed)
@@ -2709,7 +2710,7 @@ async def new(ctx):
         else:
             newloc = create_gmaps_query(details, report_channel)
 
-        server_dict[message.server]['raidchannel_dict'][message.channel]['address'] = details
+
         oldraidmsg = server_dict[message.server]['raidchannel_dict'][message.channel]['raidmessage']
         oldreportmsg = server_dict[message.server]['raidchannel_dict'][message.channel]['raidreport']
         oldembed = oldraidmsg.embeds[0]

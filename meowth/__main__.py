@@ -2916,10 +2916,8 @@ async def _invite(ctx):
 
 @Meowth.command(pass_context=True)
 @checks.is_owner()
-async def raid_json_reload(ctx):
-    with open(os.path.join('data', 'raid_info.json'), "r") as fd:
-        raid_info = json.load(fd)
-
+async def reload_json(ctx):
+    load_config()
 
 try:
     event_loop.run_until_complete(Meowth.start(config['bot_token']))

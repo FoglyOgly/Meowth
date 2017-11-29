@@ -2736,8 +2736,7 @@ async def new(ctx):
 
 async def _interest(ctx):
     ctx_maybecount = 0
-    tzlocal = tz.tzoffset(None, server_dict[ctx.message.channel.server]['offset']*3600)
-    now = datetime.datetime.now().replace(tzinfo=tzlocal)
+    now = datetime.datetime.utcnow() + datetime.timedelta(hours=server_dict[ctx.message.channel.server]['offset'])
     # Grab all trainers who are maybe and sum
     # up their counts
     trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
@@ -2756,7 +2755,7 @@ async def _interest(ctx):
             name_list.append("**"+user.name+"**")
             maybe_list.append(user.mention)
     if ctx_maybecount > 0:
-        if now.time().replace(tzinfo=tzlocal) >= datetime.time(5,0).replace(tzinfo=tzlocal) and now.time().replace(tzinfo=tzlocal) <= datetime.time(21,0).replace(tzinfo=tzlocal):
+        if now.time() >= datetime.time(5,0) and now.time() <= datetime.time(21,0):
             maybe_exstr = _(" including {trainer_list} and the people with them! Let them know if there is a group forming").format(trainer_list=", ".join(maybe_list))
         else:
             maybe_exstr = _(" including {trainer_list} and the people with them! Let them know if there is a group forming").format(trainer_list=", ".join(name_list))
@@ -2767,8 +2766,7 @@ async def _interest(ctx):
 async def _otw(ctx):
 
     ctx_omwcount = 0
-    tzlocal = tz.tzoffset(None, server_dict[ctx.message.channel.server]['offset']*3600)
-    now = datetime.datetime.now().replace(tzinfo=tzlocal)
+    now = datetime.datetime.utcnow() + datetime.timedelta(hours=server_dict[ctx.message.channel.server]['offset'])
     # Grab all trainers who are :omw: and sum
     # up their counts
     trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
@@ -2787,7 +2785,7 @@ async def _otw(ctx):
             name_list.append("**"+user.name+"**")
             otw_list.append(user.mention)
     if ctx_omwcount > 0:
-        if now.time().replace(tzinfo=tzlocal) >= datetime.time(5,0).replace(tzinfo=tzlocal) and now.time().replace(tzinfo=tzlocal) <= datetime.time(21,0).replace(tzinfo=tzlocal):
+        if now.time() >= datetime.time(5,0) and now.time() <= datetime.time(21,0):
             otw_exstr = _(" including {trainer_list} and the people with them! Be considerate and wait for them if possible").format(trainer_list=", ".join(otw_list))
         else:
             otw_exstr = _(" including {trainer_list} and the people with them! Be considerate and wait for them if possible").format(trainer_list=", ".join(name_list))
@@ -2797,8 +2795,7 @@ async def _otw(ctx):
 async def _waiting(ctx):
 
     ctx_waitingcount = 0
-    tzlocal = tz.tzoffset(None, server_dict[ctx.message.channel.server]['offset']*3600)
-    now = datetime.datetime.now().replace(tzinfo=tzlocal)
+    now = datetime.datetime.utcnow() + datetime.timedelta(hours=server_dict[ctx.message.channel.server]['offset'])
     # Grab all trainers who are :here: and sum
     # up their counts
     trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
@@ -2817,7 +2814,7 @@ async def _waiting(ctx):
             name_list.append("**"+user.name+"**")
             waiting_list.append(user.mention)
     if ctx_waitingcount > 0:
-        if now.time().replace(tzinfo=tzlocal) >= datetime.time(5,0).replace(tzinfo=tzlocal) and now.time().replace(tzinfo=tzlocal) <= datetime.time(21,0).replace(tzinfo=tzlocal):
+        if now.time() >= datetime.time(5,0) and now.time() <= datetime.time(21,0):
             waiting_exstr = _(" including {trainer_list} and the people with them! Be considerate and let them know if and when you'll be there").format(trainer_list=", ".join(waiting_list))
         else:
             waiting_exstr = _(" including {trainer_list} and the people with them! Be considerate and let them know if and when you'll be there").format(trainer_list=", ".join(name_list))

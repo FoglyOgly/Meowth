@@ -2464,7 +2464,7 @@ async def list(ctx):
                         assumed_str = " (assumed)"
                     else:
                         assumed_str = ""
-                    if rc_d[r]['egglevel'].isdigit():
+                    if rc_d[r]['egglevel'].isdigit() and int(rc_d[r]['egglevel']) > 0:
                         expirytext = " - Hatches: {expiry} ({expiry24hr}){is_assumed}".format(expiry=localexpire, expiry24hr=localexpire24, is_assumed=assumed_str)
                     elif rc_d[r]['egglevel'] is "EX" or rc_d[r]['type'] is "exraid":
                         expirytext = " - Hatches: {expiry_day} at {expiry_time} ({expiry_time24}){is_assumed}!".format(expiry_day=strftime("%B %d",expiry_time),expiry_time=strftime("%I:%M%p", expiry_time),expiry_time24=strftime("%H:%M", expiry_time),is_assumed=assumed_str)

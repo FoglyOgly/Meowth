@@ -1469,8 +1469,6 @@ async def _wild(message):
                     await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!wild <pokemon name> <location>**"))
                     return
         wild_gmaps_link = create_gmaps_query(wild_details, message.channel)
-
-
         rgx = r"[^a-zA-Z0-9]"
         pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", entered_wild)), None)
         if pkmn_match:
@@ -1478,7 +1476,6 @@ async def _wild(message):
         else:
             await Meowth.send_message(message.channel, spellcheck(entered_wild))
             return
-
         wild = discord.utils.get(message.server.roles, name = entered_wild)
         if wild is None:
             wild = await Meowth.create_role(server = message.server, name = entered_wild, hoist = False, mentionable = True)
@@ -1826,6 +1823,7 @@ async def _cancel(message):
         else:
             await Meowth.send_message(channel, _("Meowth! {member} and their total of {trainer_count} trainers are no longer on their way!").format(member=author.mention, trainer_count=t_dict['count']))
     t_dict['status'] = None
+    t_dict['count'] = 1
 
 @Meowth.event
 async def on_message(message):
@@ -2088,7 +2086,7 @@ Use **!list interested** to see the list of trainers who are interested.
 **!location new <address>** will let you correct the raid address.
 Sending a Google Maps link will also update the raid location.
 
-**!timer** will show how long until the egg catches into an open raid.
+**!timer** will show how long until the egg hatches into an open raid.
 **!timerset** will let you correct the egg countdown time.
 
 Message **!raid <pokemon>** to update this channel into an open raid.
@@ -2125,18 +2123,21 @@ async def _eggassume(args, raid_channel):
         await Meowth.send_message(raid_channel, _("Meowth! **!raid assume** is not allowed in this level egg."))
         return
     entered_raid = re.sub("[\@]", "", args.lstrip("assume").lstrip(" ").lower())
-    if entered_raid not in pkmn_info['pokemon_list']:
+    rgx = r"[^a-zA-Z0-9]"
+    pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", entered_raid)), None)
+    if pkmn_match:
+        entered_raid = pkmn_match
+    else:
         await Meowth.send_message(raid_channel, spellcheck(entered_raid))
         return
+    raid_match = next((p for p in pkmn_info['raid_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", entered_raid)), None)
+    if not raid_match:
+        await Meowth.send_message(raid_channel, _("Meowth! The Pokemon {pokemon} does not appear in raids!").format(pokemon=entered_raid.capitalize()))
+        return
     else:
-        if entered_raid not in pkmn_info['raid_list']:
-            await Meowth.send_message(raid_channel, _("Meowth! The Pokemon {pokemon} does not appear in raids!").format(pokemon=entered_raid.capitalize()))
+        if get_number(entered_raid) not in raid_info['raid_eggs'][egglevel]['pokemon']:
+            await Meowth.send_message(raid_channel, _("Meowth! The Pokemon {pokemon} does not hatch from level {level} raid eggs!").format(pokemon=entered_raid.capitalize(), level=egglevel))
             return
-        else:
-            if get_number(entered_raid) not in raid_info['raid_eggs'][egglevel]['pokemon']:
-                await Meowth.send_message(raid_channel, _("Meowth! The Pokemon {pokemon} does not hatch from level {level} raid eggs!").format(pokemon=entered_raid.capitalize(), level=egglevel))
-                return
-
     eggdetails['pokemon'] = entered_raid
     raidrole = discord.utils.get(raid_channel.server.roles, name = entered_raid)
     if raidrole is None:

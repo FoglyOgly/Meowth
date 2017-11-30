@@ -337,7 +337,7 @@ If this was in error, reset the raid with **!timerset**"""))
         elif server_dict[server]['raidchannel_dict'][channel]['type'] == 'egg':
             if not alreadyexpired:
                 maybe_list = []
-                trainer_dict = server_dict[channel.server]['raidchannel_dict'][channel]['trainer_dict']
+                trainer_dict = copy.deepcopy(server_dict[channel.server]['raidchannel_dict'][channel]['trainer_dict'])
                 for trainer in trainer_dict.keys():
                     if trainer_dict[trainer]['status']=='maybe':
                         user = await Meowth.get_user_info(trainer)
@@ -1883,7 +1883,7 @@ async def on_message(message):
                     server_dict[message.server]['raidchannel_dict'][message.channel]['raidmessage'] = newraidmsg
                     server_dict[message.server]['raidchannel_dict'][message.channel]['raidreport'] = newreportmsg
                     otw_list = []
-                    trainer_dict = server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']
+                    trainer_dict = copy.deepcopy(server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict'])
                     for trainer in trainer_dict.keys():
                         if trainer_dict[trainer]['status']=='omw':
                             user = await Meowth.get_user_info(trainer)
@@ -2262,7 +2262,7 @@ Message **!starting** when the raid is beginning to clear the raid's 'here' list
     }
 
     trainer_list = []
-    trainer_dict = server_dict[raid_channel.server]['raidchannel_dict'][raid_channel]['trainer_dict']
+    trainer_dict = copy.deepcopy(server_dict[raid_channel.server]['raidchannel_dict'][raid_channel]['trainer_dict'])
     for trainer in trainer_dict.keys():
         if trainer_dict[trainer]['status'] =='maybe' or trainer_dict[trainer]['status'] =='omw' or trainer_dict[trainer]['status'] =='waiting':
             user = await Meowth.get_user_info(trainer)
@@ -2387,7 +2387,7 @@ async def starting(ctx):
     ctx_startinglist = []
     id_startinglist = []
 
-    trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
+    trainer_dict = copy.deepcopy(server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict'])
 
     # Add all waiting trainers to the starting list
     for trainer in trainer_dict:
@@ -2729,7 +2729,7 @@ async def new(ctx):
         server_dict[message.server]['raidchannel_dict'][message.channel]['raidmessage'] = newraidmsg
         server_dict[message.server]['raidchannel_dict'][message.channel]['raidreport'] = newreportmsg
         otw_list = []
-        trainer_dict = server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict']
+        trainer_dict = copy.deepcopy(server_dict[message.server]['raidchannel_dict'][message.channel]['trainer_dict'])
         for trainer in trainer_dict.keys():
             user = await Meowth.get_user_info(trainer)
             if trainer_dict[user.id]['status']=='omw':
@@ -2742,7 +2742,7 @@ async def _interest(ctx):
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=server_dict[ctx.message.channel.server]['offset'])
     # Grab all trainers who are maybe and sum
     # up their counts
-    trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
+    trainer_dict = copy.deepcopy(server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict'])
     for trainer in trainer_dict.values():
         if trainer['status'] == "maybe":
             ctx_maybecount += trainer['count']
@@ -2772,7 +2772,7 @@ async def _otw(ctx):
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=server_dict[ctx.message.channel.server]['offset'])
     # Grab all trainers who are :omw: and sum
     # up their counts
-    trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
+    trainer_dict = copy.deepcopy(server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict'])
     for trainer in trainer_dict.values():
         if trainer['status'] == "omw":
             ctx_omwcount += trainer['count']
@@ -2801,7 +2801,7 @@ async def _waiting(ctx):
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=server_dict[ctx.message.channel.server]['offset'])
     # Grab all trainers who are :here: and sum
     # up their counts
-    trainer_dict = server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict']
+    trainer_dict = copy.deepcopy(server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict'])
     for trainer in trainer_dict.values():
         if trainer['status'] == "waiting":
             ctx_waitingcount += trainer['count']

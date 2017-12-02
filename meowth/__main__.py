@@ -279,7 +279,7 @@ async def expiry_check(channel):
                         if server_dict[server]['raidchannel_dict'][channel]['exp'] <= time.time():
                             if server_dict[server]['raidchannel_dict'][channel]['type'] == 'egg':
                                 pokemon = server_dict[server]['raidchannel_dict'][channel]['pokemon']
-                                if pokemon != '':
+                                if pokemon:
                                     logger.info("Expire_Channel - Egg Auto Hatched - "+channel.name)
                                     try:
                                         active_raids.remove(channel)
@@ -592,7 +592,7 @@ The trainer_dict contains "trainer" elements, which have the following fields:
 'count'  : the number of trainers in the party
 """
 
-team_msg = " or ".join(["`!team {0}`".format(team) for team in config['team_dict'].keys()])
+team_msg = " or ".join(["**!team {0}**".format(team) for team in config['team_dict'].keys()])
 
 @Meowth.event
 async def on_ready():
@@ -986,6 +986,11 @@ async def _save():
         if e.errno != errno.ENOENT:
             raise
     os.rename(tempname, os.path.join('data', 'serverdict'))
+
+@Meowth.command(pass_context=True)
+@checks.is_owner()
+async def reload_json(ctx):
+    load_config()
 
 @Meowth.command(pass_context=True)
 @checks.is_owner()
@@ -1649,7 +1654,7 @@ async def print_raid_timer(channel):
     if not server_dict[channel.server]['raidchannel_dict'][channel]['active']:
         timerstr += _("Meowth! This {raidtype}'s timer has already expired as of {expiry_time} ({expiry_time24})!").format(raidtype=raidtype,expiry_time=strftime("%I:%M%p", localexpire),expiry_time24=strftime("%H:%M", localexpire))
     else:
-        if server_dict[channel.server]['raidchannel_dict'][channel]['egglevel'] == "EX" or server_dict[channel.server]['raidchannel_dict'][channel]['type'] == "exraid" :
+        if server_dict[channel.server]['raidchannel_dict'][channel]['egglevel'] == "EX" or server_dict[channel.server]['raidchannel_dict'][channel]['type'] == "exraid":
             if server_dict[channel.server]['raidchannel_dict'][channel]['manual_timer']:
                 timerstr += _("Meowth! This {raidtype} will {raidaction} on {expiry_day} at {expiry_time} ({expiry_time24})!").format(raidtype=raidtype,raidaction=raidaction,expiry_day=strftime("%B %d",localexpire),expiry_time=strftime("%I:%M %p", localexpire),expiry_time24=strftime("%H:%M", localexpire))
             else:
@@ -1707,7 +1712,7 @@ async def timerset(ctx,timer):
             timer_split = message.clean_content.lower().split()
             del timer_split[0]
             try:
-                end = datetime.datetime.strptime(" ".join(timer_split)+" "+str(now.year), '%m/%d %I:%M %p %Y').replace(tzinfo=tzlocal)
+                end = datetime.datetime.strptime(" ".join(timer_split)+" "+str(now.year), '%B %d %I:%M %p %Y').replace(tzinfo=tzlocal)
             except ValueError:
                 await Meowth.send_message(channel, _("Meowth! Your timer wasn't formatted correctly. Change your **!timerset** to match the format on your EX Raid invite and try again."))
             diff = end - now
@@ -1985,9 +1990,9 @@ Message **!starting** when the raid is beginning to clear the raid's 'here' list
         }
 
     if len(raid_info['raid_eggs']['EX']['pokemon']) == 1:
-        server_dict[message.server]['raidchannel_dict'][raid_channel]['pokemon'] = get_name(raid_info['raid_eggs']['EX']['pokemon'][0])
+        await _eggassume("assume "+ get_name(raid_info['raid_eggs']['EX']['pokemon'][0]), raid_channel)
     tzlocal = tz.tzoffset(None, server_dict[message.server]['offset']*3600)
-    await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset <date and time>** so others can check it with **!timer**. **<date and time>** should look like this **{format}**, but set it to the date and time your invitation has.").format(member=message.author.mention, format=datetime.datetime.now(tzlocal).strftime('%m/%d %I:%M %p')))
+    await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset <date and time>** so others can check it with **!timer**. **<date and time>** should look like this **{format}**, but set it to the date and time your invitation has.").format(member=message.author.mention, format=datetime.datetime.now(tzlocal).strftime('%B %d %I:%M %p')))
     event_loop.create_task(expiry_check(raid_channel))
 
 @Meowth.command(pass_context=True)
@@ -2067,8 +2072,12 @@ async def _raidegg(message):
         raid_channel = await Meowth.create_channel(message.server, raid_channel_name, *message.channel.overwrites)
         raid_img_url = "https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/eggs/{}?cache=no".format(str(egg_img))
         raid_embed = discord.Embed(title=_("Meowth! Click here for directions to the coming raid!"),url=raid_gmaps_link,colour=message.server.me.colour)
-        raid_embed.add_field(name="**Possible Bosses:**", value=_("{bosslist1}").format(bosslist1="\n".join(boss_list[::2])), inline=True)
-        raid_embed.add_field(name="\u200b", value=_("{bosslist2}").format(bosslist2="\n".join(boss_list[1::2])), inline=True)
+        if len(egg_info['pokemon']) > 1:
+            raid_embed.add_field(name="**Possible Bosses:**", value=_("{bosslist1}").format(bosslist1="\n".join(boss_list[::2])), inline=True)
+            raid_embed.add_field(name="\u200b", value=_("{bosslist2}").format(bosslist2="\n".join(boss_list[1::2])), inline=True)
+        else:
+            raid_embed.add_field(name="**Possible Bosses:**", value=_("{bosslist}").format(bosslist="".join(boss_list)), inline=True)
+            raid_embed.add_field(name="\u200b", value="\u200b", inline=True)
         raid_embed.set_footer(text=_("Reported by @{author}").format(author=message.author.display_name), icon_url=_("https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}.{format}?size={size}".format(user=message.author, format="jpg", size=32)))
         raid_embed.set_thumbnail(url=raid_img_url)
         raidreport = await Meowth.send_message(message.channel, content = _("Meowth! Level {level} raid egg reported by {member}! Details: {location_details}. Coordinate in {raid_channel}").format(level=egg_level, member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention),embed=raid_embed)
@@ -2112,7 +2121,8 @@ When this egg raid expires, there will be 15 minutes to update it into an open r
             await _timerset(raid_channel,raidexp)
         else:
             await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset <minutes>** so others can check it with **!timer**.").format(member=message.author.mention))
-
+        if len(raid_info['raid_eggs'][egg_level]['pokemon']) == 1:
+            await _eggassume("assume "+ get_name(raid_info['raid_eggs'][egg_level]['pokemon'][0]), raid_channel)
         event_loop.create_task(expiry_check(raid_channel))
 
 
@@ -2424,7 +2434,7 @@ async def list(ctx):
         if checks.check_citychannel(ctx):
             activeraidnum = 0
             cty = channel.name
-            rc_d = server_dict[server]['raidchannel_dict']
+            rc_d = copy.deepcopy(server_dict[server]['raidchannel_dict'])
 
             raid_dict = {}
             egg_dict = {}
@@ -2678,7 +2688,7 @@ async def location(ctx):
         newembed.add_field(name=oldembed['fields'][1]['name'],value=oldembed['fields'][1]['value'],inline=True)
         newembed.set_footer(text=oldembed['footer']['text'], icon_url=oldembed['footer']['icon_url'])
         newembed.set_thumbnail(url=oldembed['thumbnail']['url'])
-        locationmsg = await Meowth.send_message(channel, content = _("Meowth! Here's the current location for the raid!\nDetails:{location}").format(location = location), embed = newembed)
+        locationmsg = await Meowth.send_message(channel, content = _("Meowth! Here's the current location for the raid!\nDetails: {location}").format(location = location), embed = newembed)
         await asyncio.sleep(60)
         await Meowth.delete_message(locationmsg)
 
@@ -2916,10 +2926,6 @@ async def _invite(ctx):
     else:
         await Meowth.send_message(ctx.message.channel, "Meowth! Please upload your screenshot directly to Discord!")
 
-@Meowth.command(pass_context=True)
-@checks.is_owner()
-async def reload_json(ctx):
-    load_config()
 
 try:
     event_loop.run_until_complete(Meowth.start(config['bot_token']))

@@ -2526,8 +2526,7 @@ async def list(ctx):
                     listmsg += await _interest(ctx)
                     listmsg += "\n" + await _otw(ctx)
                     listmsg += "\n" + await _waiting(ctx)
-                    if rc_d['type'] != 'exraid':
-                        listmsg += "\n" + await print_raid_timer(channel)
+                    listmsg += "\n" + await print_raid_timer(channel)
                 await Meowth.send_message(channel, listmsg)
                 return
 

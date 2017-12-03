@@ -24,12 +24,17 @@
         "5": {
             "egg": "legendary",
             "egg_img": "5.png",
-            "pokemon": [243,244,245,250]
+            "pokemon": [250]
         },
         "EX": {
             "egg": "EX",
             "egg_img": "EX.png",
             "pokemon": [150]
         }
+    },
+    "settings": {
+        "hatchtime": 60,
+        "raidtime": 45,
+        "EXdays": 14
     }
 }

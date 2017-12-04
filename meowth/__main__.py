@@ -1777,6 +1777,7 @@ async def _timerset(raidchannel, exptime):
     else:
         topicstr += _("Ends on {end_day} at {end_time} ({end_time24})").format(end_day=end.strftime("%B %d"),end_time=end.strftime("%I:%M %p"),end_time24=end.strftime("%H:%M"))
     await Meowth.edit_channel(raidchannel, topic=topicstr)
+    raidchannel = Meowth.get_channel(raidchannel.id)
     # Trigger expiry checking
     event_loop.create_task(expiry_check(raidchannel))
 
@@ -2157,7 +2158,6 @@ When this egg raid expires, there will be 15 minutes to update it into an open r
         if len(raid_info['raid_eggs'][egg_level]['pokemon']) == 1:
             await _eggassume("assume "+ get_name(raid_info['raid_eggs'][egg_level]['pokemon'][0]), raid_channel)
         event_loop.create_task(expiry_check(raid_channel))
-
 
 async def _eggassume(args, raid_channel):
     eggdetails = server_dict[raid_channel.server]['raidchannel_dict'][raid_channel]

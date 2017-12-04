@@ -1,43 +1,6 @@
 {
 "//": "This file stores generic information about the Pokemon games.",
 
-
-"//": "Below is a dict of raid bosses. These become part of the raid report message.",
-"raid_list": [
-    "ivysaur",
-    "metapod",
-    "charmeleon",
-    "wartortle",
-    "magneton",
-    "magikarp",
-    "sableye",
-    "sandslash",
-    "tentacruel",
-    "marowak",
-    "cloyster",
-    "ninetales",
-    "scyther",
-    "omastar",
-    "porygon",
-    "alakazam",
-    "gengar",
-    "machamp",
-    "poliwrath",
-    "victreebel",
-    "golem",
-    "nidoking",
-    "nidoqueen",
-    "tyranitar",
-    "lapras",
-    "snorlax",
-    "entei",
-    "suicune",
-    "raikou",
-    "mewtwo",
-    "ho-oh"
-],
-
-
 "//": "A list of all Pokemon up to Gen VII. This helps partially futureproof",
 "pokemon_list": [
     "bulbasaur",

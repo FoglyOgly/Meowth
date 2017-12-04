@@ -1,43 +1,6 @@
 {
 "//": "This file stores generic information about the Pokemon games.",
 
-
-"//": "Below is a dict of raid bosses with their type weaknesses. These become part of the raid report message.",
-"raid_list": [
-    "raikou",
-    "entei",
-    "suicune",
-    "mewtwo",
-    "lugia",
-    "sulfura",
-    "electhor",
-    "artikodin",
-    "tyranocif",
-    "ronflex",
-    "lokhlass",
-    "rhinoferos",
-    "tortank",
-    "dracaufeu",
-    "herbiZarre",
-    "pyroli",
-    "voltali",
-    "aquali",
-    "ectoplasma",
-    "mackogneur",
-    "alakaZam",
-    "arcanin",
-    "magmar",
-    "elektek",
-    "smogogo",
-    "noadkoko",
-    "grotadmorv",
-    "crocrodil",
-    "feurisson",
-    "macronium",
-    "magicarpe"
-],
-
-
 "//": "A list of all Pokemon up to Gen VII. This helps partially futureproof",
 "pokemon_list": [
     "bulbizarre",

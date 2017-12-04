@@ -148,6 +148,24 @@ def get_number(pkm_name):
     number = pkmn_info['pokemon_list'].index(pkm_name) + 1
     return number
 
+def get_level(pkmn):
+    if str(pkmn).isdigit():
+        pkmn_number = pkmn
+    elif not str(pkmn).isdigit():
+        pkmn_number = get_number(pkmn)
+    for level in raid_info["raid_eggs"]:
+        for pokemon in raid_info["raid_eggs"][level]["pokemon"]:
+            if pokemon == pkmn_number:
+                return level
+
+def get_raidlist():
+    raidlist = []
+    for level in raid_info["raid_eggs"]:
+        for pokemon in raid_info["raid_eggs"][level]["pokemon"]:
+            raidlist.append(pokemon)
+            raidlist.append(get_name(pokemon).lower())
+    return raidlist
+
 # Given a Pokemon name, return a list of its
 # weaknesses as defined in the type chart
 def get_weaknesses(species):
@@ -272,6 +290,7 @@ async def expiry_check(channel):
     if channel not in active_raids:
         active_raids.append(channel)
         logger.info("Expire_Channel - Channel Added To Watchlist - "+channel.name)
+        await asyncio.sleep(0.5) #wait for assume
         while True:
             try:
                 if server_dict[server]['raidchannel_dict'][channel]['active'] is True:
@@ -1463,6 +1482,7 @@ async def _wild(message):
     else:
         content = " ".join(wild_split)
         entered_wild = content.split(' ',1)[0]
+        entered_wild = get_name(entered_wild).lower() if entered_wild.isdigit() else entered_wild
         wild_details = content.split(' ',1)[1]
         if entered_wild not in pkmn_info['pokemon_list']:
             entered_wild2 = ' '.join([content.split(' ',2)[0],content.split(' ',2)[1]])
@@ -1536,6 +1556,7 @@ async def _raid(message):
         await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**"))
         return
     entered_raid = re.sub("[\@]", "", raid_split[0].lower())
+    entered_raid = get_name(entered_raid).lower() if entered_raid.isdigit() else entered_raid
     del raid_split[0]
 
     if raid_split[-1].isdigit():
@@ -1557,8 +1578,8 @@ async def _raid(message):
         raidexp = False
 
     if raidexp is not False:
-        if _timercheck(raidexp, raid_info['settings']['raidtime']):
-            await Meowth.send_message(message.channel, _("Meowth...that's too long. Raids currently last no more than {raidtime} minutes...").format(raidtime=raid_info['settings']['raidtime']))
+        if _timercheck(raidexp, raid_info["raid_eggs"][get_level(entered_raid)]['raidtime']):
+            await Meowth.send_message(message.channel, _("Meowth...that's too long. Level {raidlevel} raids currently last no more than {raidtime} minutes...").format(raidlevel=get_level(entered_raid), raidtime=raid_info["raid_eggs"][get_level(entered_raid)]['raidtime']))
             return
 
     rgx = r"[^a-zA-Z0-9]"
@@ -1569,7 +1590,7 @@ async def _raid(message):
         await Meowth.send_message(message.channel, spellcheck(entered_raid))
         return
 
-    raid_match = next((p for p in pkmn_info['raid_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", entered_raid)), None)
+    raid_match = True if entered_raid in get_raidlist() else False
     if not raid_match:
         await Meowth.send_message(message.channel, _("Meowth! The Pokemon {pokemon} does not appear in raids!").format(pokemon=entered_raid.capitalize()))
         return
@@ -1623,7 +1644,7 @@ This channel will be deleted five minutes after the timer expires.""").format(po
     server_dict[message.server]['raidchannel_dict'][raid_channel] = {
         'reportcity' : message.channel.name,
         'trainer_dict' : {},
-        'exp' : time.time() + 60 * raid_info['settings']['raidtime'], # minutes from now
+        'exp' : time.time() + 60 * raid_info["raid_eggs"][get_level(entered_raid)]['raidtime'], # minutes from now
         'manual_timer' : False, # No one has explicitly set the timer, Meowth is just assuming 2 hours
         'active' : True,
         'raidmessage' : raidmessage,
@@ -1681,11 +1702,13 @@ async def timerset(ctx,timer):
     server = message.server
     if not checks.check_exraidchannel(ctx):
         if server_dict[server]['raidchannel_dict'][channel]['type'] == 'egg':
+            raidlevel = server_dict[server]['raidchannel_dict'][channel]['egglevel']
             raidtype = "Raid Egg"
-            maxtime = raid_info['settings']['hatchtime']
+            maxtime = raid_info["raid_eggs"][raidlevel]['hatchtime']
         else:
+            raidlevel = get_level(server_dict[server]['raidchannel_dict'][channel]['pokemon'])
             raidtype = "Raid"
-            maxtime = raid_info['settings']['raidtime']
+            maxtime = raid_info["raid_eggs"][raidlevel]['raidtime']
         if timer.isdigit():
             raidexp = int(timer)
         elif ":" in timer:
@@ -1701,7 +1724,7 @@ async def timerset(ctx,timer):
             await Meowth.send_message(channel, "Meowth! I couldn't understand your time format. Try again like this: **!timerset <minutes>**")
             return
         if _timercheck(raidexp, maxtime):
-            await Meowth.send_message(channel, _("Meowth...that's too long. {raidtype}s currently last no more than {maxtime} minutes...").format(raidtype=raidtype.capitalize(), maxtime=str(maxtime)))
+            await Meowth.send_message(channel, _("Meowth...that's too long. Level {raidlevel} {raidtype}s currently last no more than {maxtime} minutes...").format(raidlevel=str(raidlevel),raidtype=raidtype.capitalize(), maxtime=str(maxtime)))
             return
         await _timerset(channel, raidexp)
 
@@ -1717,26 +1740,23 @@ async def timerset(ctx,timer):
                 await Meowth.send_message(channel, _("Meowth! Your timer wasn't formatted correctly. Change your **!timerset** to match the format on your EX Raid invite and try again."))
             diff = start - now
             total = (diff.total_seconds() / 60)
-            end = start + datetime.timedelta(minutes=raid_info['settings']['raidtime'])
+            end = start + datetime.timedelta(minutes=raid_info["raid_eggs"]["EX"]['raidtime'])
             if now <= start:
                 await _timerset(channel, total)
-                await Meowth.edit_channel(channel, topic=_("Hatches on {hatch_day} at {hatch_time} ({hatch_time24}) | Ends on {end_day} at {end_time} ({end_time24})").format(hatch_day=start.strftime("%B %d"),hatch_time=start.strftime("%I:%M %p"),hatch_time24=start.strftime("%H:%M"),end_day=end.strftime("%B %d"),end_time=end.strftime("%I:%M %p"),end_time24=end.strftime("%H:%M")))
             elif now > start:
                 await Meowth.send_message(channel, _("Meowth! Please enter a time in the future."))
         else:
-            await Meowth.send_message(channel, _("Meowth! Timerset isn't supported for exraids after they have hatched."))
+            await Meowth.send_message(channel, _("Meowth! Timerset isn't supported for EX Raids after they have hatched."))
 
 def _timercheck(time, maxtime):
     return time > maxtime
 
 async def _timerset(raidchannel, exptime):
     server = raidchannel.server
-    # Meowth saves the timer message in the channel's 'exp' field.
-
-    expire = time.time() + (exptime * 60)
-
+    now = datetime.datetime.utcnow() + datetime.timedelta(hours=server_dict[server]['offset'])
+    end = now + datetime.timedelta(minutes=exptime)
     # Update timestamp
-    server_dict[server]['raidchannel_dict'][raidchannel]['exp'] = expire
+    server_dict[server]['raidchannel_dict'][raidchannel]['exp'] = end.timestamp()
     # Reactivate channel
     if not server_dict[server]['raidchannel_dict'][raidchannel]['active']:
         await Meowth.send_message(raidchannel, "The channel has been reactivated.")
@@ -1746,6 +1766,17 @@ async def _timerset(raidchannel, exptime):
     # Send message
     timerstr = await print_raid_timer(raidchannel)
     await Meowth.send_message(raidchannel, timerstr)
+    # Edit topic
+    topicstr = ""
+    if server_dict[server]['raidchannel_dict'][raidchannel]['type'] == "egg":
+        egglevel = server_dict[server]['raidchannel_dict'][raidchannel]['egglevel']
+        hatch = end
+        end = hatch + datetime.timedelta(minutes=raid_info["raid_eggs"][egglevel]['raidtime'])
+        topicstr += _("Hatches on {expiry_day} at {expiry_time} ({expiry_time24}) | ").format(expiry_day=hatch.strftime("%B %d"),expiry_time=hatch.strftime("%I:%M %p"),expiry_time24=hatch.strftime("%H:%M"))
+        topicstr += _("Ends on {end_day} at {end_time} ({end_time24})").format(end_day=end.strftime("%B %d"),end_time=end.strftime("%I:%M %p"),end_time24=end.strftime("%H:%M"))
+    else:
+        topicstr += _("Ends on {end_day} at {end_time} ({end_time24})").format(end_day=end.strftime("%B %d"),end_time=end.strftime("%I:%M %p"),end_time24=end.strftime("%H:%M"))
+    await Meowth.edit_channel(raidchannel, topic=topicstr)
     # Trigger expiry checking
     event_loop.create_task(expiry_check(raidchannel))
 
@@ -1980,7 +2011,7 @@ Message **!starting** when the raid is beginning to clear the raid's 'here' list
     server_dict[message.server]['raidchannel_dict'][raid_channel] = {
         'reportcity' : channel.name,
         'trainer_dict' : {},
-        'exp' : time.time() + 60*60*24*raid_info['settings']['EXdays'], # days from now
+        'exp' : time.time() + 60*60*24*raid_info['raid_eggs']['EX']['hatchtime'], # days from now
         'manual_timer' : False,
         'active' : True,
         'raidmessage' : raidmessage,
@@ -2046,8 +2077,8 @@ async def _raidegg(message):
         raidexp = False
 
     if raidexp is not False:
-        if _timercheck(raidexp, raid_info['settings']['hatchtime']):
-            await Meowth.send_message(message.channel, _("Meowth...that's too long. Raid Eggs currently last no more than {hatchtime} minutes...").format(hatchtime=raid_info['settings']['hatchtime']))
+        if _timercheck(raidexp, raid_info["raid_eggs"][str(egg_level)]['hatchtime']):
+            await Meowth.send_message(message.channel, _("Meowth...that's too long. Level {raidlevel} Raid Eggs currently last no more than {hatchtime} minutes...").format(raidlevel=egg_level,hatchtime=raid_info["raid_eggs"][str(egg_level)]['hatchtime']))
             return
 
     raid_details = " ".join(raidegg_split)
@@ -2108,7 +2139,7 @@ When this egg raid expires, there will be 15 minutes to update it into an open r
         server_dict[message.server]['raidchannel_dict'][raid_channel] = {
             'reportcity' : message.channel.name,
             'trainer_dict' : {},
-            'exp' : time.time() + 60 * raid_info['settings']['hatchtime'], # minutes from now
+            'exp' : time.time() + 60 * raid_info["raid_eggs"][egg_level]['hatchtime'], # minutes from now
             'manual_timer' : False, # No one has explicitly set the timer, Meowth is just assuming 2 hours
             'active' : True,
             'raidmessage' : raidmessage,
@@ -2131,10 +2162,20 @@ When this egg raid expires, there will be 15 minutes to update it into an open r
 async def _eggassume(args, raid_channel):
     eggdetails = server_dict[raid_channel.server]['raidchannel_dict'][raid_channel]
     egglevel = eggdetails['egglevel']
+    manual_timer = eggdetails['manual_timer']
+    egg_report = eggdetails['raidreport']
+    raid_message = eggdetails['raidmessage']
+    try:
+        raid_messageauthor = raid_message.mentions[0]
+    except IndexError:
+        raid_messageauthor = "<@"+raid_message.raw_mentions[0]+">"
+        logger.info("Hatching Mention Failed - Trying alternative method: channel: {} (id: {}) - server: {} | Attempted mention: {}...".format(raid_channel.name,raid_channel.id,raid_channel.server.name,raid_message.content[:125]))
+
     if config['allow_assume'][egglevel] == "False":
         await Meowth.send_message(raid_channel, _("Meowth! **!raid assume** is not allowed in this level egg."))
         return
     entered_raid = re.sub("[\@]", "", args.lstrip("assume").lstrip(" ").lower())
+    entered_raid = get_name(entered_raid).lower() if entered_raid.isdigit() else entered_raid
     rgx = r"[^a-zA-Z0-9]"
     pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", entered_raid)), None)
     if pkmn_match:
@@ -2142,7 +2183,7 @@ async def _eggassume(args, raid_channel):
     else:
         await Meowth.send_message(raid_channel, spellcheck(entered_raid))
         return
-    raid_match = next((p for p in pkmn_info['raid_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", entered_raid)), None)
+    raid_match = True if entered_raid in get_raidlist() else False
     if not raid_match:
         await Meowth.send_message(raid_channel, _("Meowth! The Pokemon {pokemon} does not appear in raids!").format(pokemon=entered_raid.capitalize()))
         return
@@ -2151,10 +2192,27 @@ async def _eggassume(args, raid_channel):
             await Meowth.send_message(raid_channel, _("Meowth! The Pokemon {pokemon} does not hatch from level {level} raid eggs!").format(pokemon=entered_raid.capitalize(), level=egglevel))
             return
     eggdetails['pokemon'] = entered_raid
+    oldembed = raid_message.embeds[0]
+    raid_gmaps_link = oldembed['url']
     raidrole = discord.utils.get(raid_channel.server.roles, name = entered_raid)
     if raidrole is None:
         raidrole = await Meowth.create_role(server = raid_channel.server, name = entered_raid, hoist = False, mentionable = True)
         await asyncio.sleep(0.5)
+    raid_number = pkmn_info['pokemon_list'].index(entered_raid) + 1
+    raid_img_url = "https://raw.githubusercontent.com/doonce/Meowth/master/images/pkmn/{0}_.png".format(str(raid_number).zfill(3))
+    raid_embed = discord.Embed(title=_("Meowth! Click here for directions to the coming raid!"),url=raid_gmaps_link,colour=raid_channel.server.me.colour)
+    raid_embed.add_field(name="**Details:**", value=_("{pokemon} ({pokemonnumber}) {type}").format(pokemon=entered_raid.capitalize(),pokemonnumber=str(raid_number),type="".join(get_type(raid_channel.server, raid_number)),inline=True))
+    raid_embed.add_field(name="**Weaknesses:**", value=_("{weakness_list}").format(weakness_list=weakness_to_str(raid_channel.server, get_weaknesses(entered_raid))),inline=True)
+    raid_embed.set_footer(text=_("Reported by @{author}").format(author=raid_messageauthor.display_name), icon_url=_("https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}.{format}?size={size}".format(user=raid_messageauthor, format="jpg", size=32)))
+    raid_embed.set_thumbnail(url=oldembed['thumbnail']['url'])
+    try:
+        raid_message = await Meowth.edit_message(raid_message, new_content=raid_message.content, embed=raid_embed)
+    except discord.errors.NotFound:
+        pass
+    try:
+        egg_report = await Meowth.edit_message(egg_report, new_content=egg_report.content, embed=raid_embed)
+    except discord.errors.NotFound:
+        pass
     await Meowth.send_message(raid_channel, _("Meowth! This egg will be assumed to be {pokemon} when it hatches!").format(pokemon=raidrole.mention))
     server_dict[raid_channel.server]['raidchannel_dict'][raid_channel] = eggdetails
     return
@@ -2176,7 +2234,7 @@ async def _eggtoraid(entered_raid, raid_channel):
         logger.info("Hatching Mention Failed - Trying alternative method: channel: {} (id: {}) - server: {} | Attempted mention: {}...".format(raid_channel.name,raid_channel.id,raid_channel.server.name,raid_message.content[:125]))
 
     if eggdetails['egglevel'].isdigit():
-        raidexp = eggdetails['exp'] + 60 * raid_info['settings']['raidtime']
+        raidexp = eggdetails['exp'] + 60 * raid_info["raid_eggs"][egglevel]['raidtime']
         hatchtype = "raid"
         raidreportcontent = _("Meowth! The egg has hatched into a {pokemon} raid! Details: {location_details}. Coordinate in {raid_channel}").format(pokemon=entered_raid.capitalize(), location_details=egg_address, raid_channel=raid_channel.mention)
         raidmsg = _("""Meowth! The egg reported by {member} in {citychannel} hatched into a {pokemon} raid! Details: {location_details}. Coordinate here!
@@ -2201,7 +2259,7 @@ Message **!starting** when the raid is beginning to clear the raid's 'here' list
 
 This channel will be deleted five minutes after the timer expires.""").format(member= raid_messageauthor.mention, citychannel=reportcitychannel.mention, pokemon=entered_raid.capitalize(), location_details=egg_address)
     elif eggdetails['egglevel'] == "EX":
-        raidexp = eggdetails['exp'] + 60 * raid_info['settings']['raidtime']
+        raidexp = eggdetails['exp'] + 60 * raid_info["raid_eggs"][egglevel]['raidtime']
         hatchtype = "exraid"
         raidreportcontent = _("Meowth! The EX egg has hatched into a {pokemon} raid! Details: {location_details}. Use the **!invite** command to gain access and coordinate in {raid_channel}").format(pokemon=entered_raid.capitalize(), location_details=egg_address, raid_channel=raid_channel.mention)
         raidmsg = _("""Meowth! {pokemon} EX raid reported by {member} in {citychannel}! Details: {location_details}. Coordinate here!
@@ -2227,7 +2285,7 @@ Message **!starting** when the raid is beginning to clear the raid's 'here' list
     else:
         await Meowth.send_message(raid_channel, spellcheck(entered_raid))
         return
-    raid_match = next((p for p in pkmn_info['raid_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", entered_raid)), None)
+    raid_match = True if entered_raid in get_raidlist() else False
     if not raid_match:
         await Meowth.send_message(raid_channel, _("Meowth! The Pokemon {pokemon} does not appear in raids!").format(pokemon=entered_raid.capitalize()))
         return
@@ -2499,7 +2557,7 @@ async def list(ctx):
                 listmsg += "\n"
 
             if exraid_list:
-                listmsg += (_("**EXRaids:**\n").format(cty.capitalize()))
+                listmsg += (_("**EX Raids:**\n").format(cty.capitalize()))
                 for r in exraid_list:
                     listmsg += list_output(r)
 

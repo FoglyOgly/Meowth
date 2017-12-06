@@ -1018,6 +1018,7 @@ async def _save():
 @checks.is_owner()
 async def reload_json(ctx):
     load_config()
+    await Meowth.add_reaction(ctx.message, '✅')
 
 @Meowth.command(pass_context=True)
 @checks.is_owner()

@@ -2513,7 +2513,7 @@ async def list(ctx):
                     exp = rc_d[r]['exp']
                     type = rc_d[r]['type']
                     level = rc_d[r]['egglevel']
-                    if type == 'egg' and str(type).isdigit():
+                    if type == 'egg' and level.isdigit():
                         egg_dict[r] = exp
                     elif type == 'exraid' or level == "EX":
                         exraid_list.append(r)

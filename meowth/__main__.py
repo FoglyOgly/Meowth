@@ -1522,8 +1522,8 @@ async def _wild(message):
         wild_embed.set_thumbnail(url=wild_img_url)
         await Meowth.send_message(message.channel, content=_("Meowth! Wild {pokemon} reported by {member}! Details: {location_details}").format(pokemon=wild.mention, member=message.author.mention, location_details=wild_details),embed=wild_embed)
 
-@checks.cityeggchannel()
 @Meowth.command(pass_context=True)
+@checks.cityeggchannel()
 @checks.raidset()
 async def raid(ctx):
     """Report an ongoing raid.
@@ -1743,9 +1743,9 @@ async def timerset(ctx,timer):
             timer_split = message.clean_content.lower().split()
             del timer_split[0]
             try:
-                start = datetime.datetime.strptime(" ".join(timer_split)+" "+str(now.year), '%B %d %I:%M %p %Y').replace(tzinfo=datetime.timezone.utc)
+                start = datetime.datetime.strptime(" ".join(timer_split)+" "+str(now.year), '%m/%d %I:%M %p %Y').replace(tzinfo=datetime.timezone.utc)
             except ValueError:
-                await Meowth.send_message(channel, _("Meowth! Your timer wasn't formatted correctly. Change your **!timerset** to match the format on your EX Raid invite and try again."))
+                await Meowth.send_message(channel, _("Meowth! Your timer wasn't formatted correctly. Change your **!timerset** to match this format: **MM/DD HH:MM AM/PM**"))
             diff = start - now
             total = (diff.total_seconds() / 60)
             end = start + datetime.timedelta(minutes=raid_info["raid_eggs"]["EX"]['raidtime'])
@@ -2034,7 +2034,7 @@ Message **!starting** when the raid is beginning to clear the raid's 'here' list
     if len(raid_info['raid_eggs']['EX']['pokemon']) == 1:
         await _eggassume("assume "+ get_name(raid_info['raid_eggs']['EX']['pokemon'][0]), raid_channel)
     now = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=server_dict[raid_channel.server]['offset'])
-    await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset <date and time>** so others can check it with **!timer**. **<date and time>** should look like this **{format}**, but set it to the date and time your invitation has.").format(member=message.author.mention, format=now.strftime('%B %d %I:%M %p')))
+    await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset <date and time>** so others can check it with **!timer**. **<date and time>** should look like this **{format}**, but set it to the date and time your invitation has.").format(member=message.author.mention, format=now.strftime('%m/%d %I:%M %p')))
     event_loop.create_task(expiry_check(raid_channel))
 
 @Meowth.command(pass_context=True)

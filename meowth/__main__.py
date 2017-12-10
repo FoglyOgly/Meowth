@@ -1522,8 +1522,8 @@ async def _wild(message):
         wild_embed.set_thumbnail(url=wild_img_url)
         await Meowth.send_message(message.channel, content=_("Meowth! Wild {pokemon} reported by {member}! Details: {location_details}").format(pokemon=wild.mention, member=message.author.mention, location_details=wild_details),embed=wild_embed)
 
-@checks.cityeggchannel()
 @Meowth.command(pass_context=True)
+@checks.cityeggchannel()
 @checks.raidset()
 async def raid(ctx):
     """Report an ongoing raid.
@@ -1548,6 +1548,9 @@ async def _raid(message):
     del raid_split[0]
     if fromegg is True:
         if raid_split[0] == 'assume':
+            if config['allow_assume'][egglevel] == "False":
+                await Meowth.send_message(raid_channel, _("Meowth! **!raid assume** is not allowed in this level egg."))
+                return
             if server_dict[message.channel.server]['raidchannel_dict'][message.channel]['active'] == False:
                 await _eggtoraid(raid_split[1].lower(), message.channel)
                 return
@@ -1674,8 +1677,8 @@ This channel will be deleted five minutes after the timer expires.""").format(po
 
 # Print raid timer
 async def print_raid_timer(channel):
-    localexpiresecs = server_dict[channel.server]['raidchannel_dict'][channel]['exp'] + 3600 * server_dict[channel.server]['offset']
-    localexpire = time.gmtime(localexpiresecs)
+    now = datetime.datetime.utcnow() + datetime.timedelta(hours=server_dict[channel.server]['offset'])
+    end = now + datetime.timedelta(seconds=server_dict[channel.server]['raidchannel_dict'][channel]['exp']-time.time())
     timerstr = ""
     if server_dict[channel.server]['raidchannel_dict'][channel]['type'] == 'egg':
         raidtype = "egg"
@@ -1684,18 +1687,18 @@ async def print_raid_timer(channel):
         raidtype = "raid"
         raidaction = "end"
     if not server_dict[channel.server]['raidchannel_dict'][channel]['active']:
-        timerstr += _("Meowth! This {raidtype}'s timer has already expired as of {expiry_time} ({expiry_time24})!").format(raidtype=raidtype,expiry_time=strftime("%I:%M%p", localexpire),expiry_time24=strftime("%H:%M", localexpire))
+        timerstr += _("Meowth! This {raidtype}'s timer has already expired as of {expiry_time} ({expiry_time24})!").format(raidtype=raidtype,expiry_time=end.strftime("%I:%M%p"),expiry_time24=end.strftime("%H:%M"))
     else:
         if server_dict[channel.server]['raidchannel_dict'][channel]['egglevel'] == "EX" or server_dict[channel.server]['raidchannel_dict'][channel]['type'] == "exraid" :
             if server_dict[channel.server]['raidchannel_dict'][channel]['manual_timer']:
-                timerstr += _("Meowth! This {raidtype} will {raidaction} on {expiry_day} at {expiry_time} ({expiry_time24})!").format(raidtype=raidtype,raidaction=raidaction,expiry_day=strftime("%B %d",localexpire),expiry_time=strftime("%I:%M %p", localexpire),expiry_time24=strftime("%H:%M", localexpire))
+                timerstr += _("Meowth! This {raidtype} will {raidaction} on {expiry_day} at {expiry_time} ({expiry_time24})!").format(raidtype=raidtype,raidaction=raidaction,expiry_day=end.strftime("%B %d"),expiry_time=end.strftime("%I:%M %p"),expiry_time24=end.strftime("%H:%M"))
             else:
-                timerstr += _("Meowth! No one told me when the {raidtype} will {raidaction}, so I'm assuming it will {raidaction} on {expiry_day} at {expiry_time} ({expiry_time24})!").format(raidtype=raidtype,raidaction=raidaction,expiry_day=strftime("%B %d",localexpire),expiry_time=strftime("%I:%M %p", localexpire),expiry_time24=strftime("%H:%M", localexpire))
+                timerstr += _("Meowth! No one told me when the {raidtype} will {raidaction}, so I'm assuming it will {raidaction} on {expiry_day} at {expiry_time} ({expiry_time24})!").format(raidtype=raidtype,raidaction=raidaction,expiry_day=end.strftime("%B %d"),expiry_time=end.strftime("%I:%M %p"),expiry_time24=end.strftime("%H:%M"))
         else:
             if server_dict[channel.server]['raidchannel_dict'][channel]['manual_timer']:
-                timerstr += _("Meowth! This {raidtype} will {raidaction} at {expiry_time} ({expiry_time24})!").format(raidtype=raidtype,raidaction=raidaction,expiry_time=strftime("%I:%M %p", localexpire),expiry_time24=strftime("%H:%M", localexpire))
+                timerstr += _("Meowth! This {raidtype} will {raidaction} at {expiry_time} ({expiry_time24})!").format(raidtype=raidtype,raidaction=raidaction,expiry_time=end.strftime("%I:%M %p"),expiry_time24=end.strftime("%H:%M"))
             else:
-                timerstr += _("Meowth! No one told me when the {raidtype} will {raidaction}, so I'm assuming it will {raidaction} at {expiry_time} ({expiry_time24})!").format(raidtype=raidtype,raidaction=raidaction,expiry_time=strftime("%I:%M %p", localexpire),expiry_time24=strftime("%H:%M", localexpire))
+                timerstr += _("Meowth! No one told me when the {raidtype} will {raidaction}, so I'm assuming it will {raidaction} at {expiry_time} ({expiry_time24})!").format(raidtype=raidtype,raidaction=raidaction,expiry_time=end.strftime("%I:%M %p"),expiry_time24=end.strftime("%H:%M"))
 
     return timerstr
 
@@ -1741,19 +1744,20 @@ async def timerset(ctx,timer):
 
     if checks.check_exraidchannel(ctx):
         if checks.check_eggchannel(ctx):
-            tzlocal = tz.tzoffset(None, server_dict[server]['offset']*3600)
-            now = datetime.datetime.now(tzlocal)
+            now = datetime.datetime.utcnow() + datetime.timedelta(hours=server_dict[channel.server]['offset'])
             timer_split = message.clean_content.lower().split()
             del timer_split[0]
             try:
-                end = datetime.datetime.strptime(" ".join(timer_split)+" "+str(now.year), '%m/%d %I:%M %p %Y').replace(tzinfo=tzlocal)
+                start = datetime.datetime.strptime(" ".join(timer_split)+" "+str(now.year), '%m/%d %I:%M %p %Y')
+                if start.month == 1:
+                    start.replace(year=self.year+1)
             except ValueError:
-                await Meowth.send_message(channel, _("Meowth! Your timer wasn't formatted correctly. Change your **!timerset** to match this format: **MM/DD HH:MM AM/PM**."))
-            diff = end - now
+                await Meowth.send_message(channel, _("Meowth! Your timer wasn't formatted correctly. Change your **!timerset** to match this format: **MM/DD HH:MM AM/PM**"))
+            diff = start - now
             total = (diff.total_seconds() / 60)
-            if now <= end:
+            if now <= start:
                 await _timerset(channel, total)
-            elif now > end:
+            elif now > start:
                 await Meowth.send_message(channel, _("Meowth! Please enter a time in the future."))
         else:
             await Meowth.send_message(channel, _("Meowth! Timerset isn't supported for exraids after they have hatched."))
@@ -1763,12 +1767,8 @@ def _timercheck(time, maxtime):
 
 async def _timerset(raidchannel, exptime):
     server = raidchannel.server
-    # Meowth saves the timer message in the channel's 'exp' field.
-
-    expire = time.time() + (exptime * 60)
-
     # Update timestamp
-    server_dict[server]['raidchannel_dict'][raidchannel]['exp'] = expire
+    server_dict[server]['raidchannel_dict'][raidchannel]['exp'] = time.time() + (exptime * 60)
     # Reactivate channel
     if not server_dict[server]['raidchannel_dict'][raidchannel]['active']:
         await Meowth.send_message(raidchannel, "The channel has been reactivated.")
@@ -2025,8 +2025,8 @@ Message **!starting** when the raid is beginning to clear the raid's 'here' list
 
     if len(raid_info['raid_eggs']['EX']['pokemon']) == 1:
         await _eggassume("assume "+ get_name(raid_info['raid_eggs']['EX']['pokemon'][0]), raid_channel)
-    tzlocal = tz.tzoffset(None, server_dict[message.server]['offset']*3600)
-    await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset <date and time>** so others can check it with **!timer**. **<date and time>** should look like this **{format}**, but set it to the date and time your invitation has.").format(member=message.author.mention, format=datetime.datetime.now(tzlocal).strftime('%m/%d %I:%M %p')))
+    now = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=server_dict[raid_channel.server]['offset'])
+    await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset <date and time>** so others can check it with **!timer**. **<date and time>** should look like this **{format}**, but set it to the date and time your invitation has.").format(member=message.author.mention, format=now.strftime('%m/%d %I:%M %p')))
     event_loop.create_task(expiry_check(raid_channel))
 
 @Meowth.command(pass_context=True)
@@ -2171,9 +2171,7 @@ async def _eggassume(args, raid_channel):
         raid_messageauthor = "<@"+raid_message.raw_mentions[0]+">"
         logger.info("Hatching Mention Failed - Trying alternative method: channel: {} (id: {}) - server: {} | Attempted mention: {}...".format(raid_channel.name,raid_channel.id,raid_channel.server.name,raid_message.content[:125]))
 
-    if config['allow_assume'][egglevel] == "False":
-        await Meowth.send_message(raid_channel, _("Meowth! **!raid assume** is not allowed in this level egg."))
-        return
+
     entered_raid = re.sub("[\@]", "", args.lstrip("assume").lstrip(" ").lower())
     entered_raid = get_name(entered_raid).lower() if entered_raid.isdigit() else entered_raid
     rgx = r"[^a-zA-Z0-9]"
@@ -2232,9 +2230,10 @@ async def _eggtoraid(entered_raid, raid_channel):
     except IndexError:
         raid_messageauthor = "<@"+raid_message.raw_mentions[0]+">"
         logger.info("Hatching Mention Failed - Trying alternative method: channel: {} (id: {}) - server: {} | Attempted mention: {}...".format(raid_channel.name,raid_channel.id,raid_channel.server.name,raid_message.content[:125]))
-
-    if eggdetails['egglevel'].isdigit():
-        end = eggdetails['exp'] + raid_info["raid_eggs"][egglevel]['raidtime']*60
+    now = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=server_dict[raid_channel.server]['offset'])
+    end = now + datetime.timedelta(minutes=raid_info["raid_eggs"][egglevel]['raidtime'])
+    raidexp = eggdetails['exp'] + 60 * raid_info['raid_eggs'][egglevel]['raidtime']
+    if egglevel.isdigit():
         hatchtype = "raid"
         raidreportcontent = _("Meowth! The egg has hatched into a {pokemon} raid! Details: {location_details}. Coordinate in {raid_channel}").format(pokemon=entered_raid.capitalize(), location_details=egg_address, raid_channel=raid_channel.mention)
         raidmsg = _("""Meowth! The egg reported by {member} in {citychannel} hatched into a {pokemon} raid! Details: {location_details}. Coordinate here!
@@ -2258,8 +2257,7 @@ Sending a Google Maps link will also update the raid location.
 Message **!starting** when the raid is beginning to clear the raid's 'here' list.
 
 This channel will be deleted five minutes after the timer expires.""").format(member= raid_messageauthor.mention, citychannel=reportcitychannel.mention, pokemon=entered_raid.capitalize(), location_details=egg_address)
-    elif eggdetails['egglevel'] == "EX":
-        end = eggdetails['exp'] + raid_info["raid_eggs"][egglevel]['raidtime']*60
+    elif egglevel == "EX":
         hatchtype = "exraid"
         raidreportcontent = _("Meowth! The EX egg has hatched into a {pokemon} raid! Details: {location_details}. Use the **!invite** command to gain access and coordinate in {raid_channel}").format(pokemon=entered_raid.capitalize(), location_details=egg_address, raid_channel=raid_channel.mention)
         raidmsg = _("""Meowth! {pokemon} EX raid reported by {member} in {citychannel}! Details: {location_details}. Coordinate here!
@@ -2321,7 +2319,7 @@ Message **!starting** when the raid is beginning to clear the raid's 'here' list
     server_dict[raid_channel.server]['raidchannel_dict'][raid_channel] = {
     'reportcity' : reportcity,
     'trainer_dict' : trainer_dict,
-    'exp' : end,
+    'exp' : raidexp,
     'manual_timer' : manual_timer,
     'active' : True,
     'raidmessage' : raid_message,
@@ -2505,7 +2503,7 @@ async def list(ctx):
                     exp = rc_d[r]['exp']
                     type = rc_d[r]['type']
                     level = rc_d[r]['egglevel']
-                    if type == 'egg' and str(type).isdigit():
+                    if type == 'egg' and level.isdigit():
                         egg_dict[r] = exp
                     elif type == 'exraid' or level == "EX":
                         exraid_list.append(r)
@@ -2515,8 +2513,8 @@ async def list(ctx):
                     activeraidnum += 1
 
             def list_output(r):
-                now = datetime.datetime.utcnow() + datetime.timedelta(hours=server_dict[server]['offset'])
-                end = now + datetime.timedelta(seconds=rc_d[r]['exp']-now.timestamp())
+                now = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=server_dict[server]['offset'])
+                end = now + datetime.timedelta(seconds=rc_d[r]['exp']-time.time())
                 output = ""
                 ctx_waitingcount = 0
                 ctx_omwcount = 0
@@ -2804,7 +2802,7 @@ async def new(ctx):
 
 async def _interest(ctx):
     ctx_maybecount = 0
-    now = datetime.datetime.utcnow() + datetime.timedelta(hours=server_dict[ctx.message.channel.server]['offset'])
+    now = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=server_dict[ctx.message.channel.server]['offset'])
     # Grab all trainers who are maybe and sum
     # up their counts
     trainer_dict = copy.deepcopy(server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict'])
@@ -2834,7 +2832,7 @@ async def _interest(ctx):
 async def _otw(ctx):
 
     ctx_omwcount = 0
-    now = datetime.datetime.utcnow() + datetime.timedelta(hours=server_dict[ctx.message.channel.server]['offset'])
+    now = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=server_dict[ctx.message.channel.server]['offset'])
     # Grab all trainers who are :omw: and sum
     # up their counts
     trainer_dict = copy.deepcopy(server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict'])
@@ -2863,7 +2861,7 @@ async def _otw(ctx):
 async def _waiting(ctx):
 
     ctx_waitingcount = 0
-    now = datetime.datetime.utcnow() + datetime.timedelta(hours=server_dict[ctx.message.channel.server]['offset'])
+    now = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=server_dict[ctx.message.channel.server]['offset'])
     # Grab all trainers who are :here: and sum
     # up their counts
     trainer_dict = copy.deepcopy(server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict'])

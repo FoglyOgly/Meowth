@@ -1541,6 +1541,8 @@ async def _raid(message):
     if message.channel.name not in server_dict[message.server]['city_channels'].keys():
         if message.channel in server_dict[message.channel.server]['raidchannel_dict'] and server_dict[message.channel.server]['raidchannel_dict'][message.channel]['type'] == 'egg':
             fromegg = True
+            eggdetails = server_dict[message.server]['raidchannel_dict'][message.channel]
+            egglevel = eggdetails['egglevel']
         else:
             await Meowth.send_message(message.channel, _("Meowth! Please restrict raid reports to a city channel!"))
             return
@@ -2184,9 +2186,6 @@ async def _eggassume(args, raid_channel):
         raid_messageauthor = "<@"+raid_message.raw_mentions[0]+">"
         logger.info("Hatching Mention Failed - Trying alternative method: channel: {} (id: {}) - server: {} | Attempted mention: {}...".format(raid_channel.name,raid_channel.id,raid_channel.server.name,raid_message.content[:125]))
 
-    if config['allow_assume'][egglevel] == "False":
-        await Meowth.send_message(raid_channel, _("Meowth! **!raid assume** is not allowed in this level egg."))
-        return
     entered_raid = re.sub("[\@]", "", args.lstrip("assume").lstrip(" ").lower())
     entered_raid = get_name(entered_raid).lower() if entered_raid.isdigit() else entered_raid
     rgx = r"[^a-zA-Z0-9]"

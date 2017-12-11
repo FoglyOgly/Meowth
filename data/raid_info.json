@@ -11,7 +11,7 @@
         "2": {
             "egg": "normal",
             "egg_img": "2.png",
-            "pokemon": [28,73,82,91,105,302],
+            "pokemon": [28,73,82,91,105,302,303],
             "hatchtime":60,
             "raidtime":45
         },
@@ -25,7 +25,7 @@
         "4": {
             "egg": "rare",
             "egg_img": "4.png",
-            "pokemon": [31,34,62,71,76,131,143,248],
+            "pokemon": [31,34,62,71,76,131,143,248,359],
             "hatchtime":60,
             "raidtime":45
         },

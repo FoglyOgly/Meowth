@@ -1991,6 +1991,9 @@ async def _exraid(ctx):
     raid_channel_overwrites = channel.overwrites
     meowth_overwrite = (Meowth.user, discord.PermissionOverwrite(send_messages = True))
     for overwrite in raid_channel_overwrites:
+        if isinstance(overwrite[0], discord.Role):
+            if overwrite[0].permissions.manage_server:
+                continue
         overwrite[1].send_messages = False
     raid_channel = await Meowth.create_channel(message.server, raid_channel_name, *raid_channel_overwrites, meowth_overwrite)
     raid_img_url = "https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/eggs/{}?cache=nono".format(str(egg_img))

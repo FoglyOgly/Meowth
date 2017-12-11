@@ -2634,6 +2634,16 @@ async def here(ctx):
     listmsg = await _waiting(ctx)
     await Meowth.send_message(ctx.message.channel, listmsg)
 
+@list.command(pass_context=True)
+@checks.activeraidchannel()
+async def teams(ctx):
+    """List the number and users who are present at a raid.
+
+    Usage: !list here
+    Works only in raid channels."""
+    listmsg = await _teamlist(ctx)
+    await Meowth.send_message(ctx.message.channel, listmsg)
+
 @Meowth.command(pass_context=True)
 @commands.has_permissions(manage_server=True)
 @checks.raidchannel()
@@ -2816,6 +2826,67 @@ async def new(ctx):
                 otw_list.append(user.mention)
         await Meowth.send_message(message.channel, content = _("Meowth! Someone has suggested a different location for the raid! Trainers {trainer_list}: make sure you are headed to the right place!").format(trainer_list=", ".join(otw_list)), embed = newembed)
         return
+
+async def _teamlist(ctx):
+    redlist = []
+    redmaybe = 0
+    redcoming = 0
+    redwaiting = 0
+    bluelist = []
+    bluemaybe = 0
+    bluecoming = 0
+    bluewaiting = 0
+    yellowlist = []
+    yellowmaybe = 0
+    yellowcoming = 0
+    yellowwaiting = 0
+    teamliststr = ""
+    trainer_dict = copy.deepcopy(server_dict[ctx.message.server]['raidchannel_dict'][ctx.message.channel]['trainer_dict'])
+    for trainer in trainer_dict.keys():
+        if trainer_dict[trainer]['status'] =='maybe' or trainer_dict[trainer]['status'] =='omw' or trainer_dict[trainer]['status'] =='waiting':
+            user = ctx.message.server.get_member(trainer)
+            for role in user.roles:
+                if role.name == "mystic":
+                    bluelist.append(user.id)
+                elif role.name == "valor":
+                    redlist.append(user.id)
+                elif role.name =="instinct":
+                    yellowlist.append(user.id)
+        for trainer in redlist:
+            if trainer_dict[trainer]['status'] == "waiting":
+                redwaiting += 1
+            elif trainer_dict[trainer]['status'] == "omw":
+                redcoming += 1
+            elif trainer_dict[trainer]['status'] == "maybe":
+                redmaybe += 1
+        for trainer in bluelist:
+            if trainer_dict[trainer]['status'] == "waiting":
+                bluewaiting += 1
+            elif trainer_dict[trainer]['status'] == "omw":
+                bluecoming += 1
+            elif trainer_dict[trainer]['status'] == "maybe":
+                bluemaybe += 1
+        for trainer in yellowlist:
+            if trainer_dict[trainer]['status'] == "waiting":
+                yellowwaiting += 1
+            elif trainer_dict[trainer]['status'] == "omw":
+                yellowcoming += 1
+            elif trainer_dict[trainer]['status'] == "maybe":
+                yellowmaybe += 1
+
+    if len(redlist) > 0:
+        teamliststr += _("{red_emoji} **{red_number} total,** {redmaybe} interested, {redcoming} coming, {redwaiting} waiting {red_emoji}\n").format(red_number=len(redlist), red_emoji=parse_emoji(ctx.message.server, config['team_dict']['valor']), redmaybe=redmaybe, redcoming=redcoming, redwaiting=redwaiting)
+    if len(bluelist) > 0:
+        teamliststr += _("{blue_emoji} **{blue_number} total,** {bluemaybe} interested, {bluecoming} coming, {bluewaiting} waiting {blue_emoji}\n").format(blue_number=len(bluelist), blue_emoji=parse_emoji(ctx.message.server, config['team_dict']['mystic']), bluemaybe=bluemaybe, bluecoming=bluecoming, bluewaiting=bluewaiting)
+    if len(yellowlist) > 0:
+        teamliststr += _("{yellow_emoji} **{yellow_number}total,**{yellowmaybe} interested, {yellowcoming} coming, {yellowwaiting} waiting {yellow_emoji}\n").format(yellow_number=len(yellowlist), yellow_emoji=parse_emoji(ctx.message.server, config['team_dict']['instinct']), yellowmaybe=yellowmaybe, yellowcoming=yellowcoming, yellowwaiting=yellowwaiting)
+
+    if (len(redlist)+len(bluelist)+len(yellowlist)) > 0:
+        listmsg = _("Meowth! Known team numbers for the raid:\n{}").format(teamliststr)
+    else:
+        listmsg = _("Meowth! I couldn't find any trainer with a team!")
+
+    return listmsg
 
 async def _interest(ctx):
     ctx_maybecount = 0

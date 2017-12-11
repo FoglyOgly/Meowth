@@ -1746,11 +1746,11 @@ async def timerset(ctx,timer):
             timer_split = message.clean_content.lower().split()
             del timer_split[0]
             try:
-                start = datetime.datetime.strptime(" ".join(timer_split)+" "+str(now.year), '%B %d %I:%M %p %Y').replace(tzinfo=datetime.timezone.utc)
+                start = datetime.datetime.strptime(" ".join(timer_split)+" "+str(now.year), '%m/%d %I:%M %p %Y').replace(tzinfo=datetime.timezone.utc)
                 if start.month < now.month:
                     start = start.replace(year=now.year+1)
             except ValueError:
-                await Meowth.send_message(channel, _("Meowth! Your timer wasn't formatted correctly. Change your **!timerset** to match the format on your EX Raid invite and try again."))
+                await Meowth.send_message(channel, _("Meowth! Your timer wasn't formatted correctly. Change your **!timerset** to match this format: **MM/DD HH:MM AM/PM**"))
             diff = start - now
             total = (diff.total_seconds() / 60)
             end = start + datetime.timedelta(minutes=raid_info["raid_eggs"]["EX"]['raidtime'])

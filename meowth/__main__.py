@@ -2854,36 +2854,36 @@ async def _teamlist(ctx):
                     redlist.append(user.id)
                 elif role.name =="instinct":
                     yellowlist.append(user.id)
-        for trainer in redlist:
-            if trainer_dict[trainer]['status'] == "waiting":
-                redwaiting += 1
-                otherwaiting += trainer_dict[trainer]['count']-1
-            elif trainer_dict[trainer]['status'] == "omw":
-                redcoming += 1
-                othercoming += trainer_dict[trainer]['count']-1
-            elif trainer_dict[trainer]['status'] == "maybe":
-                redmaybe += 1
-                othermaybe += trainer_dict[trainer]['count']-1
-        for trainer in bluelist:
-            if trainer_dict[trainer]['status'] == "waiting":
-                bluewaiting += 1
-                otherwaiting += trainer_dict[trainer]['count']-1
-            elif trainer_dict[trainer]['status'] == "omw":
-                bluecoming += 1
-                othercoming += trainer_dict[trainer]['count']-1
-            elif trainer_dict[trainer]['status'] == "maybe":
-                bluemaybe += 1
-                othermaybe += trainer_dict[trainer]['count']-1
-        for trainer in yellowlist:
-            if trainer_dict[trainer]['status'] == "waiting":
-                yellowwaiting += 1
-                otherwaiting += trainer_dict[trainer]['count']-1
-            elif trainer_dict[trainer]['status'] == "omw":
-                yellowcoming += 1
-                othercoming += trainer_dict[trainer]['count']-1
-            elif trainer_dict[trainer]['status'] == "maybe":
-                yellowmaybe += 1
-                othermaybe += trainer_dict[trainer]['count']-1
+    for trainer in redlist:
+        if trainer_dict[trainer]['status'] == "waiting":
+            redwaiting += 1
+            otherwaiting += trainer_dict[trainer]['count']-1
+        elif trainer_dict[trainer]['status'] == "omw":
+            redcoming += 1
+            othercoming += trainer_dict[trainer]['count']-1
+        elif trainer_dict[trainer]['status'] == "maybe":
+            redmaybe += 1
+            othermaybe += trainer_dict[trainer]['count']-1
+    for trainer in bluelist:
+        if trainer_dict[trainer]['status'] == "waiting":
+            bluewaiting += 1
+            otherwaiting += trainer_dict[trainer]['count']-1
+        elif trainer_dict[trainer]['status'] == "omw":
+            bluecoming += 1
+            othercoming += trainer_dict[trainer]['count']-1
+        elif trainer_dict[trainer]['status'] == "maybe":
+            bluemaybe += 1
+            othermaybe += trainer_dict[trainer]['count']-1
+    for trainer in yellowlist:
+        if trainer_dict[trainer]['status'] == "waiting":
+            yellowwaiting += 1
+            otherwaiting += trainer_dict[trainer]['count']-1
+        elif trainer_dict[trainer]['status'] == "omw":
+            yellowcoming += 1
+            othercoming += trainer_dict[trainer]['count']-1
+        elif trainer_dict[trainer]['status'] == "maybe":
+            yellowmaybe += 1
+            othermaybe += trainer_dict[trainer]['count']-1
 
     if len(redlist) > 0:
         teamliststr += _("{red_emoji} **{red_number} total,** {redmaybe} interested, {redcoming} coming, {redwaiting} waiting {red_emoji}\n").format(red_number=len(redlist), red_emoji=parse_emoji(ctx.message.server, config['team_dict']['valor']), redmaybe=redmaybe, redcoming=redcoming, redwaiting=redwaiting)

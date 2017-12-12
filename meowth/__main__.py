@@ -405,7 +405,7 @@ To reactivate the channel, use **!timerset** to set the timer again."""))
 
 
 async def channel_cleanup(loop=True):
-    while True:
+    while True and Meowth.is_logged_in and not Meowth.is_closed:
         global active_raids
         serverdict_chtemp = copy.deepcopy(server_dict)
         logger.info("Channel_Cleanup ------ BEGIN ------")
@@ -546,7 +546,7 @@ async def channel_cleanup(loop=True):
         continue
 
 async def server_cleanup(loop=True):
-    while True:
+    while True and Meowth.is_logged_in and not Meowth.is_closed:
         serverdict_srvtemp = copy.deepcopy(server_dict)
         logger.info("Server_Cleanup ------ BEGIN ------")
 

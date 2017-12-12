@@ -328,7 +328,7 @@ async def expire_channel(channel):
     # else deleted the actual channel at some point.
 
     channel_exists = Meowth.get_channel(channel.id)
-    if channel_exists is None:
+    if channel_exists is None and Meowth.is_logged_in and not Meowth.is_closed:
         try:
             del server_dict[channel.server]['raidchannel_dict'][channel]
         except KeyError:
@@ -376,7 +376,7 @@ To reactivate the channel, use **!timerset** to set the timer again."""))
         # Also, if the channel got reactivated, don't do anything either.
 
         try:
-            if server_dict[channel.server]['raidchannel_dict'][channel]['active'] == False:
+            if server_dict[channel.server]['raidchannel_dict'][channel]['active'] == False and Meowth.is_logged_in and not Meowth.is_closed:
                 if dupechannel:
                     reportmsg = server_dict[channel.server]['raidchannel_dict'][channel]['raidreport']
                     try:
@@ -1755,7 +1755,6 @@ async def timerset(ctx,timer):
                 await Meowth.send_message(channel, _("Meowth! Your timer wasn't formatted correctly. Change your **!timerset** to match this format: **MM/DD HH:MM AM/PM**"))
             diff = start - now
             total = (diff.total_seconds() / 60)
-            end = start + datetime.timedelta(minutes=raid_info["raid_eggs"]["EX"]['raidtime'])
             if now <= start:
                 await _timerset(channel, total)
             elif now > start:

@@ -1466,6 +1466,7 @@ async def all(ctx):
     await Meowth.remove_roles(author, *remove_roles)
     if count == 0:
         await Meowth.send_message(channel, content=_("{0}, you have no pokemon in your want list.").format(author.mention, count))
+        return
     await Meowth.send_message(channel, content=_("{0}, I've removed {1} pokemon from your want list.").format(author.mention, count))
     return
 

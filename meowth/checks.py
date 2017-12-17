@@ -51,10 +51,10 @@ def check_wantchannel(ctx):
     channel = ctx.message.channel
     server = ctx.message.server
     try:
-        want_channels = ctx.bot.server_dict[server]['want_channel_list']
+        want_channels = ctx.bot.server_dict[server.id]['want_channel_list']
     except KeyError:
         return False
-    if channel in want_channels:
+    if channel.id in want_channels:
         return True
 
 def check_citychannel(ctx):
@@ -63,7 +63,7 @@ def check_citychannel(ctx):
     channel = ctx.message.channel.name
     server = ctx.message.server
     try:
-        city_channels = ctx.bot.server_dict[server]['city_channels'].keys()
+        city_channels = ctx.bot.server_dict[server.id]['city_channels'].keys()
     except KeyError:
         return False
     if channel in city_channels:
@@ -75,10 +75,10 @@ def check_raidchannel(ctx):
     channel = ctx.message.channel
     server = ctx.message.server
     try:
-        raid_channels = ctx.bot.server_dict[server]['raidchannel_dict'].keys()
+        raid_channels = ctx.bot.server_dict[server.id]['raidchannel_dict'].keys()
     except KeyError:
         return False
-    if channel in raid_channels:
+    if channel.id in raid_channels:
         return True
 
 def check_eggchannel(ctx):
@@ -87,7 +87,7 @@ def check_eggchannel(ctx):
     channel = ctx.message.channel
     server = ctx.message.server
     try:
-        type = ctx.bot.server_dict[server]['raidchannel_dict'][channel]['type']
+        type = ctx.bot.server_dict[server.id]['raidchannel_dict'][channel.id]['type']
     except KeyError:
         return False
     if type == 'egg':
@@ -99,8 +99,8 @@ def check_exraidchannel(ctx):
     channel = ctx.message.channel
     server = ctx.message.server
     try:
-        level = ctx.bot.server_dict[server]['raidchannel_dict'][channel]['egglevel']
-        type = ctx.bot.server_dict[server]['raidchannel_dict'][channel]['type']
+        level = ctx.bot.server_dict[server.id]['raidchannel_dict'][channel.id]['egglevel']
+        type = ctx.bot.server_dict[server.id]['raidchannel_dict'][channel.id]['type']
     except KeyError:
         return False
     if level == 'EX' or type == 'exraid':
@@ -112,7 +112,7 @@ def check_raidactive(ctx):
     channel = ctx.message.channel
     server = ctx.message.server
     try:
-        return ctx.bot.server_dict[server]['raidchannel_dict'][channel]['active']
+        return ctx.bot.server_dict[server.id]['raidchannel_dict'][channel.id]['active']
     except KeyError:
         return False
 
@@ -121,7 +121,7 @@ def check_raidset(ctx):
         return False
     server = ctx.message.server
     try:
-        return ctx.bot.server_dict[server]['raidset']
+        return ctx.bot.server_dict[server.id]['raidset']
     except KeyError:
         return False
 
@@ -130,7 +130,7 @@ def check_wildset(ctx):
         return False
     server = ctx.message.server
     try:
-        return ctx.bot.server_dict[server]['wildset']
+        return ctx.bot.server_dict[server.id]['wildset']
     except KeyError:
         return False
 
@@ -139,7 +139,7 @@ def check_wantset(ctx):
         return False
     server = ctx.message.server
     try:
-        return ctx.bot.server_dict[server]['wantset']
+        return ctx.bot.server_dict[server.id]['wantset']
     except KeyError:
         return False
 
@@ -148,7 +148,7 @@ def check_teamset(ctx):
         return False
     server = ctx.message.server
     try:
-        return ctx.bot.server_dict[server]['team']
+        return ctx.bot.server_dict[server.id]['team']
     except KeyError:
         return False
 

@@ -139,7 +139,7 @@ def custom_error_handling(bot,logger):
         elif isinstance(error, CityChannelCheckFail):
             server = ctx.message.server
             msg = "Meowth! Please use **!{cmd_name}** in ".format(cmd_name=ctx.command.name)
-            city_channels = bot.server_dict[server]['city_channels']
+            city_channels = bot.server_dict[server.id]['city_channels']
             if len(city_channels) > 10:
                 msg+="a Region report channel."
             else:
@@ -153,7 +153,7 @@ def custom_error_handling(bot,logger):
         elif isinstance(error, WantChannelCheckFail):
             server = ctx.message.server
             msg = "Meowth! Please use **!{cmd_name}** in the following channel".format(cmd_name=ctx.command.name)
-            want_channels = bot.server_dict[server]['want_channel_list']
+            want_channels = bot.server_dict[server.id]['want_channel_list']
 
             if len(want_channels) > 1:
                 msg += "s:\n"
@@ -161,7 +161,7 @@ def custom_error_handling(bot,logger):
                 msg += ": "
             counter = 0
             for c in want_channels:
-                channel = discord.utils.get(server.channels,id=c.id)
+                channel = discord.utils.get(server.channels,id=c)
                 if counter > 0:
                     msg += "\n"
                 msg += channel.mention
@@ -172,7 +172,7 @@ def custom_error_handling(bot,logger):
         elif isinstance(error, RaidChannelCheckFail):
             server = ctx.message.server
             msg = "Meowth! Please use **!{cmd_name}** in a Raid channel. Use **!list** in any ".format(cmd_name=ctx.command.name)
-            city_channels = bot.server_dict[server]['city_channels']
+            city_channels = bot.server_dict[server.id]['city_channels']
             if len(city_channels) > 10:
                 msg+="Region report channel to see active raids."
             else:
@@ -186,7 +186,7 @@ def custom_error_handling(bot,logger):
         elif isinstance(error, RaidChannelCheckFail):
             server = ctx.message.server
             msg = "Meowth! Please use **!{cmd_name}** in an Egg channel. Use **!list** in any ".format(cmd_name=ctx.command.name)
-            city_channels = bot.server_dict[server]['city_channels']
+            city_channels = bot.server_dict[server.id]['city_channels']
             if len(city_channels) > 10:
                 msg+="Region report channel to see active raids."
             else:
@@ -205,7 +205,7 @@ def custom_error_handling(bot,logger):
         elif isinstance(error, ActiveRaidChannelCheckFail):
             server = ctx.message.server
             msg = "Meowth! Please use **!{cmd_name}** in an Active Raid channel. Use **!list** in any ".format(cmd_name=ctx.command.name)
-            city_channels = bot.server_dict[server]['city_channels']
+            city_channels = bot.server_dict[server.id]['city_channels']
             if len(city_channels) > 10:
                 msg+="Region report channel to see active raids."
             else:
@@ -219,7 +219,7 @@ def custom_error_handling(bot,logger):
         elif isinstance(error, CityRaidChannelCheckFail):
             server = ctx.message.server
             msg = "Meowth! Please use **!{cmd_name}** in either a Raid channel or ".format(cmd_name=ctx.command.name)
-            city_channels = bot.server_dict[server]['city_channels']
+            city_channels = bot.server_dict[server.id]['city_channels']
             if len(city_channels) > 10:
                 msg+="a Region report channel."
             else:
@@ -233,7 +233,7 @@ def custom_error_handling(bot,logger):
         elif isinstance(error, RegionEggChannelCheckFail):
             server = ctx.message.server
             msg = "Meowth! Please use **!{cmd_name}** in either a Raid Egg channel or ".format(cmd_name=ctx.command.name)
-            city_channels = bot.server_dict[server]['city_channels']
+            city_channels = bot.server_dict[server.id]['city_channels']
             if len(city_channels) > 10:
                 msg+="a Region report channel."
             else:
@@ -247,7 +247,7 @@ def custom_error_handling(bot,logger):
         elif isinstance(error, RegionExRaidChannelCheckFail):
             server = ctx.message.server
             msg = "Meowth! Please use **!{cmd_name}** in either a EX Raid channel or one of the following region channels:".format(cmd_name=ctx.command.name)
-            city_channels = bot.server_dict[server]['city_channels']
+            city_channels = bot.server_dict[server.id]['city_channels']
             if len(city_channels) > 10:
                 msg+="a Region report channel."
             else:
@@ -261,7 +261,7 @@ def custom_error_handling(bot,logger):
         elif isinstance(error, ExRaidChannelCheckFail):
             server = ctx.message.server
             msg = "Meowth! Please use **!{cmd_name}** in a EX Raid channel. Use **!list** in any of the following region channels to see active raids:".format(cmd_name=ctx.command.name)
-            city_channels = bot.server_dict[server]['city_channels']
+            city_channels = bot.server_dict[server.id]['city_channels']
             if len(city_channels) > 10:
                 msg+="a Region report channel."
             else:

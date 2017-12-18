@@ -424,7 +424,7 @@ async def channel_cleanup(loop=True):
             for channelid in serverdict_chtemp[serverid]['raidchannel_dict']:
                 channel = Meowth.get_channel(channelid)
                 log_str = "Channel_Cleanup - Server: "+server.name
-                log_str = log_str+": Channel:"+channel.name
+                log_str = log_str+": Channel:"+channelid
                 logger.info(log_str+" - CHECKING")
 
                 channelmatch = Meowth.get_channel(channel.id)
@@ -435,7 +435,7 @@ async def channel_cleanup(loop=True):
                     logger.info(log_str+" - DOESN'T EXIST IN DISCORD")
                 #otherwise, if meowth can still see the channel in discord
                 else:
-                    logger.info(log_str+" - EXISTS IN DISCORD")
+                    logger.info(log_str+" ("+channel.name+") - EXISTS IN DISCORD")
                     #if the channel save data shows it's not an active raid
                     if serverdict_chtemp[serverid]['raidchannel_dict'][channelid]['active'] == False:
 
@@ -1693,6 +1693,8 @@ This channel will be deleted five minutes after the timer expires.""").format(po
     if raidexp is not False:
         await _timerset(raid_channel,raidexp)
     else:
+        await _timerset(raid_channel, raid_info["raid_eggs"][get_level(entered_raid)]['raidtime'])
+        server_dict[message.server.id]['raidchannel_dict'][raid_channel.id]['manual_timer'] = False
         await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left on the raid using **!timerset <minutes>** so others can check it with **!timer**.").format(member=message.author.mention))
     event_loop.create_task(expiry_check(raid_channel))
 
@@ -2199,6 +2201,8 @@ When this egg raid expires, there will be 15 minutes to update it into an open r
         if raidexp is not False:
             await _timerset(raid_channel,raidexp)
         else:
+            await _timerset(raid_channel, raid_info["raid_eggs"][egg_level]['hatchtime'])
+            server_dict[message.server.id]['raidchannel_dict'][raid_channel.id]['manual_timer'] = False
             await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset <minutes>** so others can check it with **!timer**.").format(member=message.author.mention))
         if len(raid_info['raid_eggs'][egg_level]['pokemon']) == 1:
             await _eggassume("assume "+ get_name(raid_info['raid_eggs'][egg_level]['pokemon'][0]), raid_channel)

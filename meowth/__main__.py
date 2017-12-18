@@ -378,16 +378,18 @@ To reactivate the channel, use **!timerset** to set the timer again."""))
         try:
             if server_dict[channel.server.id]['raidchannel_dict'][channel.id]['active'] == False and Meowth.is_logged_in and not Meowth.is_closed:
                 if dupechannel:
-                    reportmsg = await Meowth.get_message(channel, server_dict[channel.server.id]['raidchannel_dict'][channel.id]['raidreport'])
                     try:
+                        report_channel = discord.utils.get(channel.server.channels, name = server_dict[channel.server.id]['raidchannel_dict'][channel.id]['reportcity'])
+                        reportmsg = await Meowth.get_message(report_channel, server_dict[channel.server.id]['raidchannel_dict'][channel.id]['raidreport'])
                         await Meowth.delete_message(reportmsg)
                     except:
                         pass
                 else:
-                    reportmsg = await Meowth.get_message(channel, server_dict[channel.server.id]['raidchannel_dict'][channel.id]['raidreport'])
                     try:
+                        report_channel = discord.utils.get(channel.server.channels, name = server_dict[channel.server.id]['raidchannel_dict'][channel.id]['reportcity'])
+                        reportmsg = await Meowth.get_message(report_channel, server_dict[channel.server.id]['raidchannel_dict'][channel.id]['raidreport'])
                         await Meowth.edit_message(reportmsg, embed=discord.Embed(description=expiremsg,colour=channel.server.me.colour))
-                    except discord.errors.NotFound:
+                    except:
                         pass
                 try:
                     del server_dict[channel.server.id]['raidchannel_dict'][channel.id]

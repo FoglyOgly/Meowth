@@ -336,6 +336,7 @@ async def expire_channel(channel):
         return
     else:
         dupechannel = False
+        reportchannel = Meowth.get_channel(server_dict[server.id]['raidchannel_dict'][channel.id]['reportcity'])
         if server_dict[server.id]['raidchannel_dict'][channel.id]['active'] == False:
             alreadyexpired = True
         else:
@@ -378,13 +379,13 @@ To reactivate the channel, use **!timerset** to set the timer again."""))
         try:
             if server_dict[channel.server.id]['raidchannel_dict'][channel.id]['active'] == False and Meowth.is_logged_in and not Meowth.is_closed:
                 if dupechannel:
-                    reportmsg = await Meowth.get_message(channel, server_dict[channel.server.id]['raidchannel_dict'][channel.id]['raidreport'])
+                    reportmsg = await Meowth.get_message(reportchannel, server_dict[channel.server.id]['raidchannel_dict'][channel.id]['raidreport'])
                     try:
                         await Meowth.delete_message(reportmsg)
                     except:
                         pass
                 else:
-                    reportmsg = await Meowth.get_message(channel, server_dict[channel.server.id]['raidchannel_dict'][channel.id]['raidreport'])
+                    reportmsg = await Meowth.get_message(reportchannel, server_dict[channel.server.id]['raidchannel_dict'][channel.id]['raidreport'])
                     try:
                         await Meowth.edit_message(reportmsg, embed=discord.Embed(description=expiremsg,colour=channel.server.me.colour))
                     except discord.errors.NotFound:
@@ -427,11 +428,11 @@ async def channel_cleanup(loop=True):
                 log_str = log_str+": Channel:"+channelid
                 logger.info(log_str+" - CHECKING")
 
-                channelmatch = Meowth.get_channel(channel.id)
+                channelmatch = Meowth.get_channel(channelid)
 
                 if channelmatch is None:
                     #list channel for deletion from save data
-                    dict_channel_delete.append(channel)
+                    dict_channel_delete.append(channelid)
                     logger.info(log_str+" - DOESN'T EXIST IN DISCORD")
                 #otherwise, if meowth can still see the channel in discord
                 else:
@@ -445,7 +446,7 @@ async def channel_cleanup(loop=True):
                             if serverdict_chtemp[serverid]['raidchannel_dict'][channelid]['exp'] < (time.time() - (15 * 60)):
 
                                 #list the channel to be removed from save data
-                                dict_channel_delete.append(channel)
+                                dict_channel_delete.append(channelid)
 
                                 #and list the channel to be deleted in discord
                                 discord_channel_delete.append(channel)
@@ -459,7 +460,7 @@ async def channel_cleanup(loop=True):
                             if serverdict_chtemp[serverid]['raidchannel_dict'][channelid]['exp'] < (time.time() - (5 * 60)):
 
                                 #list the channel to be removed from save data
-                                dict_channel_delete.append(channel)
+                                dict_channel_delete.append(channelid)
 
                                 #and list the channel to be deleted in discord
                                 discord_channel_delete.append(channel)
@@ -470,6 +471,7 @@ async def channel_cleanup(loop=True):
                         event_loop.create_task(expire_channel(channel))
                         logger.info(log_str+" - = RECENTLY EXPIRED NONACTIVE RAID")
                         continue
+
 
                     #if the channel save data shows it as an active raid still
                     elif serverdict_chtemp[serverid]['raidchannel_dict'][channelid]['active'] == True:
@@ -484,7 +486,7 @@ async def channel_cleanup(loop=True):
                         elif serverdict_chtemp[serverid]['raidchannel_dict'][channelid]['exp'] < (time.time() - (5 * 60)):
 
                             #list the channel to be removed from save data
-                            dict_channel_delete.append(channel)
+                            dict_channel_delete.append(channelid)
 
                             #and list the channel to be deleted in discord
                             discord_channel_delete.append(channel)
@@ -512,17 +514,9 @@ async def channel_cleanup(loop=True):
             for c in dict_channel_delete:
                 try:
                     #attempt to delete the channel from save data
-                    del server_dict[serverid]['raidchannel_dict'][c.id]
-                    logger.info("Channel_Cleanup - Channel Savedata Cleared - " + c.name)
+                    del server_dict[serverid]['raidchannel_dict'][c]
+                    logger.info("Channel_Cleanup - Channel Savedata Cleared - " + c)
                 except KeyError:
-                    pass
-
-                try:
-                    #delete channel if it still exists in discord
-                    await Meowth.delete_channel(c)
-                    logger.info("Channel_Cleanup - Channel Deleted - " + c.name)
-                except:
-                    logger.info("Channel_Cleanup - Channel Deletion Failure - " + c.name)
                     pass
 
             #for every channel listed to have the discord channel deleted
@@ -1677,7 +1671,7 @@ This channel will be deleted five minutes after the timer expires.""").format(po
     raidmessage = await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)
 
     server_dict[message.server.id]['raidchannel_dict'][raid_channel.id] = {
-        'reportcity' : message.channel.name,
+        'reportcity' : message.channel.id,
         'trainer_dict' : {},
         'exp' : time.time() + 60 * raid_info["raid_eggs"][get_level(entered_raid)]['raidtime'], # minutes from now
         'manual_timer' : False, # No one has explicitly set the timer, Meowth is just assuming 2 hours
@@ -1947,7 +1941,7 @@ async def on_message(message):
                     else:
                         newloc = message.content[newlocindex:newlocend+1]
                     oldraidmsg = await Meowth.get_message(message.channel, server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['raidmessage'])
-                    report_channel = discord.utils.get(message.channel.server.channels, name=server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['reportcity'])
+                    report_channel = Meowth.get_channel(server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['reportcity'])
                     oldreportmsg = await Meowth.get_message(report_channel, server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['raidreport'])
                     oldembed = oldraidmsg.embeds[0]
                     newembed = discord.Embed(title=oldembed['title'],url=newloc,colour=message.server.me.colour)
@@ -1998,6 +1992,10 @@ async def _exraid(ctx):
     fromegg = False
     exraid_split = message.clean_content.lower().split()
     del exraid_split[0]
+    rgx = r"[^a-zA-Z0-9]"
+    pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", exraid_split[0])), None)
+    if pkmn_match:
+        del exraid_split[0]
     if len(exraid_split) <= 0:
         await Meowth.send_message(channel, _("Meowth! Give more details when reporting! Usage: **!exraid <location>**"))
         return
@@ -2038,7 +2036,7 @@ async def _exraid(ctx):
     raidreport = await Meowth.send_message(channel, content = _("Meowth! EX raid egg reported by {member}! Details: {location_details}. Use the **!invite** command to gain access and coordinate in {raid_channel}").format(member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention),embed=raid_embed)
     await asyncio.sleep(1) #Wait for the channel to be created.
 
-    raidmsg = _("""Meowth! EX raid reported by {member} in {citychannel}! Details: {location_details}. Coordinate here!
+    raidmsg = _("""Meowth! EX raid reported by {member} in {citychannel}! Details: {location_details}. Coordinate here after using **!invite** to gain access!
 
 To update your status, choose from the following commands:
 **!interested, !coming, !here, !cancel**
@@ -2057,7 +2055,7 @@ Message **!starting** when the raid is beginning to clear the raid's 'here' list
     raidmessage = await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)
 
     server_dict[message.server.id]['raidchannel_dict'][raid_channel.id] = {
-        'reportcity' : channel.name,
+        'reportcity' : channel.id,
         'trainer_dict' : {},
         'exp' : time.time() + 60*60*24*raid_info['raid_eggs']['EX']['hatchtime'], # days from now
         'manual_timer' : False,
@@ -2185,7 +2183,7 @@ Message **!raid assume <pokemon>** to have the channel auto-update into an open 
 When this egg raid expires, there will be 15 minutes to update it into an open raid before it'll be deleted.""").format(level=egg_level, member=message.author.mention, citychannel=message.channel.mention, location_details=raid_details)
         raidmessage = await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)
         server_dict[message.server.id]['raidchannel_dict'][raid_channel.id] = {
-            'reportcity' : message.channel.name,
+            'reportcity' : message.channel.id,
             'trainer_dict' : {},
             'exp' : time.time() + 60 * raid_info["raid_eggs"][egg_level]['hatchtime'], # minutes from now
             'manual_timer' : False, # No one has explicitly set the timer, Meowth is just assuming 2 hours
@@ -2210,7 +2208,7 @@ When this egg raid expires, there will be 15 minutes to update it into an open r
 
 async def _eggassume(args, raid_channel):
     eggdetails = server_dict[raid_channel.server.id]['raidchannel_dict'][raid_channel.id]
-    report_channel = discord.utils.get(raid_channel.server.channels, name=eggdetails['reportcity'])
+    report_channel = Meowth.get_channel(eggdetails['reportcity'])
     egglevel = eggdetails['egglevel']
     manual_timer = eggdetails['manual_timer']
     egg_report = await Meowth.get_message(report_channel, eggdetails['raidreport'])
@@ -2267,8 +2265,8 @@ async def _eggassume(args, raid_channel):
 async def _eggtoraid(entered_raid, raid_channel):
     eggdetails = server_dict[raid_channel.server.id]['raidchannel_dict'][raid_channel.id]
     egglevel = eggdetails['egglevel']
-    reportcity = eggdetails['reportcity']
-    reportcitychannel = discord.utils.get(raid_channel.server.channels, name=reportcity)
+    reportcitychannel = Meowth.get_channel(eggdetails['reportcity'])
+    reportcity = reportcitychannel.name
     manual_timer = eggdetails['manual_timer']
     trainer_dict = eggdetails['trainer_dict']
     egg_address = eggdetails['address']
@@ -2366,7 +2364,7 @@ Message **!starting** when the raid is beginning to clear the raid's 'here' list
         pass
 
     server_dict[raid_channel.server.id]['raidchannel_dict'][raid_channel.id] = {
-    'reportcity' : reportcity,
+    'reportcity' : reportcitychannel.id,
     'trainer_dict' : trainer_dict,
     'exp' : raidexp,
     'manual_timer' : manual_timer,
@@ -2548,7 +2546,8 @@ async def list(ctx):
             egg_dict = {}
             exraid_list = []
             for r in rc_d:
-                if rc_d[r]['reportcity'] == cty and rc_d[r]['active'] and discord.utils.get(server.channels, id=r):
+                reportcity = Meowth.get_channel(rc_d[r]['reportcity'])
+                if reportcity.name == cty and rc_d[r]['active'] and discord.utils.get(server.channels, id=r):
                     exp = rc_d[r]['exp']
                     type = rc_d[r]['type']
                     level = rc_d[r]['egglevel']
@@ -2792,8 +2791,8 @@ async def location(ctx):
         rc_d = server_dict[server.id]['raidchannel_dict']
         raidmsg = await Meowth.get_message(channel, rc_d[channel.id]['raidmessage'])
         location = rc_d[channel.id]['address']
-        report_city = rc_d[channel.id]['reportcity']
-        report_channel = discord.utils.get(server.channels, name=report_city)
+        report_channel = Meowth.get_channel(rc_d[channel.id]['reportcity'])
+        report_city = report_channel.name
         oldembed = raidmsg.embeds[0]
         locurl = oldembed['url']
         newembed = discord.Embed(title=oldembed['title'],url=locurl,colour=server.me.colour)
@@ -2821,8 +2820,8 @@ async def new(ctx):
         await Meowth.send_message(message.channel, _("Meowth! We're missing the new location details! Usage: **!location new <new address>**"))
         return
     else:
-        report_city = server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['reportcity']
-        report_channel = discord.utils.get(message.server.channels, name=report_city)
+        report_channel = Meowth.get_channel(rc_d[r]['reportcity'])
+        report_city = report_channel.name
 
         details = " ".join(location_split)
         if "/maps" in message.content:

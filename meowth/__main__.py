@@ -2307,7 +2307,7 @@ This channel will be deleted five minutes after the timer expires.""").format(me
     elif egglevel == "EX":
         hatchtype = "exraid"
         raidreportcontent = _("Meowth! The EX egg has hatched into a {pokemon} raid! Details: {location_details}. Use the **!invite** command to gain access and coordinate in {raid_channel}").format(pokemon=entered_raid.capitalize(), location_details=egg_address, raid_channel=raid_channel.mention)
-        raidmsg = _("""Meowth! {pokemon} EX raid reported by {member} in {citychannel}! Details: {location_details}. Coordinate here!
+        raidmsg = _("""Meowth! {pokemon} EX raid reported by {member} in {citychannel}! Details: {location_details}. Coordinate here after using **!invite** to gain access!
 
 To update your status, choose from the following commands:
 **!interested, !coming, !here, !cancel**
@@ -2669,7 +2669,7 @@ async def here(ctx):
 @list.command(pass_context=True)
 @checks.activeraidchannel()
 async def teams(ctx):
-    """List the number and users who are present at a raid.
+    """List the teams for the users that have RSVP'd to a raid.
 
     Usage: !list teams
     Works only in raid channels."""

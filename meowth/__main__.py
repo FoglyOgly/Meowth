@@ -2496,7 +2496,7 @@ async def cancel(ctx):
 async def starttime(ctx):
     """Set a time for a group to start a raid
 
-    Usage: !starttime [HH/MM AM/PM]
+    Usage: !starttime [HH:MM AM/PM]
     Works only in raid channels. Sends a message and sets a group start time that
     can be seen using !starttime (without a time). One start time is allowed at
     a time and is visibile in !list output. Cleared with !starting."""

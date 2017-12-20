@@ -2561,7 +2561,7 @@ async def starting(ctx):
         timestr = " "
     starting_str = _("Meowth! The group that was waiting{timestr}is starting the raid! Trainers {trainer_list}, please respond with {here_emoji} or **!here** if you are waiting for another group!").format(timestr=timestr,trainer_list=", ".join(ctx_startinglist), here_emoji=parse_emoji(ctx.message.server, config['here_id']))
     if starttime:
-        starting_str += "\n\nThe start time has also been cleared, new groups can set a new start time wtih **!starttime**."
+        starting_str += "\n\nThe start time has also been cleared, new groups can set a new start time wtih **!starttime HH:MM AM/PM**."
     if len(ctx_startinglist) == 0:
         starting_str = _("Meowth! How can you start when there's no one waiting at this raid!?")
     await Meowth.send_message(ctx.message.channel, starting_str)

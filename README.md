@@ -44,19 +44,30 @@ py install.py
 Tesseract-OCR has to be installed with a standard binary installer on Windows.
 Get the installer [HERE](https://github.com/tesseract-ocr/tesseract/wiki/Downloads)
 
-3. Download the files in this repository. The source code is in meowth.py and bot config is in config.json.
+3. Make sure the Tesseract-OCR install folder and your python install folder are added to your system environment PATH variable.
 
-4. Go to https://discordapp.com/developers/applications/me#top and create a new app.
+4. Download the files in this repository. The source code is in meowth.py and bot config is in config.json.
 
-5. Name it and upload the avatar of your choice.
+5. Go to https://discordapp.com/developers/applications/me#top and create a new app.
 
-6. Create a bot user for your app and reveal the bot token to copy it.
+6. Name it and upload the avatar of your choice.
 
-7. Copy config_blank.json and rename to config.json. Open config.json in a text editor (a good one to use is Notepad++) and paste the bot token into the value for "bot_token", replacing the "yourtoken" string.
+7. Create a bot user for your app and reveal the bot token to copy it.
 
-8. Replace the "master" value in config.json with your user ID from discord.
+8. Copy config_blank.json and rename to config.json. 
 
-9. Run the launcher from the command prompt or terminal window:
+9. Open config.json in a text editor (a good one to use is Notepad++) and paste the bot token into the value for "bot_token", replacing the "yourtoken" string.
+
+10. Replace the "master" value in config.json with your user ID from discord.
+
+11. Go back to your Discord application page and copy the Client ID.
+
+12. Go to the following link, replacing <CLIENT_ID> with the Client ID you copied.
+`https://discordapp.com/oauth2/authorize?client_id=<CLIENT_ID>&scope=bot&permissions=268822608`
+
+13. Select the server you want to add Meowth to and complete the prompts. If you get to an empty screen and didn't get to see the Google new reCaptcha tickbox, disable your adblocker.
+
+14. Run the launcher from the command prompt or terminal window:
 
 Linux:
 ```bash
@@ -69,16 +80,9 @@ py launcher.py -s
 
 If successful, it should show "Meowth! That's right!".
 
-10. Go back to your Discord application page and copy the Client ID.
+15. The bot should have sent you DM in Discord. Add the team roles: mystic, instinct and valor. Ensure they're below the bot role in the server role hierarchy.
 
-11. Go to the following link, replacing <CLIENT_ID> with the Client ID you copied.
-`https://discordapp.com/oauth2/authorize?client_id=<CLIENT_ID>&scope=bot&permissions=268822608`
-
-12. Select the server you want to add Meowth to and complete the prompts. If you get to an empty screen and didn't get to see the Google new reCaptcha tickbox, disable your adblocker.
-
-9. The bot should now have sent you DM in Discord. Add the team roles: mystic, instinct and valor. Ensure they're below the bot role in the server role hierarchy.
-
-10. Simply type !configure in your server to start the configuration process.
+16. Simply type !configure in your server to start the configuration process.
 
 ### Launcher Reference:
 Arguments:
@@ -160,7 +164,9 @@ pkmn = Pokemon
 | **!list interested** | *Raid Channel* | Lists 'interested' members for the raid. |
 | **!list coming**  | *Raid Channel* | Lists 'coming' members for the raid. |
 | **!list here** | *Raid Channel* | Lists 'here' members for the raid. |
+| **!list teams** | *Raid Channel* | Lists teams of the members that have RSVPd. |
 | **!duplicate** | *Raid Channel* | Reports the raid as a duplicate channel. |
+| **!starttime** \[HH:MM AM/PM\] | *Raid Channel* | Reports the raid as a duplicate channel. |
 
 ## General notes on Meowth:
 

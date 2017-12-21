@@ -2724,14 +2724,14 @@ async def list(ctx):
                     listmsg += await _interest(ctx)
                     listmsg += "\n"
                     listmsg += await print_raid_timer(channel)
-                    if (starttime and starttime > now) or rc_d[channel.id]['type'] == "exraid" or rc_d[channel.id]['egglevel'] == "EX":
+                    if starttime and (starttime > now or rc_d[channel.id]['type'] == "exraid" or rc_d[channel.id]['egglevel'] == "EX"):
                         listmsg += "\nMeowth! The next group will be starting at {}".format(starttime.strftime("%I:%M %p"))
                 else:
                     listmsg += await _interest(ctx)
                     listmsg += "\n" + await _otw(ctx)
                     listmsg += "\n" + await _waiting(ctx)
                     listmsg += "\n" + await print_raid_timer(channel)
-                    if (starttime and starttime > now) or rc_d['type'] == "exraid" or rc_d['egglevel'] == "EX":
+                    if starttime and (starttime > now or rc_d['type'] == "exraid" or rc_d['egglevel'] == "EX"):
                         listmsg += "\nMeowth! The next group will be starting at **{}**".format(starttime.strftime("%I:%M %p"))
                 await Meowth.send_message(channel, listmsg)
                 return

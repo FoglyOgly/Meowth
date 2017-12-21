@@ -2503,24 +2503,69 @@ async def starttime(ctx):
     message = ctx.message
     server = message.server
     channel = message.channel
+    author = message.author
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=server_dict[server.id]['offset'])
     start_split = message.clean_content.lower().split()
+    rc_d = server_dict[server.id]['raidchannel_dict'][channel.id]
+    if rc_d['type'] == "egg":
+        egglevel = rc_d['egglevel']
+        maxtime = raid_info['raid_eggs'][egglevel]['hatchtime'] + raid_info['raid_eggs'][egglevel]['raidtime']
+    else:
+        egglevel = get_level(rc_d['pokemon'])
+        maxtime = raid_info['raid_eggs'][egglevel]['raidtime']
     del start_split[0]
     if len(start_split) > 0:
+        try:
+            alreadyset = rc_d['starttime']
+        except KeyError:
+            alreadyset = False
         try:
             start = datetime.datetime.strptime(" ".join(start_split)+" "+str(now.month)+str(now.day)+str(now.year), '%I:%M %p %m%d%Y')
         except ValueError:
             await Meowth.send_message(channel, _("Meowth! Your start time wasn't formatted correctly. Change your **!starttime** to match this format: **HH:MM AM/PM**"))
-        if now <= start:
-            server_dict[server.id]['raidchannel_dict'][channel.id]['starttime'] = start
-            await Meowth.send_message(channel, _("Meowth! The current start time has been set to: **{starttime}**").format(starttime=start.strftime("%I:%M %p")))
-        elif now > start:
+            return
+        diff = start - now
+        total = (diff.total_seconds() / 60)
+        if (total > maxtime) and rc_d['type'] != "exraid" and rc_d['egglevel'] != "EX":
+            await Meowth.send_message(channel, _("Meowth! The raid will be over before that...."))
+            return
+        if now > start:
             await Meowth.send_message(channel, _("Meowth! Please enter a time in the future."))
+            return
+        if alreadyset:
+            rusure = await Meowth.send_message(channel,_("Meowth! There is already a start time of **{start}** set! Do you want to change it?").format(start=alreadyset.strftime("%H:%M %p")))
+            await asyncio.sleep(0.25)
+            await Meowth.add_reaction(rusure,"✅") #checkmark
+            await asyncio.sleep(0.25)
+            await Meowth.add_reaction(rusure,"❎") #cross
+            def check(react,user):
+                if user.id != author.id:
+                    return False
+                return True
+            res = await Meowth.wait_for_reaction(['✅','❎'], message=rusure, check=check, timeout=60)
+            if res is not None:
+                if res.reaction.emoji == "❎":
+                    await Meowth.delete_message(rusure)
+                    confirmation = await Meowth.send_message(channel,_("Start time change cancelled."))
+                    await asyncio.sleep(10)
+                    await Meowth.delete_message(confirmation)
+                    return
+                elif res.reaction.emoji == "✅":
+                    await Meowth.delete_message(rusure)
+                    if now <= start:
+                        rc_d['starttime'] = start
+                        await Meowth.send_message(channel, _("Meowth! The current start time has been set to: **{starttime}**").format(starttime=start.strftime("%I:%M %p")))
+                        return
+        else:
+            if now <= start:
+                rc_d['starttime'] = start
+                await Meowth.send_message(channel, _("Meowth! The current start time has been set to: **{starttime}**").format(starttime=start.strftime("%I:%M %p")))
+                return
     else:
         try:
-            starttime = server_dict[server.id]['raidchannel_dict'][channel.id]['starttime']
-            if starttime < now:
-                del server_dict[server.id]['raidchannel_dict'][channel.id]['starttime']
+            starttime = rc_d['starttime']
+            if (starttime < now) and rc_d['type'] != "exraid" and rc_d['egglevel'] != "EX":
+                del rc_d['starttime']
                 await Meowth.send_message(channel, _("Meowth! No start time has been set, set one with **!starttime HH:MM AM/PM**!"))
                 return
             await Meowth.send_message(channel, _("Meowth! The current start time is: **{starttime}**").format(starttime=starttime.strftime("%I:%M %p")))
@@ -2625,7 +2670,7 @@ async def list(ctx):
                     assumed_str = ""
                 try:
                     starttime = rc_d[r]['starttime']
-                    if starttime > now:
+                    if (starttime > now) or rc_d[r]['type'] == "exraid" or rc_d[r]['egglevel'] == "EX":
                         start_str = " Next group: **{}**".format(starttime.strftime("%I:%M %p"))
                 except KeyError:
                     starttime = False
@@ -2679,14 +2724,14 @@ async def list(ctx):
                     listmsg += await _interest(ctx)
                     listmsg += "\n"
                     listmsg += await print_raid_timer(channel)
-                    if starttime and starttime > now:
+                    if (starttime and starttime > now) or rc_d[channel.id]['type'] == "exraid" or rc_d[channel.id]['egglevel'] == "EX":
                         listmsg += "\nMeowth! The next group will be starting at {}".format(starttime.strftime("%I:%M %p"))
                 else:
                     listmsg += await _interest(ctx)
                     listmsg += "\n" + await _otw(ctx)
                     listmsg += "\n" + await _waiting(ctx)
                     listmsg += "\n" + await print_raid_timer(channel)
-                    if starttime and starttime > now:
+                    if (starttime and starttime > now) or rc_d['type'] == "exraid" or rc_d['egglevel'] == "EX":
                         listmsg += "\nMeowth! The next group will be starting at **{}**".format(starttime.strftime("%I:%M %p"))
                 await Meowth.send_message(channel, listmsg)
                 return

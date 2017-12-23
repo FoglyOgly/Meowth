@@ -2511,13 +2511,15 @@ async def starttime(ctx):
     rc_d = server_dict[server.id]['raidchannel_dict'][channel.id]
     if rc_d['type'] == "egg" and rc_d['egglevel'].isdigit():
         egglevel = rc_d['egglevel']
-        maxtime = ((rc_d['exp'] - time.time())/60) + raid_info['raid_eggs'][egglevel]['raidtime']
+        mintime = (rc_d['exp'] - time.time())/60
+        maxtime = mintime + raid_info['raid_eggs'][egglevel]['raidtime']
     elif rc_d['type'] == "raid":
         egglevel = get_level(rc_d['pokemon'])
         maxtime = (rc_d['exp'] - time.time())/60
     elif rc_d['type'] == "exraid" or rc_d['egglevel'] == "EX":
         egglevel = "EX"
-        maxtime = (rc_d['exp'] - time.time())/60
+        mintime = (rc_d['exp'] - time.time())/60
+        maxtime = mintime  + raid_info['raid_eggs'][egglevel]['raidtime']
     del start_split[0]
     if len(start_split) > 0:
         try:
@@ -2527,8 +2529,8 @@ async def starttime(ctx):
         try:
             start = datetime.datetime.strptime(" ".join(start_split)+" "+str(now.month)+str(now.day)+str(now.year), '%I:%M %p %m%d%Y')
             if egglevel == "EX":
-                endtime = datetime.datetime.fromtimestamp(rc_d['exp'])
-                start = start + datetime.timedelta(days=(endtime - start).days)
+                hatch = datetime.datetime.utcfromtimestamp(rc_d['exp']) + datetime.timedelta(hours=server_dict[server.id]['offset'])
+                start = start.replace(year=hatch.year, month=hatch.month, day=hatch.day)
         except ValueError:
             await Meowth.send_message(channel, _("Meowth! Your start time wasn't formatted correctly. Change your **!starttime** to match this format: **HH:MM AM/PM**"))
             return
@@ -2536,6 +2538,9 @@ async def starttime(ctx):
         total = (diff.total_seconds() / 60)
         if total > maxtime:
             await Meowth.send_message(channel, _("Meowth! The raid will be over before that...."))
+            return
+        if total < mintime:
+            await Meowth.send_message(channel, "Meowth! The egg will not hatch by then!")
             return
         if now > start:
             await Meowth.send_message(channel, _("Meowth! Please enter a time in the future."))

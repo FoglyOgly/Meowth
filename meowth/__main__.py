@@ -2509,17 +2509,14 @@ async def starttime(ctx):
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=server_dict[server.id]['offset'])
     start_split = message.clean_content.lower().split()
     rc_d = server_dict[server.id]['raidchannel_dict'][channel.id]
-    if rc_d['type'] == "egg" and rc_d['egglevel'].isdigit():
+    if rc_d['type'] == "egg":
         egglevel = rc_d['egglevel']
         mintime = (rc_d['exp'] - time.time())/60
         maxtime = mintime + raid_info['raid_eggs'][egglevel]['raidtime']
-    elif rc_d['type'] == "raid":
+    elif rc_d['type'] == "raid" or rc_d['type'] ==  'exraid':
         egglevel = get_level(rc_d['pokemon'])
+        mintime = 0
         maxtime = (rc_d['exp'] - time.time())/60
-    elif rc_d['type'] == "exraid" or rc_d['egglevel'] == "EX":
-        egglevel = "EX"
-        mintime = (rc_d['exp'] - time.time())/60
-        maxtime = mintime  + raid_info['raid_eggs'][egglevel]['raidtime']
     del start_split[0]
     if len(start_split) > 0:
         try:
@@ -2539,11 +2536,11 @@ async def starttime(ctx):
         if total > maxtime:
             await Meowth.send_message(channel, _("Meowth! The raid will be over before that...."))
             return
-        if total < mintime:
-            await Meowth.send_message(channel, "Meowth! The egg will not hatch by then!")
-            return
         if now > start:
             await Meowth.send_message(channel, _("Meowth! Please enter a time in the future."))
+            return
+        if total < mintime:
+            await Meowth.send_message(channel, "Meowth! The egg will not hatch by then!")
             return
         if alreadyset:
             rusure = await Meowth.send_message(channel,_("Meowth! There is already a start time of **{start}** set! Do you want to change it?").format(start=alreadyset.strftime("%I:%M %p")))
@@ -3275,6 +3272,7 @@ async def recover(ctx):
             raidtype = 'raid'
             chsplit = name.split('-')
             pokemon = chsplit[0]
+            egglevel = get_level(pokemon)
             del chsplit[0]
             raid_details = " ".join(chsplit)
             raid_details = raid_details.strip()
@@ -3324,6 +3322,7 @@ async def recover(ctx):
             'egglevel': egglevel
             }
         await Meowth.send_message(channel, "Meowth! This channel has been recovered! However, I can't remember if anyone RSVPed to this raid.")
+        event_loop.create_task(expiry_check(channel))
 
 
 

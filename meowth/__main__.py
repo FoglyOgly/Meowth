@@ -2260,6 +2260,7 @@ async def _eggtoraid(entered_raid, raid_channel):
     egg_address = eggdetails['address']
     egg_report = await Meowth.get_message(reportcitychannel, eggdetails['raidreport'])
     raid_message = await Meowth.get_message(raid_channel, eggdetails['raidmessage'])
+    starttime = eggdetails['starttime']
     try:
         raid_messageauthor = raid_message.mentions[0]
     except IndexError:
@@ -2357,7 +2358,8 @@ This channel will be deleted five minutes after the timer expires.""").format(po
     'address' : egg_address,
     'type' : hatchtype,
     'pokemon' : entered_raid,
-    'egglevel' : '0'
+    'egglevel' : '0',
+    'starttime' : starttime
     }
 
     trainer_list = []

@@ -1664,7 +1664,7 @@ You can set the start time with **!starttime [HH:MM AM/PM]** (you can also omit 
 Message **!starting** when the raid is beginning to clear the raid's 'here' list.
 
 This channel will be deleted five minutes after the timer expires.""").format(pokemon=raid.mention, member=message.author.mention, citychannel=message.channel.mention, location_details=raid_details)
-
+    raidmessage = await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)
     server_dict[message.server.id]['raidchannel_dict'][raid_channel.id] = {
         'reportcity' : message.channel.id,
         'trainer_dict' : {},

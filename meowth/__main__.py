@@ -1087,9 +1087,8 @@ async def outputlog(ctx):
 
     Usage: !outputlog
     Output is a link to hastebin."""
-    with open(os.path.join('logs', 'meowth.log'), 'r') as logfile:
+    with open(os.path.join('logs', 'meowth.log'), 'r', encoding='latin-1', errors='replace') as logfile:
         logdata=logfile.read()
-    logdata = logdata.encode('ascii', errors='replace').decode('utf-8')
     await Meowth.send_message(ctx.message.channel, hastebin.post(logdata))
 
 @Meowth.command(pass_context=True)
@@ -1328,7 +1327,9 @@ async def team(ctx):
     high_roles = []
 
     for team in config['team_dict'].keys():
-        temp_role = discord.utils.get(ctx.message.server.roles, name=team)
+        temp_role = discord.utils.get(server.roles, name=team)
+        if not temp_role:
+            temp_role = await Meowth.create_role(server, name=team)
         if temp_role.position > position:
             high_roles.append(temp_role.name)
 
@@ -1566,6 +1567,9 @@ async def _raid(message):
             return
     raid_split = message.clean_content.lower().split()
     del raid_split[0]
+    if len(raid_split) <= 1:
+        await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**"))
+        return
     if raid_split[0] == "egg":
         await _raidegg(message)
         return
@@ -1589,9 +1593,6 @@ async def _raid(message):
             else:
                 await Meowth.send_message(message.channel, _("Meowth! Please wait until the egg has hatched before changing it to an open raid!"))
                 return
-    elif len(raid_split) <= 1:
-        await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**"))
-        return
     entered_raid = re.sub("[\@]", "", raid_split[0].lower())
     entered_raid = get_name(entered_raid).lower() if entered_raid.isdigit() else entered_raid
     del raid_split[0]
@@ -1772,6 +1773,7 @@ async def timerset(ctx,timer):
                     start = start.replace(year=now.year+1)
             except ValueError:
                 await Meowth.send_message(channel, _("Meowth! Your timer wasn't formatted correctly. Change your **!timerset** to match this format: **MM/DD HH:MM AM/PM**"))
+                return
             diff = start - now
             total = (diff.total_seconds() / 60)
             if now <= start:
@@ -2691,7 +2693,7 @@ async def starting(ctx):
         starting_str = _("Meowth! How can you start when there's no one waiting at this raid!?")
     await Meowth.send_message(ctx.message.channel, starting_str)
     await asyncio.sleep(120)
-    if time.time() < server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['lobby']:
+    if 'lobby' not in server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id] or time.time() < server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id].get('lobby'):
         return
     ctx_lobbycount = 0
     trainer_delete_list = []

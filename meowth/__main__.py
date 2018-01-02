@@ -1567,7 +1567,7 @@ async def _raid(message):
             return
     raid_split = message.clean_content.lower().split()
     del raid_split[0]
-    if len(raid_split) <= 1:
+    if len(raid_split) == 0:
         await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**"))
         return
     if raid_split[0] == "egg":
@@ -1596,7 +1596,9 @@ async def _raid(message):
     entered_raid = re.sub("[\@]", "", raid_split[0].lower())
     entered_raid = get_name(entered_raid).lower() if entered_raid.isdigit() else entered_raid
     del raid_split[0]
-
+    if len(raid_split) == 0:
+        await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**"))
+        return
     if raid_split[-1].isdigit():
         raidexp = int(raid_split[-1])
         del raid_split[-1]

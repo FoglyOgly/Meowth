@@ -54,7 +54,7 @@ Get the installer [HERE](https://github.com/tesseract-ocr/tesseract/wiki/Downloa
 
 7. Create a bot user for your app and reveal the bot token to copy it.
 
-8. Copy config_blank.json and rename to config.json. 
+8. Copy config_blank.json and rename to config.json.
 
 9. Open config.json in a text editor (a good one to use is Notepad++) and paste the bot token into the value for "bot_token", replacing the "yourtoken" string.
 

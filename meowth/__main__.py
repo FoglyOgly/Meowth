@@ -1586,7 +1586,7 @@ async def _raid(message):
     if fromegg is True:
         eggdetails = server_dict[message.server.id]['raidchannel_dict'][message.channel.id]
         egglevel = eggdetails['egglevel']
-        if raid_split[0] == 'assume':
+        if raid_split[0].lower() == 'assume':
             if config['allow_assume'][egglevel] == "False":
                 await Meowth.send_message(message.channel, _("Meowth! **!raid assume** is not allowed in this level egg."))
                 return

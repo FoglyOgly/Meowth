@@ -1502,7 +1502,7 @@ async def wild(ctx):
 
 
 async def _wild(message):
-    wild_split = message.clean_content.lower().split()
+    wild_split = message.clean_content.split()
     del wild_split[0]
     if len(wild_split) <= 1:
         await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!wild <pokemon name> <location>**"))
@@ -1510,10 +1510,10 @@ async def _wild(message):
     else:
         content = " ".join(wild_split)
         entered_wild = content.split(' ',1)[0]
-        entered_wild = get_name(entered_wild).lower() if entered_wild.isdigit() else entered_wild
+        entered_wild = get_name(entered_wild).lower() if entered_wild.isdigit() else entered_wild.lower()
         wild_details = content.split(' ',1)[1]
         if entered_wild not in pkmn_info['pokemon_list']:
-            entered_wild2 = ' '.join([content.split(' ',2)[0],content.split(' ',2)[1]])
+            entered_wild2 = ' '.join([content.split(' ',2)[0],content.split(' ',2)[1]]).lower()
             if entered_wild2 in pkmn_info['pokemon_list']:
                 entered_wild = entered_wild2
                 try:
@@ -1521,7 +1521,10 @@ async def _wild(message):
                 except IndexError:
                     await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!wild <pokemon name> <location>**"))
                     return
-        wild_gmaps_link = create_gmaps_query(wild_details, message.channel)
+        if "/maps" in wild_details:
+            wild_gmaps_link = wild_details
+        else:
+            wild_gmaps_link = create_gmaps_query(wild_details, message.channel)
         rgx = r"[^a-zA-Z0-9]"
         pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", entered_wild)), None)
         if pkmn_match:
@@ -1572,7 +1575,7 @@ async def _raid(message):
         else:
             await Meowth.send_message(message.channel, _("Meowth! Please restrict raid reports to a city channel!"))
             return
-    raid_split = message.clean_content.lower().split()
+    raid_split = message.clean_content.split()
     del raid_split[0]
     if len(raid_split) == 0:
         await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**"))
@@ -1601,7 +1604,7 @@ async def _raid(message):
                 await Meowth.send_message(message.channel, _("Meowth! Please wait until the egg has hatched before changing it to an open raid!"))
                 return
     entered_raid = re.sub("[\@]", "", raid_split[0].lower())
-    entered_raid = get_name(entered_raid).lower() if entered_raid.isdigit() else entered_raid
+    entered_raid = get_name(entered_raid).lower() if entered_raid.isdigit() else entered_raid.lower()
     del raid_split[0]
     if len(raid_split) == 0:
         await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**"))
@@ -2034,10 +2037,10 @@ async def _exraid(ctx):
     message = ctx.message
     channel = message.channel
     fromegg = False
-    exraid_split = message.clean_content.lower().split()
+    exraid_split = message.clean_content.split()
     del exraid_split[0]
     rgx = r"[^a-zA-Z0-9]"
-    pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", exraid_split[0])), None)
+    pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", exraid_split[0].lower())), None)
     if pkmn_match:
         del exraid_split[0]
     if len(exraid_split) <= 0:
@@ -2135,9 +2138,9 @@ async def raidegg(ctx):
     await _raidegg(ctx.message)
 
 async def _raidegg(message):
-    raidegg_split = message.clean_content.lower().split()
+    raidegg_split = message.clean_content.split()
     del raidegg_split[0]
-    if raidegg_split[0] == "egg":
+    if raidegg_split[0].lower() == "egg":
         del raidegg_split[0]
     if len(raidegg_split) <= 1:
         await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!raidegg <level> <location>**"))
@@ -2363,7 +2366,7 @@ You can set the start time with **!starttime [HH:MM AM/PM]** (you can also omit 
 Message **!starting** when the raid is beginning to clear the raid's 'here' list.
 
 This channel will be deleted five minutes after the timer expires.""").format(pokemon=entered_raid.capitalize(), member=raid_messageauthor.mention, citychannel=reportcitychannel.mention, location_details=egg_address)
-    entered_raid = get_name(entered_raid).lower() if entered_raid.isdigit() else entered_raid
+    entered_raid = get_name(entered_raid).lower() if entered_raid.isdigit() else entered_raid.lower()
     rgx = r"[^a-zA-Z0-9]"
     pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", entered_raid)), None)
     if pkmn_match:

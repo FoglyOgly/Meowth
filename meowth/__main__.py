@@ -255,6 +255,19 @@ def print_emoji_name(server, emoji_string):
 # Given an arbitrary string, create a Google Maps
 # query using the configured hints
 def create_gmaps_query(details, channel):
+    if "/maps" in details:
+        mapsindex = details.find("/maps")
+        newlocindex = details.rfind("http", 0, mapsindex)
+        if newlocindex == -1:
+            return
+        newlocend = message.content.find(" ", newlocindex)
+        if newlocend == -1:
+            newloc = message.content[newlocindex:]
+            return newloc
+        else:
+            newloc = message.content[newlocindex:newlocend+1]
+            return newloc
+
     details_list = details.split()
     loc_list = server_dict[channel.server.id]['city_channels'][channel.name].split()
     return "https://www.google.com/maps/search/?api=1&query={0}+{1}".format('+'.join(details_list),'+'.join(loc_list))
@@ -1521,10 +1534,7 @@ async def _wild(message):
                 except IndexError:
                     await Meowth.send_message(message.channel, _("Meowth! Give more details when reporting! Usage: **!wild <pokemon name> <location>**"))
                     return
-        if "/maps" in wild_details:
-            wild_gmaps_link = wild_details
-        else:
-            wild_gmaps_link = create_gmaps_query(wild_details, message.channel)
+        wild_gmaps_link = create_gmaps_query(wild_details, message.channel)
         rgx = r"[^a-zA-Z0-9]"
         pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", entered_wild)), None)
         if pkmn_match:
@@ -3071,18 +3081,8 @@ async def new(ctx):
         report_channel = Meowth.get_channel(server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['reportcity'])
 
         details = " ".join(location_split)
-        if "/maps" in message.content:
-            mapsindex = message.content.find("/maps")
-            newlocindex = message.content.rfind("http", 0, mapsindex)
-            if newlocindex == -1:
-                return
-            newlocend = message.content.find(" ", newlocindex)
-            if newlocend == -1:
-                newloc = message.content[newlocindex:]
-            else:
-                newloc = message.content[newlocindex:newlocend+1]
-        else:
-            newloc = create_gmaps_query(details, report_channel)
+
+        newloc = create_gmaps_query(details, report_channel)
 
 
         oldraidmsg = await Meowth.get_message(message.channel, server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['raidmessage'])

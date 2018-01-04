@@ -1994,15 +1994,7 @@ async def on_message(message):
                     await _here(message, emoji_count)
                     return
                 if "/maps" in message.content:
-                    mapsindex = message.content.find("/maps")
-                    newlocindex = message.content.rfind("http", 0, mapsindex)
-                    if newlocindex == -1:
-                        return
-                    newlocend = message.content.find(" ", newlocindex)
-                    if newlocend == -1:
-                        newloc = message.content[newlocindex:]
-                    else:
-                        newloc = message.content[newlocindex:newlocend+1]
+                    newloc = create_gmaps_query(message.content, message.channel)
                     oldraidmsg = await Meowth.get_message(message.channel, server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['raidmessage'])
                     report_channel = Meowth.get_channel(server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['reportcity'])
                     oldreportmsg = await Meowth.get_message(report_channel, server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['raidreport'])
@@ -2057,10 +2049,10 @@ async def _exraid(ctx):
     channel = message.channel
     fromegg = False
     exraid_split = message.clean_content.split()
+    del exraid_split[0]
     if len(exraid_split) <= 0:
         await Meowth.send_message(channel, _("Meowth! Give more details when reporting! Usage: **!exraid <location>**"))
         return
-    del exraid_split[0]
     rgx = r"[^a-zA-Z0-9]"
     pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", exraid_split[0].lower())), None)
     if pkmn_match:
@@ -2070,12 +2062,7 @@ async def _exraid(ctx):
         return
     raid_details = " ".join(exraid_split)
     raid_details = raid_details.strip()
-    if raid_details == '':
-        await Meowth.send_message(channel, _("Meowth! Give more details when reporting! Usage: **!exraid <location>**"))
-        return
-
     raid_gmaps_link = create_gmaps_query(raid_details, message.channel)
-
     egg_info = raid_info['raid_eggs']['EX']
     egg_img = egg_info['egg_img']
     boss_list = []

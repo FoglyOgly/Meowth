@@ -2926,6 +2926,30 @@ async def teams(ctx):
     listmsg += await _teamlist(ctx)
     await Meowth.send_message(ctx.message.channel, listmsg)
 
+@list.command(pass_context=True)
+@checks.activeraidchannel()
+async def invites(ctx):
+    """List the players who have used !invite to gain access to this EX Raid.
+
+    Usage: !list invites
+    Works only in EX Raid channels."""
+    if checks.check_exraidchannel(ctx):
+        listmsg = "**Meowth!**"
+        reportlist = [ctx.message.server.me.display_name]
+        invitelist = []
+        for overwrite in ctx.message.channel.overwrites:
+            if isinstance(overwrite[0], discord.User):
+                invitelist.append(overwrite[0].display_name)
+        for overwrite in Meowth.get_channel(server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['reportcity']).overwrites:
+            if isinstance(overwrite[0], discord.User):
+                reportlist.append(overwrite[0].display_name)
+        diff = set(invitelist) - set(reportlist)
+        if len(diff) > 0:
+            listmsg += " Trainers with an invite include: **{}**".format(", ".join(diff))
+        else:
+            listmsg += " There are no trainers here! Use **!invite** to gain access to this channel."
+        await Meowth.send_message(ctx.message.channel, listmsg)
+
 @Meowth.command(pass_context=True)
 @commands.has_permissions(manage_server=True)
 @checks.raidchannel()

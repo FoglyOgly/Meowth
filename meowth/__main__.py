@@ -260,12 +260,12 @@ def create_gmaps_query(details, channel):
         newlocindex = details.rfind("http", 0, mapsindex)
         if newlocindex == -1:
             return
-        newlocend = message.content.find(" ", newlocindex)
+        newlocend = details.find(" ", newlocindex)
         if newlocend == -1:
-            newloc = message.content[newlocindex:]
+            newloc = details[newlocindex:]
             return newloc
         else:
-            newloc = message.content[newlocindex:newlocend+1]
+            newloc = details[newlocindex:newlocend+1]
             return newloc
 
     details_list = details.split()
@@ -2057,6 +2057,9 @@ async def _exraid(ctx):
     channel = message.channel
     fromegg = False
     exraid_split = message.clean_content.split()
+    if len(exraid_split) <= 0:
+        await Meowth.send_message(channel, _("Meowth! Give more details when reporting! Usage: **!exraid <location>**"))
+        return
     del exraid_split[0]
     rgx = r"[^a-zA-Z0-9]"
     pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", exraid_split[0].lower())), None)
@@ -2083,12 +2086,13 @@ async def _exraid(ctx):
     raid_channel_name = "ex-raid-egg-" + sanitize_channel_name(raid_details)
     raid_channel_overwrites = channel.overwrites
     meowth_overwrite = (Meowth.user, discord.PermissionOverwrite(send_messages = True))
+    everyone_overwrite = (channel.server.default_role, discord.PermissionOverwrite(send_messages = False))
     for overwrite in raid_channel_overwrites:
         if isinstance(overwrite[0], discord.Role):
             if overwrite[0].permissions.manage_server:
                 continue
         overwrite[1].send_messages = False
-    raid_channel = await Meowth.create_channel(message.server, raid_channel_name, *raid_channel_overwrites, meowth_overwrite)
+    raid_channel = await Meowth.create_channel(message.server, raid_channel_name, *raid_channel_overwrites, everyone_overwrite, meowth_overwrite)
     raid_img_url = "https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/eggs/{}?cache=0".format(str(egg_img))
     raid_embed = discord.Embed(title=_("Meowth! Click here for directions to the coming raid!"),url=raid_gmaps_link,colour=message.server.me.colour)
     if len(egg_info['pokemon']) > 1:

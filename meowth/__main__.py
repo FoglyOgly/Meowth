@@ -2699,6 +2699,7 @@ async def starting(ctx):
             user = ctx.message.server.get_member(trainer)
             ctx_startinglist.append(user.mention)
             id_startinglist.append(trainer)
+    server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['trainer_dict'] = trainer_dict
     if len(ctx_startinglist) == 0:
         starting_str = _("Meowth! How can you start when there's no one waiting at this raid!?")
         await Meowth.send_message(ctx.message.channel, starting_str)

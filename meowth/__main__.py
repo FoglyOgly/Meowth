@@ -2699,10 +2699,10 @@ async def starting(ctx):
             user = ctx.message.server.get_member(trainer)
             ctx_startinglist.append(user.mention)
             id_startinglist.append(trainer)
-
-    # Go back and delete the trainers from the waiting list
-
-    server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['trainer_dict'] = trainer_dict
+    if len(ctx_startinglist) == 0:
+        starting_str = _("Meowth! How can you start when there's no one waiting at this raid!?")
+        await Meowth.send_message(ctx.message.channel, starting_str)
+        return
     try:
         starttime = server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['starttime']
         timestr = " to start at **{}** ".format(starttime.strftime("%I:%M %p (%H:%M)"))
@@ -2714,8 +2714,6 @@ async def starting(ctx):
     server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['lobby'] = time.time() + 120
     if starttime:
         starting_str += "\n\nThe start time has also been cleared, new groups can set a new start time wtih **!starttime HH:MM AM/PM** (You can also omit AM/PM and use 24-hour time!)."
-    if len(ctx_startinglist) == 0:
-        starting_str = _("Meowth! How can you start when there's no one waiting at this raid!?")
     await Meowth.send_message(ctx.message.channel, starting_str)
     await asyncio.sleep(120)
     if 'lobby' not in server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id] or time.time() < server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id].get('lobby'):

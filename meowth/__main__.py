@@ -1994,15 +1994,7 @@ async def on_message(message):
                     await _here(message, emoji_count)
                     return
                 if "/maps" in message.content:
-                    mapsindex = message.content.find("/maps")
-                    newlocindex = message.content.rfind("http", 0, mapsindex)
-                    if newlocindex == -1:
-                        return
-                    newlocend = message.content.find(" ", newlocindex)
-                    if newlocend == -1:
-                        newloc = message.content[newlocindex:]
-                    else:
-                        newloc = message.content[newlocindex:newlocend+1]
+                    newloc = create_gmaps_query(message.content, message.channel)
                     oldraidmsg = await Meowth.get_message(message.channel, server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['raidmessage'])
                     report_channel = Meowth.get_channel(server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['reportcity'])
                     oldreportmsg = await Meowth.get_message(report_channel, server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['raidreport'])
@@ -2057,10 +2049,10 @@ async def _exraid(ctx):
     channel = message.channel
     fromegg = False
     exraid_split = message.clean_content.split()
+    del exraid_split[0]
     if len(exraid_split) <= 0:
         await Meowth.send_message(channel, _("Meowth! Give more details when reporting! Usage: **!exraid <location>**"))
         return
-    del exraid_split[0]
     rgx = r"[^a-zA-Z0-9]"
     pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", exraid_split[0].lower())), None)
     if pkmn_match:
@@ -2070,12 +2062,7 @@ async def _exraid(ctx):
         return
     raid_details = " ".join(exraid_split)
     raid_details = raid_details.strip()
-    if raid_details == '':
-        await Meowth.send_message(channel, _("Meowth! Give more details when reporting! Usage: **!exraid <location>**"))
-        return
-
     raid_gmaps_link = create_gmaps_query(raid_details, message.channel)
-
     egg_info = raid_info['raid_eggs']['EX']
     egg_img = egg_info['egg_img']
     boss_list = []
@@ -2712,10 +2699,11 @@ async def starting(ctx):
             user = ctx.message.server.get_member(trainer)
             ctx_startinglist.append(user.mention)
             id_startinglist.append(trainer)
-
-    # Go back and delete the trainers from the waiting list
-
     server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['trainer_dict'] = trainer_dict
+    if len(ctx_startinglist) == 0:
+        starting_str = _("Meowth! How can you start when there's no one waiting at this raid!?")
+        await Meowth.send_message(ctx.message.channel, starting_str)
+        return
     try:
         starttime = server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['starttime']
         timestr = " to start at **{}** ".format(starttime.strftime("%I:%M %p (%H:%M)"))
@@ -2727,8 +2715,6 @@ async def starting(ctx):
     server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['lobby'] = time.time() + 120
     if starttime:
         starting_str += "\n\nThe start time has also been cleared, new groups can set a new start time wtih **!starttime HH:MM AM/PM** (You can also omit AM/PM and use 24-hour time!)."
-    if len(ctx_startinglist) == 0:
-        starting_str = _("Meowth! How can you start when there's no one waiting at this raid!?")
     await Meowth.send_message(ctx.message.channel, starting_str)
     await asyncio.sleep(120)
     if 'lobby' not in server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id] or time.time() < server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id].get('lobby'):
@@ -2938,6 +2924,34 @@ async def teams(ctx):
     listmsg = "**Meowth!**"
     listmsg += await _teamlist(ctx)
     await Meowth.send_message(ctx.message.channel, listmsg)
+
+@list.command(pass_context=True)
+@checks.activeraidchannel()
+async def invites(ctx):
+    """List the players who have used !invite to gain access to this EX Raid.
+
+    Usage: !list invites
+    Works only in EX Raid channels."""
+    if checks.check_exraidchannel(ctx):
+        listmsg = "**Meowth!**"
+        reportlist = [ctx.message.server.me.id]
+        invitelist = []
+        userlist = []
+        for overwrite in ctx.message.channel.overwrites:
+            if isinstance(overwrite[0], discord.User):
+                invitelist.append(overwrite[0].id)
+        for overwrite in Meowth.get_channel(server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['reportcity']).overwrites:
+            if isinstance(overwrite[0], discord.User):
+                reportlist.append(overwrite[0].id)
+        diff = set(invitelist) - set(reportlist)
+        for trainer in diff:
+            user = ctx.message.server.get_member(trainer)
+            userlist.append(user.display_name)
+        if len(userlist) > 0:
+            listmsg += " Trainers with an invite include: **{}**".format(", ".join(userlist))
+        else:
+            listmsg += " There are no trainers here! Use **!invite** to gain access to this channel."
+        await Meowth.send_message(ctx.message.channel, listmsg)
 
 @Meowth.command(pass_context=True)
 @commands.has_permissions(manage_server=True)

@@ -1862,18 +1862,18 @@ async def timer(ctx):
 Behind-the-scenes functions for raid management.
 Triggerable through commands or through emoji
 """
-async def _maybe(message, count):
-    trainer_dict = server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['trainer_dict']
+async def _maybe(channel, author, count):
+    trainer_dict = server_dict[channel.server.id]['raidchannel_dict'][channel.id]['trainer_dict']
     if count == 1:
-        await Meowth.send_message(message.channel, _("Meowth! {member} is interested!").format(member=message.author.mention))
+        await Meowth.send_message(channel, _("Meowth! {member} is interested!").format(member=author.mention))
     else:
-        await Meowth.send_message(message.channel, _("Meowth! {member} is interested with a total of {trainer_count} trainers!").format(member=message.author.mention, trainer_count=count))
+        await Meowth.send_message(message.channel, _("Meowth! {member} is interested with a total of {trainer_count} trainers!").format(member=author.mention, trainer_count=count))
     # Add trainer name to trainer list
-    if message.author.id not in server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['trainer_dict']:
-        trainer_dict[message.author.id] = {}
-    trainer_dict[message.author.id]['status'] = "maybe"
-    trainer_dict[message.author.id]['count'] = count
-    server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['trainer_dict'] = trainer_dict
+    if author.id not in server_dict[channel.server.id]['raidchannel_dict'][channel.id]['trainer_dict']:
+        trainer_dict[author.id] = {}
+    trainer_dict[author.id]['status'] = "maybe"
+    trainer_dict[author.id]['count'] = count
+    server_dict[server.id]['raidchannel_dict'][channel.id]['trainer_dict'] = trainer_dict
 
 async def _coming(message, count):
     trainer_dict = server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['trainer_dict']
@@ -2462,7 +2462,7 @@ async def interested(ctx, *, count: str = None):
         else:
             count = 1
 
-    await _maybe(ctx.message, count)
+    await _maybe(ctx.message.channel, ctx.message.author, count)
 
 
 @Meowth.command(pass_context=True,aliases=["c"])
@@ -3404,6 +3404,7 @@ async def _invite(ctx):
                         exraid_channel = exraid_dict[str(int(reply.content))]
                         await Meowth.edit_channel_permissions(exraid_channel, ctx.message.author, overwrite)
                         await Meowth.send_message(ctx.message.channel, "Meowth! Alright {0}, you can now send messages in {1}! Make sure you let the trainers in there know if you can make it to the EX Raid!".format(ctx.message.author.mention, exraid_channel.mention))
+                        await _maybe(exraid_channel,ctx.message.author,1)
                     else:
                         await Meowth.send_message(ctx.message.channel, "Meowth! I couldn't understand your reply! Try the **!invite** command again!")
                 else:

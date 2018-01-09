@@ -26,6 +26,7 @@ import checks
 import hastebin
 from operator import itemgetter
 from errors import custom_error_handling
+import dateparser
 
 tessdata_dir_config = "--tessdata-dir 'C:\\Program Files (x86)\\Tesseract-OCR\\tessdata' "
 xtraconfig = "-l eng -c tessedit_char_blacklist=&|=+%#^*[]{};<> -psm 6"
@@ -1789,22 +1790,25 @@ async def timerset(ctx,timer):
             now = datetime.datetime.utcnow() + datetime.timedelta(hours=server_dict[channel.server.id]['offset'])
             timer_split = message.clean_content.lower().split()
             del timer_split[0]
-            if "am" in " ".join(timer_split).lower() or "pm" in " ".join(timer_split).lower():
-                try:
-                    start = datetime.datetime.strptime(" ".join(timer_split)+" "+str(now.year), '%m/%d %I:%M %p %Y')
-                    if start.month < now.month:
-                        start = start.replace(year=now.year+1)
-                except ValueError:
-                    await Meowth.send_message(channel, _("Meowth! Your timer wasn't formatted correctly. Change your **!timerset** to match this format: **MM/DD HH:MM AM/PM** (You can also omit AM/PM and use 24-hour time!)"))
-                    return
-            else:
-                try:
-                    start = datetime.datetime.strptime(" ".join(timer_split)+" "+str(now.year), '%m/%d %H:%M %Y')
-                    if start.month < now.month:
-                        start = start.replace(year=now.year+1)
-                except ValueError:
-                    await Meowth.send_message(channel, _("Meowth! Your timer wasn't formatted correctly. Change your **!timerset** to match this format: **MM/DD HH:MM AM/PM** (You can also omit AM/PM and use 24-hour time!)"))
-                    return
+            try:
+                start = dateparser.parse(" ".join(timer_split).lower())
+            except:
+                if "am" in " ".join(timer_split).lower() or "pm" in " ".join(timer_split).lower():
+                    try:
+                        start = datetime.datetime.strptime(" ".join(timer_split)+" "+str(now.year), '%m/%d %I:%M %p %Y')
+                        if start.month < now.month:
+                            start = start.replace(year=now.year+1)
+                    except ValueError:
+                        await Meowth.send_message(channel, _("Meowth! Your timer wasn't formatted correctly. Change your **!timerset** to match this format: **MM/DD HH:MM AM/PM** (You can also omit AM/PM and use 24-hour time!)"))
+                        return
+                else:
+                    try:
+                        start = datetime.datetime.strptime(" ".join(timer_split)+" "+str(now.year), '%m/%d %H:%M %Y')
+                        if start.month < now.month:
+                            start = start.replace(year=now.year+1)
+                    except ValueError:
+                        await Meowth.send_message(channel, _("Meowth! Your timer wasn't formatted correctly. Change your **!timerset** to match this format: **MM/DD HH:MM AM/PM** (You can also omit AM/PM and use 24-hour time!)"))
+                        return
             diff = start - now
             total = (diff.total_seconds() / 60)
             if now <= start:
@@ -2028,7 +2032,8 @@ async def on_message(message):
         firstsplit = re.split("\n|\r", messagelist.pop(0))
         command = firstsplit.pop(0).lower()
         message.content = command + "\n" + "\n".join(firstsplit) + " " + " ".join(messagelist)
-    await Meowth.process_commands(message)
+    if not message.author.bot:
+        await Meowth.process_commands(message)
 
 @Meowth.command(pass_context=True)
 @checks.cityexraidchannel()
@@ -3355,7 +3360,7 @@ async def invite(ctx):
             if msg.channel == ctx.message.channel and ctx.message.author.id == msg.author.id:
                 if msg.attachments:
                     return True
-        invitemsg = await Meowth.wait_for_message(author = ctx.message.author, check=check, timeout=30)
+        invitemsg = await Meowth.wait_for_message(author = ctx.message.author, check=check, timeout=60)
         if invitemsg is not None:
             ctx.message = invitemsg
             await _invite(ctx)
@@ -3430,6 +3435,7 @@ async def recover(ctx):
         name = channel.name
         topic = channel.topic
         egg = re.match('level-[1-5]-egg', name)
+        now = datetime.datetime.utcnow() + datetime.timedelta(hours=server_dict[server.id]['offset'])
         if egg:
             raidtype = 'egg'
             chsplit = egg.string.split('-')
@@ -3446,11 +3452,11 @@ async def recover(ctx):
                 topicsplit = topic.split('|')
                 localhatch = datetime.datetime.strptime(topicsplit[0][:-9], "Hatches on %B %d at %I:%M %p")
                 utchatch = localhatch - datetime.timedelta(hours=server_dict[server.id]['offset'])
-                exp = utchatch.replace(tzinfo=datetime.timezone.utc).timestamp()
+                exp = utchatch.replace(year=now.year,tzinfo=datetime.timezone.utc).timestamp()
                 manual_timer = True
             pokemon = ''
             if len(raid_info['raid_eggs'][egglevel]['pokemon']) == 1:
-                pokemon = raid_info['raid_eggs'][egglevel]['pokemon'][0]
+                pokemon = get_name(raid_info['raid_eggs'][egglevel]['pokemon'][0])
         elif name.split('-')[0] in get_raidlist():
             raidtype = 'raid'
             egglevel = 0
@@ -3465,7 +3471,7 @@ async def recover(ctx):
             else:
                 localend = datetime.datetime.strptime(topic[:-8], "Ends on %B %d at %I:%M %p")
                 utcend = localend - datetime.timedelta(hours=server_dict[server.id]['offset'])
-                exp = utcend.replace(tzinfo=datetime.timezone.utc).timestamp()
+                exp = utcend.replace(year=now.year,tzinfo=datetime.timezone.utc).timestamp()
                 manual_timer = True
         elif name.split('-')[0] == 'ex':
             raidtype = 'egg'
@@ -3483,32 +3489,52 @@ async def recover(ctx):
                 topicsplit = topic.split('|')
                 localhatch = datetime.datetime.strptime(topicsplit[0][:-9], "Hatches on %B %d at %I:%M %p")
                 utchatch = localhatch - datetime.timedelta(hours=server_dict[server.id]['offset'])
-                exp = utchatch.replace(tzinfo=datetime.timezone.utc).timestamp()
+                exp = utchatch.replace(year=now.year,tzinfo=datetime.timezone.utc).timestamp()
                 manual_timer = True
             pokemon = ''
             if len(raid_info['raid_eggs']['EX']['pokemon']) == 1:
-                pokemon = raid_info['raid_eggs']['EX']['pokemon'][0]
+                pokemon = get_name(raid_info['raid_eggs']['EX']['pokemon'][0])
         else:
             await Meowth.send_message(channel, "Meowth! I couldn't recognize this as a raid channel!")
             return
         reportchannel = None
         raidmessage = None
-        rsvpidlist = []
-        rsvpmentions = []
-        async for message in Meowth.logs_from(channel, limit=500):
+        trainer_dict = {}
+        async for message in Meowth.logs_from(channel, limit=5, reverse=True):
             if message.author.id == server.me.id:
                 if "Coordinate here" in message.content:
                     reportchannel = message.raw_channel_mentions[0]
                     raidmessage = message.id
+        async for message in Meowth.logs_from(channel, limit=500):
+            if message.author.id == server.me.id:
                 if "is interested" in message.content or "on the way" in message.content or "at the raid" in message.content:
-                    if message.raw_mentions[0] not in rsvpidlist:
-                        rsvpidlist.append(message.raw_mentions[0])
-        for trainer in rsvpidlist:
-            user = ctx.message.server.get_member(trainer)
-            rsvpmentions.append(user.mention)
+                    if message.raw_mentions:
+                        if message.raw_mentions[0] not in trainer_dict:
+                            trainerid = message.raw_mentions[0]
+                            if "is interested" in message.content:
+                                status = "maybe"
+                            if "on the way" in message.content:
+                                status = "omw"
+                            if "at the raid" in message.content:
+                                status = "waiting"
+                            if "trainers" in message.content:
+                                messagesplit = message.content.split()
+                                if messagesplit[-2].isdigit():
+                                    count = int(messagesplit[-2])
+                                else:
+                                    count = 1
+                            else:
+                                count = 1
+
+                            trainer_dict[trainerid] = {'status': status, 'count': count}
+                        else:
+                            continue
+                    else:
+                        continue
+
         server_dict[channel.server.id]['raidchannel_dict'][channel.id] = {
             'reportcity' : reportchannel,
-            'trainer_dict' : {},
+            'trainer_dict' : trainer_dict,
             'exp': exp,
             'manual_timer': manual_timer,
             'active': True,
@@ -3519,13 +3545,19 @@ async def recover(ctx):
             'pokemon' : pokemon,
             'egglevel': egglevel
             }
-        recovermsg = _("Meowth! This channel has been recovered! However, I can't remember if anyone RSVPed to this raid. Trainers {} could you help me remember your status? ").format(", ".join(rsvpmentions))
+        recovermsg = _("Meowth! This channel has been recovered! However, there may be some inaccuracies in what I remembered! Here's what I have:")
+        bulletpoint = parse_emoji(ctx.message.server, ":small_blue_diamond:")
+        recovermsg += "\n" + bulletpoint + await _interest(ctx)
+        recovermsg += "\n" + bulletpoint + await _otw(ctx)
+        recovermsg += "\n" + bulletpoint + await _waiting(ctx)
         if not manual_timer:
             if raidtype == "egg":
                 action = "hatch"
             elif raidtype == "raid":
                 action = "end"
-            recovermsg += "I'm also not sure when this {raidtype} will {action}, so please use **!timerset** if you can!".format(raidtype=raidtype, action=action)
+            recovermsg += "\n" "I'm not sure when this {raidtype} will {action}, so please use **!timerset** if you can!".format(raidtype=raidtype, action=action)
+        else:
+            recovermsg += "\n" + bulletpoint + await print_raid_timer(channel)
         await Meowth.send_message(channel, recovermsg)
         event_loop.create_task(expiry_check(channel))
 

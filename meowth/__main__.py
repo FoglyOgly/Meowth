@@ -3509,7 +3509,7 @@ async def recover(ctx):
 
         async for message in Meowth.logs_from(channel, limit=500):
             if message.author.id == server.me.id:
-                if "is interested" in message.content or "on the way" in message.content or "at the raid" in message.content:
+                if "is interested" in message.content or "on the way" in message.content or "at the raid" in message.content or "no longer" in message.content or "left the raid" in message.content:
                     if message.raw_mentions:
                         if message.raw_mentions[0] not in trainer_dict:
                             trainerid = message.raw_mentions[0]

@@ -3436,6 +3436,15 @@ async def recover(ctx):
         topic = channel.topic
         egg = re.match('level-[1-5]-egg', name)
         now = datetime.datetime.utcnow() + datetime.timedelta(hours=server_dict[server.id]['offset'])
+        reportchannel = None
+        raidmessage = None
+        trainer_dict = {}
+        async for message in Meowth.logs_from(channel, limit=500, reverse=True):
+            if message.author.id == server.me.id:
+                if "Coordinate here" in message.content:
+                    reportchannel = message.raw_channel_mentions[0]
+                    raidmessage = message
+                    break
         if egg:
             raidtype = 'egg'
             chsplit = egg.string.split('-')
@@ -3446,7 +3455,7 @@ async def recover(ctx):
             raid_details = " ".join(chsplit)
             raid_details = raid_details.strip()
             if not topic:
-                exp = time.time() + 60 * raid_info['raid_eggs'][egglevel]['hatchtime']
+                exp = raidmessage.timestamp.replace(tzinfo=datetime.timezone.utc).timestamp() + 60 * raid_info['raid_eggs'][egglevel]['hatchtime']
                 manual_timer = False
             else:
                 topicsplit = topic.split('|')
@@ -3466,7 +3475,7 @@ async def recover(ctx):
             raid_details = " ".join(chsplit)
             raid_details = raid_details.strip()
             if not topic:
-                exp = time.time() + 60 * 45
+                exp = raidmessage.timestamp.replace(tzinfo=datetime.timezone.utc).timestamp() + 60 * raid_info['raid_eggs'][get_level(pokemon)]['raidtime']
                 manual_timer = False
             else:
                 localend = datetime.datetime.strptime(topic[:-8], "Ends on %B %d at %I:%M %p")
@@ -3483,7 +3492,7 @@ async def recover(ctx):
             raid_details = " ".join(chsplit)
             raid_details = raid_details.strip()
             if not topic:
-                exp = time.time() + 60*60*24*14
+                exp = raidmessage.timestamp.replace(tzinfo=datetime.timezone.utc).timestamp() + 60*60*24*14
                 manual_timer = False
             else:
                 topicsplit = topic.split('|')
@@ -3497,14 +3506,7 @@ async def recover(ctx):
         else:
             await Meowth.send_message(channel, "Meowth! I couldn't recognize this as a raid channel!")
             return
-        reportchannel = None
-        raidmessage = None
-        trainer_dict = {}
-        async for message in Meowth.logs_from(channel, limit=5, reverse=True):
-            if message.author.id == server.me.id:
-                if "Coordinate here" in message.content:
-                    reportchannel = message.raw_channel_mentions[0]
-                    raidmessage = message.id
+
         async for message in Meowth.logs_from(channel, limit=500):
             if message.author.id == server.me.id:
                 if "is interested" in message.content or "on the way" in message.content or "at the raid" in message.content:
@@ -3517,6 +3519,8 @@ async def recover(ctx):
                                 status = "omw"
                             if "at the raid" in message.content:
                                 status = "waiting"
+                            if "no longer" in message.content or "left the raid" in message.content:
+                                status = None
                             if "trainers" in message.content:
                                 messagesplit = message.content.split()
                                 if messagesplit[-2].isdigit():
@@ -3538,7 +3542,7 @@ async def recover(ctx):
             'exp': exp,
             'manual_timer': manual_timer,
             'active': True,
-            'raidmessage': raidmessage,
+            'raidmessage': raidmessage.id,
             'raidreport': None,
             'address': raid_details,
             'type': raidtype,

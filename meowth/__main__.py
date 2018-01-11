@@ -3467,7 +3467,7 @@ async def recover(ctx):
                 pokemon = get_name(raid_info['raid_eggs'][egglevel]['pokemon'][0])
         elif name.split('-')[0] in get_raidlist():
             raidtype = 'raid'
-            egglevel = 0
+            egglevel = '0'
             chsplit = name.split('-')
             pokemon = chsplit[0]
             del chsplit[0]

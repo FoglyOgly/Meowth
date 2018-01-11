@@ -1405,33 +1405,42 @@ async def want(ctx):
     server = message.server
     channel = message.channel
     want_split = message.clean_content.lower().split()
+    want_list = []
     del want_split[0]
-    entered_want = " ".join(want_split)
-    entered_want = get_name(entered_want).lower() if entered_want.isdigit() else entered_want
-    rgx = r"[^a-zA-Z0-9]"
-    pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", entered_want)), None)
-    if pkmn_match:
-        entered_want = pkmn_match
+    if "," in "".join(want_split):
+        for pokemon in "".join(want_split).split(","):
+            if pokemon.isdigit():
+                pokemon = get_name(pokemon).lower()
+            want_list.append(pokemon)
     else:
-        await Meowth.send_message(message.channel, spellcheck(entered_want))
-        return
-    role = discord.utils.get(server.roles, name=entered_want)
-    # Create role if it doesn't exist yet
-    if role is None:
-        role = await Meowth.create_role(server = server, name = entered_want, hoist = False, mentionable = True)
-        await asyncio.sleep(0.5)
+        want_list.append(want_split[0])
+    for want in want_list:
+        entered_want = want
+        entered_want = get_name(entered_want).lower() if entered_want.isdigit() else entered_want
+        rgx = r"[^a-zA-Z0-9]"
+        pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", entered_want)), None)
+        if pkmn_match:
+            entered_want = pkmn_match
+        else:
+            await Meowth.send_message(message.channel, spellcheck(entered_want))
+            return
+        role = discord.utils.get(server.roles, name=entered_want)
+        # Create role if it doesn't exist yet
+        if role is None:
+            role = await Meowth.create_role(server = server, name = entered_want, hoist = False, mentionable = True)
+            await asyncio.sleep(0.5)
 
-    # If user is already wanting the Pokemon,
-    # print a less noisy message
-    if role in ctx.message.author.roles:
-        await Meowth.send_message(channel, content=_("Meowth! {member}, I already know you want {pokemon}!").format(member=ctx.message.author.mention, pokemon=entered_want.capitalize()))
-    else:
-        await Meowth.add_roles(ctx.message.author, role)
-        want_number = pkmn_info['pokemon_list'].index(entered_want) + 1
-        want_img_url = "https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn/{0}_.png?cache=0".format(str(want_number).zfill(3)) #This part embeds the sprite
-        want_embed = discord.Embed(colour=server.me.colour)
-        want_embed.set_thumbnail(url=want_img_url)
-        await Meowth.send_message(channel, content=_("Meowth! Got it! {member} wants {pokemon}").format(member=ctx.message.author.mention, pokemon=entered_want.capitalize()),embed=want_embed)
+        # If user is already wanting the Pokemon,
+        # print a less noisy message
+        if role in ctx.message.author.roles:
+            await Meowth.send_message(channel, content=_("Meowth! {member}, I already know you want {pokemon}!").format(member=ctx.message.author.mention, pokemon=entered_want.capitalize()))
+        else:
+            await Meowth.add_roles(ctx.message.author, role)
+            want_number = pkmn_info['pokemon_list'].index(entered_want) + 1
+            want_img_url = "https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn/{0}_.png?cache=0".format(str(want_number).zfill(3)) #This part embeds the sprite
+            want_embed = discord.Embed(colour=server.me.colour)
+            want_embed.set_thumbnail(url=want_img_url)
+            await Meowth.send_message(channel, content=_("Meowth! Got it! {member} wants {pokemon}").format(member=ctx.message.author.mention, pokemon=entered_want.capitalize()),embed=want_embed)
 
 @Meowth.group(pass_context=True)
 @checks.wantset()
@@ -1450,25 +1459,34 @@ async def unwant(ctx):
     channel = message.channel
     if ctx.invoked_subcommand is None:
         unwant_split = message.clean_content.lower().split()
+        unwant_list = []
         del unwant_split[0]
-        entered_unwant = " ".join(unwant_split)
-        entered_unwant = get_name(entered_unwant).lower() if entered_unwant.isdigit() else entered_unwant
-        rgx = r"[^a-zA-Z0-9]"
-        pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", entered_unwant)), None)
-        if pkmn_match:
-            entered_unwant = pkmn_match
+        if "," in "".join(unwant_split):
+            for pokemon in "".join(unwant_split).split(","):
+                if pokemon.isdigit():
+                    pokemon = get_name(pokemon).lower()
+                unwant_list.append(pokemon)
         else:
-            await Meowth.send_message(message.channel, spellcheck(entered_unwant))
-            return
-        # If user is not already wanting the Pokemon,
-        # print a less noisy message
-        role = discord.utils.get(server.roles, name=entered_unwant)
-        if role not in message.author.roles:
-            await Meowth.add_reaction(message, '✅')
-        else:
-            await Meowth.remove_roles(message.author, role)
-            unwant_number = pkmn_info['pokemon_list'].index(entered_unwant) + 1
-            await Meowth.add_reaction(message, '✅')
+            unwant_list.append(unwant_split[0])
+        for unwant in unwant_list:
+            entered_unwant = unwant
+            entered_unwant = get_name(entered_unwant).lower() if entered_unwant.isdigit() else entered_unwant
+            rgx = r"[^a-zA-Z0-9]"
+            pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", entered_unwant)), None)
+            if pkmn_match:
+                entered_unwant = pkmn_match
+            else:
+                await Meowth.send_message(message.channel, spellcheck(entered_unwant))
+                return
+            # If user is not already wanting the Pokemon,
+            # print a less noisy message
+            role = discord.utils.get(server.roles, name=entered_unwant)
+            if role not in message.author.roles:
+                await Meowth.add_reaction(message, '✅')
+            else:
+                await Meowth.remove_roles(message.author, role)
+                unwant_number = pkmn_info['pokemon_list'].index(entered_unwant) + 1
+                await Meowth.add_reaction(message, '✅')
 
 @unwant.command(pass_context=True)
 @checks.wantset()

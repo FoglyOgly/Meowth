@@ -2621,13 +2621,13 @@ async def starttime(ctx):
             alreadyset = False
         if "am" in " ".join(start_split).lower() or "pm" in " ".join(start_split).lower():
             try:
-                start = datetime.datetime.strptime(" ".join(start_split)+" "+str(now.month)+str(now.day)+str(now.year), '%I:%M %p %m%d%Y')
+                start = datetime.datetime.strptime(" ".join(start_split), '%I:%M %p').replace(year=now.year, month=now.month, day=now.day)
             except ValueError:
                 await Meowth.send_message(channel, _("Meowth! Your start time wasn't formatted correctly. Change your **!starttime** to match this format: **HH:MM AM/PM** (You can also omit AM/PM and use 24-hour time!)"))
                 return
         else:
             try:
-                start = datetime.datetime.strptime(" ".join(start_split)+" "+str(now.month)+str(now.day)+str(now.year), '%H:%M %m%d%Y')
+                start = datetime.datetime.strptime(" ".join(start_split), '%I:%M %p').replace(year=now.year, month=now.month, day=now.day)
             except ValueError:
                 await Meowth.send_message(channel, _("Meowth! Your start time wasn't formatted correctly. Change your **!starttime** to match this format: **HH:MM AM/PM** (You can also omit AM/PM and use 24-hour time!)"))
                 return

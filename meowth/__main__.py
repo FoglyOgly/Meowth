@@ -1421,8 +1421,8 @@ async def want(ctx):
                 pokemon = get_name(pokemon).lower()
             want_list.append(pokemon)
     elif len(want_split) > 1:
-        await Meowth.send_message(channel, "Meowth! If you are trying to add multiple Pokemon to your want list, please separate them with commas!")
-        return
+        pokemon = "".join(want_split)
+        want_list.append(pokemon)
     else:
         want_list.append(want_split[0])
     for want in want_list:

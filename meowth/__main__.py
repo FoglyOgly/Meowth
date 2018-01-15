@@ -3499,7 +3499,6 @@ async def _invite(ctx):
         await Meowth.send_message(ctx.message.channel, "Meowth! Please upload your screenshot directly to Discord!")
 
 @Meowth.command(pass_context=True)
-@commands.has_permissions(manage_server=True)
 async def recover(ctx):
     if checks.check_wantchannel(ctx) or checks.check_citychannel(ctx) or checks.check_raidchannel(ctx) or checks.check_eggchannel(ctx) or checks.check_exraidchannel(ctx):
         await Meowth.send_message(ctx.message.channel, "Meowth! I can't recover this channel because I know about it already!")

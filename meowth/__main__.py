@@ -1606,7 +1606,7 @@ async def _wild(message):
         else:
             msg = "Meowth! {word} isn't a Pokemon!".format(word=entered_wild)
             if spellcheck(entered_wild) != entered_wild:
-                msg += " Did you mean {correction}?".format(spellcheck(entered_wild))
+                msg += " Did you mean {correction}?".format(correction=spellcheck(entered_wild))
             await Meowth.send_message(message.channel, msg)
             return
         wild = discord.utils.get(message.server.roles, name = entered_wild)
@@ -1711,9 +1711,9 @@ async def _raid(message):
     if pkmn_match:
         entered_raid = pkmn_match
     else:
-        msg = "Meowth! {word} isn't a Pokemon!".format(entered_raid)
+        msg = "Meowth! {word} isn't a Pokemon!".format(word=entered_raid)
         if spellcheck(entered_raid) != entered_raid:
-            msg += " Did you mean {correction}?".format(spellcheck(entered_raid))
+            msg += " Did you mean {correction}?".format(correction=spellcheck(entered_raid))
         await Meowth.send_message(message.channel, msg)
         return
 
@@ -2354,9 +2354,9 @@ async def _eggassume(args, raid_channel):
     if pkmn_match:
         entered_raid = pkmn_match
     else:
-        msg = "Meowth! {word} isn't a Pokemon!".format(entered_raid)
+        msg = "Meowth! {word} isn't a Pokemon!".format(word=entered_raid)
         if spellcheck(entered_raid) != entered_raid:
-            msg += " Did you mean {correction}?".format(spellcheck(entered_raid))
+            msg += " Did you mean {correction}?".format(correction=spellcheck(entered_raid))
         await Meowth.send_message(raid_channel, msg)
         return
     raid_match = True if entered_raid in get_raidlist() else False
@@ -2463,7 +2463,7 @@ This channel will be deleted five minutes after the timer expires.""").format(po
     else:
         msg = "Meowth! {word} isn't a Pokemon!".format(word=entered_raid)
         if spellcheck(entered_raid) != entered_raid:
-            msg += " Did you mean {correction}?".format(spellcheck(entered_raid))
+            msg += " Did you mean {correction}?".format(correction=spellcheck(entered_raid))
         await Meowth.send_message(raid_channel, msg)
         return
     raid_match = True if entered_raid in get_raidlist() else False

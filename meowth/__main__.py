@@ -3005,11 +3005,11 @@ async def interested(ctx, count=None, *,party=None):
     else:
         for role in author.roles:
             if role.name == "mystic":
-                allblue += 1
+                allblue += count
             elif role.name == "valor":
-                allred += 1
+                allred += count
             elif role.name =="instinct":
-                allyellow += 1
+                allyellow += count
         if author.id in trainer_dict:
             partysum = trainer_dict[author.id]['party'][0]+trainer_dict[author.id]['party'][1]+trainer_dict[author.id]['party'][2]
             if count == partysum:
@@ -3119,11 +3119,11 @@ async def coming(ctx, count=None, *,party=None):
     else:
         for role in author.roles:
             if role.name == "mystic":
-                allblue += 1
+                allblue += count
             elif role.name == "valor":
-                allred += 1
+                allred += count
             elif role.name =="instinct":
-                allyellow += 1
+                allyellow += count
         if author.id in trainer_dict:
             partysum = trainer_dict[author.id]['party'][0]+trainer_dict[author.id]['party'][1]+trainer_dict[author.id]['party'][2]
             if count == partysum:
@@ -3234,11 +3234,11 @@ async def here(ctx, count=None, *,party=None):
     else:
         for role in author.roles:
             if role.name == "mystic":
-                allblue += 1
+                allblue += count
             elif role.name == "valor":
-                allred += 1
+                allred += count
             elif role.name =="instinct":
-                allyellow += 1
+                allyellow += count
         if author.id in trainer_dict:
             partysum = trainer_dict[author.id]['party'][0]+trainer_dict[author.id]['party'][1]+trainer_dict[author.id]['party'][2]
             if count == partysum:

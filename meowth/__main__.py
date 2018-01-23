@@ -1333,11 +1333,11 @@ async def setstatus(ctx, user, status):
     user = ctx.message.server.get_member(user)
     count = server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['trainer_dict'][user.id]['count']
     try:
-        if status == "maybe" or status == "interested" or status = "i":
+        if status == "maybe" or status == "interested" or status == "i":
             await _maybe(ctx.message.channel, user, count, party=None)
-        elif status == "omw" or status == "coming" or status = "c":
+        elif status == "omw" or status == "coming" or status == "c":
             await _coming(ctx.message.channel, user, count, party=None)
-        elif status == "waiting" or status == "here" or status = "h":
+        elif status == "waiting" or status == "here" or status == "h":
             await _here(ctx.message.channel, user, count, party=None)
         elif status == "cancel":
             await _cancel(ctx.message.channel, user)

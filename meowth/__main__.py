@@ -1324,25 +1324,26 @@ async def clearstatus(ctx):
 @commands.has_permissions(manage_server=True)
 @checks.raidchannel()
 async def setstatus(ctx, user, status):
-    """Clears raid channel status lists.
+    """Changes raid channel status lists.
 
-    Usage: !setstatus [user] [status]
+    Usage: !setstatus <user> <status>
+    User can be a mention or ID number. Status can be maybe/interested, omw/coming, waiting/here, or cancel
     Only usable by admins."""
     user = re.sub(r'\W+', '', user)
     user = ctx.message.server.get_member(user)
     count = server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['trainer_dict'][user.id]['count']
     try:
-        if status == "maybe" or status == "interested":
+        if status == "maybe" or status == "interested" or status = "i":
             await _maybe(ctx.message.channel, user, count, party=None)
-        elif status == "omw" or status == "coming":
+        elif status == "omw" or status == "coming" or status = "c":
             await _coming(ctx.message.channel, user, count, party=None)
-        elif status == "waiting" or status == "here":
+        elif status == "waiting" or status == "here" or status = "h":
             await _here(ctx.message.channel, user, count, party=None)
         elif status == "cancel":
             await _cancel(ctx.message.channel, user)
     except KeyError:
         pass
-        
+
 """
 Miscellaneous
 """

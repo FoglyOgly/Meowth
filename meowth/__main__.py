@@ -697,7 +697,7 @@ async def on_message(message):
                     except:
                         pass
                     emoji_count = message.content.count(omw_emoji)
-                    await _coming(message, emoji_count, party=None)
+                    await _coming(message.channel, message.author, emoji_count, party=None)
                     return
                 here_emoji = parse_emoji(message.server, config['here_id'])
                 if message.content.startswith(here_emoji):
@@ -709,7 +709,7 @@ async def on_message(message):
                     except:
                         pass
                     emoji_count = message.content.count(here_emoji)
-                    await _here(message, emoji_count,party=None)
+                    await _here(message.channel, message.author, emoji_count, party=None)
                     return
                 if "/maps" in message.content:
                     newloc = create_gmaps_query(message.content, message.channel)
@@ -1320,7 +1320,29 @@ async def clearstatus(ctx):
     except KeyError:
         pass
 
+@Meowth.command(pass_context=True)
+@commands.has_permissions(manage_server=True)
+@checks.raidchannel()
+async def setstatus(ctx, user, status):
+    """Clears raid channel status lists.
 
+    Usage: !setstatus [user] [status]
+    Only usable by admins."""
+    user = re.sub(r'\W+', '', user)
+    user = ctx.message.server.get_member(user)
+    count = server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['trainer_dict'][user.id]['count']
+    try:
+        if status == "maybe" or status == "interested":
+            await _maybe(ctx.message.channel, user, count, party=None)
+        elif status == "omw" or status == "coming":
+            await _coming(ctx.message.channel, user, count, party=None)
+        elif status == "waiting" or status == "here":
+            await _here(ctx.message.channel, user, count, party=None)
+        elif status == "cancel":
+            await _cancel(ctx.message.channel, user)
+    except KeyError:
+        pass
+        
 """
 Miscellaneous
 """
@@ -3032,18 +3054,18 @@ async def coming(ctx, *, teamcounts: str = None):
     if isinstance(result, __builtins__.list):
         count = result[0]
         partylist = result[1]
-        await _coming(ctx.message, count, partylist)
+        await _coming(ctx.message.channel, ctx.message.author, count, partylist)
 
-async def _coming(message, count, party):
+async def _coming(channel, author, count, party):
     allblue = 0
     allred = 0
     allyellow = 0
-    trainer_dict = server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['trainer_dict']
+    trainer_dict = server_dict[channel.server.id]['raidchannel_dict'][channel.id]['trainer_dict']
 
     if count == 1:
-        await Meowth.send_message(message.channel, _("Meowth! {member} is on the way!").format(member=message.author.mention))
+        await Meowth.send_message(channel, _("Meowth! {member} is on the way!").format(member=author.mention))
     else:
-        await Meowth.send_message(message.channel, _("Meowth! {member} is on the way with a total of {trainer_count} trainers!").format(member=message.author.mention, trainer_count=count))
+        await Meowth.send_message(channel, _("Meowth! {member} is on the way with a total of {trainer_count} trainers!").format(member=author.mention, trainer_count=count))
     if not party:
         for role in author.roles:
             if role.name == "mystic":
@@ -3056,10 +3078,10 @@ async def _coming(message, count, party):
     # Add trainer name to trainer list
     if message.author.id not in trainer_dict:
         trainer_dict[message.author.id] = {}
-    trainer_dict[message.author.id]['status'] = "omw"
-    trainer_dict[message.author.id]['count'] = count
-    trainer_dict[message.author.id]['party'] = party
-    server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['trainer_dict'] = trainer_dict
+    trainer_dict[author.id]['status'] = "omw"
+    trainer_dict[author.id]['count'] = count
+    trainer_dict[author.id]['party'] = party
+    server_dict[channel.server.id]['raidchannel_dict'][channel.id]['trainer_dict'] = trainer_dict
 
 @Meowth.command(pass_context=True,aliases=["h"])
 @checks.activeraidchannel()
@@ -3102,23 +3124,24 @@ async def here(ctx, *, teamcounts: str = None):
     if isinstance(result, __builtins__.list):
         count = result[0]
         partylist = result[1]
-        await _here(ctx.message, count, partylist)
+        await _here(ctx.message.channel, ctx.message.author, count, partylist)
 
-async def _here(message, count, party):
-    trainer_dict = server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['trainer_dict']
+async def _here(channel, author, count, party):
     lobbymsg = ""
     allblue = 0
     allred = 0
     allyellow = 0
+    trainer_dict = server_dict[channel.server.id]['raidchannel_dict'][channel.id]['trainer_dict']
+
     try:
-        if server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['lobby']:
+        if server_dict[channel.server.id]['raidchannel_dict'][channel.id]['lobby']:
             lobbymsg += " There is a group already in the lobby! Use **!lobby** to join them or **!backout** to request a backout! Otherwise, you may be stuck waiting for the next group!"
     except KeyError:
         pass
     if count == 1:
-        await Meowth.send_message(message.channel, _("Meowth! {member} is at the raid!"+lobbymsg).format(member=message.author.mention))
+        await Meowth.send_message(channel, _("Meowth! {member} is at the raid!"+lobbymsg).format(member=author.mention))
     else:
-        await Meowth.send_message(message.channel, _("Meowth! {member} is at the raid with a total of {trainer_count} trainers!"+lobbymsg).format(member=message.author.mention, trainer_count=count))
+        await Meowth.send_message(channel, _("Meowth! {member} is at the raid with a total of {trainer_count} trainers!"+lobbymsg).format(member=author.mention, trainer_count=count))
     if not party:
         for role in author.roles:
             if role.name == "mystic":
@@ -3129,12 +3152,12 @@ async def _here(message, count, party):
                 allyellow = count
         party = [allblue, allred, allyellow]
     # Add trainer name to trainer list
-    if message.author.id not in trainer_dict:
+    if author.id not in trainer_dict:
         trainer_dict[message.author.id] = {}
-    trainer_dict[message.author.id]['status'] = "waiting"
-    trainer_dict[message.author.id]['count'] = count
-    trainer_dict[message.author.id]['party'] = party
-    server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['trainer_dict'] = trainer_dict
+    trainer_dict[author.id]['status'] = "waiting"
+    trainer_dict[author.id]['count'] = count
+    trainer_dict[author.id]['party'] = party
+    server_dict[channel.server.id]['raidchannel_dict'][channel.id]['trainer_dict'] = trainer_dict
 
 async def _party_status(ctx, total, teamcounts):
     channel = ctx.message.channel
@@ -3271,12 +3294,10 @@ async def cancel(ctx):
     Usage: !cancel
     Works only in raid channels. Removes you and your party
     from the list of trainers who are "otw" or "here"."""
-    await _cancel(ctx.message)
+    await _cancel(ctx.message.channel, ctx.message.author)
 
-async def _cancel(message):
-    author = message.author
-    channel = message.channel
-    server = message.server
+async def _cancel(channel, author):
+    server = channel.server
     try:
         t_dict = server_dict[server.id]['raidchannel_dict'][channel.id]['trainer_dict'][author.id]
     except KeyError:

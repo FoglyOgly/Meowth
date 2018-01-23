@@ -3077,8 +3077,8 @@ async def _coming(channel, author, count, party):
                 allyellow = count
         party = [allblue, allred, allyellow]
     # Add trainer name to trainer list
-    if message.author.id not in trainer_dict:
-        trainer_dict[message.author.id] = {}
+    if author.id not in trainer_dict:
+        trainer_dict[author.id] = {}
     trainer_dict[author.id]['status'] = "omw"
     trainer_dict[author.id]['count'] = count
     trainer_dict[author.id]['party'] = party

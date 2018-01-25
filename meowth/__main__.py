@@ -1703,6 +1703,7 @@ async def wild(ctx):
     await _wild(ctx.message)
 
 async def _wild(message):
+    timestamp = (message.timestamp + datetime.timedelta(hours=server_dict[message.channel.server.id]['offset'])).strftime("%I:%M %p")
     wild_split = message.clean_content.split()
     del wild_split[0]
     if len(wild_split) <= 1:
@@ -1749,9 +1750,9 @@ async def _wild(message):
         wild_embed = discord.Embed(title=_("Meowth! Click here for my directions to the wild {pokemon}!").format(pokemon=entered_wild.capitalize()),description=_("Ask {author} if my directions aren't perfect!").format(author=message.author.name),url=wild_gmaps_link,colour=message.server.me.colour)
         wild_embed.add_field(name="**Details:**", value=_("{pokemon} ({pokemonnumber}) {type}").format(pokemon=entered_wild.capitalize(),pokemonnumber=str(wild_number),type="".join(get_type(message.server, wild_number)),inline=True))
         if message.author.avatar:
-            wild_embed.set_footer(text=_("Reported by @{author}").format(author=message.author.display_name), icon_url=_("https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}.{format}?size={size}".format(user=message.author, format="jpg", size=32)))
+            wild_embed.set_footer(text=_("Reported by @{author} - {timestamp}").format(author=message.author.display_name, timestamp=timestamp), icon_url=_("https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}.{format}?size={size}".format(user=message.author, format="jpg", size=32)))
         else:
-            wild_embed.set_footer(text=_("Reported by @{author}").format(author=message.author.display_name), icon_url=message.author.default_avatar_url)
+            wild_embed.set_footer(text=_("Reported by @{author} - {timestamp}").format(author=message.author.display_name, timestamp=timestamp), icon_url=message.author.default_avatar_url)
         wild_embed.set_thumbnail(url=wild_img_url)
         wildreportmsg = await Meowth.send_message(message.channel, content=_("Meowth! Wild {pokemon} reported by {member}! Details: {location_details}").format(pokemon=wild, member=message.author.mention, location_details=wild_details),embed=wild_embed)
         expiremsg = _("**This {pokemon} has despawned!**").format(pokemon=entered_wild.capitalize())
@@ -1777,6 +1778,7 @@ async def raid(ctx):
 
 async def _raid(message):
     fromegg = False
+    timestamp = (message.timestamp + datetime.timedelta(hours=server_dict[message.channel.server.id]['offset'])).strftime("%I:%M %p")
     if message.channel.name not in server_dict[message.server.id]['city_channels'].keys():
         if message.channel.id in server_dict[message.channel.server.id]['raidchannel_dict'] and server_dict[message.channel.server.id]['raidchannel_dict'][message.channel.id]['type'] == 'egg':
             fromegg = True
@@ -1886,9 +1888,9 @@ async def _raid(message):
     raid_embed.add_field(name="**Details:**", value=_("{pokemon} ({pokemonnumber}) {type}").format(pokemon=entered_raid.capitalize(),pokemonnumber=str(raid_number),type="".join(get_type(message.server, raid_number)),inline=True))
     raid_embed.add_field(name="**Weaknesses:**", value=_("{weakness_list}").format(weakness_list=weakness_to_str(message.server, get_weaknesses(entered_raid))),inline=True)
     if message.author.avatar:
-        raid_embed.set_footer(text=_("Reported by @{author}").format(author=message.author.display_name), icon_url=_("https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}.{format}?size={size}".format(user=message.author, format="jpg", size=32)))
+        raid_embed.set_footer(text=_("Reported by @{author} - {timestamp}").format(author=message.author.display_name, timestamp=timestamp), icon_url=_("https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}.{format}?size={size}".format(user=message.author, format="jpg", size=32)))
     else:
-        raid_embed.set_footer(text=_("Reported by @{author}").format(author=message.author.display_name), icon_url=message.author.default_avatar_url)
+        raid_embed.set_footer(text=_("Reported by @{author} - {timestamp}").format(author=message.author.display_name, timestamp=timestamp), icon_url=message.author.default_avatar_url)
     raid_embed.set_thumbnail(url=raid_img_url)
     raidreport = await Meowth.send_message(message.channel, content = _("Meowth! {pokemon} raid reported by {member}! Details: {location_details}. Coordinate in {raid_channel}").format(pokemon=entered_raid.capitalize(), member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention),embed=raid_embed)
     await asyncio.sleep(1) #Wait for the channel to be created.
@@ -1949,6 +1951,7 @@ async def raidegg(ctx):
     await _raidegg(ctx.message)
 
 async def _raidegg(message):
+    timestamp = (message.timestamp + datetime.timedelta(hours=server_dict[message.channel.server.id]['offset'])).strftime("%I:%M %p")
     raidegg_split = message.clean_content.split()
     del raidegg_split[0]
     if raidegg_split[0].lower() == "egg":
@@ -2018,9 +2021,9 @@ async def _raidegg(message):
             raid_embed.add_field(name="**Possible Bosses:**", value=_("{bosslist}").format(bosslist="".join(boss_list)), inline=True)
             raid_embed.add_field(name="\u200b", value="\u200b", inline=True)
         if message.author.avatar:
-            raid_embed.set_footer(text=_("Reported by @{author}").format(author=message.author.display_name), icon_url=_("https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}.{format}?size={size}".format(user=message.author, format="jpg", size=32)))
+            raid_embed.set_footer(text=_("Reported by @{author} - {timestamp}").format(author=message.author.display_name, timestamp=timestamp), icon_url=_("https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}.{format}?size={size}".format(user=message.author, format="jpg", size=32)))
         else:
-            raid_embed.set_footer(text=_("Reported by @{author}").format(author=message.author.display_name), icon_url=message.author.default_avatar_url)
+            raid_embed.set_footer(text=_("Reported by @{author} - {timestamp}").format(author=message.author.display_name, timestamp=timestamp), icon_url=message.author.default_avatar_url)
         raid_embed.set_thumbnail(url=raid_img_url)
         raidreport = await Meowth.send_message(message.channel, content = _("Meowth! Level {level} raid egg reported by {member}! Details: {location_details}. Coordinate in {raid_channel}").format(level=egg_level, member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention),embed=raid_embed)
         await asyncio.sleep(1) #Wait for the channel to be created.
@@ -2121,10 +2124,7 @@ async def _eggassume(args, raid_channel):
     for field in oldembed['fields']:
         if "team" in field['name'].lower() or "status" in field['name'].lower():
             raid_embed.add_field(name=field['name'], value=field['value'], inline=field['inline'])
-    if raid_messageauthor.avatar:
-        raid_embed.set_footer(text=_("Reported by @{author}").format(author=raid_messageauthor.display_name), icon_url=_("https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}.{format}?size={size}".format(user=raid_messageauthor, format="jpg", size=32)))
-    else:
-        raid_embed.set_footer(text=_("Reported by @{author}").format(author=raid_messageauthor.display_name), icon_url=raid_messageauthor.default_avatar_url)
+    raid_embed.set_footer(text=oldembed['footer']['text'], icon_url=oldembed['footer']['icon_url'])
     raid_embed.set_thumbnail(url=oldembed['thumbnail']['url'])
 
     try:
@@ -2241,10 +2241,7 @@ This channel will be deleted five minutes after the timer expires.""").format(po
     raid_embed = discord.Embed(title=_("Meowth! Click here for directions to the raid!"),url=raid_gmaps_link,colour=raid_channel.server.me.colour)
     raid_embed.add_field(name="**Details:**", value=_("{pokemon} ({pokemonnumber}) {type}").format(pokemon=entered_raid.capitalize(),pokemonnumber=str(raid_number),type="".join(get_type(raid_channel.server, raid_number)),inline=True))
     raid_embed.add_field(name="**Weaknesses:**", value=_("{weakness_list}").format(weakness_list=weakness_to_str(raid_channel.server, get_weaknesses(entered_raid))),inline=True)
-    if raid_messageauthor.avatar:
-        raid_embed.set_footer(text=_("Reported by @{author}").format(author=raid_messageauthor.display_name), icon_url=_("https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}.{format}?size={size}".format(user=raid_messageauthor, format="jpg", size=32)))
-    else:
-        raid_embed.set_footer(text=_("Reported by @{author}").format(author=raid_messageauthor.display_name), icon_url=raid_messageauthor.default_avatar_url)
+    raid_embed.set_footer(text=oldembed['footer']['text'], icon_url=oldembed['footer']['icon_url'])
     raid_embed.set_thumbnail(url=raid_img_url)
     await Meowth.edit_channel(raid_channel, name=raid_channel_name, topic=end.strftime("Ends on %B %d at %I:%M %p (%H:%M)"))
     trainer_list = []
@@ -2301,6 +2298,7 @@ async def exraid(ctx):
 async def _exraid(ctx):
     message = ctx.message
     channel = message.channel
+    timestamp = (message.timestamp + datetime.timedelta(hours=server_dict[message.channel.server.id]['offset'])).strftime("%I:%M %p")
     fromegg = False
     exraid_split = message.clean_content.split()
     del exraid_split[0]
@@ -2343,9 +2341,9 @@ async def _exraid(ctx):
         raid_embed.add_field(name="**Possible Bosses:**", value=_("{bosslist}").format(bosslist="".join(boss_list)), inline=True)
         raid_embed.add_field(name="\u200b", value="\u200b", inline=True)
     if message.author.avatar:
-        raid_embed.set_footer(text=_("Reported by @{author}").format(author=message.author.display_name), icon_url=_("https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}.{format}?size={size}".format(user=message.author, format="jpg", size=32)))
+        raid_embed.set_footer(text=_("Reported by @{author} - {timestamp}").format(author=message.author.display_name, timestamp=timestamp), icon_url=_("https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}.{format}?size={size}".format(user=message.author, format="jpg", size=32)))
     else:
-        raid_embed.set_footer(text=_("Reported by @{author}").format(author=message.author.display_name), icon_url=message.author.default_avatar_url)
+        raid_embed.set_footer(text=_("Reported by @{author} - {timestamp}").format(author=message.author.display_name, timestamp=timestamp), icon_url=message.author.default_avatar_url)
     raid_embed.set_thumbnail(url=raid_img_url)
     raidreport = await Meowth.send_message(channel, content = _("Meowth! EX raid egg reported by {member}! Details: {location_details}. Use the **!invite** command to gain access and coordinate in {raid_channel}").format(member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention),embed=raid_embed)
     await asyncio.sleep(1) #Wait for the channel to be created.
@@ -3720,7 +3718,7 @@ async def _interest(ctx, tag=False):
     for trainer in trainer_dict:
         memberexists = ctx.message.server.get_member(trainer)
         if trainer_dict[trainer]['status'] == "maybe" and memberexists:
-            ctx_maybecount += trainer_dict[trainer]['count']
+            ctx_maybecount += trainer['count']
 
     # If at least 1 person is interested,
     # add an extra message indicating who it is.
@@ -3763,7 +3761,7 @@ async def _otw(ctx, tag=False):
     for trainer in trainer_dict:
         memberexists = ctx.message.server.get_member(trainer)
         if trainer_dict[trainer]['status'] == "omw" and memberexists:
-            ctx_omwcount += trainer_dict[trainer]['count']
+            ctx_omwcount += trainer['count']
 
     # If at least 1 person is on the way,
     # add an extra message indicating who it is.
@@ -3805,7 +3803,7 @@ async def _waiting(ctx, tag=False):
     for trainer in trainer_dict:
         memberexists = ctx.message.server.get_member(trainer)
         if trainer_dict[trainer]['status'] == "waiting" and memberexists:
-            ctx_waitingcount += trainer_dict[trainer]['count']
+            ctx_waitingcount += trainer['count']
 
     # If at least 1 person is waiting,
     # add an extra message indicating who it is.
@@ -3847,7 +3845,7 @@ async def _lobbylist(ctx, tag=False):
     for trainer in trainer_dict:
         memberexists = ctx.message.server.get_member(trainer)
         if trainer_dict[trainer]['status'] == "lobby" and memberexists:
-            ctx_lobbycount += trainer_dict[trainer]['count']
+            ctx_lobbycount += trainer['count']
 
     # If at least 1 person is on the way,
     # add an extra message indicating who it is.

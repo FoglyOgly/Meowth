@@ -1703,7 +1703,7 @@ async def wild(ctx):
     await _wild(ctx.message)
 
 async def _wild(message):
-    timestamp = (message.timestamp + datetime.timedelta(hours=server_dict[message.channel.server.id]['offset'])).strftime("%I:%M %p")
+    timestamp = (message.timestamp + datetime.timedelta(hours=server_dict[message.channel.server.id]['offset'])).strftime("%I:%M %p (%H:%M)")
     wild_split = message.clean_content.split()
     del wild_split[0]
     if len(wild_split) <= 1:
@@ -1778,7 +1778,7 @@ async def raid(ctx):
 
 async def _raid(message):
     fromegg = False
-    timestamp = (message.timestamp + datetime.timedelta(hours=server_dict[message.channel.server.id]['offset'])).strftime("%I:%M %p")
+    timestamp = (message.timestamp + datetime.timedelta(hours=server_dict[message.channel.server.id]['offset'])).strftime("%I:%M %p (%H:%M)")
     if message.channel.name not in server_dict[message.server.id]['city_channels'].keys():
         if message.channel.id in server_dict[message.channel.server.id]['raidchannel_dict'] and server_dict[message.channel.server.id]['raidchannel_dict'][message.channel.id]['type'] == 'egg':
             fromegg = True
@@ -1951,7 +1951,7 @@ async def raidegg(ctx):
     await _raidegg(ctx.message)
 
 async def _raidegg(message):
-    timestamp = (message.timestamp + datetime.timedelta(hours=server_dict[message.channel.server.id]['offset'])).strftime("%I:%M %p")
+    timestamp = (message.timestamp + datetime.timedelta(hours=server_dict[message.channel.server.id]['offset'])).strftime("%I:%M %p (%H:%M)")
     raidegg_split = message.clean_content.split()
     del raidegg_split[0]
     if raidegg_split[0].lower() == "egg":
@@ -2298,7 +2298,7 @@ async def exraid(ctx):
 async def _exraid(ctx):
     message = ctx.message
     channel = message.channel
-    timestamp = (message.timestamp + datetime.timedelta(hours=server_dict[message.channel.server.id]['offset'])).strftime("%I:%M %p")
+    timestamp = (message.timestamp + datetime.timedelta(hours=server_dict[message.channel.server.id]['offset'])).strftime("%I:%M %p (%H:%M)")
     fromegg = False
     exraid_split = message.clean_content.split()
     del exraid_split[0]

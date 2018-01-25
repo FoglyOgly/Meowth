@@ -697,7 +697,7 @@ async def on_message(message):
                     except:
                         pass
                     emoji_count = message.content.count(omw_emoji)
-                    await _coming(message, emoji_count)
+                    await _coming(message.channel, message.author, emoji_count, party=None)
                     return
                 here_emoji = parse_emoji(message.server, config['here_id'])
                 if message.content.startswith(here_emoji):
@@ -709,7 +709,7 @@ async def on_message(message):
                     except:
                         pass
                     emoji_count = message.content.count(here_emoji)
-                    await _here(message, emoji_count)
+                    await _here(message.channel, message.author, emoji_count, party=None)
                     return
                 if "/maps" in message.content:
                     newloc = create_gmaps_query(message.content, message.channel)
@@ -1317,6 +1317,30 @@ async def clearstatus(ctx):
     try:
         server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['trainer_dict'] = {}
         await Meowth.send_message(ctx.message.channel,"Meowth! Raid status lists have been cleared!")
+    except KeyError:
+        pass
+
+@Meowth.command(pass_context=True)
+@commands.has_permissions(manage_server=True)
+@checks.raidchannel()
+async def setstatus(ctx, user, status):
+    """Changes raid channel status lists.
+
+    Usage: !setstatus <user> <status>
+    User can be a mention or ID number. Status can be maybe/interested, omw/coming, waiting/here, or cancel
+    Only usable by admins."""
+    user = re.sub(r'\W+', '', user)
+    user = ctx.message.server.get_member(user)
+    count = server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['trainer_dict'][user.id]['count']
+    try:
+        if status == "maybe" or status == "interested" or status == "i":
+            await _maybe(ctx.message.channel, user, count, party=None)
+        elif status == "omw" or status == "coming" or status == "c":
+            await _coming(ctx.message.channel, user, count, party=None)
+        elif status == "waiting" or status == "here" or status == "h":
+            await _here(ctx.message.channel, user, count, party=None)
+        elif status == "cancel":
+            await _cancel(ctx.message.channel, user)
     except KeyError:
         pass
 
@@ -2365,7 +2389,7 @@ async def _invite(ctx):
                         exraid_channel = exraid_dict[str(int(reply.content))]
                         await Meowth.edit_channel_permissions(exraid_channel, ctx.message.author, overwrite)
                         await Meowth.send_message(ctx.message.channel, "Meowth! Alright {0}, you can now send messages in {1}! Make sure you let the trainers in there know if you can make it to the EX Raid!".format(ctx.message.author.mention, exraid_channel.mention))
-                        await _maybe(exraid_channel,ctx.message.author,1)
+                        await _maybe(exraid_channel,ctx.message.author,1,party=None)
                     else:
                         await Meowth.send_message(ctx.message.channel, "Meowth! I couldn't understand your reply! Try the **!invite** command again!")
                 else:
@@ -2933,30 +2957,42 @@ Status Management
 
 @Meowth.command(pass_context=True,aliases=["i","maybe"])
 @checks.activeraidchannel()
-async def interested(ctx, *, count: str = None):
+async def interested(ctx, *, teamcounts: str = None):
     """Indicate you are interested in the raid.
 
-    Usage: !interested [message]
-    Works only in raid channels. If message is omitted, assumes you are a group of 1.
+    Usage: !interested [count] [party]
+    Works only in raid channels. If count is omitted, assumes you are a group of 1.
     Otherwise, this command expects at least one word in your message to be a number,
-    and will assume you are a group with that many people."""
+    and will assume you are a group with that many people.
+
+    Party is also optional. Format is #m #v #i to tell your party's teams."""
     trainer_dict = server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['trainer_dict']
-    if count:
-        if count.isdigit():
-            count = int(count)
+    if not teamcounts:
+        if ctx.message.author.id in trainer_dict:
+            bluecount = str(trainer_dict[ctx.message.author.id]['party'][0])+"m "
+            redcount = str(trainer_dict[ctx.message.author.id]['party'][1])+"v "
+            yellowcount = str(trainer_dict[ctx.message.author.id]['party'][2])+"i "
+            teamcounts = str(trainer_dict[ctx.message.author.id]['count']) +" "+ bluecount + redcount + yellowcount
         else:
-            await Meowth.send_message(ctx.message.channel, _("Meowth! I can't understand how many are in your group. Just say **!interested** if you're by yourself, or **!interested 5** for example if there are 5 in your group."))
-            return
+            teamcounts = "1"
+    if teamcounts.split()[0].isdigit():
+        total = int(teamcounts.split()[0])
     else:
         if ctx.message.author.id in trainer_dict:
-            count = trainer_dict[ctx.message.author.id]['count']
+            total = trainer_dict[ctx.message.author.id]['count']
         else:
-            count = 1
+            total = 1
+    result = await _party_status(ctx, total, teamcounts)
+    if isinstance(result, __builtins__.list):
+        count = result[0]
+        partylist = result[1]
+        await _maybe(ctx.message.channel, ctx.message.author, count, partylist)
 
-    await _maybe(ctx.message.channel, ctx.message.author, count)
-
-async def _maybe(channel, author, count):
+async def _maybe(channel, author, count, party):
     trainer_dict = server_dict[channel.server.id]['raidchannel_dict'][channel.id]['trainer_dict']
+    allblue = 0
+    allred = 0
+    allyellow = 0
     if count == 1:
         await Meowth.send_message(channel, _("Meowth! {member} is interested!").format(member=author.mention))
     else:
@@ -2964,21 +3000,33 @@ async def _maybe(channel, author, count):
     # Add trainer name to trainer list
     if author.id not in server_dict[channel.server.id]['raidchannel_dict'][channel.id]['trainer_dict']:
         trainer_dict[author.id] = {}
+    if not party:
+        for role in author.roles:
+            if role.name == "mystic":
+                allblue = count
+            elif role.name == "valor":
+                allred = count
+            elif role.name =="instinct":
+                allyellow = count
+        party = [allblue, allred, allyellow]
     trainer_dict[author.id]['status'] = "maybe"
     trainer_dict[author.id]['count'] = count
+    trainer_dict[author.id]['party'] = party
     server_dict[channel.server.id]['raidchannel_dict'][channel.id]['trainer_dict'] = trainer_dict
 
 @Meowth.command(pass_context=True,aliases=["c"])
 @checks.activeraidchannel()
-async def coming(ctx, *, count: str = None):
+async def coming(ctx, *, teamcounts: str = None):
     """Indicate you are on the way to a raid.
 
-    Usage: !coming [message]
-    Works only in raid channels. If message is omitted, checks for previous !maybe
+    Usage: !coming [count] [party]
+    Works only in raid channels. If count is omitted, checks for previous !maybe
     command and takes the count from that. If it finds none, assumes you are a group
     of 1.
     Otherwise, this command expects at least one word in your message to be a number,
-    and will assume you are a group with that many people."""
+    and will assume you are a group with that many people.
+
+    Party is also optional. Format is #m #v #i to tell your party's teams."""
     try:
         if server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['type'] == "egg":
             if server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['pokemon'] == "":
@@ -2988,46 +3036,67 @@ async def coming(ctx, *, count: str = None):
         pass
 
     trainer_dict = server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['trainer_dict']
-
-    if count:
-        if count.isdigit():
-            count = int(count)
+    if not teamcounts:
+        if ctx.message.author.id in trainer_dict:
+            bluecount = str(trainer_dict[ctx.message.author.id]['party'][0])+"m "
+            redcount = str(trainer_dict[ctx.message.author.id]['party'][1])+"v "
+            yellowcount = str(trainer_dict[ctx.message.author.id]['party'][2])+"i "
+            teamcounts = str(trainer_dict[ctx.message.author.id]['count']) +" "+ bluecount + redcount + yellowcount
         else:
-            await Meowth.send_message(ctx.message.channel, _("Meowth! I can't understand how many are in your group. Just say **!coming** if you're by yourself, or **!coming 5** for example if there are 5 in your group."))
-            return
+            teamcounts = "1"
+    if teamcounts.split()[0].isdigit():
+        total = int(teamcounts.split()[0])
     else:
         if ctx.message.author.id in trainer_dict:
-            count = trainer_dict[ctx.message.author.id]['count']
+            total = trainer_dict[ctx.message.author.id]['count']
         else:
-            count = 1
+            total = 1
+    result = await _party_status(ctx, total, teamcounts)
+    if isinstance(result, __builtins__.list):
+        count = result[0]
+        partylist = result[1]
+        await _coming(ctx.message.channel, ctx.message.author, count, partylist)
 
-    await _coming(ctx.message, count)
-
-async def _coming(message, count):
-    trainer_dict = server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['trainer_dict']
+async def _coming(channel, author, count, party):
+    allblue = 0
+    allred = 0
+    allyellow = 0
+    trainer_dict = server_dict[channel.server.id]['raidchannel_dict'][channel.id]['trainer_dict']
 
     if count == 1:
-        await Meowth.send_message(message.channel, _("Meowth! {member} is on the way!").format(member=message.author.mention))
+        await Meowth.send_message(channel, _("Meowth! {member} is on the way!").format(member=author.mention))
     else:
-        await Meowth.send_message(message.channel, _("Meowth! {member} is on the way with a total of {trainer_count} trainers!").format(member=message.author.mention, trainer_count=count))
+        await Meowth.send_message(channel, _("Meowth! {member} is on the way with a total of {trainer_count} trainers!").format(member=author.mention, trainer_count=count))
+    if not party:
+        for role in author.roles:
+            if role.name == "mystic":
+                allblue = count
+            elif role.name == "valor":
+                allred = count
+            elif role.name =="instinct":
+                allyellow = count
+        party = [allblue, allred, allyellow]
     # Add trainer name to trainer list
-    if message.author.id not in trainer_dict:
-        trainer_dict[message.author.id] = {}
-    trainer_dict[message.author.id]['status'] = "omw"
-    trainer_dict[message.author.id]['count'] = count
-    server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['trainer_dict'] = trainer_dict
+    if author.id not in trainer_dict:
+        trainer_dict[author.id] = {}
+    trainer_dict[author.id]['status'] = "omw"
+    trainer_dict[author.id]['count'] = count
+    trainer_dict[author.id]['party'] = party
+    server_dict[channel.server.id]['raidchannel_dict'][channel.id]['trainer_dict'] = trainer_dict
 
 @Meowth.command(pass_context=True,aliases=["h"])
 @checks.activeraidchannel()
-async def here(ctx, *, count: str = None):
+async def here(ctx, *, teamcounts: str = None):
     """Indicate you have arrived at the raid.
 
-    Usage: !here [message]
+    Usage: !here [count] [party]
     Works only in raid channels. If message is omitted, and
     you have previously issued !coming, then preserves the count
     from that command. Otherwise, assumes you are a group of 1.
     Otherwise, this command expects at least one word in your message to be a number,
-    and will assume you are a group with that many people."""
+    and will assume you are a group with that many people.
+
+    Party is also optional. Format is #m #v #i to tell your party's teams."""
     try:
         if server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['type'] == "egg":
             if server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['pokemon'] == "":
@@ -3037,39 +3106,135 @@ async def here(ctx, *, count: str = None):
         pass
 
     trainer_dict = server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['trainer_dict']
-
-    if count:
-        if count.isdigit():
-            count = int(count)
+    if not teamcounts:
+        if ctx.message.author.id in trainer_dict:
+            bluecount = str(trainer_dict[ctx.message.author.id]['party'][0])+"m "
+            redcount = str(trainer_dict[ctx.message.author.id]['party'][1])+"v "
+            yellowcount = str(trainer_dict[ctx.message.author.id]['party'][2])+"i "
+            teamcounts = str(trainer_dict[ctx.message.author.id]['count']) +" "+ bluecount + redcount + yellowcount
         else:
-            await Meowth.send_message(ctx.message.channel, _("Meowth! I can't understand how many are in your group. Just say **!here** if you're by yourself, or **!coming 5** for example if there are 5 in your group."))
-            return
+            teamcounts = "1"
+    if teamcounts.split()[0].isdigit():
+        total = int(teamcounts.split()[0])
     else:
         if ctx.message.author.id in trainer_dict:
-            count = trainer_dict[ctx.message.author.id]['count']
+            total = trainer_dict[ctx.message.author.id]['count']
         else:
-            count = 1
+            total = 1
+    result = await _party_status(ctx, total, teamcounts)
+    if isinstance(result, __builtins__.list):
+        count = result[0]
+        partylist = result[1]
+        await _here(ctx.message.channel, ctx.message.author, count, partylist)
 
-    await _here(ctx.message, count)
-
-async def _here(message, count):
-    trainer_dict = server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['trainer_dict']
+async def _here(channel, author, count, party):
     lobbymsg = ""
+    allblue = 0
+    allred = 0
+    allyellow = 0
+    trainer_dict = server_dict[channel.server.id]['raidchannel_dict'][channel.id]['trainer_dict']
+
     try:
-        if server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['lobby']:
+        if server_dict[channel.server.id]['raidchannel_dict'][channel.id]['lobby']:
             lobbymsg += " There is a group already in the lobby! Use **!lobby** to join them or **!backout** to request a backout! Otherwise, you may be stuck waiting for the next group!"
     except KeyError:
         pass
     if count == 1:
-        await Meowth.send_message(message.channel, _("Meowth! {member} is at the raid!"+lobbymsg).format(member=message.author.mention))
+        await Meowth.send_message(channel, _("Meowth! {member} is at the raid!"+lobbymsg).format(member=author.mention))
     else:
-        await Meowth.send_message(message.channel, _("Meowth! {member} is at the raid with a total of {trainer_count} trainers!"+lobbymsg).format(member=message.author.mention, trainer_count=count))
+        await Meowth.send_message(channel, _("Meowth! {member} is at the raid with a total of {trainer_count} trainers!"+lobbymsg).format(member=author.mention, trainer_count=count))
+    if not party:
+        for role in author.roles:
+            if role.name == "mystic":
+                allblue = count
+            elif role.name == "valor":
+                allred = count
+            elif role.name =="instinct":
+                allyellow = count
+        party = [allblue, allred, allyellow]
     # Add trainer name to trainer list
-    if message.author.id not in trainer_dict:
+    if author.id not in trainer_dict:
         trainer_dict[message.author.id] = {}
-    trainer_dict[message.author.id]['status'] = "waiting"
-    trainer_dict[message.author.id]['count'] = count
-    server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['trainer_dict'] = trainer_dict
+    trainer_dict[author.id]['status'] = "waiting"
+    trainer_dict[author.id]['count'] = count
+    trainer_dict[author.id]['party'] = party
+    server_dict[channel.server.id]['raidchannel_dict'][channel.id]['trainer_dict'] = trainer_dict
+
+async def _party_status(ctx, total, teamcounts):
+    channel = ctx.message.channel
+    my_team = None
+    for role in ctx.message.author.roles:
+        if role.name == "mystic":
+            my_team = "mystic"
+        elif role.name == "valor":
+            my_team = "valor"
+        elif role.name =="instinct":
+            my_team = "instinct"
+    teamcounts = teamcounts.split()
+    if total and teamcounts[0].isdigit():
+        del teamcounts[0]
+    mystic = ['mystic', 0]
+    instinct = ['instinct', 0]
+    valor = ['valor', 0]
+    team_aliases = {
+        'mystic':mystic,
+        'blue':mystic,
+        'm':mystic,
+        'b':mystic,
+        'instinct':instinct,
+        'yellow':instinct,
+        'i':instinct,
+        'y':instinct,
+        'valor':valor,
+        'red':valor,
+        'v':valor,
+        'r':valor
+    }
+    regx = re.compile("([a-zA-Z]+)([0-9]+)|([0-9]+)([a-zA-Z]+)")
+    for count in teamcounts:
+        if count.isdigit():
+            if total:
+                return await Meowth.send_message(
+                    channel, "Only one non-team count can be accepted.")
+            else:
+                total = int(count)
+        else:
+            match = regx.match(count)
+            if match:
+                match = regx.match(count).groups()
+                str_match = match[0] or match[3]
+                int_match = match[1] or match[2]
+                if str_match in team_aliases.keys():
+                    if int_match:
+                        if team_aliases[str_match][1]:
+                            return await Meowth.send_message(
+                                channel,
+                                "Only one count per team accepted.")
+                        else:
+                            team_aliases[str_match][1] = int(int_match)
+                            continue
+            return await Meowth.send_message(
+                channel, "Invalid format, please check and try again.")
+    team_total = mystic[1] + instinct[1] + valor[1]
+    if total and my_team:
+        if team_total > total:
+            return await Meowth.send_message(channel,
+                "Team counts are higher than the total. "
+                "Double check your counts and try again. You might need to "
+                "update your total. I currently have {total} total and "
+                "you entered {team_total} in your party.").format(total=total,
+                team_total=team_total)
+        if total > team_total:
+            if team_aliases[my_team][1]:
+                return await Meowth.send_message(
+                    channel,
+                    ("Your team counts don't match the total amount. "
+                    "Double check your counts and try again."))
+            team_aliases[my_team][1] = total - team_total
+
+    partylist = [mystic[1], valor[1], instinct[1]]
+    result = [total,partylist]
+    return result
 
 @Meowth.command(pass_context=True,aliases=["l"])
 @checks.activeraidchannel()
@@ -3130,12 +3295,10 @@ async def cancel(ctx):
     Usage: !cancel
     Works only in raid channels. Removes you and your party
     from the list of trainers who are "otw" or "here"."""
-    await _cancel(ctx.message)
+    await _cancel(ctx.message.channel, ctx.message.author)
 
-async def _cancel(message):
-    author = message.author
-    channel = message.channel
-    server = message.server
+async def _cancel(channel, author):
+    server = channel.server
     try:
         t_dict = server_dict[server.id]['raidchannel_dict'][channel.id]['trainer_dict'][author.id]
     except KeyError:
@@ -3164,6 +3327,7 @@ async def _cancel(message):
             await Meowth.send_message(channel, "Meowth! {member} and their total of {trainer_count} trainers have backed out of the lobby!".format(member=author.mention, trainer_count=t_dict['count']))
     t_dict['status'] = None
     t_dict['count'] = 1
+    t_dict['party'] = [0,0,0]
 
 @Meowth.command(pass_context=True)
 @checks.activeraidchannel()
@@ -3405,7 +3569,7 @@ async def list(ctx):
                     listmsg += "\n" + bulletpoint
                     listmsg += await print_raid_timer(channel)
                     if starttime and starttime > now:
-                        listmsg += "\nMeowth! The next group will be starting at {}".format(starttime.strftime("%I:%M %p (%H:%M)"))
+                        listmsg += "\nThe next group will be starting at **{}**".format(starttime.strftime("%I:%M %p (%H:%M)"))
                 else:
                     listmsg += "\n" + bulletpoint + await _interest(ctx)
                     listmsg += "\n" + bulletpoint + await _otw(ctx)
@@ -3419,7 +3583,7 @@ async def list(ctx):
 
 @list.command(pass_context=True)
 @checks.activeraidchannel()
-async def interested(ctx):
+async def interested(ctx, tag=False):
     """Lists the number and users who are interested in the raid.
 
     Usage: !list interested
@@ -3428,7 +3592,7 @@ async def interested(ctx):
     listmsg += await _interest(ctx)
     await Meowth.send_message(ctx.message.channel, listmsg)
 
-async def _interest(ctx):
+async def _interest(ctx, tag=False):
     ctx_maybecount = 0
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=server_dict[ctx.message.channel.server.id]['offset'])
     # Grab all trainers who are maybe and sum
@@ -3449,7 +3613,7 @@ async def _interest(ctx):
             name_list.append("**"+user.name+"**")
             maybe_list.append(user.mention)
     if ctx_maybecount > 0:
-        if now.time() >= datetime.time(5,0) and now.time() <= datetime.time(21,0):
+        if now.time() >= datetime.time(5,0) and now.time() <= datetime.time(21,0) and tag == True:
             maybe_exstr = _(" including {trainer_list} and the people with them! Let them know if there is a group forming").format(trainer_list=", ".join(maybe_list))
         else:
             maybe_exstr = _(" including {trainer_list} and the people with them! Let them know if there is a group forming").format(trainer_list=", ".join(name_list))
@@ -3459,7 +3623,7 @@ async def _interest(ctx):
 
 @list.command(pass_context=True)
 @checks.activeraidchannel()
-async def coming(ctx):
+async def coming(ctx, tag=False):
     """Lists the number and users who are coming to a raid.
 
     Usage: !list coming
@@ -3468,7 +3632,7 @@ async def coming(ctx):
     listmsg += await _otw(ctx)
     await Meowth.send_message(ctx.message.channel, listmsg)
 
-async def _otw(ctx):
+async def _otw(ctx, tag=False):
 
     ctx_omwcount = 0
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=server_dict[ctx.message.channel.server.id]['offset'])
@@ -3490,7 +3654,7 @@ async def _otw(ctx):
             name_list.append("**"+user.name+"**")
             otw_list.append(user.mention)
     if ctx_omwcount > 0:
-        if now.time() >= datetime.time(5,0) and now.time() <= datetime.time(21,0):
+        if now.time() >= datetime.time(5,0) and now.time() <= datetime.time(21,0) and tag == True:
             otw_exstr = _(" including {trainer_list} and the people with them! Be considerate and wait for them if possible").format(trainer_list=", ".join(otw_list))
         else:
             otw_exstr = _(" including {trainer_list} and the people with them! Be considerate and wait for them if possible").format(trainer_list=", ".join(name_list))
@@ -3499,7 +3663,7 @@ async def _otw(ctx):
 
 @list.command(pass_context=True)
 @checks.activeraidchannel()
-async def here(ctx):
+async def here(ctx, tag=False):
     """List the number and users who are present at a raid.
 
     Usage: !list here
@@ -3508,7 +3672,7 @@ async def here(ctx):
     listmsg += await _waiting(ctx)
     await Meowth.send_message(ctx.message.channel, listmsg)
 
-async def _waiting(ctx):
+async def _waiting(ctx, tag=False):
 
     ctx_waitingcount = 0
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=server_dict[ctx.message.channel.server.id]['offset'])
@@ -3530,7 +3694,7 @@ async def _waiting(ctx):
             name_list.append("**"+user.name+"**")
             waiting_list.append(user.mention)
     if ctx_waitingcount > 0:
-        if now.time() >= datetime.time(5,0) and now.time() <= datetime.time(21,0):
+        if now.time() >= datetime.time(5,0) and now.time() <= datetime.time(21,0) and tag == True:
             waiting_exstr = _(" including {trainer_list} and the people with them! Be considerate and let them know if and when you'll be there").format(trainer_list=", ".join(waiting_list))
         else:
             waiting_exstr = _(" including {trainer_list} and the people with them! Be considerate and let them know if and when you'll be there").format(trainer_list=", ".join(name_list))
@@ -3539,7 +3703,7 @@ async def _waiting(ctx):
 
 @list.command(pass_context=True)
 @checks.activeraidchannel()
-async def lobby(ctx):
+async def lobby(ctx, tag=False):
     """List the number and users who are in the raid lobby.
 
     Usage: !list lobby
@@ -3548,7 +3712,7 @@ async def lobby(ctx):
     listmsg += await _lobbylist(ctx)
     await Meowth.send_message(ctx.message.channel, listmsg)
 
-async def _lobbylist(ctx):
+async def _lobbylist(ctx, tag=False):
 
     ctx_lobbycount = 0
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=server_dict[ctx.message.channel.server.id]['offset'])
@@ -3570,7 +3734,7 @@ async def _lobbylist(ctx):
             name_list.append("**"+user.name+"**")
             lobby_list.append(user.mention)
     if ctx_lobbycount > 0:
-        if now.time() >= datetime.time(5,0) and now.time() <= datetime.time(21,0):
+        if now.time() >= datetime.time(5,0) and now.time() <= datetime.time(21,0) and tag == True:
             lobby_exstr = _(" including {trainer_list} and the people with them! Use **!lobby** if you are joining them or **!backout** to request a backout").format(trainer_list=", ".join(lobby_list))
         else:
             lobby_exstr = _(" including {trainer_list} and the people with them! Use **!lobby** if you are joining them or **!backout** to request a backout").format(trainer_list=", ".join(name_list))
@@ -3589,88 +3753,94 @@ async def teams(ctx):
     await Meowth.send_message(ctx.message.channel, listmsg)
 
 async def _teamlist(ctx):
-    redlist = []
+    message = ctx.message
+    bluecount = 0
+    redcount = 0
+    yellowcount = 0
+    total = 0
     redmaybe = 0
     redcoming = 0
     redwaiting = 0
-    bluelist = []
     bluemaybe = 0
     bluecoming = 0
     bluewaiting = 0
-    yellowlist = []
     yellowmaybe = 0
     yellowcoming = 0
     yellowwaiting = 0
-    otherlist = []
     othermaybe = 0
     othercoming = 0
     otherwaiting = 0
     teamliststr = ""
-    trainer_dict = copy.deepcopy(server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['trainer_dict'])
+    trainer_dict = copy.deepcopy(server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['trainer_dict'])
     for trainer in trainer_dict.keys():
-        if trainer_dict[trainer]['status'] =='maybe' or trainer_dict[trainer]['status'] =='omw' or trainer_dict[trainer]['status'] =='waiting':
-            user = ctx.message.server.get_member(trainer)
-            for role in user.roles:
-                if role.name == "mystic":
-                    bluelist.append(user.id)
-                elif role.name == "valor":
-                    redlist.append(user.id)
-                elif role.name =="instinct":
-                    yellowlist.append(user.id)
-            if user.id not in bluelist and user.id not in redlist and user.id not in yellowlist and user.id not in otherlist:
-                otherlist.append(user.id)
-    for trainer in redlist:
+        bluecount += int(trainer_dict[trainer]['party'][0])
+        redcount += int(trainer_dict[trainer]['party'][1])
+        yellowcount += int(trainer_dict[trainer]['party'][2])
+        total = int(trainer_dict[trainer]['party'][0]) + int(trainer_dict[trainer]['party'][1]) + int(trainer_dict[trainer]['party'][2])
         if trainer_dict[trainer]['status'] == "waiting":
-            redwaiting += 1
-            otherwaiting += trainer_dict[trainer]['count']-1
+            bluewaiting += int(trainer_dict[trainer]['party'][0])
+            redwaiting += int(trainer_dict[trainer]['party'][1])
+            yellowwaiting += int(trainer_dict[trainer]['party'][2])
+            otherwaiting += trainer_dict[trainer]['count']-total
         elif trainer_dict[trainer]['status'] == "omw":
-            redcoming += 1
-            othercoming += trainer_dict[trainer]['count']-1
+            bluecoming += int(trainer_dict[trainer]['party'][0])
+            redcoming += int(trainer_dict[trainer]['party'][1])
+            yellowcoming += int(trainer_dict[trainer]['party'][2])
+            othercoming += trainer_dict[trainer]['count']-total
         elif trainer_dict[trainer]['status'] == "maybe":
-            redmaybe += 1
-            othermaybe += trainer_dict[trainer]['count']-1
-    for trainer in bluelist:
-        if trainer_dict[trainer]['status'] == "waiting":
-            bluewaiting += 1
-            otherwaiting += trainer_dict[trainer]['count']-1
-        elif trainer_dict[trainer]['status'] == "omw":
-            bluecoming += 1
-            othercoming += trainer_dict[trainer]['count']-1
-        elif trainer_dict[trainer]['status'] == "maybe":
-            bluemaybe += 1
-            othermaybe += trainer_dict[trainer]['count']-1
-    for trainer in yellowlist:
-        if trainer_dict[trainer]['status'] == "waiting":
-            yellowwaiting += 1
-            otherwaiting += trainer_dict[trainer]['count']-1
-        elif trainer_dict[trainer]['status'] == "omw":
-            yellowcoming += 1
-            othercoming += trainer_dict[trainer]['count']-1
-        elif trainer_dict[trainer]['status'] == "maybe":
-            yellowmaybe += 1
-            othermaybe += trainer_dict[trainer]['count']-1
-    for trainer in otherlist:
-        if trainer_dict[trainer]['status'] == "waiting":
-            otherwaiting += trainer_dict[trainer]['count']
-        elif trainer_dict[trainer]['status'] == "omw":
-            othercoming += trainer_dict[trainer]['count']
-        elif trainer_dict[trainer]['status'] == "maybe":
-            othermaybe += trainer_dict[trainer]['count']
-
-    if len(redlist) > 0:
-        teamliststr += _("{red_emoji} **{red_number} total,** {redmaybe} interested, {redcoming} coming, {redwaiting} waiting {red_emoji}\n").format(red_number=len(redlist), red_emoji=parse_emoji(ctx.message.server, config['team_dict']['valor']), redmaybe=redmaybe, redcoming=redcoming, redwaiting=redwaiting)
-    if len(bluelist) > 0:
-        teamliststr += _("{blue_emoji} **{blue_number} total,** {bluemaybe} interested, {bluecoming} coming, {bluewaiting} waiting {blue_emoji}\n").format(blue_number=len(bluelist), blue_emoji=parse_emoji(ctx.message.server, config['team_dict']['mystic']), bluemaybe=bluemaybe, bluecoming=bluecoming, bluewaiting=bluewaiting)
-    if len(yellowlist) > 0:
-        teamliststr += _("{yellow_emoji} **{yellow_number} total,** {yellowmaybe} interested, {yellowcoming} coming, {yellowwaiting} waiting {yellow_emoji}\n").format(yellow_number=len(yellowlist), yellow_emoji=parse_emoji(ctx.message.server, config['team_dict']['instinct']), yellowmaybe=yellowmaybe, yellowcoming=yellowcoming, yellowwaiting=yellowwaiting)
+            bluemaybe += int(trainer_dict[trainer]['party'][0])
+            redmaybe += int(trainer_dict[trainer]['party'][1])
+            yellowmaybe += int(trainer_dict[trainer]['party'][2])
+            othermaybe += trainer_dict[trainer]['count']-total
+    if bluecount > 0:
+        teamliststr += _("{blue_emoji} **{blue_number} total,** {bluemaybe} interested, {bluecoming} coming, {bluewaiting} waiting {blue_emoji}\n").format(blue_number=bluecount, blue_emoji=parse_emoji(ctx.message.server, config['team_dict']['mystic']), bluemaybe=bluemaybe, bluecoming=bluecoming, bluewaiting=bluewaiting)
+    if redcount > 0:
+        teamliststr += _("{red_emoji} **{red_number} total,** {redmaybe} interested, {redcoming} coming, {redwaiting} waiting {red_emoji}\n").format(red_number=redcount, red_emoji=parse_emoji(ctx.message.server, config['team_dict']['valor']), redmaybe=redmaybe, redcoming=redcoming, redwaiting=redwaiting)
+    if yellowcount > 0:
+        teamliststr += _("{yellow_emoji} **{yellow_number} total,** {yellowmaybe} interested, {yellowcoming} coming, {yellowwaiting} waiting {yellow_emoji}\n").format(yellow_number=yellowcount, yellow_emoji=parse_emoji(ctx.message.server, config['team_dict']['instinct']), yellowmaybe=yellowmaybe, yellowcoming=yellowcoming, yellowwaiting=yellowwaiting)
     if (othermaybe+othercoming+otherwaiting) > 0:
         teamliststr += _("{grey_emoji} **{grey_number} unknown,** {greymaybe} interested, {greycoming} coming, {greywaiting} waiting {grey_emoji}\n").format(grey_number=othermaybe+othercoming+otherwaiting, grey_emoji=parse_emoji(ctx.message.server, config['type_id_dict']['normal']), greymaybe=othermaybe, greycoming=othercoming, greywaiting=otherwaiting)
-    if (len(redlist)+len(bluelist)+len(yellowlist)+len(otherlist)) > 0:
+    if (bluecount+redcount+yellowcount) > 0:
         listmsg = _(" Team numbers for the raid:\n{}").format(teamliststr)
     else:
         listmsg = _(" Nobody has updated their status!")
-
     return listmsg
+
+@list.command(pass_context=True)
+@checks.activeraidchannel()
+async def tags(ctx):
+    """Lists all raid info for the current channel, @mentioning all users.
+
+    Usage: !list tags
+    Works only in raid channels."""
+    if checks.check_raidchannel(ctx):
+        if checks.check_raidactive(ctx):
+            listmsg = "**Meowth!** "
+            server = ctx.message.server
+            channel = ctx.message.channel
+            bulletpoint = parse_emoji(ctx.message.server, ":small_blue_diamond:")
+            starttime = False
+            try:
+                starttime = server_dict[server.id]['raidchannel_dict'][channel.id]['starttime']
+            except KeyError:
+                pass
+            rc_d = server_dict[server.id]['raidchannel_dict'][channel.id]
+            if rc_d['type'] == 'egg' and rc_d['pokemon'] == '':
+                listmsg += "\n" + bulletpoint + await _interest(ctx, tag=True)
+                listmsg += "\n" + bulletpoint
+                listmsg += await print_raid_timer(channel)
+                if starttime and starttime > now:
+                    listmsg += "\nThe next group will be starting at **{}**".format(starttime.strftime("%I:%M %p (%H:%M)"))
+            else:
+                listmsg += "\n" + bulletpoint + await _interest(ctx,tag=True)
+                listmsg += "\n" + bulletpoint + await _otw(ctx,tag=True)
+                listmsg += "\n" + bulletpoint + await _waiting(ctx,tag=True)
+                listmsg += "\n" + bulletpoint + await _lobbylist(ctx,tag=True)
+                listmsg += "\n" + bulletpoint + await print_raid_timer(channel)
+                if starttime and starttime > now:
+                    listmsg += "\nThe next group will be starting at **{}**".format(starttime.strftime("%I:%M %p (%H:%M)"))
+            await Meowth.send_message(channel, listmsg)
+            return
 
 # @list.command(pass_context=True)
 # @checks.activeraidchannel()

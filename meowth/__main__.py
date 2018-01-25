@@ -3720,7 +3720,7 @@ async def _interest(ctx, tag=False):
     for trainer in trainer_dict:
         memberexists = ctx.message.server.get_member(trainer)
         if trainer_dict[trainer]['status'] == "maybe" and memberexists:
-            ctx_maybecount += trainer['count']
+            ctx_maybecount += trainer_dict[trainer]['count']
 
     # If at least 1 person is interested,
     # add an extra message indicating who it is.
@@ -3763,7 +3763,7 @@ async def _otw(ctx, tag=False):
     for trainer in trainer_dict:
         memberexists = ctx.message.server.get_member(trainer)
         if trainer_dict[trainer]['status'] == "omw" and memberexists:
-            ctx_omwcount += trainer['count']
+            ctx_omwcount += trainer_dict[trainer]['count']
 
     # If at least 1 person is on the way,
     # add an extra message indicating who it is.
@@ -3805,7 +3805,7 @@ async def _waiting(ctx, tag=False):
     for trainer in trainer_dict:
         memberexists = ctx.message.server.get_member(trainer)
         if trainer_dict[trainer]['status'] == "waiting" and memberexists:
-            ctx_waitingcount += trainer['count']
+            ctx_waitingcount += trainer_dict[trainer]['count']
 
     # If at least 1 person is waiting,
     # add an extra message indicating who it is.
@@ -3847,7 +3847,7 @@ async def _lobbylist(ctx, tag=False):
     for trainer in trainer_dict:
         memberexists = ctx.message.server.get_member(trainer)
         if trainer_dict[trainer]['status'] == "lobby" and memberexists:
-            ctx_lobbycount += trainer['count']
+            ctx_lobbycount += trainer_dict[trainer]['count']
 
     # If at least 1 person is on the way,
     # add an extra message indicating who it is.

@@ -3924,7 +3924,7 @@ async def _teamlist(ctx):
     if yellowcount > 0:
         teamliststr += _("{yellow_emoji} **{yellow_number} total,** {yellowmaybe} interested, {yellowcoming} coming, {yellowwaiting} waiting {yellow_emoji}\n").format(yellow_number=yellowcount, yellow_emoji=parse_emoji(ctx.message.server, config['team_dict']['instinct']), yellowmaybe=yellowmaybe, yellowcoming=yellowcoming, yellowwaiting=yellowwaiting)
     if (othermaybe+othercoming+otherwaiting) > 0:
-        teamliststr += _("❔ **{grey_number} unknown,** {greymaybe} interested, {greycoming} coming, {greywaiting} waiting {❔\n").format(grey_number=othermaybe+othercoming+otherwaiting, greymaybe=othermaybe, greycoming=othercoming, greywaiting=otherwaiting)
+        teamliststr += _("❔ **{grey_number} unknown,** {greymaybe} interested, {greycoming} coming, {greywaiting} waiting ❔\n").format(grey_number=othermaybe+othercoming+otherwaiting, greymaybe=othermaybe, greycoming=othercoming, greywaiting=otherwaiting)
     if (bluecount+redcount+yellowcount) > 0:
         listmsg = _(" Team numbers for the raid:\n{}").format(teamliststr)
     else:

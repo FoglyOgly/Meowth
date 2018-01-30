@@ -21,12 +21,12 @@
 "master": "000000000000000000",
 
 "//": "Limit egg assumed hatches to certain egg levels.",
-"allow_assume": {"EX": "False", "5": "False", "4": "False", "3": "False", "2": "False", "1": "False"},
+"allow_assume": {"EX": "True", "5": "True", "4": "False", "3": "False", "2": "False", "1": "False"},
 
 "//": "Define your server's emoji strings here.",
 
 "//": "Emoji for team assignments",
-"team_dict": {"mystic": ":mystic:", "valor": ":valor:", "instinct": ":instinct:"},
+"team_dict": {"mystic": ":mystic:", "valor": ":valor:", "instinct": ":instinct:", "harmony": ":harmony:"},
 
 "//": "Emoji for raid organization",
 "omw_id": ":omw:",

@@ -1435,6 +1435,7 @@ async def team(ctx):
     position = server.me.top_role.position
     team_msg = " or ".join(["**!team {0}**".format(team) for team in config['team_dict'].keys()])
     high_roles = []
+
     for team in config['team_dict'].keys():
         temp_role = discord.utils.get(server.roles, name=team)
         if not temp_role:
@@ -1444,14 +1445,17 @@ async def team(ctx):
                 pass
         if temp_role.position > position:
             high_roles.append(temp_role.name)
+
     if high_roles:
         await Meowth.send_message(ctx.message.channel, _("Meowth! My roles are ranked lower than the following team roles: **{higher_roles_list}**\nPlease get an admin to move my roles above them!").format(higher_roles_list=', '.join(high_roles)))
         return
+
     role = None
     team_split = ctx.message.clean_content.lower().split()
     del team_split[0]
     entered_team = team_split[0]
     role = discord.utils.get(ctx.message.server.roles, name=entered_team)
+    harmony = discord.utils.get(ctx.message.server.roles, name ="harmony")
 
     # Check if user already belongs to a team role by
     # getting the role objects of all teams in team_dict and
@@ -1461,9 +1465,13 @@ async def team(ctx):
         # If the role is valid,
         if temp_role:
             # and the user has this role,
-            if temp_role in ctx.message.author.roles:
+            if temp_role in ctx.message.author.roles and harmony not in ctx.message.author.roles:
                 # then report that a role is already assigned
                 await Meowth.send_message(ctx.message.channel, _("Meowth! You already have a team role!"))
+                return
+            if role.name == "harmony" and harmony in ctx.message.author.roles:
+                # then report that a role is already assigned
+                await Meowth.send_message(ctx.message.channel, _("Meowth! You are already in Team Harmony!"))
                 return
         # If the role isn't valid, something is misconfigured, so fire a warning.
         else:
@@ -1478,6 +1486,7 @@ async def team(ctx):
         await Meowth.send_message(ctx.message.channel, _("Meowth! The \"{entered_team}\" role isn't configured on this server! Contact an admin!").format(entered_team=entered_team))
     else:
         try:
+            await Meowth.remove_roles(ctx.message.author, harmony)
             await Meowth.add_roles(ctx.message.author, role)
             await Meowth.send_message(ctx.message.channel, _("Meowth! Added {member} to Team {team_name}! {team_emoji}").format(member=ctx.message.author.mention, team_name=role.name.capitalize(), team_emoji=parse_emoji(ctx.message.server, config['team_dict'][entered_team])))
         except discord.Forbidden:
@@ -3287,20 +3296,20 @@ async def _party_status(ctx, total, teamcounts):
             return await Meowth.send_message(
                 channel, "Invalid format, please check and try again.")
     team_total = mystic[1] + instinct[1] + valor[1]
-    if total and my_team:
+    if total:
         if int(team_total) > int(total):
             return await Meowth.send_message(channel,
                 "Team counts are higher than the total. "
                 "Double check your counts and try again. You might need to "
-                "update your total. I currently have {total} total and "
-                "you entered {team_total} in your party.").format(total=total,
-                team_total=team_total)
-        if int(total) > int(team_total):
+                "update your total. I currently have **"+str(total)+"** total "
+                "and you entered **"+str(team_total)+"** in your party.")
+        if int(total) > int(team_total) and my_team:
             if team_aliases[my_team][1]:
-                return await Meowth.send_message(
-                    channel,
-                    ("Your team counts don't match the total amount. "
-                    "Double check your counts and try again."))
+                return await Meowth.send_message(channel,
+                    "Your team counts don't match the total amount. "
+                    "Double check your counts and try again. You might need to "
+                    "update your total. I currently have **"+str(total)+"** total "
+                    "and you entered **"+str(team_total)+"** in your party.")
             team_aliases[my_team][1] = total - team_total
 
     partylist = [mystic[1], valor[1], instinct[1]]
@@ -3918,15 +3927,16 @@ async def _teamlist(ctx):
             redmaybe += int(trainer_dict[trainer]['party'][1])
             yellowmaybe += int(trainer_dict[trainer]['party'][2])
             othermaybe += trainer_dict[trainer]['count']-total
+    othercount = othermaybe+othercoming+otherwaiting
     if bluecount > 0:
         teamliststr += _("{blue_emoji} **{blue_number} total,** {bluemaybe} interested, {bluecoming} coming, {bluewaiting} waiting {blue_emoji}\n").format(blue_number=bluecount, blue_emoji=parse_emoji(ctx.message.server, config['team_dict']['mystic']), bluemaybe=bluemaybe, bluecoming=bluecoming, bluewaiting=bluewaiting)
     if redcount > 0:
         teamliststr += _("{red_emoji} **{red_number} total,** {redmaybe} interested, {redcoming} coming, {redwaiting} waiting {red_emoji}\n").format(red_number=redcount, red_emoji=parse_emoji(ctx.message.server, config['team_dict']['valor']), redmaybe=redmaybe, redcoming=redcoming, redwaiting=redwaiting)
     if yellowcount > 0:
         teamliststr += _("{yellow_emoji} **{yellow_number} total,** {yellowmaybe} interested, {yellowcoming} coming, {yellowwaiting} waiting {yellow_emoji}\n").format(yellow_number=yellowcount, yellow_emoji=parse_emoji(ctx.message.server, config['team_dict']['instinct']), yellowmaybe=yellowmaybe, yellowcoming=yellowcoming, yellowwaiting=yellowwaiting)
-    if (othermaybe+othercoming+otherwaiting) > 0:
-        teamliststr += _("❔ **{grey_number} unknown,** {greymaybe} interested, {greycoming} coming, {greywaiting} waiting ❔\n").format(grey_number=othermaybe+othercoming+otherwaiting, greymaybe=othermaybe, greycoming=othercoming, greywaiting=otherwaiting)
-    if (bluecount+redcount+yellowcount) > 0:
+    if othercount > 0:
+        teamliststr += _("{grey_emoji} **{grey_number} other,** {greymaybe} interested, {greycoming} coming, {greywaiting} waiting {grey_emoji}").format(grey_emoji = parse_emoji(ctx.message.server, config['team_dict']['harmony']),grey_number=othercount, greymaybe=othermaybe, greycoming=othercoming, greywaiting=otherwaiting)
+    if (bluecount+redcount+yellowcount+othercount) > 0:
         listmsg = _(" Team numbers for the raid:\n{}").format(teamliststr)
     else:
         listmsg = _(" Nobody has updated their status!")

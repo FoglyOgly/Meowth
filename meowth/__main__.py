@@ -2601,7 +2601,8 @@ async def _timerset(raidchannel, exptime):
     # Send message
     timerstr = await print_raid_timer(raidchannel)
     await Meowth.send_message(raidchannel, timerstr)
-    # Edit topic
+    # Edit channel name and topic
+    new_name = raidchannel.name.lstrip("expired-")
     topicstr = ""
     if server_dict[server.id]['raidchannel_dict'][raidchannel.id]['type'] == "egg":
         egglevel = server_dict[server.id]['raidchannel_dict'][raidchannel.id]['egglevel']
@@ -2611,7 +2612,7 @@ async def _timerset(raidchannel, exptime):
         topicstr += _("Ends on {end}").format(end=end.strftime("%B %d at %I:%M %p (%H:%M)"))
     else:
         topicstr += _("Ends on {end}").format(end=end.strftime("%B %d at %I:%M %p (%H:%M)"))
-    await Meowth.edit_channel(raidchannel, topic=topicstr)
+    await Meowth.edit_channel(raidchannel, topic=topicstr, name=new_name)
     raidchannel = Meowth.get_channel(raidchannel.id)
     # Trigger expiry checking
     event_loop.create_task(expiry_check(raidchannel))

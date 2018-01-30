@@ -3908,7 +3908,7 @@ async def _teamlist(ctx):
     bluecount = 0
     redcount = 0
     yellowcount = 0
-    total = 0
+    othercount = 0
     redmaybe = 0
     redcoming = 0
     redwaiting = 0
@@ -3927,23 +3927,22 @@ async def _teamlist(ctx):
         bluecount += int(trainer_dict[trainer]['party'][0])
         redcount += int(trainer_dict[trainer]['party'][1])
         yellowcount += int(trainer_dict[trainer]['party'][2])
-        total = int(trainer_dict[trainer]['party'][0]) + int(trainer_dict[trainer]['party'][1]) + int(trainer_dict[trainer]['party'][2])
+        othercount += int(trainer_dict[trainer]['party'][3])
         if trainer_dict[trainer]['status'] == "waiting":
             bluewaiting += int(trainer_dict[trainer]['party'][0])
             redwaiting += int(trainer_dict[trainer]['party'][1])
             yellowwaiting += int(trainer_dict[trainer]['party'][2])
-            otherwaiting += trainer_dict[trainer]['count']-total
+            otherwaiting += int(trainer_dict[trainer]['party'][3])
         elif trainer_dict[trainer]['status'] == "omw":
             bluecoming += int(trainer_dict[trainer]['party'][0])
             redcoming += int(trainer_dict[trainer]['party'][1])
             yellowcoming += int(trainer_dict[trainer]['party'][2])
-            othercoming += trainer_dict[trainer]['count']-total
+            othercoming += int(trainer_dict[trainer]['party'][3])
         elif trainer_dict[trainer]['status'] == "maybe":
             bluemaybe += int(trainer_dict[trainer]['party'][0])
             redmaybe += int(trainer_dict[trainer]['party'][1])
             yellowmaybe += int(trainer_dict[trainer]['party'][2])
-            othermaybe += trainer_dict[trainer]['count']-total
-    othercount = othermaybe+othercoming+otherwaiting
+            othermaybe += int(trainer_dict[trainer]['party'][3])
     if bluecount > 0:
         teamliststr += _("{blue_emoji} **{blue_number} total,** {bluemaybe} interested, {bluecoming} coming, {bluewaiting} waiting {blue_emoji}\n").format(blue_number=bluecount, blue_emoji=parse_emoji(ctx.message.server, config['team_dict']['mystic']), bluemaybe=bluemaybe, bluecoming=bluecoming, bluewaiting=bluewaiting)
     if redcount > 0:

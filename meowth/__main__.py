@@ -3054,7 +3054,8 @@ async def interested(ctx, *, teamcounts: str = None):
             bluecount = str(trainer_dict[ctx.message.author.id]['party'][0])+"m "
             redcount = str(trainer_dict[ctx.message.author.id]['party'][1])+"v "
             yellowcount = str(trainer_dict[ctx.message.author.id]['party'][2])+"i "
-            teamcounts = str(trainer_dict[ctx.message.author.id]['count']) +" "+ bluecount + redcount + yellowcount
+            unknowncount = str(trainer_dict[ctx.message.author.id]['party'][3])+"i "
+            teamcounts = str(trainer_dict[ctx.message.author.id]['count']) +" "+ bluecount + redcount + yellowcount + unknowncount
         else:
             teamcounts = "1"
     if teamcounts.split()[0].isdigit():
@@ -3124,7 +3125,8 @@ async def coming(ctx, *, teamcounts: str = None):
             bluecount = str(trainer_dict[ctx.message.author.id]['party'][0])+"m "
             redcount = str(trainer_dict[ctx.message.author.id]['party'][1])+"v "
             yellowcount = str(trainer_dict[ctx.message.author.id]['party'][2])+"i "
-            teamcounts = str(trainer_dict[ctx.message.author.id]['count']) +" "+ bluecount + redcount + yellowcount
+            unknowncount = str(trainer_dict[ctx.message.author.id]['party'][3])+"i "
+            teamcounts = str(trainer_dict[ctx.message.author.id]['count']) +" "+ bluecount + redcount + yellowcount + unknowncount
         else:
             teamcounts = "1"
     if teamcounts.split()[0].isdigit():
@@ -3195,7 +3197,8 @@ async def here(ctx, *, teamcounts: str = None):
             bluecount = str(trainer_dict[ctx.message.author.id]['party'][0])+"m "
             redcount = str(trainer_dict[ctx.message.author.id]['party'][1])+"v "
             yellowcount = str(trainer_dict[ctx.message.author.id]['party'][2])+"i "
-            teamcounts = str(trainer_dict[ctx.message.author.id]['count']) +" "+ bluecount + redcount + yellowcount
+            unknowncount = str(trainer_dict[ctx.message.author.id]['party'][3])+"i "
+            teamcounts = str(trainer_dict[ctx.message.author.id]['count']) +" "+ bluecount + redcount + yellowcount + unknowncount
         else:
             teamcounts = "1"
     if teamcounts.split()[0].isdigit():
@@ -3256,12 +3259,15 @@ async def _party_status(ctx, total, teamcounts):
             my_team = "valor"
         elif role.name =="instinct":
             my_team = "instinct"
+    if my_team != "mystic" and my_team != "valor" and my_team != "instinct":
+        my_team = "unknown"
     teamcounts = teamcounts.split()
     if total and teamcounts[0].isdigit():
         del teamcounts[0]
     mystic = ['mystic', 0]
     instinct = ['instinct', 0]
     valor = ['valor', 0]
+    unknown = ['unknown', 0]
     team_aliases = {
         'mystic':mystic,
         'blue':mystic,
@@ -3274,10 +3280,13 @@ async def _party_status(ctx, total, teamcounts):
         'valor':valor,
         'red':valor,
         'v':valor,
-        'r':valor
+        'r':valor,
+        'unknown':unknown,
+        'grey':unknown,
+        'gray':unknown,
+        'u':unknown,
+        'g':unknown
     }
-    if not teamcounts and my_team and total:
-        team_aliases[my_team][1] = total
     regx = re.compile("([a-zA-Z]+)([0-9]+)|([0-9]+)([a-zA-Z]+)")
     for count in teamcounts:
         if count.isdigit():
@@ -3303,17 +3312,24 @@ async def _party_status(ctx, total, teamcounts):
                             continue
             return await Meowth.send_message(
                 channel, "Invalid format, please check and try again.")
-    team_total = mystic[1] + instinct[1] + valor[1]
+    team_total = mystic[1] + instinct[1] + valor[1] + unknown[1]
     if total:
         if int(team_total) > int(total):
             return await Meowth.send_message(channel,
-                "Team counts are higher than the total. "
-                "Double check your counts and try again. You might need to "
-                "update your total. I currently have **"+str(total)+"** total "
-                "and you entered **"+str(team_total)+"** in your party.")
+                "Team counts are higher than the total, "
+                "double check your counts and try again. "
+                "You entered **"+str(total)+"** total "
+                "and **"+str(team_total)+"** in your party.")
+        if int(total) > int(team_total) and my_team:
+            if team_aliases[my_team][1]:
+                return await Meowth.send_message(channel,
+                    "Your team counts don't match the total amount, "
+                    "double check your counts and try again. "
+                    "You entered **"+str(total)+"** total "
+                    "and **"+str(team_total)+"** in your party.")
+            team_aliases[my_team][1] = total - team_total
 
-
-    partylist = [mystic[1], valor[1], instinct[1]]
+    partylist = [mystic[1], valor[1], instinct[1], unknown[1]]
     result = [total,partylist]
     return result
 
@@ -3331,7 +3347,7 @@ async def _edit_party(channel, author):
         channelblue += int(trainer_dict[trainer]['party'][0])
         channelred += int(trainer_dict[trainer]['party'][1])
         channelyellow += int(trainer_dict[trainer]['party'][2])
-        channelunknown += int(trainer_dict[trainer]['count']) - int(trainer_dict[trainer]['party'][0]) - int(trainer_dict[trainer]['party'][1]) - int(trainer_dict[trainer]['party'][2])
+        channelunknown += int(trainer_dict[trainer]['party'][3])
         if trainer_dict[trainer]['status'] == "maybe":
             channelmaybe += int(trainer_dict[trainer]['count'])
         elif trainer_dict[trainer]['status'] == "omw":
@@ -3451,10 +3467,9 @@ async def _cancel(channel, author):
         else:
             await Meowth.send_message(channel, "Meowth! {member} and their total of {trainer_count} trainers have backed out of the lobby!".format(member=author.mention, trainer_count=t_dict['count']))
     t_dict['status'] = None
-    t_dict['count'] = 0
-    t_dict['party'] = [0,0,0]
-    await _edit_party(channel, author)
+    t_dict['party'] = [0,0,0,0]
     t_dict['count'] = 1
+    await _edit_party(channel, author)
 
 @Meowth.command(pass_context=True)
 @checks.activeraidchannel()
@@ -3936,7 +3951,7 @@ async def _teamlist(ctx):
     if yellowcount > 0:
         teamliststr += _("{yellow_emoji} **{yellow_number} total,** {yellowmaybe} interested, {yellowcoming} coming, {yellowwaiting} waiting {yellow_emoji}\n").format(yellow_number=yellowcount, yellow_emoji=parse_emoji(ctx.message.server, config['team_dict']['instinct']), yellowmaybe=yellowmaybe, yellowcoming=yellowcoming, yellowwaiting=yellowwaiting)
     if othercount > 0:
-        teamliststr += _("❔ **{grey_number} total,** {greymaybe} interested, {greycoming} coming, {greywaiting} waiting {grey_emoji}").format(grey_number=othercount, greymaybe=othermaybe, greycoming=othercoming, greywaiting=otherwaiting)
+        teamliststr += _("❔ **{grey_number} total,** {greymaybe} interested, {greycoming} coming, {greywaiting} waiting ❔").format(grey_number=othercount, greymaybe=othermaybe, greycoming=othercoming, greywaiting=otherwaiting)
     if (bluecount+redcount+yellowcount+othercount) > 0:
         listmsg = _(" Team numbers for the raid:\n{}").format(teamliststr)
     else:

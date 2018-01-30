@@ -4,7 +4,7 @@
         "1": {
             "egg": "normal",
             "egg_img": "1.png",
-            "pokemon": [2,5,8,11,129],
+            "pokemon": [2,5,8,11,129,320],
             "hatchtime":60,
             "raidtime":45
         },
@@ -32,7 +32,7 @@
         "5": {
             "egg": "legendary",
             "egg_img": "5.png",
-            "pokemon": [250],
+            "pokemon": [382],
             "hatchtime":60,
             "raidtime":45
         },

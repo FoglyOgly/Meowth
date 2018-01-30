@@ -2429,7 +2429,7 @@ async def invite(ctx):
 
 async def _invite(ctx):
     if 'https://cdn.discordapp.com' in ctx.message.attachments[0]['url']:
-        if 'png' in ctx.message.attachments[0]['url'].lower() or 'jpg' in ctx.message.attachments[0]['url'].lower():
+        if 'png' in ctx.message.attachments[0]['url'].lower() or 'jpg' in ctx.message.attachments[0]['url'].lower() or 'jpeg' in ctx.message.attachments[0]['url'].lower():
             fd = requests.get(ctx.message.attachments[0]['url'])
             img = Image.open(BytesIO(fd.content))
             width, height = img.size
@@ -3323,7 +3323,7 @@ async def _party_status(ctx, total, teamcounts):
                 "double check your counts and try again. "
                 "You entered **"+str(total)+"** total "
                 "and **"+str(team_total)+"** in your party.")
-        if int(total) > int(team_total) and my_team:
+        if int(total) > int(team_total):
             if team_aliases[my_team][1]:
                 return await Meowth.send_message(channel,
                     "Your team counts don't match the total amount, "

@@ -3054,7 +3054,7 @@ async def interested(ctx, *, teamcounts: str = None):
             bluecount = str(trainer_dict[ctx.message.author.id]['party'][0])+"m "
             redcount = str(trainer_dict[ctx.message.author.id]['party'][1])+"v "
             yellowcount = str(trainer_dict[ctx.message.author.id]['party'][2])+"i "
-            unknowncount = str(trainer_dict[ctx.message.author.id]['party'][3])+"i "
+            unknowncount = str(trainer_dict[ctx.message.author.id]['party'][3])+"u "
             teamcounts = str(trainer_dict[ctx.message.author.id]['count']) +" "+ bluecount + redcount + yellowcount + unknowncount
         else:
             teamcounts = "1"
@@ -3125,7 +3125,7 @@ async def coming(ctx, *, teamcounts: str = None):
             bluecount = str(trainer_dict[ctx.message.author.id]['party'][0])+"m "
             redcount = str(trainer_dict[ctx.message.author.id]['party'][1])+"v "
             yellowcount = str(trainer_dict[ctx.message.author.id]['party'][2])+"i "
-            unknowncount = str(trainer_dict[ctx.message.author.id]['party'][3])+"i "
+            unknowncount = str(trainer_dict[ctx.message.author.id]['party'][3])+"u "
             teamcounts = str(trainer_dict[ctx.message.author.id]['count']) +" "+ bluecount + redcount + yellowcount + unknowncount
         else:
             teamcounts = "1"
@@ -3197,7 +3197,7 @@ async def here(ctx, *, teamcounts: str = None):
             bluecount = str(trainer_dict[ctx.message.author.id]['party'][0])+"m "
             redcount = str(trainer_dict[ctx.message.author.id]['party'][1])+"v "
             yellowcount = str(trainer_dict[ctx.message.author.id]['party'][2])+"i "
-            unknowncount = str(trainer_dict[ctx.message.author.id]['party'][3])+"i "
+            unknowncount = str(trainer_dict[ctx.message.author.id]['party'][3])+"u "
             teamcounts = str(trainer_dict[ctx.message.author.id]['count']) +" "+ bluecount + redcount + yellowcount + unknowncount
         else:
             teamcounts = "1"

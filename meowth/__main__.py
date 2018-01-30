@@ -2602,7 +2602,9 @@ async def _timerset(raidchannel, exptime):
     timerstr = await print_raid_timer(raidchannel)
     await Meowth.send_message(raidchannel, timerstr)
     # Edit channel name and topic
-    new_name = raidchannel.name.lstrip("expired-")
+    new_name = raidchannel.name
+    if raidchannel.name.startswith("expired-"):
+        new_name = raidchannel.name[len("expired-"):]
     topicstr = ""
     if server_dict[server.id]['raidchannel_dict'][raidchannel.id]['type'] == "egg":
         egglevel = server_dict[server.id]['raidchannel_dict'][raidchannel.id]['egglevel']

@@ -3877,7 +3877,7 @@ async def _lobbylist(ctx, tag=False):
     listmsg = (_(" {trainer_count} in the lobby{including_string}!").format(trainer_count=str(ctx_lobbycount), including_string=lobby_exstr))
     return listmsg
 
-@list.command(pass_context=True)
+@list.command(pass_context=True, aliases=['team'])
 @checks.activeraidchannel()
 async def teams(ctx):
     """List the teams for the users that have RSVP'd to a raid.

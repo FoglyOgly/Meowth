@@ -3326,11 +3326,15 @@ async def _party_status(ctx, total, teamcounts):
                 "Team counts are higher than the total, "
                 "double check your counts and try again. "
                 "You entered **"+str(total)+"** total "
-                "and **"+str(team_total)+"** in your party.")
-        if int(total) > int(team_total) and teamcounts:
-            unknown[1] += total-team_total
-        elif int(total) > int(team_total) and not teamcounts:
-            team_aliase[my_team][1] = total - team_total
+                 "and **"+str(team_total)+"** in your party.")
+        if int(total) > int(team_total):
+            if team_aliases[my_team][1]:
+                return await Meowth.send_message(channel,
+                    "Your team counts don't match the total amount, "
+                    "double check your counts and try again. "
+                    "You entered **"+str(total)+"** total "
+                    "and **"+str(team_total)+"** in your party.")
+            team_aliases[my_team][1] = total - team_total
 
     partylist = [mystic[1], valor[1], instinct[1], unknown[1]]
     result = [total,partylist]

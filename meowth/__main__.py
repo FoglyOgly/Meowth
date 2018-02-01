@@ -1456,7 +1456,7 @@ async def team(ctx):
     for team in config['team_dict'].keys():
         if team.lower() not in lowercase_roles:
             try:
-                temp_role = await Meowth.create_role(server, name=team.lower())
+                temp_role = await Meowth.create_role(server, name=team.lower(),hoist = False, mentionable = True))
                 server_roles.append(team.lower())
             except discord.errors.HTTPException:
                 await Meowth.send_message(message.channel, "Maximum guild roles reached.")

@@ -247,7 +247,7 @@ def print_emoji_name(server, emoji_string):
 # Given an arbitrary string, create a Google Maps
 # query using the configured hints
 def create_gmaps_query(details, channel):
-    if "/maps" in details:
+    if "/maps" in details and "http" in details:
         mapsindex = details.find("/maps")
         newlocindex = details.rfind("http", 0, mapsindex)
         if newlocindex == -1:
@@ -718,7 +718,7 @@ async def on_message(message):
                     emoji_count = message.content.count(here_emoji)
                     await _here(message.channel, message.author, emoji_count, party=None)
                     return
-                if "/maps" in message.content:
+                if "/maps" in message.content and "http" in message.content:
                     newloc = create_gmaps_query(message.content, message.channel)
                     oldraidmsg = await Meowth.get_message(message.channel, server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['raidmessage'])
                     report_channel = Meowth.get_channel(server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['reportcity'])

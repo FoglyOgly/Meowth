@@ -363,17 +363,19 @@ If this was in error, reset the raid with **!timerset**"""))
             delete_time = server_dict[server.id]['raidchannel_dict'][channel.id]['exp'] + (1 * 60) - time.time()
         elif server_dict[server.id]['raidchannel_dict'][channel.id]['type'] == 'egg':
             if not alreadyexpired:
+                egg_level = server_dict[channel.server.id]['raidchannel_dict'][channel.id]['egglevel']
                 maybe_list = []
                 trainer_dict = copy.deepcopy(server_dict[channel.server.id]['raidchannel_dict'][channel.id]['trainer_dict'])
                 for trainer in trainer_dict.keys():
                     if trainer_dict[trainer]['status']=='maybe':
                         user = channel.server.get_member(trainer)
                         maybe_list.append(user.mention)
-                new_name = "hatched-" + channel.name
-                await Meowth.edit_channel(channel,name=new_name)
+                if len(raid_info['raid_eggs'][egg_level]['pokemon']) > 1:
+                    new_name = "hatched-" + channel.name
+                    await Meowth.edit_channel(channel,name=new_name)
                 await Meowth.send_message(channel, _("""**This egg has hatched!**\n\n...or the time has just expired. Trainers {trainer_list}: Update the raid to the pokemon that hatched using **!raid <pokemon>** or reset the hatch timer with **!timerset**. This channel will be deactivated until I get an update and I'll delete it in 45 minutes if I don't hear anything.""").format(trainer_list=", ".join(maybe_list)))
             delete_time = server_dict[server.id]['raidchannel_dict'][channel.id]['exp'] + (45 * 60) - time.time()
-            expiremsg = _("**This level {level} raid egg has expired!**").format(level=server_dict[channel.server.id]['raidchannel_dict'][channel.id]['egglevel'])
+            expiremsg = _("**This level {level} raid egg has expired!**").format(level=egg_level)
         else:
             if not alreadyexpired:
                 new_name = "expired-" + channel.name

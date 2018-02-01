@@ -2912,14 +2912,19 @@ async def recover(ctx):
                                 status = None
                             if "trainers" in message.content:
                                 messagesplit = message.content.split()
-                                if messagesplit[-2].isdigit():
-                                    count = int(messagesplit[-2])
+                                if messagesplit[-13].isdigit():
+                                    count = int(messagesplit[-13])
                                 else:
                                     count = 1
+                                if messagesplit[-1].isdigit():
+                                    party = [int(messagesplit[-10]),int(messagesplit[-7]),int(messagesplit[-4]),int(messagesplit[-1])]
+                                else:
+                                    party = [0,0,0,count]
                             else:
                                 count = 1
+                                party = [0,0,0,count]
 
-                            trainer_dict[trainerid] = {'status': status, 'count': count}
+                            trainer_dict[trainerid] = {'status': status, 'count': count, 'party': party}
                         else:
                             continue
                     else:

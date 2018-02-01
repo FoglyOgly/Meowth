@@ -1447,43 +1447,41 @@ async def team(ctx):
     position = server.me.top_role.position
     team_msg = " or ".join(["**!team {0}**".format(team) for team in config['team_dict'].keys()])
     high_roles = []
-
+    server_roles = []
+    lowercase_roles = []
+    for role in server.roles:
+        if role.name.lower() in config['team_dict']:
+            server_roles.append(role.name)
+    lowercase_roles = [element.lower() for element in server_roles]
     for team in config['team_dict'].keys():
-        temp_role = discord.utils.get(server.roles, name=team.lower())
-        if not temp_role:
-            temp_role = discord.utils.get(server.roles, name=team.capitalize())
-        if not temp_role:
+        if team.lower() not in lowercase_roles:
             try:
                 temp_role = await Meowth.create_role(server, name=team.lower())
+                server_roles.append(team.lower())
             except discord.errors.HTTPException:
-                pass
-        if temp_role.position > position:
-            high_roles.append(temp_role.name)
-
+                await Meowth.send_message(message.channel, "Maximum guild roles reached.")
+                return
+            if temp_role.position > position:
+                high_roles.append(temp_role.name)
     if high_roles:
         await Meowth.send_message(ctx.message.channel, _("Meowth! My roles are ranked lower than the following team roles: **{higher_roles_list}**\nPlease get an admin to move my roles above them!").format(higher_roles_list=', '.join(high_roles)))
         return
-
     role = None
     team_split = ctx.message.clean_content.lower().split()
     del team_split[0]
     entered_team = team_split[0]
     entered_team = ''.join([i for i in entered_team if i.isalpha()])
-    role = discord.utils.get(ctx.message.server.roles, name=entered_team)
-    if not role:
-        role = discord.utils.get(ctx.message.server.roles, name=entered_team.capitalize())
-    harmony = discord.utils.get(ctx.message.server.roles, name ="harmony")
-    if not harmony:
-        harmony = discord.utils.get(ctx.message.server.roles, name ="Harmony")
-
+    if entered_team in lowercase_roles:
+        index = lowercase_roles.index(entered_team)
+        role = discord.utils.get(ctx.message.server.roles, name=server_roles[index])
+    if "harmony" in lowercase_roles:
+        index = lowercase_roles.index("harmony")
+        harmony = discord.utils.get(ctx.message.server.roles, name=server_roles[index])
     # Check if user already belongs to a team role by
     # getting the role objects of all teams in team_dict and
     # checking if the message author has any of them.
-    for team in config['team_dict'].keys():
-        temp_role = discord.utils.get(ctx.message.server.roles, name=team.lower())
-        if not temp_role:
-            temp_role = discord.utils.get(ctx.message.server.roles, name=team.capitalize())
-        # If the role is valid,
+    for team in server_roles:
+        temp_role = discord.utils.get(ctx.message.server.roles, name=team)
         if temp_role:
             # and the user has this role,
             if temp_role in ctx.message.author.roles and harmony not in ctx.message.author.roles:

@@ -1447,10 +1447,12 @@ async def team(ctx):
     high_roles = []
 
     for team in config['team_dict'].keys():
-        temp_role = discord.utils.get(server.roles, name=team)
+        temp_role = discord.utils.get(server.roles, name=team.lower())
+        if not temp_role:
+            temp_role = discord.utils.get(server.roles, name=team.capitalize())
         if not temp_role:
             try:
-                temp_role = await Meowth.create_role(server, name=team)
+                temp_role = await Meowth.create_role(server, name=team.lower())
             except discord.errors.HTTPException:
                 pass
         if temp_role.position > position:
@@ -1464,15 +1466,21 @@ async def team(ctx):
     team_split = ctx.message.clean_content.lower().split()
     del team_split[0]
     entered_team = team_split[0]
+    entered_team = ''.join([i for i in entered_team if i.isalpha()])
     role = discord.utils.get(ctx.message.server.roles, name=entered_team)
+    if not role:
+        role = discord.utils.get(ctx.message.server.roles, name=entered_team.capitalize())
     harmony = discord.utils.get(ctx.message.server.roles, name ="harmony")
-
+    if not harmony:
+        harmony = discord.utils.get(ctx.message.server.roles, name ="Harmony")
 
     # Check if user already belongs to a team role by
     # getting the role objects of all teams in team_dict and
     # checking if the message author has any of them.
     for team in config['team_dict'].keys():
-        temp_role = discord.utils.get(ctx.message.server.roles, name=team)
+        temp_role = discord.utils.get(ctx.message.server.roles, name=team.lower())
+        if not temp_role:
+            temp_role = discord.utils.get(ctx.message.server.roles, name=team.capitalize())
         # If the role is valid,
         if temp_role:
             # and the user has this role,
@@ -1480,7 +1488,7 @@ async def team(ctx):
                 # then report that a role is already assigned
                 await Meowth.send_message(ctx.message.channel, _("Meowth! You already have a team role!"))
                 return
-            if role and role.name == "harmony" and harmony in ctx.message.author.roles:
+            if role and role.name.lower() == "harmony" and harmony in ctx.message.author.roles:
                 # then report that a role is already assigned
                 await Meowth.send_message(ctx.message.channel, _("Meowth! You are already in Team Harmony!"))
                 return
@@ -2927,7 +2935,6 @@ async def recover(ctx):
                             else:
                                 count = 1
                                 party = [0,0,0,count]
-
                             trainer_dict[trainerid] = {'status': status, 'count': count, 'party': party}
                         else:
                             continue
@@ -3111,8 +3118,7 @@ async def _maybe(channel, author, count, party):
             else:
                 allunknown = count
             party = [allblue, allred, allyellow, allunknown]
-        await Meowth.send_message(channel, _("Meowth! {member} is interested with a total of {trainer_count} trainers! {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | :grey_question:: {unknown}").format(
-        member=author.mention, trainer_count=count, blue_emoji=parse_emoji(channel.server, config['team_dict']['mystic']),mystic=party[0],red_emoji=parse_emoji(channel.server, config['team_dict']['valor']),valor=party[1], instinct=party[2], yellow_emoji=parse_emoji(channel.server,config['team_dict']['instinct']), unknown=party[3]))
+        await Meowth.send_message(channel, _("Meowth! {member} is interested with a total of {trainer_count} trainers! {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | :grey_question:: {unknown}").format(member=author.mention, trainer_count=count, blue_emoji=parse_emoji(channel.server, config['team_dict']['mystic']),mystic=party[0],red_emoji=parse_emoji(channel.server, config['team_dict']['valor']),valor=party[1], instinct=party[2], yellow_emoji=parse_emoji(channel.server,config['team_dict']['instinct']), unknown=party[3]))
 
     # Add trainer name to trainer list
     if author.id not in server_dict[channel.server.id]['raidchannel_dict'][channel.id]['trainer_dict']:
@@ -3192,8 +3198,7 @@ async def _coming(channel, author, count, party):
             else:
                 allunknown = count
             party = [allblue, allred, allyellow, allunknown]
-        await Meowth.send_message(channel, _("Meowth! {member} is on the way with a total of {trainer_count} trainers! {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | :grey_question:: {unknown}").format(
-        member=author.mention, trainer_count=count, blue_emoji=parse_emoji(channel.server, config['team_dict']['mystic']),mystic=party[0],red_emoji=parse_emoji(channel.server, config['team_dict']['valor']),valor=party[1], instinct=party[2], yellow_emoji=parse_emoji(channel.server,config['team_dict']['instinct']), unknown=party[3]))
+        await Meowth.send_message(channel, _("Meowth! {member} is on the way with a total of {trainer_count} trainers! {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | :grey_question:: {unknown}").format(member=author.mention, trainer_count=count, blue_emoji=parse_emoji(channel.server, config['team_dict']['mystic']),mystic=party[0],red_emoji=parse_emoji(channel.server, config['team_dict']['valor']),valor=party[1], instinct=party[2], yellow_emoji=parse_emoji(channel.server,config['team_dict']['instinct']), unknown=party[3]))
 
     # Add trainer name to trainer list
     if author.id not in trainer_dict:
@@ -3278,8 +3283,7 @@ async def _here(channel, author, count, party):
             else:
                 allunknown = count
             party = [allblue, allred, allyellow, allunknown]
-        await Meowth.send_message(channel, _("Meowth! {member} is at the raid with a total of {trainer_count} trainers! {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | :grey_question:: {unknown}"+lobbymsg).format(
-        member=author.mention, trainer_count=count, blue_emoji=parse_emoji(channel.server, config['team_dict']['mystic']),mystic=party[0],red_emoji=parse_emoji(channel.server, config['team_dict']['valor']),valor=party[1], instinct=party[2], yellow_emoji=parse_emoji(channel.server,config['team_dict']['instinct']), unknown=party[3]))
+        await Meowth.send_message(channel, _("Meowth! {member} is at the raid with a total of {trainer_count} trainers! {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | :grey_question:: {unknown}"+lobbymsg).format(member=author.mention, trainer_count=count, blue_emoji=parse_emoji(channel.server, config['team_dict']['mystic']),mystic=party[0],red_emoji=parse_emoji(channel.server, config['team_dict']['valor']),valor=party[1], instinct=party[2], yellow_emoji=parse_emoji(channel.server,config['team_dict']['instinct']), unknown=party[3]))
     # Add trainer name to trainer list
     if author.id not in trainer_dict:
         trainer_dict[author.id] = {}

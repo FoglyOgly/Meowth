@@ -1498,7 +1498,8 @@ async def team(ctx):
         await Meowth.send_message(ctx.message.channel, _("Meowth! The \"{entered_team}\" role isn't configured on this server! Contact an admin!").format(entered_team=entered_team))
     else:
         try:
-            await Meowth.remove_roles(ctx.message.author, harmony)
+            if harmony and harmony in ctx.message.author.roles:
+                await Meowth.remove_roles(ctx.message.author, harmony)
             await Meowth.add_roles(ctx.message.author, role)
             await Meowth.send_message(ctx.message.channel, _("Meowth! Added {member} to Team {team_name}! {team_emoji}").format(member=ctx.message.author.mention, team_name=role.name.capitalize(), team_emoji=parse_emoji(ctx.message.server, config['team_dict'][entered_team])))
         except discord.Forbidden:

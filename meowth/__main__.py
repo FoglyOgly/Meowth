@@ -4005,9 +4005,9 @@ async def _teamlist(ctx):
 @list.command(pass_context=True)
 @checks.activeraidchannel()
 async def tags(ctx):
-    """List the teams for the users that have RSVP'd to a raid.
+    """List mentions of the users that have RSVP'd to a raid.
 
-    Usage: !list teams
+    Usage: !list tags
     Works only in raid channels."""
     server = ctx.message.server
     channel = ctx.message.channel

@@ -3368,7 +3368,10 @@ async def _edit_party(channel, author):
             channelhere += int(trainer_dict[trainer]['count'])
     channeltotal = channelmaybe + channelcoming + channelhere
     reportchannel = Meowth.get_channel(server_dict[channel.server.id]['raidchannel_dict'][channel.id]['reportcity'])
-    reportmsg = await Meowth.get_message(reportchannel, server_dict[channel.server.id]['raidchannel_dict'][channel.id]['raidreport'])
+    try:
+        reportmsg = await Meowth.get_message(reportchannel, server_dict[channel.server.id]['raidchannel_dict'][channel.id]['raidreport'])
+    except:
+        pass
     raidmsg = await Meowth.get_message(channel, server_dict[channel.server.id]['raidchannel_dict'][channel.id]['raidmessage'])
     reportembed = raidmsg.embeds[0]
     newembed = discord.Embed(title=reportembed['title'],url=reportembed['url'],colour=channel.server.me.colour)

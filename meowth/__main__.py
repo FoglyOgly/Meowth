@@ -632,6 +632,7 @@ async def on_ready():
 
         owners.append(server.owner)
 
+
     await _print(Meowth.owner,_("Meowth! That's right!\n\n{server_count} servers connected.\n{member_count} members found.").format(server_count=servers,member_count=users))
 
     await maint_start()
@@ -1479,7 +1480,7 @@ async def team(ctx):
                 # then report that a role is already assigned
                 await Meowth.send_message(ctx.message.channel, _("Meowth! You already have a team role!"))
                 return
-            if role.name == "harmony" and harmony in ctx.message.author.roles:
+            if role and role.name == "harmony" and harmony in ctx.message.author.roles:
                 # then report that a role is already assigned
                 await Meowth.send_message(ctx.message.channel, _("Meowth! You are already in Team Harmony!"))
                 return

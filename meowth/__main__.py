@@ -4066,7 +4066,10 @@ async def _wantlist(ctx):
     for role in ctx.message.author.roles:
         if role.name in pkmn_info['pokemon_list']:
             wantlist.append(role.name.title())
-    await Meowth.send_message(ctx.message.channel, _("Your current !want list is: ```{wantlist}```").format(wantlist=", ".join(wantlist)))
+    if len(wantlist)>0:
+        listmsg = " Your current **!want** list is: ```{wantlist}```".format(wantlist=", ".join(wantlist))
+    else:
+        listmsg = " You don't have any wants! use **!want** to add some."
     return listmsg
 
 # @list.command(pass_context=True)

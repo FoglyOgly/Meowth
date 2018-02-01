@@ -4012,6 +4012,9 @@ async def tags(ctx):
 
     Usage: !list teams
     Works only in raid channels."""
+    server = ctx.message.server
+    channel = ctx.message.channel
+    now = datetime.datetime.utcnow() + datetime.timedelta(hours=server_dict[server.id]['offset'])
     if checks.check_raidchannel(ctx):
         if checks.check_raidactive(ctx):
             listmsg = "**Meowth!** "

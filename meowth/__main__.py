@@ -1043,14 +1043,22 @@ async def configure(ctx):
             teamreply = await Meowth.wait_for_message(author = owner, check=lambda message: message.server is None)
             if teamreply.content.lower() == "y":
                 server_dict_temp['team']=True
+                high_roles = []
+                server_roles = []
+                lowercase_roles = []
+                for role in server.roles:
+                    if role.name.lower() in config['team_dict'] and role.name not in server_roles:
+                        server_roles.append(role.name)
+                lowercase_roles = [element.lower() for element in server_roles]
                 for team in config['team_dict'].keys():
-                    temp_role = discord.utils.get(server.roles, name=team)
-                    if temp_role == None:
+                    if team.lower() not in lowercase_roles:
                         try:
-                            await Meowth.create_role(server = server, name = team, hoist = False, mentionable = True)
+                            temp_role = await Meowth.create_role(server=server, name=team.lower(), hoist = False, mentionable = True)
+                            server_roles.append(team.lower())
                         except discord.errors.HTTPException:
-                            pass
-                await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.green(), description="Team Assignments enabled!"))
+                            await Meowth.send_message(owner, "Maximum guild roles reached.")
+                            return
+                await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.green(), description="Team Assignments enabled! I've made some roles for you if you didn't have them, but please ensure you only have one role per team."))
                 break
             elif teamreply.content.lower() == "n":
                 server_dict_temp['team']=False
@@ -1450,7 +1458,7 @@ async def team(ctx):
     server_roles = []
     lowercase_roles = []
     for role in server.roles:
-        if role.name.lower() in config['team_dict']:
+        if role.name.lower() in config['team_dict'] and role.name not in server_roles:
             server_roles.append(role.name)
     lowercase_roles = [element.lower() for element in server_roles]
     for team in config['team_dict'].keys():

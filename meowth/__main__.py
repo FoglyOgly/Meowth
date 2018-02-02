@@ -2408,6 +2408,7 @@ Message **!starting** when the raid is beginning to clear the raid's 'here' list
 
 This channel will be deleted five minutes after the timer expires.""").format(member=message.author.mention, citychannel=message.channel.mention, location_details=raid_details)
     raidmessage = await Meowth.send_message(raid_channel, content = raidmsg, embed=raid_embed)
+    await Meowth.pin_message(raidmessage)
 
     server_dict[message.server.id]['raidchannel_dict'][raid_channel.id] = {
         'reportcity' : channel.id,

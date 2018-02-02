@@ -247,7 +247,7 @@ def print_emoji_name(server, emoji_string):
 # Given an arbitrary string, create a Google Maps
 # query using the configured hints
 def create_gmaps_query(details, channel):
-    if "/maps" in details:
+    if "/maps" in details and "http" in details:
         mapsindex = details.find("/maps")
         newlocindex = details.rfind("http", 0, mapsindex)
         if newlocindex == -1:
@@ -363,17 +363,19 @@ If this was in error, reset the raid with **!timerset**"""))
             delete_time = server_dict[server.id]['raidchannel_dict'][channel.id]['exp'] + (1 * 60) - time.time()
         elif server_dict[server.id]['raidchannel_dict'][channel.id]['type'] == 'egg':
             if not alreadyexpired:
+                egg_level = server_dict[channel.server.id]['raidchannel_dict'][channel.id]['egglevel']
                 maybe_list = []
                 trainer_dict = copy.deepcopy(server_dict[channel.server.id]['raidchannel_dict'][channel.id]['trainer_dict'])
                 for trainer in trainer_dict.keys():
                     if trainer_dict[trainer]['status']=='maybe':
                         user = channel.server.get_member(trainer)
                         maybe_list.append(user.mention)
-                new_name = "hatched-" + channel.name
-                await Meowth.edit_channel(channel,name=new_name)
+                if len(raid_info['raid_eggs'][egg_level]['pokemon']) > 1:
+                    new_name = "hatched-" + channel.name
+                    await Meowth.edit_channel(channel,name=new_name)
                 await Meowth.send_message(channel, _("""**This egg has hatched!**\n\n...or the time has just expired. Trainers {trainer_list}: Update the raid to the pokemon that hatched using **!raid <pokemon>** or reset the hatch timer with **!timerset**. This channel will be deactivated until I get an update and I'll delete it in 45 minutes if I don't hear anything.""").format(trainer_list=", ".join(maybe_list)))
             delete_time = server_dict[server.id]['raidchannel_dict'][channel.id]['exp'] + (45 * 60) - time.time()
-            expiremsg = _("**This level {level} raid egg has expired!**").format(level=server_dict[channel.server.id]['raidchannel_dict'][channel.id]['egglevel'])
+            expiremsg = _("**This level {level} raid egg has expired!**").format(level=egg_level)
         else:
             if not alreadyexpired:
                 new_name = "expired-" + channel.name
@@ -716,7 +718,7 @@ async def on_message(message):
                     emoji_count = message.content.count(here_emoji)
                     await _here(message.channel, message.author, emoji_count, party=None)
                     return
-                if "/maps" in message.content:
+                if "/maps" in message.content and "http" in message.content:
                     newloc = create_gmaps_query(message.content, message.channel)
                     oldraidmsg = await Meowth.get_message(message.channel, server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['raidmessage'])
                     report_channel = Meowth.get_channel(server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['reportcity'])
@@ -1041,14 +1043,22 @@ async def configure(ctx):
             teamreply = await Meowth.wait_for_message(author = owner, check=lambda message: message.server is None)
             if teamreply.content.lower() == "y":
                 server_dict_temp['team']=True
+                high_roles = []
+                server_roles = []
+                lowercase_roles = []
+                for role in server.roles:
+                    if role.name.lower() in config['team_dict'] and role.name not in server_roles:
+                        server_roles.append(role.name)
+                lowercase_roles = [element.lower() for element in server_roles]
                 for team in config['team_dict'].keys():
-                    temp_role = discord.utils.get(server.roles, name=team)
-                    if temp_role == None:
+                    if team.lower() not in lowercase_roles:
                         try:
-                            await Meowth.create_role(server = server, name = team, hoist = False, mentionable = True)
+                            temp_role = await Meowth.create_role(server=server, name=team.lower(), hoist = False, mentionable = True)
+                            server_roles.append(team.lower())
                         except discord.errors.HTTPException:
-                            pass
-                await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.green(), description="Team Assignments enabled!"))
+                            await Meowth.send_message(owner, "Maximum guild roles reached.")
+                            return
+                await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.green(), description="Team Assignments enabled! I've made some roles for you if you didn't have them, but please ensure you only have one role per team."))
                 break
             elif teamreply.content.lower() == "n":
                 server_dict_temp['team']=False
@@ -1344,11 +1354,10 @@ async def setstatus(ctx, user, status, count=None):
             count = server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['trainer_dict'][user.id]['count']
         except KeyError:
             count = 1
-    if not party:
-        try:
-            party = server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['trainer_dict'][user.id]['party']
-        except KeyError:
-            party = [0,0,0,count]
+    try:
+        party = server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['trainer_dict'][user.id]['party']
+    except KeyError:
+        party = [0,0,0,count]
     if status == "maybe" or status == "interested" or status == "i":
         await _maybe(ctx.message.channel, user, count, party)
     elif status == "omw" or status == "coming" or status == "c":
@@ -1445,42 +1454,48 @@ async def team(ctx):
     position = server.me.top_role.position
     team_msg = " or ".join(["**!team {0}**".format(team) for team in config['team_dict'].keys()])
     high_roles = []
-
+    server_roles = []
+    lowercase_roles = []
+    for role in server.roles:
+        if role.name.lower() in config['team_dict'] and role.name not in server_roles:
+            server_roles.append(role.name)
+    lowercase_roles = [element.lower() for element in server_roles]
     for team in config['team_dict'].keys():
-        temp_role = discord.utils.get(server.roles, name=team)
-        if not temp_role:
+        if team.lower() not in lowercase_roles:
             try:
-                temp_role = await Meowth.create_role(server, name=team)
+                temp_role = await Meowth.create_role(server, name=team.lower(),hoist = False, mentionable = True))
+                server_roles.append(team.lower())
             except discord.errors.HTTPException:
-                pass
-        if temp_role.position > position:
-            high_roles.append(temp_role.name)
-
+                await Meowth.send_message(message.channel, "Maximum guild roles reached.")
+                return
+            if temp_role.position > position:
+                high_roles.append(temp_role.name)
     if high_roles:
         await Meowth.send_message(ctx.message.channel, _("Meowth! My roles are ranked lower than the following team roles: **{higher_roles_list}**\nPlease get an admin to move my roles above them!").format(higher_roles_list=', '.join(high_roles)))
         return
-
     role = None
     team_split = ctx.message.clean_content.lower().split()
     del team_split[0]
     entered_team = team_split[0]
-    role = discord.utils.get(ctx.message.server.roles, name=entered_team)
-    harmony = discord.utils.get(ctx.message.server.roles, name ="harmony")
-
-
+    entered_team = ''.join([i for i in entered_team if i.isalpha()])
+    if entered_team in lowercase_roles:
+        index = lowercase_roles.index(entered_team)
+        role = discord.utils.get(ctx.message.server.roles, name=server_roles[index])
+    if "harmony" in lowercase_roles:
+        index = lowercase_roles.index("harmony")
+        harmony = discord.utils.get(ctx.message.server.roles, name=server_roles[index])
     # Check if user already belongs to a team role by
     # getting the role objects of all teams in team_dict and
     # checking if the message author has any of them.
-    for team in config['team_dict'].keys():
+    for team in server_roles:
         temp_role = discord.utils.get(ctx.message.server.roles, name=team)
-        # If the role is valid,
         if temp_role:
             # and the user has this role,
             if temp_role in ctx.message.author.roles and harmony not in ctx.message.author.roles:
                 # then report that a role is already assigned
                 await Meowth.send_message(ctx.message.channel, _("Meowth! You already have a team role!"))
                 return
-            if role and role.name == "harmony" and harmony in ctx.message.author.roles:
+            if role and role.name.lower() == "harmony" and harmony in ctx.message.author.roles:
                 # then report that a role is already assigned
                 await Meowth.send_message(ctx.message.channel, _("Meowth! You are already in Team Harmony!"))
                 return
@@ -2916,14 +2931,18 @@ async def recover(ctx):
                                 status = None
                             if "trainers" in message.content:
                                 messagesplit = message.content.split()
-                                if messagesplit[-2].isdigit():
-                                    count = int(messagesplit[-2])
+                                if messagesplit[-13].isdigit():
+                                    count = int(messagesplit[-13])
                                 else:
                                     count = 1
+                                if messagesplit[-1].isdigit():
+                                    party = [int(messagesplit[-10]),int(messagesplit[-7]),int(messagesplit[-4]),int(messagesplit[-1])]
+                                else:
+                                    party = [0,0,0,count]
                             else:
                                 count = 1
-
-                            trainer_dict[trainerid] = {'status': status, 'count': count}
+                                party = [0,0,0,count]
+                            trainer_dict[trainerid] = {'status': status, 'count': count, 'party': party}
                         else:
                             continue
                     else:
@@ -3089,25 +3108,24 @@ async def _maybe(channel, author, count, party):
     allred = 0
     allyellow = 0
     allunknown = 0
+    if not party:
+        for role in author.roles:
+            if role.name.lower() == "mystic":
+                allblue = count
+                break
+            elif role.name.lower() == "valor":
+                allred = count
+                break
+            elif role.name.lower() =="instinct":
+                allyellow = count
+                break
+        else:
+            allunknown = count
+        party = [allblue, allred, allyellow, allunknown]
     if count == 1:
         await Meowth.send_message(channel, _("Meowth! {member} is interested!").format(member=author.mention))
     else:
-        if not party:
-            for role in author.roles:
-                if role.name == "mystic":
-                    allblue = count
-                    break
-                elif role.name == "valor":
-                    allred = count
-                    break
-                elif role.name =="instinct":
-                    allyellow = count
-                    break
-            else:
-                allunknown = count
-            party = [allblue, allred, allyellow, allunknown]
-        await Meowth.send_message(channel, _("Meowth! {member} is interested with a total of {trainer_count} trainers! {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | :grey_question:: {unknown}").format(
-        member=author.mention, trainer_count=count, blue_emoji=parse_emoji(channel.server, config['team_dict']['mystic']),mystic=party[0],red_emoji=parse_emoji(channel.server, config['team_dict']['valor']),valor=party[1], instinct=party[2], yellow_emoji=parse_emoji(channel.server,config['team_dict']['instinct']), unknown=party[3]))
+        await Meowth.send_message(channel, _("Meowth! {member} is interested with a total of {trainer_count} trainers! {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | :grey_question:: {unknown}").format(member=author.mention, trainer_count=count, blue_emoji=parse_emoji(channel.server, config['team_dict']['mystic']),mystic=party[0],red_emoji=parse_emoji(channel.server, config['team_dict']['valor']),valor=party[1], instinct=party[2], yellow_emoji=parse_emoji(channel.server,config['team_dict']['instinct']), unknown=party[3]))
 
     # Add trainer name to trainer list
     if author.id not in server_dict[channel.server.id]['raidchannel_dict'][channel.id]['trainer_dict']:
@@ -3168,27 +3186,24 @@ async def _coming(channel, author, count, party):
     allyellow = 0
     allunknown = 0
     trainer_dict = server_dict[channel.server.id]['raidchannel_dict'][channel.id]['trainer_dict']
-
+    if not party:
+        for role in author.roles:
+            if role.name == "mystic":
+                allblue = count
+                break
+            elif role.name == "valor":
+                allred = count
+                break
+            elif role.name =="instinct":
+                allyellow = count
+                break
+        else:
+            allunknown = count
+        party = [allblue, allred, allyellow, allunknown]
     if count == 1:
         await Meowth.send_message(channel, _("Meowth! {member} is on the way!").format(member=author.mention))
-
     else:
-        if not party:
-            for role in author.roles:
-                if role.name == "mystic":
-                    allblue = count
-                    break
-                elif role.name == "valor":
-                    allred = count
-                    break
-                elif role.name =="instinct":
-                    allyellow = count
-                    break
-            else:
-                allunknown = count
-            party = [allblue, allred, allyellow, allunknown]
-        await Meowth.send_message(channel, _("Meowth! {member} is on the way with a total of {trainer_count} trainers! {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | :grey_question:: {unknown}").format(
-        member=author.mention, trainer_count=count, blue_emoji=parse_emoji(channel.server, config['team_dict']['mystic']),mystic=party[0],red_emoji=parse_emoji(channel.server, config['team_dict']['valor']),valor=party[1], instinct=party[2], yellow_emoji=parse_emoji(channel.server,config['team_dict']['instinct']), unknown=party[3]))
+        await Meowth.send_message(channel, _("Meowth! {member} is on the way with a total of {trainer_count} trainers! {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | :grey_question:: {unknown}").format(member=author.mention, trainer_count=count, blue_emoji=parse_emoji(channel.server, config['team_dict']['mystic']),mystic=party[0],red_emoji=parse_emoji(channel.server, config['team_dict']['valor']),valor=party[1], instinct=party[2], yellow_emoji=parse_emoji(channel.server,config['team_dict']['instinct']), unknown=party[3]))
 
     # Add trainer name to trainer list
     if author.id not in trainer_dict:
@@ -3250,31 +3265,29 @@ async def _here(channel, author, count, party):
     allyellow = 0
     allunknown = 0
     trainer_dict = server_dict[channel.server.id]['raidchannel_dict'][channel.id]['trainer_dict']
-
     try:
         if server_dict[channel.server.id]['raidchannel_dict'][channel.id]['lobby']:
             lobbymsg += "\nThere is a group already in the lobby! Use **!lobby** to join them or **!backout** to request a backout! Otherwise, you may have to wait for the next group!"
     except KeyError:
         pass
+    if not party:
+        for role in author.roles:
+            if role.name == "mystic":
+                allblue = count
+                break
+            elif role.name == "valor":
+                allred = count
+                break
+            elif role.name =="instinct":
+                allyellow = count
+                break
+        else:
+            allunknown = count
+        party = [allblue, allred, allyellow, allunknown]
     if count == 1:
         await Meowth.send_message(channel, _("Meowth! {member} is at the raid!"+lobbymsg).format(member=author.mention))
     else:
-        if not party:
-            for role in author.roles:
-                if role.name == "mystic":
-                    allblue = count
-                    break
-                elif role.name == "valor":
-                    allred = count
-                    break
-                elif role.name =="instinct":
-                    allyellow = count
-                    break
-            else:
-                allunknown = count
-            party = [allblue, allred, allyellow, allunknown]
-        await Meowth.send_message(channel, _("Meowth! {member} is at the raid with a total of {trainer_count} trainers! {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | :grey_question:: {unknown}"+lobbymsg).format(
-        member=author.mention, trainer_count=count, blue_emoji=parse_emoji(channel.server, config['team_dict']['mystic']),mystic=party[0],red_emoji=parse_emoji(channel.server, config['team_dict']['valor']),valor=party[1], instinct=party[2], yellow_emoji=parse_emoji(channel.server,config['team_dict']['instinct']), unknown=party[3]))
+        await Meowth.send_message(channel, _("Meowth! {member} is at the raid with a total of {trainer_count} trainers! {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | :grey_question:: {unknown}"+lobbymsg).format(member=author.mention, trainer_count=count, blue_emoji=parse_emoji(channel.server, config['team_dict']['mystic']),mystic=party[0],red_emoji=parse_emoji(channel.server, config['team_dict']['valor']),valor=party[1], instinct=party[2], yellow_emoji=parse_emoji(channel.server,config['team_dict']['instinct']), unknown=party[3]))
     # Add trainer name to trainer list
     if author.id not in trainer_dict:
         trainer_dict[author.id] = {}
@@ -3393,7 +3406,10 @@ async def _edit_party(channel, author):
             channelhere += int(trainer_dict[trainer]['count'])
     channeltotal = channelmaybe + channelcoming + channelhere
     reportchannel = Meowth.get_channel(server_dict[channel.server.id]['raidchannel_dict'][channel.id]['reportcity'])
-    reportmsg = await Meowth.get_message(reportchannel, server_dict[channel.server.id]['raidchannel_dict'][channel.id]['raidreport'])
+    try:
+        reportmsg = await Meowth.get_message(reportchannel, server_dict[channel.server.id]['raidchannel_dict'][channel.id]['raidreport'])
+    except:
+        pass
     raidmsg = await Meowth.get_message(channel, server_dict[channel.server.id]['raidchannel_dict'][channel.id]['raidmessage'])
     reportembed = raidmsg.embeds[0]
     newembed = discord.Embed(title=reportembed['title'],url=reportembed['url'],colour=channel.server.me.colour)
@@ -3465,7 +3481,7 @@ async def _lobby(message, count):
     trainer_dict[message.author.id]['count'] = count
     server_dict[message.server.id]['raidchannel_dict'][message.channel.id]['trainer_dict'] = trainer_dict
 
-@Meowth.command(pass_context=True)
+@Meowth.command(pass_context=True,aliases=["x"])
 @checks.activeraidchannel()
 async def cancel(ctx):
     """Indicate you are no longer interested in a raid.
@@ -3996,10 +4012,13 @@ async def _teamlist(ctx):
 @list.command(pass_context=True)
 @checks.activeraidchannel()
 async def tags(ctx):
-    """List the teams for the users that have RSVP'd to a raid.
+    """List mentions of the users that have RSVP'd to a raid.
 
-    Usage: !list teams
+    Usage: !list tags
     Works only in raid channels."""
+    server = ctx.message.server
+    channel = ctx.message.channel
+    now = datetime.datetime.utcnow() + datetime.timedelta(hours=server_dict[server.id]['offset'])
     if checks.check_raidchannel(ctx):
         if checks.check_raidactive(ctx):
             listmsg = "**Meowth!** "
@@ -4047,7 +4066,10 @@ async def _wantlist(ctx):
     for role in ctx.message.author.roles:
         if role.name in pkmn_info['pokemon_list']:
             wantlist.append(role.name.title())
-    await Meowth.send_message(ctx.message.channel, _("Your current !want list is: ```{wantlist}```").format(wantlist=", ".join(wantlist)))
+    if len(wantlist)>0:
+        listmsg = " Your current **!want** list is: ```{wantlist}```".format(wantlist=", ".join(wantlist))
+    else:
+        listmsg = " You don't have any wants! use **!want** to add some."
     return listmsg
 
 # @list.command(pass_context=True)

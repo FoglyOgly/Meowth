@@ -1414,6 +1414,8 @@ async def about(ctx):
     owner = Meowth.owner
     channel = ctx.message.channel
     uptime_str = await _uptime(Meowth)
+    yourserver = ctx.message.server.name
+    yourmembers = len(ctx.message.server.members)
     embed_colour = ctx.message.server.me.colour or discord.Colour.lighter_grey()
 
     about = (
@@ -1431,8 +1433,11 @@ async def about(ctx):
     embed = discord.Embed(colour=embed_colour,icon_url=Meowth.user.avatar_url)
     embed.add_field(name="About Meowth", value=about, inline=False)
     embed.add_field(name="Owner", value=owner)
-    embed.add_field(name="Servers", value=server_count)
-    embed.add_field(name="Members", value=member_count)
+    if server_count > 1:
+        embed.add_field(name="Servers", value=server_count)
+        embed.add_field(name="Members", value=member_count)
+    embed.add_field(name="Your Server", value=yourserver)
+    embed.add_field(name="Your Members", value=yourmembers)
     embed.add_field(name="Uptime", value=uptime_str)
     embed.set_footer(text="For support, contact us on our Discord server. Invite Code: hhVjAN8")
 

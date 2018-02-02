@@ -702,11 +702,17 @@ async def on_member_join(member):
         welcomemessage = "".join(welcomesplit)
 
     if server_dict[server.id]['welcomechan'] == "dm":
-        await Meowth.send_message(member, welcomemessage.format(server_name=server.name, new_member_name=member.mention))
+        if welcomemessage.startswith("<") and welcomemessage.endswith("> "):
+            await Meowth.send_message(member, embed=discord.Embed(colour=server.me.colour, description=welcomemessage[1:-2]))
+        else:
+            await Meowth.send_message(member, welcomemessage.format(server_name=server.name, new_member_name=member.mention))
     else:
         default = discord.utils.get(server.channels, name = server_dict[server.id]['welcomechan'])
         if default:
-            await Meowth.send_message(default, welcomemessage.format(server_name=server.name, new_member_name=member.mention))
+            if welcomemessage.startswith("<") and welcomemessage.endswith("> "):
+                await Meowth.send_message(default, embed=discord.Embed(colour=server.me.colour, description=welcomemessage[1:-2]))
+            else:
+                await Meowth.send_message(default, welcomemessage.format(server_name=server.name, new_member_name=member.mention))
 
 @Meowth.event
 async def on_message(message):
@@ -1110,7 +1116,7 @@ async def configure(ctx):
             if welcomereply.content.lower() == "y":
                 server_dict_temp['welcome'] = True
                 await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.green(), description="Welcome Message enabled!"))
-                await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="Would you like a custom welcome message? You can reply with **N** to use the default message above or enter your own below.\n\nI can read all discord formatting and I have the following variables:\n\n**{@member}** - Replace member with a username to mention that user\n**{#channel}** - Replace channel with a channel to mention\n**{&role}** - Replace role with a role to mention (case sensitive)\n**{user}** - Will mention the new user\n**{server}** - Will print your server's name").set_author(name="Welcome Message", icon_url=Meowth.user.avatar_url))
+                await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="Would you like a custom welcome message? You can reply with **N** to use the default message above or enter your own below.\n\nI can read all [discord formatting](https://support.discordapp.com/hc/en-us/articles/210298617-Markdown-Text-101-Chat-Formatting-Bold-Italic-Underline-) and I have the following variables:\n\n**{@member}** - Replace member with a username to mention that user\n**{#channel}** - Replace channel with a channel to mention\n**{&role}** - Replace role with a role to mention (case sensitive)\n**{user}** - Will mention the new user\n**{server}** - Will print your server's name\nSurround your message with <> to send it as an embed.").set_author(name="Welcome Message", icon_url=Meowth.user.avatar_url))
                 while True:
                     welcomemsgreply = await Meowth.wait_for_message(author = owner, check=lambda message: message.server is None)
                     if welcomemsgreply.content.lower() == "n":

@@ -628,9 +628,9 @@ async def on_ready():
         users += len(server.members)
         try:
             if server.id not in server_dict:
-                server_dict[server.id] = {'want_channel_list': [], 'offset': 0, 'welcome': False, 'welcomechan': '', 'wantset': False, 'raidset': False, 'wildset': False, 'team': False, 'want': False, 'other': False, 'done': False, 'raidchannel_dict' : {}}
+                server_dict[server.id] = {'want_channel_list': [], 'offset': 0, 'welcome': False, 'welcomechan': '', 'welcomemsg':'default','wantset': False, 'raidset': False, 'wildset': False, 'team': False, 'want': False, 'other': False, 'done': False, 'raidchannel_dict' : {}}
         except KeyError:
-            server_dict[server.id] = {'want_channel_list': [], 'offset': 0, 'welcome': False, 'welcomechan': '', 'wantset': False, 'raidset': False, 'wildset': False, 'team': False, 'want': False, 'other': False, 'done': False, 'raidchannel_dict' : {}}
+            server_dict[server.id] = {'want_channel_list': [], 'offset': 0, 'welcome': False, 'welcomechan': '','welcomemsg':'default','wantset': False, 'raidset': False, 'wildset': False, 'team': False, 'want': False, 'other': False, 'done': False, 'raidchannel_dict' : {}}
 
         owners.append(server.owner)
 
@@ -642,7 +642,7 @@ async def on_ready():
 @Meowth.event
 async def on_server_join(server):
     owner = server.owner
-    server_dict[server.id] = {'want_channel_list': [], 'offset': 0, 'welcome': False, 'welcomechan': '', 'wantset': False, 'raidset': False, 'wildset': False, 'team': False, 'want': False, 'other': False, 'done': False, 'raidchannel_dict' : {}}
+    server_dict[server.id] = {'want_channel_list': [], 'offset': 0, 'welcome': False, 'welcomechan': '','welcomemsg':'default','wantset': False, 'raidset': False, 'wildset': False, 'team': False, 'want': False, 'other': False, 'done': False, 'raidchannel_dict' : {}}
     await Meowth.send_message(owner, _("Meowth! I'm Meowth, a Discord helper bot for Pokemon Go communities, and someone has invited me to your server! Type **!help** to see a list of things I can do, and type **!configure** in any channel of your server to begin!"))
 
 @Meowth.event
@@ -663,24 +663,49 @@ async def on_member_join(member):
     team_msg = " or ".join(["**!team {0}**".format(team) for team in config['team_dict'].keys()])
     if server_dict[server.id]['done'] == False or server_dict[server.id]['welcome'] == False:
         return
-
     # Build welcome message
-
-    admin_message = _(" If you have any questions just ask an admin.")
-
-    welcomemessage = _("Meowth! Welcome to {server_name}, {new_member_name}! ")
-    if server_dict[server.id]['team'] == True:
-        welcomemessage += _("Set your team by typing {team_command}.").format(team_command=team_msg)
-    welcomemessage += admin_message
+    if server_dict[server.id]['welcomemsg'] == "default":
+        admin_message = _(" If you have any questions just ask an admin.")
+        welcomemessage = _("Meowth! Welcome to {server_name}, {new_member_name}! ")
+        if server_dict[server.id]['team'] == True:
+            welcomemessage += _("Set your team by typing {team_command}.").format(team_command=team_msg)
+        welcomemessage += admin_message
+    else:
+        welcomesplit = []
+        msgsplit = re.split("\n|\r| ",server_dict[server.id]['welcomemsg'])
+        for word in msgsplit:
+            if "{#" in word:
+                channel = discord.utils.get(member.server.channels, name=word.split('{#', 1)[1].split('}')[0])
+                if channel:
+                    mention = word.split('{#')[0]+channel.mention+word.split('}')[1]+" "
+                    welcomesplit.append(mention)
+            elif "{@" in word:
+                user = discord.utils.get(member.server.members, name=word.split('{@', 1)[1].split('}')[0])
+                if user:
+                    mention = word.split('{@')[0]+user.mention+word.split('}')[1]+" "
+                    welcomesplit.append(mention)
+            elif "{&" in word:
+                role = discord.utils.get(member.server.roles, name=word.split('{&', 1)[1].split('}')[0])
+                if role:
+                    mention = word.split('{&')[0]+role.mention+word.split('}')[1]+" "
+                    welcomesplit.append(mention)
+            elif "{user}" in word:
+                mention = word.split('{')[0]+member.mention+word.split('}')[1]+" "
+                welcomesplit.append(mention)
+            elif "{server}" in word:
+                mention = word.split('{')[0]+member.server.name+word.split('}')[1]+" "
+                welcomesplit.append(mention)
+            elif word == "":
+                welcomesplit.append("\n")
+            else:
+                welcomesplit.append(word+" ")
+        welcomemessage = "".join(welcomesplit)
 
     if server_dict[server.id]['welcomechan'] == "dm":
         await Meowth.send_message(member, welcomemessage.format(server_name=server.name, new_member_name=member.mention))
-
     else:
         default = discord.utils.get(server.channels, name = server_dict[server.id]['welcomechan'])
-        if not default:
-            pass
-        else:
+        if default:
             await Meowth.send_message(default, welcomemessage.format(server_name=server.name, new_member_name=member.mention))
 
 @Meowth.event
@@ -865,7 +890,7 @@ async def prefix(ctx):
     await Meowth.send_message(ctx.message.channel,"Prefix for this server is: `{}`".format(prefix))
 
 @Meowth.command(pass_context=True)
-@checks.is_owner()
+@commands.has_permissions(manage_server=True)
 async def welcome(ctx, user: discord.Member = None):
     """Test welcome on yourself or mentioned member.
 
@@ -990,7 +1015,7 @@ async def configure(ctx):
     If it is not your first time configuring, you can choose a section to jump to."""
     server = ctx.message.server
     owner = ctx.message.author
-    server_dict_check = {'want_channel_list': [], 'offset': 0, 'welcome': False, 'welcomechan': '', 'wantset': False, 'raidset': False, 'wildset': False, 'team': False, 'want': False, 'other': False, 'done': False, 'raidchannel_dict' : {}}
+    server_dict_check = {'want_channel_list': [], 'offset': 0, 'welcome': False, 'welcomechan': '','welcomemsg':'default','wantset': False, 'raidset': False, 'wildset': False, 'team': False, 'want': False, 'other': False, 'done': False, 'raidchannel_dict' : {}}
     server_dict_temp = copy.deepcopy(server_dict[server.id])
     firstconfig = False
     configcancel = False
@@ -1073,7 +1098,7 @@ async def configure(ctx):
                 continue
     #configure welcome
     if configcancel == False and (firstconfig == True or configgoto == "all" or configgoto == "welcome"):
-        welcomeconfig = "I can welcome new members to the server with a short message. Here is an example:\n\n"
+        welcomeconfig = "I can welcome new members to the server with a short message. Here is the default message:\n\n"
         if server_dict_temp['team'] == True:
             welcomeconfig += _("Meowth! Welcome to {server_name}, {owner_name.mention}! Set your team by typing '**!team mystic**' or '**!team valor**' or '**!team instinct**' without quotations. If you have any questions just ask an admin.").format(server_name=server.name, owner_name=owner)
         else:
@@ -1085,8 +1110,26 @@ async def configure(ctx):
             if welcomereply.content.lower() == "y":
                 server_dict_temp['welcome'] = True
                 await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.green(), description="Welcome Message enabled!"))
+                await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="Would you like a custom welcome message? You can reply with **N** to use the default message above or enter your own below.\n\nI can read all discord formatting and I have the following variables:\n\n**{@member}** - Replace member with a username to mention that user\n**{#channel}** - Replace channel with a channel to mention\n**{&role}** - Replace role with a role to mention (case sensitive)\n**{user}** - Will mention the new user\n**{server}** - Will print your server's name").set_author(name="Welcome Message", icon_url=Meowth.user.avatar_url))
+                while True:
+                    welcomemsgreply = await Meowth.wait_for_message(author = owner, check=lambda message: message.server is None)
+                    if welcomemsgreply.content.lower() == "n":
+                        server_dict_temp['welcomemsg'] = "default"
+                        await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.green(), description="Default welcome message set"))
+                        break
+                    elif welcomemsgreply.content.lower() == "cancel":
+                        configcancel = True
+                        await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.red(), description="**CONFIG CANCELLED!**\n\nNo changes have been made."))
+                        return
+                    elif len(welcomemsgreply.content) > 500:
+                        await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="Please shorten your message to less than 500 characters."))
+                        continue
+                    else:
+                        server_dict_temp['welcomemsg'] = welcomemsgreply.content
+                        await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.green(), description="Welcome Channel set to:\n\n{}".format(server_dict_temp['welcomemsg'])))
+                        break
+                    break
                 await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="Which channel in your server would you like me to post the Welcome Messages? You can also choose to have them sent to the new member via Direct Message (DM) instead.\n\nRespond with: **channel-name** of a channel in your server or **DM** to Direct Message:").set_author(name="Welcome Message Channel", icon_url=Meowth.user.avatar_url))
-                wchcheck = 0
                 while True:
                     welcomechannelreply = await Meowth.wait_for_message(author = owner, check=lambda message: message.server is None)
                     if welcomechannelreply.content.lower() == "dm":

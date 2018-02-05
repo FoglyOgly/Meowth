@@ -666,53 +666,25 @@ async def on_member_join(member):
     # Build welcome message
     if server_dict[server.id]['welcomemsg'] == "default":
         admin_message = _(" If you have any questions just ask an admin.")
-        welcomemessage = _("Meowth! Welcome to {server_name}, {new_member_name}! ")
+        welcomemessage = _("Meowth! Welcome to {server}, {user}! ")
         if server_dict[server.id]['team'] == True:
             welcomemessage += _("Set your team by typing {team_command}.").format(team_command=team_msg)
         welcomemessage += admin_message
     else:
-        welcomesplit = []
-        msgsplit = re.split("\n|\r| ",server_dict[server.id]['welcomemsg'])
-        for word in msgsplit:
-            if "{#" in word:
-                channel = discord.utils.get(member.server.channels, name=word.split('{#', 1)[1].split('}')[0])
-                if channel:
-                    mention = word.split('{#')[0]+channel.mention+word.split('}')[1]+" "
-                    welcomesplit.append(mention)
-            elif "{@" in word:
-                user = discord.utils.get(member.server.members, name=word.split('{@', 1)[1].split('}')[0])
-                if user:
-                    mention = word.split('{@')[0]+user.mention+word.split('}')[1]+" "
-                    welcomesplit.append(mention)
-            elif "{&" in word:
-                role = discord.utils.get(member.server.roles, name=word.split('{&', 1)[1].split('}')[0])
-                if role:
-                    mention = word.split('{&')[0]+role.mention+word.split('}')[1]+" "
-                    welcomesplit.append(mention)
-            elif "{user}" in word:
-                mention = word.split('{')[0]+member.mention+word.split('}')[1]+" "
-                welcomesplit.append(mention)
-            elif "{server}" in word:
-                mention = word.split('{')[0]+member.server.name+word.split('}')[1]+" "
-                welcomesplit.append(mention)
-            elif word == "":
-                welcomesplit.append("\n")
-            else:
-                welcomesplit.append(word+" ")
-        welcomemessage = "".join(welcomesplit)
+        welcomemessage = server_dict[server.id]['welcomemsg']
 
     if server_dict[server.id]['welcomechan'] == "dm":
         if welcomemessage.startswith("<") and welcomemessage.endswith("> "):
             await Meowth.send_message(member, embed=discord.Embed(colour=server.me.colour, description=welcomemessage[1:-2]))
         else:
-            await Meowth.send_message(member, welcomemessage.format(server_name=server.name, new_member_name=member.mention))
+            await Meowth.send_message(member, welcomemessage.format(server=server.name, user=member.mention))
     else:
         default = discord.utils.get(server.channels, name = server_dict[server.id]['welcomechan'])
         if default:
             if welcomemessage.startswith("<") and welcomemessage.endswith("> "):
                 await Meowth.send_message(default, embed=discord.Embed(colour=server.me.colour, description=welcomemessage[1:-2]))
             else:
-                await Meowth.send_message(default, welcomemessage.format(server_name=server.name, new_member_name=member.mention))
+                await Meowth.send_message(default, welcomemessage.format(server=server.name, user=member.mention))
 
 @Meowth.event
 async def on_message(message):
@@ -1131,7 +1103,33 @@ async def configure(ctx):
                         await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="Please shorten your message to less than 500 characters."))
                         continue
                     else:
-                        server_dict_temp['welcomemsg'] = welcomemsgreply.content
+                        welcomesplit = []
+                        msgsplit = re.split("\n|\r| ",welcomemsgreply.content)
+                        for word in msgsplit:
+                            if "{#" in word:
+                                channel = discord.utils.get(server.channels, name=word.split('{#', 1)[1].split('}')[0])
+                                if channel:
+                                    mention = word.split('{#')[0]+channel.mention+word.split('}')[1]+" "
+                                    welcomesplit.append(mention)
+                            elif "{@" in word:
+                                user = discord.utils.get(server.members, name=word.split('{@', 1)[1].split('}')[0])
+                                if user:
+                                    mention = word.split('{@')[0]+user.mention+word.split('}')[1]+" "
+                                    welcomesplit.append(mention)
+                            elif "{&" in word:
+                                role = discord.utils.get(server.roles, name=word.split('{&', 1)[1].split('}')[0])
+                                if role:
+                                    mention = word.split('{&')[0]+role.mention+word.split('}')[1]+" "
+                                    welcomesplit.append(mention)
+                            elif "{server}" in word:
+                                mention = word.split('{')[0]+server.name+word.split('}')[1]+" "
+                                welcomesplit.append(mention)
+                            elif word == "":
+                                welcomesplit.append("\n")
+                            else:
+                                welcomesplit.append(word+" ")
+                        welcomemessage = "".join(welcomesplit)
+                        server_dict_temp['welcomemsg'] = welcomemessage
                         await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.green(), description="Welcome Channel set to:\n\n{}".format(server_dict_temp['welcomemsg'])))
                         break
                     break
@@ -1517,7 +1515,7 @@ async def team(ctx):
     for team in config['team_dict'].keys():
         if team.lower() not in lowercase_roles:
             try:
-                temp_role = await Meowth.create_role(server, name=team.lower(),hoist = False, mentionable = True))
+                temp_role = await Meowth.create_role(server, name=team.lower(),hoist = False, mentionable = True)
                 server_roles.append(team.lower())
             except discord.errors.HTTPException:
                 await Meowth.send_message(message.channel, "Maximum guild roles reached.")

@@ -294,6 +294,7 @@ async def expiry_check(channel):
     logger.info("Expiry_Check - "+channel.name)
     server = channel.server
     global active_raids
+    channel = Meowth.get_channel(channel.id)
     if channel not in active_raids:
         active_raids.append(channel)
         logger.info("Expire_Channel - Channel Added To Watchlist - "+channel.name)
@@ -335,6 +336,7 @@ async def expire_channel(channel):
     # else deleted the actual channel at some point.
 
     channel_exists = Meowth.get_channel(channel.id)
+    channel = channel_exists
     if channel_exists is None and Meowth.is_logged_in and not Meowth.is_closed:
         try:
             del server_dict[channel.server.id]['raidchannel_dict'][channel.id]
@@ -418,7 +420,6 @@ To reactivate the channel, use **!timerset** to set the timer again."""))
                     logger.info("Expire_Channel - Channel Deleted - "+channel.name)
         except:
             pass
-
 
 async def channel_cleanup(loop=True):
     while Meowth.is_logged_in and not Meowth.is_closed:

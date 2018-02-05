@@ -329,7 +329,6 @@ async def ask(message, destination, user_id, *, react_list=['✅', '❎']):
         await asyncio.sleep(0.25)
         await Meowth.add_reaction(msg, r)
     res = await Meowth.wait_for_reaction(react_list, message=msg, check=check, timeout=60)
-    await Meowth.delete_message(msg)
     return res.reaction.emoji if res else None
 
 @Meowth.command(pass_context=True, hidden=True)
@@ -338,10 +337,10 @@ async def template(ctx, *, sample_message):
     embed = None
     msg = do_template(sample_message, ctx.message.author, ctx.message.server)
     if msg.startswith("[") and msg.endswith("]"):
-        embed = discord.Embed(colour=ctx.message.server.me.colour, description=msg[1:-1])
-    res = await ask(embed or msg, ctx.message.channel, ctx.message.author.id, react_list=['\N{WASTEBASKET}'])
-    if res == '\N{WASTEBASKET}':
-        await Meowth.delete_message(msg)
+        await Meowth.send_message(ctx.message.channel, embed=discord.Embed(
+            colour=ctx.message.server.me.colour, description=msg[1:-1]))
+    else:
+        await Meowth.send_message(ctx.message.channel, msg)
 
 
 """

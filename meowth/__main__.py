@@ -1104,6 +1104,7 @@ async def configure(ctx):
                         continue
                     else:
                         welcomesplit = []
+                        found_none = False
                         msgsplit = re.split("\n|\r| ",welcomemsgreply.content)
                         for word in msgsplit:
                             if "{#" in word:
@@ -1111,16 +1112,25 @@ async def configure(ctx):
                                 if channel:
                                     mention = word.split('{#')[0]+channel.mention+word.split('}')[1]+" "
                                     welcomesplit.append(mention)
+                                else:
+                                    found_none = "#{channel} isn't in your server. Please double check your channel name and resend your response.".format(channel=word.split('{#', 1)[1].split('}')[0])
+                                    break
                             elif "{@" in word:
                                 user = discord.utils.get(server.members, name=word.split('{@', 1)[1].split('}')[0])
                                 if user:
                                     mention = word.split('{@')[0]+user.mention+word.split('}')[1]+" "
                                     welcomesplit.append(mention)
+                                else:
+                                    found_none = "@{member} isn't in your server. Please double check your member name and resend your response.".format(member=word.split('{@', 1)[1].split('}')[0])
+                                    break
                             elif "{&" in word:
                                 role = discord.utils.get(server.roles, name=word.split('{&', 1)[1].split('}')[0])
                                 if role:
                                     mention = word.split('{&')[0]+role.mention+word.split('}')[1]+" "
                                     welcomesplit.append(mention)
+                                else:
+                                    found_none = "@{role} isn't in your server. Please double check your role name and resend your response.".format(role=word.split('{&', 1)[1].split('}')[0])
+                                    break
                             elif "{server}" in word:
                                 mention = word.split('{')[0]+server.name+word.split('}')[1]+" "
                                 welcomesplit.append(mention)
@@ -1128,6 +1138,9 @@ async def configure(ctx):
                                 welcomesplit.append("\n")
                             else:
                                 welcomesplit.append(word+" ")
+                        if found_none:
+                            await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=found_none))
+                            continue
                         welcomemessage = "".join(welcomesplit)
                         server_dict_temp['welcomemsg'] = welcomemessage
                         await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.green(), description="Welcome Message set to:\n\n{}".format(server_dict_temp['welcomemsg'])))

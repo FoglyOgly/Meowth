@@ -665,7 +665,7 @@ async def on_member_join(member):
     if server_dict[server.id]['done'] == False or server_dict[server.id]['welcome'] == False:
         return
     # Build welcome message
-    if server_dict[server.id]['welcomemsg'] == "default":
+    if server_dict[server.id].get('welcomemsg', 'default') == "default":
         admin_message = _(" If you have any questions just ask an admin.")
         welcomemessage = _("Meowth! Welcome to {server}, {user}! ")
         if server_dict[server.id]['team'] == True:

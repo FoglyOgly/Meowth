@@ -1349,7 +1349,7 @@ async def configure(ctx):
                     continue
                 break
     #configure main-timezone
-    if configcancel == False and server_dict_temp['other'] is True and server_dict_temp['raidset'] is True and (firstconfig == True or configgoto == "all" or configgoto == "timezone" or configgoto == "allmain"):
+    if configcancel == False and server_dict_temp['other'] is True and (server_dict_temp['wildset'] is True or server_dict_temp['raidset'] is True) and (firstconfig == True or configgoto == "all" or configgoto == "timezone" or configgoto == "allmain"):
         await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("To help coordinate raids reports for you, I need to know what timezone you're in! The current 24-hr time UTC is {utctime}. How many hours off from that are you?\n\nRespond with: A number from **-12** to **12**:").format(utctime=strftime("%H:%M",time.gmtime()))).set_author(name="Timezone Configuration", icon_url=Meowth.user.avatar_url))
         while True:
             offsetmsg = await Meowth.wait_for_message(author = owner, check=lambda message: message.server is None)

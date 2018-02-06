@@ -992,6 +992,10 @@ async def configure(ctx):
     Usage: !configure
     Meowth will DM you instructions on how to configure Meowth for your server.
     If it is not your first time configuring, you can choose a section to jump to."""
+    try:
+        await Meowth.delete_message(ctx.message)
+    except (discord.Forbidden, discord.HTTPException):
+        pass
     server = ctx.message.server
     owner = ctx.message.author
     server_dict_check = {'want_channel_list': [], 'offset': 0, 'welcome': False, 'welcomechan': '','welcomemsg':'default','wantset': False, 'raidset': False, 'wildset': False, 'team': False, 'want': False, 'other': False, 'done': False, 'raidchannel_dict' : {}}

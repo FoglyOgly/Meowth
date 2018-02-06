@@ -3259,13 +3259,13 @@ async def _coming(channel, author, count, party):
     trainer_dict = server_dict[channel.server.id]['raidchannel_dict'][channel.id]['trainer_dict']
     if not party:
         for role in author.roles:
-            if role.name == "mystic":
+            if role.name.lower() == "mystic":
                 allblue = count
                 break
-            elif role.name == "valor":
+            elif role.name.lower() == "valor":
                 allred = count
                 break
-            elif role.name =="instinct":
+            elif role.name.lower() =="instinct":
                 allyellow = count
                 break
         else:
@@ -3343,13 +3343,13 @@ async def _here(channel, author, count, party):
         pass
     if not party:
         for role in author.roles:
-            if role.name == "mystic":
+            if role.name.lower() == "mystic":
                 allblue = count
                 break
-            elif role.name == "valor":
+            elif role.name.lower() == "valor":
                 allred = count
                 break
-            elif role.name =="instinct":
+            elif role.name.lower() =="instinct":
                 allyellow = count
                 break
         else:
@@ -3372,13 +3372,13 @@ async def _party_status(ctx, total, teamcounts):
     channel = ctx.message.channel
     author = ctx.message.author
     for role in ctx.message.author.roles:
-        if role.name == "mystic":
+        if role.name.lower() == "mystic":
             my_team = "mystic"
             break
-        elif role.name == "valor":
+        elif role.name.lower() == "valor":
             my_team = "valor"
             break
-        elif role.name =="instinct":
+        elif role.name.lower() =="instinct":
             my_team = "instinct"
             break
     else:

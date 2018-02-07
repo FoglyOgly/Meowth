@@ -2572,27 +2572,10 @@ This channel will be deleted five minutes after the timer expires.""").format(me
 @Meowth.command(pass_context=True)
 @checks.citychannel()
 async def invite(ctx):
-    """Join an EX Raid by showing your invite.
+    """Join an EX Raid.
 
-    Usage: !invite [image attachment]
-    If the image isn't added at the same time as the command, Meowth will wait 30 seconds for a followup message containing the image."""
-    if ctx.message.attachments:
-        await _invite(ctx)
-    else:
-        wait_msg = await Meowth.send_message(ctx.message.channel,_("Meowth! I'll wait for you to send your pass!"))
-        def check(msg):
-            if msg.channel == ctx.message.channel and ctx.message.author.id == msg.author.id:
-                if msg.attachments:
-                    return True
-        invitemsg = await Meowth.wait_for_message(author = ctx.message.author, check=check, timeout=60)
-        if invitemsg is not None:
-            ctx.message = invitemsg
-            await _invite(ctx)
-            return
-        else:
-            await Meowth.delete_message(wait_msg)
-            await Meowth.send_message(ctx.message.channel, "Meowth! You took too long to show me a screenshot of your invite! Retry when you're ready.")
-            return
+    Usage: !invite"""
+    await _invite(ctx)
 
 def invite_processing(invite_bytes: bytes) -> BytesIO:
     with Image.open(BytesIO(invite_bytes)) as img:
@@ -2613,27 +2596,7 @@ async def _invite(ctx):
     channel = ctx.message.channel
     author = ctx.message.author
     server = ctx.message.server
-    att_url = ctx.message.attachments[0]['url']
-    filetypes = ('jpg', 'jpeg', 'png')
-    cdn_url = 'https://cdn.discordapp.com'
-    if cdn_url not in att_url:
-        await bot.send_message(channel, "Meowth! Please upload your screenshot directly to Discord!")
-        return
-    if not any(ft in att_url for ft in filetypes):
-        await bot.send_message(channel, "Meowth! Your attachment was not a supported image format!")
-        return
     await bot.send_typing(channel)
-    async with aiohttp.ClientSession() as session:
-        async with session.get(ctx.message.attachments[0]['url']) as resp:
-            invite_bytes = await resp.read()
-    await bot.send_typing(channel)
-    txt = await bot.loop.run_in_executor(None, invite_processing, invite_bytes)
-    txt_check = ('EX Raid Battle', "This is a reward", "Please visit the Gym")
-    if not any(t in txt for t in txt_check):
-        await bot.send_message(
-            channel, ("Meowth! That doesn't look like an EX Raid invitation to me! If it is, "
-                      "please message an admin to get added to the EX Raid channel manually!"))
-        return
     exraidlist = ''
     exraid_dict = {}
     exraidcount = 0
@@ -2650,7 +2613,7 @@ async def _invite(ctx):
     if exraidcount == 0:
         await bot.send_message(channel, "Meowth! No EX Raids have been reported in this server! Use **!exraid** to report one!")
         return
-    await bot.send_message(channel, "Meowth! {0}, it looks like you've got an EX Raid invitation! The following {1} EX Raids have been reported:\n{2}\nReply with the number of the EX Raid you have been invited to. If none of them match your invite, type 'N' and report it with **!exraid**".format(author.mention, str(exraidcount), exraidlist))
+    await bot.send_message(channel, "Meowth! {0}, you've told me you have an invite to an EX Raid, and I'm just going to take your word for it! The following {1} EX Raids have been reported:\n{2}\nReply with the number of the EX Raid you have been invited to. If none of them match your invite, type 'N' and report it with **!exraid**".format(author.mention, str(exraidcount), exraidlist))
     reply = await bot.wait_for_message(author=author)
     if reply.content.lower() == 'n':
         await bot.send_message(channel, "Meowth! Be sure to report your EX Raid with **!exraid**!")

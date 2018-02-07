@@ -299,6 +299,10 @@ def do_template(message, author, server):
         match_type = match.group(1)
         full_match = match.group(0)
         match = match.group(2)
+        if match_type == "<":
+            mention_match = re.search(r'(#|@!?|&)([0-9]+)', match)
+            match_type = mention_match.group(1)[0]
+            match = mention_match.group(2)
         if match_type == "@":
             member = server.get_member_named(match)
             if match.isdigit() and not member:
@@ -320,7 +324,7 @@ def do_template(message, author, server):
             if not role:
                 not_found.append(full_match)
             return role.mention if role else full_match
-    template_pattern = r'{(@|#|&)([^{}]+)}|{(user|server)}'
+    template_pattern = r'{(@|#|&|<)([^{}]+)}|{(user|server)}'
     msg = re.sub(template_pattern, template_replace, message)
     return (msg, not_found)
 

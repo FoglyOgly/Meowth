@@ -2594,61 +2594,78 @@ async def invite(ctx):
             await Meowth.send_message(ctx.message.channel, "Meowth! You took too long to show me a screenshot of your invite! Retry when you're ready.")
             return
 
+def invite_processing(invite_bytes: bytes) -> BytesIO:
+    with Image.open(BytesIO(invite_bytes)) as img:
+        width, height = img.size
+        new_height = 3500
+        new_width = int(new_height * width / height)
+        img = img.resize((new_width, new_height), Image.BICUBIC)
+        img = img.filter(ImageFilter.EDGE_ENHANCE)
+        enh = ImageEnhance.Brightness(img)
+        img = enh.enhance(0.4)
+        enh = ImageEnhance.Contrast(img)
+        img = enh.enhance(4)
+        txt = pytesseract.image_to_string(img, config=tesseract_config)
+    return txt
+
 async def _invite(ctx):
-    if 'https://cdn.discordapp.com' in ctx.message.attachments[0]['url']:
-        if 'png' in ctx.message.attachments[0]['url'].lower() or 'jpg' in ctx.message.attachments[0]['url'].lower() or 'jpeg' in ctx.message.attachments[0]['url'].lower():
-            async with aiohttp.ClientSession() as session:
-                async with session.get(ctx.message.attachments[0]['url']) as fd:
-                    imgread = await fd.read()
-                    img = Image.open(BytesIO(imgread))
-            width, height = img.size
-            new_height = 3500
-            new_width  = int(new_height * width / height)
-            img = img.resize((new_width, new_height), Image.BICUBIC)
-            img = img.filter(ImageFilter.EDGE_ENHANCE)
-            enh = ImageEnhance.Brightness(img)
-            img = enh.enhance(0.4)
-            enh = ImageEnhance.Contrast(img)
-            img = enh.enhance(4)
-            txt = pytesseract.image_to_string(img, config=tesseract_config)
-            if 'EX Raid Battle' in txt or "This is a reward" in txt or "Please visit the Gym" in txt:
-                exraidlist = ''
-                exraid_dict = {}
-                exraidcount = 0
-                for channelid in server_dict[ctx.message.server.id]['raidchannel_dict']:
-                    if not discord.utils.get(ctx.message.server.channels, id = channelid):
-                        continue
-                    if server_dict[ctx.message.server.id]['raidchannel_dict'][channelid]['egglevel'] == 'EX' or server_dict[ctx.message.server.id]['raidchannel_dict'][channelid]['type'] == 'exraid':
-                        channel = Meowth.get_channel(channelid)
-                        if channel.mention != '#deleted-channel':
-                            exraidcount += 1
-                            exraidlist += '\n' + str(exraidcount) + '.   ' + channel.mention
-                            exraid_dict[str(exraidcount)] = channel
-                if exraidcount > 0:
-                    await Meowth.send_message(ctx.message.channel, "Meowth! {0}, it looks like you've got an EX Raid invitation! The following {1} EX Raids have been reported: \n {2} \n Reply with the number of the EX Raid you have been invited to. If none of them match your invite, type 'N' and report it with **!exraid**".format(ctx.message.author.mention, str(exraidcount), exraidlist))
-                    reply = await Meowth.wait_for_message(author=ctx.message.author)
-                    if reply.content.lower() == 'n':
-                        await Meowth.send_message(ctx.message.channel, "Meowth! Be sure to report your EX Raid with **!exraid**!")
-                    elif not reply.content.isdigit() or int(reply.content) > exraidcount:
-                        await Meowth.send_message(ctx.message.channel, "Meowth! I couldn't tell which EX Raid you meant! Try the **!invite** command again, and make sure you respond with the number of the channel that matches!")
-                    elif int(reply.content) <= exraidcount and int(reply.content) > 0:
-                        overwrite = discord.PermissionOverwrite()
-                        overwrite.send_messages = True
-                        overwrite.read_messages = True
-                        exraid_channel = exraid_dict[str(int(reply.content))]
-                        await Meowth.edit_channel_permissions(exraid_channel, ctx.message.author, overwrite)
-                        await Meowth.send_message(ctx.message.channel, "Meowth! Alright {0}, you can now send messages in {1}! Make sure you let the trainers in there know if you can make it to the EX Raid!".format(ctx.message.author.mention, exraid_channel.mention))
-                        await _maybe(exraid_channel,ctx.message.author,1,party=None)
-                    else:
-                        await Meowth.send_message(ctx.message.channel, "Meowth! I couldn't understand your reply! Try the **!invite** command again!")
-                else:
-                    await Meowth.send_message(ctx.message.channel, "Meowth! No EX Raids have been reported in this server! Use **!exraid** to report one!")
-            else:
-                await Meowth.send_message(ctx.message.channel, "Meowth! That doesn't look like an EX Raid invitation to me! If it is, please message an admin to get added to the EX Raid channel manually!")
-        else:
-            await Meowth.send_message(ctx.message.channel, "Meowth! Your attachment was not a supported image format!")
+    bot = ctx.bot
+    channel = ctx.message.channel
+    author = ctx.message.author
+    server = ctx.message.server
+    att_url = ctx.message.attachments[0]['url']
+    filetypes = ('jpg', 'jpeg', 'png')
+    cdn_url = 'https://cdn.discordapp.com'
+    if cdn_url not in att_url:
+        await bot.send_message(channel, "Meowth! Please upload your screenshot directly to Discord!")
+        return
+    if not any(ft in att_url for ft in filetypes):
+        await bot.send_message(channel, "Meowth! Your attachment was not a supported image format!")
+        return
+    await bot.send_typing(channel)
+    async with aiohttp.ClientSession() as session:
+        async with session.get(ctx.message.attachments[0]['url']) as resp:
+            invite_bytes = await resp.read()
+    await bot.send_typing(channel)
+    txt = await bot.loop.run_in_executor(None, invite_processing, invite_bytes)
+    txt_check = ('EX Raid Battle', "This is a reward", "Please visit the Gym")
+    if not any(t in txt for t in txt_check):
+        await bot.send_message(
+            channel, ("Meowth! That doesn't look like an EX Raid invitation to me! If it is, "
+                      "please message an admin to get added to the EX Raid channel manually!"))
+        return
+    exraidlist = ''
+    exraid_dict = {}
+    exraidcount = 0
+    rc_dict = bot.server_dict[server.id]['raidchannel_dict']
+    for channelid in rc_dict:
+        if not discord.utils.get(server.channels, id=channelid):
+            continue
+        if rc_dict[channelid]['egglevel'] == 'EX' or rc_dict[channelid]['type'] == 'exraid':
+            exraid_channel = bot.get_channel(channelid)
+            if exraid_channel.mention != '#deleted-channel':
+                exraidcount += 1
+                exraidlist += '\n' + str(exraidcount) + '.   ' + exraid_channel.mention
+                exraid_dict[str(exraidcount)] = exraid_channel
+    if exraidcount == 0:
+        await bot.send_message(channel, "Meowth! No EX Raids have been reported in this server! Use **!exraid** to report one!")
+        return
+    await bot.send_message(channel, "Meowth! {0}, it looks like you've got an EX Raid invitation! The following {1} EX Raids have been reported:\n{2}\nReply with the number of the EX Raid you have been invited to. If none of them match your invite, type 'N' and report it with **!exraid**".format(author.mention, str(exraidcount), exraidlist))
+    reply = await bot.wait_for_message(author=author)
+    if reply.content.lower() == 'n':
+        await bot.send_message(channel, "Meowth! Be sure to report your EX Raid with **!exraid**!")
+    elif not reply.content.isdigit() or int(reply.content) > exraidcount:
+        await bot.send_message(channel, "Meowth! I couldn't tell which EX Raid you meant! Try the **!invite** command again, and make sure you respond with the number of the channel that matches!")
+    elif int(reply.content) <= exraidcount and int(reply.content) > 0:
+        overwrite = discord.PermissionOverwrite()
+        overwrite.send_messages = True
+        overwrite.read_messages = True
+        exraid_channel = exraid_dict[str(int(reply.content))]
+        await bot.edit_channel_permissions(exraid_channel, author, overwrite)
+        await bot.send_message(channel, "Meowth! Alright {0}, you can now send messages in {1}! Make sure you let the trainers in there know if you can make it to the EX Raid!".format(author.mention, exraid_channel.mention))
+        await _maybe(exraid_channel, author, 1, party=None)
     else:
-        await Meowth.send_message(ctx.message.channel, "Meowth! Please upload your screenshot directly to Discord!")
+        await bot.send_message(channel, "Meowth! I couldn't understand your reply! Try the **!invite** command again!")
 
 """
 Raid Channel Management

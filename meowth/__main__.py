@@ -1418,13 +1418,13 @@ async def setstatus(ctx, user, status, count=None):
     try:
         party = server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['trainer_dict'][user.id]['party']
     except KeyError:
-        party = [0,0,0,count]
+        party = None
     if status == "maybe" or status == "interested" or status == "i":
-        await _maybe(ctx.message.channel, user, count, party)
+        await _maybe(ctx.message.channel, user, int(count), party)
     elif status == "omw" or status == "coming" or status == "c":
-        await _coming(ctx.message.channel, user, count, party)
+        await _coming(ctx.message.channel, user, int(count), party)
     elif status == "waiting" or status == "here" or status == "h":
-        await _here(ctx.message.channel, user, count, party)
+        await _here(ctx.message.channel, user, int(count), party)
     elif status == "cancel":
         await _cancel(ctx.message.channel, user)
 

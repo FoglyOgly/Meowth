@@ -287,6 +287,7 @@ def spellcheck(word):
         return _("Meowth! \"{entered_word}\" is not a Pokemon! Check your spelling!").format(entered_word=word)
 
 def do_template(message, author, server):
+    not_found = []
     def template_replace(match):
         if match.group(3):
             if match.group(3) == 'user':
@@ -302,19 +303,26 @@ def do_template(message, author, server):
             member = server.get_member_named(match)
             if match.isdigit() and not member:
                 member = server.get_member(match)
+            if not member:
+                not_found.append(full_match)
             return member.mention if member else full_match
         elif match_type == "#":
             channel = discord.utils.get(server.channels, name=match)
             if match.isdigit() and not channel:
                 channel = server.get_channel(match)
+            if not channel:
+                not_found.append(full_match)
             return channel.mention if channel else full_match
         elif match_type == '&':
             role = discord.utils.get(server.roles, name=match)
             if match.isdigit() and not role:
                 role = discord.utils.get(server.roles, id=match)
+            if not role:
+                not_found.append(full_match)
             return role.mention if role else full_match
     template_pattern = r'{(@|#|&)([^{}]+)}|{(user|server)}'
-    return re.sub(template_pattern, template_replace, message)
+    msg = re.sub(template_pattern, template_replace, message)
+    return (msg, not_found)
 
 async def ask(message, destination, user_id, *, react_list=['✅', '❎']):
     if isinstance(message, discord.Embed):
@@ -335,7 +343,10 @@ async def ask(message, destination, user_id, *, react_list=['✅', '❎']):
 async def template(ctx, *, sample_message):
     """Sample template messages to see how they would appear."""
     embed = None
-    msg = do_template(sample_message, ctx.message.author, ctx.message.server)
+    msg, errors = do_template(sample_message, ctx.message.author, ctx.message.server)
+    if errors:
+        msg = ("{}\n\n**Warning:**\nThe following could not be found: {}"
+               "").format(msg, ', '.join(errors))
     if msg.startswith("[") and msg.endswith("]"):
         await Meowth.send_message(ctx.message.channel, embed=discord.Embed(
             colour=ctx.message.server.me.colour, description=msg[1:-1]))
@@ -1154,7 +1165,7 @@ async def configure(ctx):
                                  "and I have the following template tags:\n\n"
                                  "**{@member}** - Replace member with user name or ID\n"
                                  "**{#channel}** - Replace channel with channel name or ID\n"
-                                 "**{&role}** - Replace role name or ID (doesn't show in DM preview)\n"
+                                 "**{&role}** - Replace role name or ID (shows as @deleted-role DM preview)\n"
                                  "**{user}** - Will mention the new user\n"
                                  "**{server}** - Will print your server's name\n"
                                  "Surround your message with [] to send it as an embed.")).set_author(name="Welcome Message", icon_url=Meowth.user.avatar_url))
@@ -1172,8 +1183,22 @@ async def configure(ctx):
                         await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="Please shorten your message to less than 500 characters."))
                         continue
                     else:
-                        welcomemessage = do_template(welcomemsgreply.content, owner, server)
-                        res = await ask(welcomemessage, owner, owner.id)
+                        welcomemessage, errors = do_template(welcomemsgreply.content, owner, server)
+                        if errors:
+                            if welcomemessage.startswith("[") and welcomemessage.endswith("]"):
+                                embed = discord.Embed(colour=server.me.colour, description=welcomemessage[1:-1])
+                                embed.add_field(name='Warning', value='The following could not be found:\n{}'.format('\n'.join(errors)))
+                                await Meowth.send_message(owner, embed=embed)
+                            else:
+                                await Meowth.send_message(owner, "{}\n\n**Warning:**\nThe following could not be found: {}".format(welcomemessage, ', '.join(errors)))
+                            await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="Please check the data given and retry a new welcome message, or reply with **N** to use the default."))
+                            continue
+                        else:
+                            if welcomemessage.startswith("[") and welcomemessage.endswith("]"):
+                                embed = discord.Embed(colour=server.me.colour, description=welcomemessage[1:-1])
+                                res = await ask(embed, owner, owner.id)
+                            else:
+                                res = await ask(welcomemessage, owner, owner.id)
                         if res == '❎':
                             await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="Please enter a new welcome message, or reply with **N** to use the default."))
                             continue

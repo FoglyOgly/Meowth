@@ -2536,7 +2536,7 @@ To see the list of trainers who have given their status:
 
 Sometimes I'm not great at directions, but I'll correct my directions if anybody sends me a maps link or uses **!location new <address>**. You can see the location of a raid by using **!location**
 
-You can set the hatch time with **!timerset <MM/DD HH:MM AM/PM>** and access this with **!timer**.
+You can set the hatch time with **!timerset <date/time>** and access this with **!timer**. <date/time> can be exactly as it appears on the EX Raid pass.
 You can set the start time with **!starttime [HH:MM AM/PM]** (you can also omit AM/PM and use 24-hour time) and access this with **!starttime**.
 
 Message **!starting** when the raid is beginning to clear the raid's 'here' list.
@@ -2562,7 +2562,7 @@ This channel will be deleted five minutes after the timer expires.""").format(me
     if len(raid_info['raid_eggs']['EX']['pokemon']) == 1:
         await _eggassume("assume "+ get_name(raid_info['raid_eggs']['EX']['pokemon'][0]), raid_channel)
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=server_dict[raid_channel.server.id]['offset'])
-    await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset <date and time>** so others can check it with **!timer**. **<date and time>** should look like this **{format}** (MM/DD HH:MM AM/PM - You can also omit AM/PM and use 24-hour time!), but set it to the date and time your invitation has.").format(member=message.author.mention, format=now.strftime('%m/%d %I:%M %p')))
+    await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset <date and time>** so others can check it with **!timer**. **<date and time>** should look like it does on your EX Raid pass.").format(member=message.author.mention))
     event_loop.create_task(expiry_check(raid_channel))
 
 @Meowth.command(pass_context=True)

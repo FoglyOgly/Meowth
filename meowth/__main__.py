@@ -345,13 +345,23 @@ async def template(ctx, *, sample_message):
     embed = None
     msg, errors = do_template(sample_message, ctx.message.author, ctx.message.server)
     if errors:
-        msg = ("{}\n\n**Warning:**\nThe following could not be found: {}"
-               "").format(msg, ', '.join(errors))
-    if msg.startswith("[") and msg.endswith("]"):
-        await Meowth.send_message(ctx.message.channel, embed=discord.Embed(
-            colour=ctx.message.server.me.colour, description=msg[1:-1]))
+        if msg.startswith("[") and msg.endswith("]"):
+            embed = discord.Embed(
+                colour=ctx.message.server.me.colour, description=msg[1:-1])
+            embed.add_field(
+                name='Warning',
+                value='The following could not be found:\n{}'.format('\n'.join(errors)))
+            await Meowth.send_message(ctx.message.channel, embed=embed)
+        else:
+            msg = ("{}\n\n**Warning:**\nThe following could not be found: {}"
+                   "").format(msg, ', '.join(errors))
+            await Meowth.send_message(ctx.message.channel, msg)
     else:
-        await Meowth.send_message(ctx.message.channel, msg)
+        if msg.startswith("[") and msg.endswith("]"):
+            await Meowth.send_message(ctx.message.channel, embed=discord.Embed(
+                colour=ctx.message.server.me.colour, description=msg[1:-1]))
+        else:
+            await Meowth.send_message(ctx.message.channel, msg)
 
 
 """

@@ -366,9 +366,9 @@ async def template(ctx, *, sample_message):
     else:
         if msg.startswith("[") and msg.endswith("]"):
             await Meowth.send_message(ctx.message.channel, embed=discord.Embed(
-                colour=ctx.message.server.me.colour, description=msg[1:-1]))
+                colour=ctx.message.server.me.colour, description=msg[1:-1].format(user=ctx.message.author.mention)))
         else:
-            await Meowth.send_message(ctx.message.channel, msg)
+            await Meowth.send_message(ctx.message.channel, msg.format(user=ctx.message.author.mention))
 
 
 """

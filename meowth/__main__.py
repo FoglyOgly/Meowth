@@ -1427,7 +1427,7 @@ async def configure(ctx):
                     continue
                 break
     #configure main-timezone
-    if configcancel == False and server_dict_temp['other'] is True and server_dict_temp['raidset'] is True and (firstconfig == True or configgoto == "all" or configgoto == "timezone" or configgoto == "allmain"):
+    if configcancel == False and server_dict_temp['other'] is True and (server_dict_temp['wildset'] is True or server_dict_temp['raidset'] is True) and (firstconfig == True or configgoto == "all" or configgoto == "timezone" or configgoto == "allmain"):
         await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("To help coordinate raids reports for you, I need to know what timezone you're in! The current 24-hr time UTC is {utctime}. How many hours off from that are you?\n\nRespond with: A number from **-12** to **12**:").format(utctime=strftime("%H:%M",time.gmtime()))).set_author(name="Timezone Configuration", icon_url=Meowth.user.avatar_url))
         while True:
             offsetmsg = await Meowth.wait_for_message(author = owner, check=lambda message: message.server is None)
@@ -1480,7 +1480,7 @@ async def clearstatus(ctx):
 @Meowth.command(pass_context=True)
 @commands.has_permissions(manage_server=True)
 @checks.raidchannel()
-async def setstatus(ctx, user, status, count=None):
+async def setstatus(ctx, user, status,*, teamcounts: str = None):
     """Changes raid channel status lists.
 
     Usage: !setstatus <user> <status> [count]
@@ -1488,21 +1488,32 @@ async def setstatus(ctx, user, status, count=None):
     Only usable by admins."""
     user = re.sub(r'\W+', '', user)
     user = ctx.message.server.get_member(user)
-    if not count:
-        try:
-            count = server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['trainer_dict'][user.id]['count']
-        except KeyError:
-            count = 1
-    try:
-        party = server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['trainer_dict'][user.id]['party']
-    except KeyError:
-        party = [0,0,0,count]
+    if not teamcounts:
+        if user.id in trainer_dict:
+            bluecount = str(trainer_dict[user.id]['party'][0])+"m "
+            redcount = str(trainer_dict[user.id]['party'][1])+"v "
+            yellowcount = str(trainer_dict[user.id]['party'][2])+"i "
+            unknowncount = str(trainer_dict[user.id]['party'][3])+"u "
+            teamcounts = str(trainer_dict[user.id]['count']) +" "+ bluecount + redcount + yellowcount + unknowncount
+        else:
+            teamcounts = "1"
+    if teamcounts.split()[0].isdigit():
+        total = int(teamcounts.split()[0])
+    else:
+        if user.id in trainer_dict:
+            total = trainer_dict[user.id]['count']
+        else:
+            total = 1
+    result = await _party_status(ctx, total, teamcounts)
+    if isinstance(result, __builtins__.list):
+        count = result[0]
+        partylist = result[1]
     if status == "maybe" or status == "interested" or status == "i":
-        await _maybe(ctx.message.channel, user, count, party)
+        await _maybe(ctx.message.channel, user, count, partylist)
     elif status == "omw" or status == "coming" or status == "c":
-        await _coming(ctx.message.channel, user, count, party)
+        await _coming(ctx.message.channel, user, count, partylist)
     elif status == "waiting" or status == "here" or status == "h":
-        await _here(ctx.message.channel, user, count, party)
+        await _here(ctx.message.channel, user, count, partylist)
     elif status == "cancel":
         await _cancel(ctx.message.channel, user)
 

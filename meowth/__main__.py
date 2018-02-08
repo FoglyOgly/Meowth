@@ -291,7 +291,7 @@ def do_template(message, author, server):
     def template_replace(match):
         if match.group(3):
             if match.group(3) == 'user':
-                return author.mention
+                return "{user}"
             elif match.group(3) == 'server':
                 return server.name
             else:

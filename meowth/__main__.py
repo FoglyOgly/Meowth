@@ -296,6 +296,9 @@ def do_template(message, author, server):
                 return server.name
             else:
                 return match.group(0)
+        if match.group(4):
+            emoji = ":"+match.group(4)+":"
+            return parse_emoji(server, emoji)
         match_type = match.group(1)
         full_match = match.group(0)
         match = match.group(2)
@@ -324,7 +327,7 @@ def do_template(message, author, server):
             if not role:
                 not_found.append(full_match)
             return role.mention if role else full_match
-    template_pattern = r'{(@|#|&|<)([^{}]+)}|{(user|server)}'
+    template_pattern = r'{(@|#|&|<)([^{}]+)}|{(user|server)}|:([a-zA-Z0-9]+):'
     msg = re.sub(template_pattern, template_replace, message)
     return (msg, not_found)
 

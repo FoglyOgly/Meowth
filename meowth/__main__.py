@@ -1402,7 +1402,7 @@ async def clearstatus(ctx):
 @Meowth.command(pass_context=True)
 @commands.has_permissions(manage_server=True)
 @checks.raidchannel()
-async def setstatus(ctx, user, status, count=None):
+async def setstatus(ctx, user, status,*, teamcounts: str = None):
     """Changes raid channel status lists.
 
     Usage: !setstatus <user> <status> [count]
@@ -1410,21 +1410,32 @@ async def setstatus(ctx, user, status, count=None):
     Only usable by admins."""
     user = re.sub(r'\W+', '', user)
     user = ctx.message.server.get_member(user)
-    if not count:
-        try:
-            count = server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['trainer_dict'][user.id]['count']
-        except KeyError:
-            count = 1
-    try:
-        party = server_dict[ctx.message.server.id]['raidchannel_dict'][ctx.message.channel.id]['trainer_dict'][user.id]['party']
-    except KeyError:
-        party = None
+    if not teamcounts:
+        if user.id in trainer_dict:
+            bluecount = str(trainer_dict[user.id]['party'][0])+"m "
+            redcount = str(trainer_dict[user.id]['party'][1])+"v "
+            yellowcount = str(trainer_dict[user.id]['party'][2])+"i "
+            unknowncount = str(trainer_dict[user.id]['party'][3])+"u "
+            teamcounts = str(trainer_dict[user.id]['count']) +" "+ bluecount + redcount + yellowcount + unknowncount
+        else:
+            teamcounts = "1"
+    if teamcounts.split()[0].isdigit():
+        total = int(teamcounts.split()[0])
+    else:
+        if user.id in trainer_dict:
+            total = trainer_dict[user.id]['count']
+        else:
+            total = 1
+    result = await _party_status(ctx, total, teamcounts)
+    if isinstance(result, __builtins__.list):
+        count = result[0]
+        partylist = result[1]
     if status == "maybe" or status == "interested" or status == "i":
-        await _maybe(ctx.message.channel, user, int(count), party)
+        await _maybe(ctx.message.channel, user, count, partylist)
     elif status == "omw" or status == "coming" or status == "c":
-        await _coming(ctx.message.channel, user, int(count), party)
+        await _coming(ctx.message.channel, user, count, partylist)
     elif status == "waiting" or status == "here" or status == "h":
-        await _here(ctx.message.channel, user, int(count), party)
+        await _here(ctx.message.channel, user, count, partylist)
     elif status == "cancel":
         await _cancel(ctx.message.channel, user)
 

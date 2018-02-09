@@ -1189,7 +1189,7 @@ async def configure(ctx):
                                  "**{&role}** - Replace role name or ID (shows as @deleted-role DM preview)\n"
                                  "**{user}** - Will mention the new user\n"
                                  "**{server}** - Will print your server's name\n"
-                                 "Surround your message with [] to send it as an embed.")).set_author(name="Welcome Message", icon_url=Meowth.user.avatar_url))
+                                 "Surround your message with [] to send it as an embed. **Warning:** Mentions within embeds may be broken on mobile, this is a discord bug.")).set_author(name="Welcome Message", icon_url=Meowth.user.avatar_url))
                 while True:
                     welcomemsgreply = await Meowth.wait_for_message(author = owner, check=lambda message: message.server is None)
                     if welcomemsgreply.content.lower() == "n":
@@ -2628,12 +2628,12 @@ async def _invite(ctx):
             exraid_channel = bot.get_channel(channelid)
             if exraid_channel.mention != '#deleted-channel':
                 exraidcount += 1
-                exraidlist += '\n' + str(exraidcount) + '.   ' + exraid_channel.mention
+                exraidlist += '\n**' + str(exraidcount) + '.**   ' + exraid_channel.mention
                 exraid_dict[str(exraidcount)] = exraid_channel
     if exraidcount == 0:
         await bot.send_message(channel, "Meowth! No EX Raids have been reported in this server! Use **!exraid** to report one!")
         return
-    await bot.send_message(channel, "Meowth! {0}, you've told me you have an invite to an EX Raid, and I'm just going to take your word for it! The following {1} EX Raids have been reported:\n{2}\nReply with the number of the EX Raid you have been invited to. If none of them match your invite, type 'N' and report it with **!exraid**".format(author.mention, str(exraidcount), exraidlist))
+    await bot.send_message(channel, "Meowth! {0}, you've told me you have an invite to an EX Raid, and I'm just going to take your word for it! The following {1} EX Raids have been reported:\n{2}\nReply with **the number** (1, 2, etc) of the EX Raid you have been invited to. If none of them match your invite, type 'N' and report it with **!exraid**".format(author.mention, str(exraidcount), exraidlist))
     reply = await bot.wait_for_message(author=author)
     if reply.content.lower() == 'n':
         await bot.send_message(channel, "Meowth! Be sure to report your EX Raid with **!exraid**!")

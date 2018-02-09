@@ -1207,19 +1207,19 @@ async def configure(ctx):
                         welcomemessage, errors = do_template(welcomemsgreply.content, owner, server)
                         if errors:
                             if welcomemessage.startswith("[") and welcomemessage.endswith("]"):
-                                embed = discord.Embed(colour=server.me.colour, description=welcomemessage[1:-1])
+                                embed = discord.Embed(colour=server.me.colour, description=welcomemessage[1:-1].format(user=owner.mention))
                                 embed.add_field(name='Warning', value='The following could not be found:\n{}'.format('\n'.join(errors)))
                                 await Meowth.send_message(owner, embed=embed)
                             else:
-                                await Meowth.send_message(owner, "{}\n\n**Warning:**\nThe following could not be found: {}".format(welcomemessage, ', '.join(errors)))
+                                await Meowth.send_message(owner, "{}\n\n**Warning:**\nThe following could not be found: {}".format(welcomemessage.format(user=author.mention), ', '.join(errors)))
                             await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="Please check the data given and retry a new welcome message, or reply with **N** to use the default."))
                             continue
                         else:
                             if welcomemessage.startswith("[") and welcomemessage.endswith("]"):
-                                embed = discord.Embed(colour=server.me.colour, description=welcomemessage[1:-1])
+                                embed = discord.Embed(colour=server.me.colour, description=welcomemessage[1:-1].format(user=owner.mention))
                                 res = await ask(embed, owner, owner.id)
                             else:
-                                res = await ask(welcomemessage, owner, owner.id)
+                                res = await ask(welcomemessage.format(user=owner.mention), owner, owner.id)
                         if res == '❎':
                             await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="Please enter a new welcome message, or reply with **N** to use the default."))
                             continue

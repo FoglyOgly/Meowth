@@ -327,7 +327,7 @@ def do_template(message, author, server):
             if not role:
                 not_found.append(full_match)
             return role.mention if role else full_match
-    template_pattern = r'{(@|#|&|<)([^{}]+)}|{(user|server)}|:([a-zA-Z0-9]+):'
+    template_pattern = r'{(@|#|&|<)([^{}]+)}|{(user|server)}|<*:([a-zA-Z0-9]+):[0-9]*>*'
     msg = re.sub(template_pattern, template_replace, message)
     return (msg, not_found)
 

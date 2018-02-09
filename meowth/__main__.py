@@ -366,9 +366,9 @@ async def template(ctx, *, sample_message):
     else:
         if msg.startswith("[") and msg.endswith("]"):
             await Meowth.send_message(ctx.message.channel, embed=discord.Embed(
-                colour=ctx.message.server.me.colour, description=msg[1:-1]))
+                colour=ctx.message.server.me.colour, description=msg[1:-1].format(user=ctx.message.author.mention)))
         else:
-            await Meowth.send_message(ctx.message.channel, msg)
+            await Meowth.send_message(ctx.message.channel, msg.format(user=ctx.message.author.mention))
 
 
 """
@@ -1207,19 +1207,19 @@ async def configure(ctx):
                         welcomemessage, errors = do_template(welcomemsgreply.content, owner, server)
                         if errors:
                             if welcomemessage.startswith("[") and welcomemessage.endswith("]"):
-                                embed = discord.Embed(colour=server.me.colour, description=welcomemessage[1:-1])
+                                embed = discord.Embed(colour=server.me.colour, description=welcomemessage[1:-1].format(user=owner.mention))
                                 embed.add_field(name='Warning', value='The following could not be found:\n{}'.format('\n'.join(errors)))
                                 await Meowth.send_message(owner, embed=embed)
                             else:
-                                await Meowth.send_message(owner, "{}\n\n**Warning:**\nThe following could not be found: {}".format(welcomemessage, ', '.join(errors)))
+                                await Meowth.send_message(owner, "{}\n\n**Warning:**\nThe following could not be found: {}".format(welcomemessage.format(user=author.mention), ', '.join(errors)))
                             await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="Please check the data given and retry a new welcome message, or reply with **N** to use the default."))
                             continue
                         else:
                             if welcomemessage.startswith("[") and welcomemessage.endswith("]"):
-                                embed = discord.Embed(colour=server.me.colour, description=welcomemessage[1:-1])
+                                embed = discord.Embed(colour=server.me.colour, description=welcomemessage[1:-1].format(user=owner.mention))
                                 res = await ask(embed, owner, owner.id)
                             else:
-                                res = await ask(welcomemessage, owner, owner.id)
+                                res = await ask(welcomemessage.format(user=owner.mention), owner, owner.id)
                         if res == '❎':
                             await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="Please enter a new welcome message, or reply with **N** to use the default."))
                             continue
@@ -2340,8 +2340,11 @@ async def _eggassume(args, raid_channel):
 async def _eggtoraid(entered_raid, raid_channel):
     eggdetails = server_dict[raid_channel.server.id]['raidchannel_dict'][raid_channel.id]
     egglevel = eggdetails['egglevel']
-    reportcitychannel = Meowth.get_channel(eggdetails['reportcity'])
-    reportcity = reportcitychannel.name
+    try:
+        reportcitychannel = Meowth.get_channel(eggdetails['reportcity'])
+        reportcity = reportcitychannel.name
+    except (discord.errors.NotFound, AttributeError):
+        reportcity = None
     manual_timer = eggdetails['manual_timer']
     trainer_dict = eggdetails['trainer_dict']
     egg_address = eggdetails['address']
@@ -2379,7 +2382,7 @@ You can set the start time with **!starttime [HH:MM AM/PM]** (you can also omit 
 
 Message **!starting** when the raid is beginning to clear the raid's 'here' list.
 
-This channel will be deleted five minutes after the timer expires.""").format(member=raid_messageauthor.mention, citychannel=reportcitychannel.mention, pokemon=entered_raid.capitalize(), location_details=egg_address)
+This channel will be deleted five minutes after the timer expires.""").format(member=raid_messageauthor.mention, citychannel=reportcitychannel.mention if reportcitychannel else "UNKNOWN", pokemon=entered_raid.capitalize(), location_details=egg_address)
     elif egglevel == "EX":
         hatchtype = "exraid"
         raidreportcontent = _("Meowth! The EX egg has hatched into a {pokemon} raid! Details: {location_details}. Use the **!invite** command to gain access and coordinate in {raid_channel}").format(pokemon=entered_raid.capitalize(), location_details=egg_address, raid_channel=raid_channel.mention)
@@ -2444,8 +2447,11 @@ This channel will be deleted five minutes after the timer expires.""").format(po
     trainer_dict = copy.deepcopy(server_dict[raid_channel.server.id]['raidchannel_dict'][raid_channel.id]['trainer_dict'])
     for trainer in trainer_dict.keys():
         if trainer_dict[trainer]['status'] =='maybe' or trainer_dict[trainer]['status'] =='omw' or trainer_dict[trainer]['status'] =='waiting':
-            user = raid_channel.server.get_member(trainer)
-            trainer_list.append(user.mention)
+            try:
+                user = raid_channel.server.get_member(trainer)
+                trainer_list.append(user.mention)
+            except (discord.errors.NotFound, AttributeError):
+                continue
     await Meowth.send_message(raid_channel, content = _("Meowth! Trainers {trainer_list}: The raid egg has just hatched into a {pokemon} raid!\nIf you couldn't before, you're now able to update your status with **!coming** or **!here**. If you've changed your plans, use **!cancel**.").format(trainer_list=", ".join(trainer_list), pokemon=raid), embed = raid_embed)
     for field in oldembed['fields']:
         if "team" in field['name'].lower() or "status" in field['name'].lower():

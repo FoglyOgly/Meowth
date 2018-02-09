@@ -1211,7 +1211,7 @@ async def configure(ctx):
                                 embed.add_field(name='Warning', value='The following could not be found:\n{}'.format('\n'.join(errors)))
                                 await Meowth.send_message(owner, embed=embed)
                             else:
-                                await Meowth.send_message(owner, "{}\n\n**Warning:**\nThe following could not be found: {}".format(welcomemessage.format(user=owner.mention), ', '.join(errors)))
+                                await Meowth.send_message(owner, "{msg}\n\n**Warning:**\nThe following could not be found: {errors}".format(msg=welcomemessage.format(user=owner.mention), errors=', '.join(errors)))
                             await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="Please check the data given and retry a new welcome message, or reply with **N** to use the default."))
                             continue
                         else:

@@ -1467,7 +1467,7 @@ async def reload_json(ctx):
     await Meowth.add_reaction(ctx.message, '✅')
 
 @Meowth.command(pass_context=True)
-@commands.has_permissions(manage_server=True)
+@commands.has_permissions(manage_channels=True)
 @checks.raidchannel()
 async def clearstatus(ctx):
     """Clears raid channel status lists.

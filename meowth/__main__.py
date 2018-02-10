@@ -2833,7 +2833,7 @@ async def starttime(ctx):
         if now > start:
             await Meowth.send_message(channel, _("Meowth! Please enter a time in the future."))
             return
-        if total < mintime:
+        if int(total) < int(mintime):
             await Meowth.send_message(channel, "Meowth! The egg will not hatch by then!")
             return
         if alreadyset:

@@ -36,6 +36,7 @@ else:
     tesseract_config = xtraconfig
 logger = init_loggers()
 
+
 def _get_prefix(bot, message):
     guild = message.guild
     try:
@@ -44,6 +45,8 @@ def _get_prefix(bot, message):
         set_prefix = None
     default_prefix = bot.config['default_prefix']
     return set_prefix or default_prefix
+
+
 Meowth = commands.Bot(command_prefix=_get_prefix)
 custom_error_handling(Meowth, logger)
 try:
@@ -66,10 +69,6 @@ except OSError:
         logger.info('Serverdict Created')
 
 
-
-
-
-
 guild_dict = Meowth.guild_dict
 
 
@@ -89,6 +88,7 @@ script_path = os.path.dirname(os.path.realpath(__file__))
 Helper functions
 """
 
+
 def load_config():
     global config
     global pkmn_info
@@ -99,10 +99,12 @@ def load_config():
     with open('config.json', 'r') as fd:
         config = json.load(fd)
     # Set up message catalog access
-    language = gettext.translation('meowth', localedir='locale', languages=[config['bot-language']])
+    language = gettext.translation('meowth', localedir='locale', languages=[
+                                   config['bot-language']])
     language.install()
     pokemon_language = [config['pokemon-language']]
-    pokemon_path_source = os.path.join('locale', '{0}', 'pkmn.json').format(config['pokemon-language'])
+    pokemon_path_source = os.path.join(
+        'locale', '{0}', 'pkmn.json').format(config['pokemon-language'])
     # Load Pokemon list and raid info
     with open(pokemon_path_source, 'r') as fd:
         pkmn_info = json.load(fd)
@@ -115,11 +117,15 @@ def load_config():
         type_list = json.load(fd)
     # Set spelling dictionary to our list of Pokemon
     spelling.set_dictionary(pkmn_info['pokemon_list'])
+
+
 load_config()
 Meowth.config = config
 
 # Given a Pokemon name, return a list of its
 # weaknesses as defined in the type chart
+
+
 def get_type(guild, pkmn_number):
     pkmn_number = int(pkmn_number) - 1
     types = type_list[pkmn_number]
@@ -128,14 +134,17 @@ def get_type(guild, pkmn_number):
         ret.append(parse_emoji(guild, config['type_id_dict'][type.lower()]))
     return ret
 
+
 def get_name(pkmn_number):
     pkmn_number = int(pkmn_number) - 1
     name = pkmn_info['pokemon_list'][pkmn_number].capitalize()
     return name
 
+
 def get_number(pkm_name):
     number = pkmn_info['pokemon_list'].index(pkm_name) + 1
     return number
+
 
 def get_level(pkmn):
     if str(pkmn).isdigit():
@@ -147,6 +156,7 @@ def get_level(pkmn):
             if pokemon == pkmn_number:
                 return level
 
+
 def get_raidlist():
     raidlist = []
     for level in raid_info['raid_eggs']:
@@ -157,6 +167,8 @@ def get_raidlist():
 
 # Given a Pokemon name, return a list of its
 # weaknesses as defined in the type chart
+
+
 def get_weaknesses(species):
     # Get the Pokemon's number
     number = pkmn_info['pokemon_list'].index(species)
@@ -187,6 +199,8 @@ def get_weaknesses(species):
 # Given a list of weaknesses, return a
 # space-separated string of their type IDs,
 # as defined in the type_id_dict
+
+
 def weakness_to_str(guild, weak_list):
     ret = ''
     for weakness in weak_list:
@@ -196,11 +210,14 @@ def weakness_to_str(guild, weak_list):
             weakness = weakness[:(- 2)]
             x2 = 'x2'
         # Append to string
-        ret += (parse_emoji(guild, config['type_id_dict'][weakness]) + x2) + ' '
+        ret += (parse_emoji(guild,
+                config['type_id_dict'][weakness]) + x2) + ' '
     return ret
 
 # Convert an arbitrary string into something which
 # is acceptable as a Discord channel name.
+
+
 def sanitize_channel_name(name):
     # Remove all characters other than alphanumerics,
     # dashes, underscores, and spaces
@@ -213,12 +230,15 @@ def sanitize_channel_name(name):
 # and <emoji_name> is in the server's emoji list, then
 # return the string <:emoji name:emoji id>. Otherwise,
 # just return the string unmodified.
+
+
 def parse_emoji(guild, emoji_string):
     if (emoji_string[0] == ':') and (emoji_string[(- 1)] == ':'):
         emoji = discord.utils.get(guild.emojis, name=emoji_string.strip(':'))
         if emoji:
             emoji_string = '<:{0}:{1}>'.format(emoji.name, emoji.id)
     return emoji_string
+
 
 def print_emoji_name(guild, emoji_string):
     # By default, just print the emoji_string
@@ -233,6 +253,8 @@ def print_emoji_name(guild, emoji_string):
 
 # Given an arbitrary string, create a Google Maps
 # query using the configured hints
+
+
 def create_gmaps_query(details, channel):
     if "/maps" in details and "http" in details:
         mapsindex = details.find('/maps')
@@ -247,20 +269,28 @@ def create_gmaps_query(details, channel):
             newloc = details[newlocindex:newlocend + 1]
             return newloc
     details_list = details.split()
-    loc_list = guild_dict[channel.guild.id]['city_channels'][channel.name].split()
+    loc_list = guild_dict[channel.guild.id]['city_channels'][channel.name].split(
+    )
     return 'https://www.google.com/maps/search/?api=1&query={0}+{1}'.format('+'.join(details_list), '+'.join(loc_list))
 
 # Given a User, check that it is Meowth's master
+
+
 def check_master(user):
     return str(user) == config['master']
+
 
 def check_server_owner(user, guild):
     return str(user) == str(guild.owner)
 
 # Given a violating message, raise an exception
 # reporting unauthorized use of admin commands
+
+
 def raise_admin_violation(message):
-    raise Exception(_('Received admin command {command} from unauthorized user, {user}!').format(command=message.content, user=message.author))
+    raise Exception(_('Received admin command {command} from unauthorized user, {user}!').format(
+        command=message.content, user=message.author))
+
 
 def spellcheck(word):
     suggestion = spelling.correction(word)
@@ -271,8 +301,10 @@ def spellcheck(word):
     else:
         return _('Meowth! "{entered_word}" is not a Pokemon! Check your spelling!').format(entered_word=word)
 
+
 def do_template(message, author, guild):
     not_found = []
+
     def template_replace(match):
         if match.group(3):
             if match.group(3) == 'user':
@@ -316,6 +348,7 @@ def do_template(message, author, guild):
     msg = re.sub(template_pattern, template_replace, message)
     return (msg, not_found)
 
+
 async def ask(message, destination, user_id, *, react_list=['✅', '❎']):
     if isinstance(message, discord.Embed):
         msg = await destination.send(embed=message)
@@ -333,6 +366,7 @@ async def ask(message, destination, user_id, *, react_list=['✅', '❎']):
     except asyncio.TimeoutError:
         return
 
+
 @Meowth.command(hidden=True)
 async def template(ctx, *, sample_message):
     """Sample template messages to see how they would appear."""
@@ -340,11 +374,14 @@ async def template(ctx, *, sample_message):
     (msg, errors) = do_template(sample_message, ctx.author, ctx.guild)
     if errors:
         if msg.startswith('[') and msg.endswith(']'):
-            embed = discord.Embed(colour=ctx.guild.me.colour, description=msg[1:(- 1)])
-            embed.add_field(name='Warning', value='The following could not be found:\n{}'.format('\n'.join(errors)))
+            embed = discord.Embed(
+                colour=ctx.guild.me.colour, description=msg[1:(- 1)])
+            embed.add_field(name='Warning', value='The following could not be found:\n{}'.format(
+                '\n'.join(errors)))
             await ctx.channel.send(embed=embed)
         else:
-            msg = '{}\n\n**Warning:**\nThe following could not be found: {}'.format(msg, ', '.join(errors))
+            msg = '{}\n\n**Warning:**\nThe following could not be found: {}'.format(
+                msg, ', '.join(errors))
             await ctx.channel.send(msg)
     elif msg.startswith('[') and msg.endswith(']'):
         await ctx.channel.send(embed=discord.Embed(colour=ctx.guild.me.colour, description=msg[1:(- 1)].format(user=ctx.author.mention)))
@@ -356,6 +393,7 @@ async def template(ctx, *, sample_message):
 Server Management
 """
 
+
 async def expiry_check(channel):
     logger.info('Expiry_Check - ' + channel.name)
     guild = channel.guild
@@ -363,7 +401,8 @@ async def expiry_check(channel):
     channel = Meowth.get_channel(channel.id)
     if channel not in active_raids:
         active_raids.append(channel)
-        logger.info('Expire_Channel - Channel Added To Watchlist - ' + channel.name)
+        logger.info(
+            'Expire_Channel - Channel Added To Watchlist - ' + channel.name)
         await asyncio.sleep(0.5)
         while True:
             try:
@@ -373,24 +412,29 @@ async def expiry_check(channel):
                             if guild_dict[guild.id]['raidchannel_dict'][channel.id]['type'] == 'egg':
                                 pokemon = guild_dict[guild.id]['raidchannel_dict'][channel.id]['pokemon']
                                 if pokemon:
-                                    logger.info('Expire_Channel - Egg Auto Hatched - ' + channel.name)
+                                    logger.info(
+                                        'Expire_Channel - Egg Auto Hatched - ' + channel.name)
                                     try:
                                         active_raids.remove(channel)
                                     except ValueError:
-                                        logger.info('Expire_Channel - Channel Removal From Active Raid Failed - Not in List - ' + channel.name)
+                                        logger.info(
+                                            'Expire_Channel - Channel Removal From Active Raid Failed - Not in List - ' + channel.name)
                                     await _eggtoraid(pokemon.lower(), channel)
                                     break
                             event_loop.create_task(expire_channel(channel))
                             try:
                                 active_raids.remove(channel)
                             except ValueError:
-                                logger.info('Expire_Channel - Channel Removal From Active Raid Failed - Not in List - ' + channel.name)
-                            logger.info('Expire_Channel - Channel Expired And Removed From Watchlist - ' + channel.name)
+                                logger.info(
+                                    'Expire_Channel - Channel Removal From Active Raid Failed - Not in List - ' + channel.name)
+                            logger.info(
+                                'Expire_Channel - Channel Expired And Removed From Watchlist - ' + channel.name)
                             break
             except KeyError:
                 pass
             await asyncio.sleep(30)
             continue
+
 
 async def expire_channel(channel):
     guild = channel.guild
@@ -424,11 +468,13 @@ async def expire_channel(channel):
             guild_dict[guild.id]['raidchannel_dict'][channel.id]['exp'] = time.time()
             if (not alreadyexpired):
                 await channel.send(_('This channel has been successfully reported as a duplicate and will be deleted in 1 minute. Check the channel list for the other raid channel to coordinate in!\nIf this was in error, reset the raid with **!timerset**'))
-            delete_time = (guild_dict[guild.id]['raidchannel_dict'][channel.id]['exp'] + (1 * 60)) - time.time()
+            delete_time = (guild_dict[guild.id]['raidchannel_dict']
+                           [channel.id]['exp'] + (1 * 60)) - time.time()
         elif guild_dict[guild.id]['raidchannel_dict'][channel.id]['type'] == 'egg':
             if (not alreadyexpired):
                 maybe_list = []
-                trainer_dict = copy.deepcopy(guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['trainer_dict'])
+                trainer_dict = copy.deepcopy(
+                    guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['trainer_dict'])
                 for trainer in trainer_dict.keys():
                     if trainer_dict[trainer]['status'] == 'maybe':
                         user = channel.guild.get_member(trainer)
@@ -436,15 +482,19 @@ async def expire_channel(channel):
                 new_name = 'hatched-' + channel.name
                 await channel.edit(name=new_name)
                 await channel.send(_("**This egg has hatched!**\n\n...or the time has just expired. Trainers {trainer_list}: Update the raid to the pokemon that hatched using **!raid <pokemon>** or reset the hatch timer with **!timerset**. This channel will be deactivated until I get an update and I'll delete it in 45 minutes if I don't hear anything.").format(trainer_list=', '.join(maybe_list)))
-            delete_time = (guild_dict[guild.id]['raidchannel_dict'][channel.id]['exp'] + (45 * 60)) - time.time()
-            expiremsg = _('**This level {level} raid egg has expired!**').format(level=guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['egglevel'])
+            delete_time = (guild_dict[guild.id]['raidchannel_dict']
+                           [channel.id]['exp'] + (45 * 60)) - time.time()
+            expiremsg = _('**This level {level} raid egg has expired!**').format(
+                level=guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['egglevel'])
         else:
             if (not alreadyexpired):
                 new_name = 'expired-' + channel.name
                 await channel.edit(name=new_name)
                 await channel.send(_('This channel timer has expired! The channel has been deactivated and will be deleted in 5 minutes.\nTo reactivate the channel, use **!timerset** to set the timer again.'))
-            delete_time = (guild_dict[guild.id]['raidchannel_dict'][channel.id]['exp'] + (5 * 60)) - time.time()
-            expiremsg = _('**This {pokemon} raid has expired!**').format(pokemon=guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['pokemon'].capitalize())
+            delete_time = (guild_dict[guild.id]['raidchannel_dict']
+                           [channel.id]['exp'] + (5 * 60)) - time.time()
+            expiremsg = _('**This {pokemon} raid has expired!**').format(
+                pokemon=guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['pokemon'].capitalize())
         await asyncio.sleep(delete_time)
         # If the channel has already been deleted from the dict, someone
         # else got to it before us, so don't do anything.
@@ -453,14 +503,16 @@ async def expire_channel(channel):
             if (guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['active'] == False) and Meowth.is_logged_in and (not Meowth.is_closed):
                 if dupechannel:
                     try:
-                        report_channel = Meowth.get_channel(guild_dict[guild.id]['raidchannel_dict'][channel.id]['reportcity'])
+                        report_channel = Meowth.get_channel(
+                            guild_dict[guild.id]['raidchannel_dict'][channel.id]['reportcity'])
                         reportmsg = await report_channel.get_message(guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['raidreport'])
                         await reportmsg.delete()
                     except:
                         pass
                 else:
                     try:
-                        report_channel = Meowth.get_channel(guild_dict[guild.id]['raidchannel_dict'][channel.id]['reportcity'])
+                        report_channel = Meowth.get_channel(
+                            guild_dict[guild.id]['raidchannel_dict'][channel.id]['reportcity'])
                         reportmsg = await report_channel.get_message(guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['raidreport'])
                         await reportmsg.edit(embed=discord.Embed(description=expiremsg, colour=channel.guild.me.colour))
                     except:
@@ -469,22 +521,24 @@ async def expire_channel(channel):
                     del guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]
                 except KeyError:
                     pass
-                    #channel doesn't exist anymore in serverdict
+                    # channel doesn't exist anymore in serverdict
                 channel_exists = Meowth.get_channel(channel.id)
                 if channel_exists is None:
                     return
                 else:
                     await channel_exists.delete()
-                    logger.info('Expire_Channel - Channel Deleted - ' + channel.name)
+                    logger.info(
+                        'Expire_Channel - Channel Deleted - ' + channel.name)
         except:
             pass
+
 
 async def channel_cleanup(loop=True):
     while Meowth.is_logged_in and (not Meowth.is_closed):
         global active_raids
         guilddict_chtemp = copy.deepcopy(guild_dict)
         logger.info('Channel_Cleanup ------ BEGIN ------')
-        #for every server in save data
+        # for every server in save data
         for guildid in guilddict_chtemp.keys():
             guild = Meowth.get_guild(guildid)
             log_str = 'Channel_Cleanup - Server: ' + guildid
@@ -492,11 +546,12 @@ async def channel_cleanup(loop=True):
             if guild is None:
                 logger.info(log_str + ': NOT FOUND')
                 continue
-            logger.info(((log_str + ' (') + guild.name) + ')  - BEGIN CHECKING SERVER')
-            #clear channel lists
+            logger.info(((log_str + ' (') + guild.name) +
+                        ')  - BEGIN CHECKING SERVER')
+            # clear channel lists
             dict_channel_delete = []
             discord_channel_delete = []
-            #check every raid channel data for each server
+            # check every raid channel data for each server
             for channelid in guilddict_chtemp[guildid]['raidchannel_dict']:
                 channel = Meowth.get_channel(channelid)
                 log_str = 'Channel_Cleanup - Server: ' + guild.name
@@ -504,79 +559,80 @@ async def channel_cleanup(loop=True):
                 logger.info(log_str + ' - CHECKING')
                 channelmatch = Meowth.get_channel(channelid)
                 if channelmatch is None:
-                    #list channel for deletion from save data
+                    # list channel for deletion from save data
                     dict_channel_delete.append(channelid)
                     logger.info(log_str + " - DOESN'T EXIST IN DISCORD")
-                #otherwise, if meowth can still see the channel in discord
+                # otherwise, if meowth can still see the channel in discord
                 else:
-                    logger.info(((log_str + ' (') + channel.name) + ') - EXISTS IN DISCORD')
-                    #if the channel save data shows it's not an active raid
+                    logger.info(
+                        ((log_str + ' (') + channel.name) + ') - EXISTS IN DISCORD')
+                    # if the channel save data shows it's not an active raid
                     if guilddict_chtemp[guildid]['raidchannel_dict'][channelid]['active'] == False:
                         if guilddict_chtemp[guildid]['raidchannel_dict'][channelid]['type'] == 'egg':
-                            #and if it has been expired for longer than 15 minutes already
+                            # and if it has been expired for longer than 15 minutes already
                             if guilddict_chtemp[guildid]['raidchannel_dict'][channelid]['exp'] < (time.time() - (15 * 60)):
-                                #list the channel to be removed from save data
+                                # list the channel to be removed from save data
                                 dict_channel_delete.append(channelid)
-                                #and list the channel to be deleted in discord
+                                # and list the channel to be deleted in discord
                                 discord_channel_delete.append(channel)
-                                logger.info(log_str + ' - 15+ MIN EXPIRY NONACTIVE EGG')
+                                logger.info(
+                                    log_str + ' - 15+ MIN EXPIRY NONACTIVE EGG')
                                 continue
-                            #and if it has been expired for longer than 5 minutes already
+                            # and if it has been expired for longer than 5 minutes already
                         elif guilddict_chtemp[guildid]['raidchannel_dict'][channelid]['exp'] < (time.time() - (5 * 60)):
-                                #list the channel to be removed from save data
+                                # list the channel to be removed from save data
                             dict_channel_delete.append(channelid)
-                                #and list the channel to be deleted in discord
+                                # and list the channel to be deleted in discord
                             discord_channel_delete.append(channel)
-                            logger.info(log_str + ' - 5+ MIN EXPIRY NONACTIVE RAID')
+                            logger.info(
+                                log_str + ' - 5+ MIN EXPIRY NONACTIVE RAID')
                             continue
                         event_loop.create_task(expire_channel(channel))
-                        logger.info(log_str + ' - = RECENTLY EXPIRED NONACTIVE RAID')
+                        logger.info(
+                            log_str + ' - = RECENTLY EXPIRED NONACTIVE RAID')
                         continue
-                    #if the channel save data shows it as an active raid still
+                    # if the channel save data shows it as an active raid still
                     elif guilddict_chtemp[guildid]['raidchannel_dict'][channelid]['active'] == True:
-                        #if it's an exraid
+                        # if it's an exraid
                         if guilddict_chtemp[guildid]['raidchannel_dict'][channelid]['type'] == 'exraid':
                             logger.info(log_str + ' - EXRAID')
 
-
-
-
-
                             continue
-                        #or if the expiry time for the channel has already passed within 5 minutes
+                        # or if the expiry time for the channel has already passed within 5 minutes
                         elif guilddict_chtemp[guildid]['raidchannel_dict'][channelid]['exp'] <= time.time():
-                            #list the channel to be sent to the channel expiry function
+                            # list the channel to be sent to the channel expiry function
                             event_loop.create_task(expire_channel(channel))
                             logger.info(log_str + ' - RECENTLY EXPIRED')
-
-
-
 
                             continue
 
                         elif channel not in active_raids:
-                            #if channel is still active, make sure it's expiry is being monitored
+                            # if channel is still active, make sure it's expiry is being monitored
                             event_loop.create_task(expiry_check(channel))
-                            logger.info(log_str + ' - MISSING FROM EXPIRY CHECK')
+                            logger.info(
+                                log_str + ' - MISSING FROM EXPIRY CHECK')
                             continue
-            #for every channel listed to have save data deleted
+            # for every channel listed to have save data deleted
             for c in dict_channel_delete:
                 try:
-                    #attempt to delete the channel from save data
+                    # attempt to delete the channel from save data
                     del guild_dict[guildid]['raidchannel_dict'][c]
-                    logger.info('Channel_Cleanup - Channel Savedata Cleared - ' + c)
+                    logger.info(
+                        'Channel_Cleanup - Channel Savedata Cleared - ' + c)
                 except KeyError:
                     pass
-            #for every channel listed to have the discord channel deleted
+            # for every channel listed to have the discord channel deleted
             for c in discord_channel_delete:
                 try:
-                    #delete channel from discord
+                    # delete channel from discord
                     await c.delete()
-                    logger.info('Channel_Cleanup - Channel Deleted - ' + c.name)
+                    logger.info(
+                        'Channel_Cleanup - Channel Deleted - ' + c.name)
                 except:
-                    logger.info('Channel_Cleanup - Channel Deletion Failure - ' + c.name)
+                    logger.info(
+                        'Channel_Cleanup - Channel Deletion Failure - ' + c.name)
                     pass
-        #save server_dict changes after cleanup
+        # save server_dict changes after cleanup
         logger.info('Channel_Cleanup - SAVING CHANGES')
         try:
             await _save()
@@ -585,6 +641,7 @@ async def channel_cleanup(loop=True):
         logger.info('Channel_Cleanup ------ END ------')
         await asyncio.sleep(600)
         continue
+
 
 async def guild_cleanup(loop=True):
     while Meowth.is_logged_in and (not Meowth.is_closed):
@@ -604,7 +661,8 @@ async def guild_cleanup(loop=True):
         for s in dict_guild_delete:
             try:
                 del guild_dict[s]
-                logger.info(('Server_Cleanup - Cleared ' + s) + ' from save data')
+                logger.info(('Server_Cleanup - Cleared ' + s) +
+                            ' from save data')
             except KeyError:
                 pass
         logger.info('Server_Cleanup - SAVING CHANGES')
@@ -616,12 +674,14 @@ async def guild_cleanup(loop=True):
         await asyncio.sleep(7200)
         continue
 
+
 async def _print(owner, message):
     if 'launcher' in sys.argv[1:]:
         if 'debug' not in sys.argv[1:]:
             await owner.send(message)
     print(message)
     logger.info(message)
+
 
 async def maint_start():
     try:
@@ -637,9 +697,12 @@ event_loop = asyncio.get_event_loop()
 """
 Events
 """
+
+
 @Meowth.event
 async def on_ready():
-    Meowth.owner = discord.utils.get(Meowth.get_all_members(), id=config['master'])
+    Meowth.owner = discord.utils.get(
+        Meowth.get_all_members(), id=config['master'])
     await _print(Meowth.owner, _('Starting up...'))
     Meowth.uptime = datetime.datetime.now()
     owners = []
@@ -688,6 +751,7 @@ async def on_ready():
     await _print(Meowth.owner, _("Meowth! That's right!\n\n{server_count} servers connected.\n{member_count} members found.").format(server_count=guilds, member_count=users))
     await maint_start()
 
+
 @Meowth.event
 async def on_guild_join(guild):
     owner = guild.owner
@@ -709,6 +773,7 @@ async def on_guild_join(guild):
     }
     await owner.send(_("Meowth! I'm Meowth, a Discord helper bot for Pokemon Go communities, and someone has invited me to your server! Type **!help** to see a list of things I can do, and type **!configure** in any channel of your server to begin!"))
 
+
 @Meowth.event
 async def on_guild_remove(guild):
     try:
@@ -720,21 +785,23 @@ async def on_guild_remove(guild):
     except KeyError:
         pass
 
+
 @Meowth.event
 async def on_member_join(member):
     'Welcome message to the server and some basic instructions.'
     guild = member.guild
-    team_msg = ' or '.join(['**!team {0}**'.format(team) for team in config['team_dict'].keys()])
+    team_msg = ' or '.join(['**!team {0}**'.format(team)
+                           for team in config['team_dict'].keys()])
     if (guild_dict[guild.id]['done'] == False) or (guild_dict[guild.id]['welcome'] == False):
         return
     # Build welcome message
-	if guild_dict[guild.id].get('welcomemsg','default') == "default":
+	if guild_dict[guild.id].get('welcomemsg', 'default') == "default":
         admin_message = _(' If you have any questions just ask an admin.')
         welcomemessage = _('Meowth! Welcome to {server}, {user}! ')
         if guild_dict[guild.id]['team'] == True:
-            welcomemessage += _('Set your team by typing {team_command}.').format(team_command=team_msg)
+            welcomemessage += _('Set your team by typing {team_command}.').format(
+                team_command=team_msg)
         welcomemessage += admin_message
-
 
 	else:
 	    welcomemessage = guild_dict[guild.id]['welcomemsg']
@@ -1152,7 +1219,7 @@ async def configure(ctx):
             else:
                 await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="I'm sorry I don't understand. Please reply with either **N** to disable, or **Y** to enable."))
                 continue
-    #configure welcome
+    # configure welcome
     if (configcancel == False) and ((firstconfig == True) or (configgoto == 'all') or (configgoto == 'welcome')):
         welcomeconfig = 'I can welcome new members to the server with a short message. Here is an example:\n\n'
         if guild_dict_temp['team'] == True:
@@ -1255,7 +1322,7 @@ async def configure(ctx):
             else:
                 await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="I'm sorry I don't understand. Please reply with either **N** to disable, or **Y** to enable."))
                 continue
-    #configure main
+    # configure main
     if (configcancel == False) and ((firstconfig == True) or (configgoto == 'all') or (configgoto == 'main') or (configgoto == 'allmain')):
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="Main Functions include:\n - **!want** and creating tracked Pokemon roles \n - **!wild** Pokemon reports\n - **!raid** reports and channel creation for raid management.\nIf you don't want __any__ of the Pokemon tracking or Raid management features, you may want to disable them.\n\nRespond with: **N** to disable, or **Y** to enable:").set_author(name='Main Functions', icon_url=Meowth.user.avatar_url))
         while True:
@@ -1278,7 +1345,7 @@ async def configure(ctx):
             else:
                 await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="I'm sorry I don't understand. Please reply with either **N** to disable, or **Y** to enable."))
                 continue
-    #configure main-raid
+    # configure main-raid
     if (configcancel == False) and (guild_dict_temp['other'] is True) and ((firstconfig == True) or (configgoto == 'all') or (configgoto == 'raid') or (configgoto == 'allmain')):
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description='Do you want **!raid** reports enabled? If you want __only__ the **!wild** feature for reports, you may want to disable this.\n\nRespond with: **N** to disable, or **Y** to enable:').set_author(name='Raid Reports', icon_url=Meowth.user.avatar_url))
         while True:
@@ -1298,7 +1365,7 @@ async def configure(ctx):
             else:
                 await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="I'm sorry I don't understand. Please reply with either **N** to disable, or **Y** to enable."))
                 continue
-    #configure main-wild
+    # configure main-wild
     if (configcancel == False) and (guild_dict_temp['other'] is True) and ((firstconfig == True) or (configgoto == 'all') or (configgoto == 'wild') or (configgoto == 'allmain')):
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description='Do you want **!wild** reports enabled? If you want __only__ the **!raid** feature for reports, you may want to disable this.\n\nRespond with: **N** to disable, or **Y** to enable:').set_author(name='Wild Reports', icon_url=Meowth.user.avatar_url))
         while True:
@@ -1318,7 +1385,7 @@ async def configure(ctx):
             else:
                 await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="I'm sorry I don't understand. Please reply with either **N** to disable, or **Y** to enable."))
                 continue
-    #configure main-channels
+    # configure main-channels
     if (configcancel == False) and (guild_dict_temp['other'] is True) and ((guild_dict_temp['wildset'] is True) or (guild_dict_temp['raidset'] is True)) and ((firstconfig == True) or (configgoto == 'all') or (configgoto == 'regions') or (configgoto == 'allmain')):
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="Pokemon raid or wild reports are contained within one or more channels. Each channel will be able to represent different areas/communities. I'll need you to provide a list of channels in your server you will allow reports from in this format: `channel-name, channel-name, channel-name`\n\nIf you do not require raid and wild reporting, you may want to disable this function.\n\nRespond with: **N** to disable, or the **channel-name** list to enable, each seperated with a comma and space:").set_author(name='Reporting Channels', icon_url=Meowth.user.avatar_url))
         citychannel_dict = {

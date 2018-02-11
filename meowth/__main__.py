@@ -795,7 +795,7 @@ async def on_member_join(member):
     if (guild_dict[guild.id]['done'] == False) or (guild_dict[guild.id]['welcome'] == False):
         return
     # Build welcome message
-	if guild_dict[guild.id].get('welcomemsg', 'default') == "default":
+    if guild_dict[guild.id].get('welcomemsg', 'default') == "default":
         admin_message = _(' If you have any questions just ask an admin.')
         welcomemessage = _('Meowth! Welcome to {server}, {user}! ')
         if guild_dict[guild.id]['team'] == True:
@@ -803,19 +803,19 @@ async def on_member_join(member):
                 team_command=team_msg)
         welcomemessage += admin_message
 
-	else:
-	    welcomemessage = guild_dict[guild.id]['welcomemsg']
+    else:
+        welcomemessage = guild_dict[guild.id]['welcomemsg']
 
     if guild_dict[guild.id]['welcomechan'] == 'dm':
-	    if welcomemessage.startswith("[") and welcomemessage.endswith("]"):
-		    await member.send(embed=discord.Embed(colour=guild.me.colour, description=welcomemessage[1:-1].format(server=guild.name, user=member.mention)))
-		else:
+        if welcomemessage.startswith("[") and welcomemessage.endswith("]"):
+            await member.send(embed=discord.Embed(colour=guild.me.colour, description=welcomemessage[1:-1].format(server=guild.name, user=member.mention)))
+        else:
             await member.send(welcomemessage.format(server=guild.name, user=member.mention))
     else:
         default = discord.utils.get(guild.channels, name=guild_dict[guild.id]['welcomechan'])
         if default:
             if welcomemessage.startswith("[") and welcomemessage.endswith("]"):
-			    await default.send(embed=discord.Embed(colour=guild.me.colour, description=welcomemessage[1:-1].format(server=guild.name, user=member.mention)))
+                await default.send(embed=discord.Embed(colour=guild.me.colour, description=welcomemessage[1:-1].format(server=guild.name, user=member.mention)))
             else:
                 await default.send(welcomemessage.format(server=guild.name, user=member.mention))
 @Meowth.event
@@ -1458,7 +1458,7 @@ async def configure(ctx):
                             for want_channel_name in want_list:
                                 want_channel = discord.utils.get(guild.channels, name=want_channel_name)
                                 if want_channel == None:
-                                    want_channel = await guild.create_text_channel(guild, want_channel_name)
+                                    want_channel = await guild.create_text_channel(want_channel_name)
                                 if want_channel.id not in guild_dict_temp['want_channel_list']:
                                     guild_dict_temp['want_channel_list'].append(want_channel.id)
                             break
@@ -1927,7 +1927,7 @@ async def wild(ctx):
     await _wild(ctx.message)
 
 async def _wild(message):
-    timestamp = (message.timestamp + datetime.timedelta(hours=guild_dict[message.channel.guild.id]['offset'])).strftime('%I:%M %p (%H:%M)')
+    timestamp = (message.created_at + datetime.timedelta(hours=guild_dict[message.channel.guild.id]['offset'])).strftime('%I:%M %p (%H:%M)')
     wild_split = message.clean_content.split()
     del wild_split[0]
     if len(wild_split) <= 1:
@@ -2002,7 +2002,7 @@ async def raid(ctx):
 
 async def _raid(message):
     fromegg = False
-    timestamp = (message.timestamp + datetime.timedelta(hours=guild_dict[message.channel.guild.id]['offset'])).strftime('%I:%M %p (%H:%M)')
+    timestamp = (message.created_at + datetime.timedelta(hours=guild_dict[message.channel.guild.id]['offset'])).strftime('%I:%M %p (%H:%M)')
     if message.channel.name not in guild_dict[message.guild.id]['city_channels'].keys():
         if (message.channel.id in guild_dict[message.channel.guild.id]['raidchannel_dict']) and (guild_dict[message.channel.guild.id]['raidchannel_dict'][message.channel.id]['type'] == 'egg'):
             fromegg = True
@@ -2089,7 +2089,7 @@ async def _raid(message):
         return
     raid_gmaps_link = create_gmaps_query(raid_details, message.channel)
     raid_channel_name = (entered_raid + '-') + sanitize_channel_name(raid_details)
-    raid_channel = await message.guild.create_text_channel(message.guild, raid_channel_name, *message.channel.overwrites)
+    raid_channel = await message.guild.create_text_channel(raid_channel_name, *message.channel.overwrites)
     raid = discord.utils.get(message.guild.roles, name=entered_raid)
     if raid is None:
         try:
@@ -2154,7 +2154,7 @@ async def raidegg(ctx):
     await _raidegg(ctx.message)
 
 async def _raidegg(message):
-    timestamp = (message.timestamp + datetime.timedelta(hours=guild_dict[message.channel.guild.id]['offset'])).strftime('%I:%M %p (%H:%M)')
+    timestamp = (message.created_at + datetime.timedelta(hours=guild_dict[message.channel.guild.id]['offset'])).strftime('%I:%M %p (%H:%M)')
     raidegg_split = message.clean_content.split()
     del raidegg_split[0]
     if raidegg_split[0].lower() == 'egg':
@@ -2208,7 +2208,7 @@ async def _raidegg(message):
             p_type = get_type(message.guild, p)
             boss_list.append((((p_name + ' (') + str(p)) + ') ') + ''.join(p_type))
         raid_channel_name = (('level-' + egg_level) + '-egg-') + sanitize_channel_name(raid_details)
-        raid_channel = await message.guild.create_text_channel(message.guild, raid_channel_name, *message.channel.overwrites)
+        raid_channel = await message.guild.create_text_channel(raid_channel_name, *message.channel.overwrites)
         raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/eggs/{}?cache=2'.format(str(egg_img))
         raid_embed = discord.Embed(title=_('Meowth! Click here for directions to the coming raid!'), url=raid_gmaps_link, colour=message.guild.me.colour)
         if len(egg_info['pokemon']) > 1:
@@ -2451,7 +2451,7 @@ async def exraid(ctx):
 async def _exraid(ctx):
     message = ctx.message
     channel = message.channel
-    timestamp = (message.timestamp + datetime.timedelta(hours=guild_dict[message.channel.guild.id]['offset'])).strftime('%I:%M %p (%H:%M)')
+    timestamp = (message.created_at + datetime.timedelta(hours=guild_dict[message.channel.guild.id]['offset'])).strftime('%I:%M %p (%H:%M)')
     fromegg = False
     exraid_split = message.clean_content.split()
     del exraid_split[0]
@@ -2484,7 +2484,7 @@ async def _exraid(ctx):
             if overwrite[0].permissions.manage_guild:
                 continue
         overwrite[1].send_messages = False
-    raid_channel = await message.guild.create_text_channel(message.guild, raid_channel_name, *raid_channel_overwrites, everyone_overwrite, meowth_overwrite)
+    raid_channel = await message.guild.create_text_channel(raid_channel_name, *raid_channel_overwrites, everyone_overwrite, meowth_overwrite)
     raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/eggs/{}?cache=2'.format(str(egg_img))
     raid_embed = discord.Embed(title=_('Meowth! Click here for directions to the coming raid!'), url=raid_gmaps_link, colour=message.guild.me.colour)
     if len(egg_info['pokemon']) > 1:
@@ -2961,7 +2961,7 @@ async def recover(ctx):
             raid_details = ' '.join(chsplit)
             raid_details = raid_details.strip()
             if (not topic):
-                exp = raidmessage.timestamp.replace(tzinfo=datetime.timezone.utc).timestamp() + (60 * raid_info['raid_eggs'][egglevel]['hatchtime'])
+                exp = raidmessage.created_at.replace(tzinfo=datetime.timezone.utc).timestamp() + (60 * raid_info['raid_eggs'][egglevel]['hatchtime'])
                 manual_timer = False
             else:
                 topicsplit = topic.split('|')
@@ -2981,7 +2981,7 @@ async def recover(ctx):
             raid_details = ' '.join(chsplit)
             raid_details = raid_details.strip()
             if (not topic):
-                exp = raidmessage.timestamp.replace(tzinfo=datetime.timezone.utc).timestamp() + (60 * raid_info['raid_eggs'][get_level(pokemon)]['raidtime'])
+                exp = raidmessage.created_at.replace(tzinfo=datetime.timezone.utc).timestamp() + (60 * raid_info['raid_eggs'][get_level(pokemon)]['raidtime'])
                 manual_timer = False
             else:
                 localend = datetime.datetime.strptime(topic[:(- 8)], 'Ends on %B %d at %I:%M %p')
@@ -2998,7 +2998,7 @@ async def recover(ctx):
             raid_details = ' '.join(chsplit)
             raid_details = raid_details.strip()
             if (not topic):
-                exp = raidmessage.timestamp.replace(tzinfo=datetime.timezone.utc).timestamp() + (((60 * 60) * 24) * 14)
+                exp = raidmessage.created_at.replace(tzinfo=datetime.timezone.utc).timestamp() + (((60 * 60) * 24) * 14)
                 manual_timer = False
             else:
                 topicsplit = topic.split('|')
@@ -3032,7 +3032,7 @@ async def recover(ctx):
                                     count = int(messagesplit[(- 2)])
                                 else:
                                     count = 1
-                             if messagesplit[-1].isdigit():
+                                if messagesplit[-1].isdigit():
                                     party = [int(messagesplit[-10]),int(messagesplit[-7]),int(messagesplit[-4]),int(messagesplit[-1])]
                                 else:
                                     party = [0,0,0,count]

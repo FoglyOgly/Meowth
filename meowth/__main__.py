@@ -1471,13 +1471,13 @@ async def clearstatus(ctx):
 @Meowth.command(pass_context=True)
 @commands.has_permissions(manage_channels=True)
 @checks.raidchannel()
-async def setstatus(ctx, member: discord.Member, status,*, status_counts: str = None):
+async def setstatus(ctx, member: discord.Member, status,*, status_counts: str = ''):
     """Changes raid channel status lists.
 
     Usage: !setstatus <user> <status> [count]
     User can be a mention or ID number. Status can be maybe/interested/i, omw/coming/c, waiting/here/h, or cancel
     Only usable by admins."""
-    valid_status_list = ['interested', 'i', 'maybe', 'coming', 'c', 'here', 'h']
+    valid_status_list = ['interested', 'i', 'maybe', 'coming', 'c', 'here', 'h', 'cancel','x']
     if status not in valid_status_list:
         await Meowth.send_message(ctx.message.channel, "Meowth! {status} is not a valid status!".format(status=status))
         return

@@ -587,18 +587,6 @@ async def channel_cleanup(loop=True):
                             logger.info(log_str+" - EXRAID")
                             continue
 
-                        #and if it has been expired for longer than 5 minutes already
-                        elif serverdict_chtemp[serverid]['raidchannel_dict'][channelid]['exp'] < (time.time() - (5 * 60)):
-
-                            #list the channel to be removed from save data
-                            dict_channel_delete.append(channelid)
-
-                            #and list the channel to be deleted in discord
-                            discord_channel_delete.append(channel)
-
-                            logger.info(log_str+" - 5+ MIN EXPIRY ACTIVE")
-                            continue
-
                         #or if the expiry time for the channel has already passed within 5 minutes
                         elif serverdict_chtemp[serverid]['raidchannel_dict'][channelid]['exp'] <= time.time():
 

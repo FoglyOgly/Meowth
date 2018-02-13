@@ -587,18 +587,6 @@ async def channel_cleanup(loop=True):
                             logger.info(log_str+" - EXRAID")
                             continue
 
-                        #and if it has been expired for longer than 5 minutes already
-                        elif serverdict_chtemp[serverid]['raidchannel_dict'][channelid]['exp'] < (time.time() - (5 * 60)):
-
-                            #list the channel to be removed from save data
-                            dict_channel_delete.append(channelid)
-
-                            #and list the channel to be deleted in discord
-                            discord_channel_delete.append(channel)
-
-                            logger.info(log_str+" - 5+ MIN EXPIRY ACTIVE")
-                            continue
-
                         #or if the expiry time for the channel has already passed within 5 minutes
                         elif serverdict_chtemp[serverid]['raidchannel_dict'][channelid]['exp'] <= time.time():
 
@@ -1189,7 +1177,7 @@ async def configure(ctx):
                                  "**{&role}** - Replace role name or ID (shows as @deleted-role DM preview)\n"
                                  "**{user}** - Will mention the new user\n"
                                  "**{server}** - Will print your server's name\n"
-                                 "Surround your message with [] to send it as an embed. **Warning:** Mentions within embeds may be broken on mobile, this is a discord bug.")).set_author(name="Welcome Message", icon_url=Meowth.user.avatar_url))
+                                 "Surround your message with [] to send it as an embed. **Warning:** Mentions within embeds may be broken on mobile, this is a Discord bug.")).set_author(name="Welcome Message", icon_url=Meowth.user.avatar_url))
                 while True:
                     welcomemsgreply = await Meowth.wait_for_message(author = owner, check=lambda message: message.server is None)
                     if welcomemsgreply.content.lower() == "n":
@@ -1467,7 +1455,7 @@ async def reload_json(ctx):
     await Meowth.add_reaction(ctx.message, '✅')
 
 @Meowth.command(pass_context=True)
-@commands.has_permissions(manage_server=True)
+@commands.has_permissions(manage_channels=True)
 @checks.raidchannel()
 async def clearstatus(ctx):
     """Clears raid channel status lists.
@@ -1481,44 +1469,21 @@ async def clearstatus(ctx):
         pass
 
 @Meowth.command(pass_context=True)
-@commands.has_permissions(manage_server=True)
+@commands.has_permissions(manage_channels=True)
 @checks.raidchannel()
-async def setstatus(ctx, user, status,*, teamcounts: str = None):
+async def setstatus(ctx, member: discord.Member, status,*, status_counts: str = ''):
     """Changes raid channel status lists.
 
     Usage: !setstatus <user> <status> [count]
     User can be a mention or ID number. Status can be maybe/interested/i, omw/coming/c, waiting/here/h, or cancel
     Only usable by admins."""
-    user = re.sub(r'\W+', '', user)
-    user = ctx.message.server.get_member(user)
-    if not teamcounts:
-        if user.id in trainer_dict:
-            bluecount = str(trainer_dict[user.id]['party'][0])+"m "
-            redcount = str(trainer_dict[user.id]['party'][1])+"v "
-            yellowcount = str(trainer_dict[user.id]['party'][2])+"i "
-            unknowncount = str(trainer_dict[user.id]['party'][3])+"u "
-            teamcounts = str(trainer_dict[user.id]['count']) +" "+ bluecount + redcount + yellowcount + unknowncount
-        else:
-            teamcounts = "1"
-    if teamcounts.split()[0].isdigit():
-        total = int(teamcounts.split()[0])
-    else:
-        if user.id in trainer_dict:
-            total = trainer_dict[user.id]['count']
-        else:
-            total = 1
-    result = await _party_status(ctx, total, teamcounts)
-    if isinstance(result, __builtins__.list):
-        count = result[0]
-        partylist = result[1]
-    if status == "maybe" or status == "interested" or status == "i":
-        await _maybe(ctx.message.channel, user, count, partylist)
-    elif status == "omw" or status == "coming" or status == "c":
-        await _coming(ctx.message.channel, user, count, partylist)
-    elif status == "waiting" or status == "here" or status == "h":
-        await _here(ctx.message.channel, user, count, partylist)
-    elif status == "cancel":
-        await _cancel(ctx.message.channel, user)
+    valid_status_list = ['interested', 'i', 'maybe', 'coming', 'c', 'here', 'h', 'cancel','x']
+    if status not in valid_status_list:
+        await Meowth.send_message(ctx.message.channel, "Meowth! {status} is not a valid status!".format(status=status))
+        return
+    ctx.message.author = member
+    ctx.message.content = "{}{} {}".format(ctx.prefix, status, status_counts)
+    await ctx.bot.process_commands(ctx.message)
 
 """
 Miscellaneous
@@ -2051,6 +2016,9 @@ async def _raid(message):
     raid_match = True if entered_raid in get_raidlist() else False
     if not raid_match:
         await Meowth.send_message(message.channel, _("Meowth! The Pokemon {pokemon} does not appear in raids!").format(pokemon=entered_raid.capitalize()))
+        return
+    elif get_level(entered_raid) == "EX":
+        await Meowth.send_message(message.channel, "Meowth! The Pokemon {pokemon} only appears in EX Raids! Use **!exraid** to report one!".format(pokemon=entered_raid.capitalize()))
         return
 
     if raidexp is not False:
@@ -3893,7 +3861,7 @@ async def list(ctx):
                 return
 
         elif checks.check_raidchannel(ctx):
-            if checks.check_raidactive(ctx):
+            if checks.check_raidactive(ctx) or checks.check_eggchannel(ctx):
                 bulletpoint = parse_emoji(ctx.message.server, ":small_blue_diamond:")
                 starttime = False
                 try:

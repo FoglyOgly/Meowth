@@ -332,18 +332,14 @@ def do_template(message, author, server):
     return (msg, not_found)
 
 async def ask(message, destination, user_id, *, react_list=['✅', '❎']):
-    if isinstance(message, discord.Embed):
-        msg = await Meowth.send_message(destination, embed=message)
-    else:
-        msg = await Meowth.send_message(destination, message)
     def check(reaction, user):
         if user.id != user_id:
             return False
         return True
     for r in react_list:
         await asyncio.sleep(0.25)
-        await Meowth.add_reaction(msg, r)
-    res = await Meowth.wait_for_reaction(react_list, message=msg, check=check, timeout=60)
+        await Meowth.add_reaction(message, r)
+    res = await Meowth.wait_for_reaction(react_list, message=message, check=check, timeout=60)
     return res.reaction.emoji if res else None
 
 @Meowth.command(pass_context=True, hidden=True)
@@ -397,7 +393,7 @@ async def expiry_check(channel):
                                         active_raids.remove(channel)
                                     except ValueError:
                                         logger.info("Expire_Channel - Channel Removal From Active Raid Failed - Not in List - "+channel.name)
-                                    await _eggtoraid(pokemon.lower(), channel)
+                                    await _eggtoraid(pokemon.lower(), channel, author=None)
                                     break
                             event_loop.create_task(expire_channel(channel))
                             try:
@@ -999,18 +995,15 @@ async def announce(ctx,*,announce=None):
         owner_msg_add = "🌎 to send it to all servers, "
         reaction_list.insert(0,'🌎')
     rusure = await Meowth.send_message(channel,_("That's what you sent, does it look good? React with {}❔ to send to another channel, ✅ to send it to this channel, or ❎ to cancel").format(owner_msg_add))
-    for r in reaction_list:
-        await asyncio.sleep(0.25)
-        await Meowth.add_reaction(rusure,r)
-    res = await Meowth.wait_for_reaction(reaction_list, message=rusure, check=check, timeout=60)
+    res = await ask(rusure, channel, author.id, react_list=reaction_list)
     if res is not None:
         await Meowth.delete_message(rusure)
-        if res.reaction.emoji == "❎":
+        if res == "❎":
             confirmation = await Meowth.send_message(channel,_("Announcement Cancelled."))
             await Meowth.delete_message(draft)
-        elif res.reaction.emoji == "✅":
+        elif res == "✅":
             confirmation = await Meowth.send_message(channel,_("Announcement Sent."))
-        elif res.reaction.emoji == "❔":
+        elif res == "❔":
             channelwait = await Meowth.send_message(channel, "What channel would you like me to send it to?")
             channelmsg = await Meowth.wait_for_message(author=ctx.message.author, timeout=60)
             try:
@@ -1027,7 +1020,7 @@ async def announce(ctx,*,announce=None):
             await Meowth.delete_message(channelwait)
             await Meowth.delete_message(channelmsg)
             await Meowth.delete_message(draft)
-        elif res.reaction.emoji == "🌎" and checks.is_owner_check(ctx):
+        elif res == "🌎" and checks.is_owner_check(ctx):
             failed = 0
             sent = 0
             count = 0
@@ -1205,9 +1198,11 @@ async def configure(ctx):
                         else:
                             if welcomemessage.startswith("[") and welcomemessage.endswith("]"):
                                 embed = discord.Embed(colour=server.me.colour, description=welcomemessage[1:-1].format(user=owner.mention))
-                                res = await ask(embed, owner, owner.id)
+                                question = await Meowth.send_message(owner, embed=embed)
+                                res = await ask(question, owner, owner.id)
                             else:
-                                res = await ask(welcomemessage.format(user=owner.mention), owner, owner.id)
+                                question = await Meowth.send_message(owner, welcomemessage.format(user=owner.mention))
+                                res = await ask(question, owner, owner.id)
                         if res == '❎':
                             await Meowth.send_message(owner, embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="Please enter a new welcome message, or reply with **N** to use the default."))
                             continue
@@ -1452,7 +1447,7 @@ async def reload_json(ctx):
     Usage: !reload_json
     Useful to avoid a full restart if boss list changed"""
     load_config()
-    await Meowth.add_reaction(ctx.message, '✅')
+    await Meowth.add_reaction(ctx.message, '☑')
 
 @Meowth.command(pass_context=True)
 @commands.has_permissions(manage_channels=True)
@@ -1712,9 +1707,17 @@ async def want(ctx):
         if pkmn_match:
             entered_want = pkmn_match
         else:
-            spellcheck_list.append(entered_want)
-            spellcheck_dict[entered_want] = spellcheck(entered_want) if spellcheck(entered_want) != entered_want else None
-            continue
+            entered_want = spellcheck(entered_want)
+            pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", entered_want)), None)
+            if not pkmn_match:
+                if len(want_list) == 1:
+                    msg = "Meowth! **{word}** isn't a Pokemon!".format(word=entered_want.title())
+                    question = await Meowth.send_message(message.channel, msg)
+                    return
+                else:
+                    spellcheck_list.append(entered_want)
+                    spellcheck_dict[entered_want] = spellcheck(entered_want) if spellcheck(entered_want) != entered_want else None
+                    continue
         role = discord.utils.get(server.roles, name=entered_want)
         # Create role if it doesn't exist yet
         if role is None:
@@ -1728,11 +1731,11 @@ async def want(ctx):
         # If user is already wanting the Pokemon,
         # print a less noisy message
         if role in ctx.message.author.roles:
-            already_want_list.append(entered_want.capitalize())
+            already_want_list.append(entered_want.title())
             already_want_count += 1
         else:
             role_list.append(role)
-            added_list.append(entered_want.capitalize())
+            added_list.append(entered_want.title())
             added_count += 1
     await Meowth.add_roles(ctx.message.author, *role_list)
     if len(want_list) == 1 and (len(added_list) == 1 or len(spellcheck_dict) == 1 or len(already_want_list) == 1):
@@ -1741,16 +1744,10 @@ async def want(ctx):
             want_img_url = "https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn/{0}_.png?cache=3".format(str(want_number).zfill(3)) #This part embeds the sprite
             want_embed = discord.Embed(colour=server.me.colour)
             want_embed.set_thumbnail(url=want_img_url)
-            await Meowth.send_message(channel, content=_("Meowth! Got it! {member} wants {pokemon}").format(member=ctx.message.author.mention, pokemon=added_list[0].capitalize()),embed=want_embed)
-            return
-        elif len(spellcheck_dict) == 1:
-            msg = "Meowth! {word} isn't a Pokemon!".format(word=spellcheck_list[0])
-            if spellcheck_list[0] != spellcheck(spellcheck_list[0]):
-                msg += " Did you mean {correction}?".format(correction=spellcheck(spellcheck_list[0]))
-            await Meowth.send_message(channel, msg)
+            await Meowth.send_message(channel, content=_("Meowth! Got it! {member} wants {pokemon}").format(member=ctx.message.author.mention, pokemon=added_list[0].title()),embed=want_embed)
             return
         elif len(already_want_list) == 1:
-            await Meowth.send_message(channel, content="Meowth! {member}, I already know you want {pokemon}!".format(member=ctx.message.author.mention, pokemon=already_want_list[0].capitalize()))
+            await Meowth.send_message(channel, content="Meowth! {member}, I already know you want {pokemon}!".format(member=ctx.message.author.mention, pokemon=already_want_list[0].title()))
             return
     else:
         confirmation_msg = "Meowth! {member}, out of your total {count} items:".format(member=ctx.message.author.mention,count=added_count + already_want_count + len(spellcheck_dict))
@@ -1761,9 +1758,7 @@ async def want(ctx):
         if spellcheck_dict:
             spellcheckmsg = ""
             for word in spellcheck_dict:
-                spellcheckmsg += "\n\t{word}".format(word=word)
-                if spellcheck_dict[word]:
-                    spellcheckmsg += ": *({correction}?)*".format(correction=spellcheck_dict[word])
+                spellcheckmsg += "\n\t{word}".format(word=word.title())
             confirmation_msg += "\n**{count} Not Valid:**".format(count=len(spellcheck_dict)) + spellcheckmsg
         await Meowth.send_message(channel, content=confirmation_msg)
 
@@ -1801,20 +1796,30 @@ async def unwant(ctx):
             if pkmn_match:
                 entered_unwant = pkmn_match
             else:
-                msg = "Meowth! {word} isn't a Pokemon!".format(word=entered_unwant)
-                if spellcheck(entered_unwant) != entered_unwant:
-                    msg += " Did you mean {correction}?".format(correction=spellcheck(entered_unwant))
-                await Meowth.send_message(message.channel, msg)
-                return
+                msg = "Meowth! **{word}** isn't a Pokemon!".format(word=entered_unwant.title())
+                if spellcheck(entered_unwant) and spellcheck(entered_unwant) != entered_unwant:
+                    msg += " Did you mean **{correction}**?".format(correction=spellcheck(entered_unwant).title())
+                    question = await Meowth.send_message(message.channel, msg)
+                    res = await ask(question, message.channel, message.author.id)
+                    await Meowth.delete_message(question)
+                    if res == "❎":
+                        return
+                    elif res == "✅":
+                        entered_unwant = spellcheck(entered_unwant)
+                    else:
+                        return
+                else:
+                    question = await Meowth.send_message(message.channel, msg)
+                    return
             # If user is not already wanting the Pokemon,
             # print a less noisy message
             role = discord.utils.get(server.roles, name=entered_unwant)
             if role not in message.author.roles:
-                await Meowth.add_reaction(message, '✅')
+                await Meowth.add_reaction(message, '☑')
             else:
                 await Meowth.remove_roles(message.author, role)
                 unwant_number = pkmn_info['pokemon_list'].index(entered_unwant) + 1
-                await Meowth.add_reaction(message, '✅')
+                await Meowth.add_reaction(message, '☑')
 
 @unwant.command(pass_context=True)
 @checks.wantset()
@@ -1890,11 +1895,21 @@ async def _wild(message):
         if pkmn_match:
             entered_wild = pkmn_match
         else:
-            msg = "Meowth! {word} isn't a Pokemon!".format(word=entered_wild)
-            if spellcheck(entered_wild) != entered_wild:
-                msg += " Did you mean {correction}?".format(correction=spellcheck(entered_wild))
-            await Meowth.send_message(message.channel, msg)
-            return
+            msg = "Meowth! **{word}** isn't a Pokemon!".format(word=entered_wild.title())
+            if spellcheck(entered_wild) and spellcheck(entered_wild) != entered_wild:
+                msg += " Did you mean **{correction}**?".format(correction=spellcheck(entered_wild).title())
+                question = await Meowth.send_message(message.channel, msg)
+                res = await ask(question, message.channel, message.author.id)
+                await Meowth.delete_message(question)
+                if res == "❎":
+                    return
+                elif res == "✅":
+                    entered_wild = spellcheck(entered_wild)
+                else:
+                    return
+            else:
+                question = await Meowth.send_message(message.channel, msg)
+                return
         wild = discord.utils.get(message.server.roles, name = entered_wild)
         if wild is None:
             try:
@@ -1964,14 +1979,14 @@ async def _raid(message):
                 await Meowth.send_message(message.channel, _("Meowth! **!raid assume** is not allowed in this level egg."))
                 return
             if server_dict[message.channel.server.id]['raidchannel_dict'][message.channel.id]['active'] == False:
-                await _eggtoraid(raid_split[1].lower(), message.channel)
+                await _eggtoraid(raid_split[1].lower(), message.channel, message.author)
                 return
             else:
-                await _eggassume(" ".join(raid_split), message.channel)
+                await _eggassume(" ".join(raid_split), message.channel, message.author)
                 return
         else:
             if server_dict[message.channel.server.id]['raidchannel_dict'][message.channel.id]['active'] == False:
-                await _eggtoraid(" ".join(raid_split).lower(), message.channel)
+                await _eggtoraid(" ".join(raid_split).lower(), message.channel, message.author)
                 return
             else:
                 await Meowth.send_message(message.channel, _("Meowth! Please wait until the egg has hatched before changing it to an open raid!"))
@@ -2007,11 +2022,21 @@ async def _raid(message):
     if pkmn_match:
         entered_raid = pkmn_match
     else:
-        msg = "Meowth! {word} isn't a Pokemon!".format(word=entered_raid)
-        if spellcheck(entered_raid) != entered_raid:
-            msg += " Did you mean {correction}?".format(correction=spellcheck(entered_raid))
-        await Meowth.send_message(message.channel, msg)
-        return
+        msg = "Meowth! **{word}** isn't a Pokemon!".format(word=entered_raid.title())
+        if spellcheck(entered_raid) and spellcheck(entered_raid) != entered_raid:
+            msg += " Did you mean **{correction}**?".format(correction=spellcheck(entered_raid).title())
+            question = await Meowth.send_message(message.channel, msg)
+            res = await ask(question, message.channel, message.author.id)
+            await Meowth.delete_message(question)
+            if res == "❎":
+                return
+            elif res == "✅":
+                entered_raid = spellcheck(entered_raid)
+            else:
+                return
+        else:
+            question = await Meowth.send_message(message.channel, msg)
+            return
 
     raid_match = True if entered_raid in get_raidlist() else False
     if not raid_match:
@@ -2230,10 +2255,10 @@ This channel will be deleted five minutes after the timer expires.""").format(le
         else:
             await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset <minutes>** so others can check it with **!timer**.").format(member=message.author.mention))
         if len(raid_info['raid_eggs'][egg_level]['pokemon']) == 1:
-            await _eggassume("assume "+ get_name(raid_info['raid_eggs'][egg_level]['pokemon'][0]), raid_channel)
+            await _eggassume("assume "+ get_name(raid_info['raid_eggs'][egg_level]['pokemon'][0]), raid_channel, author=None)
         event_loop.create_task(expiry_check(raid_channel))
 
-async def _eggassume(args, raid_channel):
+async def _eggassume(args, raid_channel, author=None):
     eggdetails = server_dict[raid_channel.server.id]['raidchannel_dict'][raid_channel.id]
     report_channel = Meowth.get_channel(eggdetails['reportcity'])
     egglevel = eggdetails['egglevel']
@@ -2253,11 +2278,24 @@ async def _eggassume(args, raid_channel):
     if pkmn_match:
         entered_raid = pkmn_match
     else:
-        msg = "Meowth! {word} isn't a Pokemon!".format(word=entered_raid)
-        if spellcheck(entered_raid) != entered_raid:
-            msg += " Did you mean {correction}?".format(correction=spellcheck(entered_raid))
-        await Meowth.send_message(raid_channel, msg)
-        return
+        msg = "Meowth! **{word}** isn't a Pokemon!".format(word=entered_raid.title())
+        if spellcheck(entered_raid) and spellcheck(entered_raid) != entered_raid:
+            msg += " Did you mean **{correction}**?".format(correction=spellcheck(entered_raid).title())
+            question = await Meowth.send_message(raid_channel, msg)
+            if author:
+                res = await ask(question, raid_channel, author.id)
+                await Meowth.delete_message(question)
+                if res == "❎":
+                    return
+                elif res == "✅":
+                    entered_raid = spellcheck(entered_raid)
+                else:
+                    return
+            else:
+                return
+        else:
+            question = await Meowth.send_message(raid_channel, msg)
+            return
     raid_match = True if entered_raid in get_raidlist() else False
     if not raid_match:
         await Meowth.send_message(raid_channel, _("Meowth! The Pokemon {pokemon} does not appear in raids!").format(pokemon=entered_raid.capitalize()))
@@ -2305,7 +2343,7 @@ async def _eggassume(args, raid_channel):
     server_dict[raid_channel.server.id]['raidchannel_dict'][raid_channel.id] = eggdetails
     return
 
-async def _eggtoraid(entered_raid, raid_channel):
+async def _eggtoraid(entered_raid, raid_channel, author=None):
     eggdetails = server_dict[raid_channel.server.id]['raidchannel_dict'][raid_channel.id]
     egglevel = eggdetails['egglevel']
     try:
@@ -2332,6 +2370,30 @@ async def _eggtoraid(entered_raid, raid_channel):
         logger.info("Hatching Mention Failed - Trying alternative method: channel: {} (id: {}) - server: {} | Attempted mention: {}...".format(raid_channel.name,raid_channel.id,raid_channel.server.name,raid_message.content[:125]))
     raidexp = eggdetails['exp'] + 60 * raid_info['raid_eggs'][egglevel]['raidtime']
     end = datetime.datetime.utcfromtimestamp(raidexp) + datetime.timedelta(hours=server_dict[raid_channel.server.id]['offset'])
+    entered_raid = get_name(entered_raid).lower() if entered_raid.isdigit() else entered_raid.lower()
+    rgx = r"[^a-zA-Z0-9]"
+    pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", entered_raid)), None)
+    if pkmn_match:
+        entered_raid = pkmn_match
+    else:
+        msg = "Meowth! **{word}** isn't a Pokemon!".format(word=entered_raid.title())
+        if spellcheck(entered_raid) and spellcheck(entered_raid) != entered_raid:
+            msg += " Did you mean **{correction}**?".format(correction=spellcheck(entered_raid).title())
+            question = await Meowth.send_message(raid_channel, msg)
+            if author:
+                res = await ask(question, raid_channel, author.id)
+                await Meowth.delete_message(question)
+                if res == "❎":
+                    return
+                elif res == "✅":
+                    entered_raid = spellcheck(entered_raid)
+                else:
+                    return
+            else:
+                return
+        else:
+            question = await Meowth.send_message(raid_channel, msg)
+            return
     if egglevel.isdigit():
         hatchtype = "raid"
         raidreportcontent = _("Meowth! The egg has hatched into a {pokemon} raid! Details: {location_details}. Coordinate in {raid_channel}").format(pokemon=entered_raid.capitalize(), location_details=egg_address, raid_channel=raid_channel.mention)
@@ -2370,17 +2432,6 @@ You can set the start time with **!starttime [HH:MM AM/PM]** (you can also omit 
 Message **!starting** when the raid is beginning to clear the raid's 'here' list.
 
 This channel will be deleted five minutes after the timer expires.""").format(pokemon=entered_raid.capitalize(), member=raid_messageauthor.mention, citychannel=reportcitychannel.mention, location_details=egg_address)
-    entered_raid = get_name(entered_raid).lower() if entered_raid.isdigit() else entered_raid.lower()
-    rgx = r"[^a-zA-Z0-9]"
-    pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", entered_raid)), None)
-    if pkmn_match:
-        entered_raid = pkmn_match
-    else:
-        msg = "Meowth! {word} isn't a Pokemon!".format(word=entered_raid)
-        if spellcheck(entered_raid) != entered_raid:
-            msg += " Did you mean {correction}?".format(correction=spellcheck(entered_raid))
-        await Meowth.send_message(raid_channel, msg)
-        return
     raid_match = True if entered_raid in get_raidlist() else False
     if not raid_match:
         await Meowth.send_message(raid_channel, _("Meowth! The Pokemon {pokemon} does not appear in raids!").format(pokemon=entered_raid.capitalize()))
@@ -2552,7 +2603,7 @@ This channel will be deleted five minutes after the timer expires.""").format(me
         }
 
     if len(raid_info['raid_eggs']['EX']['pokemon']) == 1:
-        await _eggassume("assume "+ get_name(raid_info['raid_eggs']['EX']['pokemon'][0]), raid_channel)
+        await _eggassume("assume "+ get_name(raid_info['raid_eggs']['EX']['pokemon'][0]), raid_channel, author=None)
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=server_dict[raid_channel.server.id]['offset'])
     await Meowth.send_message(raid_channel, content = _("Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset <date and time>** so others can check it with **!timer**. **<date and time>** should look like it does on your EX Raid pass.").format(member=message.author.mention))
     event_loop.create_task(expiry_check(raid_channel))
@@ -2826,23 +2877,15 @@ async def starttime(ctx):
             return
         if alreadyset:
             rusure = await Meowth.send_message(channel,_("Meowth! There is already a start time of **{start}** set! Do you want to change it?").format(start=alreadyset.strftime("%I:%M %p (%H:%M)")))
-            await asyncio.sleep(0.25)
-            await Meowth.add_reaction(rusure,"✅") #checkmark
-            await asyncio.sleep(0.25)
-            await Meowth.add_reaction(rusure,"❎") #cross
-            def check(react,user):
-                if user.id != author.id:
-                    return False
-                return True
-            res = await Meowth.wait_for_reaction(['✅','❎'], message=rusure, check=check, timeout=60)
+            res = await ask(rusure, channel, author.id)
             if res is not None:
-                if res.reaction.emoji == "❎":
+                if res == "❎":
                     await Meowth.delete_message(rusure)
                     confirmation = await Meowth.send_message(channel,_("Start time change cancelled."))
                     await asyncio.sleep(10)
                     await Meowth.delete_message(confirmation)
                     return
-                elif res.reaction.emoji == "✅":
+                elif res == "✅":
                     await Meowth.delete_message(rusure)
                     if now <= start:
                         rc_d['starttime'] = start
@@ -3136,19 +3179,9 @@ async def duplicate(ctx):
 
     if dupecount >= 3:
         rusure = await Meowth.send_message(channel,_("Meowth! Are you sure you wish to remove this raid?"))
-        await asyncio.sleep(0.25)
-        await Meowth.add_reaction(rusure,"✅") #checkmark
-        await asyncio.sleep(0.25)
-        await Meowth.add_reaction(rusure,"❎") #cross
-        def check(react,user):
-            if user.id != author.id:
-                return False
-            return True
-
-        res = await Meowth.wait_for_reaction(['✅','❎'], message=rusure, check=check, timeout=60)
-
+        res = await ask(rusure, channel, author.id)
         if res is not None:
-            if res.reaction.emoji == "❎":
+            if res == "❎":
                 await Meowth.delete_message(rusure)
                 confirmation = await Meowth.send_message(channel,_("Duplicate Report cancelled."))
                 logger.info("Duplicate Report - Cancelled - "+channel.name+" - Report by "+author.name)
@@ -3157,7 +3190,7 @@ async def duplicate(ctx):
                 await asyncio.sleep(10)
                 await Meowth.delete_message(confirmation)
                 return
-            elif res.reaction.emoji == "✅":
+            elif res == "✅":
                 await Meowth.delete_message(rusure)
                 await Meowth.send_message(channel,"Duplicate Confirmed")
                 logger.info("Duplicate Report - Channel Expired - "+channel.name+" - Last Report by "+author.name)

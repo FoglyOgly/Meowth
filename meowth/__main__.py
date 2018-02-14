@@ -366,6 +366,22 @@ async def ask(message, destination, user_id, *, react_list=['✅', '❎']):
     except asyncio.TimeoutError:
         return
 
+def get_category(channel, level):
+    guild = channel.guild
+    catsort = guild_dict[guild.id].get('categories', None)
+    if catsort == None:
+        return None
+    elif catsort == "same":
+        return channel.category
+    elif catsort == "region":
+        category = discord.utils.get(guild.categories,name=guild_dict[guild.id]['category_dict'][channel.name])
+        return category
+    elif catsort == "level":
+        category = discord.utils.get(guild.categories,name=guild_dict[guild.id]['category_dict'][level])
+        return category
+    else:
+        return None
+
 
 @Meowth.command(hidden=True)
 async def template(ctx, *, sample_message):
@@ -445,7 +461,7 @@ async def expire_channel(channel):
     # else deleted the actual channel at some point.
     channel_exists = Meowth.get_channel(channel.id)
     channel = channel_exists
-    if (channel_exists is None) and Meowth.is_logged_in and (not Meowth.is_closed):
+    if (channel_exists is None) and (not Meowth.is_closed):
         try:
             del guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]
         except KeyError:
@@ -500,7 +516,7 @@ async def expire_channel(channel):
         # else got to it before us, so don't do anything.
         # Also, if the channel got reactivated, don't do anything either.
         try:
-            if (guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['active'] == False) and Meowth.is_logged_in and (not Meowth.is_closed):
+            if (guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['active'] == False) and (not Meowth.is_closed):
                 if dupechannel:
                     try:
                         report_channel = Meowth.get_channel(
@@ -534,7 +550,7 @@ async def expire_channel(channel):
 
 
 async def channel_cleanup(loop=True):
-    while Meowth.is_logged_in and (not Meowth.is_closed):
+    while (not Meowth.is_closed):
         global active_raids
         guilddict_chtemp = copy.deepcopy(guild_dict)
         logger.info('Channel_Cleanup ------ BEGIN ------')
@@ -644,7 +660,7 @@ async def channel_cleanup(loop=True):
 
 
 async def guild_cleanup(loop=True):
-    while Meowth.is_logged_in and (not Meowth.is_closed):
+    while (not Meowth.is_closed):
         guilddict_srvtemp = copy.deepcopy(guild_dict)
         logger.info('Server_Cleanup ------ BEGIN ------')
         guilddict_srvtemp = guild_dict
@@ -954,7 +970,7 @@ async def exit(ctx):
     await Meowth.logout()
 
 @Meowth.group(name='set')
-@commands.has_permissions(manage_server=True)
+@commands.has_permissions(manage_guild=True)
 async def _set(ctx):
     """Changes a setting."""
     if ctx.invoked_subcommand is None:
@@ -963,7 +979,7 @@ async def _set(ctx):
             await ctx.channel.send(page)
 
 @_set.command()
-@commands.has_permissions(manage_server=True)
+@commands.has_permissions(manage_guild=True)
 async def prefix(ctx, prefix=None):
     """Changes server prefix."""
     if prefix == 'clear':
@@ -979,7 +995,7 @@ def _set_prefix(bot, guild, prefix):
     bot.guild_dict[guild.id]['prefix'] = prefix
 
 @Meowth.group(name='get')
-@commands.has_permissions(manage_server=True)
+@commands.has_permissions(manage_guild=True)
 async def _get(ctx):
     """Get a setting value"""
     if ctx.invoked_subcommand is None:
@@ -988,7 +1004,7 @@ async def _get(ctx):
             await ctx.channel.send(page)
 
 @_get.command()
-@commands.has_permissions(manage_server=True)
+@commands.has_permissions(manage_guild=True)
 async def prefix(ctx):
     """Get server prefix."""
     prefix = _get_prefix(Meowth, ctx.message)
@@ -1005,7 +1021,7 @@ async def welcome(ctx, user: discord.Member=None):
     await on_member_join(user)
 
 @Meowth.command(hidden=True)
-@commands.has_permissions(manage_server=True)
+@commands.has_permissions(manage_guild=True)
 async def outputlog(ctx):
     """Get current Meowth log.
 
@@ -1016,7 +1032,7 @@ async def outputlog(ctx):
     await ctx.channel.send(hastebin.post(logdata))
 
 @Meowth.command()
-@commands.has_permissions(manage_server=True)
+@commands.has_permissions(manage_guild=True)
 async def announce(ctx, *, announce=None):
     """Repeats your message in an embed from Meowth.
 
@@ -1115,7 +1131,7 @@ async def announce(ctx, *, announce=None):
     await message.delete()
 
 @Meowth.command()
-@commands.has_permissions(manage_server=True)
+@commands.has_permissions(manage_guild=True)
 async def configure(ctx):
     'Meowth Configuration\n\n    Usage: !configure\n    Meowth will DM you instructions on how to configure Meowth for your server.\n    If it is not your first time configuring, you can choose a section to jump to.'
     guild = ctx.guild
@@ -1164,16 +1180,18 @@ async def configure(ctx):
     if firstconfig == False:
         if guild_dict_temp['other']:
             configreplylist = ['all', 'team', 'welcome', 'main', 'regions', 'raid', 'wild', 'want', 'timezone', 'allmain']
-            configmessage += "\n\n**Welcome Back**\nThis isn't your first time configurating. You can either reconfigure everything by replying with **all** or reply with one of the following to configure that specific setting:\n\n**all** - To redo configuration\n**team** - For Team Assignment configuration\n**welcome** - For Welcome Message configuration\n**main** - For main command configuration\n**raid** - for raid command configuration\n**wild** - for wild command configuration\n**regions** - For configuration of reporting channels or map links\n**want** - for want/unwant command configuration and channel\n**timezone** - For timezone configuration\n**allmain** - For main, regions, raid, wild, want, timezone configuration"
+            configmessage += "\n\n**Welcome Back**\nThis isn't your first time configuring. You can either reconfigure everything by replying with **all** or reply with one of the following to configure that specific setting:\n\n**all** - To redo configuration\n**team** - For Team Assignment configuration\n**welcome** - For Welcome Message configuration\n**main** - For main command configuration\n**raid** - for raid command configuration\n**wild** - for wild command configuration\n**regions** - For configuration of reporting channels or map links\n**want** - for want/unwant command configuration and channel\n**timezone** - For timezone configuration\n**allmain** - For main, regions, raid, wild, want, timezone configuration"
             configmessage += '\n\nReply with **cancel** at any time throughout the questions to cancel the configure process.'
             await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=configmessage).set_author(name=_('Meowth Configuration - {0}').format(guild), icon_url=Meowth.user.avatar_url))
         else:
             configreplylist = ['all', 'team', 'welcome', 'main', 'allmain']
-            configmessage += "\n\n**Welcome Back**\nThis isn't your first time configurating. You can either reconfigure everything by replying with **all** or reply with one of the following to configure that specific setting:\n\n**all** - To redo configuration\n**team** - For Team Assignment configuration\n**welcome** - For Welcome Message configuration\n**main** - For main command configuration\n**allmain** - For main, regions, raid, wild, want, timezone configuration"
+            configmessage += "\n\n**Welcome Back**\nThis isn't your first time configuring. You can either reconfigure everything by replying with **all** or reply with one of the following to configure that specific setting:\n\n**all** - To redo configuration\n**team** - For Team Assignment configuration\n**welcome** - For Welcome Message configuration\n**main** - For main command configuration\n**allmain** - For main, regions, raid, wild, want, timezone configuration"
             configmessage += '\n\nReply with **cancel** at any time throughout the questions to cancel the configure process.'
             await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=configmessage).set_author(name=_('Meowth Configuration - {0}').format(guild), icon_url=Meowth.user.avatar_url))
         while True:
-            configreply = await Meowth.wait_for('message', check=(lambda message: (message.guild is None) and message.author is owner))
+            def check(m):
+                return m.guild is None and m.author is owner
+            configreply = await Meowth.wait_for('message', check=check)
             if configreply.content.lower() in configreplylist:
                 configgoto = configreply.content.lower()
                 break
@@ -1285,7 +1303,7 @@ async def configure(ctx):
                     break
                 await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="Which channel in your server would you like me to post the Welcome Messages? You can also choose to have them sent to the new member via Direct Message (DM) instead.\n\nRespond with: **channel-name** of a channel in your server or **DM** to Direct Message:").set_author(name="Welcome Message Channel", icon_url=Meowth.user.avatar_url))
                 while True:
-                    welcomechannelreply = await Meowth.wait_for('message',check=lambda message: message.server is None and message.author is owner)
+                    welcomechannelreply = await Meowth.wait_for('message',check=lambda message: message.guild is None and message.author is owner)
                     if welcomechannelreply.content.lower() == "dm":
                         guild_dict_temp['welcomechan'] = "dm"
                         await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description="Welcome DM set"))
@@ -1428,10 +1446,78 @@ async def configure(ctx):
                     citychannel_dict[citychannel_list[i]] = city_list[i]
                 break
             else:
-                await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("The number of cities don't match the number of channels you gave me earlier!\n\nI'll show you the two lists to compare:\n\n{channellist}\n{citylist}\n\nPlease double check that your locations match up with your provided channels and resend your response.").format(channellist=', '.join(citychannel_list), citylist=', '.join(city_list))))
+                await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("The number of cities doesn't match the number of channels you gave me earlier!\n\nI'll show you the two lists to compare:\n\n{channellist}\n{citylist}\n\nPlease double check that your locations match up with your provided channels and resend your response.").format(channellist=', '.join(citychannel_list), citylist=', '.join(city_list))))
                 continue
         guild_dict_temp['city_channels'] = citychannel_dict
         await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description='Report Locations are set'))
+        guild_catlist = []
+        for cat in guild.categories:
+            guild_catlist.append(cat.name)
+        await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="How would you like me to categorize the raid channels I create? Your options are **none** if you don't want them categorized, **same** if you want them in the same category as the reporting channel, **region** if you want them categorized by region, or **level** if you want them categorized by level."))
+        while True:
+            category_dict = {}
+            categories = await Meowth.wait_for('message', check=lambda message: message.guild is None and message.author is owner)
+            if categories.content.lower() == 'cancel':
+                configcancel = True
+                await owner.send(embed=discord.Embed(colour=discord.Colour.red(), description='**CONFIG CANCELLED!**\n\nNo changes have been made.'))
+                return
+            elif categories.content.lower() == 'none':
+                guild_dict_temp['categories'] = None
+                break
+            elif categories.content.lower() == 'same':
+                guild_dict_temp['categories'] = 'same'
+                break
+            elif categories.content.lower() == 'region':
+                while True:
+                    guild_dict_temp['categories'] = 'region'
+                    await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(),description="You have configured the following channels as raid reporting channels: {citychannel_list}\n\nIn the same order as they appear above, please give the names of the categories you would like raids reported in each channel to appear in. You do not need to use different categories for each channel, but they do need to be pre-existing categories. Separate each category name with a comma.".format(citychannel_list=citychannels.content.lower())))
+                    regioncats = await Meowth.wait_for('message', check=lambda message: message.guild is None and message.author is owner)
+                    if regioncats.content.lower() == "cancel":
+                        configcancel = True
+                        await owner.send(embed=discord.Embed(colour=discord.Colour.red(), description='**CONFIG CANCELLED!**\n\nNo changes have been made.'))
+                        return
+                    regioncat_list = regioncats.content.split(', ')
+                    if len(regioncat_list) == len(citychannel_list):
+                        catdiff = set(regioncat_list) - set(guild_catlist)
+                        if (not catdiff):
+                            for i in range(len(citychannel_list)):
+                                category_dict[citychannel_list[i]] = regioncat_list[i]
+                            break
+                        else:
+                            await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(),description="The category list you provided doesn't match with your server's categories.\n\nThe following aren't in your server: {invalid_categories}\n\nPlease double check your category list and resend your response.".format(invalid_categories=', '.join(catdiff))))
+                            continue
+                    else:
+                        await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("The number of categories doesn't match the number of channels you gave me earlier!\n\nI'll show you the two lists to compare:\n\n{channellist}\n{catlist}\n\nPlease double check that your categories match up with your provided channels and resend your response.").format(channellist=', '.join(citychannel_list), citylist=', '.join(regioncat_list))))
+                        continue
+                    break
+            elif categories.content.lower() == 'level':
+                guild_dict_temp['categories'] = 'level'
+                while True:
+                    await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(),description="Pokemon Go currently has six levels of raids. Please provide the names of the categories you would like each level of raid to appear in. Use the following order: 1, 2, 3, 4, 5, EX \n\n You do not need to use different categories for each level, but they do need to be pre-existing categories. Separate each category name with a comma."))
+                    levelcats = await Meowth.wait_for('message', check=lambda message: message.guild is None and message.author is owner)
+                    if levelcats.content.lower() == "cancel":
+                        configcancel = True
+                        await owner.send(embed=discord.Embed(colour=discord.Colour.red(), description='**CONFIG CANCELLED!**\n\nNo changes have been made.'))
+                        return
+                    levelcat_list = levelcats.content.split(', ')
+                    if len(levelcat_list) == 6:
+                        catdiff = set(levelcat_list) - set(guild_catlist)
+                        if not catdiff:
+                            level_list = ["1",'2','3','4','5',"EX"]
+                            for i in range(6):
+                                category_dict[level_list[i]] = levelcat_list[i]
+                            break
+                        else:
+                            await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(),description="The category list you provided doesn't match with your server's categories.\n\nThe following aren't in your server: {invalid_categories}\n\nPlease double check your category list and resend your response.".format(invalid_categories=', '.join(catdiff))))
+                            continue
+                    else:
+                        await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("The number of categories doesn't match the number of raid levels! Make sure you give me exactly six categories, one for each level of raid. You can use the same category for multiple levels if you want, but I need to see six category names.")))
+                        continue
+            else:
+                await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(),description="Sorry, I didn't understand your answer! Try again."))
+                continue
+            break
+        guild_dict_temp['category_dict'] = category_dict
     if (configcancel == False) and (guild_dict_temp['other'] is True) and ((firstconfig == True) or (configgoto == 'all') or (configgoto == 'want') or (configgoto == 'allmain')):
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="The **!want** and **!unwant** commands let you add or remove roles for Pokemon that will be mentioned in reports. This let you get notifications on the Pokemon you want to track. I just need to know what channels you want to allow people to manage their pokemon with the **!want** and **!unwant** command. If you pick a channel that doesn't exist, I'll make it for you.\n\nIf you don't want to allow the management of tracked Pokemon roles, then you may want to disable this feature.\n\nRepond with: **N** to disable, or the **channel-name** list to enable, each seperated by a comma and space.").set_author(name='Pokemon Notifications', icon_url=Meowth.user.avatar_url))
         while True:
@@ -1521,7 +1607,7 @@ async def reload_json(ctx):
     await '✅'.add_reaction()
 
 @Meowth.command()
-@commands.has_permissions(manage_server=True)
+@commands.has_permissions(manage_guild=True)
 @checks.raidchannel()
 async def clearstatus(ctx):
     """Clears raid channel status lists.
@@ -1537,7 +1623,7 @@ async def clearstatus(ctx):
         pass
 
 @Meowth.command()
-@commands.has_permissions(manage_server=True)
+@commands.has_permissions(manage_guild=True)
 @checks.raidchannel()
 async def setstatus(ctx, member: discord.Member, status,*, status_counts: str = ''):
     """Changes raid channel status lists.
@@ -2089,7 +2175,8 @@ async def _raid(message):
         return
     raid_gmaps_link = create_gmaps_query(raid_details, message.channel)
     raid_channel_name = (entered_raid + '-') + sanitize_channel_name(raid_details)
-    raid_channel = await message.guild.create_text_channel(raid_channel_name, *message.channel.overwrites)
+    raid_channel_category = get_category(message.channel, get_level(entered_raid))
+    raid_channel = await message.guild.create_text_channel(raid_channel_name, *message.channel.overwrites, category=raid_channel_category)
     raid = discord.utils.get(message.guild.roles, name=entered_raid)
     if raid is None:
         try:
@@ -2208,7 +2295,8 @@ async def _raidegg(message):
             p_type = get_type(message.guild, p)
             boss_list.append((((p_name + ' (') + str(p)) + ') ') + ''.join(p_type))
         raid_channel_name = (('level-' + egg_level) + '-egg-') + sanitize_channel_name(raid_details)
-        raid_channel = await message.guild.create_text_channel(raid_channel_name, *message.channel.overwrites)
+        raid_channel_category = get_category(message.channel, egg_level)
+        raid_channel = await message.guild.create_text_channel(raid_channel_name, *message.channel.overwrites, category=raid_channel_category)
         raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/eggs/{}?cache=2'.format(str(egg_img))
         raid_embed = discord.Embed(title=_('Meowth! Click here for directions to the coming raid!'), url=raid_gmaps_link, colour=message.guild.me.colour)
         if len(egg_info['pokemon']) > 1:
@@ -2484,7 +2572,8 @@ async def _exraid(ctx):
             if overwrite[0].permissions.manage_guild:
                 continue
         overwrite[1].send_messages = False
-    raid_channel = await message.guild.create_text_channel(raid_channel_name, *raid_channel_overwrites, everyone_overwrite, meowth_overwrite)
+    raid_channel_category = get_category(message.channel,"EX")
+    raid_channel = await message.guild.create_text_channel(raid_channel_name, *raid_channel_overwrites, everyone_overwrite, meowth_overwrite,category=raid_channel_category)
     raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/eggs/{}?cache=2'.format(str(egg_img))
     raid_embed = discord.Embed(title=_('Meowth! Click here for directions to the coming raid!'), url=raid_gmaps_link, colour=message.guild.me.colour)
     if len(egg_info['pokemon']) > 1:
@@ -3867,7 +3956,7 @@ async def _interest(ctx, tag=False):
     for trainer in trainer_dict:
         memberexists = ctx.guild.get_member(trainer)
         if (trainer_dict[trainer]['status'] == 'maybe') and memberexists:
-            ctx_maybecount += trainer['count']
+            ctx_maybecount += trainer_dict[trainer]['count']
     maybe_exstr = ''
     maybe_list = []
     name_list = []

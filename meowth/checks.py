@@ -4,7 +4,7 @@ import discord.utils
 import errors
 
 def is_owner_check(ctx):
-    author = str(ctx.author.id)
+    author = ctx.author.id
     owner = ctx.bot.config['master']
     return author == owner
 

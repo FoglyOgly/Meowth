@@ -1547,10 +1547,43 @@ async def changeraid(ctx, newraid):
     if not channel or channel.id not in server_dict[server.id]['raidchannel_dict']:
         await Meowth.send_message(channel, "The channel you entered is not a raid channel.")
         return
-    if server_dict[server.id]['raidchannel_dict'][channel.id]['type'] != 'raid':
-        await Meowth.send_message(channel, "You can only change an active raid.")
-        return
-    await _eggtoraid(newraid, channel, author=message.author, huntr=None)
+    if newraid.isdigit() and server_dict[server.id]['raidchannel_dict'][channel.id]['type'] == 'egg':
+        raid_channel_name = "level-" + newraid + "-egg-" + sanitize_channel_name(server_dict[server.id]['raidchannel_dict'][channel.id]['address'])
+        server_dict[server.id]['raidchannel_dict'][channel.id]['egglevel'] = newraid
+        server_dict[server.id]['raidchannel_dict'][channel.id]['pokemon'] = ''
+        egg_img = raid_info['raid_eggs'][newraid]['egg_img']
+        boss_list = []
+        for p in raid_info['raid_eggs'][newraid]['pokemon']:
+            p_name = get_name(p)
+            p_type = get_type(message.server,p)
+            boss_list.append(p_name+" ("+str(p)+") "+''.join(p_type))
+        raid_img_url = "https://raw.githubusercontent.com/doonce/Meowth/master/images/eggs/{}?cache=3".format(str(egg_img))
+        raid_message = await Meowth.get_message(channel, server_dict[server.id]['raidchannel_dict'][channel.id]['raidmessage'])
+        report_channel = Meowth.get_channel(raid_message.raw_channel_mentions[0])
+        report_message = await Meowth.get_message(report_channel, server_dict[server.id]['raidchannel_dict'][channel.id]['raidreport'])
+        oldembed = raid_message.embeds[0]
+        raid_embed = discord.Embed(title=oldembed['title'], url=oldembed['url'],colour=message.server.me.colour)
+        if len(raid_info['raid_eggs'][newraid]['pokemon']) > 1:
+            raid_embed.add_field(name="**Possible Bosses:**", value=_("{bosslist1}").format(bosslist1="\n".join(boss_list[::2])), inline=True)
+            raid_embed.add_field(name="\u200b", value=_("{bosslist2}").format(bosslist2="\n".join(boss_list[1::2])), inline=True)
+        else:
+            raid_embed.add_field(name="**Possible Bosses:**", value=_("{bosslist}").format(bosslist="".join(boss_list)), inline=True)
+            raid_embed.add_field(name="\u200b", value="\u200b", inline=True)
+        raid_embed.set_footer(text=oldembed['footer']['text'], icon_url=oldembed['footer']['icon_url'])
+        raid_embed.set_thumbnail(url=raid_img_url)
+        for field in oldembed['fields']:
+            if "team" in field['name'].lower() or "status" in field['name'].lower():
+                raid_embed.add_field(name=field['name'], value=field['value'], inline=field['inline'])
+        raid_message.content = re.sub(r'level\s\d', 'Level {}'.format(newraid), raid_message.content, flags=re.IGNORECASE)
+        report_message.content = re.sub(r'level\s\d', 'Level {}'.format(newraid), report_message.content, flags=re.IGNORECASE)
+        await Meowth.edit_message(raid_message, new_content=raid_message.content,embed=raid_embed)
+        try:
+            await Meowth.edit_message(report_message, new_content=report_message.content, embed=raid_embed)
+        except (discord.errors.NotFound, AttributeError):
+            pass
+        await Meowth.edit_channel(channel, name=raid_channel_name, topic=channel.topic)
+    elif newraid and server_dict[server.id]['raidchannel_dict'][channel.id]['type'] == 'raid':
+        await _eggtoraid(newraid, channel, author=message.author)
 
 """
 Miscellaneous

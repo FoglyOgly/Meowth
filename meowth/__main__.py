@@ -2170,10 +2170,7 @@ async def _raid(message):
     raid_gmaps_link = create_gmaps_query(raid_details, message.channel)
     raid_channel_name = (entered_raid + '-') + sanitize_channel_name(raid_details)
     raid_channel_category = get_category(message.channel, get_level(entered_raid))
-    raid_channel_overwrites = {}
-    for i in range(len(message.channel.overwrites)):
-        raid_channel_overwrites[message.channel.overwrites[i][0]] = message.channel.overwrites[i][1]
-    raid_channel = await message.guild.create_text_channel(raid_channel_name, overwrites=raid_channel_overwrites, category=raid_channel_category)
+    raid_channel = await message.guild.create_text_channel(raid_channel_name, overwrites=dict(message.channel.overwrites), category=raid_channel_category)
     raid = discord.utils.get(message.guild.roles, name=entered_raid)
     if raid == None:
         try:
@@ -2293,10 +2290,7 @@ async def _raidegg(message):
             boss_list.append((((p_name + ' (') + str(p)) + ') ') + ''.join(p_type))
         raid_channel_name = (('level-' + egg_level) + '-egg-') + sanitize_channel_name(raid_details)
         raid_channel_category = get_category(message.channel, egg_level)
-        raid_channel_overwrites = {}
-        for i in range(len(message.channel.overwrites)):
-            raid_channel_overwrites[message.channel.overwrites[0]] = message.channel.overwrites[1]
-        raid_channel = await message.guild.create_text_channel(raid_channel_name, overwrites=raid_channel_overwrites, category=raid_channel_category)
+        raid_channel = await message.guild.create_text_channel(raid_channel_name, overwrites=dict(message.channel.overwrites, category=raid_channel_category)
         raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/eggs/{}?cache=2'.format(str(egg_img))
         raid_embed = discord.Embed(title=_('Meowth! Click here for directions to the coming raid!'), url=raid_gmaps_link, colour=message.guild.me.colour)
         if len(egg_info['pokemon']) > 1:
@@ -2574,9 +2568,7 @@ async def _exraid(ctx):
         overwrite[1].send_messages = False
     raid_channel_overwrite_list.append(meowth_overwrite)
     raid_channel_overwrite_list.append(everyone_overwrite)
-    raid_channel_overwrites = {}
-    for i in range(len(raid_channel_overwrite_list)):
-        raid_channel_overwrites[raid_channel_overwrite_list[i][0]] = raid_channel_overwrite_list[i][1]
+    raid_channel_overwrites = dict(raid_channel_overwrite_list)
     raid_channel_category = get_category(message.channel,"EX")
     raid_channel = await message.guild.create_text_channel(raid_channel_name, overwrites=raid_channel_overwrites,category=raid_channel_category)
     raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/eggs/{}?cache=2'.format(str(egg_img))

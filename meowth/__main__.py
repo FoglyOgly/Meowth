@@ -1690,7 +1690,7 @@ async def about(ctx):
     embed = discord.Embed(colour=embed_colour, icon_url=Meowth.user.avatar_url)
     embed.add_field(name='About Meowth', value=about, inline=False)
     embed.add_field(name='Owner', value=owner)
-    if server_count > 1:
+    if guild_count > 1:
         embed.add_field(name='Servers', value=guild_count)
         embed.add_field(name='Members', value=member_count)
     embed.add_field(name="Your Server", value=yourserver)
@@ -2290,7 +2290,7 @@ async def _raidegg(message):
             boss_list.append((((p_name + ' (') + str(p)) + ') ') + ''.join(p_type))
         raid_channel_name = (('level-' + egg_level) + '-egg-') + sanitize_channel_name(raid_details)
         raid_channel_category = get_category(message.channel, egg_level)
-        raid_channel = await message.guild.create_text_channel(raid_channel_name, overwrites=dict(message.channel.overwrites, category=raid_channel_category)
+        raid_channel = await message.guild.create_text_channel(raid_channel_name, overwrites=dict(message.channel.overwrites, category=raid_channel_category))
         raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/eggs/{}?cache=2'.format(str(egg_img))
         raid_embed = discord.Embed(title=_('Meowth! Click here for directions to the coming raid!'), url=raid_gmaps_link, colour=message.guild.me.colour)
         if len(egg_info['pokemon']) > 1:

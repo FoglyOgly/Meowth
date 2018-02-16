@@ -2290,7 +2290,7 @@ async def _raidegg(message):
             boss_list.append((((p_name + ' (') + str(p)) + ') ') + ''.join(p_type))
         raid_channel_name = (('level-' + egg_level) + '-egg-') + sanitize_channel_name(raid_details)
         raid_channel_category = get_category(message.channel, egg_level)
-        raid_channel = await message.guild.create_text_channel(raid_channel_name, overwrites=dict(message.channel.overwrites), category=raid_channel_category))
+        raid_channel = await message.guild.create_text_channel(raid_channel_name, overwrites=dict(message.channel.overwrites), category=raid_channel_category)
         raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/eggs/{}?cache=2'.format(str(egg_img))
         raid_embed = discord.Embed(title=_('Meowth! Click here for directions to the coming raid!'), url=raid_gmaps_link, colour=message.guild.me.colour)
         if len(egg_info['pokemon']) > 1:
@@ -2890,7 +2890,7 @@ async def starttime(ctx):
         if now > start:
             await channel.send(_('Meowth! Please enter a time in the future.'))
             return
-        if total < mintime:
+        if int(total) < int(mintime):
             await channel.send('Meowth! The egg will not hatch by then!')
             return
         if alreadyset:
@@ -3835,6 +3835,8 @@ async def list(ctx):
             exraid_list = []
             for r in rc_d:
                 reportcity = Meowth.get_channel(rc_d[r]['reportcity'])
+                if not reportcity:
+                    continue
                 if (reportcity.name == cty) and rc_d[r]['active'] and discord.utils.get(guild.channels, id=r):
                     exp = rc_d[r]['exp']
                     type = rc_d[r]['type']

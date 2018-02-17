@@ -1480,7 +1480,7 @@ async def configure(ctx):
                             await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(),description="The category list you provided doesn't match with your server's categories.\n\nThe following aren't in your server: {invalid_categories}\n\nPlease double check your category list and resend your response.".format(invalid_categories=', '.join(catdiff))))
                             continue
                     else:
-                        await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("The number of categories doesn't match the number of channels you gave me earlier!\n\nI'll show you the two lists to compare:\n\n{channellist}\n{catlist}\n\nPlease double check that your categories match up with your provided channels and resend your response.").format(channellist=', '.join(citychannel_list), citylist=', '.join(regioncat_list))))
+                        await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("The number of categories doesn't match the number of channels you gave me earlier!\n\nI'll show you the two lists to compare:\n\n{channellist}\n{catlist}\n\nPlease double check that your categories match up with your provided channels and resend your response.").format(channellist=', '.join(citychannel_list), catlist=', '.join(regioncat_list))))
                         continue
                     break
             elif categories.content.lower() == 'level':
@@ -2413,10 +2413,17 @@ async def _eggtoraid(entered_raid, raid_channel):
     trainer_dict = eggdetails['trainer_dict']
     egg_address = eggdetails['address']
     raid_message = await raid_channel.get_message(eggdetails['raidmessage'])
-    try:
-        egg_report = await reportcitychannel.get_message(eggdetails['raidreport'])
-    except (discord.errors.NotFound, discord.errors.HTTPException):
-        egg_report = None
+    if not reportcitychannel:
+        async for message in raid_channel.history(limit=500, reverse=True):
+            if message.author.id == guild.me.id:
+                if 'Coordinate here' in message.content:
+                    reportcitychannel = message.raw_channel_mentions[0]
+                    break
+    if reportcitychannel:
+        try:
+            egg_report = await reportcitychannel.get_message(eggdetails['raidreport'])
+        except (discord.errors.NotFound, discord.errors.HTTPException):
+            egg_report = None
     try:
         starttime = eggdetails['starttime']
     except KeyError:
@@ -2977,6 +2984,12 @@ async def new(ctx):
         return
     else:
         report_channel = Meowth.get_channel(guild_dict[message.guild.id]['raidchannel_dict'][message.channel.id]['reportcity'])
+        if not report_channel:
+            async for m in message.channel.history(limit=500, reverse=True):
+                if m.author.id == guild.me.id:
+                    if 'Coordinate here' in m.content:
+                        report_channel = m.raw_channel_mentions[0]
+                        break
         report_city = report_channel.name
         details = ' '.join(location_split)
         newloc = create_gmaps_query(details, report_channel)
@@ -3578,7 +3591,15 @@ async def _edit_party(channel, author):
         reportmsg = await reportchannel.get_message(guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['raidreport'])
     except:
         pass
-    raidmsg = await channel.get_message(guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['raidmessage'])
+    try:
+        raidmsg = await channel.get_message(guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['raidmessage'])
+    except:
+        async for message in channel.history(limit=500, reverse=True):
+            if message.author.id == guild.me.id:
+                if 'Coordinate here' in message.content:
+                    reportchannel = message.raw_channel_mentions[0]
+                    raidmsg = message
+                    break
     reportembed = raidmsg.embeds[0]
     newembed = discord.Embed(title=reportembed.title, url=reportembed.url, colour=channel.guild.me.colour)
     for field in reportembed.fields:

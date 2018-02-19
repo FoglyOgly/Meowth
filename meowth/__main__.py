@@ -1786,6 +1786,16 @@ async def clearstatus(ctx):
 
     Usage: !clearstatus
     Only usable by admins."""
+    msg = "Are you sure you want to clear all status for this raid? Everybody will have to RSVP again. If you are wanting to clear one user's status, use `!setstatus <user> cancel`"
+    question = await ctx.channel.send(msg)
+    res = await ask(question, ctx.message.channel, ctx.message.author.id)
+    await question.delete()
+    if res == '❎':
+        return
+    elif res == '✅':
+        pass
+    else:
+        return
     try:
         guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict'] = {}
         await ctx.channel.send('Meowth! Raid status lists have been cleared!')
@@ -3456,6 +3466,8 @@ async def interested(ctx, *, teamcounts: str=None):
         total = int(teamcounts.split()[0])
     elif ctx.author.id in trainer_dict:
         total = trainer_dict[ctx.author.id]['count']
+    elif teamcounts:
+        total = str(sum([int(s) for s in teamcounts if s.isdigit()]))
     else:
         total = 1
     result = await _party_status(ctx, total, teamcounts)
@@ -3532,6 +3544,8 @@ async def coming(ctx, *, teamcounts: str=None):
         total = int(teamcounts.split()[0])
     elif ctx.author.id in trainer_dict:
         total = trainer_dict[ctx.author.id]['count']
+    elif teamcounts:
+        total = str(sum([int(s) for s in teamcounts if s.isdigit()]))
     else:
         total = 1
     result = await _party_status(ctx, total, teamcounts)
@@ -3608,6 +3622,8 @@ async def here(ctx, *, teamcounts: str=None):
         total = int(teamcounts.split()[0])
     elif ctx.author.id in trainer_dict:
         total = trainer_dict[ctx.author.id]['count']
+    elif teamcounts:
+        total = str(sum([int(s) for s in teamcounts if s.isdigit()]))
     else:
         total = 1
     result = await _party_status(ctx, total, teamcounts)

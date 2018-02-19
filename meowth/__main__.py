@@ -2356,7 +2356,7 @@ async def _raid(message):
     elif get_level(entered_raid) == "EX":
         await message.channel.send("Meowth! The Pokemon {pokemon} only appears in EX Raids! Use **!exraid** to report one!".format(pokemon=entered_raid.capitalize()))
         return
-    if raidexp:
+    if raidexp is not False:
         if _timercheck(raidexp, raid_info['raid_eggs'][get_level(entered_raid)]['raidtime']):
             await message.channel.send(_("Meowth...that's too long. Level {raidlevel} raids currently last no more than {raidtime} minutes...").format(raidlevel=get_level(entered_raid), raidtime=raid_info['raid_eggs'][get_level(entered_raid)]['raidtime']))
             return
@@ -2410,7 +2410,7 @@ async def _raid(message):
         'pokemon': entered_raid,
         'egglevel': '0',
     }
-    if raidexp:
+    if raidexp is not False:
         await _timerset(raid_channel, raidexp)
     else:
         await raid_channel.send(content=_('Meowth! Hey {member}, if you can, set the time left on the raid using **!timerset <minutes>** so others can check it with **!timer**.').format(member=message.author.mention))
@@ -2464,7 +2464,7 @@ async def _raidegg(message):
         del raidegg_split[(- 1)]
     else:
         raidexp = False
-    if raidexp:
+    if raidexp is not False:
         if _timercheck(raidexp, raid_info['raid_eggs'][str(egg_level)]['hatchtime']):
             await message.channel.send(_("Meowth...that's too long. Level {raidlevel} Raid Eggs currently last no more than {hatchtime} minutes...").format(raidlevel=egg_level, hatchtime=raid_info['raid_eggs'][str(egg_level)]['hatchtime']))
             return
@@ -2522,7 +2522,7 @@ async def _raidegg(message):
             'pokemon': '',
             'egglevel': egg_level,
         }
-        if raidexp:
+        if raidexp is not False:
             await _timerset(raid_channel, raidexp)
         else:
             await raid_channel.send(content=_('Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset <minutes>** so others can check it with **!timer**.').format(member=message.author.mention))

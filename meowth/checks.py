@@ -56,7 +56,7 @@ def check_wantchannel(ctx):
 def check_citychannel(ctx):
     if ctx.guild is None:
         return False
-    channel = ctx.channel.name
+    channel = ctx.channel.id
     guild = ctx.guild
     try:
         city_channels = ctx.bot.guild_dict[guild.id]['city_channels'].keys()

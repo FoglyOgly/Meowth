@@ -1409,7 +1409,7 @@ async def configure(ctx):
                 continue
     # configure main-channels
     if (configcancel == False) and (guild_dict_temp['other'] == True) and ((guild_dict_temp['wildset'] == True) or (guild_dict_temp['raidset'] == True)) and ((firstconfig == True) or (configgoto == 'all') or (configgoto == 'regions') or (configgoto == 'allmain')):
-        await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="Pokemon raid or wild reports are contained within one or more channels. Each channel will be able to represent different areas/communities. I'll need you to provide a list of channels in your server you will allow reports from in this format: `channel-name, channel-name, channel-name`\n\nIf you do not require raid and wild reporting, you may want to disable this function.\n\nRespond with: **N** to disable, or the **channel-name** list to enable, each seperated with a comma and space:").set_author(name='Reporting Channels', icon_url=Meowth.user.avatar_url))
+        await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="Pokemon raid or wild reports are contained within one or more channels. Each channel will be able to represent different areas/communities. I'll need you to provide a list of channels in your server you will allow reports from in this format: `channel-name, channel-name, channel-name`\n\nExample: `kansas-city-raids, hull-raids, sydney-raids`\n\nIf you do not require raid and wild reporting, you may want to disable this function.\n\nRespond with: **N** to disable, or the **channel-name** list to enable, each seperated with a comma and space:").set_author(name='Reporting Channels', icon_url=Meowth.user.avatar_url))
         citychannel_dict = {
 
         }
@@ -1428,13 +1428,33 @@ async def configure(ctx):
                 citychannel_list = citychannels.content.lower().split(', ')
                 guild_channel_list = []
                 for channel in guild.channels:
-                    guild_channel_list.append(channel.name)
+                    guild_channel_list.append(channel.id)
+                citychannel_ids = []
+                citychannel_names = []
+                citychannel_errors = []
+                for item in citychannel_list:
+                    if item.isdigit():
+                        channel = discord.utils.get(guild.channels, id=item)
+                        if channel:
+                            citychannel_ids.append(channel.id)
+                            citychannel_names.append(channel.name)
+                        else:
+                            citychannel_errors.append(item)
+                    else:
+                        name = await letter_case(guild.channels, item.lower())
+                        channel = discord.utils.get(guild.channels, name=name)
+                        if channel:
+                            citychannel_ids.append(channel.id)
+                            citychannel_names.append(channel.name)
+                        else:
+                            citychannel_errors.append(item)
+                citychannel_list = citychannel_ids
                 diff = set(citychannel_list) - set(guild_channel_list)
-                if (not diff):
+                if (not diff) and (not citychannel_errors):
                     await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description='Reporting Channels enabled'))
                     break
                 else:
-                    await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("The channel list you provided doesn't match with your servers channels.\n\nThe following aren't in your server: {invalid_channels}\n\nPlease double check your channel list and resend your reponse.").format(invalid_channels=', '.join(diff))))
+                    await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("The channel list you provided doesn't match with your servers channels.\n\nThe following aren't in your server: **{invalid_channels}**\n\nPlease double check your channel list and resend your reponse.").format(invalid_channels=', '.join(citychannel_errors))))
                     continue
     # configure main-regions
     if (configcancel == False) and (guild_dict_temp['other'] == True) and ((guild_dict_temp['wildset'] == True) or (guild_dict_temp['raidset'] == True)) and ((firstconfig == True) or (configgoto == 'all') or (configgoto == 'regions') or (configgoto == 'allmain')):
@@ -1451,14 +1471,14 @@ async def configure(ctx):
                     citychannel_dict[citychannel_list[i]] = city_list[i]
                 break
             else:
-                await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("The number of cities doesn't match the number of channels you gave me earlier!\n\nI'll show you the two lists to compare:\n\n{channellist}\n{citylist}\n\nPlease double check that your locations match up with your provided channels and resend your response.").format(channellist=', '.join(citychannel_list), citylist=', '.join(city_list))))
+                await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("The number of cities doesn't match the number of channels you gave me earlier!\n\nI'll show you the two lists to compare:\n\n{channellist}\n{citylist}\n\nPlease double check that your locations match up with your provided channels and resend your response.").format(channellist=', '.join(citychannel_names), citylist=', '.join(city_list))))
                 continue
         guild_dict_temp['city_channels'] = citychannel_dict
         await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description='Report Locations are set'))
         guild_catlist = []
         for cat in guild.categories:
             guild_catlist.append(cat.id)
-        await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="How would you like me to categorize the raid channels I create? Your options are **none** if you don't want them categorized, **same** if you want them in the same category as the reporting channel, **region** if you want them categorized by region, or **level** if you want them categorized by level."))
+        await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="How would you like me to categorize the raid channels I create? Your options are:\n\n**none** - If you don't want them categorized\n**same** - If you want them in the same category as the reporting channel\n**region** - If you want them categorized by region\n**level** - If you want them categorized by level."))
         while True:
             category_dict = {}
             categories = await Meowth.wait_for('message', check=lambda message: message.guild == None and message.author == owner)
@@ -1475,77 +1495,100 @@ async def configure(ctx):
             elif categories.content.lower() == 'region':
                 while True:
                     guild_dict_temp['categories'] = 'region'
-                    await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(),description="You have configured the following channels as raid reporting channels: {citychannel_list}\n\nIn the same order as they appear above, please give the names of the categories you would like raids reported in each channel to appear in. You do not need to use different categories for each channel, but they do need to be pre-existing categories. Separate each category name with a comma.".format(citychannel_list=citychannels.content.lower())))
+                    await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(),description="You have configured the following channels as raid reporting channels: {citychannel_list}\n\nIn the same order as they appear above, please give the names of the categories you would like raids reported in each channel to appear in. You do not need to use different categories for each channel, but they do need to be pre-existing categories. Separate each category name with a comma. Response can be either category name or ID.".format(citychannel_list=citychannels.content.lower())))
                     regioncats = await Meowth.wait_for('message', check=lambda message: message.guild == None and message.author == owner)
                     if regioncats.content.lower() == "cancel":
                         configcancel = True
                         await owner.send(embed=discord.Embed(colour=discord.Colour.red(), description='**CONFIG CANCELLED!**\n\nNo changes have been made.'))
                         return
                     regioncat_list = regioncats.content.split(', ')
-                    regioncat_fixed = []
+                    regioncat_ids = []
+                    regioncat_names = []
+                    regioncat_errors = []
                     for item in regioncat_list:
                         if item.isdigit():
                             category = discord.utils.get(guild.categories, id=item)
                             if category:
-                                regioncat_fixed.append(category.id)
+                                regioncat_ids.append(category.id)
+                                regioncat_names.append(category.name)
+                            else:
+                                regioncat_errors.append(item)
                         else:
                             name = await letter_case(guild.categories, item.lower())
                             category = discord.utils.get(guild.categories, name=name)
                             if category:
-                                regioncat_fixed.append(category.id)
-                    regioncat_list = regioncat_fixed
+                                regioncat_ids.append(category.id)
+                                regioncat_names.append(category.name)
+                            else:
+                                regioncat_errors.append(item)
+                    regioncat_list = regioncat_ids
                     if len(regioncat_list) == len(citychannel_list):
                         catdiff = set(regioncat_list) - set(guild_catlist)
-                        if (not catdiff):
+                        if (not catdiff) and (not regioncat_errors):
                             for i in range(len(citychannel_list)):
                                 category_dict[citychannel_list[i]] = regioncat_list[i]
                             break
                         else:
-                            await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(),description="The category list you provided doesn't match with your server's categories.\n\nThe following aren't in your server: {invalid_categories}\n\nPlease double check your category list and resend your response.".format(invalid_categories=', '.join(catdiff))))
+                            await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(),description="The category list you provided doesn't match with your server's categories.\n\nThe following aren't in your server: **{invalid_categories}**\n\nPlease double check your category list and resend your response.".format(invalid_categories=', '.join(regioncat_errors))))
                             continue
                     else:
-                        await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("The number of categories doesn't match the number of channels you gave me earlier!\n\nI'll show you the two lists to compare:\n\n{channellist}\n{catlist}\n\nPlease double check that your categories match up with your provided channels and resend your response.").format(channellist=', '.join(citychannel_list), catlist=', '.join(regioncat_list))))
+                        msg = _("The number of categories I found in your server doesn't match the number of channels you gave me earlier!\n\nI'll show you the two lists to compare:\n\n**Matched Channels:** {channellist}\n**Matched Categories:** {catlist}\n\nPlease double check that your categories match up with your provided channels and resend your response.").format(channellist=', '.join(citychannel_names), catlist=', '.join(regioncat_names) if len(regioncat_list)>0 else "None")
+                        if regioncat_errors:
+                            msg += _("\n\nThe following aren't in your server: **{invalid_categories}**").format(invalid_categories=', '.join(regioncat_errors))
+                        await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=msg))
                         continue
                     break
             elif categories.content.lower() == 'level':
                 guild_dict_temp['categories'] = 'level'
                 while True:
-                    await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(),description="Pokemon Go currently has six levels of raids. Please provide the names of the categories you would like each level of raid to appear in. Use the following order: 1, 2, 3, 4, 5, EX \n\n You do not need to use different categories for each level, but they do need to be pre-existing categories. Separate each category name with a comma."))
+                    await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(),description="Pokemon Go currently has six levels of raids. Please provide the names of the categories you would like each level of raid to appear in. Use the following order: 1, 2, 3, 4, 5, EX \n\nYou do not need to use different categories for each level, but they do need to be pre-existing categories. Separate each category name with a comma. Response can be either category name or ID."))
                     levelcats = await Meowth.wait_for('message', check=lambda message: message.guild == None and message.author == owner)
                     if levelcats.content.lower() == "cancel":
                         configcancel = True
                         await owner.send(embed=discord.Embed(colour=discord.Colour.red(), description='**CONFIG CANCELLED!**\n\nNo changes have been made.'))
                         return
                     levelcat_list = levelcats.content.split(', ')
-                    levelcat_fixed = []
+                    levelcat_ids = []
+                    levelcat_names = []
+                    levelcat_errors = []
                     for item in levelcat_list:
                         if item.isdigit():
                             category = discord.utils.get(guild.categories, id=item)
                             if category:
-                                levelcat_fixed.append(category.id)
+                                levelcat_ids.append(category.id)
+                                levelcat_names.append(category.name)
+                            else:
+                                levelcat_errors.append(item)
                         else:
                             name = await letter_case(guild.categories, item.lower())
                             category = discord.utils.get(guild.categories, name=name)
                             if category:
-                                levelcat_fixed.append(category.id)
-                    levelcat_list = levelcat_fixed
+                                levelcat_ids.append(category.id)
+                                levelcat_names.append(category.name)
+                            else:
+                                levelcat_errors.append(item)
+                    levelcat_list = levelcat_ids
                     if len(levelcat_list) == 6:
                         catdiff = set(levelcat_list) - set(guild_catlist)
-                        if not catdiff:
+                        if (not catdiff) and (not levelcat_errors):
                             level_list = ["1",'2','3','4','5',"EX"]
                             for i in range(6):
                                 category_dict[level_list[i]] = levelcat_list[i]
                             break
                         else:
-                            await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(),description="The category list you provided doesn't match with your server's categories.\n\nThe following aren't in your server: {invalid_categories}\n\nPlease double check your category list and resend your response.".format(invalid_categories=', '.join(catdiff))))
+                            await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(),description="The category list you provided doesn't match with your server's categories.\n\nThe following aren't in your server: **{invalid_categories}**\n\nPlease double check your category list and resend your response.".format(invalid_categories=', '.join(levelcat_errors))))
                             continue
                     else:
-                        await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("The number of categories doesn't match the number of raid levels! Make sure you give me exactly six categories, one for each level of raid. You can use the same category for multiple levels if you want, but I need to see six category names.")))
+                        msg = _("The number of categories I found in your server doesn't match the number of raid levels! Make sure you give me exactly six categories, one for each level of raid. You can use the same category for multiple levels if you want, but I need to see six category names.\n\n**Matched Categories:** {catlist}\n\nPlease double check your categories.").format(catlist=', '.join(levelcat_names) if len(levelcat_list)>0 else "None")
+                        if levelcat_errors:
+                            msg += _("\n\nThe following aren't in your server: **{invalid_categories}**").format(invalid_categories=', '.join(levelcat_errors))
+                        await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=msg))
                         continue
             else:
                 await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(),description="Sorry, I didn't understand your answer! Try again."))
                 continue
             break
+        await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description='Categories are set'))
         guild_dict_temp['category_dict'] = category_dict
     if (configcancel == False) and (guild_dict_temp['other'] == True) and ((firstconfig == True) or (configgoto == 'all') or (configgoto == 'want') or (configgoto == 'allmain')):
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description="The **!want** and **!unwant** commands let you add or remove roles for Pokemon that will be mentioned in reports. This let you get notifications on the Pokemon you want to track. I just need to know what channels you want to allow people to manage their pokemon with the **!want** and **!unwant** command. If you pick a channel that doesn't exist, I'll make it for you.\n\nIf you don't want to allow the management of tracked Pokemon roles, then you may want to disable this feature.\n\nRepond with: **N** to disable, or the **channel-name** list to enable, each seperated by a comma and space.").set_author(name='Pokemon Notifications', icon_url=Meowth.user.avatar_url))
@@ -1596,7 +1639,7 @@ async def configure(ctx):
                                 continue
                             break
                 else:
-                    await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("The channel list you provided doesn't match with your servers channels.\n\nThe following aren't in your server:{invalid_channels}\n\nPlease double check your channel list and resend your reponse.").format(invalid_channels=', '.join(diff))))
+                    await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("The channel list you provided doesn't match with your servers channels.\n\nThe following aren't in your server:**{invalid_channels}**\n\nPlease double check your channel list and resend your reponse.").format(invalid_channels=', '.join(diff))))
                     continue
                 break
     if (configcancel == False) and (guild_dict_temp['other'] == True) and (guild_dict_temp['raidset'] == True) and ((firstconfig == True) or (configgoto == 'all') or (configgoto == 'timezone') or (configgoto == 'allmain')):

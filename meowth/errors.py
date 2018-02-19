@@ -130,7 +130,7 @@ def custom_error_handling(bot, logger):
             else:
                 msg += 'one of the following region channels:'
                 for c in city_channels:
-                    channel = discord.utils.get(guild.channels, name=c)
+                    channel = discord.utils.get(guild.channels, id=c)
                     msg += '\n' + channel.mention
             await ctx.channel.send(msg)
             pass
@@ -160,7 +160,7 @@ def custom_error_handling(bot, logger):
             else:
                 msg += 'of the following Region channels to see active raids:'
                 for c in city_channels:
-                    channel = discord.utils.get(guild.channels, name=c)
+                    channel = discord.utils.get(guild.channels, id=c)
                     msg += '\n' + channel.mention
             await ctx.channel.send(msg)
             pass
@@ -173,7 +173,7 @@ def custom_error_handling(bot, logger):
             else:
                 msg += 'of the following Region channels to see active raids:'
                 for c in city_channels:
-                    channel = discord.utils.get(guild.channels, name=c)
+                    channel = discord.utils.get(guild.channels, id=c)
                     msg += '\n' + channel.mention
             await ctx.channel.send(msg)
             pass
@@ -190,7 +190,7 @@ def custom_error_handling(bot, logger):
             else:
                 msg += 'of the following Region channels to see active raids:'
                 for c in city_channels:
-                    channel = discord.utils.get(guild.channels, name=c)
+                    channel = discord.utils.get(guild.channels, id=c)
                     msg += '\n' + channel.mention
             await ctx.channel.send(msg)
             pass
@@ -203,7 +203,7 @@ def custom_error_handling(bot, logger):
             else:
                 msg += 'one of the following region channels:'
                 for c in city_channels:
-                    channel = discord.utils.get(guild.channels, name=c)
+                    channel = discord.utils.get(guild.channels, id=c)
                     msg += '\n' + channel.mention
             await ctx.channel.send(msg)
             pass
@@ -216,7 +216,7 @@ def custom_error_handling(bot, logger):
             else:
                 msg += 'one of the following region channels:'
                 for c in city_channels:
-                    channel = discord.utils.get(guild.channels, name=c)
+                    channel = discord.utils.get(guild.channels, id=c)
                     msg += '\n' + channel.mention
             await ctx.channel.send(msg)
             pass
@@ -229,7 +229,7 @@ def custom_error_handling(bot, logger):
             else:
                 msg += 'one of the following region channels:'
                 for c in city_channels:
-                    channel = discord.utils.get(guild.channels, name=c)
+                    channel = discord.utils.get(guild.channels, id=c)
                     msg += '\n' + channel.mention
             await ctx.channel.send(msg)
             pass
@@ -242,7 +242,7 @@ def custom_error_handling(bot, logger):
             else:
                 msg += 'one of the following region channels:'
                 for c in city_channels:
-                    channel = discord.utils.get(guild.channels, name=c)
+                    channel = discord.utils.get(guild.channels, id=c)
                     msg += '\n' + channel.mention
             await ctx.channel.send(msg)
             pass

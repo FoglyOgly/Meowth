@@ -1485,12 +1485,12 @@ async def configure(ctx):
                     regioncat_fixed = []
                     for item in regioncat_list:
                         if item.isdigit():
-                            category = discord.utils.get(guild.channels, id=item)
+                            category = discord.utils.get(guild.categories, id=item)
                             if category:
                                 regioncat_fixed.append(category.id)
                         else:
                             name = await letter_case(guild.categories, item.lower())
-                            category = discord.utils.get(guild.channels, name=name)
+                            category = discord.utils.get(guild.categories, name=name)
                             if category:
                                 regioncat_fixed.append(category.id)
                     regioncat_list = regioncat_fixed
@@ -1520,12 +1520,12 @@ async def configure(ctx):
                     levelcat_fixed = []
                     for item in levelcat_list:
                         if item.isdigit():
-                            category = discord.utils.get(guild.channels, id=item)
+                            category = discord.utils.get(guild.categories, id=item)
                             if category:
                                 levelcat_fixed.append(category.id)
                         else:
                             name = await letter_case(guild.categories, item.lower())
-                            category = discord.utils.get(guild.channels, name=name)
+                            category = discord.utils.get(guild.categories, name=name)
                             if category:
                                 levelcat_fixed.append(category.id)
                     levelcat_list = levelcat_fixed

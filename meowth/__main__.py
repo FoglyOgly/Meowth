@@ -2132,11 +2132,21 @@ async def unwant(ctx):
             if pkmn_match:
                 entered_unwant = pkmn_match
             else:
-                msg = "Meowth! {word} isn't a Pokemon!".format(word=entered_unwant)
-                if spellcheck(entered_unwant) != entered_unwant:
-                    msg += ' Did you mean {correction}?'.format(correction=spellcheck(entered_unwant))
-                await message.channel.send(msg)
-                return
+                msg = "Meowth! **{word}** isn't a Pokemon!".format(word=entered_unwant.title())
+                if spellcheck(entered_unwant) and (spellcheck(entered_unwant) != entered_unwant):
+                    msg += ' Did you mean **{correction}**?'.format(correction=spellcheck(entered_unwant).title())
+                    question = await message.channel.send(msg)
+                    res = await ask(question, message.channel, message.author.id)
+                    await question.delete()
+                    if res == '❎':
+                        return
+                    elif res == '✅':
+                        entered_unwant = spellcheck(entered_unwant)
+                    else:
+                        return
+                else:
+                    question = await message.channel.send(msg)
+                    return
             # If user is not already wanting the Pokemon,
             # print a less noisy message
             role = discord.utils.get(guild.roles, name=entered_unwant)
@@ -2639,7 +2649,7 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
             return
     eggdetails = guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id]
     egglevel = eggdetails['egglevel']
-    if int(egglevel) == 0:
+    if egglevel == "0":
         egglevel = get_level(entered_raid)
     try:
         reportcitychannel = Meowth.get_channel(eggdetails['reportcity'])

@@ -1291,7 +1291,7 @@ async def configure(ctx):
                             continue
                         else:
                             if welcomemessage.startswith("[") and welcomemessage.endswith("]"):
-                                embed = discord.Embed(colour=server.me.colour, description=welcomemessage[1:-1].format(user=owner.mention))
+                                embed = discord.Embed(colour=guild.me.colour, description=welcomemessage[1:-1].format(user=owner.mention))
                                 question = await owner.send(embed=embed)
                                 res = await ask(question, owner, owner.id)
                             else:

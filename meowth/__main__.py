@@ -269,7 +269,7 @@ def create_gmaps_query(details, channel):
             newloc = details[newlocindex:newlocend + 1]
             return newloc
     details_list = details.split()
-    loc_list = guild_dict[channel.guild.id]['city_channels'][channel.name].split(
+    loc_list = guild_dict[channel.guild.id]['city_channels'][channel.id].split(
     )
     return 'https://www.google.com/maps/search/?api=1&query={0}+{1}'.format('+'.join(details_list), '+'.join(loc_list))
 
@@ -381,7 +381,7 @@ def get_category(channel, level):
     if catsort == "same":
         return channel.category
     elif catsort == "region":
-        category = discord.utils.get(guild.categories,id=guild_dict[guild.id]['category_dict'][channel.name])
+        category = discord.utils.get(guild.categories,id=guild_dict[guild.id]['category_dict'][channel.id])
         return category
     elif catsort == "level":
         category = discord.utils.get(guild.categories,id=guild_dict[guild.id]['category_dict'][level])

@@ -331,7 +331,7 @@ def do_template(message, author, guild):
                 not_found.append(full_match)
             return member.mention if member else full_match
         elif match_type == '#':
-            channel = discord.utils.get(guild.channels, name=match)
+            channel = discord.utils.get(guild.text_channels, name=match)
             if match.isdigit() and (not channel):
                 channel = guild.get_channel(match)
             if (not channel):
@@ -721,7 +721,7 @@ Events
 
 @Meowth.event
 async def on_ready():
-    
+
 
     Meowth.owner = discord.utils.get(
         Meowth.get_all_members(), id=config['master'])
@@ -834,7 +834,7 @@ async def on_member_join(member):
         else:
             await member.send(welcomemessage.format(server=guild.name, user=member.mention))
     else:
-        default = discord.utils.get(guild.channels, name=guild_dict[guild.id]['welcomechan'])
+        default = discord.utils.get(guild.text_channels, name=guild_dict[guild.id]['welcomechan'])
         if default:
             if welcomemessage.startswith("[") and welcomemessage.endswith("]"):
                 await default.send(embed=discord.Embed(colour=guild.me.colour, description=welcomemessage[1:-1].format(server=guild.name, user=member.mention)))
@@ -1095,7 +1095,7 @@ async def announce(ctx, *, announce=None):
             elif channelmsg.raw_channel_mentions:
                 sendchannel = Meowth.get_channel(channelmsg.raw_channel_mentions[0])
             else:
-                sendchannel = discord.utils.get(guild.channels, name=channelmsg.content)
+                sendchannel = discord.utils.get(guild.text_channels, name=channelmsg.content)
             if (channelmsg != None) and (sendchannel != None):
                 announcement = await sendchannel.send(embed=embeddraft)
                 confirmation = await channel.send(_('Announcement Sent.'))
@@ -1322,7 +1322,7 @@ async def configure(ctx):
                         return
                     else:
                         guild_channel_list = []
-                        for channel in guild.channels:
+                        for channel in guild.text_channels:
                             guild_channel_list.append(channel.name)
                         diff = set([welcomechannelreply.content.lower().strip()]) - set(guild_channel_list)
                         if (not diff):
@@ -1428,22 +1428,22 @@ async def configure(ctx):
             else:
                 citychannel_list = citychannels.content.lower().split(', ')
                 guild_channel_list = []
-                for channel in guild.channels:
+                for channel in guild.text_channels:
                     guild_channel_list.append(channel.id)
                 citychannel_ids = []
                 citychannel_names = []
                 citychannel_errors = []
                 for item in citychannel_list:
                     if item.isdigit():
-                        channel = discord.utils.get(guild.channels, id=item)
+                        channel = discord.utils.get(guild.text_channels, id=item)
                         if channel:
                             citychannel_ids.append(channel.id)
                             citychannel_names.append(channel.name)
                         else:
                             citychannel_errors.append(item)
                     else:
-                        name = await letter_case(guild.channels, item.lower())
-                        channel = discord.utils.get(guild.channels, name=name)
+                        name = await letter_case(guild.text_channels, item.lower())
+                        channel = discord.utils.get(guild.text_channels, name=name)
                         if channel:
                             citychannel_ids.append(channel.id)
                             citychannel_names.append(channel.name)
@@ -1606,7 +1606,7 @@ async def configure(ctx):
             else:
                 want_list = wantchs.content.lower().split(', ')
                 guild_channel_list = []
-                for channel in guild.channels:
+                for channel in guild.text_channels:
                     guild_channel_list.append(channel.name)
                 diff = set(want_list) - set(guild_channel_list)
                 if (not diff):
@@ -1615,7 +1615,7 @@ async def configure(ctx):
                     while True:
                         try:
                             for want_channel_name in want_list:
-                                want_channel = discord.utils.get(guild.channels, name=want_channel_name)
+                                want_channel = discord.utils.get(guild.text_channels, name=want_channel_name)
                                 if want_channel == None:
                                     want_channel = await guild.create_text_channel(want_channel_name)
                                 if want_channel.id not in guild_dict_temp['want_channel_list']:
@@ -2904,7 +2904,7 @@ async def _invite(ctx):
     exraidcount = 0
     rc_dict = bot.guild_dict[guild.id]['raidchannel_dict']
     for channelid in rc_dict:
-        if (not discord.utils.get(guild.channels, id=channelid)):
+        if (not discord.utils.get(guild.text_channels, id=channelid)):
             continue
         if (rc_dict[channelid]['egglevel'] == 'EX') or (rc_dict[channelid]['type'] == 'exraid'):
             exraid_channel = bot.get_channel(channelid)
@@ -4108,7 +4108,7 @@ async def list(ctx):
                 reportcity = Meowth.get_channel(rc_d[r]['reportcity'])
                 if not reportcity:
                     continue
-                if (reportcity.name == cty) and rc_d[r]['active'] and discord.utils.get(guild.channels, id=r):
+                if (reportcity.name == cty) and rc_d[r]['active'] and discord.utils.get(guild.text_channels, id=r):
                     exp = rc_d[r]['exp']
                     type = rc_d[r]['type']
                     level = rc_d[r]['egglevel']

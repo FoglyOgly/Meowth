@@ -2679,7 +2679,7 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
     except IndexError:
         raid_messageauthor = ('<@' + raid_message.raw_mentions[0]) + '>'
         logger.info('Hatching Mention Failed - Trying alternative method: channel: {} (id: {}) - server: {} | Attempted mention: {}...'.format(raid_channel.name, raid_channel.id, raid_channel.guild.name, raid_message.content[:125]))
-    if int(eggdetails['egglevel']) > 0:
+    if egglevel.isdigit() and int(egglevel) > 0:
         raidexp = eggdetails['exp'] + 60 * raid_info['raid_eggs'][egglevel]['raidtime']
     else:
         raidexp = eggdetails['exp']
@@ -3485,10 +3485,11 @@ async def interested(ctx, *, teamcounts: str=None):
         else:
             teamcounts = '1'
     rgx = '[^a-zA-Z0-9]'
-    entered_interest = []
-    pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, '', p) in re.sub(rgx, '', teamcounts)), None)
+    if teamcounts:
+        pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, '', p) in re.sub(rgx, '', teamcounts)), None)
     if pkmn_match:
-        for word in re.split(' |,', teamcounts):
+        entered_interest = []
+        for word.lower() in re.split(' |,', teamcounts):
             if word.lower() in pkmn_info['pokemon_list'] and get_number(word.lower()) in raid_info['raid_eggs'][get_level(word.lower())]['pokemon']:
                 entered_interest.append(word.lower())
                 teamcounts = teamcounts.replace(word,"").replace(",","").strip()
@@ -3563,7 +3564,7 @@ async def coming(ctx, *, teamcounts: str=None):
         pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, '', p) in re.sub(rgx, '', teamcounts)), None)
     if pkmn_match:
         entered_interest = []
-        for word in re.split(' |,', teamcounts):
+        for word.lower() in re.split(' |,', teamcounts):
             if word.lower() in pkmn_info['pokemon_list'] and get_number(word.lower()) in raid_info['raid_eggs'][get_level(word.lower())]['pokemon']:
                 entered_interest.append(word.lower())
                 teamcounts = teamcounts.replace(word,"").replace(",","").strip()
@@ -3657,7 +3658,7 @@ async def here(ctx, *, teamcounts: str=None):
         pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, '', p) in re.sub(rgx, '', teamcounts)), None)
     if pkmn_match:
         entered_interest = []
-        for word in re.split(' |,', teamcounts):
+        for word.lower() in re.split(' |,', teamcounts):
             if word.lower() in pkmn_info['pokemon_list'] and get_number(word.lower()) in raid_info['raid_eggs'][get_level(word.lower())]['pokemon']:
                 entered_interest.append(word.lower())
                 teamcounts = teamcounts.replace(word,"").replace(",","").strip()

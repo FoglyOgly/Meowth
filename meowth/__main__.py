@@ -2681,7 +2681,7 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
     except IndexError:
         raid_messageauthor = ('<@' + raid_message.raw_mentions[0]) + '>'
         logger.info('Hatching Mention Failed - Trying alternative method: channel: {} (id: {}) - server: {} | Attempted mention: {}...'.format(raid_channel.name, raid_channel.id, raid_channel.guild.name, raid_message.content[:125]))
-    if egglevel.isdigit() and int(egglevel) > 0:
+    if (egglevel.isdigit() and int(egglevel) > 0) or egglevel == 'EX':
         raidexp = eggdetails['exp'] + 60 * raid_info['raid_eggs'][egglevel]['raidtime']
     else:
         raidexp = eggdetails['exp']

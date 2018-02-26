@@ -3491,7 +3491,7 @@ async def interested(ctx, *, teamcounts: str=None):
         pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, '', p) in re.sub(rgx, '', teamcounts)), None)
     if pkmn_match:
         entered_interest = []
-        for word.lower() in re.split(' |,', teamcounts):
+        for word in re.split(' |,', teamcounts):
             if word.lower() in pkmn_info['pokemon_list'] and get_number(word.lower()) in raid_info['raid_eggs'][get_level(word.lower())]['pokemon']:
                 entered_interest.append(word.lower())
                 teamcounts = teamcounts.replace(word,"").replace(",","").strip()
@@ -3566,7 +3566,7 @@ async def coming(ctx, *, teamcounts: str=None):
         pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, '', p) in re.sub(rgx, '', teamcounts)), None)
     if pkmn_match:
         entered_interest = []
-        for word.lower() in re.split(' |,', teamcounts):
+        for word in re.split(' |,', teamcounts):
             if word.lower() in pkmn_info['pokemon_list'] and get_number(word.lower()) in raid_info['raid_eggs'][get_level(word.lower())]['pokemon']:
                 entered_interest.append(word.lower())
                 teamcounts = teamcounts.replace(word,"").replace(",","").strip()
@@ -3660,7 +3660,7 @@ async def here(ctx, *, teamcounts: str=None):
         pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, '', p) in re.sub(rgx, '', teamcounts)), None)
     if pkmn_match:
         entered_interest = []
-        for word.lower() in re.split(' |,', teamcounts):
+        for word in re.split(' |,', teamcounts):
             if word.lower() in pkmn_info['pokemon_list'] and get_number(word.lower()) in raid_info['raid_eggs'][get_level(word.lower())]['pokemon']:
                 entered_interest.append(word.lower())
                 teamcounts = teamcounts.replace(word,"").replace(",","").strip()

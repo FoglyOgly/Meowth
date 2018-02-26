@@ -3477,16 +3477,15 @@ async def interested(ctx, *, teamcounts: str=None):
 
     Party is also optional. Format is #m #v #i to tell your party's teams."""
     trainer_dict = guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict']
+    entered_interest = trainer_dict.get(ctx.author.id, {}).get('interest', [])
     if (not teamcounts):
         if ctx.author.id in trainer_dict:
-            entered_interest = trainer_dict[ctx.author.id].get('interest', [])
             bluecount = str(trainer_dict[ctx.author.id]['party'][0]) + 'm '
             redcount = str(trainer_dict[ctx.author.id]['party'][1]) + 'v '
             yellowcount = str(trainer_dict[ctx.author.id]['party'][2]) + 'i '
             unknowncount = str(trainer_dict[ctx.author.id]['party'][3]) + 'i '
             teamcounts = ((((str(trainer_dict[ctx.author.id]['count']) + ' ') + bluecount) + redcount) + yellowcount) + unknowncount
         else:
-            entered_interest = []
             teamcounts = '1'
     rgx = '[^a-zA-Z0-9]'
     if teamcounts:

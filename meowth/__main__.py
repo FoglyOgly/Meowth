@@ -721,24 +721,7 @@ Events
 
 @Meowth.event
 async def on_ready():
-    for guildid in guild_dict:
-        guild = Meowth.get_guild(guildid)
-        for channelname in guild_dict[guildid]['city_channels']:
-            if isinstance(channelname, int):
-                continue
-            channel = discord.utils.get(guild.channels, name=await letter_case(guild.channels,channelname.lower()))
-            if channel:
-                guild_dict[guildid]['city_channels'][channel.id] = guild_dict[guildid]['city_channels'].pop(channelname)
-            else:
-                continue
-        if guild_dict[guildid]['category_dict']:
-            for item in guild_dict[guildid]['category_dict']:
-                catname = guild_dict[guildid]['category_dict'][item]
-                category = discord.utils.get(guild.categories, name=await letter_case(guild.categories,catname.lower()))
-                if category:
-                    guild_dict[guildid]['category_dict'][item] = category.id
-                else:
-                    continue
+    
 
     Meowth.owner = discord.utils.get(
         Meowth.get_all_members(), id=config['master'])

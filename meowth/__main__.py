@@ -510,7 +510,6 @@ async def expire_channel(channel):
         else:
             if (not alreadyexpired):
                 new_name = 'expired-' + channel.name
-                print('debug 0')
                 await channel.edit(name=new_name)
                 await channel.send(_('This channel timer has expired! The channel has been deactivated and will be deleted in 5 minutes.\nTo reactivate the channel, use **!timerset** to set the timer again.'))
             delete_time = (guild_dict[guild.id]['raidchannel_dict'][channel.id]['exp'] + (5 * 60)) - time.time()

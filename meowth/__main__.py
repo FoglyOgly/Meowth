@@ -268,6 +268,12 @@ def create_gmaps_query(details, channel):
         else:
             newloc = details[newlocindex:newlocend + 1]
             return newloc
+
+    #look for lat/long coordinates in the location details. If provided, 
+    #then channel location hints are not needed in the  maps query
+    if re.match (r'^\s*-?\d{1,2}\.?\d*,\s+-?\d{1,3}\.?\d*\s*$', details): #regex looks for lat/long in the format similar to 42.434546, -83.985195. 
+        return "https://www.google.com/maps/search/?api=1&query={0}".format('+'.join(details_list))
+			
     details_list = details.split()
     loc_list = guild_dict[channel.guild.id]['city_channels'][channel.id].split(
     )

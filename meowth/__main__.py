@@ -2866,7 +2866,7 @@ async def _exraid(ctx):
     if len(raid_info['raid_eggs']['EX']['pokemon']) == 1:
         await _eggassume('assume ' + get_name(raid_info['raid_eggs']['EX']['pokemon'][0]), raid_channel)
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[raid_channel.guild.id]['offset'])
-    await raid_channel.send(content=_('Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset <date and time>** so others can check it with **!timer**. **<date and time>** should look like this **{format}** (MM/DD HH:MM AM/PM - You can also omit AM/PM and use 24-hour time!), but set it to the date and time your invitation has.').format(member=message.author.mention, format=now.strftime('%m/%d %I:%M %p')))
+    await raid_channel.send(content=_('Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset <date and time>** so others can check it with **!timer**. **<date and time>** can just be written exactly how it appears on your EX Raid Pass.').format(member=message.author.mention))
     event_loop.create_task(expiry_check(raid_channel))
 
 @Meowth.command()
@@ -4356,6 +4356,45 @@ async def _lobbylist(ctx, tag=False):
 
 @list.command()
 @checks.activeraidchannel()
+async def bosses(ctx):
+    "List each possible boss and the number of users that have RSVP'd for it.\n\n    Usage: !list bosses\n   Works only in raid channels."
+    listmsg = "**Meowth!**"
+    listmsg += await _bosslist(ctx)
+    await ctx.channel.send(listmsg)
+
+async def _bosslist(ctx):
+    message = ctx.message
+    channel = ctx.channel
+    egglevel = guild_dict[message.guild.id]['raidchannel_dict'][channel.id]['egglevel']
+    egg_level = str(egglevel)
+    egg_info = raid_info['raid_eggs'][egg_level]
+    egg_img = egg_info['egg_img']
+    boss_dict = {}
+    boss_list = []
+    boss_dict["unspecified"] = {"type": "❔", "total": 0, "maybe": 0, "omw": 0, "waiting": 0}
+    for p in egg_info['pokemon']:
+        p_name = get_name(p)
+        boss_list.append(p_name.lower())
+        p_type = get_type(message.guild,p)
+        boss_dict[p_name.lower()] = {"type": "{}".format(''.join(p_type)), "total": 0, "maybe": 0, "omw": 0, "waiting": 0}
+    boss_list.append('unspecified')
+    trainer_dict = copy.deepcopy(guild_dict[message.guild.id]['raidchannel_dict'][channel.id]['trainer_dict'])
+    for trainer in trainer_dict:
+        interest = trainer_dict[trainer].get('interest', ['unspecified'])
+        for item in interest:
+            status = trainer_dict[trainer]['status']
+            count = trainer_dict[trainer]['count']
+            boss_dict[item][status] += count
+            boss_dict[item]['total'] += count
+    bossliststr = ''
+    for boss in boss_list:
+        if boss_dict[boss]['total'] > 0:
+            bossliststr += '{type}{name}: **{total} total,** {interested} interested, {coming} coming, {waiting} waiting{type}\n '.format(type=boss_dict[boss]['type'],name=boss.capitalize(), total=boss_dict[boss]['total'], interested=boss_dict[boss]['maybe'], coming=boss_dict[boss]['omw'], waiting=boss_dict[boss]['waiting'])
+    listmsg = ' Boss numbers for the raid:\n{}'.format(bossliststr)
+    return listmsg
+
+@list.command()
+@checks.activeraidchannel()
 async def teams(ctx):
     "List the teams for the users that have RSVP'd to a raid.\n\n    Usage: !list teams\n    Works only in raid channels."
     listmsg = '**Meowth!**'
@@ -4457,7 +4496,7 @@ async def tags(ctx):
 @checks.nonraidchannel()
 @checks.wantchannel()
 async def wants(ctx):
-    'List the wants for the user\n\n    Usage: !list wants\n    Works only in raid channels.'
+    'List the wants for the user\n\n    Usage: !list wants\n    Works only in the want channel.'
     listmsg = '**Meowth!**'
     listmsg += await _wantlist(ctx)
     await ctx.channel.send(listmsg)
@@ -4472,6 +4511,85 @@ async def _wantlist(ctx):
     else:
         listmsg = " You don't have any wants! use **!want** to add some."
     return listmsg
+
+@Meowth.command()
+@checks.activeraidchannel()
+async def counters(ctx, *, entered_pkmn = None):
+    """Simulate a Raid battle with Pokebattler.
+
+    Usage: !counters
+    Only usable in raid channels. Uses current boss and weather.
+    """
+    channel = ctx.channel
+    guild = channel.guild
+    pkmn = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('pokemon', None)
+    if not pkmn:
+        pkmn = entered_pkmn if entered_pkmn in get_raidlist() else None
+    weather = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('weather', None)
+    if pkmn:
+        img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn/{0}_.png?cache=2'.format(str(get_number(pkmn)).zfill(3))
+        if not weather:
+            weather = "NO_WEATHER"
+        else:
+            weather_list = ['none', 'extreme', 'clear', 'rainy',
+                            'partlycloudy', 'cloudy', 'windy', 'snow', 'fog']
+            if not weather.lower() in weather_list:
+                msg = "Please pick a valid weather option."
+                await ctx.embed(msg, msg_type='error')
+                return
+            if weather.lower() == 'partlycloudy':
+                weather = 'PARTLY_CLOUDY'
+            weather = weather.upper()
+        url = "https://fight.pokebattler.com/raids/defenders/"
+        url += "{pkmn}/levels/RAID_LEVEL_{level}/".format(pkmn=pkmn.upper(),level=get_level(pkmn))
+        url += "attackers/levels/30/strategies/CINEMATIC_ATTACK_WHEN_POSSIBLE/DEFENSE?sort=OVERALL&"
+        url += "weatherCondition={weather}&dodgeStrategy=DODGE_REACTION_TIME&aggregation=AVERAGE".format(weather=weather)
+        async with ctx.typing():
+            async with aiohttp.ClientSession() as sess:
+                async with sess.get(url) as resp:
+                    data = await resp.json()
+
+            title_url = url.replace('https://fight', 'https://www')
+            colour = guild.me.colour
+            pbtlr_icon = 'https://www.pokebattler.com/favicon-32x32.png'
+            data = data['attackers'][0]
+            raid_cp = data['cp']
+            atk_levels = '30'
+            ctrs = data['randomMove']['defenders'][-6:]
+            index = 1
+            def clean(txt):
+                return txt.replace('_', ' ').title()
+            title = 'Boss: {pkmn} | Weather: {weather}'.format(pkmn=pkmn.title(),weather=clean(weather))
+            stats_msg = "**CP:** {raid_cp}\n".format(raid_cp=raid_cp)
+            stats_msg += "**Weather:** {weather}\n".format(weather=clean(weather))
+            stats_msg += "**Attacker Level:** {atk_levels}".format(atk_levels=atk_levels)
+            ctrs_embed = discord.Embed(colour=colour)
+            ctrs_embed.set_author(name=title,url=title_url,icon_url=pbtlr_icon)
+            ctrs_embed.set_thumbnail(url=img_url)
+            ctrs_embed.set_footer(text='Made possible with Pokebattler by Celandro')
+            for ctr in reversed(ctrs):
+                ctr_name = clean(ctr['pokemonId'])
+                moveset = ctr['byMove'][-1]
+                moves = "{move1} | {move2}".format(move1=clean(moveset['move1'])[:-5], move2=clean(moveset['move2']))
+                name = "#{index} - {ctr_name}".format(index=index, ctr_name=ctr_name)
+                ctrs_embed.add_field(name=name,value=moves)
+                index += 1
+            await ctx.channel.send(embed=ctrs_embed)
+    else:
+        await ctx.channel.send("Meowth! Enter a Pokemon that appears in raids, or wait for this raid egg to hatch!")
+
+@Meowth.command()
+@checks.activeraidchannel()
+async def weather(ctx, *, weather):
+    "Sets the weather for the raid. \nUsage: !weather <weather> \nOnly usable in raid channels. \n Acceptable options: none, extreme, clear, rainy, partlycloudy, cloudy, windy, snow, fog"
+    weather_list = ['none', 'extreme', 'clear', 'rainy',
+                    'partlycloudy', 'cloudy', 'windy', 'snow', 'fog']
+    if weather.lower() not in weather_list:
+        return await ctx.channel.send("Meowth! Enter one of the following weather conditions: {}".format(", ".join(weather_list)))
+    else:
+        guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['weather'] = weather.lower()
+        return await ctx.channel.send("Meowth! Weather set to {}!".format(weather.lower()))
+
 try:
     event_loop.run_until_complete(Meowth.start(config['bot_token']))
 except discord.LoginFailure:

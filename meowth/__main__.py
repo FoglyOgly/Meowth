@@ -3506,7 +3506,7 @@ async def counters(ctx, *, entered_pkmn = None):
             weather = match_list[index]
         url = "https://fight.pokebattler.com/raids/defenders/"
         url += "{pkmn}/levels/RAID_LEVEL_{level}/".format(pkmn=pkmn.upper(),level=level)
-        url += "attackers/levels/30/strategies/CINEMATIC_ATTACK_WHEN_POSSIBLE/DEFENSE?sort=OVERALL&"
+        url += "attackers/levels/30/strategies/CINEMATIC_ATTACK_WHEN_POSSIBLE/DEFENSE_RANDOM_MC?sort=OVERALL&"
         url += "weatherCondition={weather}&dodgeStrategy=DODGE_REACTION_TIME&aggregation=AVERAGE".format(weather=weather)
         async with ctx.typing():
             async with aiohttp.ClientSession() as sess:

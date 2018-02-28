@@ -3505,7 +3505,7 @@ async def counters(ctx, *, entered_pkmn = None):
             index = weather_list.index(weather)
             weather = match_list[index]
         url = "https://fight.pokebattler.com/raids/defenders/"
-        url += "{pkmn}/levels/RAID_LEVEL_{level}/".format(pkmn=pkmn.upper(),level=level)
+        url += "{pkmn}/levels/RAID_LEVEL_{level}/".format(pkmn=pkmn.replace('-','_').upper(),level=level)
         url += "attackers/levels/30/strategies/CINEMATIC_ATTACK_WHEN_POSSIBLE/DEFENSE_RANDOM_MC?sort=OVERALL&"
         url += "weatherCondition={weather}&dodgeStrategy=DODGE_REACTION_TIME&aggregation=AVERAGE".format(weather=weather)
         async with ctx.typing():
@@ -3515,6 +3515,7 @@ async def counters(ctx, *, entered_pkmn = None):
 
             title_url = url.replace('https://fight', 'https://www')
             colour = guild.me.colour
+            hyperlink_icon = 'https://i.imgur.com/fn9E5nb.png'
             pbtlr_icon = 'https://www.pokebattler.com/favicon-32x32.png'
             data = data['attackers'][0]
             raid_cp = data['cp']
@@ -3523,14 +3524,14 @@ async def counters(ctx, *, entered_pkmn = None):
             index = 1
             def clean(txt):
                 return txt.replace('_', ' ').title()
-            title = 'Boss: {pkmn} | Weather: {weather}'.format(pkmn=pkmn.title(),weather=clean(weather))
+            title = '{pkmn} | {weather}'.format(pkmn=pkmn.title(),weather=clean(weather))
             stats_msg = "**CP:** {raid_cp}\n".format(raid_cp=raid_cp)
             stats_msg += "**Weather:** {weather}\n".format(weather=clean(weather))
             stats_msg += "**Attacker Level:** {atk_levels}".format(atk_levels=atk_levels)
             ctrs_embed = discord.Embed(colour=colour)
-            ctrs_embed.set_author(name=title,url=title_url,icon_url=pbtlr_icon)
+            ctrs_embed.set_author(name=title,url=title_url,icon_url=hyperlink_icon)
             ctrs_embed.set_thumbnail(url=img_url)
-            ctrs_embed.set_footer(text='Made possible with Pokebattler by Celandro')
+            ctrs_embed.set_footer(text='Results courtesy of Pokebattler', icon_url=pbtlr_icon)
             for ctr in reversed(ctrs):
                 ctr_name = clean(ctr['pokemonId'])
                 moveset = ctr['byMove'][-1]
@@ -3538,6 +3539,7 @@ async def counters(ctx, *, entered_pkmn = None):
                 name = "#{index} - {ctr_name}".format(index=index, ctr_name=ctr_name)
                 ctrs_embed.add_field(name=name,value=moves)
                 index += 1
+            ctrs_embed.add_field(name="Results with Level 30 attackers", value="[See your personalized results!](https://www.pokebattler.com/raids/{pkmn})".format(pkmn=pkmn.replace('-','_').upper()))
             await ctx.channel.send(embed=ctrs_embed)
     else:
         await ctx.channel.send("Meowth! Enter a Pokemon that appears in raids, or wait for this raid egg to hatch!")

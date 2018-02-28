@@ -1226,7 +1226,7 @@ async def configure(ctx):
                     temp_role = discord.utils.get(guild.roles, name=team)
                     if temp_role == None:
                         try:
-                            await guild.create_role(name=team, hoist=False, mentionable=True)
+                            await guild.create_role(name=team.lower(), hoist=False, mentionable=True)
                         except discord.errors.HTTPException:
                             pass
                 await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description='Team Assignments enabled!'))
@@ -2069,7 +2069,7 @@ async def want(ctx):
         # Create role if it doesn't exist yet
         if role == None:
             try:
-                role = await guild.create_role(name = entered_want, hoist = False, mentionable = True)
+                role = await guild.create_role(name = entered_want.lower(), hoist = False, mentionable = True)
             except discord.errors.HTTPException:
                 await message.channel.send('Maximum guild roles reached. Pokemon not added.')
                 return
@@ -2251,13 +2251,7 @@ async def _wild(message):
             return
         wild = discord.utils.get(message.guild.roles, name=entered_wild)
         if wild == None:
-            try:
-                wild = await message.guild.create_role(name = entered_wild, hoist = False, mentionable = True)
-                wild = wild.mention
-            except discord.errors.HTTPException:
-                await message.channel.send('Maximum guild roles reached.')
-                wild = entered_wild.title()
-            await asyncio.sleep(0.5)
+            wild = entered_wild.title()
         else:
             wild = wild.mention
         wild_number = pkmn_info['pokemon_list'].index(entered_wild) + 1
@@ -2394,13 +2388,7 @@ async def _raid(message):
     raid_channel = await message.guild.create_text_channel(raid_channel_name, overwrites=dict(message.channel.overwrites), category=raid_channel_category)
     raid = discord.utils.get(message.guild.roles, name=entered_raid)
     if raid == None:
-        try:
-            raid = await message.guild.create_role(name = entered_raid, hoist = False, mentionable = True)
-            raid = raid.mention
-        except discord.errors.HTTPException:
-            await message.channel.send('Maximum guild roles reached.')
-            raid = entered_raid.title()
-        await asyncio.sleep(0.5)
+        raid = entered_raid.title()
     else:
         raid = raid.mention
     raid_number = pkmn_info['pokemon_list'].index(entered_raid) + 1
@@ -2602,13 +2590,7 @@ async def _eggassume(args, raid_channel, author=None):
     raid_gmaps_link = oldembed.url
     raidrole = discord.utils.get(raid_channel.guild.roles, name=entered_raid)
     if raidrole == None:
-        try:
-            raidrole = await raid_channel.guild.create_role(name = entered_raid, hoist = False, mentionable = True)
-            raidrole = raidrole.mention
-        except discord.errors.HTTPException:
-            await raid_channel.send('Maximum guild roles reached.')
-            raidrole = entered_raid.title()
-        await asyncio.sleep(0.5)
+        raidrole = entered_raid.title()
     else:
         raidrole = raidrole.mention
     raid_number = pkmn_info['pokemon_list'].index(entered_raid) + 1
@@ -2718,13 +2700,7 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
     raid_gmaps_link = oldembed.url
     raid = discord.utils.get(raid_channel.guild.roles, name=entered_raid)
     if raid == None:
-        try:
-            raid = await raid_channel.guild.create_role(name = entered_raid, hoist = False, mentionable = True)
-            raid = raid.mention
-        except discord.errors.HTTPException:
-            await raid_channel.send('Maximum guild roles reached.')
-            raid = entered_raid.title()
-        await asyncio.sleep(0.5)
+        raid = entered_raid.title()
     else:
         raid = raid.mention
     raid_number = pkmn_info['pokemon_list'].index(entered_raid) + 1
@@ -4044,7 +4020,7 @@ async def _lobby(message, count):
     guild_dict[message.guild.id]['raidchannel_dict'][message.channel.id]['trainer_dict'] = trainer_dict
 
 @Meowth.command(aliases=['x'])
-@checks.activeraidchannel()
+@checks.raidchannel()
 async def cancel(ctx):
     """Indicate you are no longer interested in a raid.
 
@@ -4528,53 +4504,30 @@ async def teams(ctx):
 
 async def _teamlist(ctx):
     message = ctx.message
-    bluecount = 0
-    redcount = 0
-    yellowcount = 0
-    othercount = 0
-    redmaybe = 0
-    redcoming = 0
-    redwaiting = 0
-    bluemaybe = 0
-    bluecoming = 0
-    bluewaiting = 0
-    yellowmaybe = 0
-    yellowcoming = 0
-    yellowwaiting = 0
-    othermaybe = 0
-    othercoming = 0
-    otherwaiting = 0
+    team_dict = {}
+    team_dict["mystic"] = {"total":0,"maybe":0,"omw":0,"waiting":0}
+    team_dict["valor"] = {"total":0,"maybe":0,"omw":0,"waiting":0}
+    team_dict["instinct"] = {"total":0,"maybe":0,"omw":0,"waiting":0}
+    team_dict["unknown"] = {"total":0,"maybe":0,"omw":0,"waiting":0}
+    status_list = ["waiting","omw","maybe"]
+    team_list = ["mystic","valor","instinct","unknown"]
+    index = 0
     teamliststr = ''
     trainer_dict = copy.deepcopy(guild_dict[message.guild.id]['raidchannel_dict'][message.channel.id]['trainer_dict'])
     for trainer in trainer_dict.keys():
-        bluecount += int(trainer_dict[trainer]['party'][0])
-        redcount += int(trainer_dict[trainer]['party'][1])
-        yellowcount += int(trainer_dict[trainer]['party'][2])
-        othercount += int(trainer_dict[trainer]['party'][3])
-        if trainer_dict[trainer]['status'] == 'waiting':
-            bluewaiting += int(trainer_dict[trainer]['party'][0])
-            redwaiting += int(trainer_dict[trainer]['party'][1])
-            yellowwaiting += int(trainer_dict[trainer]['party'][2])
-            otherwaiting += int(trainer_dict[trainer]['party'][3])
-        elif trainer_dict[trainer]['status'] == 'omw':
-            bluecoming += int(trainer_dict[trainer]['party'][0])
-            redcoming += int(trainer_dict[trainer]['party'][1])
-            yellowcoming += int(trainer_dict[trainer]['party'][2])
-            othercoming += int(trainer_dict[trainer]['party'][3])
-        elif trainer_dict[trainer]['status'] == 'maybe':
-            bluemaybe += int(trainer_dict[trainer]['party'][0])
-            redmaybe += int(trainer_dict[trainer]['party'][1])
-            yellowmaybe += int(trainer_dict[trainer]['party'][2])
-            othermaybe += int(trainer_dict[trainer]['party'][3])
-    if bluecount > 0:
-        teamliststr += _('{blue_emoji} **{blue_number} total,** {bluemaybe} interested, {bluecoming} coming, {bluewaiting} waiting {blue_emoji}\n').format(blue_number=bluecount, blue_emoji=parse_emoji(ctx.guild, config['team_dict']['mystic']), bluemaybe=bluemaybe, bluecoming=bluecoming, bluewaiting=bluewaiting)
-    if redcount > 0:
-        teamliststr += _('{red_emoji} **{red_number} total,** {redmaybe} interested, {redcoming} coming, {redwaiting} waiting {red_emoji}\n').format(red_number=redcount, red_emoji=parse_emoji(ctx.guild, config['team_dict']['valor']), redmaybe=redmaybe, redcoming=redcoming, redwaiting=redwaiting)
-    if yellowcount > 0:
-        teamliststr += _('{yellow_emoji} **{yellow_number} total,** {yellowmaybe} interested, {yellowcoming} coming, {yellowwaiting} waiting {yellow_emoji}\n').format(yellow_number=yellowcount, yellow_emoji=parse_emoji(ctx.guild, config['team_dict']['instinct']), yellowmaybe=yellowmaybe, yellowcoming=yellowcoming, yellowwaiting=yellowwaiting)
-    if othercount > 0:
-        teamliststr += _('❔ **{grey_number} total,** {greymaybe} interested, {greycoming} coming, {greywaiting} waiting ❔').format(grey_number=othercount, greymaybe=othermaybe, greycoming=othercoming, greywaiting=otherwaiting)
-    if (((bluecount + redcount) + yellowcount) + othercount) > 0:
+        for team in team_list:
+            team_dict[team]["total"] += int(trainer_dict[trainer]['party'][index])
+            for status in status_list:
+                if trainer_dict[trainer]['status'] == status:
+                    team_dict[team][status] += int(trainer_dict[trainer]['party'][index])
+            index += 1
+        index = 0
+    for team in team_list[:-1]:
+        if team_dict[team]['total'] > 0:
+            teamliststr += '{emoji} **{total} total,** {interested} interested, {coming} coming, {waiting} waiting {emoji}\n'.format(emoji=parse_emoji(ctx.guild, config['team_dict'][team]), total=team_dict[team]['total'], interested=team_dict[team]['maybe'], coming=team_dict[team]['omw'], waiting=team_dict[team]['waiting'])
+    if team_dict["unknown"]['total'] > 0:
+        teamliststr += _('❔ **{grey_number} total,** {greymaybe} interested, {greycoming} coming, {greywaiting} waiting ❔').format(grey_number=team_dict["unknown"]['total'], greymaybe=team_dict["unknown"]['maybe'], greycoming=team_dict["unknown"]['omw'], greywaiting=team_dict["unknown"]['waiting'])
+    if teamliststr:
         listmsg = _(' Team numbers for the raid:\n{}').format(teamliststr)
     else:
         listmsg = _(' Nobody has updated their status!')

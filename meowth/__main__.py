@@ -3940,7 +3940,7 @@ async def _edit_party(channel, author=None):
                 channel_dict[status] += int(trainer_dict[trainer]['count'])
         if egglevel != "0":
             for boss in boss_list:
-                if boss.lower() in trainer_dict[trainer]['interest']:
+                if boss.lower() in trainer_dict[trainer].get('interest',[]):
                     boss_dict[boss]['total'] += int(trainer_dict[trainer]['count'])
                     channel_dict["boss"] += int(trainer_dict[trainer]['count'])
         teamindex = 0

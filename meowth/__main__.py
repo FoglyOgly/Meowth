@@ -1226,7 +1226,7 @@ async def configure(ctx):
                     temp_role = discord.utils.get(guild.roles, name=team)
                     if temp_role == None:
                         try:
-                            await guild.create_role(name=team, hoist=False, mentionable=True)
+                            await guild.create_role(name=team.lower(), hoist=False, mentionable=True)
                         except discord.errors.HTTPException:
                             pass
                 await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description='Team Assignments enabled!'))
@@ -1829,6 +1829,7 @@ async def cleanroles(ctx):
     for role in ctx.guild.roles:
         if role.members == [] and role.name in pkmn_info['pokemon_list']:
             await role.delete()
+            await asyncio.sleep(0.25)
             cleancount += 1
     await ctx.message.channel.send("Removed {cleancount} empty roles".format(cleancount=cleancount))
 
@@ -2069,7 +2070,7 @@ async def want(ctx):
         # Create role if it doesn't exist yet
         if role == None:
             try:
-                role = await guild.create_role(name = entered_want, hoist = False, mentionable = True)
+                role = await guild.create_role(name = entered_want.lower(), hoist = False, mentionable = True)
             except discord.errors.HTTPException:
                 await message.channel.send('Maximum guild roles reached. Pokemon not added.')
                 return
@@ -2251,13 +2252,7 @@ async def _wild(message):
             return
         wild = discord.utils.get(message.guild.roles, name=entered_wild)
         if wild == None:
-            try:
-                wild = await message.guild.create_role(name = entered_wild, hoist = False, mentionable = True)
-                wild = wild.mention
-            except discord.errors.HTTPException:
-                await message.channel.send('Maximum guild roles reached.')
-                wild = entered_wild.title()
-            await asyncio.sleep(0.5)
+            wild = entered_wild.title()
         else:
             wild = wild.mention
         wild_number = pkmn_info['pokemon_list'].index(entered_wild) + 1
@@ -2394,13 +2389,7 @@ async def _raid(message):
     raid_channel = await message.guild.create_text_channel(raid_channel_name, overwrites=dict(message.channel.overwrites), category=raid_channel_category)
     raid = discord.utils.get(message.guild.roles, name=entered_raid)
     if raid == None:
-        try:
-            raid = await message.guild.create_role(name = entered_raid, hoist = False, mentionable = True)
-            raid = raid.mention
-        except discord.errors.HTTPException:
-            await message.channel.send('Maximum guild roles reached.')
-            raid = entered_raid.title()
-        await asyncio.sleep(0.5)
+        raid = entered_raid.title()
     else:
         raid = raid.mention
     raid_number = pkmn_info['pokemon_list'].index(entered_raid) + 1
@@ -2560,11 +2549,6 @@ async def _eggassume(args, raid_channel, author=None):
     manual_timer = eggdetails['manual_timer']
     egg_report = await report_channel.get_message(eggdetails['raidreport'])
     raid_message = await raid_channel.get_message(eggdetails['raidmessage'])
-    try:
-        raid_messageauthor = raid_message.mentions[0]
-    except IndexError:
-        raid_messageauthor = ('<@' + raid_message.raw_mentions[0]) + '>'
-        logger.info('Hatching Mention Failed - Trying alternative method: channel: {} (id: {}) - server: {} | Attempted mention: {}...'.format(raid_channel.name, raid_channel.id, raid_channel.guild.name, raid_message.content[:125]))
     entered_raid = re.sub('[\\@]', '', args.lower().lstrip('assume').lstrip(' '))
     entered_raid = get_name(entered_raid).lower() if entered_raid.isdigit() else entered_raid
     rgx = '[^a-zA-Z0-9]'
@@ -2602,13 +2586,7 @@ async def _eggassume(args, raid_channel, author=None):
     raid_gmaps_link = oldembed.url
     raidrole = discord.utils.get(raid_channel.guild.roles, name=entered_raid)
     if raidrole == None:
-        try:
-            raidrole = await raid_channel.guild.create_role(name = entered_raid, hoist = False, mentionable = True)
-            raidrole = raidrole.mention
-        except discord.errors.HTTPException:
-            await raid_channel.send('Maximum guild roles reached.')
-            raidrole = entered_raid.title()
-        await asyncio.sleep(0.5)
+        raidrole = entered_raid.title()
     else:
         raidrole = raidrole.mention
     raid_number = pkmn_info['pokemon_list'].index(entered_raid) + 1
@@ -2688,11 +2666,14 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
         starttime = eggdetails['starttime']
     except KeyError:
         starttime = None
-    try:
-        raid_messageauthor = raid_message.mentions[0]
-    except IndexError:
-        raid_messageauthor = ('<@' + raid_message.raw_mentions[0]) + '>'
-        logger.info('Hatching Mention Failed - Trying alternative method: channel: {} (id: {}) - server: {} | Attempted mention: {}...'.format(raid_channel.name, raid_channel.id, raid_channel.guild.name, raid_message.content[:125]))
+    if not author:
+        try:
+            raid_messageauthor = raid_message.mentions[0]
+        except IndexError:
+            raid_messageauthor = ('<@' + raid_message.raw_mentions[0]) + '>'
+            logger.info('Hatching Mention Failed - Trying alternative method: channel: {} (id: {}) - server: {} | Attempted mention: {}...'.format(raid_channel.name, raid_channel.id, raid_channel.guild.name, raid_message.content[:125]))
+    else:
+        raid_messageauthor = author
     if (egglevel.isdigit() and int(egglevel) > 0) or egglevel == 'EX':
         raidexp = eggdetails['exp'] + 60 * raid_info['raid_eggs'][egglevel]['raidtime']
     else:
@@ -2718,13 +2699,7 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
     raid_gmaps_link = oldembed.url
     raid = discord.utils.get(raid_channel.guild.roles, name=entered_raid)
     if raid == None:
-        try:
-            raid = await raid_channel.guild.create_role(name = entered_raid, hoist = False, mentionable = True)
-            raid = raid.mention
-        except discord.errors.HTTPException:
-            await raid_channel.send('Maximum guild roles reached.')
-            raid = entered_raid.title()
-        await asyncio.sleep(0.5)
+        raid = entered_raid.title()
     else:
         raid = raid.mention
     raid_number = pkmn_info['pokemon_list'].index(entered_raid) + 1
@@ -3190,7 +3165,7 @@ async def location(ctx):
             newembed.add_field(name=field.name, value=field.value, inline=field.inline)
         newembed.set_footer(text=oldembed.footer.text, icon_url=oldembed.footer.icon_url)
         newembed.set_thumbnail(url=oldembed.thumbnail.url)
-        locationmsg = await channel.send(content=_("Meowth! Here's the current location for the raid!\nDetails: {location}").format(location=location), embed=newembed)
+        locationmsg = await channel.send(content=_("Meowth! Here's the current location for the raid!\nDetails: {location}\nExpiry: {topic}").format(location=location, topic=await print_raid_timer(channel)), embed=newembed)
         await asyncio.sleep(60)
         await locationmsg.delete()
 
@@ -3941,27 +3916,43 @@ async def _party_status(ctx, total, teamcounts):
     return result
 
 async def _edit_party(channel, author=None):
-    channelblue = 0
-    channelred = 0
-    channelyellow = 0
-    channelunknown = 0
-    channelmaybe = 0
-    channelcoming = 0
-    channelhere = 0
-    channeltotal = 0
+    egglevel = guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['egglevel']
+    if egglevel != "0":
+        boss_dict = {}
+        boss_list = []
+        display_list = []
+        for p in raid_info['raid_eggs'][egglevel]['pokemon']:
+            p_name = get_name(p)
+            boss_list.append(p_name.lower())
+            p_type = get_type(channel.guild,p)
+            boss_dict[p_name.lower()] = {"type": "{}".format(''.join(p_type)), "total": 0}
+    channel_dict = {"mystic":0,"valor":0,"instinct":0,"unknown":0,"maybe":0,"omw":0,"waiting":0,"total":0,"boss":0}
+    team_list = ["mystic","valor","instinct","unknown"]
+    status_list = ["maybe","omw","waiting"]
+    teamindex = 0
     trainer_dict = copy.deepcopy(guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['trainer_dict'])
     for trainer in trainer_dict:
-        channelblue += int(trainer_dict[trainer]['party'][0])
-        channelred += int(trainer_dict[trainer]['party'][1])
-        channelyellow += int(trainer_dict[trainer]['party'][2])
-        channelunknown += int(trainer_dict[trainer]['party'][3])
-        if trainer_dict[trainer]['status'] == 'maybe':
-            channelmaybe += int(trainer_dict[trainer]['count'])
-        elif trainer_dict[trainer]['status'] == 'omw':
-            channelcoming += int(trainer_dict[trainer]['count'])
-        elif trainer_dict[trainer]['status'] == 'waiting':
-            channelhere += int(trainer_dict[trainer]['count'])
-    channeltotal = (channelmaybe + channelcoming) + channelhere
+        for team in team_list:
+            channel_dict[team] += int(trainer_dict[trainer]['party'][teamindex])
+            teamindex += 1
+        for status in status_list:
+            if trainer_dict[trainer]['status'] == status:
+                channel_dict[status] += int(trainer_dict[trainer]['count'])
+        if egglevel != "0":
+            for boss in boss_list:
+                if boss.lower() in trainer_dict[trainer].get('interest',[]):
+                    boss_dict[boss]['total'] += int(trainer_dict[trainer]['count'])
+                    channel_dict["boss"] += int(trainer_dict[trainer]['count'])
+        teamindex = 0
+    if egglevel != "0":
+        for boss in boss_list:
+            if boss_dict[boss]['total'] > 0:
+                bossstr = "{name} ({number}) {types} : **{count}**".format(name=boss.title(),number=get_number(boss),types=boss_dict[boss]['type'],count=boss_dict[boss]['total'])
+                display_list.append(bossstr)
+            elif boss_dict[boss]['total'] == 0:
+                bossstr = "{name} ({number}) {types}".format(name=boss.title(),number=get_number(boss),types=boss_dict[boss]['type'])
+                display_list.append(bossstr)
+    channel_dict["total"] = channel_dict["maybe"] + channel_dict["omw"] + channel_dict["waiting"]
     reportchannel = Meowth.get_channel(guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['reportcity'])
     try:
         reportmsg = await reportchannel.get_message(guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['raidreport'])
@@ -3981,9 +3972,16 @@ async def _edit_party(channel, author=None):
     for field in reportembed.fields:
         if ('team' not in field.name.lower()) and ('status' not in field.name.lower()):
             newembed.add_field(name=field.name, value=field.value, inline=field.inline)
-    if channeltotal > 0:
-        newembed.add_field(name='**Status List**', value=_('Maybe: **{channelmaybe}** | Coming: **{channelcoming}** | Here: **{channelhere}**').format(channelmaybe=channelmaybe, channelcoming=channelcoming, channelhere=channelhere), inline=True)
-        newembed.add_field(name='**Team List**', value=_('{blue_emoji}: **{channelblue}** | {red_emoji}: **{channelred}** | {yellow_emoji}: **{channelyellow}** | ❔: **{channelunknown}**').format(blue_emoji=parse_emoji(channel.guild, config['team_dict']['mystic']), channelblue=channelblue, red_emoji=parse_emoji(channel.guild, config['team_dict']['valor']), channelred=channelred, yellow_emoji=parse_emoji(channel.guild, config['team_dict']['instinct']), channelyellow=channelyellow, channelunknown=channelunknown), inline=True)
+    if egglevel != "0":
+        if len(boss_list) > 1:
+            newembed.set_field_at(0, name="**Boss Interest:**" if channel_dict["boss"] > 0 else "**Possible Bosses:**", value=_('{bosslist1}').format(bosslist1='\n'.join(display_list[::2])), inline=True)
+            newembed.set_field_at(1, name='\u200b', value=_('{bosslist2}').format(bosslist2='\n'.join(display_list[1::2])), inline=True)
+        else:
+            newembed.set_field_at(0, name="**Boss Interest:**" if channel_dict["boss"] > 0 else "**Possible Bosses:**", value=_('{bosslist}').format(bosslist=''.join(display_list)), inline=True)
+            newembed.set_field_at(1, name='\u200b', value='\u200b', inline=True)
+    if channel_dict["total"] > 0:
+        newembed.add_field(name='**Status List**', value=_('Maybe: **{channelmaybe}** | Coming: **{channelcoming}** | Here: **{channelhere}**').format(channelmaybe=channel_dict["maybe"], channelcoming=channel_dict["omw"], channelhere=channel_dict["waiting"]), inline=True)
+        newembed.add_field(name='**Team List**', value=_('{blue_emoji}: **{channelblue}** | {red_emoji}: **{channelred}** | {yellow_emoji}: **{channelyellow}** | ❔: **{channelunknown}**').format(blue_emoji=parse_emoji(channel.guild, config['team_dict']['mystic']), channelblue=channel_dict["mystic"], red_emoji=parse_emoji(channel.guild, config['team_dict']['valor']), channelred=channel_dict["valor"], yellow_emoji=parse_emoji(channel.guild, config['team_dict']['instinct']), channelyellow=channel_dict["instinct"], channelunknown=channel_dict["unknown"]), inline=True)
     newembed.set_footer(text=reportembed.footer.text, icon_url=reportembed.footer.icon_url)
     newembed.set_thumbnail(url=reportembed.thumbnail.url)
     try:
@@ -4044,7 +4042,7 @@ async def _lobby(message, count):
     guild_dict[message.guild.id]['raidchannel_dict'][message.channel.id]['trainer_dict'] = trainer_dict
 
 @Meowth.command(aliases=['x'])
-@checks.activeraidchannel()
+@checks.raidchannel()
 async def cancel(ctx):
     """Indicate you are no longer interested in a raid.
 
@@ -4528,53 +4526,30 @@ async def teams(ctx):
 
 async def _teamlist(ctx):
     message = ctx.message
-    bluecount = 0
-    redcount = 0
-    yellowcount = 0
-    othercount = 0
-    redmaybe = 0
-    redcoming = 0
-    redwaiting = 0
-    bluemaybe = 0
-    bluecoming = 0
-    bluewaiting = 0
-    yellowmaybe = 0
-    yellowcoming = 0
-    yellowwaiting = 0
-    othermaybe = 0
-    othercoming = 0
-    otherwaiting = 0
+    team_dict = {}
+    team_dict["mystic"] = {"total":0,"maybe":0,"omw":0,"waiting":0}
+    team_dict["valor"] = {"total":0,"maybe":0,"omw":0,"waiting":0}
+    team_dict["instinct"] = {"total":0,"maybe":0,"omw":0,"waiting":0}
+    team_dict["unknown"] = {"total":0,"maybe":0,"omw":0,"waiting":0}
+    status_list = ["waiting","omw","maybe"]
+    team_list = ["mystic","valor","instinct","unknown"]
+    index = 0
     teamliststr = ''
     trainer_dict = copy.deepcopy(guild_dict[message.guild.id]['raidchannel_dict'][message.channel.id]['trainer_dict'])
     for trainer in trainer_dict.keys():
-        bluecount += int(trainer_dict[trainer]['party'][0])
-        redcount += int(trainer_dict[trainer]['party'][1])
-        yellowcount += int(trainer_dict[trainer]['party'][2])
-        othercount += int(trainer_dict[trainer]['party'][3])
-        if trainer_dict[trainer]['status'] == 'waiting':
-            bluewaiting += int(trainer_dict[trainer]['party'][0])
-            redwaiting += int(trainer_dict[trainer]['party'][1])
-            yellowwaiting += int(trainer_dict[trainer]['party'][2])
-            otherwaiting += int(trainer_dict[trainer]['party'][3])
-        elif trainer_dict[trainer]['status'] == 'omw':
-            bluecoming += int(trainer_dict[trainer]['party'][0])
-            redcoming += int(trainer_dict[trainer]['party'][1])
-            yellowcoming += int(trainer_dict[trainer]['party'][2])
-            othercoming += int(trainer_dict[trainer]['party'][3])
-        elif trainer_dict[trainer]['status'] == 'maybe':
-            bluemaybe += int(trainer_dict[trainer]['party'][0])
-            redmaybe += int(trainer_dict[trainer]['party'][1])
-            yellowmaybe += int(trainer_dict[trainer]['party'][2])
-            othermaybe += int(trainer_dict[trainer]['party'][3])
-    if bluecount > 0:
-        teamliststr += _('{blue_emoji} **{blue_number} total,** {bluemaybe} interested, {bluecoming} coming, {bluewaiting} waiting {blue_emoji}\n').format(blue_number=bluecount, blue_emoji=parse_emoji(ctx.guild, config['team_dict']['mystic']), bluemaybe=bluemaybe, bluecoming=bluecoming, bluewaiting=bluewaiting)
-    if redcount > 0:
-        teamliststr += _('{red_emoji} **{red_number} total,** {redmaybe} interested, {redcoming} coming, {redwaiting} waiting {red_emoji}\n').format(red_number=redcount, red_emoji=parse_emoji(ctx.guild, config['team_dict']['valor']), redmaybe=redmaybe, redcoming=redcoming, redwaiting=redwaiting)
-    if yellowcount > 0:
-        teamliststr += _('{yellow_emoji} **{yellow_number} total,** {yellowmaybe} interested, {yellowcoming} coming, {yellowwaiting} waiting {yellow_emoji}\n').format(yellow_number=yellowcount, yellow_emoji=parse_emoji(ctx.guild, config['team_dict']['instinct']), yellowmaybe=yellowmaybe, yellowcoming=yellowcoming, yellowwaiting=yellowwaiting)
-    if othercount > 0:
-        teamliststr += _('❔ **{grey_number} total,** {greymaybe} interested, {greycoming} coming, {greywaiting} waiting ❔').format(grey_number=othercount, greymaybe=othermaybe, greycoming=othercoming, greywaiting=otherwaiting)
-    if (((bluecount + redcount) + yellowcount) + othercount) > 0:
+        for team in team_list:
+            team_dict[team]["total"] += int(trainer_dict[trainer]['party'][index])
+            for status in status_list:
+                if trainer_dict[trainer]['status'] == status:
+                    team_dict[team][status] += int(trainer_dict[trainer]['party'][index])
+            index += 1
+        index = 0
+    for team in team_list[:-1]:
+        if team_dict[team]['total'] > 0:
+            teamliststr += '{emoji} **{total} total,** {interested} interested, {coming} coming, {waiting} waiting {emoji}\n'.format(emoji=parse_emoji(ctx.guild, config['team_dict'][team]), total=team_dict[team]['total'], interested=team_dict[team]['maybe'], coming=team_dict[team]['omw'], waiting=team_dict[team]['waiting'])
+    if team_dict["unknown"]['total'] > 0:
+        teamliststr += _('❔ **{grey_number} total,** {greymaybe} interested, {greycoming} coming, {greywaiting} waiting ❔').format(grey_number=team_dict["unknown"]['total'], greymaybe=team_dict["unknown"]['maybe'], greycoming=team_dict["unknown"]['omw'], greywaiting=team_dict["unknown"]['waiting'])
+    if teamliststr:
         listmsg = _(' Team numbers for the raid:\n{}').format(teamliststr)
     else:
         listmsg = _(' Nobody has updated their status!')

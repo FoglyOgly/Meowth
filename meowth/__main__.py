@@ -1826,10 +1826,10 @@ async def setstatus(ctx, member: discord.Member, status,*, status_counts: str = 
 @commands.has_permissions(manage_guild=True)
 async def cleanroles(ctx):
     cleancount = 0
-    for role in ctx.guild.roles:
+    for role in copy.copy(ctx.guild.roles):
         if role.members == [] and role.name in pkmn_info['pokemon_list']:
-            await role.delete()
-            await asyncio.sleep(0.25)
+            server_role = discord.utils.get(ctx.guild.roles, name=role.name)
+            await server_role.delete()
             cleancount += 1
     await ctx.message.channel.send("Removed {cleancount} empty roles".format(cleancount=cleancount))
 

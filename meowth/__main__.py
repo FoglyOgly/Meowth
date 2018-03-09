@@ -3479,6 +3479,7 @@ async def counters(ctx, *, args = None):
     else:
         pkmn = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('pokemon', None)
         weather = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('weather', None)
+        user = None
     if not pkmn:
         await ctx.channel.send("Meowth! Enter a Pokemon that appears in raids, or wait for this raid egg to hatch!")
         return

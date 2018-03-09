@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2017-10-21 22:31+1000\n"
+"POT-Creation-Date: 2018-03-07 14:55+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -13,58 +13,80 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
-"X-Generator: Poedit 2.0.4\n"
-"X-Poedit-Basepath: ../meowth\n"
-"X-Poedit-SearchPath-0: .\n"
 
-#: __main__.py:269
-#, python-brace-format
+
+#: __main__.py:295
 msgid "Received admin command {command} from unauthorized user, {user}!"
 msgstr ""
 
-#: __main__.py:276
-#, python-brace-format
+#: __main__.py:304
 msgid "Meowth! \"{entered_word}\" is not a Pokemon! Did you mean \"{corrected_word}\"?"
 msgstr ""
 
-#: __main__.py:278
-#, python-brace-format
+#: __main__.py:306
 msgid "Meowth! \"{entered_word}\" is not a Pokemon! Check your spelling!"
 msgstr ""
 
-#: __main__.py:346
+#: __main__.py:406
+#: __main__.py:1299
+msgid ""
+"The following could not be found:\n"
+"{}"
+msgstr ""
+
+#: __main__.py:406
+#: __main__.py:1299
+msgid "Warning"
+msgstr ""
+
+#: __main__.py:410
+msgid ""
+"{}\n"
+"\n"
+"**Warning:**\n"
+"The following could not be found: {}"
+msgstr ""
+
+#: __main__.py:497
 msgid ""
 "This channel has been successfully reported as a duplicate and will be deleted in 1 minute. Check the channel list for the other raid channel to coordinate in!\n"
 "If this was in error, reset the raid with **!timerset**"
 msgstr ""
 
-#: __main__.py:356
-#, python-brace-format
+#: __main__.py:508
+msgid "hatched-"
+msgstr ""
+
+#: __main__.py:511
 msgid ""
 "**This egg has hatched!**\n"
 "\n"
-"...or the time has just expired. Trainers {trainer_list}: Update the raid to the pokemon that hatched using **!raid <pokemon>** or reset the hatch timer with **!timerset**. This channel will be deactivated until I get an update and I'll delete it in 15 minutes if I don't hear anything."
+"...or the time has just expired. Trainers {trainer_list}: Update the raid to the pokemon that hatched using **!raid <pokemon>** or reset the hatch timer with **!timerset**. This channel will be deactivated until I get an update and I'll delete it in 45 minutes if I don't hear anything."
 msgstr ""
 
-#: __main__.py:360
+#: __main__.py:513
+msgid "**This level {level} raid egg has expired!**"
+msgstr ""
+
+#: __main__.py:517
+msgid "expired-"
+msgstr ""
+
+#: __main__.py:520
 msgid ""
 "This channel timer has expired! The channel has been deactivated and will be deleted in 5 minutes.\n"
-"To reactivate the channel, use !timerset to set the timer again."
+"To reactivate the channel, use **!timerset** to set the timer again."
 msgstr ""
 
-#: __main__.py:604
-#, python-brace-format
-msgid ""
-"\n"
-"Reboot messages sent: {success_count} successful, {fail_count} failed."
+#: __main__.py:522
+msgid "**This {pokemon} raid has expired!**"
 msgstr ""
 
-#: __main__.py:645
+#: __main__.py:732
 msgid "Starting up..."
 msgstr ""
 
-#: __main__.py:664
-#, python-brace-format
+#: __main__.py:777
 msgid ""
 "Meowth! That's right!\n"
 "\n"
@@ -72,109 +94,348 @@ msgid ""
 "{member_count} members found."
 msgstr ""
 
-#: __main__.py:677
+#: __main__.py:800
 msgid "Meowth! I'm Meowth, a Discord helper bot for Pokemon Go communities, and someone has invited me to your server! Type **!help** to see a list of things I can do, and type **!configure** in any channel of your server to begin!"
 msgstr ""
 
-#: __main__.py:696
+#: __main__.py:819
+msgid " or "
+msgstr ""
+
+#: __main__.py:825
+msgid " If you have any questions just ask an admin."
+msgstr ""
+
+#: __main__.py:826
+msgid "Meowth! Welcome to {server}, {user}! "
+msgstr ""
+
+#: __main__.py:828
+msgid "Set your team by typing {team_command}."
+msgstr ""
+
+#: __main__.py:863
+#: __main__.py:875
+#: __main__.py:4064
+msgid "Meowth! Please wait until the raid egg has hatched before announcing you're coming or present."
+msgstr ""
+
+#: __main__.py:909
+#: __main__.py:3232
+msgid "Meowth! Someone has suggested a different location for the raid! Trainers {trainer_list}: make sure you are headed to the right place!"
+msgstr ""
+
+#: __main__.py:935
+#: __main__.py:963
+#: __main__.py:979
+msgid "Error occured while trying to save!"
+msgstr ""
+
+#: __main__.py:965
+msgid "Restarting..."
+msgstr ""
+
+#: __main__.py:981
+msgid "Shutting down..."
+msgstr ""
+
+#: __main__.py:1002
+msgid "Prefix has been set to: `{}`"
+msgstr ""
+
+#: __main__.py:1005
+msgid "Prefix has been reset to default: `{}`"
+msgstr ""
+
+#: __main__.py:1024
+msgid "Prefix for this server is: `{}`"
+msgstr ""
+
+#: __main__.py:1059
+msgid "I'll wait for your announcement!"
+msgstr ""
+
+#: __main__.py:1066
+#: __main__.py:1117
+msgid "Meowth! You took too long to send me your announcement! Retry when you're ready."
+msgstr ""
+
+#: __main__.py:1068
+msgid "Announcement"
+msgstr ""
+
+#: __main__.py:1078
+msgid "to send it to all servers, "
+msgstr ""
+
+#: __main__.py:1086
+msgid "That's what you sent, does it look good? React with "
+msgstr ""
+
+#: __main__.py:1088
+msgid "to send to another channel, "
+msgstr ""
+
+#: __main__.py:1090
+msgid "to send it to this channel, or "
+msgstr ""
+
+#: __main__.py:1092
+msgid "to cancel"
+msgstr ""
+
+#: __main__.py:1098
+msgid "Announcement Cancelled."
+msgstr ""
+
+#: __main__.py:1101
+#: __main__.py:1113
+msgid "Announcement Sent."
+msgstr ""
+
+#: __main__.py:1103
+msgid "What channel would you like me to send it to?"
+msgstr ""
+
+#: __main__.py:1115
+msgid "Meowth! That channel doesn't exist! Retry when you're ready."
+msgstr ""
+
+#: __main__.py:1128
+msgid "For support, contact us on our Discord server. Invite Code: hhVjAN8"
+msgstr ""
+
+#: __main__.py:1142
+msgid "Announcement sent to {} server owners: {} successful, {} failed."
+msgstr ""
+
+#: __main__.py:1147
+msgid "Announcement Timed Out."
+msgstr ""
+
+#: __main__.py:1194
 msgid ""
-"__**Meowth Configuration**__\n"
-"Meowth! That's Right! Welcome to the configuration for Meowth the Pokemon Go Helper Bot! I will be guiding you through some setup steps to get me setup on your server.\n"
+"Meowth! That's Right! Welcome to the configuration for Meowth the Pokemon Go Helper Bot! I will be guiding you through some steps to get me setup on your server.\n"
 "\n"
 "**Role Setup**\n"
-"Before you begin the configuration, please make sure my role is moved to the top end of the server role hierarchy. It can be under admins and mods, but must be above team ands general roles. Here is an example: <http://i.imgur.com/c5eaX1u.png>\n"
+"Before you begin the configuration, please make sure my role is moved to the top end of the server role hierarchy. It can be under admins and mods, but must be above team ands general roles. [Here is an example](http://i.imgur.com/c5eaX1u.png)"
+msgstr ""
+
+#: __main__.py:1198
+msgid ""
 "\n"
-"Reply with **cancel** at any time throughout the questions to cancel the configure process.\n"
 "\n"
-"**Team Assignments**\n"
+"**Welcome Back**\n"
+"This isn't your first time configuring. You can either reconfigure everything by replying with **all** or reply with one of the following to configure that specific setting:\n"
+"\n"
+"**all** - To redo configuration\n"
+"**team** - For Team Assignment configuration\n"
+"**welcome** - For Welcome Message configuration\n"
+"**main** - For main command configuration\n"
+"**raid** - for raid command configuration\n"
+"**wild** - for wild command configuration\n"
+"**regions** - For configuration of reporting channels or map links\n"
+"**want** - for want/unwant command configuration and channel\n"
+"**timezone** - For timezone configuration\n"
+"**allmain** - For main, regions, raid, wild, want, timezone configuration"
+msgstr ""
+
+#: __main__.py:1199
+#: __main__.py:1204
+msgid ""
+"\n"
+"\n"
+"Reply with **cancel** at any time throughout the questions to cancel the configure process."
+msgstr ""
+
+#: __main__.py:1200
+#: __main__.py:1205
+#: __main__.py:1221
+msgid "Meowth Configuration - {0}"
+msgstr ""
+
+#: __main__.py:1203
+msgid ""
+"\n"
+"\n"
+"**Welcome Back**\n"
+"This isn't your first time configuring. You can either reconfigure everything by replying with **all** or reply with one of the following to configure that specific setting:\n"
+"\n"
+"**all** - To redo configuration\n"
+"**team** - For Team Assignment configuration\n"
+"**welcome** - For Welcome Message configuration\n"
+"**main** - For main command configuration\n"
+"**allmain** - For main, regions, raid, wild, want, timezone configuration"
+msgstr ""
+
+#: __main__.py:1215
+#: __main__.py:1250
+#: __main__.py:1289
+#: __main__.py:1333
+#: __main__.py:1355
+#: __main__.py:1378
+#: __main__.py:1398
+#: __main__.py:1418
+#: __main__.py:1438
+#: __main__.py:1479
+#: __main__.py:1500
+#: __main__.py:1515
+#: __main__.py:1561
+#: __main__.py:1616
+#: __main__.py:1646
+#: __main__.py:1664
+msgid ""
+"**CONFIG CANCELLED!**\n"
+"\n"
+"No changes have been made."
+msgstr ""
+
+#: __main__.py:1218
+msgid "I'm sorry I don't understand. Please reply with one of the choices above."
+msgstr ""
+
+#: __main__.py:1223
+msgid "Team Assignments"
+msgstr ""
+
+#: __main__.py:1223
+msgid ""
 "Team assignment allows users to assign their Pokemon Go team role using the **!team** command. If you have a bot that handles this already, you may want to disable this feature.\n"
+"\n"
 "If you are to use this feature, ensure existing team roles are as follows: mystic, valor, instinct. These must be all lowercase letters. If they don't exist yet, I'll make some for you instead.\n"
 "\n"
 "Respond with: **N** to disable, **Y** to enable:"
 msgstr ""
 
-#: __main__.py:705
-msgid ""
-"**Team Assignments enabled!**\n"
-"---"
+#: __main__.py:1242
+msgid "Team Assignments enabled!"
 msgstr ""
 
-#: __main__.py:709
-msgid ""
-"**Team Assignments disabled!**\n"
-"---"
+#: __main__.py:1246
+msgid "Team Assignments disabled!"
 msgstr ""
 
-#: __main__.py:712 __main__.py:739 __main__.py:758 __main__.py:781
-#: __main__.py:800 __main__.py:823 __main__.py:840 __main__.py:880
-#: __main__.py:897 __main__.py:924
-msgid ""
-"**CONFIG CANCELLED!**\n"
-"No changes have been made."
-msgstr ""
-
-#: __main__.py:715 __main__.py:761 __main__.py:826 __main__.py:843
-#: __main__.py:927
+#: __main__.py:1253
+#: __main__.py:1358
+#: __main__.py:1381
+#: __main__.py:1401
+#: __main__.py:1421
 msgid "I'm sorry I don't understand. Please reply with either **N** to disable, or **Y** to enable."
 msgstr ""
 
-#: __main__.py:718
+#: __main__.py:1257
 msgid ""
-"**Welcome Message**\n"
+"I can welcome new members to the server with a short message. Here is an example:\n"
 "\n"
-" I can welcome new members to the server with a short message. Here is an example:\n"
 msgstr ""
 
-#: __main__.py:720
-#, python-brace-format
+#: __main__.py:1259
 msgid "Meowth! Welcome to {server_name}, {owner_name.mention}! Set your team by typing '**!team mystic**' or '**!team valor**' or '**!team instinct**' without quotations. If you have any questions just ask an admin."
 msgstr ""
 
-#: __main__.py:722
-#, python-brace-format
+#: __main__.py:1261
 msgid "Meowth! Welcome to {server_name}, {owner_name.mention}! If you have any questions just ask an admin."
 msgstr ""
 
-#: __main__.py:723
+#: __main__.py:1262
 msgid ""
+"\n"
+"\n"
 "This welcome message can be in a specific channel or a direct message. If you have a bot that handles this already, you may want to disable this feature.\n"
 "\n"
 "Respond with: **N** to disable, **Y** to enable:"
 msgstr ""
 
-#: __main__.py:728
+#: __main__.py:1263
+msgid "Welcome Message"
+msgstr ""
+
+#: __main__.py:1268
+msgid "Welcome Message enabled!"
+msgstr ""
+
+#: __main__.py:1271
 msgid ""
-"**Welcome Message enabled!**\n"
-"---\n"
-"**Welcome Message Channels**\n"
+"Would you like a custom welcome message? You can reply with **N** to use the default message above or enter your own below.\n"
+"\n"
+"I can read all [discord formatting](https://support.discordapp.com/hc/en-us/articles/210298617-Markdown-Text-101-Chat-Formatting-Bold-Italic-Underline-) and I have the following template tags:\n"
+"\n"
+"**{@member}** - Replace member with user name or ID\n"
+"**{#channel}** - Replace channel with channel name or ID\n"
+"**{&role}** - Replace role name or ID (shows as @deleted-role DM preview)\n"
+"**{user}** - Will mention the new user\n"
+"**{server}** - Will print your server's name\n"
+"Surround your message with [] to send it as an embed. **Warning:** Mentions within embeds may be broken on mobile, this is a Discord bug."
+msgstr ""
+
+#: __main__.py:1285
+msgid "Default welcome message set"
+msgstr ""
+
+#: __main__.py:1292
+msgid "Please shorten your message to less than 500 characters."
+msgstr ""
+
+#: __main__.py:1302
+msgid ""
+"{msg}\n"
+"\n"
+"**Warning:**\n"
+"The following could not be found: {errors}"
+msgstr ""
+
+#: __main__.py:1303
+msgid "Please check the data given and retry a new welcome message, or reply with **N** to use the default."
+msgstr ""
+
+#: __main__.py:1314
+msgid "Please enter a new welcome message, or reply with **N** to use the default."
+msgstr ""
+
+#: __main__.py:1318
+msgid ""
+"Welcome Message set to:\n"
+"\n"
+"{}"
+msgstr ""
+
+#: __main__.py:1321
+msgid "Welcome Message Channel"
+msgstr ""
+
+#: __main__.py:1321
+msgid ""
 "Which channel in your server would you like me to post the Welcome Messages? You can also choose to have them sent to the new member via Direct Message (DM) instead.\n"
 "\n"
 "Respond with: **channel-name** of a channel in your server or **DM** to Direct Message:"
 msgstr ""
 
-#: __main__.py:736
+#: __main__.py:1326
+msgid "Welcome DM set"
+msgstr ""
+
+#: __main__.py:1329
 msgid "Channel names can't contain spaces, sorry. Please double check the name and send your response again."
 msgstr ""
 
-#: __main__.py:748
-msgid ""
-"**Welcome Channel set**\n"
-"---"
+#: __main__.py:1342
+msgid "Welcome Channel set"
 msgstr ""
 
-#: __main__.py:751
+#: __main__.py:1345
 msgid "The channel you provided isn't in your server. Please double check your channel name and resend your response."
 msgstr ""
 
-#: __main__.py:755
-msgid ""
-"**Welcome Message disabled!**\n"
-"---"
+#: __main__.py:1351
+msgid "Welcome Message disabled!"
 msgstr ""
 
-#: __main__.py:764
+#: __main__.py:1362
+msgid "Main Functions"
+msgstr ""
+
+#: __main__.py:1362
 msgid ""
-"**Main Functions**\n"
 "Main Functions include:\n"
 " - **!want** and creating tracked Pokemon roles \n"
 " - **!wild** Pokemon reports\n"
@@ -184,688 +445,1476 @@ msgid ""
 "Respond with: **N** to disable, or **Y** to enable:"
 msgstr ""
 
-#: __main__.py:769
-msgid ""
-"**Main Functions enabled**\n"
-"---\n"
-"**Reporting Channels**\n"
-"Pokemon raid or wild reports are contained within one or more channels. Each channel will be able to represent different areas/communities. I'll need you to provide a list of channels in your server you will allow reports from in this format: `channel-name, channel-name, channel-name`"
+#: __main__.py:1367
+msgid "Main Functions enabled"
 msgstr ""
 
-#: __main__.py:771
-msgid ""
-"If you do not require raid and wild reporting, you may want to disable this function.\n"
-"\n"
-"Respond with: **N** to disable, or the **channel-name** list to enable, each seperated with a comma and space:"
+#: __main__.py:1374
+msgid "Main Functions disabled"
 msgstr ""
 
-#: __main__.py:778
+#: __main__.py:1385
 msgid ""
-"**Reporting Channels disabled**\n"
-"---"
-msgstr ""
-
-#: __main__.py:791
-msgid ""
-"**Reporting Channels enabled**\n"
-"---"
-msgstr ""
-
-#: __main__.py:793
-#, python-brace-format
-msgid ""
-"The channel list you provided doesn't match with your servers channels.\n"
-"The following aren't in your server: {invalid_channels}\n"
-"Please double check your channel list and resend your reponse."
-msgstr ""
-
-#: __main__.py:796
-msgid ""
-"**Report Locations**\n"
-"For each report, I generate Google Maps links to give people directions to raids and spawns! To do this, I need to know which suburb/town/region each report channel represents, to ensure we get the right location in the map. For each report channel you provided, I will need it's corresponding general location using only letters and spaces, with each location seperated by a comma and space.\n"
-"Example: `kansas city mo, hull uk, sydney nsw australia`\n"
-"Each location will have to be in the same order as you provided the channels in the previous question.\n"
-"\n"
-"Respond with: **location info, location info, location info** each matching the order of the previous channel list:"
-msgstr ""
-
-#: __main__.py:808
-#, python-brace-format
-msgid ""
-"The number of cities don't match the number of channels you gave me earlier!\n"
-"I'll show you the two lists to compare:\n"
-"{channellist}\n"
-"{citylist}\n"
-"Please double check that your locations match up with your provided channels and resend your response."
-msgstr ""
-
-#: __main__.py:811
-msgid ""
-"**Report Locations are set**\n"
-"---\n"
-"**Raid Reports**\n"
 "Do you want **!raid** reports enabled? If you want __only__ the **!wild** feature for reports, you may want to disable this.\n"
 "\n"
 "Respond with: **N** to disable, or **Y** to enable:"
 msgstr ""
 
-#: __main__.py:816
-msgid ""
-"**Raid Reports enabled**\n"
-"---"
+#: __main__.py:1385
+msgid "Raid Reports"
 msgstr ""
 
-#: __main__.py:820
-msgid ""
-"**Raid Reports disabled**\n"
-"---"
+#: __main__.py:1390
+msgid "Raid Reports enabled"
 msgstr ""
 
-#: __main__.py:828
+#: __main__.py:1394
+msgid "Raid Reports disabled"
+msgstr ""
+
+#: __main__.py:1405
 msgid ""
-"**Wild Reports**\n"
 "Do you want **!wild** reports enabled? If you want __only__ the **!raid** feature for reports, you may want to disable this.\n"
 "\n"
 "Respond with: **N** to disable, or **Y** to enable:"
 msgstr ""
 
-#: __main__.py:833
-msgid ""
-"**Wild Reports enabled**\n"
-"---"
+#: __main__.py:1405
+msgid "Wild Reports"
 msgstr ""
 
-#: __main__.py:837
-msgid ""
-"**Wild Reports disabled**\n"
-"---"
+#: __main__.py:1410
+msgid "Wild Reports enabled"
 msgstr ""
 
-#: __main__.py:846
+#: __main__.py:1414
+msgid "Wild Reports disabled"
+msgstr ""
+
+#: __main__.py:1425
 msgid ""
-"**Pokemon Notifications**\n"
+"Pokemon raid or wild reports are contained within one or more channels. Each channel will be able to represent different areas/communities. I'll need you to provide a list of channels in your server you will allow reports from in this format: `channel-name, channel-name, channel-name`\n"
+"\n"
+"Example: `kansas-city-raids, hull-raids, sydney-raids`\n"
+"\n"
+"If you do not require raid and wild reporting, you may want to disable this function.\n"
+"\n"
+"Respond with: **N** to disable, or the **channel-name** list to enable, each seperated with a comma and space:"
+msgstr ""
+
+#: __main__.py:1425
+msgid "Reporting Channels"
+msgstr ""
+
+#: __main__.py:1434
+msgid "Reporting Channels disabled"
+msgstr ""
+
+#: __main__.py:1467
+msgid "Reporting Channels enabled"
+msgstr ""
+
+#: __main__.py:1470
+msgid ""
+"The channel list you provided doesn't match with your servers channels.\n"
+"\n"
+"The following aren't in your server: **{invalid_channels}**\n"
+"\n"
+"Please double check your channel list and resend your reponse."
+msgstr ""
+
+#: __main__.py:1474
+msgid ""
+"For each report, I generate Google Maps links to give people directions to raids and spawns! To do this, I need to know which suburb/town/region each report channel represents, to ensure we get the right location in the map. For each report channel you provided, I will need its corresponding general location using only letters and spaces, with each location seperated by a comma and space.\n"
+"\n"
+"Example: `kansas city mo, hull uk, sydney nsw australia`\n"
+"\n"
+"Each location will have to be in the same order as you provided the channels in the previous question.\n"
+"\n"
+"Respond with: **location info, location info, location info** each matching the order of the previous channel list:"
+msgstr ""
+
+#: __main__.py:1474
+msgid "Report Locations"
+msgstr ""
+
+#: __main__.py:1487
+msgid ""
+"The number of cities doesn't match the number of channels you gave me earlier!\n"
+"\n"
+"I'll show you the two lists to compare:\n"
+"\n"
+"{channellist}\n"
+"{citylist}\n"
+"\n"
+"Please double check that your locations match up with your provided channels and resend your response."
+msgstr ""
+
+#: __main__.py:1490
+msgid "Report Locations are set"
+msgstr ""
+
+#: __main__.py:1494
+msgid ""
+"How would you like me to categorize the raid channels I create? Your options are:\n"
+"\n"
+"**none** - If you don't want them categorized\n"
+"**same** - If you want them in the same category as the reporting channel\n"
+"**region** - If you want them categorized by region\n"
+"**level** - If you want them categorized by level."
+msgstr ""
+
+#: __main__.py:1511
+msgid ""
+"You have configured the following channels as raid reporting channels: {citychannel_list}\n"
+"\n"
+"In the same order as they appear above, please give the names of the categories you would like raids reported in each channel to appear in. You do not need to use different categories for each channel, but they do need to be pre-existing categories. Separate each category name with a comma. Response can be either category name or ID."
+msgstr ""
+
+#: __main__.py:1545
+#: __main__.py:1592
+msgid ""
+"The category list you provided doesn't match with your server's categories.\n"
+"\n"
+"The following aren't in your server: **{invalid_categories}**\n"
+"\n"
+"Please double check your category list and resend your response."
+msgstr ""
+
+#: __main__.py:1548
+msgid ""
+"The number of categories I found in your server doesn't match the number of channels you gave me earlier!\n"
+"\n"
+"I'll show you the two lists to compare:\n"
+"\n"
+"**Matched Channels:** {channellist}\n"
+"**Matched Categories:** {catlist}\n"
+"\n"
+"Please double check that your categories match up with your provided channels and resend your response."
+msgstr ""
+
+#: __main__.py:1550
+#: __main__.py:1597
+msgid ""
+"\n"
+"\n"
+"The following aren't in your server: **{invalid_categories}**"
+msgstr ""
+
+#: __main__.py:1557
+msgid ""
+"Pokemon Go currently has six levels of raids. Please provide the names of the categories you would like each level of raid to appear in. Use the following order: 1, 2, 3, 4, 5, EX \n"
+"\n"
+"You do not need to use different categories for each level, but they do need to be pre-existing categories. Separate each category name with a comma. Response can be either category name or ID."
+msgstr ""
+
+#: __main__.py:1595
+msgid ""
+"The number of categories I found in your server doesn't match the number of raid levels! Make sure you give me exactly six categories, one for each level of raid. You can use the same category for multiple levels if you want, but I need to see six category names.\n"
+"\n"
+"**Matched Categories:** {catlist}\n"
+"\n"
+"Please double check your categories."
+msgstr ""
+
+#: __main__.py:1601
+msgid "Sorry, I didn't understand your answer! Try again."
+msgstr ""
+
+#: __main__.py:1604
+msgid "Categories are set"
+msgstr ""
+
+#: __main__.py:1607
+msgid "Pokemon Notifications"
+msgstr ""
+
+#: __main__.py:1607
+msgid ""
 "The **!want** and **!unwant** commands let you add or remove roles for Pokemon that will be mentioned in reports. This let you get notifications on the Pokemon you want to track. I just need to know what channels you want to allow people to manage their pokemon with the **!want** and **!unwant** command. If you pick a channel that doesn't exist, I'll make it for you.\n"
+"\n"
 "If you don't want to allow the management of tracked Pokemon roles, then you may want to disable this feature.\n"
 "\n"
 "Repond with: **N** to disable, or the **channel-name** list to enable, each seperated by a comma and space."
 msgstr ""
 
-#: __main__.py:851
-msgid ""
-"**Pokemon Notifications disabled**\n"
-"---"
+#: __main__.py:1612
+msgid "Pokemon Notifications disabled"
 msgstr ""
 
-#: __main__.py:861
-msgid ""
-"**Pokemon Notifications enabled**\n"
-"---"
+#: __main__.py:1626
+msgid "Pokemon Notifications enabled"
 msgstr ""
 
-#: __main__.py:872
+#: __main__.py:1637
 msgid ""
 "Meowth! You didn't give me enough permissions to create channels! Please check my permissions and that my role is above general roles. Let me know if you'd like me to check again.\n"
 "\n"
 "Respond with: **Y** to try again, or **N** to skip and create the missing channels yourself."
 msgstr ""
 
-#: __main__.py:883
+#: __main__.py:1649
 msgid "I'm sorry I don't understand. Please reply with either **Y** to try again, or **N** to skip and create the missing channels yourself."
 msgstr ""
 
-#: __main__.py:889
-#, python-brace-format
+#: __main__.py:1655
 msgid ""
 "The channel list you provided doesn't match with your servers channels.\n"
-"The following aren't in your server:{invalid_channels}\n"
+"\n"
+"The following aren't in your server:**{invalid_channels}**\n"
+"\n"
 "Please double check your channel list and resend your reponse."
 msgstr ""
 
-#: __main__.py:893
-#, python-brace-format
+#: __main__.py:1659
+msgid "Timezone Configuration"
+msgstr ""
+
+#: __main__.py:1659
 msgid ""
-"**Timezone Configuration**\n"
 "To help coordinate raids reports for you, I need to know what timezone you're in! The current 24-hr time UTC is {utctime}. How many hours off from that are you?\n"
 "\n"
 "Respond with: A number from **-12** to **12**:"
 msgstr ""
 
-#: __main__.py:903 __main__.py:906
+#: __main__.py:1670
+#: __main__.py:1673
 msgid ""
 "I couldn't convert your answer to an appropriate timezone!.\n"
+"\n"
 "Please double check what you sent me and resend a number strarting from **-12** to **12**."
 msgstr ""
 
-#: __main__.py:911
-msgid ""
-"**Timezone set**\n"
-"---"
+#: __main__.py:1678
+msgid "Timezone set"
 msgstr ""
 
-#: __main__.py:921
-msgid ""
-"**Main Functions disabled**\n"
-"---"
-msgstr ""
-
-#: __main__.py:932
+#: __main__.py:1682
 msgid "Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again."
 msgstr ""
 
-#: __main__.py:944
-msgid " If you have any questions just ask an admin."
+#: __main__.py:1701
+msgid ""
+"\n"
+"**Level {level} raid list:** `{raidlist}` \n"
 msgstr ""
 
-#: __main__.py:946
-#, python-brace-format
-msgid "Meowth! Welcome to {server_name}, {new_member_name}! "
+#: __main__.py:1708
+#: __main__.py:1718
+#: __main__.py:1723
+msgid ""
+"**Level {level} raid list:** `{raidlist}` \n"
 msgstr ""
 
-#: __main__.py:948
-#, python-brace-format
-msgid "Set your team by typing {team_command} without quotations."
+#: __main__.py:1717
+msgid ""
+"I will replace this:\n"
 msgstr ""
 
-#: __main__.py:995 __main__.py:1012 __main__.py:1035
-msgid "Error occured while trying to save!"
+#: __main__.py:1722
+msgid ""
+"\n"
+"\n"
+"With this:\n"
 msgstr ""
 
-#: __main__.py:1077
-#, python-brace-format
+#: __main__.py:1727
+msgid ""
+"\n"
+"\n"
+"Continue?"
+msgstr ""
+
+#: __main__.py:1754
+msgid "The channel you entered is not a raid channel."
+msgstr ""
+
+#: __main__.py:1773
+#: __main__.py:1776
+#: __main__.py:2520
+#: __main__.py:2523
+#: __main__.py:2844
+#: __main__.py:2847
+msgid "**Possible Bosses:**"
+msgstr ""
+
+#: __main__.py:1773
+#: __main__.py:2520
+#: __main__.py:2844
+#: __main__.py:4031
+msgid "{bosslist1}"
+msgstr ""
+
+#: __main__.py:1774
+#: __main__.py:2521
+#: __main__.py:2845
+#: __main__.py:4032
+msgid "{bosslist2}"
+msgstr ""
+
+#: __main__.py:1776
+#: __main__.py:2523
+#: __main__.py:2847
+#: __main__.py:4034
+msgid "{bosslist}"
+msgstr ""
+
+#: __main__.py:1781
+#: __main__.py:2611
+#: __main__.py:2752
+#: __main__.py:3220
+#: __main__.py:3234
+#: __main__.py:4025
+msgid "team"
+msgstr ""
+
+#: __main__.py:1782
+#: __main__.py:2612
+#: __main__.py:2753
+#: __main__.py:3221
+#: __main__.py:3235
+#: __main__.py:4026
+msgid "status"
+msgstr ""
+
+#: __main__.py:1804
+msgid "Are you sure you want to clear all status for this raid? Everybody will have to RSVP again. If you are wanting to clear one user's status, use `!setstatus <user> cancel`"
+msgstr ""
+
+#: __main__.py:1831
+msgid "Meowth! {status} is not a valid status!"
+msgstr ""
+
+#: __main__.py:1846
+msgid "Removed {cleancount} empty roles"
+msgstr ""
+
+#: __main__.py:1860
+msgid "Uptime"
+msgstr ""
+
+#: __main__.py:1943
+msgid "Maximum guild roles reached."
+msgstr ""
+
+#: __main__.py:1948
 msgid ""
 "Meowth! My roles are ranked lower than the following team roles: **{higher_roles_list}**\n"
 "Please get an admin to move my roles above them!"
 msgstr ""
 
-#: __main__.py:1094
+#: __main__.py:1970
 msgid "Meowth! You already have a team role!"
 msgstr ""
 
-#: __main__.py:1098
-#, python-brace-format
+#: __main__.py:1974
+msgid "Meowth! You are already in Team Harmony!"
+msgstr ""
+
+#: __main__.py:1978
 msgid "Meowth! {team_role} is not configured as a role on this server. Please contact an admin for assistance."
 msgstr ""
 
-#: __main__.py:1102
-#, python-brace-format
+#: __main__.py:1982
 msgid "Meowth! \"{entered_team}\" isn't a valid team! Try {available_teams}"
 msgstr ""
 
-#: __main__.py:1106
-#, python-brace-format
+#: __main__.py:1986
 msgid "Meowth! The \"{entered_team}\" role isn't configured on this server! Contact an admin!"
 msgstr ""
 
-#: __main__.py:1110
-#, python-brace-format
+#: __main__.py:1992
 msgid "Meowth! Added {member} to Team {team_name}! {team_emoji}"
 msgstr ""
 
-#: __main__.py:1112
+#: __main__.py:1994
 msgid "Meowth! I can't add roles!"
 msgstr ""
 
-#: __main__.py:1144
-#, python-brace-format
-msgid "Meowth! {member}, I already know you want {pokemon}!"
-msgstr ""
-
-#: __main__.py:1151
-#, python-brace-format
-msgid "Meowth! Got it! {member} wants {pokemon}"
-msgstr ""
-
-#: __main__.py:1218
-#, python-brace-format
-msgid "{0}, you have no pokemon in your want list."
-msgstr ""
-
-#: __main__.py:1219
-#, python-brace-format
-msgid "{0}, I've removed {1} pokemon from your want list."
-msgstr ""
-
-#: __main__.py:1242 __main__.py:1255
-msgid "Meowth! Give more details when reporting! Usage: **!wild <pokemon name> <location>**"
-msgstr ""
-
-#: __main__.py:1270
-#, python-brace-format
-msgid "Meowth! Click here for directions to the wild {pokemon}!"
-msgstr ""
-
-#: __main__.py:1270
-msgid "This is just my best guess!"
-msgstr ""
-
-#: __main__.py:1272
-#, python-brace-format
-msgid "Meowth! Wild {pokemon} reported by {member}! Details: {location_details}"
-msgstr ""
-
-#: __main__.py:1294
-msgid "Meowth! Please restrict raid reports to a city channel!"
-msgstr ""
-
-#: __main__.py:1313
-msgid "Meowth! Please wait until the egg has hatched before changing it to an open raid!"
-msgstr ""
-
-#: __main__.py:1316 __main__.py:1349
-msgid "Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**"
-msgstr ""
-
-#: __main__.py:1343 __main__.py:1664 __main__.py:1861 __main__.py:1893
-#, python-brace-format
-msgid "Meowth! The Pokemon {pokemon} does not appear in raids!"
-msgstr ""
-
-#: __main__.py:1361 __main__.py:1911
-msgid "Meowth! Click here for directions to the raid!"
-msgstr ""
-
-#: __main__.py:1361 __main__.py:1687 __main__.py:1911
-#, python-brace-format
-msgid "Weaknesses: {weakness_list}"
-msgstr ""
-
-#: __main__.py:1363
-#, python-brace-format
-msgid "Meowth! {pokemon} raid reported by {member}! Details: {location_details}. Coordinate in {raid_channel}"
-msgstr ""
-
-#: __main__.py:1366
-#, python-brace-format
-msgid ""
-"Meowth! {pokemon} raid reported by {member} in {citychannel}! Details: {location_details}. Coordinate here!\n"
-"\n"
-"To update your status, choose from the following commands:\n"
-"**!interested, !coming, !here, !cancel**\n"
-"If you are bringing more than one trainer/account, add the number of accounts total on your first status update.\n"
-"Example: `!coming 5`\n"
-"\n"
-"To see the list of trainers who have given their status:\n"
-"**!list interested, !list coming, !list here**\n"
-"Alternatively **!list** by itself will show all of the above.\n"
-"\n"
-"**!location** will show the current raid location.\n"
-"**!location new <address>** will let you correct the raid address.\n"
-"Sending a Google Maps link will also update the raid location.\n"
-"\n"
-"**!timer** will show the current raid time.\n"
-"**!timerset** will let you correct the raid countdown time.\n"
-"\n"
-"Message **!starting** when the raid is beginning to clear the raid's 'here' list.\n"
-"\n"
-"This channel will be deleted five minutes after the timer expires."
-msgstr ""
-
-#: __main__.py:1406
-#, python-brace-format
-msgid "Meowth! Hey {member}, if you can, set the time left on the raid using **!timerset <minutes>** so others can check it with **!timer**."
-msgstr ""
-
-#: __main__.py:1422
-#, python-brace-format
-msgid "Meowth! This {raidtype}'s timer has already expired as of {expiry_time} ({expiry_time24})!"
-msgstr ""
-
-#: __main__.py:1425
-#, python-brace-format
-msgid "Meowth! This {raidtype} will {raidaction} at {expiry_time} ({expiry_time24})!"
-msgstr ""
-
-#: __main__.py:1427
-#, python-brace-format
-msgid "Meowth! No one told me when the {raidtype} will {raidaction}, so I'm assuming it will {raidaction} at {expiry_time} ({expiry_time24})!"
-msgstr ""
-
-#: __main__.py:1445
-msgid "Timerset isn't supported for exraids. Please get a mod/admin to remove the channel if channel needs to be removed."
-msgstr ""
-
-#: __main__.py:1470
-#, python-brace-format
-msgid "Meowth...that's too long. {raidtype}s currently last no more than one hour..."
-msgstr ""
-
-#: __main__.py:1507
-msgid "Exraids don't expire. Please get a mod/admin to remove the channel if channel needs to be removed."
-msgstr ""
-
-#: __main__.py:1520
-#, python-brace-format
-msgid "Meowth! {member} is interested!"
-msgstr ""
-
-#: __main__.py:1522
-#, python-brace-format
-msgid "Meowth! {member} is interested with a total of {trainer_count} trainers!"
-msgstr ""
-
-#: __main__.py:1534
-#, python-brace-format
-msgid "Meowth! {member} is on the way!"
-msgstr ""
-
-#: __main__.py:1536
-#, python-brace-format
-msgid "Meowth! {member} is on the way with a total of {trainer_count} trainers!"
-msgstr ""
-
-#: __main__.py:1548
-#, python-brace-format
-msgid "Meowth! {member} is at the raid!"
-msgstr ""
-
-#: __main__.py:1550
-#, python-brace-format
-msgid "Meowth! {member} is at the raid with a total of {trainer_count} trainers!"
-msgstr ""
-
-#: __main__.py:1565
-#, python-brace-format
-msgid "Meowth! {member} has no status to cancel!"
-msgstr ""
-
-#: __main__.py:1569
-#, python-brace-format
-msgid "Meowth! {member} is no longer interested!"
-msgstr ""
-
-#: __main__.py:1571
-#, python-brace-format
-msgid "Meowth! {member} and their total of {trainer_count} trainers are no longer interested!"
-msgstr ""
-
-#: __main__.py:1574
-#, python-brace-format
-msgid "Meowth! {member} has left the raid!"
-msgstr ""
-
-#: __main__.py:1576
-#, python-brace-format
-msgid "Meowth! {member} and their total of {trainer_count} trainers have left the raid!"
-msgstr ""
-
-#: __main__.py:1579
-#, python-brace-format
-msgid "Meowth! {member} is no longer on their way!"
-msgstr ""
-
-#: __main__.py:1581
-#, python-brace-format
-msgid "Meowth! {member} and their total of {trainer_count} trainers are no longer on their way!"
-msgstr ""
-
-#: __main__.py:1629 __main__.py:2373
-#, python-brace-format
-msgid "Meowth! Someone has suggested a different location for the raid! Trainers {trainer_list}: make sure you are headed to the right place!"
-msgstr ""
-
-#: __main__.py:1656 __main__.py:1670
-msgid "Meowth! Give more details when reporting! Usage: **!exraid <pokemon name> <location>**"
-msgstr ""
-
-#: __main__.py:1687
-msgid "Meowth! Click here for directions to the EX raid!"
-msgstr ""
-
-#: __main__.py:1689
-#, python-brace-format
-msgid "Meowth! {pokemon} EX raid reported by {member}! Details: {location_details}. Send proof of your invite to this EX raid to an admin and coordinate in {raid_channel}"
-msgstr ""
-
-#: __main__.py:1692
-#, python-brace-format
-msgid ""
-"Meowth! {pokemon} EX raid reported by {member} in {citychannel}! Details: {location_details}. Coordinate here!\n"
-"\n"
-"To update your status, choose from the following commands:\n"
-"**!interested, !coming, !here, !cancel**\n"
-"If you are bringing more than one trainer/account, add the number of accounts total on your first status update.\n"
-"Example: `!coming 5`\n"
-"\n"
-"To see the list of trainers who have given their status:\n"
-"**!list interested, !list coming, !list here**\n"
-"Alternatively **!list** by itself will show all of the above.\n"
-"\n"
-"**!location** will show the current raid location.\n"
-"**!location new <address>** will let you correct the raid address.\n"
-"Sending a Google Maps link will also update the raid location.\n"
-"\n"
-"Message **!starting** when the raid is beginning to clear the raid's 'here' list.\n"
-"\n"
-"This channel needs to be manually deleted!"
-msgstr ""
-
-#: __main__.py:1749
-msgid "Meowth! Give more details when reporting! Usage: **!raidegg <level> <location>**"
-msgstr ""
-
-#: __main__.py:1756 __main__.py:1782
-msgid "Meowth! Give more details when reporting! Use at least: **!raidegg <level> <location>**. Type **!help** raidegg for more info."
-msgstr ""
-
-#: __main__.py:1788
-msgid "Meowth! Raid egg levels are only from 1-5!"
-msgstr ""
-
-#: __main__.py:1802
-msgid "Meowth! Click here for directions to the coming raid!"
-msgstr ""
-
-#: __main__.py:1802
-#, python-brace-format
-msgid "Possible Bosses: {boss_list}"
-msgstr ""
-
-#: __main__.py:1804
-#, python-brace-format
-msgid "Meowth! Level {level} raid egg reported by {member}! Details: {location_details}. Coordinate in {raid_channel}"
-msgstr ""
-
-#: __main__.py:1807
-#, python-brace-format
-msgid ""
-"Meowth! Level {level} raid egg reported by {member} in {citychannel}! Details: {location_details}. Coordinate here!\n"
-"\n"
-"Message **!interested** if you're interested in attending.\n"
-"If you are interested in bringing more than one trainer/account, add in the number at the end of the commend.\n"
-"Example: `!interested 5`\n"
-"\n"
-"Use **!list interested** to see the list of trainers who are interested.\n"
-"\n"
-"**!location** will show the current raid location.\n"
-"**!location new <address>** will let you correct the raid address.\n"
-"Sending a Google Maps link will also update the raid location.\n"
-"\n"
-"**!timer** will show how long until the egg catches into an open raid.\n"
-"**!timerset** will let you correct the egg countdown time.\n"
-"\n"
-"Message **!raid <pokemon>** to update this channel into an open raid.\n"
-"Message **!raid assume <pokemon>** to have the channel auto-update into an open raid.\n"
-"\n"
-"When this egg raid expires, there will be 15 minutes to update it into an open raid before it'll be deleted."
-msgstr ""
-
-#: __main__.py:1844
-#, python-brace-format
-msgid "Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset <minutes>** so others can check it with **!timer**."
-msgstr ""
-
-#: __main__.py:1853
-msgid "Meowth! **!raid assume** is not allowed in this level egg."
-msgstr ""
-
-#: __main__.py:1865 __main__.py:1897
-#, python-brace-format
-msgid "Meowth! The Pokemon {pokemon} does not hatch from level {level} raid eggs!"
-msgstr ""
-
-#: __main__.py:1873
-#, python-brace-format
-msgid "Meowth! This egg will be assumed to be {pokemon} when it hatches!"
-msgstr ""
-
-#: __main__.py:1913
-#, python-brace-format
-msgid "Meowth! The egg has hatched into a {pokemon} raid! Details: {location_details}. Coordinate in {raid_channel}"
-msgstr ""
-
-#: __main__.py:1915
-#, python-brace-format
-msgid ""
-"Meowth! The egg reported by {member} in {citychannel} hatched into a {pokemon} raid! Details: {location_details}. Coordinate here!\n"
-"\n"
-"To update your status, choose from the following commands:\n"
-"**!interested, !coming, !here, !cancel**\n"
-"If you are bringing more than one trainer/account, add the number of accounts total on your first status update.\n"
-"Example: `!coming 5`\n"
-"\n"
-"To see the list of trainers who have given their status:\n"
-"**!list interested, !list coming, !list here**\n"
-"Alternatively **!list** by itself will show all of the above.\n"
-"\n"
-"**!location** will show the current raid location.\n"
-"**!location new <address>** will let you correct the raid address.\n"
-"Sending a Google Maps link will also update the raid location.\n"
-"\n"
-"**!timer** will show the current raid time.\n"
-"**!timerset** will let you correct the raid countdown time.\n"
-"\n"
-"Message **!starting** when the raid is beginning to clear the raid's 'here' list.\n"
-"\n"
-"This channel will be deleted five minutes after the timer expires."
-msgstr ""
-
-#: __main__.py:1965
-#, python-brace-format
-msgid ""
-"Meowth! Trainers {trainer_list}: The raid egg has just hatched into a {pokemon} raid!\n"
-"You're now able to update your status with **!coming** or **!here**. If you've changed your plans, use **!cancel**."
-msgstr ""
-
-#: __main__.py:1984
-msgid "Meowth! I can't understand how many are in your group. Just say **!interested** if you're by yourself, or **!interested 5** for example if there are 5 in your group."
-msgstr ""
-
-#: __main__.py:2009 __main__.py:2044
-msgid "Meowth! Please wait until the raid egg has hatched before announcing you're coming or present."
-msgstr ""
-
-#: __main__.py:2020
-msgid "Meowth! I can't understand how many are in your group. Just say **!coming** if you're by yourself, or **!coming 5** for example if there are 5 in your group."
-msgstr ""
-
-#: __main__.py:2055
-msgid "Meowth! I can't understand how many are in your group. Just say **!here** if you're by yourself, or **!coming 5** for example if there are 5 in your group."
-msgstr ""
-
-#: __main__.py:2099
-#, python-brace-format
-msgid "Meowth! The group that was waiting is starting the raid! Trainers {trainer_list}, please respond with {here_emoji} or **!here** if you are waiting for another group!"
-msgstr ""
-
-#: __main__.py:2101
-msgid "Meowth! How can you start when there's no one waiting at this raid!?"
-msgstr ""
-
-#: __main__.py:2122
-#, python-brace-format
-msgid "Meowth! Current Raids for {0}:"
-msgstr ""
-
-#: __main__.py:2146
-#, python-brace-format
-msgid ""
-"\n"
-"{raidchannel} - {interestcount} interested, {comingcount} coming, {herecount} here. End time: {expiry}{manualtimer}"
-msgstr ""
-
-#: __main__.py:2149
-msgid "Meowth! No active raids! Report one with **!raid <name> <location>**."
-msgstr ""
-
-#: __main__.py:2174
-#, python-brace-format
-msgid "Meowth! Hey {member}, I don't know if you meant **!coming** to say that you are coming or **!list coming** to see the other trainers on their way"
-msgstr ""
-
-#: __main__.py:2242
-msgid "Meowth! You've already made a duplicate report for this raid!"
-msgstr ""
-
-#: __main__.py:2265
-msgid "Meowth! Are you sure you wish to remove this raid?"
-msgstr ""
-
-#: __main__.py:2278
-msgid "Duplicate Report cancelled."
-msgstr ""
-
-#: __main__.py:2293
-msgid "Duplicate Report Timed Out."
-msgstr ""
-
-#: __main__.py:2301
-#, python-brace-format
-msgid "Duplicate report #{duplicate_report_count} received."
-msgstr ""
-
-#: __main__.py:2325
-#, python-brace-format
-msgid ""
-"Meowth! Here's the current location for the raid!\n"
-"Details:{location}"
-msgstr ""
-
-#: __main__.py:2338
-msgid "Meowth! We're missing the new location details! Usage: **!location new <new address>**"
-msgstr ""
-
-#: __main__.py:2395
-#, python-brace-format
-msgid " including {trainer_list} and the people with them! Let them know if there is a group forming"
-msgstr ""
-
-#: __main__.py:2396
-#, python-brace-format
-msgid "Meowth! {trainer_count} interested{including_string}!"
-msgstr ""
-
-#: __main__.py:2419
-#, python-brace-format
-msgid " including {trainer_list} and the people with them! Be considerate and wait for them if possible"
-msgstr ""
-
-#: __main__.py:2420
-#, python-brace-format
-msgid "Meowth! {trainer_count} on the way{including_string}!"
-msgstr ""
-
-#: __main__.py:2442
-#, python-brace-format
-msgid " including {trainer_list} and the people with them! Be considerate and let them know if and when you'll be there"
-msgstr ""
-
-#: __main__.py:2443
-#, python-brace-format
-msgid "Meowth! {trainer_count} waiting at the raid{including_string}!"
-msgstr ""
-
-#: __main__.py:2449
+#: __main__.py:2001
 msgid "Meowth! We've moved this command to **!list interested**."
 msgstr ""
 
-#: __main__.py:2454
+#: __main__.py:2006
 msgid "Meowth! We've moved this command to **!list coming**."
 msgstr ""
 
-#: __main__.py:2459
+#: __main__.py:2011
 msgid "Meowth! We've moved this command to **!list here**."
 msgstr ""
 
-#: __main__.py:2471
-msgid "Meowth! I'll wait for you to send your pass!"
+#: __main__.py:2016
+msgid "Meowth! Hey {member}, I don't know if you meant **!coming** to say that you are coming or **!list coming** to see the other trainers on their way"
+msgstr ""
+
+#: __main__.py:2074
+#: __main__.py:2161
+#: __main__.py:2367
+#: __main__.py:2572
+#: __main__.py:2638
+msgid "Meowth! **{word}** isn't a Pokemon!"
+msgstr ""
+
+#: __main__.py:2087
+msgid "Maximum guild roles reached. Pokemon not added."
+msgstr ""
+
+#: __main__.py:2107
+msgid "Meowth! Got it! {member} wants {pokemon}"
+msgstr ""
+
+#: __main__.py:2110
+msgid "Meowth! {member}, I already know you want {pokemon}!"
+msgstr ""
+
+#: __main__.py:2113
+msgid "Meowth! {member}, out of your total {count} items:"
+msgstr ""
+
+#: __main__.py:2115
+msgid ""
+"\n"
+"**{added_count} Added:** \n"
+"\t{added_list}"
+msgstr ""
+
+#: __main__.py:2117
+msgid ""
+"\n"
+"**{already_want_count} Already Following:** \n"
+"\t{already_want_list}"
+msgstr ""
+
+#: __main__.py:2121
+msgid ""
+"\n"
+"\t{word}"
+msgstr ""
+
+#: __main__.py:2123
+msgid ": *({correction}?)*"
+msgstr ""
+
+#: __main__.py:2124
+msgid ""
+"\n"
+"**{count} Not Valid:**"
+msgstr ""
+
+#: __main__.py:2163
+#: __main__.py:2369
+#: __main__.py:2574
+#: __main__.py:2640
+msgid " Did you mean **{correction}**?"
+msgstr ""
+
+#: __main__.py:2213
+msgid "{0}, you have no pokemon in your want list."
+msgstr ""
+
+#: __main__.py:2215
+msgid "{0}, I've removed {1} pokemon from your want list."
+msgstr ""
+
+#: __main__.py:2234
+#: __main__.py:2303
+#: __main__.py:2460
+#: __main__.py:2802
+#: __main__.py:2957
+#: __main__.py:2964
+#: __main__.py:2966
+#: __main__.py:3134
+#: __main__.py:3147
+#: __main__.py:3151
+#: __main__.py:3160
+#: __main__.py:4165
+#: __main__.py:4325
+#: __main__.py:4330
+#: __main__.py:4334
+#: __main__.py:4381
+#: __main__.py:4646
+msgid "%I:%M %p (%H:%M)"
+msgstr ""
+
+#: __main__.py:2238
+#: __main__.py:2252
+msgid "Meowth! Give more details when reporting! Usage: **!wild <pokemon name> <location>**"
+msgstr ""
+
+#: __main__.py:2260
+msgid "Meowth! {word} isn't a Pokemon!"
+msgstr ""
+
+#: __main__.py:2262
+msgid " Did you mean {correction}?"
+msgstr ""
+
+#: __main__.py:2272
+msgid "Ask {author} if my directions aren't perfect!"
+msgstr ""
+
+#: __main__.py:2272
+msgid "Meowth! Click here for my directions to the wild {pokemon}!"
+msgstr ""
+
+#: __main__.py:2273
+#: __main__.py:2410
+#: __main__.py:2608
+#: __main__.py:2723
+msgid "**Details:**"
+msgstr ""
+
+#: __main__.py:2273
+#: __main__.py:2410
+#: __main__.py:2608
+#: __main__.py:2723
+msgid "{pokemon} ({pokemonnumber}) {type}"
+msgstr ""
+
+#: __main__.py:2275
+#: __main__.py:2277
+#: __main__.py:2413
+#: __main__.py:2415
+#: __main__.py:2526
+#: __main__.py:2528
+#: __main__.py:2850
+#: __main__.py:2852
+msgid "Reported by @{author} - {timestamp}"
+msgstr ""
+
+#: __main__.py:2279
+msgid "Meowth! Wild {pokemon} reported by {member}! Details: {location_details}"
+msgstr ""
+
+#: __main__.py:2280
+msgid "**This {pokemon} has despawned!**"
+msgstr ""
+
+#: __main__.py:2310
+msgid "Meowth! Please restrict raid reports to a city channel!"
+msgstr ""
+
+#: __main__.py:2315
+#: __main__.py:2343
+#: __main__.py:2396
+msgid "Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**"
+msgstr ""
+
+#: __main__.py:2325
+msgid "Meowth! **!raid assume** is not allowed in this level egg."
+msgstr ""
+
+#: __main__.py:2337
+msgid "Meowth! Please wait until the egg has hatched before changing it to an open raid!"
+msgstr ""
+
+#: __main__.py:2384
+#: __main__.py:2592
+#: __main__.py:2707
+msgid "Meowth! The Pokemon {pokemon} does not appear in raids!"
+msgstr ""
+
+#: __main__.py:2387
+msgid "Meowth! The Pokemon {pokemon} only appears in EX Raids! Use **!exraid** to report one!"
+msgstr ""
+
+#: __main__.py:2391
+msgid "Meowth...that's too long. Level {raidlevel} raids currently last no more than {raidtime} minutes..."
+msgstr ""
+
+#: __main__.py:2409
+#: __main__.py:2722
+msgid "Meowth! Click here for directions to the raid!"
+msgstr ""
+
+#: __main__.py:2411
+#: __main__.py:2609
+#: __main__.py:2724
+msgid "**Weaknesses:**"
+msgstr ""
+
+#: __main__.py:2411
+#: __main__.py:2609
+#: __main__.py:2724
+msgid "{weakness_list}"
+msgstr ""
+
+#: __main__.py:2417
+msgid "Meowth! {pokemon} raid reported by {member}! Details: {location_details}. Coordinate in {raid_channel}"
+msgstr ""
+
+#: __main__.py:2419
+msgid ""
+"Meowth! {pokemon} raid reported by {member} in {citychannel}! Details: {location_details}. Coordinate here!\n"
+"\n"
+"To update your status, choose from the following commands: **!maybe**, **!coming**, **!here**, **!cancel**. If you are bringing more than one trainer/account, add in the number of accounts total on your first status update.\n"
+"Example: `!coming 5`\n"
+"\n"
+"To see the list of trainers who have given their status:\n"
+"**!list interested**, **!list coming**, **!list here** or use just **!list** to see all lists. Use **!list teams** to see team distribution.\n"
+"\n"
+"Sometimes I'm not great at directions, but I'll correct my directions if anybody sends me a maps link or uses **!location new <address>**. You can see the location of a raid by using **!location**\n"
+"\n"
+"You can set the time remaining with **!timerset <minutes>** and access this with **!timer**.\n"
+"You can set the start time with **!starttime [HH:MM AM/PM]** (you can also omit AM/PM and use 24-hour time) and access this with **!starttime**.\n"
+"\n"
+"Message **!starting** when the raid is beginning to clear the raid's 'here' list.\n"
+"\n"
+"This channel will be deleted five minutes after the timer expires."
+msgstr ""
+
+#: __main__.py:2440
+msgid "Meowth! Hey {member}, if you can, set the time left on the raid using **!timerset <minutes>** so others can check it with **!timer**."
+msgstr ""
+
+#: __main__.py:2466
+msgid "Meowth! Give more details when reporting! Usage: **!raidegg <level> <location>**"
+msgstr ""
+
+#: __main__.py:2472
+#: __main__.py:2498
+msgid "Meowth! Give more details when reporting! Use at least: **!raidegg <level> <location>**. Type **!help** raidegg for more info."
+msgstr ""
+
+#: __main__.py:2493
+msgid "Meowth...that's too long. Level {raidlevel} Raid Eggs currently last no more than {hatchtime} minutes..."
+msgstr ""
+
+#: __main__.py:2502
+msgid "Meowth! Raid egg levels are only from 1-5!"
+msgstr ""
+
+#: __main__.py:2513
+msgid "level-{egg_level}-egg-"
+msgstr ""
+
+#: __main__.py:2518
+#: __main__.py:2607
+#: __main__.py:2842
+msgid "Meowth! Click here for directions to the coming raid!"
+msgstr ""
+
+#: __main__.py:2530
+msgid "Meowth! Level {level} raid egg reported by {member}! Details: {location_details}. Coordinate in {raid_channel}"
+msgstr ""
+
+#: __main__.py:2532
+msgid ""
+"Meowth! Level {level} raid egg reported by {member} in {citychannel}! Details: {location_details}. Coordinate here!\n"
+"\n"
+"To update your status, choose from the following commands: **!maybe**, **!coming**, **!here**, **!cancel**. If you are bringing more than one trainer/account, add in the number of accounts total on your first status update.\n"
+"Example: `!coming 5`\n"
+"\n"
+"To see the list of trainers who have given their status:\n"
+"**!list interested**, **!list coming**, **!list here** or use just **!list** to see all lists. Use **!list teams** to see team distribution.\n"
+"\n"
+"Sometimes I'm not great at directions, but I'll correct my directions if anybody sends me a maps link or uses **!location new <address>**. You can see the location of a raid by using **!location**\n"
+"\n"
+"You can set the time remaining with **!timerset <minutes>** and access this with **!timer**.\n"
+"You can set the start time with **!starttime [HH:MM AM/PM]** (you can also omit AM/PM and use 24-hour time) and access this with **!starttime**.\n"
+"\n"
+"Message **!starting** when the raid is beginning to clear the raid's 'here' list.\n"
+"\n"
+"This channel will be deleted five minutes after the timer expires."
+msgstr ""
+
+#: __main__.py:2553
+msgid "Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset <minutes>** so others can check it with **!timer**."
+msgstr ""
+
+#: __main__.py:2595
+#: __main__.py:2710
+msgid "Meowth! The Pokemon {pokemon} does not hatch from level {level} raid eggs!"
+msgstr ""
+
+#: __main__.py:2627
+msgid "Meowth! This egg will be assumed to be {pokemon} when it hatches!"
+msgstr ""
+
+#: __main__.py:2699
+msgid "Meowth! The egg has hatched into a {pokemon} raid! Details: {location_details}. Coordinate in {raid_channel}"
+msgstr ""
+
+#: __main__.py:2700
+msgid ""
+"Meowth! The egg reported by {member} in {citychannel} hatched into a {pokemon} raid! Details: {location_details}. Coordinate here!\n"
+"\n"
+"To update your status, choose from the following commands: **!maybe**, **!coming**, **!here**, **!cancel**. If you are bringing more than one trainer/account, add in the number of accounts total on your first status update.\n"
+"Example: `!coming 5`\n"
+"\n"
+"To see the list of trainers who have given their status:\n"
+"**!list interested**, **!list coming**, **!list here** or use just **!list** to see all lists. Use **!list teams** to see team distribution.\n"
+"\n"
+"Sometimes I'm not great at directions, but I'll correct my directions if anybody sends me a maps link or uses **!location new <address>**. You can see the location of a raid by using **!location**\n"
+"\n"
+"You can set the time remaining with **!timerset <minutes>** and access this with **!timer**.\n"
+"You can set the start time with **!starttime [HH:MM AM/PM]** (you can also omit AM/PM and use 24-hour time) and access this with **!starttime**.\n"
+"\n"
+"Message **!starting** when the raid is beginning to clear the raid's 'here' list.\n"
+"\n"
+"This channel will be deleted five minutes after the timer expires."
+msgstr ""
+
+#: __main__.py:2703
+msgid "Meowth! The EX egg has hatched into a {pokemon} raid! Details: {location_details}. Use the **!invite** command to gain access and coordinate in {raid_channel}"
+msgstr ""
+
+#: __main__.py:2704
+msgid ""
+"Meowth! {pokemon} EX raid reported by {member} in {citychannel}! Details: {location_details}. Coordinate here after using **!invite** to gain access!\n"
+"\n"
+"To update your status, choose from the following commands: **!maybe**, **!coming**, **!here**, **!cancel**. If you are bringing more than one trainer/account, add in the number of accounts total on your first status update.\n"
+"Example: `!coming 5`\n"
+"\n"
+"To see the list of trainers who have given their status:\n"
+"**!list interested**, **!list coming**, **!list here** or use just **!list** to see all lists. Use **!list teams** to see team distribution.\n"
+"\n"
+"Sometimes I'm not great at directions, but I'll correct my directions if anybody sends me a maps link or uses **!location new <address>**. You can see the location of a raid by using **!location**\n"
+"\n"
+"You can set the time remaining with **!timerset <minutes>** and access this with **!timer**.\n"
+"You can set the start time with **!starttime [HH:MM AM/PM]** (you can also omit AM/PM and use 24-hour time) and access this with **!starttime**.\n"
+"\n"
+"Message **!starting** when the raid is beginning to clear the raid's 'here' list.\n"
+"\n"
+"This channel will be deleted five minutes after the timer expires."
+msgstr ""
+
+#: __main__.py:2727
+msgid "Ends on %B %d at %I:%M %p (%H:%M)"
+msgstr ""
+
+#: __main__.py:2750
+msgid ""
+"Meowth! Trainers {trainer_list}: The raid egg has just hatched into a {pokemon} raid!\n"
+"If you couldn't before, you're now able to update your status with **!coming** or **!here**. If you've changed your plans, use **!cancel**."
+msgstr ""
+
+#: __main__.py:2807
+#: __main__.py:2814
+msgid "Meowth! Give more details when reporting! Usage: **!exraid <location>**"
+msgstr ""
+
+#: __main__.py:2826
+msgid "ex-raid-egg-"
+msgstr ""
+
+#: __main__.py:2854
+msgid "Meowth! EX raid egg reported by {member}! Details: {location_details}. Use the **!invite** command to gain access and coordinate in {raid_channel}"
+msgstr ""
+
+#: __main__.py:2856
+msgid ""
+"Meowth! EX raid reported by {member} in {citychannel}! Details: {location_details}. Coordinate here after using **!invite** to gain access!\n"
+"\n"
+"To update your status, choose from the following commands: **!maybe**, **!coming**, **!here**, **!cancel**. If you are bringing more than one trainer/account, add in the number of accounts total on your first status update.\n"
+"Example: `!coming 5`\n"
+"\n"
+"To see the list of trainers who have given their status:\n"
+"**!list interested**, **!list coming**, **!list here** or use just **!list** to see all lists. Use **!list teams** to see team distribution.\n"
+"\n"
+"Sometimes I'm not great at directions, but I'll correct my directions if anybody sends me a maps link or uses **!location new <address>**. You can see the location of a raid by using **!location**\n"
+"\n"
+"You can set the hatch time with **!timerset <MM/DD HH:MM AM/PM>** and access this with **!timer**.\n"
+"You can set the start time with **!starttime [HH:MM AM/PM]** (you can also omit AM/PM and use 24-hour time) and access this with **!starttime**.\n"
+"\n"
+"Message **!starting** when the raid is beginning to clear the raid's 'here' list.\n"
+"\n"
+"This channel will be deleted five minutes after the timer expires."
+msgstr ""
+
+#: __main__.py:2876
+msgid "Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset <date and time>** so others can check it with **!timer**. **<date and time>** can just be written exactly how it appears on your EX Raid Pass."
+msgstr ""
+
+#: __main__.py:2923
+msgid "Meowth! No EX Raids have been reported in this server! Use **!exraid** to report one!"
+msgstr ""
+
+#: __main__.py:2925
+msgid ""
+"Meowth! {0}, you've told me you have an invite to an EX Raid, and I'm just going to take your word for it! The following {1} EX Raids have been reported:\n"
+"{2}\n"
+"Reply with **the number** (1, 2, etc) of the EX Raid you have been invited to. If none of them match your invite, type 'N' and report it with **!exraid**"
+msgstr ""
+
+#: __main__.py:2928
+msgid "Meowth! Be sure to report your EX Raid with **!exraid**!"
+msgstr ""
+
+#: __main__.py:2930
+msgid "Meowth! I couldn't tell which EX Raid you meant! Try the **!invite** command again, and make sure you respond with the number of the channel that matches!"
+msgstr ""
+
+#: __main__.py:2937
+msgid "Meowth! Alright {0}, you can now send messages in {1}! Make sure you let the trainers in there know if you can make it to the EX Raid!"
+msgstr ""
+
+#: __main__.py:2940
+msgid "Meowth! I couldn't understand your reply! Try the **!invite** command again!"
+msgstr ""
+
+#: __main__.py:2951
+#: __main__.py:3277
+#: __main__.py:3314
+#: __main__.py:3390
+msgid "egg"
+msgstr ""
+
+#: __main__.py:2952
+#: __main__.py:3391
+msgid "hatch"
+msgstr ""
+
+#: __main__.py:2954
+#: __main__.py:3298
+#: __main__.py:3392
+msgid "raid"
+msgstr ""
+
+#: __main__.py:2955
+#: __main__.py:3393
+msgid "end"
+msgstr ""
+
+#: __main__.py:2957
+msgid "This {raidtype}'s timer has already expired as of {expiry_time}!"
+msgstr ""
+
+#: __main__.py:2960
+msgid "This {raidtype} will {raidaction} on {expiry}!"
+msgstr ""
+
+#: __main__.py:2960
+#: __main__.py:2962
+#: __main__.py:3058
+#: __main__.py:3060
+#: __main__.py:4332
+msgid "%B %d at %I:%M %p (%H:%M)"
+msgstr ""
+
+#: __main__.py:2962
+msgid "No one told me when the {raidtype} will {raidaction}, so I'm assuming it will {raidaction} on {expiry}!"
+msgstr ""
+
+#: __main__.py:2964
+msgid "This {raidtype} will {raidaction} at {expiry_time}!"
+msgstr ""
+
+#: __main__.py:2966
+msgid "No one told me when the {raidtype} will {raidaction}, so I'm assuming it will {raidaction} at {expiry_time}!"
+msgstr ""
+
+#: __main__.py:2979
+msgid "Raid Egg"
+msgstr ""
+
+#: __main__.py:2983
+msgid "Raid"
+msgstr ""
+
+#: __main__.py:2996
+#: __main__.py:2999
+msgid "Meowth! I couldn't understand your time format. Try again like this: **!timerset <minutes>**"
+msgstr ""
+
+#: __main__.py:3002
+msgid "Meowth...that's too long. Level {raidlevel} {raidtype}s currently last no more than {maxtime} minutes..."
+msgstr ""
+
+#: __main__.py:3019
+#: __main__.py:3027
+msgid "Meowth! Your timer wasn't formatted correctly. Change your **!timerset** to match this format: **MM/DD HH:MM AM/PM** (You can also omit AM/PM and use 24-hour time!)"
+msgstr ""
+
+#: __main__.py:3034
+#: __main__.py:3128
+msgid "Meowth! Please enter a time in the future."
+msgstr ""
+
+#: __main__.py:3036
+msgid "Meowth! Timerset isn't supported for EX Raids after they have hatched."
+msgstr ""
+
+#: __main__.py:3047
+msgid "The channel has been reactivated."
+msgstr ""
+
+#: __main__.py:3057
+msgid "%B %d at %I:%M %p (%H:%M) | "
+msgstr ""
+
+#: __main__.py:3057
+msgid "Hatches on {expiry}"
+msgstr ""
+
+#: __main__.py:3058
+#: __main__.py:3060
+msgid "Ends on {end}"
+msgstr ""
+
+#: __main__.py:3072
+msgid "Meowth!"
+msgstr ""
+
+#: __main__.py:3111
+#: __main__.py:3117
+msgid "Meowth! Your start time wasn't formatted correctly. Change your **!starttime** to match this format: **HH:MM AM/PM** (You can also omit AM/PM and use 24-hour time!)"
+msgstr ""
+
+#: __main__.py:3125
+msgid "Meowth! The raid will be over before that...."
+msgstr ""
+
+#: __main__.py:3134
+msgid "Meowth! There is already a start time of **{start}** set! Do you want to change it?"
+msgstr ""
+
+#: __main__.py:3139
+msgid "Start time change cancelled."
+msgstr ""
+
+#: __main__.py:3147
+#: __main__.py:3151
+msgid "Meowth! The current start time has been set to: **{starttime}**"
+msgstr ""
+
+#: __main__.py:3158
+#: __main__.py:3162
+msgid "Meowth! No start time has been set, set one with **!starttime HH:MM AM/PM**! (You can also omit AM/PM and use 24-hour time!)"
+msgstr ""
+
+#: __main__.py:3160
+msgid "Meowth! The current start time is: **{starttime}**"
+msgstr ""
+
+#: __main__.py:3186
+msgid ""
+"Meowth! Here's the current location for the raid!\n"
+"Details: {location}\n"
+"Expiry: {topic}"
+msgstr ""
+
+#: __main__.py:3202
+msgid "Meowth! We're missing the new location details! Usage: **!location new <new address>**"
+msgstr ""
+
+#: __main__.py:3257
+msgid "Meowth! I can't recover this channel because I know about it already!"
+msgstr ""
+
+#: __main__.py:3263
+msgid "level-[1-5]-egg"
+msgstr ""
+
+#: __main__.py:3309
+msgid "Ends on %B %d at %I:%M %p"
+msgstr ""
+
+#: __main__.py:3315
+msgid "EX"
+msgstr ""
+
+#: __main__.py:3335
+msgid "Meowth! I couldn't recognize this as a raid channel!"
+msgstr ""
+
+#: __main__.py:3384
+msgid "Meowth! This channel has been recovered! However, there may be some inaccuracies in what I remembered! Here's what I have:"
+msgstr ""
+
+#: __main__.py:3394
+msgid ""
+"\n"
+"I'm not sure when this {raidtype} will {action}, so please use **!timerset** if you can!"
+msgstr ""
+
+#: __main__.py:3421
+msgid "Meowth! You've already made a duplicate report for this raid!"
+msgstr ""
+
+#: __main__.py:3442
+msgid "Meowth! Are you sure you wish to remove this raid?"
+msgstr ""
+
+#: __main__.py:3447
+msgid "Duplicate Report cancelled."
+msgstr ""
+
+#: __main__.py:3456
+msgid "Duplicate Confirmed"
+msgstr ""
+
+#: __main__.py:3462
+msgid "Duplicate Report Timed Out."
+msgstr ""
+
+#: __main__.py:3470
+msgid "Duplicate report #{duplicate_report_count} received."
+msgstr ""
+
+#: __main__.py:3572
+msgid "clear"
+msgstr ""
+
+#: __main__.py:3572
+msgid "extreme"
+msgstr ""
+
+#: __main__.py:3572
+msgid "rainy"
+msgstr ""
+
+#: __main__.py:3572
+msgid "sunny"
+msgstr ""
+
+#: __main__.py:3573
+msgid "cloudy"
+msgstr ""
+
+#: __main__.py:3573
+msgid "fog"
+msgstr ""
+
+#: __main__.py:3573
+msgid "partlycloudy"
+msgstr ""
+
+#: __main__.py:3573
+msgid "snow"
+msgstr ""
+
+#: __main__.py:3573
+msgid "windy"
+msgstr ""
+
+#: __main__.py:3575
+msgid "Meowth! Enter one of the following weather conditions: {}"
+msgstr ""
+
+#: __main__.py:3578
+msgid "Meowth! Weather set to {}!"
+msgstr ""
+
+#: __main__.py:3621
+#: __main__.py:3705
+#: __main__.py:3808
+msgid "{word} doesn't appear in level {egglevel} raids! Please try again."
+msgstr ""
+
+#: __main__.py:3659
+msgid "Meowth! {member} is interested!"
+msgstr ""
+
+#: __main__.py:3661
+msgid "Meowth! {member} is interested with a total of {trainer_count} trainers! {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | :grey_question:: {unknown}"
+msgstr ""
+
+#: __main__.py:3712
+#: __main__.py:3815
+msgid "Meowth! Specify which of the possible bosses you are interested in! Otherwise, please wait until the raid egg has hatched before announcing you're coming or present."
+msgstr ""
+
+#: __main__.py:3762
+msgid "Meowth! {member} is on the way!"
+msgstr ""
+
+#: __main__.py:3764
+msgid "Meowth! {member} is on the way with a total of {trainer_count} trainers! {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | :grey_question:: {unknown}"
+msgstr ""
+
+#: __main__.py:3852
+msgid ""
+"\n"
+"There is a group already in the lobby! Use **!lobby** to join them or **!backout** to request a backout! Otherwise, you may have to wait for the next group!"
+msgstr ""
+
+#: __main__.py:3870
+msgid "Meowth! {member} is at the raid!"
+msgstr ""
+
+#: __main__.py:3873
+msgid "Meowth! {member} is at the raid with a total of {trainer_count} trainers! {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | :grey_question:: {unknown}"
+msgstr ""
+
+#: __main__.py:3934
+msgid "Only one non-team count can be accepted."
+msgstr ""
+
+#: __main__.py:3946
+msgid "Only one count per team accepted."
+msgstr ""
+
+#: __main__.py:3950
+msgid "Invalid format, please check and try again."
+msgstr ""
+
+#: __main__.py:3954
+msgid "Team counts are higher than the total, double check your counts and try again. You entered **"
+msgstr ""
+
+#: __main__.py:3955
+msgid "** total and **"
+msgstr ""
+
+#: __main__.py:3956
+msgid "** in your party."
+msgstr ""
+
+#: __main__.py:3961
+msgid "Meowth! Something is not adding up! Try making sure your total matches what each team adds up to!"
+msgstr ""
+
+#: __main__.py:4017
+msgid "Coordinate here"
+msgstr ""
+
+#: __main__.py:4031
+#: __main__.py:4034
+msgid "**Boss Interest:**"
+msgstr ""
+
+#: __main__.py:4037
+msgid "**Status List**"
+msgstr ""
+
+#: __main__.py:4037
+msgid "Maybe: **{channelmaybe}** | Coming: **{channelcoming}** | Here: **{channelhere}**"
+msgstr ""
+
+#: __main__.py:4038
+msgid "**Team List**"
+msgstr ""
+
+#: __main__.py:4073
+msgid "Meowth! I can't understand how many are in your group. Just say **!here** if you're by yourself, or **!coming 5** for example if there are 5 in your group."
+msgstr ""
+
+#: __main__.py:4083
+msgid "Meowth! There is no group in the lobby for you to join! Use **!starting** if the group waiting at the raid is entering the lobby!"
+msgstr ""
+
+#: __main__.py:4087
+msgid "Meowth! {member} is entering the lobby!"
+msgstr ""
+
+#: __main__.py:4089
+msgid "Meowth! {member} is entering the lobby with a total of {trainer_count} trainers!"
+msgstr ""
+
+#: __main__.py:4113
+msgid "Meowth! {member} has no status to cancel!"
+msgstr ""
+
+#: __main__.py:4117
+msgid "Meowth! {member} is no longer interested!"
+msgstr ""
+
+#: __main__.py:4119
+msgid "Meowth! {member} and their total of {trainer_count} trainers are no longer interested!"
+msgstr ""
+
+#: __main__.py:4122
+msgid "Meowth! {member} has left the raid!"
+msgstr ""
+
+#: __main__.py:4124
+msgid "Meowth! {member} and their total of {trainer_count} trainers have left the raid!"
+msgstr ""
+
+#: __main__.py:4127
+msgid "Meowth! {member} is no longer on their way!"
+msgstr ""
+
+#: __main__.py:4129
+msgid "Meowth! {member} and their total of {trainer_count} trainers are no longer on their way!"
+msgstr ""
+
+#: __main__.py:4132
+msgid "Meowth! {member} has backed out of the lobby!"
+msgstr ""
+
+#: __main__.py:4134
+msgid "Meowth! {member} and their total of {trainer_count} trainers have backed out of the lobby!"
+msgstr ""
+
+#: __main__.py:4160
+msgid "Meowth! How can you start when there's no one waiting at this raid!?"
+msgstr ""
+
+#: __main__.py:4165
+msgid " to start at **{}** "
+msgstr ""
+
+#: __main__.py:4170
+msgid "Meowth! The group that was waiting{timestr}is starting the raid! Trainers {trainer_list}, if you are not in this group and are waiting for the next group, please respond with {here_emoji} or **!here**. If you need to ask those that just started to back out of their lobby, use **!backout**"
+msgstr ""
+
+#: __main__.py:4185
+msgid "Meowth! The group of {count} in the lobby has entered the raid! Wish them luck!"
+msgstr ""
+
+#: __main__.py:4216
+msgid "Meowth! There's no one else in the lobby for this raid!"
+msgstr ""
+
+#: __main__.py:4222
+msgid "Meowth! {author} has indicated that the group consisting of {lobby_list} and the people with them has backed out of the lobby! If this is inaccurate, please use **!lobby** or **!cancel** to help me keep my lists accurate!"
+msgstr ""
+
+#: __main__.py:4236
+msgid "Meowth! There's no one in the lobby for this raid!"
+msgstr ""
+
+#: __main__.py:4238
+msgid "Meowth! {author} has requested a backout! If one of the following trainers reacts with the check mark, I will assume the group is backing out of the raid lobby as requested! {lobby_list}"
+msgstr ""
+
+#: __main__.py:4251
+msgid "Meowth! {user} confirmed the group is backing out!"
+msgstr ""
+
+#: __main__.py:4269
+#: __main__.py:4624
+msgid "**Meowth!** "
+msgstr ""
+
+#: __main__.py:4319
+msgid " (assumed)"
+msgstr ""
+
+#: __main__.py:4325
+msgid " Next group: **{}**"
+msgstr ""
+
+#: __main__.py:4330
+#: __main__.py:4332
+msgid " - Hatches: {expiry}{is_assumed}"
+msgstr ""
+
+#: __main__.py:4334
+msgid " - Expiry: {expiry}{is_assumed}"
+msgstr ""
+
+#: __main__.py:4335
+msgid ""
+"    {raidchannel}{expiry_text}\n"
+msgstr ""
+
+#: __main__.py:4336
+msgid ""
+"    {interestcount} interested, {comingcount} coming, {herecount} here, {lobbycount} in the lobby.{start_str}\n"
+msgstr ""
+
+#: __main__.py:4339
+msgid ""
+"**Here's the current raids for {0}**\n"
+"\n"
+msgstr ""
+
+#: __main__.py:4341
+msgid ""
+"**Active Raids:**\n"
+msgstr ""
+
+#: __main__.py:4346
+msgid ""
+"**Raid Eggs:**\n"
+msgstr ""
+
+#: __main__.py:4351
+msgid ""
+"**EX Raids:**\n"
+msgstr ""
+
+#: __main__.py:4355
+msgid "Meowth! No active raids! Report one with **!raid <name> <location>**."
+msgstr ""
+
+#: __main__.py:4378
+msgid " Nobody has updated their status yet!"
+msgstr ""
+
+#: __main__.py:4381
+#: __main__.py:4646
+msgid ""
+"\n"
+"The next group will be starting at **{}**"
+msgstr ""
+
+#: __main__.py:4394
+#: __main__.py:4430
+#: __main__.py:4466
+#: __main__.py:4502
+#: __main__.py:4535
+#: __main__.py:4577
+#: __main__.py:4656
+msgid "**Meowth!**"
+msgstr ""
+
+#: __main__.py:4417
+#: __main__.py:4419
+msgid " including {trainer_list} and the people with them! Let them know if there is a group forming"
+msgstr ""
+
+#: __main__.py:4420
+msgid " {trainer_count} interested{including_string}!"
+msgstr ""
+
+#: __main__.py:4453
+#: __main__.py:4455
+msgid " including {trainer_list} and the people with them! Be considerate and wait for them if possible"
+msgstr ""
+
+#: __main__.py:4456
+msgid " {trainer_count} on the way{including_string}!"
+msgstr ""
+
+#: __main__.py:4489
+#: __main__.py:4491
+msgid " including {trainer_list} and the people with them! Be considerate and let them know if and when you'll be there"
+msgstr ""
+
+#: __main__.py:4492
+msgid " {trainer_count} waiting at the raid{including_string}!"
+msgstr ""
+
+#: __main__.py:4525
+#: __main__.py:4527
+msgid " including {trainer_list} and the people with them! Use **!lobby** if you are joining them or **!backout** to request a backout"
+msgstr ""
+
+#: __main__.py:4528
+msgid " {trainer_count} in the lobby{including_string}!"
+msgstr ""
+
+#: __main__.py:4568
+msgid ""
+" Boss numbers for the raid:\n"
+"{}"
+msgstr ""
+
+#: __main__.py:4570
+msgid " Nobody has told me what boss they want!"
+msgstr ""
+
+#: __main__.py:4606
+msgid "**{grey_number} total,** {greymaybe} interested, {greycoming} coming, {greywaiting} waiting"
+msgstr ""
+
+#: __main__.py:4610
+msgid ""
+" Team numbers for the raid:\n"
+"{}"
+msgstr ""
+
+#: __main__.py:4612
+msgid " Nobody has updated their status!"
+msgstr ""
+
+#: __main__.py:4666
+msgid " Your current **!want** list is: ```{wantlist}```"
+msgstr ""
+
+#: __main__.py:4668
+msgid " You don't have any wants! use **!want** to add some."
+msgstr ""
+
+####################### MAIN END - ERRORS BEGIN #######################
+
+#: errors.py:81
+msgid "Meowth! I'm missing some details! Usage: {prefix}{command}"
+msgstr ""
+
+#: errors.py:109
+msgid "Meowth! Team Management is not enabled on this server. **!{cmd_name}** is unable to be used."
+msgstr ""
+
+#: errors.py:113
+msgid "Meowth! Pokemon Management is not enabled on this server. **!{cmd_name}** is unable to be used."
+msgstr ""
+
+#: errors.py:117
+msgid "Meowth! Wild Reporting is not enabled on this server. **!{cmd_name}** is unable to be used."
+msgstr ""
+
+#: errors.py:121
+msgid "Meowth! Raid Management is not enabled on this server. **!{cmd_name}** is unable to be used."
+msgstr ""
+
+#: errors.py:126
+msgid "Meowth! Please use **!{cmd_name}** in "
+msgstr ""
+
+#: errors.py:129
+#: errors.py:202
+#: errors.py:215
+#: errors.py:228
+#: errors.py:241
+msgid "a Region report channel."
+msgstr ""
+
+#: errors.py:131
+#: errors.py:204
+#: errors.py:217
+#: errors.py:230
+#: errors.py:243
+msgid "one of the following region channels:"
+msgstr ""
+
+#: errors.py:139
+msgid "Meowth! Please use **!{cmd_name}** in the following channel"
+msgstr ""
+
+#: errors.py:142
+msgid ""
+"s:\n"
+msgstr ""
+
+#: errors.py:144
+msgid ": "
+msgstr ""
+
+#: errors.py:156
+msgid "Meowth! Please use **!{cmd_name}** in a Raid channel. Use **!list** in any "
+msgstr ""
+
+#: errors.py:159
+#: errors.py:172
+#: errors.py:189
+msgid "Region report channel to see active raids."
+msgstr ""
+
+#: errors.py:161
+#: errors.py:174
+#: errors.py:191
+msgid "of the following Region channels to see active raids:"
+msgstr ""
+
+#: errors.py:169
+msgid "Meowth! Please use **!{cmd_name}** in an Egg channel. Use **!list** in any "
+msgstr ""
+
+#: errors.py:181
+msgid "Meowth! **!{cmd_name}** can't be used in a Raid channel."
+msgstr ""
+
+#: errors.py:186
+msgid "Meowth! Please use **!{cmd_name}** in an Active Raid channel. Use **!list** in any "
+msgstr ""
+
+#: errors.py:199
+msgid "Meowth! Please use **!{cmd_name}** in either a Raid channel or "
+msgstr ""
+
+#: errors.py:212
+msgid "Meowth! Please use **!{cmd_name}** in either a Raid Egg channel or "
+msgstr ""
+
+#: errors.py:225
+msgid "Meowth! Please use **!{cmd_name}** in either a EX Raid channel or one of the following region channels:"
+msgstr ""
+
+#: errors.py:238
+msgid "Meowth! Please use **!{cmd_name}** in a EX Raid channel. Use **!list** in any of the following region channels to see active raids:"
 msgstr ""

@@ -1447,7 +1447,7 @@ async def configure(ctx):
                 citychannel_errors = []
                 for item in citychannel_list:
                     if item.isdigit():
-                        channel = discord.utils.get(guild.text_channels, id=item)
+                        channel = discord.utils.get(guild.text_channels, id=int(item))
                         if channel:
                             citychannel_ids.append(channel.id)
                             citychannel_names.append(channel.name)
@@ -1520,7 +1520,7 @@ async def configure(ctx):
                     regioncat_errors = []
                     for item in regioncat_list:
                         if item.isdigit():
-                            category = discord.utils.get(guild.categories, id=item)
+                            category = discord.utils.get(guild.categories, id=int(item))
                             if category:
                                 regioncat_ids.append(category.id)
                                 regioncat_names.append(category.name)
@@ -1566,7 +1566,7 @@ async def configure(ctx):
                     levelcat_errors = []
                     for item in levelcat_list:
                         if item.isdigit():
-                            category = discord.utils.get(guild.categories, id=item)
+                            category = discord.utils.get(guild.categories, id=int(item))
                             if category:
                                 levelcat_ids.append(category.id)
                                 levelcat_names.append(category.name)
@@ -1838,10 +1838,10 @@ async def setstatus(ctx, member: discord.Member, status,*, status_counts: str = 
 @commands.has_permissions(manage_guild=True)
 async def cleanroles(ctx):
     cleancount = 0
-    for role in ctx.guild.roles:
+    for role in copy.copy(ctx.guild.roles):
         if role.members == [] and role.name in pkmn_info['pokemon_list']:
-            await role.delete()
-            await asyncio.sleep(0.25)
+            server_role = discord.utils.get(ctx.guild.roles, name=role.name)
+            await server_role.delete()
             cleancount += 1
     await ctx.message.channel.send(_("Removed {cleancount} empty roles").format(cleancount=cleancount))
 

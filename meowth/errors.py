@@ -185,6 +185,7 @@ def custom_error_handling(bot, logger):
             guild = ctx.guild
             msg = _('Meowth! Please use **!{cmd_name}** in an Active Raid channel. Use **!list** in any ').format(cmd_name=ctx.command.name)
             city_channels = bot.guild_dict[guild.id]['city_channels']
+            egg_check = bot.guild_dict[guild.id]['raidchannel_dict'].get(ctx.channel.id, None).get('type',None)
             if len(city_channels) > 10:
                 msg += _('Region report channel to see active raids.')
             else:
@@ -192,6 +193,8 @@ def custom_error_handling(bot, logger):
                 for c in city_channels:
                     channel = discord.utils.get(guild.channels, id=c)
                     msg += '\n' + channel.mention
+            if egg_check == "egg":
+                msg += '\nThis is an egg channel. The channel needs to be activated with **!raid <pokemon>** before I accept commands!'
             await ctx.channel.send(msg)
             pass
         elif isinstance(error, CityRaidChannelCheckFail):

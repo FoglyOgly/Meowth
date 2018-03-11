@@ -1608,7 +1608,7 @@ msgstr ""
 
 #: __main__.py:3569
 msgid ""
-"{pkmn} | {weather}\n"
+"{pkmn} | {weather}"
 msgstr ""
 
 #: __main__.py:3570

@@ -2666,6 +2666,10 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
         starttime = eggdetails['starttime']
     except KeyError:
         starttime = None
+    try:
+        duplicate = eggdetails['duplicate']
+    except KeyError:
+        duplicate = None
     if not author:
         try:
             raid_messageauthor = raid_message.mentions[0]
@@ -2761,6 +2765,8 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
     }
     if starttime:
         guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id]['starttime'] = starttime
+    if duplicate:
+        guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id]['duplicate'] = duplicate
     if author:
         await _edit_party(raid_channel, author)
     event_loop.create_task(expiry_check(raid_channel))
@@ -3328,19 +3334,32 @@ async def recover(ctx):
                                 status = None
                             if 'trainers' in message.content:
                                 messagesplit = message.content.split()
-                                if messagesplit[(- 2)].isdigit():
-                                    count = int(messagesplit[(- 2)])
-                                else:
-                                    count = 1
                                 if messagesplit[-1].isdigit():
+                                    count = int(messagesplit[-13])
                                     party = [int(messagesplit[-10]),int(messagesplit[-7]),int(messagesplit[-4]),int(messagesplit[-1])]
                                 else:
+                                    count = 1
                                     party = [0,0,0,count]
                             else:
                                 count = 1
+                                user = ctx.guild.get_member(trainerid)
+                                for role in user.roles:
+                                    if role.name.lower() == 'mystic':
+                                        party = [1,0,0,0]
+                                        break
+                                    elif role.name.lower() == 'valor':
+                                        party = [0,1,0,0]
+                                        break
+                                    elif role.name.lower() == 'instinct':
+                                        party = [0,0,1,0]
+                                        break
+                                    else:
+                                        party = [0,0,0,1]
+
                             trainer_dict[trainerid] = {
                                 'status': status,
                                 'count': count,
+                                'party': party
                             }
                         else:
                             continue
@@ -3372,6 +3391,7 @@ async def recover(ctx):
             recovermsg += "\nI'm not sure when this {raidtype} will {action}, so please use **!timerset** if you can!".format(raidtype=raidtype, action=action)
         else:
             recovermsg += ('\n' + bulletpoint) + (await print_raid_timer(channel))
+        await _edit_party(channel)
         await channel.send(recovermsg)
         event_loop.create_task(expiry_check(channel))
 
@@ -3578,7 +3598,7 @@ async def interested(ctx, *, teamcounts: str=None):
             bluecount = str(trainer_dict[ctx.author.id]['party'][0]) + 'm '
             redcount = str(trainer_dict[ctx.author.id]['party'][1]) + 'v '
             yellowcount = str(trainer_dict[ctx.author.id]['party'][2]) + 'i '
-            unknowncount = str(trainer_dict[ctx.author.id]['party'][3]) + 'i '
+            unknowncount = str(trainer_dict[ctx.author.id]['party'][3]) + 'u '
             teamcounts = ((((str(trainer_dict[ctx.author.id]['count']) + ' ') + bluecount) + redcount) + yellowcount) + unknowncount
         else:
             teamcounts = '1'

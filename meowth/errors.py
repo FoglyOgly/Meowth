@@ -194,7 +194,7 @@ def custom_error_handling(bot, logger):
                     channel = discord.utils.get(guild.channels, id=c)
                     msg += '\n' + channel.mention
             if egg_check == "egg":
-                msg += '\nThe channel needs to be activated with **!raid <pokemon>** before commands work!'
+                msg += '\nThis is an egg channel. The channel needs to be activated with **!raid <pokemon>** before I accept commands!'
             await ctx.channel.send(msg)
             pass
         elif isinstance(error, CityRaidChannelCheckFail):

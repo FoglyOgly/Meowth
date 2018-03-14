@@ -3356,7 +3356,7 @@ async def recover(ctx):
                                 messagesplit = message.content.split()
                                 if messagesplit[-1].isdigit():
                                     party = [int(messagesplit[-10]),int(messagesplit[-7]),int(messagesplit[-4]),int(messagesplit[-1])]
-                                    count = party[0] + party[1] + party[2] + party[3] 
+                                    count = sum(party)
                                 else:
                                     count = 1
                                     party = [0,0,0,1]

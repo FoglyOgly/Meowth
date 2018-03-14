@@ -1277,7 +1277,7 @@ async def configure(ctx):
                                  "**{&role}** - Replace role name or ID (shows as @deleted-role DM preview)\n"
                                  "**{user}** - Will mention the new user\n"
                                  "**{server}** - Will print your server's name\n"
-                                 "Surround your message with [] to send it as an embed. **Warning:** Mentions within embeds may be broken on mobile, this is a Discord bug."))).set_author(name="Welcome Message", icon_url=Meowth.user.avatar_url))
+                                 "Surround your message with [] to send it as an embed. **Warning:** Mentions within embeds may be broken on mobile, this is a Discord bug."))).set_author(name=_("Welcome Message"), icon_url=Meowth.user.avatar_url))
                 while True:
                     welcomemsgreply = await Meowth.wait_for('message', check=(lambda message: (message.guild == None) and (message.author == owner)))
                     if welcomemsgreply.content.lower() == 'n':
@@ -1902,15 +1902,15 @@ async def about(ctx):
         guild_count += 1
         member_count += len(guild.members)
     embed = discord.Embed(colour=embed_colour, icon_url=Meowth.user.avatar_url)
-    embed.add_field(name='About Meowth', value=about, inline=False)
-    embed.add_field(name='Owner', value=owner)
+    embed.add_field(name=_('About Meowth'), value=about, inline=False)
+    embed.add_field(name=_('Owner'), value=owner)
     if guild_count > 1:
-        embed.add_field(name='Servers', value=guild_count)
-        embed.add_field(name='Members', value=member_count)
-    embed.add_field(name="Your Server", value=yourserver)
-    embed.add_field(name="Your Members", value=yourmembers)
-    embed.add_field(name='Uptime', value=uptime_str)
-    embed.set_footer(text='For support, contact us on our Discord server. Invite Code: hhVjAN8')
+        embed.add_field(name=_('Servers'), value=guild_count)
+        embed.add_field(name=_('Members'), value=member_count)
+    embed.add_field(name=_("Your Server"), value=yourserver)
+    embed.add_field(name=_("Your Members"), value=yourmembers)
+    embed.add_field(name=_('Uptime'), value=uptime_str)
+    embed.set_footer(text=_('For support, contact us on our Discord server. Invite Code: hhVjAN8'))
     try:
         await channel.send(embed=embed)
     except discord.HTTPException:
@@ -3354,18 +3354,16 @@ async def recover(ctx):
                                 status = None
                             if _('trainers') in message.content:
                                 messagesplit = message.content.split()
-                                if messagesplit[(- 2)].isdigit():
-                                    count = int(messagesplit[(- 2)])
-                                else:
-                                    count = 1
                                 if messagesplit[-1].isdigit():
                                     party = [int(messagesplit[-10]),int(messagesplit[-7]),int(messagesplit[-4]),int(messagesplit[-1])]
-                                    count = int(messagesplit[-10]) + int(messagesplit[-7]) + int(messagesplit[-4]) + int(messagesplit[-1])
+                                    count = party[0] + party[1] + party[2] + party[3] 
                                 else:
-                                    party = [0,0,0,count]
+                                    count = 1
+                                    party = [0,0,0,1]
                             else:
                                 count = 1
-                                for role in message.raw_mentions.roles:
+                                user = ctx.guild.get_member(trainerid)
+                                for role in user.roles:
                                     if role.name.lower() == 'mystic':
                                         party = [1,0,0,0]
                                         break
@@ -3380,7 +3378,7 @@ async def recover(ctx):
                             trainer_dict[trainerid] = {
                                 'status': status,
                                 'count': count,
-                                'party': party,
+                                'party': party
                             }
                         else:
                             continue
@@ -3399,8 +3397,7 @@ async def recover(ctx):
             'pokemon': pokemon,
             'egglevel': egglevel,
         }
-        for trainerid in guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['trainer_dict']:
-            await _edit_party(channel, Meowth.get_user_info(trainerid))
+        await _edit_party(channel, message.author)
         recovermsg = _("Meowth! This channel has been recovered! However, there may be some inaccuracies in what I remembered! Here's what I have:")
         bulletpoint = parse_emoji(ctx.guild, ':small_blue_diamond:')
         recovermsg += ('\n' + bulletpoint) + (await _interest(ctx))
@@ -3748,7 +3745,7 @@ async def coming(ctx, *, teamcounts: str=None):
 
     if teamcounts and teamcounts.split()[0].isdigit():
         total = int(teamcounts.split()[0])
-    elif ctx.author.id in trainer_dict:
+    elif (ctx.author.id in trainer_dict) and (trainer_dict[ctx.author.id]['status'] != None):
         total = trainer_dict[ctx.author.id]['count']
     elif teamcounts:
         total = sum([int(s) for s in teamcounts if s.isdigit()])
@@ -3850,7 +3847,7 @@ async def here(ctx, *, teamcounts: str=None):
             teamcounts = '1'
     if teamcounts and teamcounts.split()[0].isdigit():
         total = int(teamcounts.split()[0])
-    elif ctx.author.id in trainer_dict:
+    elif (ctx.author.id in trainer_dict) and (trainer_dict[ctx.author.id]['status'] != None):
         total = trainer_dict[ctx.author.id]['count']
     elif teamcounts:
         total = sum([int(s) for s in teamcounts if s.isdigit()])
@@ -4094,7 +4091,7 @@ async def lobby(ctx, *, count: str=None):
         else:
             await ctx.channel.send(_("Meowth! I can't understand how many are in your group. Just say **!here** if you're by yourself, or **!coming 5** for example if there are 5 in your group."))
             return
-    elif ctx.author.id in trainer_dict:
+    elif (ctx.author.id in trainer_dict) and (trainer_dict[ctx.author.id]['status'] != None):
         count = trainer_dict[ctx.author.id]['count']
     else:
         count = 1

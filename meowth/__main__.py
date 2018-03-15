@@ -4687,6 +4687,47 @@ async def _wantlist(ctx):
         listmsg = _(" You don't have any wants! use **!want** to add some.")
     return listmsg
 
+@_get.command()
+@commands.has_permissions(manage_guild=True)
+async def perms(ctx):
+    """Show Meowth's permissions for the guild and channel."""
+    guild_perms = ctx.guild.me.guild_permissions
+    chan_perms = ctx.channel.permissions_for(ctx.guild.me)
+    req_perms = discord.Permissions(268822608)
+    g_perms_compare = guild_perms >= req_perms
+    c_perms_compare = chan_perms >= req_perms
+    data_file = 'permissions.json'
+    msg = f"**Guild:**\n{ctx.guild}\nID {ctx.guild.id}\n"
+    msg += f"**Channel:**\n{ctx.channel}\nID {ctx.channel.id}\n"
+    msg += "```py\nGuild     | Channel\n"
+    msg +=   "----------|----------\n"
+    msg += "{} | {}\n".format(guild_perms.value, chan_perms.value)
+    msg += "{0:9} | {1}```".format(str(g_perms_compare), str(c_perms_compare))
+    y_emj = ":white_small_square:"
+    n_emj = ":black_small_square:"
+
+    with open(os.path.join('data', data_file), "r") as perm_json:
+        perm_dict = json.load(perm_json)
+
+    for perm, bitshift in perm_dict.items():
+        if bool((req_perms.value >> bitshift) & 1):
+            guild_bool = bool((guild_perms.value >> bitshift) & 1)
+            channel_bool = bool((chan_perms.value >> bitshift) & 1)
+            guild_e = y_emj if guild_bool else n_emj
+            channel_e = y_emj if channel_bool else n_emj
+            msg += f"{guild_e} {channel_e}  {perm}\n"
+
+
+    embed = discord.Embed(description=msg, colour=ctx.guild.me.colour)
+    embed.set_author(name='Bot Permissions', icon_url="https://i.imgur.com/wzryVaS.png")
+    try:
+        if chan_perms.embed_links:
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send(msg)
+    except discord.errors.Forbidden:
+        await ctx.author.send(embed=embed)
+
 try:
     event_loop.run_until_complete(Meowth.start(config['bot_token']))
 except discord.LoginFailure:

@@ -1041,10 +1041,13 @@ async def prefix(ctx):
 
 @_get.command()
 @commands.has_permissions(manage_guild=True)
-async def perms(ctx):
+async def perms(ctx, channel_id = None):
     """Show Meowth's permissions for the guild and channel."""
-    guild_perms = ctx.guild.me.guild_permissions
-    chan_perms = ctx.channel.permissions_for(ctx.guild.me)
+    channel = discord.utils.get(ctx.bot.get_all_channels(), id=channel_id)
+    guild = channel.guild if channel else ctx.guild
+    channel = channel or ctx.channel
+    guild_perms = guild.me.guild_permissions
+    chan_perms = channel.permissions_for(guild.me)
     req_perms = discord.Permissions(268822608)
     g_perms_compare = guild_perms >= req_perms
     c_perms_compare = chan_perms >= req_perms
@@ -1073,7 +1076,7 @@ async def perms(ctx):
     embed = discord.Embed(description=msg, colour=ctx.guild.me.colour)
     embed.set_author(name='Bot Permissions', icon_url="https://i.imgur.com/wzryVaS.png")
     try:
-        if chan_perms.embed_links:
+        if ctx.channel.permissions_for(ctx.guild.me).embed_links:
             await ctx.send(embed=embed)
         else:
             await ctx.send(msg)

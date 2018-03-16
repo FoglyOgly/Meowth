@@ -1853,7 +1853,7 @@ async def changeraid(ctx, newraid):
         await _eggtoraid(newraid, channel, author=message.author)
 
 @Meowth.command()
-@commands.has_permissions(manage_guild=True)
+@commands.has_permissions(manage_channels=True)
 @checks.raidchannel()
 async def clearstatus(ctx):
     """Clears raid channel status lists.
@@ -1877,7 +1877,7 @@ async def clearstatus(ctx):
         pass
 
 @Meowth.command()
-@commands.has_permissions(manage_guild=True)
+@commands.has_permissions(manage_channels=True)
 @checks.raidchannel()
 async def setstatus(ctx, member: discord.Member, status,*, status_counts: str = ''):
     """Changes raid channel status lists.
@@ -3421,7 +3421,6 @@ async def recover(ctx):
                             if _('trainers') in message.content:
                                 messagesplit = message.content.split()
                                 if messagesplit[-1].isdigit():
-                                    count = int(messagesplit[-13])
                                     party = [int(messagesplit[-10]),int(messagesplit[-7]),int(messagesplit[-4]),int(messagesplit[-1])]
                                     count = sum(party)
                                 else:
@@ -4227,7 +4226,7 @@ async def _cancel(channel, author):
 
 @Meowth.command()
 @checks.activeraidchannel()
-async def starting(ctx):
+async def starting(ctx, team: str = ''):
     """Signal that a raid is starting.
 
     Usage: !starting
@@ -4235,11 +4234,17 @@ async def starting(ctx):
     for a second group must reannounce with the :here: emoji or !here."""
     ctx_startinglist = []
     id_startinglist = []
+    team_list = []
     trainer_dict = copy.deepcopy(guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict'])
     for trainer in trainer_dict:
-        if trainer_dict[trainer]['status'] == 'waiting':
+        user = ctx.guild.get_member(trainer)
+        if team:
+            for role in ctx.author.roles:
+                if role.name.lower() == team:
+                    team_list.append(user.id)
+                    break
+        if trainer_dict[trainer]['status'] == 'waiting' and (user.id in team_list or not team):
             trainer_dict[trainer]['status'] = 'lobby'
-            user = ctx.guild.get_member(trainer)
             ctx_startinglist.append(user.mention)
             id_startinglist.append(trainer)
     guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict'] = trainer_dict
@@ -4392,17 +4397,17 @@ async def list(ctx):
                 ctx_omwcount = 0
                 ctx_maybecount = 0
                 ctx_lobbycount = 0
-                for trainer in rc_d[r]['trainer_dict'].values():
+                for trainer in rc_d[r]['trainer_dict'].keys():
                     if not ctx.guild.get_member(trainer):
                         continue
-                    if trainer['status'] == 'waiting':
-                        ctx_waitingcount += trainer['count']
-                    elif trainer['status'] == 'omw':
-                        ctx_omwcount += trainer['count']
-                    elif trainer['status'] == 'maybe':
-                        ctx_maybecount += trainer['count']
-                    elif trainer['status'] == 'lobby':
-                        ctx_lobbycount += trainer['count']
+                    if trainer_dict[trainer]['status'] == 'waiting':
+                        ctx_waitingcount += trainer_dict[trainer]['count']
+                    elif trainer_dict[trainer]['status'] == 'omw':
+                        ctx_omwcount += trainer_dict[trainer]['count']
+                    elif trainer_dict[trainer]['status'] == 'maybe':
+                        ctx_maybecount += trainer_dict[trainer]['count']
+                    elif trainer_dict[trainer]['status'] == 'lobby':
+                        ctx_lobbycount += trainer_dict[trainer]['count']
                 if rc_d[r]['manual_timer'] == False:
                     assumed_str = _(' (assumed)')
                 else:
@@ -4468,6 +4473,99 @@ async def list(ctx):
 
 @list.command()
 @checks.activeraidchannel()
+async def mystic(ctx, tag=False):
+    "List mentions of the users that have RSVP'd to a raid.\n\n    Usage: !list tags\n    Works only in raid channels."
+    guild = ctx.guild
+    channel = ctx.channel
+    now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[guild.id]['offset'])
+    if checks.check_raidchannel(ctx):
+        if checks.check_raidactive(ctx):
+            listmsg = _('**Meowth!** ')
+            guild = ctx.guild
+            channel = ctx.channel
+            bulletpoint = parse_emoji(ctx.guild, ':mystic:')
+            starttime = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('starttime',None)
+            rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
+            if " 0 interested!" not in await _interest(ctx):
+                listmsg += ('\n' + bulletpoint) + (await _interest(ctx, tag=False, team="mystic"))
+            if " 0 on the way!" not in await _otw(ctx):
+                listmsg += ('\n' + bulletpoint) + (await _otw(ctx, tag=False, team="mystic"))
+            if " 0 waiting at the raid!" not in await _waiting(ctx):
+                listmsg += ('\n' + bulletpoint) + (await _waiting(ctx, tag=False, team="mystic"))
+            if " 0 in the lobby!" not in await _lobbylist(ctx):
+                listmsg += ('\n' + bulletpoint) + (await _lobbylist(ctx, tag=False, team="mystic"))
+            if (len(listmsg.splitlines()) <= 1):
+                listmsg +=  ('\n' + bulletpoint) + (" Nobody has updated their status yet!")
+            listmsg += ('\n' + bulletpoint) + (await print_raid_timer(channel))
+            if starttime and (starttime > now):
+                listmsg += _('\nThe next group will be starting at **{}**').format(starttime.strftime(_('%I:%M %p (%H:%M)')))
+            await channel.send(listmsg)
+            return
+
+@list.command()
+@checks.activeraidchannel()
+async def valor(ctx, tag=False):
+    "List mentions of the users that have RSVP'd to a raid.\n\n    Usage: !list tags\n    Works only in raid channels."
+    guild = ctx.guild
+    channel = ctx.channel
+    now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[guild.id]['offset'])
+    if checks.check_raidchannel(ctx):
+        if checks.check_raidactive(ctx):
+            listmsg = _('**Meowth!** ')
+            guild = ctx.guild
+            channel = ctx.channel
+            bulletpoint = parse_emoji(ctx.guild, ':valor:')
+            starttime = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('starttime',None)
+            rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
+            if " 0 interested!" not in await _interest(ctx):
+                listmsg += ('\n' + bulletpoint) + (await _interest(ctx, tag=False, team="valor"))
+            if " 0 on the way!" not in await _otw(ctx):
+                listmsg += ('\n' + bulletpoint) + (await _otw(ctx, tag=False, team="valor"))
+            if " 0 waiting at the raid!" not in await _waiting(ctx):
+                listmsg += ('\n' + bulletpoint) + (await _waiting(ctx, tag=False, team="valor"))
+            if " 0 in the lobby!" not in await _lobbylist(ctx):
+                listmsg += ('\n' + bulletpoint) + (await _lobbylist(ctx, tag=False, team="valor"))
+            if (len(listmsg.splitlines()) <= 1):
+                listmsg +=  ('\n' + bulletpoint) + (" Nobody has updated their status yet!")
+            listmsg += ('\n' + bulletpoint) + (await print_raid_timer(channel))
+            if starttime and (starttime > now):
+                listmsg += _('\nThe next group will be starting at **{}**').format(starttime.strftime(_('%I:%M %p (%H:%M)')))
+            await channel.send(listmsg)
+            return
+
+@list.command()
+@checks.activeraidchannel()
+async def instinct(ctx, tag=False):
+    "List mentions of the users that have RSVP'd to a raid.\n\n    Usage: !list tags\n    Works only in raid channels."
+    guild = ctx.guild
+    channel = ctx.channel
+    now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[guild.id]['offset'])
+    if checks.check_raidchannel(ctx):
+        if checks.check_raidactive(ctx):
+            listmsg = _('**Meowth!** ')
+            guild = ctx.guild
+            channel = ctx.channel
+            bulletpoint = parse_emoji(ctx.guild, ':instinct:')
+            starttime = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('starttime',None)
+            rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
+            if " 0 interested!" not in await _interest(ctx):
+                listmsg += ('\n' + bulletpoint) + (await _interest(ctx, tag=False, team="instinct"))
+            if " 0 on the way!" not in await _otw(ctx):
+                listmsg += ('\n' + bulletpoint) + (await _otw(ctx, tag=False, team="instinct"))
+            if " 0 waiting at the raid!" not in await _waiting(ctx):
+                listmsg += ('\n' + bulletpoint) + (await _waiting(ctx, tag=False, team="instinct"))
+            if " 0 in the lobby!" not in await _lobbylist(ctx):
+                listmsg += ('\n' + bulletpoint) + (await _lobbylist(ctx, tag=False, team="instinct"))
+            if (len(listmsg.splitlines()) <= 1):
+                listmsg +=  ('\n' + bulletpoint) + (" Nobody has updated their status yet!")
+            listmsg += ('\n' + bulletpoint) + (await print_raid_timer(channel))
+            if starttime and (starttime > now):
+                listmsg += _('\nThe next group will be starting at **{}**').format(starttime.strftime(_('%I:%M %p (%H:%M)')))
+            await channel.send(listmsg)
+            return
+
+@list.command()
+@checks.activeraidchannel()
 async def interested(ctx, tag=False):
     """Lists the number and users who are interested in the raid.
 
@@ -4477,23 +4575,30 @@ async def interested(ctx, tag=False):
     listmsg += await _interest(ctx)
     await ctx.channel.send(listmsg)
 
-async def _interest(ctx, tag=False):
+async def _interest(ctx, tag=False, team=False):
     ctx_maybecount = 0
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[ctx.channel.guild.id]['offset'])
     trainer_dict = copy.deepcopy(guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict'])
-    for trainer in trainer_dict:
-        memberexists = ctx.guild.get_member(trainer)
-        if (trainer_dict[trainer]['status'] == 'maybe') and memberexists:
-            ctx_maybecount += trainer_dict[trainer]['count']
     maybe_exstr = ''
     maybe_list = []
     name_list = []
+    team_list = []
     for trainer in trainer_dict.keys():
-        memberexists = ctx.guild.get_member(trainer)
-        if (trainer_dict[trainer]['status'] == 'maybe') and memberexists:
-            user = ctx.guild.get_member(trainer)
+        user = ctx.guild.get_member(trainer)
+        if team:
+            for role in ctx.author.roles:
+                if role.name.lower() == team:
+                    team_list.append(user.id)
+                    break
+        if (trainer_dict[trainer]['status'] == 'maybe') and user and team == False:
+            ctx_maybecount += trainer_dict[trainer]['count']
             name_list.append(('**' + user.name) + '**')
             maybe_list.append(user.mention)
+        elif (trainer_dict[trainer]['status'] == 'maybe') and user and team:
+            if user.id in team_list:
+                ctx_maybecount += trainer_dict[trainer]['count']
+                name_list.append(('**' + user.name) + '**')
+                maybe_list.append(user.mention)
     if ctx_maybecount > 0:
         if (now.time() >= datetime.time(5, 0)) and (now.time() <= datetime.time(21, 0)) and (tag == True):
             maybe_exstr = _(' including {trainer_list} and the people with them! Let them know if there is a group forming').format(trainer_list=', '.join(maybe_list))
@@ -4513,23 +4618,30 @@ async def coming(ctx, tag=False):
     listmsg += await _otw(ctx)
     await ctx.channel.send(listmsg)
 
-async def _otw(ctx, tag=False):
+async def _otw(ctx, tag=False, team=False):
     ctx_omwcount = 0
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[ctx.channel.guild.id]['offset'])
     trainer_dict = copy.deepcopy(guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict'])
-    for trainer in trainer_dict:
-        memberexists = ctx.guild.get_member(trainer)
-        if (trainer_dict[trainer]['status'] == 'omw') and memberexists:
-            ctx_omwcount += trainer_dict[trainer]['count']
     otw_exstr = ''
     otw_list = []
     name_list = []
+    team_list = []
     for trainer in trainer_dict.keys():
-        memberexists = ctx.guild.get_member(trainer)
-        if (trainer_dict[trainer]['status'] == 'omw') and memberexists:
-            user = ctx.guild.get_member(trainer)
+        user = ctx.guild.get_member(trainer)
+        if team:
+            for role in ctx.author.roles:
+                if role.name.lower() == team:
+                    team_list.append(memberexists.id)
+                    break
+        if (trainer_dict[trainer]['status'] == 'omw') and user and team == False:
+            ctx_omwcount += trainer_dict[trainer]['count']
             name_list.append(('**' + user.name) + '**')
             otw_list.append(user.mention)
+        elif (trainer_dict[trainer]['status'] == 'omw') and user and team:
+            if user.id in team_list:
+                ctx_omwcount += trainer_dict[trainer]['count']
+                name_list.append(('**' + user.name) + '**')
+                otw_list.append(user.mention)
     if ctx_omwcount > 0:
         if (now.time() >= datetime.time(5, 0)) and (now.time() <= datetime.time(21, 0)) and (tag == True):
             otw_exstr = _(' including {trainer_list} and the people with them! Be considerate and wait for them if possible').format(trainer_list=', '.join(otw_list))
@@ -4549,23 +4661,30 @@ async def here(ctx, tag=False):
     listmsg += await _waiting(ctx)
     await ctx.channel.send(listmsg)
 
-async def _waiting(ctx, tag=False):
+async def _waiting(ctx, tag=False, team=False):
     ctx_waitingcount = 0
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[ctx.channel.guild.id]['offset'])
     trainer_dict = copy.deepcopy(guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict'])
-    for trainer in trainer_dict:
-        memberexists = ctx.guild.get_member(trainer)
-        if (trainer_dict[trainer]['status'] == 'waiting') and memberexists:
-            ctx_waitingcount += trainer_dict[trainer]['count']
     waiting_exstr = ''
     waiting_list = []
     name_list = []
+    team_list = []
     for trainer in trainer_dict.keys():
-        memberexists = ctx.guild.get_member(trainer)
-        if (trainer_dict[trainer]['status'] == 'waiting') and memberexists:
-            user = ctx.guild.get_member(trainer)
+        user = ctx.guild.get_member(trainer)
+        if team:
+            for role in ctx.author.roles:
+                if role.name.lower() == team:
+                    team_list.append(user.id)
+                    break
+        if (trainer_dict[trainer]['status'] == 'waiting') and user and team == False:
+            ctx_waitingcount += trainer_dict[trainer]['count']
             name_list.append(('**' + user.name) + '**')
             waiting_list.append(user.mention)
+        elif (trainer_dict[trainer]['status'] == 'waiting') and user and team:
+            if user.id in team_list:
+                ctx_waitingcount += trainer_dict[trainer]['count']
+                name_list.append(('**' + user.name) + '**')
+                waiting_list.append(user.mention)
     if ctx_waitingcount > 0:
         if (now.time() >= datetime.time(5, 0)) and (now.time() <= datetime.time(21, 0)) and (tag == True):
             waiting_exstr = _(" including {trainer_list} and the people with them! Be considerate and let them know if and when you'll be there").format(trainer_list=', '.join(waiting_list))
@@ -4585,23 +4704,30 @@ async def lobby(ctx, tag=False):
     listmsg += await _lobbylist(ctx)
     await ctx.channel.send(listmsg)
 
-async def _lobbylist(ctx, tag=False):
+async def _lobbylist(ctx, tag=False, team=False):
     ctx_lobbycount = 0
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[ctx.channel.guild.id]['offset'])
     trainer_dict = copy.deepcopy(guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict'])
-    for trainer in trainer_dict:
-        memberexists = ctx.guild.get_member(trainer)
-        if (trainer_dict[trainer]['status'] == 'lobby') and memberexists:
-            ctx_lobbycount += trainer_dict[trainer]['count']
     lobby_exstr = ''
     lobby_list = []
     name_list = []
+    team_list = []
     for trainer in trainer_dict.keys():
-        memberexists = ctx.guild.get_member(trainer)
-        if (trainer_dict[trainer]['status'] == 'lobby') and memberexists:
-            user = ctx.guild.get_member(trainer)
+        user = ctx.guild.get_member(trainer)
+        if team:
+            for role in ctx.author.roles:
+                if role.name.lower() == team:
+                    team_list.append(memberexists.id)
+                    break
+        if (trainer_dict[trainer]['status'] == 'lobby') and user and team == False:
+            ctx_lobbycount += trainer_dict[trainer]['count']
             name_list.append(('**' + user.name) + '**')
             lobby_list.append(user.mention)
+        elif (trainer_dict[trainer]['status'] == 'lobby') and user and team:
+            if user.id in team_list:
+                ctx_lobbycount += trainer_dict[trainer]['count']
+                name_list.append(('**' + user.name) + '**')
+                lobby_list.append(user.mention)
     if ctx_lobbycount > 0:
         if (now.time() >= datetime.time(5, 0)) and (now.time() <= datetime.time(21, 0)) and (tag == True):
             lobby_exstr = _(' including {trainer_list} and the people with them! Use **!lobby** if you are joining them or **!backout** to request a backout').format(trainer_list=', '.join(lobby_list))

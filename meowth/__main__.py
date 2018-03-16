@@ -12,6 +12,8 @@ import datetime
 from dateutil.relativedelta import relativedelta
 from dateutil import tz
 import copy
+import functools
+import textwrap
 from time import strftime
 from logs import init_loggers
 import discord
@@ -1041,43 +1043,63 @@ async def prefix(ctx):
 
 @_get.command()
 @commands.has_permissions(manage_guild=True)
-async def perms(ctx):
+async def perms(ctx, channel_id = None):
     """Show Meowth's permissions for the guild and channel."""
-    guild_perms = ctx.guild.me.guild_permissions
-    chan_perms = ctx.channel.permissions_for(ctx.guild.me)
+    channel = ctx.bot.get(ctx.bot.get_all_channels(), id=channel_id)
+    guild = channel.guild if channel else ctx.guild
+    channel = channel or ctx.channel
+    guild_perms = guild.me.guild_permissions
+    chan_perms = channel.permissions_for(guild.me)
     req_perms = discord.Permissions(268822608)
-    g_perms_compare = guild_perms >= req_perms
-    c_perms_compare = chan_perms >= req_perms
-    data_file = 'permissions.json'
-    msg = f"**Guild:**\n{ctx.guild}\nID {ctx.guild.id}\n"
-    msg += f"**Channel:**\n{ctx.channel}\nID {ctx.channel.id}\n"
-    msg += "```py\nGuild     | Channel\n"
-    msg +=   "----------|----------\n"
-    msg += "{} | {}\n".format(guild_perms.value, chan_perms.value)
-    msg += "{0:9} | {1}```".format(str(g_perms_compare), str(c_perms_compare))
-    y_emj = ":white_small_square:"
-    n_emj = ":black_small_square:"
-
-    with open(os.path.join('data', data_file), "r") as perm_json:
-        perm_dict = json.load(perm_json)
-
-    for perm, bitshift in perm_dict.items():
-        if bool((req_perms.value >> bitshift) & 1):
-            guild_bool = bool((guild_perms.value >> bitshift) & 1)
-            channel_bool = bool((chan_perms.value >> bitshift) & 1)
-            guild_e = y_emj if guild_bool else n_emj
-            channel_e = y_emj if channel_bool else n_emj
-            msg += f"{guild_e} {channel_e}  {perm}\n"
-
 
     embed = discord.Embed(description=msg, colour=ctx.guild.me.colour)
     embed.set_author(name='Bot Permissions', icon_url="https://i.imgur.com/wzryVaS.png")
+
+    wrap = functools.partial(textwrap.wrap, width=20)
+    names = [wrap(channel.name), wrap(guild.name)]
+    if channel.category:
+        names.append(wrap(channel.category.name))
+    name_len = max(len(n) for n in names)
+    def same_len(txt):
+        return '\n'.join(txt + ([' '] * (name_len-len(txt))))
+    names = [same_len(n) for n in names]
+    chan_msg = [f"**{names[0]}** \n{channel.id} \n"]
+    guild_msg = [f"**{names[1]}** \n{guild.id} \n"]
+    def perms_result(perms):
+        data = []
+        meet_req = perms >= req_perms
+        result = "**PASS**" if meet_req else "**FAIL**"
+        data.append(f"{result} - {perms.value} \n")
+        true_perms = [k for k, v in dict(perms).items() if v is True]
+        false_perms = [k for k, v in dict(perms).items() if v is False]
+        req_perms_list = [k for k, v in dict(req_perms).items() if v is True]
+        true_perms_str = '\n'.join(true_perms)
+        if not meet_req:
+            missing = '\n'.join([p for p in false_perms if p in req_perms_list])
+            data.append(f"**MISSING** \n{missing} \n")
+        if true_perms_str:
+            data.append(f"**ENABLED** \n{true_perms_str} \n")
+        return '\n'.join(data)
+    guild_msg.append(perms_result(guild_perms))
+    chan_msg.append(perms_result(chan_perms))
+    embed.add_field(name='GUILD', value='\n'.join(guild_msg))
+    if channel.category:
+        cat_perms = channel.category.permissions_for(guild.me)
+        cat_msg = [f"**{names[2]}** \n{channel.category.id} \n"]
+        cat_msg.append(perms_result(cat_perms))
+        embed.add_field(name='CATEGORY', value='\n'.join(cat_msg))
+    embed.add_field(name='CHANNEL', value='\n'.join(chan_msg))
+
     try:
-        if chan_perms.embed_links:
-            await ctx.send(embed=embed)
-        else:
-            await ctx.send(msg)
+        await ctx.send(embed=embed)
     except discord.errors.Forbidden:
+        # didn't have permissions to send a message with an embed
+        try:
+            msg = "I couldn't send an embed here, so I've sent you a DM"
+            await ctx.send(msg)
+        except discord.errors.Forbidden:
+            # didn't have permissions to send a message at all
+            pass
         await ctx.author.send(embed=embed)
 
 @Meowth.command()

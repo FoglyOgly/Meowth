@@ -3421,7 +3421,6 @@ async def recover(ctx):
                             if _('trainers') in message.content:
                                 messagesplit = message.content.split()
                                 if messagesplit[-1].isdigit():
-                                    count = int(messagesplit[-13])
                                     party = [int(messagesplit[-10]),int(messagesplit[-7]),int(messagesplit[-4]),int(messagesplit[-1])]
                                     count = sum(party)
                                 else:
@@ -4392,17 +4391,17 @@ async def list(ctx):
                 ctx_omwcount = 0
                 ctx_maybecount = 0
                 ctx_lobbycount = 0
-                for trainer in rc_d[r]['trainer_dict'].values():
+                for trainer in rc_d[r]['trainer_dict'].keys():
                     if not ctx.guild.get_member(trainer):
                         continue
-                    if trainer['status'] == 'waiting':
-                        ctx_waitingcount += trainer['count']
-                    elif trainer['status'] == 'omw':
-                        ctx_omwcount += trainer['count']
-                    elif trainer['status'] == 'maybe':
-                        ctx_maybecount += trainer['count']
-                    elif trainer['status'] == 'lobby':
-                        ctx_lobbycount += trainer['count']
+                    if trainer_dict[trainer]['status'] == 'waiting':
+                        ctx_waitingcount += trainer_dict[trainer]['count']
+                    elif trainer_dict[trainer]['status'] == 'omw':
+                        ctx_omwcount += trainer_dict[trainer]['count']
+                    elif trainer_dict[trainer]['status'] == 'maybe':
+                        ctx_maybecount += trainer_dict[trainer]['count']
+                    elif trainer_dict[trainer]['status'] == 'lobby':
+                        ctx_lobbycount += trainer_dict[trainer]['count']
                 if rc_d[r]['manual_timer'] == False:
                     assumed_str = _(' (assumed)')
                 else:

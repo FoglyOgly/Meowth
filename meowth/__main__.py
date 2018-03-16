@@ -1853,7 +1853,7 @@ async def changeraid(ctx, newraid):
         await _eggtoraid(newraid, channel, author=message.author)
 
 @Meowth.command()
-@commands.has_permissions(manage_guild=True)
+@commands.has_permissions(manage_channels=True)
 @checks.raidchannel()
 async def clearstatus(ctx):
     """Clears raid channel status lists.
@@ -1877,7 +1877,7 @@ async def clearstatus(ctx):
         pass
 
 @Meowth.command()
-@commands.has_permissions(manage_guild=True)
+@commands.has_permissions(manage_channels=True)
 @checks.raidchannel()
 async def setstatus(ctx, member: discord.Member, status,*, status_counts: str = ''):
     """Changes raid channel status lists.

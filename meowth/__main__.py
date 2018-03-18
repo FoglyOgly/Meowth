@@ -569,10 +569,20 @@ async def expire_channel(channel):
                             await channel.set_permissions(overwrite[0], read_messages=False)
                     new_name = _('archived-')
                     new_name += channel.name
-                    await channel.edit(name=new_name)
-                    await channel.send(_('-----------------------------------------------\n**The channel has been marked for archiving and has been removed from view for everybody but Meowth and those with Manage Channel permissions. You will need to delete this channel manually.**\n-----------------------------------------------'))
-                    guild_dict[guild.id]['raidchannel_dict'][channel.id]['active'] = True
-                    guild_dict[guild.id]['raidchannel_dict'][channel.id]['exp'] = time.time() + time.time()
+                    category = guild_dict[channel.guild.id].get('archive', {}).get('category', 'same')
+                    if category == 'same':
+                        newcat = channel.category
+                    else:
+                        newcat = channel.guild.get_channel(category)
+                    await channel.edit(name=new_name, category=newcat)
+                    await channel.send(_('-----------------------------------------------\n**The channel has been archived and removed from view for everybody but Meowth and those with Manage Channel permissions. Any messages that were deleted after the channel was marked for archival will be posted below. You will need to delete this channel manually.**\n-----------------------------------------------'))
+                    logs = guild_dict[channel.guild.id]['raidchannel_dict'][channel.id].get('logs', [])
+                    if logs:
+                        for message in logs:
+                            embed = discord.Embed(colour=message.author.colour, description=message.content, timestamp=message.created_at + datetime.timedelta(hours=guild_dict[channel.guild.id]['offset']))
+                            embed.set_author(str(message.author), icon_url = message.author.avatar_url)
+                            await channel.send(embed=embed)
+                    del guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]
         except:
             pass
 
@@ -867,6 +877,10 @@ async def on_message(message):
     if message.guild != None:
         raid_status = guild_dict[message.guild.id]['raidchannel_dict'].get(message.channel.id, None)
         if raid_status:
+            if guild_dict[message.guild.id].get('archive', {}).get('list', []):
+                for phrase in guild_dict[message.guild.id]['archive']['list']:
+                    if phrase in message.content:
+                        await _archive(message.channel)
             if guild_dict[message.guild.id]['raidchannel_dict'][message.channel.id]['active']:
                 trainer_dict = guild_dict[message.guild.id]['raidchannel_dict'][message.channel.id]['trainer_dict']
                 if message.author.id in trainer_dict:
@@ -933,6 +947,18 @@ async def on_message(message):
         message.content = (((command + '\n') + '\n'.join(firstsplit)) + ' ') + ' '.join(messagelist)
     if (not message.author.bot):
         await Meowth.process_commands(message)
+
+@Meowth.event
+async def on_message_delete(message):
+    guild = message.guild
+    channel = message.channel
+    author = message.author
+    if channel.id in guild_dict[guild.id]['raidchannel_dict']:
+        if guild_dict[guild.id]['raidchannel_dict'][channel.id].get('archive', False):
+            logs = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('logs', [])
+            logs.append(message)
+            guild_dict[guild.id]['raidchannel_dict'][channel.id]['logs'] = logs
+
 
 
 """
@@ -1052,7 +1078,7 @@ async def perms(ctx, channel_id = None):
     chan_perms = channel.permissions_for(guild.me)
     req_perms = discord.Permissions(268822608)
 
-    embed = discord.Embed(description=msg, colour=ctx.guild.me.colour)
+    embed = discord.Embed(colour=ctx.guild.me.colour)
     embed.set_author(name='Bot Permissions', icon_url="https://i.imgur.com/wzryVaS.png")
 
     wrap = functools.partial(textwrap.wrap, width=20)
@@ -1756,6 +1782,42 @@ async def configure(ctx):
                     break
         guild_dict_temp['offset'] = offset
         await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description=_('Timezone set')))
+    if (configcancel == False) and (guild_dict_temp['other'] == True) and (guild_dict_temp['raidset'] == True) and ((firstconfig == True) or (configgoto == 'all') or (configgoto == 'archive') or (configgoto == 'allmain')):
+        await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("The **!archive** command marks temporary raid channels for archival rather than deletion. This can be useful for investigating potential violations of your server's rules in these channels.\n\nWhat category would you like me to place archived channels in? You can say **same** to keep them in the same category, or type the name or ID of a category in your server.")).set_author(name=_('Archive Configuration'), icon_url=Meowth.user.avatar_url))
+        guild_dict_temp['archive'] = {}
+        while True:
+            archivemsg = await Meowth.wait_for('message', check=(lambda message: (message.guild == None) and message.author == owner))
+            if archivemsg.content.lower() == 'cancel':
+                configcancel = True
+                await owner.send(embed=discord.Embed(colour=discord.Colour.red(), description=_('**CONFIG CANCELLED!**\n\nNo changes have been made.')))
+                return
+            if archivemsg.content.lower() == 'same':
+                guild_dict_temp['archive']['category'] = 'same'
+                await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description=_('Archived channels will remain in the same category.')))
+                break
+            else:
+                item = archivemsg.content
+                if item.isdigit():
+                    category = discord.utils.get(guild.categories, id=int(item))
+                    if not category:
+                        await owner.send(embed=discord.Embed(colour=discord.Colour.red(), description=_("I couldn't find the category you replied with! Please reply with **same** to leave archived channels in the same category, or give the name or ID of an existing category.")))
+                        continue
+                else:
+                    name = await letter_case(guild.categories, item.lower())
+                    category = discord.utils.get(guild.categories, name=name)
+                    if not category:
+                        await owner.send(embed=discord.Embed(colour=discord.Colour.red(), description=_("I couldn't find the category you replied with! Please reply with **same** to leave archived channels in the same category, or give the name or ID of an existing category.")))
+                        continue
+                guild_dict_temp['archive']['category'] = category.id
+                await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description=_('Archive category set.')))
+                break
+        await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("I can also listen in your raid channels for words or phrases that you want to trigger an automatic archival. For example, if discussion of spoofing is against your server rules, you might tell me to listen for the word 'spoofing'.\n\nReply with **none** to disable this feature, or reply with a comma separated list of phrases you want me to listen in raid channels for.")).set_author(name=_('Archive Configuration'), icon_url=Meowth.user.avatar_url))
+        phrasesmsg = await Meowth.wait_for('message', check=(lambda message: (message.guild == None) and message.author == owner))
+        if phrasemsg.content.lower() == 'none':
+            guild_dict_temp['archive']['list'] = None
+        phrase_list = phrasemsg.content.lower().split(",").strip()
+        guild_dict_temp['archive']['list'] = phrase_list
+        await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description=_('Phrase list set.')))
     guild_dict_temp['done'] = True
     if configcancel == False:
         guild_dict[guild.id] = guild_dict_temp
@@ -1927,16 +1989,15 @@ async def cleanroles(ctx):
     await ctx.message.channel.send(_("Removed {cleancount} empty roles").format(cleancount=cleancount))
 
 @Meowth.command()
-@commands.has_permissions(manage_messages=True)
 @checks.raidchannel()
 async def archive(ctx):
     message = ctx.message
-    guild = message.guild
     channel = message.channel
-    guild_dict[guild.id]['raidchannel_dict'][channel.id]['archive'] = True
-    await ctx.message.add_reaction('☑')
-    await asyncio.sleep(5)
+    await _archive(channel)
     await ctx.message.delete()
+
+async def _archive(channel):
+    guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['archive'] = True
 
 """
 Miscellaneous

@@ -711,7 +711,7 @@ async def guild_cleanup(loop=True):
         for s in dict_guild_delete:
             try:
                 del guild_dict[s]
-                logger.info(('Server_Cleanup - Cleared ' + s) +
+                logger.info(('Server_Cleanup - Cleared ' + str(s)) +
                             ' from save data')
             except KeyError:
                 pass

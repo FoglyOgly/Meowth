@@ -1192,7 +1192,7 @@ async def announce(ctx, *, announce=None):
     msg += _("to send it to this channel, or ")
     msg += "❎ "
     msg += _("to cancel")
-    rusure = await channel.send(msg).format(owner_msg_add)
+    rusure = await channel.send(msg.format(owner_msg_add))
     res = await ask(rusure, channel, author.id, react_list=reaction_list)
     if res:
         await rusure.delete()

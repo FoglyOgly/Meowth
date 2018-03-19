@@ -954,7 +954,6 @@ async def on_message_delete(message):
             logs = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('logs', [])
             logs.append(message)
             guild_dict[guild.id]['raidchannel_dict'][channel.id]['logs'] = logs
-            print(message.content)
 
 
 

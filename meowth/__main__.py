@@ -4472,6 +4472,7 @@ async def list(ctx):
                     activeraidnum += 1
 
             def list_output(r):
+                trainer_dict = rc_d[r]['trainer_dict']
                 rchan = Meowth.get_channel(r)
                 end = now + datetime.timedelta(seconds=rc_d[r]['exp'] - time.time())
                 output = ''

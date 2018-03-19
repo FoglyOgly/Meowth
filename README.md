@@ -158,9 +158,8 @@ pkmn = Pokemon
 | **!welcome** \[user\] | *Owner Only* | Test welcome message on mentioned member |
 | **!configure** | *Server Manager Only* | Configure Meowth |
 | **!reload_json** | *Owner Only* | reloads JSON files for the server |
-| **!raid_json \[level\] \[bosslist\] | *Owner Only* | Edits or displays raid_info.json |
+| **!raid_json** \[level\] \[bosslist\] | *Owner Only* | Edits or displays raid_info.json |
 | **!changeraid** \[level or boss\] | *Channel Manager Only* | Changes raid boss or egg level |
-| **!raid_json \[level\] \[bosslist\] | *Owner Only* | Edits or displays raid_info.json |
 | **!clearstatus**  | *Channel Manager<br/>Raid Channel* | Cancel everyone's status. |
 | **!setstatus** \<user\> \<status\> \[count\] | *Channel Manager<br/>Raid Channel* | Changes raid channel status lists. |
 | **!cleanroles** | *Channel Manager* | Removes all 0 member pokemon roles. |

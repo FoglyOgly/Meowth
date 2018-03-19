@@ -4672,7 +4672,7 @@ async def _interest(ctx, tag=False, team=False):
     for trainer in trainer_dict.keys():
         user = ctx.guild.get_member(trainer)
         if team:
-            for role in ctx.author.roles:
+            for role in user.roles:
                 if role.name.lower() == team:
                     name_list.append(('**' + user.name) + '**')
                     maybe_list.append(user.mention)
@@ -4716,7 +4716,7 @@ async def _otw(ctx, tag=False, team=False):
     for trainer in trainer_dict.keys():
         user = ctx.guild.get_member(trainer)
         if team:
-            for role in ctx.author.roles:
+            for role in user.roles:
                 if role.name.lower() == team:
                     name_list.append(('**' + user.name) + '**')
                     otw_list.append(user.mention)
@@ -4760,7 +4760,7 @@ async def _waiting(ctx, tag=False, team=False):
     for trainer in trainer_dict.keys():
         user = ctx.guild.get_member(trainer)
         if team:
-            for role in ctx.author.roles:
+            for role in user.roles:
                 if role.name.lower() == team:
                     name_list.append(('**' + user.name) + '**')
                     waiting_list.append(user.mention)
@@ -4804,7 +4804,7 @@ async def _lobbylist(ctx, tag=False, team=False):
     for trainer in trainer_dict.keys():
         user = ctx.guild.get_member(trainer)
         if team:
-            for role in ctx.author.roles:
+            for role in user.roles:
                 if role.name.lower() == team:
                     name_list.append(('**' + user.name) + '**')
                     lobby_list.append(user.mention)

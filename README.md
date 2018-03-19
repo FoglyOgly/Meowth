@@ -82,7 +82,18 @@ Windows:
 py -m pip install -U git+https://github.com/Rapptz/discord.py@rewrite
 ```
 
-15. Run the launcher from the command prompt or terminal window:
+15. Install dependencies from the command prompt or terminal window:
+
+Linux:
+```bash
+python3 install.py
+```
+Windows:
+```bash
+py install.py
+```
+
+16. Run the launcher from the command prompt or terminal window:
 
 Linux:
 ```bash
@@ -95,9 +106,9 @@ py launcher.py -s
 
 If successful, it should show "Meowth! That's right!".
 
-16. The bot should have sent you DM in Discord. Add the team roles: mystic, instinct and valor. Ensure they're below the bot role in the server role hierarchy.
+17. The bot should have sent you DM in Discord. Add the team roles: mystic, instinct and valor. Ensure they're below the bot role in the server role hierarchy.
 
-17. Simply type !configure in your server to start the configuration process.
+18. Simply type !configure in your server to start the configuration process.
 
 ### Launcher Reference:
 Arguments:

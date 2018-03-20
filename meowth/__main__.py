@@ -4181,7 +4181,7 @@ async def _edit_party(channel, author=None):
         raidmsg = await channel.get_message(guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['raidmessage'])
     except:
         async for message in channel.history(limit=500, reverse=True):
-            if author and message.author.id == guild.me.id:
+            if author and message.author.id == channel.guild.me.id:
                 c = _('Coordinate here')
                 if c in message.content:
                     reportchannel = message.raw_channel_mentions[0]
@@ -4905,7 +4905,7 @@ async def _teamlist(ctx):
         teamliststr += '❔ '
         teamliststr += _('**{grey_number} total,** {greymaybe} interested, {greycoming} coming, {greywaiting} waiting')
         teamliststr += ' ❔'
-        teamliststr.format(grey_number=othercount, greymaybe=othermaybe, greycoming=othercoming, greywaiting=otherwaiting)
+        teamliststr.format(grey_number=team_dict['unknown']['total'], greymaybe=team_dict['unknown']['maybe'], greycoming=team_dict['unknown']['omw'], greywaiting=team_dict['unknown']['waiting'])
     if teamliststr:
         listmsg = _(' Team numbers for the raid:\n{}').format(teamliststr)
     else:

@@ -556,6 +556,17 @@ async def expire_channel(channel):
                     logger.info(
                         'Expire_Channel - Channel Deleted - ' + channel.name)
                 elif archive == True:
+                    for overwrite in channel.overwrites:
+                        if isinstance(overwrite[0], discord.Role):
+                            if overwrite[0].permissions.manage_guild or overwrite[0].permissions.manage_channels:
+                                await channel.set_permissions(overwrite[0], read_messages=True)
+                                continue
+                        elif isinstance(overwrite[0], discord.Member):
+                            if channel.permissions_for(overwrite[0]).manage_guild or channel.permissions_for(overwrite[0]).manage_channels:
+                                await channel.set_permissions(overwrite[0], read_messages=True)
+                                continue
+                        if (overwrite[0].name not in guild.me.top_role.name) and (overwrite[0].name not in guild.me.name):
+                            await channel.set_permissions(overwrite[0], read_messages=False)
                     for role in guild.role_hierarchy:
                         if role.permissions.manage_guild or role.permissions.manage_channels:
                             await channel.set_permissions(role, read_messages=True)
@@ -4566,7 +4577,7 @@ async def mystic(ctx, tag=False):
             listmsg = _('**Meowth!** ')
             guild = ctx.guild
             channel = ctx.channel
-            bulletpoint = parse_emoji(ctx.guild, ':mystic:')
+            bulletpoint = parse_emoji(ctx.guild, config['team_dict']['mystic'])
             starttime = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('starttime',None)
             rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
             if " 0 interested!" not in await _interest(ctx):
@@ -4597,7 +4608,7 @@ async def valor(ctx, tag=False):
             listmsg = _('**Meowth!** ')
             guild = ctx.guild
             channel = ctx.channel
-            bulletpoint = parse_emoji(ctx.guild, ':valor:')
+            bulletpoint = parse_emoji(ctx.guild, config['team_dict']['valor'])
             starttime = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('starttime',None)
             rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
             if " 0 interested!" not in await _interest(ctx):
@@ -4628,7 +4639,7 @@ async def instinct(ctx, tag=False):
             listmsg = _('**Meowth!** ')
             guild = ctx.guild
             channel = ctx.channel
-            bulletpoint = parse_emoji(ctx.guild, ':instinct:')
+            bulletpoint = parse_emoji(ctx.guild, config['team_dict']['instinct'])
             starttime = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('starttime',None)
             rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
             if " 0 interested!" not in await _interest(ctx):
@@ -4905,7 +4916,7 @@ async def _teamlist(ctx):
         teamliststr += '❔ '
         teamliststr += _('**{grey_number} total,** {greymaybe} interested, {greycoming} coming, {greywaiting} waiting')
         teamliststr += ' ❔'
-        teamliststr.format(grey_number=team_dict['unknown']['total'], greymaybe=team_dict['unknown']['maybe'], greycoming=team_dict['unknown']['omw'], greywaiting=team_dict['unknown']['waiting'])
+        teamliststr = teamliststr.format(grey_number=team_dict['unknown']['total'], greymaybe=team_dict['unknown']['maybe'], greycoming=team_dict['unknown']['omw'], greywaiting=team_dict['unknown']['waiting'])
     if teamliststr:
         listmsg = _(' Team numbers for the raid:\n{}').format(teamliststr)
     else:

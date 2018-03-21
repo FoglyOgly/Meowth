@@ -3547,7 +3547,7 @@ async def recover(ctx):
         }
         await _edit_party(channel, message.author)
         recovermsg = _("Meowth! This channel has been recovered! However, there may be some inaccuracies in what I remembered! Here's what I have:")
-        bulletpoint = parse_emoji(ctx.guild, ':small_blue_diamond:')
+        bulletpoint = '🔹'
         recovermsg += ('\n' + bulletpoint) + (await _interest(ctx))
         recovermsg += ('\n' + bulletpoint) + (await _otw(ctx))
         recovermsg += ('\n' + bulletpoint) + (await _waiting(ctx))
@@ -4318,6 +4318,10 @@ async def starting(ctx, team: str = ''):
     id_startinglist = []
     team_list = []
     trainer_dict = copy.deepcopy(guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict'])
+    if guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id].get('type',None) == 'egg':
+        starting_str = _("Meowth! How can you start when the egg hasn't hatched!?")
+        await ctx.channel.send(starting_str)
+        return
     for trainer in trainer_dict:
         user = ctx.guild.get_member(trainer)
         if team:
@@ -4533,7 +4537,7 @@ async def list(ctx):
                 return
         if checks.check_raidchannel(ctx):
             if checks.check_raidactive(ctx):
-                bulletpoint = parse_emoji(ctx.guild, ':small_blue_diamond:')
+                bulletpoint = '🔹'
                 starttime = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('starttime',None)
                 rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
                 if " 0 interested!" not in await _interest(ctx):
@@ -4924,7 +4928,7 @@ async def tags(ctx):
             listmsg = _('**Meowth!** ')
             guild = ctx.guild
             channel = ctx.channel
-            bulletpoint = parse_emoji(ctx.guild, ':small_blue_diamond:')
+            bulletpoint = '🔹'
             starttime = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('starttime',None)
             rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
             if " 0 interested!" not in await _interest(ctx):

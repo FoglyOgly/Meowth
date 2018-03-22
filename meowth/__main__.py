@@ -1125,7 +1125,7 @@ async def perms(ctx, channel_id = None):
         await ctx.author.send(embed=embed)
 
 @Meowth.command()
-@checks.is_owner()
+@commands.has_permissions(manage_guild=True)
 async def welcome(ctx, user: discord.Member=None):
     """Test welcome on yourself or mentioned member.
 
@@ -4678,12 +4678,12 @@ async def _interest(ctx, tag=False, team=False):
         if team:
             for role in user.roles:
                 if role.name.lower() == team:
-                    name_list.append(('**' + user.name) + '**')
+                    name_list.append(('**' + user.display_name) + '**')
                     maybe_list.append(user.mention)
                     break
         if (trainer_dict[trainer]['status'] == 'maybe') and user and team == False:
             ctx_maybecount += trainer_dict[trainer]['count']
-            name_list.append(('**' + user.name) + '**')
+            name_list.append(('**' + user.display_name) + '**')
             maybe_list.append(user.mention)
         elif (trainer_dict[trainer]['status'] == 'maybe') and user and team:
             ctx_maybecount += trainer_dict[trainer]['party'][team_index]
@@ -4722,12 +4722,12 @@ async def _otw(ctx, tag=False, team=False):
         if team:
             for role in user.roles:
                 if role.name.lower() == team:
-                    name_list.append(('**' + user.name) + '**')
+                    name_list.append(('**' + user.display_name) + '**')
                     otw_list.append(user.mention)
                     break
         if (trainer_dict[trainer]['status'] == 'omw') and user and team == False:
             ctx_omwcount += trainer_dict[trainer]['count']
-            name_list.append(('**' + user.name) + '**')
+            name_list.append(('**' + user.display_name) + '**')
             otw_list.append(user.mention)
         elif (trainer_dict[trainer]['status'] == 'omw') and user and team:
             ctx_omwcount += trainer_dict[trainer]['party'][team_index]
@@ -4766,12 +4766,12 @@ async def _waiting(ctx, tag=False, team=False):
         if team:
             for role in user.roles:
                 if role.name.lower() == team:
-                    name_list.append(('**' + user.name) + '**')
+                    name_list.append(('**' + user.display_name) + '**')
                     waiting_list.append(user.mention)
                     break
         if (trainer_dict[trainer]['status'] == 'waiting') and user and team == False:
             ctx_waitingcount += trainer_dict[trainer]['count']
-            name_list.append(('**' + user.name) + '**')
+            name_list.append(('**' + user.display_name) + '**')
             waiting_list.append(user.mention)
         elif (trainer_dict[trainer]['status'] == 'waiting') and user and team:
             ctx_waitingcount += trainer_dict[trainer]['party'][team_index]
@@ -4810,12 +4810,12 @@ async def _lobbylist(ctx, tag=False, team=False):
         if team:
             for role in user.roles:
                 if role.name.lower() == team:
-                    name_list.append(('**' + user.name) + '**')
+                    name_list.append(('**' + user.display_name) + '**')
                     lobby_list.append(user.mention)
                     break
         if (trainer_dict[trainer]['status'] == 'lobby') and user and team == False:
             ctx_lobbycount += trainer_dict[trainer]['count']
-            name_list.append(('**' + user.name) + '**')
+            name_list.append(('**' + user.display_name) + '**')
             lobby_list.append(user.mention)
         elif (trainer_dict[trainer]['status'] == 'lobby') and user and team:
             ctx_lobbycount += trainer_dict[trainer]['party'][team_index]

@@ -364,6 +364,7 @@ async def ask(message, destination, user_id, *, react_list=['✅', '❎']):
         reaction, user = await Meowth.wait_for('reaction_add', check=check, timeout=60)
         return reaction.emoji
     except asyncio.TimeoutError:
+        await message.clear_reactions()
         return
 
 async def letter_case(iterable, find, *, limits=None):
@@ -502,7 +503,7 @@ async def expire_channel(channel):
                 trainer_dict = copy.deepcopy(
                     guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['trainer_dict'])
                 for trainer in trainer_dict.keys():
-                    if trainer_dict[trainer]['status'] == 'maybe':
+                    if trainer_dict[trainer]['status']['maybe']:
                         user = channel.guild.get_member(trainer)
                         maybe_list.append(user.mention)
                 new_name = _('hatched-')
@@ -942,7 +943,7 @@ async def on_message(message):
                     otw_list = []
                     trainer_dict = copy.deepcopy(guild_dict[message.guild.id]['raidchannel_dict'][message.channel.id]['trainer_dict'])
                     for trainer in trainer_dict.keys():
-                        if trainer_dict[trainer]['status'] == 'omw':
+                        if trainer_dict[trainer]['status']['coming']:
                             user = message.guild.get_member(trainer)
                             otw_list.append(user.mention)
                     await message.channel.send(content=_('Meowth! Someone has suggested a different location for the raid! Trainers {trainer_list}: make sure you are headed to the right place!').format(trainer_list=', '.join(otw_list)), embed=newembed)
@@ -2897,15 +2898,15 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
         except (discord.errors.NotFound, AttributeError):
             continue
         if (trainer_dict[trainer].get('interest',None)) and (entered_raid not in trainer_dict[trainer]['interest']):
-            guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id]['trainer_dict'][trainer]['status'] = None
-            guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id]['trainer_dict'][trainer]['party'] = [0, 0, 0, 0]
+            guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id]['trainer_dict'][trainer]['status'] = {'maybe':0, 'coming':0, 'here':0, 'lobby':0}
+            guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id]['trainer_dict'][trainer]['party'] = {'mystic':0, 'valor':0, 'instinct':0, 'unknown':0}
             guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id]['trainer_dict'][trainer]['count'] = 1
         else:
             guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id]['trainer_dict'][trainer]['interest'] = []
     await asyncio.sleep(1)
     trainer_dict = copy.deepcopy(guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id]['trainer_dict'])
     for trainer in trainer_dict.keys():
-        if (trainer_dict[trainer]['status'] == 'maybe') or (trainer_dict[trainer]['status'] == 'omw') or (trainer_dict[trainer]['status'] == 'waiting'):
+        if (trainer_dict[trainer]['status']['maybe']) or (trainer_dict[trainer]['status']['coming']) or (trainer_dict[trainer]['status']['here']):
             try:
                 user = raid_channel.guild.get_member(trainer)
                 trainer_list.append(user.mention)
@@ -3087,22 +3088,30 @@ async def _invite(ctx):
     if exraidcount == 0:
         await channel.send(_('Meowth! No EX Raids have been reported in this server! Use **!exraid** to report one!'))
         return
-    await channel.send(_("Meowth! {0}, you've told me you have an invite to an EX Raid, and I'm just going to take your word for it! The following {1} EX Raids have been reported:\n{2}\nReply with **the number** (1, 2, etc) of the EX Raid you have been invited to. If none of them match your invite, type 'N' and report it with **!exraid**").format(author.mention, str(exraidcount), exraidlist))
+    exraidchoice = await channel.send(_("Meowth! {0}, you've told me you have an invite to an EX Raid, and I'm just going to take your word for it! The following {1} EX Raids have been reported:\n{2}\nReply with **the number** (1, 2, etc) of the EX Raid you have been invited to. If none of them match your invite, type 'N' and report it with **!exraid**").format(author.mention, str(exraidcount), exraidlist))
     reply = await bot.wait_for('message', check=(lambda message: (message.author == author)))
     if reply.content.lower() == 'n':
-        await channel.send(_('Meowth! Be sure to report your EX Raid with **!exraid**!'))
+        await exraidchoice.delete()
+        exraidmsg = await channel.send(_('Meowth! Be sure to report your EX Raid with **!exraid**!'))
     elif (not reply.content.isdigit()) or (int(reply.content) > exraidcount):
-        await channel.send(_("Meowth! I couldn't tell which EX Raid you meant! Try the **!invite** command again, and make sure you respond with the number of the channel that matches!"))
+        await exraidchoice.delete()
+        exraidmsg = await channel.send(_("Meowth! I couldn't tell which EX Raid you meant! Try the **!invite** command again, and make sure you respond with the number of the channel that matches!"))
     elif (int(reply.content) <= exraidcount) and (int(reply.content) > 0):
+        await exraidchoice.delete()
         overwrite = discord.PermissionOverwrite()
         overwrite.send_messages = True
         overwrite.read_messages = True
         exraid_channel = exraid_dict[str(int(reply.content))]
         await exraid_channel.set_permissions(author, overwrite=overwrite)
-        await channel.send(_('Meowth! Alright {0}, you can now send messages in {1}! Make sure you let the trainers in there know if you can make it to the EX Raid!').format(author.mention, exraid_channel.mention))
+        exraidmsg = await channel.send(_('Meowth! Alright {0}, you can now send messages in {1}! Make sure you let the trainers in there know if you can make it to the EX Raid!').format(author.mention, exraid_channel.mention))
         await _maybe(exraid_channel, author, 1, party=None)
     else:
-        await channel.send(_("Meowth! I couldn't understand your reply! Try the **!invite** command again!"))
+        await exraidchoice.delete()
+        exraidmsg = await channel.send(_("Meowth! I couldn't understand your reply! Try the **!invite** command again!"))
+    await asyncio.sleep(30)
+    await ctx.message.delete()
+    await reply.delete()
+    await exraidmsg.delete()
 
 """
 Raid Channel Management
@@ -3503,37 +3512,41 @@ async def recover(ctx):
                     if message.raw_mentions:
                         if message.raw_mentions[0] not in trainer_dict:
                             trainerid = message.raw_mentions[0]
+                            status = {'maybe':0, 'coming':0, 'here':0, 'lobby':0}
+                            trainerstatus = None
                             if _('is interested') in message.content:
-                                status = 'maybe'
+                                trainerstatus = 'maybe'
                             if _('on the way') in message.content:
-                                status = 'omw'
+                                trainerstatus = 'coming'
                             if _('at the raid') in message.content:
-                                status = 'waiting'
+                                trainerstatus = 'here'
                             if (_('no longer') in message.content) or (_('left the raid') in message.content):
-                                status = None
+                                trainerstatus = None
                             if _('trainers') in message.content:
                                 messagesplit = message.content.split()
                                 if messagesplit[-1].isdigit():
-                                    party = [int(messagesplit[-10]),int(messagesplit[-7]),int(messagesplit[-4]),int(messagesplit[-1])]
-                                    count = sum(party)
+                                    count = int(messagesplit[-13])
+                                    party = {'mystic':int(messagesplit[-10]), 'valor':int(messagesplit[-7]), 'instinct':int(messagesplit[-4]), 'unknown':int(messagesplit[-1])}
                                 else:
                                     count = 1
-                                    party = [0,0,0,1]
+                                    party = {'mystic':0, 'valor':0, 'instinct':0, 'unknown':count}
                             else:
                                 count = 1
                                 user = ctx.guild.get_member(trainerid)
                                 for role in user.roles:
                                     if role.name.lower() == 'mystic':
-                                        party = [1,0,0,0]
+                                        party = {'mystic':1, 'valor':0, 'instinct':0, 'unknown':0}
                                         break
                                     elif role.name.lower() == 'valor':
-                                        party = [0,1,0,0]
+                                        party = {'mystic':0, 'valor':1, 'instinct':0, 'unknown':0}
                                         break
                                     elif role.name.lower() == 'instinct':
-                                        party = [0,0,1,0]
+                                        party = {'mystic':0, 'valor':0, 'instinct':1, 'unknown':0}
                                         break
                                     else:
-                                        party = [0,0,0,1]
+                                        party = {'mystic':0, 'valor':0, 'instinct':0, 'unknown':1}
+                            if trainerstatus:
+                                status[trainerstatus] = count
                             trainer_dict[trainerid] = {
                                 'status': status,
                                 'count': count,
@@ -3554,7 +3567,7 @@ async def recover(ctx):
             'address': raid_details,
             'type': raidtype,
             'pokemon': pokemon,
-            'egglevel': egglevel,
+            'egglevel': egglevel
         }
         await _edit_party(channel, message.author)
         recovermsg = _("Meowth! This channel has been recovered! However, there may be some inaccuracies in what I remembered! Here's what I have:")
@@ -3572,7 +3585,7 @@ async def recover(ctx):
             recovermsg += _("\nI'm not sure when this {raidtype} will {action}, so please use **!timerset** if you can!").format(raidtype=type, action=action)
         else:
             recovermsg += ('\n' + bulletpoint) + (await print_raid_timer(channel))
-        await _edit_party(channel)
+        await _edit_party(channel, ctx.message.author)
         await channel.send(recovermsg)
         event_loop.create_task(expiry_check(channel))
 
@@ -3607,7 +3620,7 @@ async def duplicate(ctx):
                 t_dict[author.id]['dupereporter'] = True
         else:
             t_dict[author.id] = {
-                'status': '',
+                'status': {'maybe':0, 'coming':0, 'here':0, 'lobby':0},
                 'dupereporter': True,
             }
         try:
@@ -3776,10 +3789,10 @@ async def interested(ctx, *, teamcounts: str=None):
     egglevel = guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['egglevel']
     if (not teamcounts):
         if ctx.author.id in trainer_dict:
-            bluecount = str(trainer_dict[ctx.author.id]['party'][0]) + 'm '
-            redcount = str(trainer_dict[ctx.author.id]['party'][1]) + 'v '
-            yellowcount = str(trainer_dict[ctx.author.id]['party'][2]) + 'i '
-            unknowncount = str(trainer_dict[ctx.author.id]['party'][3]) + 'u '
+            bluecount = str(trainer_dict[ctx.author.id]['party']['mystic']) + 'm '
+            redcount = str(trainer_dict[ctx.author.id]['party']['valor']) + 'v '
+            yellowcount = str(trainer_dict[ctx.author.id]['party']['instinct']) + 'i '
+            unknowncount = str(trainer_dict[ctx.author.id]['party']['unknown']) + 'u '
             teamcounts = ((((str(trainer_dict[ctx.author.id]['count']) + ' ') + bluecount) + redcount) + yellowcount) + unknowncount
         else:
             teamcounts = '1'
@@ -3802,7 +3815,7 @@ async def interested(ctx, *, teamcounts: str=None):
                 teamcounts = teamcounts.lower().replace(word.lower(),"").replace(",","").strip()
     if teamcounts and teamcounts.split()[0].isdigit():
         total = int(teamcounts.split()[0])
-    elif (ctx.author.id in trainer_dict) and (trainer_dict[ctx.author.id]['status'] != None):
+    elif (ctx.author.id in trainer_dict) and (sum(trainer_dict[ctx.author.id]['status'].values()) > 0):
         total = trainer_dict[ctx.author.id]['count']
     elif teamcounts:
         total = sum([int(s) for s in teamcounts if s.isdigit()])
@@ -3833,16 +3846,16 @@ async def _maybe(channel, author, count, party, entered_interest=None):
                 break
         else:
             allunknown = count
-        party = [allblue, allred, allyellow, allunknown]
+        party = {'mystic':allblue, 'valor':allred, 'instinct':allyellow, 'unknown':allunknown}
     if count == 1:
         await channel.send(_('Meowth! {member} is interested!').format(member=author.mention))
     else:
-        await channel.send(_('Meowth! {member} is interested with a total of {trainer_count} trainers! {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | ❔: {unknown}').format(member=author.mention, trainer_count=count, blue_emoji=parse_emoji(channel.guild, config['team_dict']['mystic']), mystic=party[0], red_emoji=parse_emoji(channel.guild, config['team_dict']['valor']), valor=party[1], instinct=party[2], yellow_emoji=parse_emoji(channel.guild, config['team_dict']['instinct']), unknown=party[3]))
+        await channel.send(_('Meowth! {member} is interested with a total of {trainer_count} trainers! {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | ❔: {unknown}').format(member=author.mention, trainer_count=count, blue_emoji=parse_emoji(channel.guild, config['team_dict']['mystic']), mystic=party['mystic'], red_emoji=parse_emoji(channel.guild, config['team_dict']['valor']), valor=party['valor'], instinct=party['instinct'], yellow_emoji=parse_emoji(channel.guild, config['team_dict']['instinct']), unknown=party['unknown']))
     if author.id not in guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['trainer_dict']:
         trainer_dict[author.id] = {
 
         }
-    trainer_dict[author.id]['status'] = 'maybe'
+    trainer_dict[author.id]['status'] = {'maybe':count, 'coming':0, 'here':0, 'lobby':0}
     if entered_interest:
         trainer_dict[author.id]['interest'] = entered_interest
     trainer_dict[author.id]['count'] = count
@@ -3895,17 +3908,17 @@ async def coming(ctx, *, teamcounts: str=None):
     trainer_dict = guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict']
     if (not teamcounts):
         if ctx.author.id in trainer_dict:
-            bluecount = str(trainer_dict[ctx.author.id]['party'][0]) + 'm '
-            redcount = str(trainer_dict[ctx.author.id]['party'][1]) + 'v '
-            yellowcount = str(trainer_dict[ctx.author.id]['party'][2]) + 'i '
-            unknowncount = str(trainer_dict[ctx.author.id]['party'][3]) + 'u '
+            bluecount = str(trainer_dict[ctx.author.id]['party']['mystic']) + 'm '
+            redcount = str(trainer_dict[ctx.author.id]['party']['valor']) + 'v '
+            yellowcount = str(trainer_dict[ctx.author.id]['party']['instinct']) + 'i '
+            unknowncount = str(trainer_dict[ctx.author.id]['party']['unknown']) + 'u '
             teamcounts = ((((str(trainer_dict[ctx.author.id]['count']) + ' ') + bluecount) + redcount) + yellowcount) + unknowncount
         else:
             teamcounts = '1'
 
     if teamcounts and teamcounts.split()[0].isdigit():
         total = int(teamcounts.split()[0])
-    elif (ctx.author.id in trainer_dict) and (trainer_dict[ctx.author.id]['status'] != None):
+    elif (ctx.author.id in trainer_dict) and (sum(trainer_dict[ctx.author.id]['status'].values()) > 0):
         total = trainer_dict[ctx.author.id]['count']
     elif teamcounts:
         total = sum([int(s) for s in teamcounts if s.isdigit()])
@@ -3936,16 +3949,16 @@ async def _coming(channel, author, count, party, entered_interest=None):
                 break
         else:
             allunknown = count
-        party = [allblue, allred, allyellow, allunknown]
+        party = {'mystic':allblue, 'valor':allred, 'instinct':allyellow, 'unknown':allunknown}
     if count == 1:
         await channel.send(_('Meowth! {member} is on the way!').format(member=author.mention))
     else:
-        await channel.send(_('Meowth! {member} is on the way with a total of {trainer_count} trainers! {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | ❔: {unknown}').format(member=author.mention, trainer_count=count, blue_emoji=parse_emoji(channel.guild, config['team_dict']['mystic']), mystic=party[0], red_emoji=parse_emoji(channel.guild, config['team_dict']['valor']), valor=party[1], instinct=party[2], yellow_emoji=parse_emoji(channel.guild, config['team_dict']['instinct']), unknown=party[3]))
+        await channel.send(_('Meowth! {member} is on the way with a total of {trainer_count} trainers! {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | ❔: {unknown}').format(member=author.mention, trainer_count=count, blue_emoji=parse_emoji(channel.guild, config['team_dict']['mystic']), mystic=party['mystic'], red_emoji=parse_emoji(channel.guild, config['team_dict']['valor']), valor=party['valor'], instinct=party['instinct'], yellow_emoji=parse_emoji(channel.guild, config['team_dict']['instinct']), unknown=party['unknown']))
     if author.id not in trainer_dict:
         trainer_dict[author.id] = {
 
         }
-    trainer_dict[author.id]['status'] = 'omw'
+    trainer_dict[author.id]['status'] = {'maybe':0, 'coming':count, 'here':0, 'lobby':0}
     trainer_dict[author.id]['count'] = count
     trainer_dict[author.id]['party'] = party
     if entered_interest:
@@ -3998,16 +4011,16 @@ async def here(ctx, *, teamcounts: str=None):
 
     if (not teamcounts):
         if ctx.author.id in trainer_dict:
-            bluecount = str(trainer_dict[ctx.author.id]['party'][0]) + 'm '
-            redcount = str(trainer_dict[ctx.author.id]['party'][1]) + 'v '
-            yellowcount = str(trainer_dict[ctx.author.id]['party'][2]) + 'i '
-            unknowncount = str(trainer_dict[ctx.author.id]['party'][3]) + 'u '
+            bluecount = str(trainer_dict[ctx.author.id]['party']['mystic']) + 'm '
+            redcount = str(trainer_dict[ctx.author.id]['party']['valor']) + 'v '
+            yellowcount = str(trainer_dict[ctx.author.id]['party']['instinct']) + 'i '
+            unknowncount = str(trainer_dict[ctx.author.id]['party']['unknown']) + 'u '
             teamcounts = ((((str(trainer_dict[ctx.author.id]['count']) + ' ') + bluecount) + redcount) + yellowcount) + unknowncount
         else:
             teamcounts = '1'
     if teamcounts and teamcounts.split()[0].isdigit():
         total = int(teamcounts.split()[0])
-    elif (ctx.author.id in trainer_dict) and (trainer_dict[ctx.author.id]['status'] != None):
+    elif (ctx.author.id in trainer_dict) and (sum(trainer_dict[ctx.author.id]['status'].values()) > 0):
         total = trainer_dict[ctx.author.id]['count']
     elif teamcounts:
         total = sum([int(s) for s in teamcounts if s.isdigit()])
@@ -4044,18 +4057,18 @@ async def _here(channel, author, count, party, entered_interest=None):
                 break
         else:
             allunknown = count
-        party = [allblue, allred, allyellow, allunknown]
+        party = {'mystic':allblue, 'valor':allred, 'instinct':allyellow, 'unknown':allunknown}
     if count == 1:
         msg = _('Meowth! {member} is at the raid!').format(member=author.mention)
         await channel.send(msg + lobbymsg)
     else:
-        msg = _('Meowth! {member} is at the raid with a total of {trainer_count} trainers! {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | ❔: {unknown}').format(member=author.mention, trainer_count=count, blue_emoji=parse_emoji(channel.guild, config['team_dict']['mystic']), mystic=party[0], red_emoji=parse_emoji(channel.guild, config['team_dict']['valor']), valor=party[1], instinct=party[2], yellow_emoji=parse_emoji(channel.guild, config['team_dict']['instinct']), unknown=party[3])
+        msg = _('Meowth! {member} is at the raid with a total of {trainer_count} trainers! {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | ❔: {unknown}').format(member=author.mention, trainer_count=count, blue_emoji=parse_emoji(channel.guild, config['team_dict']['mystic']), mystic=party['mystic'], red_emoji=parse_emoji(channel.guild, config['team_dict']['valor']), valor=party['valor'], instinct=party['instinct'], yellow_emoji=parse_emoji(channel.guild, config['team_dict']['instinct']), unknown=party['unknown'])
         await channel.send(msg + lobbymsg)
     if author.id not in trainer_dict:
         trainer_dict[author.id] = {
 
         }
-    trainer_dict[author.id]['status'] = 'waiting'
+    trainer_dict[author.id]['status'] = {'maybe':0, 'coming':0, 'here':count, 'lobby':0}
     trainer_dict[author.id]['count'] = count
     trainer_dict[author.id]['party'] = party
     if entered_interest:
@@ -4141,7 +4154,7 @@ async def _party_status(ctx, total, teamcounts):
                 unknown[1] = total - team_total
             else:
                 team_aliases[my_team][1] = total - team_total
-    partylist = [mystic[1], valor[1], instinct[1], unknown[1]]
+    partylist = {'mystic':mystic[1], 'valor':valor[1], 'instinct':instinct[1], 'unknown':unknown[1]}
     result = [total, partylist]
     return result
 
@@ -4156,24 +4169,21 @@ async def _edit_party(channel, author=None):
             boss_list.append(p_name.lower())
             p_type = get_type(channel.guild,p)
             boss_dict[p_name.lower()] = {"type": "{}".format(''.join(p_type)), "total": 0}
-    channel_dict = {"mystic":0,"valor":0,"instinct":0,"unknown":0,"maybe":0,"omw":0,"waiting":0,"total":0,"boss":0}
+    channel_dict = {"mystic":0,"valor":0,"instinct":0,"unknown":0,"maybe":0,"coming":0,"here":0,"total":0,"boss":0}
     team_list = ["mystic","valor","instinct","unknown"]
-    status_list = ["maybe","omw","waiting"]
-    teamindex = 0
+    status_list = ["maybe","coming","here"]
     trainer_dict = copy.deepcopy(guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['trainer_dict'])
     for trainer in trainer_dict:
         for team in team_list:
-            channel_dict[team] += int(trainer_dict[trainer]['party'][teamindex])
-            teamindex += 1
+            channel_dict[team] += int(trainer_dict[trainer]['party'][team])
         for status in status_list:
-            if trainer_dict[trainer]['status'] == status:
+            if trainer_dict[trainer]['status'][status]:
                 channel_dict[status] += int(trainer_dict[trainer]['count'])
         if egglevel != "0":
             for boss in boss_list:
                 if boss.lower() in trainer_dict[trainer].get('interest',[]):
                     boss_dict[boss]['total'] += int(trainer_dict[trainer]['count'])
                     channel_dict["boss"] += int(trainer_dict[trainer]['count'])
-        teamindex = 0
     if egglevel != "0":
         for boss in boss_list:
             if boss_dict[boss]['total'] > 0:
@@ -4182,7 +4192,7 @@ async def _edit_party(channel, author=None):
             elif boss_dict[boss]['total'] == 0:
                 bossstr = "{name} ({number}) {types}".format(name=boss.title(),number=get_number(boss),types=boss_dict[boss]['type'])
                 display_list.append(bossstr)
-    channel_dict["total"] = channel_dict["maybe"] + channel_dict["omw"] + channel_dict["waiting"]
+    channel_dict["total"] = channel_dict["maybe"] + channel_dict["coming"] + channel_dict["here"]
     reportchannel = Meowth.get_channel(guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['reportcity'])
     try:
         reportmsg = await reportchannel.get_message(guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['raidreport'])
@@ -4213,7 +4223,7 @@ async def _edit_party(channel, author=None):
             newembed.set_field_at(0, name=_("**Boss Interest:**") if channel_dict["boss"] > 0 else _("**Possible Bosses:**"), value=_('{bosslist}').format(bosslist=''.join(display_list)), inline=True)
             newembed.set_field_at(1, name='\u200b', value='\u200b', inline=True)
     if channel_dict["total"] > 0:
-        newembed.add_field(name=_('**Status List**'), value=_('Maybe: **{channelmaybe}** | Coming: **{channelcoming}** | Here: **{channelhere}**').format(channelmaybe=channel_dict["maybe"], channelcoming=channel_dict["omw"], channelhere=channel_dict["waiting"]), inline=True)
+        newembed.add_field(name=_('**Status List**'), value=_('Maybe: **{channelmaybe}** | Coming: **{channelcoming}** | Here: **{channelhere}**').format(channelmaybe=channel_dict["maybe"], channelcoming=channel_dict["coming"], channelhere=channel_dict["here"]), inline=True)
         newembed.add_field(name=_('**Team List**'), value='{blue_emoji}: **{channelblue}** | {red_emoji}: **{channelred}** | {yellow_emoji}: **{channelyellow}** | ❔: **{channelunknown}**'.format(blue_emoji=parse_emoji(channel.guild, config['team_dict']['mystic']), channelblue=channel_dict["mystic"], red_emoji=parse_emoji(channel.guild, config['team_dict']['valor']), channelred=channel_dict["valor"], yellow_emoji=parse_emoji(channel.guild, config['team_dict']['instinct']), channelyellow=channel_dict["instinct"], channelunknown=channel_dict["unknown"]), inline=True)
     newembed.set_footer(text=reportembed.footer.text, icon_url=reportembed.footer.icon_url)
     newembed.set_thumbnail(url=reportembed.thumbnail.url)
@@ -4251,7 +4261,7 @@ async def lobby(ctx, *, count: str=None):
         else:
             await ctx.channel.send(_("Meowth! I can't understand how many are in your group. Just say **!here** if you're by yourself, or **!coming 5** for example if there are 5 in your group."))
             return
-    elif (ctx.author.id in trainer_dict) and (trainer_dict[ctx.author.id]['status'] != None):
+    elif (ctx.author.id in trainer_dict) and (sum(trainer_dict[ctx.author.id]['status'].values()) > 0):
         count = trainer_dict[ctx.author.id]['count']
     else:
         count = 1
@@ -4270,7 +4280,7 @@ async def _lobby(message, count):
         trainer_dict[message.author.id] = {
 
         }
-    trainer_dict[message.author.id]['status'] = 'lobby'
+    trainer_dict[message.author.id]['status'] = {'maybe':0, 'coming':0, 'here':0, 'lobby':count}
     trainer_dict[message.author.id]['count'] = count
     guild_dict[message.guild.id]['raidchannel_dict'][message.channel.id]['trainer_dict'] = trainer_dict
 
@@ -4291,28 +4301,28 @@ async def _cancel(channel, author):
     except KeyError:
         await channel.send(_('Meowth! {member} has no status to cancel!').format(member=author.mention))
         return
-    if t_dict['status'] == 'maybe':
+    if t_dict['status']['maybe']:
         if t_dict['count'] == 1:
             await channel.send(_('Meowth! {member} is no longer interested!').format(member=author.mention))
         else:
             await channel.send(_('Meowth! {member} and their total of {trainer_count} trainers are no longer interested!').format(member=author.mention, trainer_count=t_dict['count']))
-    if t_dict['status'] == 'waiting':
+    if t_dict['status']['here']:
         if t_dict['count'] == 1:
             await channel.send(_('Meowth! {member} has left the raid!').format(member=author.mention))
         else:
             await channel.send(_('Meowth! {member} and their total of {trainer_count} trainers have left the raid!').format(member=author.mention, trainer_count=t_dict['count']))
-    if t_dict['status'] == 'omw':
+    if t_dict['status']['coming']:
         if t_dict['count'] == 1:
             await channel.send(_('Meowth! {member} is no longer on their way!').format(member=author.mention))
         else:
             await channel.send(_('Meowth! {member} and their total of {trainer_count} trainers are no longer on their way!').format(member=author.mention, trainer_count=t_dict['count']))
-    if t_dict['status'] == 'lobby':
+    if t_dict['status']['lobby']:
         if t_dict['count'] == 1:
             await channel.send(_('Meowth! {member} has backed out of the lobby!').format(member=author.mention))
         else:
             await channel.send(_('Meowth! {member} and their total of {trainer_count} trainers have backed out of the lobby!').format(member=author.mention, trainer_count=t_dict['count']))
-    t_dict['status'] = None
-    t_dict['party'] = [0, 0, 0, 0]
+    t_dict['status'] = {'maybe':0, 'coming':0, 'here':0, 'lobby':0}
+    t_dict['party'] = {'mystic':0, 'valor':0, 'instinct':0, 'unknown':0}
     t_dict['interest'] = []
     t_dict['count'] = 1
     await _edit_party(channel, author)
@@ -4322,63 +4332,93 @@ async def _cancel(channel, author):
 async def starting(ctx, team: str = ''):
     """Signal that a raid is starting.
 
-    Usage: !starting
+    Usage: !starting [team]
     Works only in raid channels. Sends a message and clears the waiting list. Users who are waiting
     for a second group must reannounce with the :here: emoji or !here."""
     ctx_startinglist = []
     id_startinglist = []
     team_list = []
+    team_names = ["mystic","valor","instinct"]
+    team = team if team and team.lower() in team_names else "all"
     trainer_dict = copy.deepcopy(guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict'])
     if guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id].get('type',None) == 'egg':
         starting_str = _("Meowth! How can you start when the egg hasn't hatched!?")
         await ctx.channel.send(starting_str)
         return
+    if guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id].get('lobby',False):
+        starting_str = _("Meowth! Please wait for the group in the lobby to enter the raid.")
+        await ctx.channel.send(starting_str)
+        return
     for trainer in trainer_dict:
+        count = trainer_dict[trainer]['count']
         user = ctx.guild.get_member(trainer)
-        if team:
-            for role in ctx.author.roles:
-                if role.name.lower() == team:
-                    team_list.append(user.id)
-                    break
-        if trainer_dict[trainer]['status'] == 'waiting' and (user.id in team_list or not team):
-            trainer_dict[trainer]['status'] = 'lobby'
-            ctx_startinglist.append(user.mention)
-            id_startinglist.append(trainer)
-    guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict'] = trainer_dict
+        if team in team_names:
+            if trainer_dict[trainer]['party'][team]:
+                team_list.append(user.id)
+            teamcount = trainer_dict[trainer]['party'][team]
+            herecount = trainer_dict[trainer]['status']['here']
+            lobbycount = trainer_dict[trainer]['status']['lobby']
+            if trainer_dict[trainer]['status']['here'] and (user.id in team_list):
+                trainer_dict[trainer]['status'] = {'maybe':0, 'coming':0, 'here':herecount - teamcount, 'lobby':lobbycount + teamcount}
+                ctx_startinglist.append(user.mention)
+                id_startinglist.append(trainer)
+        else:
+            if trainer_dict[trainer]['status']['here'] and (user.id in team_list or team == "all"):
+                trainer_dict[trainer]['status'] = {'maybe':0, 'coming':0, 'here':0, 'lobby':count}
+                ctx_startinglist.append(user.mention)
+                id_startinglist.append(trainer)
     if len(ctx_startinglist) == 0:
         starting_str = _("Meowth! How can you start when there's no one waiting at this raid!?")
         await ctx.channel.send(starting_str)
         return
-    starttime = guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id].get('starttime',None)
-    if starttime:
-        timestr = _(' to start at **{}** ').format(starttime.strftime(_('%I:%M %p (%H:%M)')))
-        guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['starttime'] = None
+    if team in team_names:
+        question = await ctx.channel.send(_("Are you sure you would like to start this raid?"))
     else:
-        timestr = ' '
-    starting_str = _('Meowth! The group that was waiting{timestr}is starting the raid! Trainers {trainer_list}, if you are not in this group and are waiting for the next group, please respond with {here_emoji} or **!here**. If you need to ask those that just started to back out of their lobby, use **!backout**').format(timestr=timestr, trainer_list=', '.join(ctx_startinglist), here_emoji=parse_emoji(ctx.guild, config['here_id']))
-    guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['lobby'] = time.time() + 120
-    if starttime:
-        starting_str += '\n\nThe start time has also been cleared, new groups can set a new start time wtih **!starttime HH:MM AM/PM** (You can also omit AM/PM and use 24-hour time!).'
-    await ctx.channel.send(starting_str)
-    await asyncio.sleep(120)
-    if ('lobby' not in guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]) or (time.time() < guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id].get('lobby')):
+        question = await ctx.channel.send(_("Are you sure you would like to start this raid? You can also do **!starting [team]** to start one team only."))
+    res = await ask(question, ctx.channel, ctx.author.id)
+    if res == '❎':
+        await question.delete()
         return
-    ctx_lobbycount = 0
-    trainer_delete_list = []
-    for trainer in trainer_dict:
-        if trainer_dict[trainer]['status'] == 'lobby':
-            ctx_lobbycount += trainer_dict[trainer]['count']
-            trainer_delete_list.append(trainer)
-    if ctx_lobbycount > 0:
-        await ctx.channel.send(_('Meowth! The group of {count} in the lobby has entered the raid! Wish them luck!').format(count=str(ctx_lobbycount)))
-    for trainer in trainer_delete_list:
-        del trainer_dict[trainer]
-    try:
-        del guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['lobby']
-    except KeyError:
-        pass
-    await _edit_party(ctx.channel, ctx.author)
-    guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict'] = trainer_dict
+    elif res == '✅':
+        await question.delete()
+        guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict'] = trainer_dict
+        starttime = guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id].get('starttime',None)
+        if starttime:
+            timestr = _(' to start at **{}** ').format(starttime.strftime(_('%I:%M %p (%H:%M)')))
+            guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['starttime'] = None
+        else:
+            timestr = ' '
+        starting_str = _('Meowth! The group that was waiting{timestr}is starting the raid! Trainers {trainer_list}, if you are not in this group and are waiting for the next group, please respond with {here_emoji} or **!here**. If you need to ask those that just started to back out of their lobby, use **!backout**').format(timestr=timestr, trainer_list=', '.join(ctx_startinglist), here_emoji=parse_emoji(ctx.guild, config['here_id']))
+        guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['lobby'] = {"exp":time.time() + 120, "team":team}
+        if starttime:
+            starting_str += '\n\nThe start time has also been cleared, new groups can set a new start time wtih **!starttime HH:MM AM/PM** (You can also omit AM/PM and use 24-hour time!).'
+        await ctx.channel.send(starting_str)
+        await asyncio.sleep(120)
+        if ('lobby' not in guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]) or (time.time() < guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['lobby']['exp']):
+            return
+        ctx_lobbycount = 0
+        trainer_delete_list = []
+        for trainer in trainer_dict:
+            if trainer_dict[trainer]['status']['lobby']:
+                ctx_lobbycount += trainer_dict[trainer]['status']['lobby']
+                trainer_delete_list.append(trainer)
+        if ctx_lobbycount > 0:
+            await ctx.channel.send(_('Meowth! The group of {count} in the lobby has entered the raid! Wish them luck!').format(count=str(ctx_lobbycount)))
+        for trainer in trainer_delete_list:
+            if team in team_names:
+                trainer_dict[trainer]['status'] = {'maybe':0, 'coming':0, 'here':herecount - teamcount, 'lobby': lobbycount}
+                trainer_dict[trainer]['party'][team] = 0
+                trainer_dict[trainer]['count'] = trainer_dict[trainer]['count'] - teamcount
+            else:
+                del trainer_dict[trainer]
+        try:
+            del guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['lobby']
+        except KeyError:
+            pass
+        await _edit_party(ctx.channel, ctx.author)
+        guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict'] = trainer_dict
+    else:
+        return
 
 @Meowth.command()
 @checks.activeraidchannel()
@@ -4392,14 +4432,16 @@ async def backout(ctx):
     author = message.author
     guild = channel.guild
     trainer_dict = guild_dict[guild.id]['raidchannel_dict'][channel.id]['trainer_dict']
-    if (author.id in trainer_dict) and (trainer_dict[author.id]['status'] == 'lobby'):
-        trainer_dict[author.id]['status'] = 'waiting'
+    if (author.id in trainer_dict) and (trainer_dict[author.id]['status']['lobby']):
+        count = trainer_dict[author.id]['count']
+        trainer_dict[author.id]['status'] = {'maybe':0, 'coming':0,'here':count,'lobby':0}
         lobby_list = []
         for trainer in trainer_dict:
-            if trainer_dict[trainer]['status'] == 'lobby':
+            count = trainer_dict[trainer]['count']
+            if trainer_dict[trainer]['status']['lobby']:
                 user = guild.get_member(trainer)
                 lobby_list.append(user.mention)
-                trainer_dict[trainer]['status'] = 'waiting'
+                trainer_dict[trainer]['status'] = {'maybe':0, 'coming':0, 'here':count, 'lobby':0}
         if (not lobby_list):
             await channel.send(_("Meowth! There's no one else in the lobby for this raid!"))
             try:
@@ -4416,7 +4458,7 @@ async def backout(ctx):
         lobby_list = []
         trainer_list = []
         for trainer in trainer_dict:
-            if trainer_dict[trainer]['status'] == 'lobby':
+            if trainer_dict[trainer]['status']['lobby']:
                 user = guild.get_member(trainer)
                 lobby_list.append(user.mention)
                 trainer_list.append(trainer)
@@ -4434,9 +4476,10 @@ async def backout(ctx):
         reaction, user = await Meowth.wait_for('reaction_add', timeout=30, check=check)
         if reaction:
             for trainer in trainer_list:
+                count = trainer_dict[trainer]['count']
                 if trainer in trainer_dict:
-                    trainer_dict[trainer]['status'] = 'waiting'
-            await channel.send(_('Meowth! {user} confirmed the group is backing out!').format(user=res.user.mention))
+                    trainer_dict[trainer]['status'] = {'maybe':0, 'coming':0, 'here':count, 'lobby':0}
+            await channel.send(_('Meowth! {user} confirmed the group is backing out!').format(user=user.mention))
             try:
                 del guild_dict[guild.id]['raidchannel_dict'][channel.id]['lobby']
             except KeyError:
@@ -4491,20 +4534,20 @@ async def list(ctx):
                 end = now + datetime.timedelta(seconds=rc_d[r]['exp'] - time.time())
                 output = ''
                 start_str = ''
-                ctx_waitingcount = 0
-                ctx_omwcount = 0
+                ctx_herecount = 0
+                ctx_comingcount = 0
                 ctx_maybecount = 0
                 ctx_lobbycount = 0
                 for trainer in rc_d[r]['trainer_dict'].keys():
                     if not ctx.guild.get_member(trainer):
                         continue
-                    if trainer_dict[trainer]['status'] == 'waiting':
-                        ctx_waitingcount += trainer_dict[trainer]['count']
-                    elif trainer_dict[trainer]['status'] == 'omw':
-                        ctx_omwcount += trainer_dict[trainer]['count']
-                    elif trainer_dict[trainer]['status'] == 'maybe':
+                    if trainer_dict[trainer]['status']['here']:
+                        ctx_herecount += trainer_dict[trainer]['count']
+                    elif trainer_dict[trainer]['status']['coming']:
+                        ctx_comingcount += trainer_dict[trainer]['count']
+                    elif trainer_dict[trainer]['status']['maybe']:
                         ctx_maybecount += trainer_dict[trainer]['count']
-                    elif trainer_dict[trainer]['status'] == 'lobby':
+                    elif trainer_dict[trainer]['status']['lobby']:
                         ctx_lobbycount += trainer_dict[trainer]['count']
                 if rc_d[r]['manual_timer'] == False:
                     assumed_str = _(' (assumed)')
@@ -4522,7 +4565,7 @@ async def list(ctx):
                 else:
                     expirytext = _(' - Expiry: {expiry}{is_assumed}').format(expiry=end.strftime(_('%I:%M %p (%H:%M)')), is_assumed=assumed_str)
                 output += _('    {raidchannel}{expiry_text}\n').format(raidchannel=rchan.mention, expiry_text=expirytext)
-                output += _('    {interestcount} interested, {comingcount} coming, {herecount} here, {lobbycount} in the lobby.{start_str}\n').format(raidchannel=rchan.mention, interestcount=ctx_maybecount, comingcount=ctx_omwcount, herecount=ctx_waitingcount, lobbycount=ctx_lobbycount, start_str=start_str)
+                output += _('    {interestcount} interested, {comingcount} coming, {herecount} here, {lobbycount} in the lobby.{start_str}\n').format(raidchannel=rchan.mention, interestcount=ctx_maybecount, comingcount=ctx_comingcount, herecount=ctx_herecount, lobbycount=ctx_lobbycount, start_str=start_str)
                 return output
             if activeraidnum:
                 listmsg += _("**Here's the current raids for {0}**\n\n").format(cty.capitalize())
@@ -4584,14 +4627,14 @@ async def mystic(ctx, tag=False):
             bulletpoint = parse_emoji(ctx.guild, config['team_dict']['mystic'])
             starttime = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('starttime',None)
             rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
-            if " 0 interested!" not in await _interest(ctx):
-                listmsg += ('\n' + bulletpoint) + (await _interest(ctx, tag=False, team="mystic"))
-            if " 0 on the way!" not in await _otw(ctx):
-                listmsg += ('\n' + bulletpoint) + (await _otw(ctx, tag=False, team="mystic"))
-            if " 0 waiting at the raid!" not in await _waiting(ctx):
-                listmsg += ('\n' + bulletpoint) + (await _waiting(ctx, tag=False, team="mystic"))
-            if " 0 in the lobby!" not in await _lobbylist(ctx):
-                listmsg += ('\n' + bulletpoint) + (await _lobbylist(ctx, tag=False, team="mystic"))
+            if " 0 interested!" not in await _interest(ctx, tag, team="mystic"):
+                listmsg += ('\n' + bulletpoint) + (await _interest(ctx, tag, team="mystic"))
+            if " 0 on the way!" not in await _otw(ctx, tag, team="mystic"):
+                listmsg += ('\n' + bulletpoint) + (await _otw(ctx, tag, team="mystic"))
+            if " 0 waiting at the raid!" not in await _waiting(ctx, tag, team="mystic"):
+                listmsg += ('\n' + bulletpoint) + (await _waiting(ctx, tag, team="mystic"))
+            if " 0 in the lobby!" not in await _lobbylist(ctx, tag, team="mystic"):
+                listmsg += ('\n' + bulletpoint) + (await _lobbylist(ctx, tag, team="mystic"))
             if (len(listmsg.splitlines()) <= 1):
                 listmsg +=  ('\n' + bulletpoint) + (" Nobody has updated their status yet!")
             listmsg += ('\n' + bulletpoint) + (await print_raid_timer(channel))
@@ -4615,14 +4658,14 @@ async def valor(ctx, tag=False):
             bulletpoint = parse_emoji(ctx.guild, config['team_dict']['valor'])
             starttime = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('starttime',None)
             rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
-            if " 0 interested!" not in await _interest(ctx):
-                listmsg += ('\n' + bulletpoint) + (await _interest(ctx, tag=False, team="valor"))
-            if " 0 on the way!" not in await _otw(ctx):
-                listmsg += ('\n' + bulletpoint) + (await _otw(ctx, tag=False, team="valor"))
-            if " 0 waiting at the raid!" not in await _waiting(ctx):
-                listmsg += ('\n' + bulletpoint) + (await _waiting(ctx, tag=False, team="valor"))
-            if " 0 in the lobby!" not in await _lobbylist(ctx):
-                listmsg += ('\n' + bulletpoint) + (await _lobbylist(ctx, tag=False, team="valor"))
+            if " 0 interested!" not in await _interest(ctx, tag, team="valor"):
+                listmsg += ('\n' + bulletpoint) + (await _interest(ctx, tag, team="valor"))
+            if " 0 on the way!" not in await _otw(ctx, tag, team="valor"):
+                listmsg += ('\n' + bulletpoint) + (await _otw(ctx, tag, team="valor"))
+            if " 0 waiting at the raid!" not in await _waiting(ctx, tag, team="valor"):
+                listmsg += ('\n' + bulletpoint) + (await _waiting(ctx, tag, team="valor"))
+            if " 0 in the lobby!" not in await _lobbylist(ctx, tag, team="valor"):
+                listmsg += ('\n' + bulletpoint) + (await _lobbylist(ctx, tag, team="valor"))
             if (len(listmsg.splitlines()) <= 1):
                 listmsg +=  ('\n' + bulletpoint) + (" Nobody has updated their status yet!")
             listmsg += ('\n' + bulletpoint) + (await print_raid_timer(channel))
@@ -4646,14 +4689,14 @@ async def instinct(ctx, tag=False):
             bulletpoint = parse_emoji(ctx.guild, config['team_dict']['instinct'])
             starttime = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('starttime',None)
             rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
-            if " 0 interested!" not in await _interest(ctx):
-                listmsg += ('\n' + bulletpoint) + (await _interest(ctx, tag=False, team="instinct"))
-            if " 0 on the way!" not in await _otw(ctx):
-                listmsg += ('\n' + bulletpoint) + (await _otw(ctx, tag=False, team="instinct"))
-            if " 0 waiting at the raid!" not in await _waiting(ctx):
-                listmsg += ('\n' + bulletpoint) + (await _waiting(ctx, tag=False, team="instinct"))
-            if " 0 in the lobby!" not in await _lobbylist(ctx):
-                listmsg += ('\n' + bulletpoint) + (await _lobbylist(ctx, tag=False, team="instinct"))
+            if " 0 interested!" not in await _interest(ctx, tag, team="instinct"):
+                listmsg += ('\n' + bulletpoint) + (await _interest(ctx, tag, team="instinct"))
+            if " 0 on the way!" not in await _otw(ctx, tag, team="instinct"):
+                listmsg += ('\n' + bulletpoint) + (await _otw(ctx, tag, team="instinct"))
+            if " 0 waiting at the raid!" not in await _waiting(ctx, tag, team="instinct"):
+                listmsg += ('\n' + bulletpoint) + (await _waiting(ctx, tag, team="instinct"))
+            if " 0 in the lobby!" not in await _lobbylist(ctx, tag, team="instinct"):
+                listmsg += ('\n' + bulletpoint) + (await _lobbylist(ctx, tag, team="instinct"))
             if (len(listmsg.splitlines()) <= 1):
                 listmsg +=  ('\n' + bulletpoint) + (" Nobody has updated their status yet!")
             listmsg += ('\n' + bulletpoint) + (await print_raid_timer(channel))
@@ -4680,24 +4723,17 @@ async def _interest(ctx, tag=False, team=False):
     maybe_exstr = ''
     maybe_list = []
     name_list = []
-    team_list = []
-    party_dict = {'mystic': 0, 'valor': 1, 'instinct': 2}
-    if team:
-        team_index = party_dict[team]
     for trainer in trainer_dict.keys():
         user = ctx.guild.get_member(trainer)
-        if team:
-            for role in user.roles:
-                if role.name.lower() == team:
-                    name_list.append(('**' + user.display_name) + '**')
-                    maybe_list.append(user.mention)
-                    break
-        if (trainer_dict[trainer]['status'] == 'maybe') and user and team == False:
-            ctx_maybecount += trainer_dict[trainer]['count']
+        if (trainer_dict[trainer]['status']['maybe']) and user and team == False:
+            ctx_maybecount += trainer_dict[trainer]['status']['maybe']
             name_list.append(('**' + user.display_name) + '**')
             maybe_list.append(user.mention)
-        elif (trainer_dict[trainer]['status'] == 'maybe') and user and team:
-            ctx_maybecount += trainer_dict[trainer]['party'][team_index]
+        elif (trainer_dict[trainer]['status']['maybe']) and user and team and trainer_dict[trainer]['party'][team]:
+            name_list.append(('**' + user.display_name) + '**')
+            maybe_list.append(user.mention)
+            ctx_maybecount += trainer_dict[trainer]['party'][team]
+
     if ctx_maybecount > 0:
         if (now.time() >= datetime.time(5, 0)) and (now.time() <= datetime.time(21, 0)) and (tag == True):
             maybe_exstr = _(' including {trainer_list} and the people with them! Let them know if there is a group forming').format(trainer_list=', '.join(maybe_list))
@@ -4718,36 +4754,29 @@ async def coming(ctx, tag=False):
     await ctx.channel.send(listmsg)
 
 async def _otw(ctx, tag=False, team=False):
-    ctx_omwcount = 0
+    ctx_comingcount = 0
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[ctx.channel.guild.id]['offset'])
     trainer_dict = copy.deepcopy(guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict'])
     otw_exstr = ''
     otw_list = []
     name_list = []
-    team_list = []
-    party_dict = {'mystic': 0, 'valor': 1, 'instinct': 2}
-    if team:
-        team_index = party_dict[team]
     for trainer in trainer_dict.keys():
         user = ctx.guild.get_member(trainer)
-        if team:
-            for role in user.roles:
-                if role.name.lower() == team:
-                    name_list.append(('**' + user.display_name) + '**')
-                    otw_list.append(user.mention)
-                    break
-        if (trainer_dict[trainer]['status'] == 'omw') and user and team == False:
-            ctx_omwcount += trainer_dict[trainer]['count']
+        if (trainer_dict[trainer]['status']['coming']) and user and team == False:
+            ctx_comingcount += trainer_dict[trainer]['status']['coming']
             name_list.append(('**' + user.display_name) + '**')
             otw_list.append(user.mention)
-        elif (trainer_dict[trainer]['status'] == 'omw') and user and team:
-            ctx_omwcount += trainer_dict[trainer]['party'][team_index]
-    if ctx_omwcount > 0:
+        elif (trainer_dict[trainer]['status']['coming']) and user and team and trainer_dict[trainer]['party'][team]:
+            name_list.append(('**' + user.display_name) + '**')
+            otw_list.append(user.mention)
+            ctx_comingcount += trainer_dict[trainer]['party'][team]
+
+    if ctx_comingcount > 0:
         if (now.time() >= datetime.time(5, 0)) and (now.time() <= datetime.time(21, 0)) and (tag == True):
             otw_exstr = _(' including {trainer_list} and the people with them! Be considerate and wait for them if possible').format(trainer_list=', '.join(otw_list))
         else:
             otw_exstr = _(' including {trainer_list} and the people with them! Be considerate and wait for them if possible').format(trainer_list=', '.join(name_list))
-    listmsg = _(' {trainer_count} on the way{including_string}!').format(trainer_count=str(ctx_omwcount), including_string=otw_exstr)
+    listmsg = _(' {trainer_count} on the way{including_string}!').format(trainer_count=str(ctx_comingcount), including_string=otw_exstr)
     return listmsg
 
 @list.command()
@@ -4762,37 +4791,32 @@ async def here(ctx, tag=False):
     await ctx.channel.send(listmsg)
 
 async def _waiting(ctx, tag=False, team=False):
-    ctx_waitingcount = 0
+    ctx_herecount = 0
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[ctx.channel.guild.id]['offset'])
+    raid_dict = copy.deepcopy(guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id])
     trainer_dict = copy.deepcopy(guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict'])
-    waiting_exstr = ''
-    waiting_list = []
+    here_exstr = ''
+    here_list = []
     name_list = []
-    team_list = []
-    party_dict = {'mystic': 0, 'valor': 1, 'instinct': 2}
-    if team:
-        team_index = party_dict[team]
     for trainer in trainer_dict.keys():
         user = ctx.guild.get_member(trainer)
-        if team:
-            for role in user.roles:
-                if role.name.lower() == team:
-                    name_list.append(('**' + user.display_name) + '**')
-                    waiting_list.append(user.mention)
-                    break
-        if (trainer_dict[trainer]['status'] == 'waiting') and user and team == False:
-            ctx_waitingcount += trainer_dict[trainer]['count']
+        if (trainer_dict[trainer]['status']['here']) and user and team == False:
+            ctx_herecount += trainer_dict[trainer]['status']['here']
             name_list.append(('**' + user.display_name) + '**')
-            waiting_list.append(user.mention)
-        elif (trainer_dict[trainer]['status'] == 'waiting') and user and team:
-            ctx_waitingcount += trainer_dict[trainer]['party'][team_index]
+            here_list.append(user.mention)
+        elif (trainer_dict[trainer]['status']['here']) and user and team and trainer_dict[trainer]['party'][team]:
+            name_list.append(('**' + user.display_name) + '**')
+            here_list.append(user.mention)
+            ctx_herecount += trainer_dict[trainer]['party'][team]
+            if raid_dict.get('lobby',{"team":"all"})['team'] == team or raid_dict.get('lobby',{"team":"all"})['team'] == "all":
+                ctx_herecount -= trainer_dict[trainer]['status']['lobby']
 
-    if ctx_waitingcount > 0:
+    if ctx_herecount > 0:
         if (now.time() >= datetime.time(5, 0)) and (now.time() <= datetime.time(21, 0)) and (tag == True):
-            waiting_exstr = _(" including {trainer_list} and the people with them! Be considerate and let them know if and when you'll be there").format(trainer_list=', '.join(waiting_list))
+            here_exstr = _(" including {trainer_list} and the people with them! Be considerate and let them know if and when you'll be there").format(trainer_list=', '.join(here_list))
         else:
-            waiting_exstr = _(" including {trainer_list} and the people with them! Be considerate and let them know if and when you'll be there").format(trainer_list=', '.join(name_list))
-    listmsg = _(' {trainer_count} waiting at the raid{including_string}!').format(trainer_count=str(ctx_waitingcount), including_string=waiting_exstr)
+            here_exstr = _(" including {trainer_list} and the people with them! Be considerate and let them know if and when you'll be there").format(trainer_list=', '.join(name_list))
+    listmsg = _(' {trainer_count} waiting at the raid{including_string}!').format(trainer_count=str(ctx_herecount), including_string=here_exstr)
     return listmsg
 
 @list.command()
@@ -4809,27 +4833,22 @@ async def lobby(ctx, tag=False):
 async def _lobbylist(ctx, tag=False, team=False):
     ctx_lobbycount = 0
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[ctx.channel.guild.id]['offset'])
+    raid_dict = copy.deepcopy(guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id])
     trainer_dict = copy.deepcopy(guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict'])
     lobby_exstr = ''
     lobby_list = []
     name_list = []
-    team_list = []
-    if team:
-        team_index = party_dict[team]
     for trainer in trainer_dict.keys():
         user = ctx.guild.get_member(trainer)
-        if team:
-            for role in user.roles:
-                if role.name.lower() == team:
-                    name_list.append(('**' + user.display_name) + '**')
-                    lobby_list.append(user.mention)
-                    break
-        if (trainer_dict[trainer]['status'] == 'lobby') and user and team == False:
-            ctx_lobbycount += trainer_dict[trainer]['count']
+        if (trainer_dict[trainer]['status']['lobby']) and user and team == False:
+            ctx_lobbycount += trainer_dict[trainer]['status']['lobby']
             name_list.append(('**' + user.display_name) + '**')
             lobby_list.append(user.mention)
-        elif (trainer_dict[trainer]['status'] == 'lobby') and user and team:
-            ctx_lobbycount += trainer_dict[trainer]['party'][team_index]
+        elif (trainer_dict[trainer]['status']['lobby']) and user and team and trainer_dict[trainer]['party'][team]:
+            name_list.append(('**' + user.display_name) + '**')
+            lobby_list.append(user.mention)
+            if raid_dict.get('lobby',{"team":"all"})['team'] == team or raid_dict.get('lobby',{"team":"all"})['team'] == "all":
+                ctx_lobbycount += trainer_dict[trainer]['party'][team]
 
     if ctx_lobbycount > 0:
         if (now.time() >= datetime.time(5, 0)) and (now.time() <= datetime.time(21, 0)) and (tag == True):
@@ -4856,12 +4875,12 @@ async def _bosslist(ctx):
     egg_img = egg_info['egg_img']
     boss_dict = {}
     boss_list = []
-    boss_dict["unspecified"] = {"type": "❔", "total": 0, "maybe": 0, "omw": 0, "waiting": 0}
+    boss_dict["unspecified"] = {"type": "❔", "total": 0, "maybe": 0, "coming": 0, "here": 0}
     for p in egg_info['pokemon']:
         p_name = get_name(p)
         boss_list.append(p_name.lower())
         p_type = get_type(message.guild,p)
-        boss_dict[p_name.lower()] = {"type": "{}".format(''.join(p_type)), "total": 0, "maybe": 0, "omw": 0, "waiting": 0}
+        boss_dict[p_name.lower()] = {"type": "{}".format(''.join(p_type)), "total": 0, "maybe": 0, "coming": 0, "here": 0}
     boss_list.append('unspecified')
     trainer_dict = copy.deepcopy(guild_dict[message.guild.id]['raidchannel_dict'][channel.id]['trainer_dict'])
     for trainer in trainer_dict:
@@ -4869,14 +4888,14 @@ async def _bosslist(ctx):
             continue
         interest = trainer_dict[trainer].get('interest', ['unspecified'])
         for item in interest:
-            status = trainer_dict[trainer]['status']
+            status = max(trainer_dict[trainer]['status'], key=lambda key: trainer_dict[trainer]['status'][key])
             count = trainer_dict[trainer]['count']
             boss_dict[item][status] += count
             boss_dict[item]['total'] += count
     bossliststr = ''
     for boss in boss_list:
         if boss_dict[boss]['total'] > 0:
-            bossliststr += _('{type}{name}: **{total} total,** {interested} interested, {coming} coming, {waiting} waiting{type}\n').format(type=boss_dict[boss]['type'],name=boss.capitalize(), total=boss_dict[boss]['total'], interested=boss_dict[boss]['maybe'], coming=boss_dict[boss]['omw'], waiting=boss_dict[boss]['waiting'])
+            bossliststr += _('{type}{name}: **{total} total,** {interested} interested, {coming} coming, {here} waiting{type}\n').format(type=boss_dict[boss]['type'],name=boss.capitalize(), total=boss_dict[boss]['total'], interested=boss_dict[boss]['maybe'], coming=boss_dict[boss]['coming'], here=boss_dict[boss]['here'])
     if bossliststr:
         listmsg = _(' Boss numbers for the raid:\n{}').format(bossliststr)
     else:
@@ -4894,33 +4913,30 @@ async def teams(ctx):
 async def _teamlist(ctx):
     message = ctx.message
     team_dict = {}
-    team_dict["mystic"] = {"total":0,"maybe":0,"omw":0,"waiting":0}
-    team_dict["valor"] = {"total":0,"maybe":0,"omw":0,"waiting":0}
-    team_dict["instinct"] = {"total":0,"maybe":0,"omw":0,"waiting":0}
-    team_dict["unknown"] = {"total":0,"maybe":0,"omw":0,"waiting":0}
-    status_list = ["waiting","omw","maybe"]
+    team_dict["mystic"] = {"total":0,"maybe":0,"coming":0,"here":0}
+    team_dict["valor"] = {"total":0,"maybe":0,"coming":0,"here":0}
+    team_dict["instinct"] = {"total":0,"maybe":0,"coming":0,"here":0}
+    team_dict["unknown"] = {"total":0,"maybe":0,"coming":0,"here":0}
+    status_list = ["here","coming","maybe"]
     team_list = ["mystic","valor","instinct","unknown"]
-    index = 0
     teamliststr = ''
     trainer_dict = copy.deepcopy(guild_dict[message.guild.id]['raidchannel_dict'][message.channel.id]['trainer_dict'])
     for trainer in trainer_dict.keys():
         if not ctx.guild.get_member(trainer):
             continue
         for team in team_list:
-            team_dict[team]["total"] += int(trainer_dict[trainer]['party'][index])
+            team_dict[team]["total"] += int(trainer_dict[trainer]['party'][team])
             for status in status_list:
-                if trainer_dict[trainer]['status'] == status:
-                    team_dict[team][status] += int(trainer_dict[trainer]['party'][index])
-            index += 1
-        index = 0
+                if max(trainer_dict[trainer]['status'], key=lambda key: trainer_dict[trainer]['status'][key]) == status:
+                    team_dict[team][status] += int(trainer_dict[trainer]['party'][team])
     for team in team_list[:-1]:
         if team_dict[team]['total'] > 0:
-            teamliststr += _('{emoji} **{total} total,** {interested} interested, {coming} coming, {waiting} waiting {emoji}\n').format(emoji=parse_emoji(ctx.guild, config['team_dict'][team]), total=team_dict[team]['total'], interested=team_dict[team]['maybe'], coming=team_dict[team]['omw'], waiting=team_dict[team]['waiting'])
+            teamliststr += _('{emoji} **{total} total,** {interested} interested, {coming} coming, {here} waiting {emoji}\n').format(emoji=parse_emoji(ctx.guild, config['team_dict'][team]), total=team_dict[team]['total'], interested=team_dict[team]['maybe'], coming=team_dict[team]['coming'], here=team_dict[team]['here'])
     if team_dict["unknown"]['total'] > 0:
         teamliststr += '❔ '
-        teamliststr += _('**{grey_number} total,** {greymaybe} interested, {greycoming} coming, {greywaiting} waiting')
+        teamliststr += _('**{grey_number} total,** {greymaybe} interested, {greycoming} coming, {greyhere} waiting')
         teamliststr += ' ❔'
-        teamliststr = teamliststr.format(grey_number=team_dict['unknown']['total'], greymaybe=team_dict['unknown']['maybe'], greycoming=team_dict['unknown']['omw'], greywaiting=team_dict['unknown']['waiting'])
+        teamliststr = teamliststr.format(grey_number=team_dict['unknown']['total'], greymaybe=team_dict['unknown']['maybe'], greycoming=team_dict['unknown']['coming'], greyhere=team_dict['unknown']['here'])
     if teamliststr:
         listmsg = _(' Team numbers for the raid:\n{}').format(teamliststr)
     else:

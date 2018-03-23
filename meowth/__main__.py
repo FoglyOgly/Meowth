@@ -1897,7 +1897,7 @@ async def raid_json(ctx, level=None, *, newlist=None):
 @commands.has_permissions(manage_channels=True)
 @checks.raidchannel()
 async def changeraid(ctx, newraid):
-    'Changes raid boss.\n\n    Usage: !changeraid <new pokemon>\n    Only usable by admins.'
+    'Changes raid boss.\n\n    Usage: !changeraid <new pokemon or level>\n    Only usable by admins.'
     message = ctx.message
     guild = message.guild
     channel = message.channel

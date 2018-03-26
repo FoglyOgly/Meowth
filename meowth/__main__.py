@@ -373,13 +373,13 @@ def do_template(message, author, guild):
     msg = re.sub(template_pattern, template_replace, message)
     return (msg, not_found)
 
-async def ask(message, destination, user_list, *, react_list=['✅', '❎']):
+async def ask(message, destination, user_list=None, *, react_list=['✅', '❎']):
     if user_list and type(user_list) != __builtins__.list:
         user_list = [user_list]
     def check(reaction, user):
         if user_list and type(user_list) is __builtins__.list:
             return (user.id in user_list) and (reaction.message.id == message.id) and (reaction.emoji in react_list)
-        else:
+        elif not user_list:
             return (user.id != message.guild.me.id) and (reaction.message.id == message.id) and (reaction.emoji in react_list)
     for r in react_list:
         await asyncio.sleep(0.25)

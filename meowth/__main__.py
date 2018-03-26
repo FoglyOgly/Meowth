@@ -374,7 +374,7 @@ def do_template(message, author, guild):
     return (msg, not_found)
 
 async def ask(message, destination, user_list, *, react_list=['✅', '❎']):
-    if type(user_list) != __builtins__.list:
+    if user_list and type(user_list) != __builtins__.list:
         user_list = [user_list]
     def check(reaction, user):
         if user_list and type(user_list) is __builtins__.list:

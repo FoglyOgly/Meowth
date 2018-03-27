@@ -608,12 +608,17 @@ async def expire_channel(channel):
                         newcat = channel.guild.get_channel(category)
                     await channel.edit(name=new_name, category=newcat)
                     await channel.send(_('-----------------------------------------------\n**The channel has been archived and removed from view for everybody but Meowth and those with Manage Channel permissions. Any messages that were deleted after the channel was marked for archival will be posted below. You will need to delete this channel manually.**\n-----------------------------------------------'))
-                    logs = guild_dict[channel.guild.id]['raidchannel_dict'][channel.id].get('logs', [])
-                    if logs:
-                        for message in logs:
-                            embed = discord.Embed(colour=message.author.colour, description=message.content, timestamp=message.created_at)
-                            embed.set_author(name=str(message.author), icon_url = message.author.avatar_url)
-                            await channel.send(embed=embed)
+                    logs = guild_dict[channel.guild.id]['raidchannel_dict'][channel.id].get('logs', {})
+                    while logs:
+                        earliest = min(logs)
+                        embed = discord.Embed(colour=logs[earliest]['color_int'], description=logs[earliest]['content'], timestamp=logs[earliest]['created_at'])
+                        if logs[earliest]['author_nick']:
+                            embed.set_author(name="{name} [{nick}]".format(name=logs[earliest]['author_str'],nick=logs[earliest]['author_nick']), icon_url = logs[earliest]['author_avy'])
+                        else:
+                            embed.set_author(name=logs[earliest]['author_str'], icon_url = logs[earliest]['author_avy'])
+                        await channel.send(embed=embed)
+                        del logs[earliest]
+                        await asyncio.sleep(.25)
                     del guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]
         except:
             pass
@@ -987,10 +992,9 @@ async def on_message_delete(message):
     author = message.author
     if channel.id in guild_dict[guild.id]['raidchannel_dict']:
         if guild_dict[guild.id]['raidchannel_dict'][channel.id].get('archive', False):
-            logs = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('logs', [])
-            logs.append(message)
+            logs = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('logs', {})
+            logs[message.id] = {'author_id': message.author.id, 'author_str': str(message.author),'author_avy':message.author.avatar_url,'author_nick':message.author.nick,'color_int':message.author.color.value,'content': message.clean_content,'created_at':message.created_at}
             guild_dict[guild.id]['raidchannel_dict'][channel.id]['logs'] = logs
-
 
 
 """
@@ -1847,11 +1851,13 @@ async def configure(ctx):
         phrasemsg = await Meowth.wait_for('message', check=(lambda message: (message.guild == None) and message.author == owner))
         if phrasemsg.content.lower() == 'none':
             guild_dict_temp['archive']['list'] = None
-        phrase_list = phrasemsg.content.lower().split(",")
-        for i in range(len(phrase_list)):
-            phrase_list[i] = phrase_list[i].strip()
-        guild_dict_temp['archive']['list'] = phrase_list
-        await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description=_('Phrase list set.')))
+            await owner.send(embed=discord.Embed(colour=discord.Colour.red(), description=_('Phrase list disabled.')))
+        else:
+            phrase_list = phrasemsg.content.lower().split(",")
+            for i in range(len(phrase_list)):
+                phrase_list[i] = phrase_list[i].strip()
+            guild_dict_temp['archive']['list'] = phrase_list
+            await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description=_('Phrase list set.')))
     guild_dict_temp['done'] = True
     if configcancel == False:
         guild_dict[guild.id] = guild_dict_temp

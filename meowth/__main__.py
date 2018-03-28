@@ -4098,7 +4098,7 @@ async def _party_status(ctx, total, teamcounts):
         my_team = 'unknown'
     if not teamcounts:
         teamcounts = "1"
-    teamcounts = teamcounts.split()
+    teamcounts = teamcounts.lower().split()
     if total and teamcounts[0].isdigit():
         del teamcounts[0]
     mystic = ['mystic', 0]

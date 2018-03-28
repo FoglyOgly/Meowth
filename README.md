@@ -163,7 +163,6 @@ pkmn = Pokemon
 | **!clearstatus**  | *Channel Manager<br/>Raid Channel* | Cancel everyone's status. |
 | **!setstatus** \<user\> \<status\> \[count\] | *Channel Manager<br/>Raid Channel* | Changes raid channel status lists. |
 | **!cleanroles** | *Channel Manager* | Removes all 0 member pokemon roles. |
-| **!archive** | *Messages Manager<br/>Raid Channel* | Mark a channel for archiving. |
 
 ### Miscellaneous Commands
 | Commands | Requirements  | Description |
@@ -207,6 +206,7 @@ pkmn = Pokemon
 | **!duplicate** | *Raid Channel* | Reports the raid as a duplicate channel. |
 | **!weather** | *Raid Channel* | Sets the weather for the raid. |
 | **!counters** | *Raid Channel* | Simulate a Raid battle with Pokebattler. |
+| **!archive** | *Raid Channel* | Mark a channel for archiving. |
 
 ### Status Management:
 

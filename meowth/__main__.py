@@ -1294,7 +1294,7 @@ async def announce(ctx, *, announce=None):
 @Meowth.command()
 @commands.has_permissions(manage_guild=True)
 async def configure(ctx):
-    'Meowth Configuration\n\n    Usage: !configure\n    Meowth will DM you instructions on how to configure Meowth for your server.\n    If it is not your first time configuring, you can choose a section to jump to.'
+    'Meowth Configuration\n\n    Usage: !configure\n    Must be used by an admin in a channel. Meowth will then DM you instructions on how to configure Meowth for your server.\n    If it is not your first time configuring, you can choose a section to jump to.'
     guild = ctx.message.guild
     owner = ctx.message.author
     guild_dict_check = {

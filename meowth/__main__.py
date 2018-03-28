@@ -1940,6 +1940,7 @@ async def changeraid(ctx, newraid):
         raid_channel_name += sanitize_channel_name(guild_dict[guild.id]['raidchannel_dict'][channel.id]['address'])
         guild_dict[guild.id]['raidchannel_dict'][channel.id]['egglevel'] = newraid
         guild_dict[guild.id]['raidchannel_dict'][channel.id]['pokemon'] = ''
+        guild_dict[guild.id]['raidchannel_dict'][channel.id]['type'] = 'egg'
         egg_img = raid_info['raid_eggs'][newraid]['egg_img']
         boss_list = []
         for p in raid_info['raid_eggs'][newraid]['pokemon']:

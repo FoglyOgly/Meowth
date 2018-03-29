@@ -212,20 +212,20 @@ pkmn = Pokemon
 
 | Commands | Requirements  | Description |
 | -------- |:-------------:| ------------|
-| **!interested** \[number\] \[teamcounts\] \[boss list or all\] | *Raid Channel* | Sets your status for the raid to 'interested'. Teamcounts format is `m# v# i#`. You can also supply a list of bosses or 'all' that you are interested in. |
-| **!coming** \[number\] \[teamcounts\] \[boss list or all\] | *Raid Channel* | Sets your status for the raid to 'coming'.  Teamcounts format is `m# v# i#`. You can also supply a list of bosses or 'all' that you are interested in. |
-| **!here** \[number\] \[teamcounts\] \[boss list or all\] | *Raid Channel* | Sets your status for the raid to 'here'.  Teamcounts format is `m# v# i#`. You can also supply a list of bosses or 'all' that you are interested in. |
-| **!lobby** \[number\] | *Raid Channel* | Indicate you are entering the raid lobby. |
+| **!interested** \[number\] \[teamcounts\] \[boss list or all\] | *Raid Channel* | Sets your status for the raid to 'interested'. Teamcounts format is `m# v# i#`. You can also supply a list of bosses or 'all' that you are interested in. Aliases: !i, !maybe |
+| **!coming** \[number\] \[teamcounts\] \[boss list or all\] | *Raid Channel* | Sets your status for the raid to 'coming'.  Teamcounts format is `m# v# i#`. You can also supply a list of bosses or 'all' that you are interested in. Aliases: !c |
+| **!here** \[number\] \[teamcounts\] \[boss list or all\] | *Raid Channel* | Sets your status for the raid to 'here'.  Teamcounts format is `m# v# i#`. You can also supply a list of bosses or 'all' that you are interested in. Aliases: !h |
+| **!lobby** \[number\] | *Raid Channel* | Indicate you are entering the raid lobby. Aliases: !l |
 | **!starting** | *Raid Channel* | Clears all members 'here', announce raid start. |
 | **!backout** | *Raid Channel* | Request players in lobby to backout. |
-| **!cancel**  | *Raid Channel* | Cancel your status. |
+| **!cancel**  | *Raid Channel* | Cancel your status. Aliases: !x |
 
 ### List Commands:
 
 | Commands | Requirements  | Description |
 | -------- |:-------------:| ------------|
-| **!list** | *Region Channel* | Lists all raids from that region channel. |
-| **!list**  | *Raid Channel* | Lists all member status' for the raid. |
+| **!list** | *Region Channel* | Lists all raids from that region channel. Aliases: !lists|
+| **!list**  | *Raid Channel* | Lists all member status' for the raid. Aliases: !lists|
 | **!list tags** | *Raid Channel* | Same behavior as !list, but with @mentions. |
 | **!list interested** | *Raid Channel* | Lists 'interested' members for the raid. |
 | **!list coming**  | *Raid Channel* | Lists 'coming' members for the raid. |

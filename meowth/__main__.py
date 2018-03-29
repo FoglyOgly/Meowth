@@ -1629,12 +1629,12 @@ async def configure(ctx):
                 continue
         guild_dict_temp['city_channels'] = citychannel_dict
         await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description=_('Report Locations are set')))
-        guild = Meowth.get_guild(guild.id)
-        guild_catlist = []
-        for cat in guild.categories:
-            guild_catlist.append(cat.id)
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("How would you like me to categorize the raid channels I create? Your options are:\n\n**none** - If you don't want them categorized\n**same** - If you want them in the same category as the reporting channel\n**region** - If you want them categorized by region\n**level** - If you want them categorized by level.")))
         while True:
+            guild = Meowth.get_guild(guild.id)
+            guild_catlist = []
+            for cat in guild.categories:
+                guild_catlist.append(cat.id)
             category_dict = {}
             categories = await Meowth.wait_for('message', check=lambda message: message.guild == None and message.author == owner)
             if categories.content.lower() == 'cancel':
@@ -1649,6 +1649,10 @@ async def configure(ctx):
                 break
             elif categories.content.lower() == 'region':
                 while True:
+                    guild = Meowth.get_guild(guild.id)
+                    guild_catlist = []
+                    for cat in guild.categories:
+                        guild_catlist.append(cat.id)
                     guild_dict_temp['categories'] = 'region'
                     await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(),description=_("You have configured the following channels as raid reporting channels: {citychannel_list}\n\nIn the same order as they appear above, please give the names of the categories you would like raids reported in each channel to appear in. You do not need to use different categories for each channel, but they do need to be pre-existing categories. Separate each category name with a comma. Response can be either category name or ID.").format(citychannel_list=citychannels.content.lower())))
                     regioncats = await Meowth.wait_for('message', check=lambda message: message.guild == None and message.author == owner)
@@ -1684,7 +1688,11 @@ async def configure(ctx):
                                 category_dict[citychannel_list[i]] = regioncat_list[i]
                             break
                         else:
-                            await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(),description=_("The category list you provided doesn't match with your server's categories.\n\nThe following aren't in your server: **{invalid_categories}**\n\nPlease double check your category list and resend your response.").format(invalid_categories=', '.join(regioncat_errors))))
+                            msg = _("The category list you provided doesn't match with your server's categories.")
+                            if regioncat_errors:
+                                msg += _("\n\nThe following aren't in your server: **{invalid_categories}**").format(invalid_categories=', '.join(regioncat_errors))
+                            msg += _("\n\nPlease double check your category list and resend your response. If you just made these categories, try again.")
+                            await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(),description=msg))
                             continue
                     else:
                         msg = _("The number of categories I found in your server doesn't match the number of channels you gave me earlier!\n\nI'll show you the two lists to compare:\n\n**Matched Channels:** {channellist}\n**Matched Categories:** {catlist}\n\nPlease double check that your categories match up with your provided channels and resend your response.").format(channellist=', '.join(citychannel_names), catlist=', '.join(regioncat_names) if len(regioncat_list)>0 else "None")
@@ -1696,6 +1704,10 @@ async def configure(ctx):
             elif categories.content.lower() == 'level':
                 guild_dict_temp['categories'] = 'level'
                 while True:
+                    guild = Meowth.get_guild(guild.id)
+                    guild_catlist = []
+                    for cat in guild.categories:
+                        guild_catlist.append(cat.id)
                     await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(),description=_("Pokemon Go currently has six levels of raids. Please provide the names of the categories you would like each level of raid to appear in. Use the following order: 1, 2, 3, 4, 5, EX \n\nYou do not need to use different categories for each level, but they do need to be pre-existing categories. Separate each category name with a comma. Response can be either category name or ID.")))
                     levelcats = await Meowth.wait_for('message', check=lambda message: message.guild == None and message.author == owner)
                     if levelcats.content.lower() == "cancel":
@@ -1731,7 +1743,11 @@ async def configure(ctx):
                                 category_dict[level_list[i]] = levelcat_list[i]
                             break
                         else:
-                            await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(),description=_("The category list you provided doesn't match with your server's categories.\n\nThe following aren't in your server: **{invalid_categories}**\n\nPlease double check your category list and resend your response.").format(invalid_categories=', '.join(levelcat_errors))))
+                            msg = _("The category list you provided doesn't match with your server's categories.")
+                            if levelcat_errors:
+                                msg += _("\n\nThe following aren't in your server: **{invalid_categories}**").format(invalid_categories=', '.join(levelcat_errors))
+                            msg += _("\n\nPlease double check your category list and resend your response. If you just made these categories, try again.")
+                            await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(),description=msg))
                             continue
                     else:
                         msg = _("The number of categories I found in your server doesn't match the number of raid levels! Make sure you give me exactly six categories, one for each level of raid. You can use the same category for multiple levels if you want, but I need to see six category names.\n\n**Matched Categories:** {catlist}\n\nPlease double check your categories.").format(catlist=', '.join(levelcat_names) if len(levelcat_list)>0 else "None")

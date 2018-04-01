@@ -50,7 +50,7 @@ Get the installer [HERE](https://github.com/tesseract-ocr/tesseract/wiki/Downloa
 
 3. Make sure the Tesseract-OCR install folder and your python install folder are added to your system environment PATH variable.
 
-4. Download the files in this repository. The source code is in meowth.py and bot config is in config.json.
+4. Download the files in this repository. The main source code is in meowth/\_\_main\_\_.py and bot config is in config.json.
 
 5. Go to https://discordapp.com/developers/applications/me#top and create a new app.
 

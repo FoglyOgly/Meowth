@@ -1073,6 +1073,28 @@ async def _set(ctx):
 
 @_set.command()
 @commands.has_permissions(manage_guild=True)
+async def regional(ctx, regional=None):
+    """Changes server regional pokemon."""
+    if regional == 'clear':
+        regional = None
+        await ctx.message.channel.send(_("Meowth! Regional raid boss cleared!"))
+    elif regional and regional.isdigit() and int(regional) in get_raidlist():
+        regional = int(regional)
+        await ctx.message.channel.send(_("Meowth! Regional raid boss set to {boss}!").format(boss=get_name(regional).title()))
+    elif regional and not regional.isdigit() and regional in get_raidlist():
+        await ctx.message.channel.send(_("Meowth! Regional raid boss set to {boss}!").format(boss=regional.title()))
+        regional = get_number(regional)
+    else:
+        await ctx.message.channel.send(_("Meowth! That Pokemon doesn't appear in raids!"))
+        return
+    _set_regional(Meowth, ctx.guild, regional)
+
+
+def _set_regional(bot, guild, regional):
+    bot.guild_dict[guild.id]['regional'] = regional
+
+@_set.command()
+@commands.has_permissions(manage_guild=True)
 async def prefix(ctx, prefix=None):
     """Changes server prefix."""
     if prefix == 'clear':
@@ -2749,6 +2771,8 @@ async def _raidegg(message):
             await raid_channel.send(content=_('Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset <minutes>** so others can check it with **!timer**.').format(member=message.author.mention))
         if len(raid_info['raid_eggs'][egg_level]['pokemon']) == 1:
             await _eggassume('assume ' + get_name(raid_info['raid_eggs'][egg_level]['pokemon'][0]), raid_channel)
+        elif egg_level == "5" and guild_dict[raid_channel.guild.id].get('regional',None) in raid_info['raid_eggs']["5"]['pokemon']:
+            await _eggassume('assume ' + get_name(guild_dict[raid_channel.guild.id]['regional']), raid_channel)
         event_loop.create_task(expiry_check(raid_channel))
 
 async def _eggassume(args, raid_channel, author=None):

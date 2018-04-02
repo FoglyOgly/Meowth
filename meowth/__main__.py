@@ -1075,14 +1075,19 @@ async def _set(ctx):
 @commands.has_permissions(manage_guild=True)
 async def regional(ctx, regional=None):
     """Changes server regional pokemon."""
-    if regional == 'clear':
+    if regional == 'reset' and checks.is_owner_check(ctx):
+        guild_dict_copy = copy.deepcopy(guild_dict)
+        for guildid in guild_dict_copy.keys():
+            guild_dict[guildid]['regional'] = None
+        return
+    elif regional == 'clear':
         regional = None
         await ctx.message.channel.send(_("Meowth! Regional raid boss cleared!"))
     elif regional and regional.isdigit() and int(regional) in get_raidlist():
         regional = int(regional)
-        await ctx.message.channel.send(_("Meowth! Regional raid boss set to {boss}!").format(boss=get_name(regional).title()))
+        await ctx.message.channel.send(_("Meowth! Regional raid boss set to **{boss}**!").format(boss=get_name(regional).title()))
     elif regional and not regional.isdigit() and regional in get_raidlist():
-        await ctx.message.channel.send(_("Meowth! Regional raid boss set to {boss}!").format(boss=regional.title()))
+        await ctx.message.channel.send(_("Meowth! Regional raid boss set to **{boss}**!").format(boss=regional.title()))
         regional = get_number(regional)
     else:
         await ctx.message.channel.send(_("Meowth! That Pokemon doesn't appear in raids!"))

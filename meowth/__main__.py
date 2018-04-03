@@ -1622,7 +1622,8 @@ async def configure(ctx):
                         else:
                             citychannel_errors.append(item)
                     else:
-                        item = re.sub('[^a-zA-Z0-9-_]+', '', item)
+                        item = re.sub('[^a-zA-Z0-9 _\\-]+', '', item)
+                        item = item.replace(" ","-")
                         name = await letter_case(guild.text_channels, item.lower())
                         channel = discord.utils.get(guild.text_channels, name=name)
                         if channel:
@@ -1702,7 +1703,7 @@ async def configure(ctx):
                             else:
                                 regioncat_errors.append(item)
                         else:
-                            item = re.sub('[^a-zA-Z0-9-_]+', '', item)
+                            item = re.sub('[^a-zA-Z0-9 _\\-]+', '', item)
                             name = await letter_case(guild.categories, item.lower())
                             category = discord.utils.get(guild.categories, name=name)
                             if category:
@@ -1757,7 +1758,7 @@ async def configure(ctx):
                             else:
                                 levelcat_errors.append(item)
                         else:
-                            item = re.sub('[^a-zA-Z0-9-_]+', '', item)
+                            item = re.sub('[^a-zA-Z0-9 _\\-]+', '', item)
                             name = await letter_case(guild.categories, item.lower())
                             category = discord.utils.get(guild.categories, name=name)
                             if category:

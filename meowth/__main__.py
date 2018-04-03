@@ -1006,7 +1006,7 @@ Admin Commands
 """
 
 @Meowth.command(hidden=True, name="eval")
-@Meowth.is_owner()
+@checks.is_owner()
 async def _eval(ctx, *, body: str):
     """Evaluates a code"""
     env = {

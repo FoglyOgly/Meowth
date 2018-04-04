@@ -153,6 +153,7 @@ pkmn = Pokemon
 | **!welcome** \[@member\] | *Owner Only* | Sends the welcome message to either user or mentioned member. |
 | **!outputlog**  | *Server Manager Only* | Uploads the log file to hastebin and replies with the link. |
 | **!set prefix** \[prefix\] | *Server Manager Only* | Sets Meowth's prefix. |
+| **!set regional** \<pkmn\> | *Server Manager Only* | Sets server's regional raid boss. Accepts number or name. |
 | **!get prefix** | *Server Manager Only* | Displays Meowth's prefix. |
 | **!get perms** \[channelid\] | *Server Manager Only* | Displays Meowth's permissions in guild and channel. |
 | **!welcome** \[user\] | *Owner Only* | Test welcome message on mentioned member |

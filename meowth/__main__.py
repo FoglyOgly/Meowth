@@ -1130,18 +1130,18 @@ async def _set(ctx):
 @commands.has_permissions(manage_guild=True)
 async def regional(ctx, regional=None):
     """Changes server regional pokemon."""
-    if regional == 'reset' and checks.is_owner_check(ctx):
+    if regional.lower() == 'reset' and checks.is_owner_check(ctx):
         guild_dict_copy = copy.deepcopy(guild_dict)
         for guildid in guild_dict_copy.keys():
             guild_dict[guildid]['regional'] = None
         return
-    elif regional == 'clear':
+    elif regional.lower() == 'clear':
         regional = None
         await ctx.message.channel.send(_("Meowth! Regional raid boss cleared!"))
     elif regional and regional.isdigit() and int(regional) in get_raidlist():
         regional = int(regional)
         await ctx.message.channel.send(_("Meowth! Regional raid boss set to **{boss}**!").format(boss=get_name(regional).title()))
-    elif regional and not regional.isdigit() and regional in get_raidlist():
+    elif regional and not regional.isdigit() and regional.lower() in get_raidlist():
         await ctx.message.channel.send(_("Meowth! Regional raid boss set to **{boss}**!").format(boss=regional.title()))
         regional = get_number(regional)
     else:
@@ -1677,7 +1677,8 @@ async def configure(ctx):
                         else:
                             citychannel_errors.append(item)
                     else:
-                        item = re.sub('[^a-zA-Z0-9-_]+', '', item)
+                        item = re.sub('[^a-zA-Z0-9 _\\-]+', '', item)
+                        item = item.replace(" ","-")
                         name = await letter_case(guild.text_channels, item.lower())
                         channel = discord.utils.get(guild.text_channels, name=name)
                         if channel:
@@ -1757,7 +1758,7 @@ async def configure(ctx):
                             else:
                                 regioncat_errors.append(item)
                         else:
-                            item = re.sub('[^a-zA-Z0-9-_]+', '', item)
+                            item = re.sub('[^a-zA-Z0-9 _\\-]+', '', item)
                             name = await letter_case(guild.categories, item.lower())
                             category = discord.utils.get(guild.categories, name=name)
                             if category:
@@ -1812,7 +1813,7 @@ async def configure(ctx):
                             else:
                                 levelcat_errors.append(item)
                         else:
-                            item = re.sub('[^a-zA-Z0-9-_]+', '', item)
+                            item = re.sub('[^a-zA-Z0-9 _\\-]+', '', item)
                             name = await letter_case(guild.categories, item.lower())
                             category = discord.utils.get(guild.categories, name=name)
                             if category:

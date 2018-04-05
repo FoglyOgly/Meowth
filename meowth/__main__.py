@@ -530,7 +530,8 @@ async def expire_channel(channel):
                     if trainer_dict[trainer]['status']['maybe']:
                         user = channel.guild.get_member(trainer)
                         maybe_list.append(user.mention)
-                new_name = _('hatched-')
+                h = _('hatched-')
+                new_name = h if h not in channel.name else ''
                 new_name += channel.name
                 await channel.edit(name=new_name)
                 await channel.send(_("**This egg has hatched!**\n\n...or the time has just expired. Trainers {trainer_list}: Update the raid to the pokemon that hatched using **!raid <pokemon>** or reset the hatch timer with **!timerset**. This channel will be deactivated until I get an update and I'll delete it in 45 minutes if I don't hear anything.").format(trainer_list=', '.join(maybe_list)))
@@ -539,7 +540,8 @@ async def expire_channel(channel):
                 level=guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['egglevel'])
         else:
             if (not alreadyexpired):
-                new_name = _('expired-')
+                e = _('expired-')
+                new_name = e if e not in channel.name else ''
                 new_name += channel.name
                 await channel.edit(name=new_name)
                 await channel.send(_('This channel timer has expired! The channel has been deactivated and will be deleted in 5 minutes.\nTo reactivate the channel, use **!timerset** to set the timer again.'))
@@ -3488,13 +3490,18 @@ async def recover(ctx):
 
     Usage: !recover
     Only necessary after a crash."""
-    if checks.check_wantchannel(ctx) or checks.check_citychannel(ctx) or checks.check_raidchannel(ctx) or checks.check_eggchannel(ctx) or checks.check_exraidchannel(ctx):
+    if (checks.check_wantchannel(ctx) or checks.check_citychannel(ctx) or checks.check_raidchannel(ctx) or checks.check_eggchannel(ctx) or checks.check_exraidchannel(ctx)):
         await ctx.channel.send(_("Meowth! I can't recover this channel because I know about it already!"))
     else:
         channel = ctx.channel
         guild = channel.guild
         name = channel.name
         topic = channel.topic
+        h = _('hatched-')
+        e = _('expired-')
+        while h in name or e in name:
+            name = name.replace(h,'')
+            name = name.replace(e,'')
         egg = re.match(_('level-[1-5]-egg'), name)
         now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[guild.id]['offset'])
         reportchannel = None

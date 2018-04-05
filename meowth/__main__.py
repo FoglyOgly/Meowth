@@ -468,7 +468,7 @@ async def expiry_check(channel):
                                 egglevel = guild_dict[guild.id]['raidchannel_dict'][channel.id]['egglevel']
                                 if not pokemon and len(raid_info['raid_eggs'][egglevel]['pokemon']) == 1:
                                     pokemon = get_name(raid_info['raid_eggs'][egglevel]['pokemon'][0])
-                                elif not pokemon egglevel == "5" and guild_dict[channel.guild.id].get('regional',None) in raid_info['raid_eggs']["5"]['pokemon']:
+                                elif not pokemon and egglevel == "5" and guild_dict[channel.guild.id].get('regional',None) in raid_info['raid_eggs']["5"]['pokemon']:
                                     pokemon = get_name(guild_dict[channel.guild.id]['regional'])
                                 if pokemon:
                                     logger.info(
@@ -2102,6 +2102,8 @@ async def archive(ctx):
 
 
 async def _archive(channel):
+    guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['archive'] = True
+    await asyncio.sleep(10)
     guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['archive'] = True
 
 """

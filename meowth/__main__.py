@@ -519,6 +519,7 @@ async def expire_channel(channel):
         logger.info('Expire_Channel - Channel Expired - ' + channel.name)
         dupecount = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('duplicate',0)
         archive = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('archive',False)
+        logs = guild_dict[channel.guild.id]['raidchannel_dict'][channel.id].get('logs', {})
         if dupecount >= 3:
             dupechannel = True
             guild_dict[guild.id]['raidchannel_dict'][channel.id]['duplicate'] = 0
@@ -579,7 +580,7 @@ async def expire_channel(channel):
                 channel_exists = Meowth.get_channel(channel.id)
                 if channel_exists == None:
                     return
-                elif archive == False:
+                elif not archive and not logs:
                     try:
                         del guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]
                     except KeyError:
@@ -587,7 +588,7 @@ async def expire_channel(channel):
                     await channel_exists.delete()
                     logger.info(
                         'Expire_Channel - Channel Deleted - ' + channel.name)
-                elif archive == True:
+                elif archive or logs:
                     for overwrite in channel.overwrites:
                         if isinstance(overwrite[0], discord.Role):
                             if overwrite[0].permissions.manage_guild or overwrite[0].permissions.manage_channels:
@@ -602,31 +603,29 @@ async def expire_channel(channel):
                     for role in guild.role_hierarchy:
                         if role.permissions.manage_guild or role.permissions.manage_channels:
                             await channel.set_permissions(role, read_messages=True)
-                            continue
-                        else:
-                            break
+                        continue
                     await channel.set_permissions(guild.default_role, read_messages=False)
                     new_name = _('archived-')
-                    new_name += channel.name
-                    category = guild_dict[channel.guild.id].get('archive', {}).get('category', 'same')
-                    if category == 'same':
-                        newcat = channel.category
-                    else:
-                        newcat = channel.guild.get_channel(category)
-                    await channel.edit(name=new_name, category=newcat)
-                    await channel.send(_('-----------------------------------------------\n**The channel has been archived and removed from view for everybody but Meowth and those with Manage Channel permissions. Any messages that were deleted after the channel was marked for archival will be posted below. You will need to delete this channel manually.**\n-----------------------------------------------'))
-                    logs = guild_dict[channel.guild.id]['raidchannel_dict'][channel.id].get('logs', {})
-                    while logs:
-                        earliest = min(logs)
-                        embed = discord.Embed(colour=logs[earliest]['color_int'], description=logs[earliest]['content'], timestamp=logs[earliest]['created_at'])
-                        if logs[earliest]['author_nick']:
-                            embed.set_author(name="{name} [{nick}]".format(name=logs[earliest]['author_str'],nick=logs[earliest]['author_nick']), icon_url = logs[earliest]['author_avy'])
+                    if new_name not in channel.name:
+                        new_name += channel.name
+                        category = guild_dict[channel.guild.id].get('archive', {}).get('category', 'same')
+                        if category == 'same':
+                            newcat = channel.category
                         else:
-                            embed.set_author(name=logs[earliest]['author_str'], icon_url = logs[earliest]['author_avy'])
-                        await channel.send(embed=embed)
-                        del logs[earliest]
-                        await asyncio.sleep(.25)
-                    del guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]
+                            newcat = channel.guild.get_channel(category)
+                        await channel.edit(name=new_name, category=newcat)
+                        await channel.send(_('-----------------------------------------------\n**The channel has been archived and removed from view for everybody but Meowth and those with Manage Channel permissions. Any messages that were deleted after the channel was marked for archival will be posted below. You will need to delete this channel manually.**\n-----------------------------------------------'))
+                        while logs:
+                            earliest = min(logs)
+                            embed = discord.Embed(colour=logs[earliest]['color_int'], description=logs[earliest]['content'], timestamp=logs[earliest]['created_at'])
+                            if logs[earliest]['author_nick']:
+                                embed.set_author(name="{name} [{nick}]".format(name=logs[earliest]['author_str'],nick=logs[earliest]['author_nick']), icon_url = logs[earliest]['author_avy'])
+                            else:
+                                embed.set_author(name=logs[earliest]['author_str'], icon_url = logs[earliest]['author_avy'])
+                            await channel.send(embed=embed)
+                            del logs[earliest]
+                            await asyncio.sleep(.25)
+                        del guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]
         except:
             pass
 
@@ -998,6 +997,8 @@ async def on_message_delete(message):
     channel = message.channel
     author = message.author
     if channel.id in guild_dict[guild.id]['raidchannel_dict']:
+        if message.content.strip() == "!archive":
+            guild_dict[guild.id]['raidchannel_dict'][channel.id]['archive'] = True
         if guild_dict[guild.id]['raidchannel_dict'][channel.id].get('archive', False):
             logs = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('logs', {})
             logs[message.id] = {'author_id': message.author.id, 'author_str': str(message.author),'author_avy':message.author.avatar_url,'author_nick':message.author.nick,'color_int':message.author.color.value,'content': message.clean_content,'created_at':message.created_at}

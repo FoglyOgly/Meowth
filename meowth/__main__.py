@@ -4685,11 +4685,11 @@ async def list(ctx):
                 team = False
                 starttime = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('starttime',None)
                 rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
-                list_split = ctx.message.clean_content.split()
+                list_split = ctx.message.clean_content.lower().split()
                 if "tags" in list_split:
                     tag = True
                 for word in list_split:
-                    if word.lower() in team_list:
+                    if word in team_list:
                         team = word.lower()
                         break
                 if team == "mystic" or team == "valor" or team == "instinct":

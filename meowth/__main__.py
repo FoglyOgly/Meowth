@@ -4690,7 +4690,7 @@ async def list(ctx):
                     tag = True
                 for word in list_split:
                     if word.lower() in team_list:
-                        team = word
+                        team = word.lower()
                         break
                 if team == "mystic" or team == "valor" or team == "instinct":
                     bulletpoint = parse_emoji(ctx.guild, config['team_dict'][team])

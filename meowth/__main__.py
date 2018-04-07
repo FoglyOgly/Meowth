@@ -2192,6 +2192,7 @@ async def team(ctx):
     high_roles = []
     guild_roles = []
     lowercase_roles = []
+    harmony = None
     for role in guild.roles:
         if (role.name.lower() in config['team_dict']) and (role.name not in guild_roles):
             guild_roles.append(role.name)
@@ -4417,7 +4418,7 @@ async def starting(ctx, team: str = ''):
     ctx_startinglist = []
     id_startinglist = []
     team_list = []
-    team_names = ["mystic","valor","instinct"]
+    team_names = ["mystic","valor","instinct","unknown"]
     team = team if team and team.lower() in team_names else "all"
     trainer_dict = copy.deepcopy(guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict'])
     if guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id].get('type',None) == 'egg':
@@ -4785,6 +4786,37 @@ async def instinct(ctx, tag=False):
                 listmsg += ('\n' + bulletpoint) + (await _waiting(ctx, tag, team="instinct"))
             if " 0 in the lobby!" not in await _lobbylist(ctx, tag, team="instinct"):
                 listmsg += ('\n' + bulletpoint) + (await _lobbylist(ctx, tag, team="instinct"))
+            if (len(listmsg.splitlines()) <= 1):
+                listmsg +=  ('\n' + bulletpoint) + (" Nobody has updated their status yet!")
+            listmsg += ('\n' + bulletpoint) + (await print_raid_timer(channel))
+            if starttime and (starttime > now):
+                listmsg += _('\nThe next group will be starting at **{}**').format(starttime.strftime(_('%I:%M %p (%H:%M)')))
+            await channel.send(listmsg)
+            return
+
+@list.command()
+@checks.activeraidchannel()
+async def unknown(ctx, tag=False):
+    "List mentions of the users that have RSVP'd to a raid.\n\n    Usage: !list tags\n    Works only in raid channels."
+    guild = ctx.guild
+    channel = ctx.channel
+    now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[guild.id]['offset'])
+    if checks.check_raidchannel(ctx):
+        if checks.check_raidactive(ctx):
+            listmsg = _('**Meowth!** ')
+            guild = ctx.guild
+            channel = ctx.channel
+            bulletpoint = '❔'
+            starttime = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('starttime',None)
+            rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
+            if " 0 interested!" not in await _interest(ctx, tag, team="unknown"):
+                listmsg += ('\n' + bulletpoint) + (await _interest(ctx, tag, team="unknown"))
+            if " 0 on the way!" not in await _otw(ctx, tag, team="unknown"):
+                listmsg += ('\n' + bulletpoint) + (await _otw(ctx, tag, team="unknown"))
+            if " 0 waiting at the raid!" not in await _waiting(ctx, tag, team="unknown"):
+                listmsg += ('\n' + bulletpoint) + (await _waiting(ctx, tag, team="unknown"))
+            if " 0 in the lobby!" not in await _lobbylist(ctx, tag, team="unknown"):
+                listmsg += ('\n' + bulletpoint) + (await _lobbylist(ctx, tag, team="unknown"))
             if (len(listmsg.splitlines()) <= 1):
                 listmsg +=  ('\n' + bulletpoint) + (" Nobody has updated their status yet!")
             listmsg += ('\n' + bulletpoint) + (await print_raid_timer(channel))

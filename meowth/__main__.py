@@ -4680,17 +4680,32 @@ async def list(ctx):
                 return
         if checks.check_raidchannel(ctx):
             if checks.check_raidactive(ctx):
-                bulletpoint = '🔹'
+                team_list = ["mystic","valor","instinct","unknown"]
+                tag = False
+                team = False
                 starttime = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('starttime',None)
                 rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
-                if " 0 interested!" not in await _interest(ctx):
-                    listmsg += ('\n' + bulletpoint) + (await _interest(ctx))
-                if " 0 on the way!" not in await _otw(ctx):
-                    listmsg += ('\n' + bulletpoint) + (await _otw(ctx))
-                if " 0 waiting at the raid!" not in await _waiting(ctx):
-                    listmsg += ('\n' + bulletpoint) + (await _waiting(ctx))
-                if " 0 in the lobby!" not in await _lobbylist(ctx):
-                    listmsg += ('\n' + bulletpoint) + (await _lobbylist(ctx))
+                list_split = ctx.message.clean_content.split()
+                if "tags" in list_split:
+                    tag = True
+                for word in list_split:
+                    if word.lower() in team_list:
+                        team = word
+                        break
+                if team == "mystic" or team == "valor" or team == "instinct":
+                    bulletpoint = parse_emoji(ctx.guild, config['team_dict'][team])
+                elif team == "unknown":
+                    bulletpoint = '❔'
+                else:
+                    bulletpoint = '🔹'
+                if " 0 interested!" not in await _interest(ctx, tag, team):
+                    listmsg += ('\n' + bulletpoint) + (await _interest(ctx, tag, team))
+                if " 0 on the way!" not in await _otw(ctx, tag, team):
+                    listmsg += ('\n' + bulletpoint) + (await _otw(ctx, tag, team))
+                if " 0 waiting at the raid!" not in await _waiting(ctx, tag, team):
+                    listmsg += ('\n' + bulletpoint) + (await _waiting(ctx, tag, team))
+                if " 0 in the lobby!" not in await _lobbylist(ctx, tag, team):
+                    listmsg += ('\n' + bulletpoint) + (await _lobbylist(ctx, tag, team))
                 if (len(listmsg.splitlines()) <= 1):
                     listmsg +=  ('\n' + bulletpoint) + (_(" Nobody has updated their status yet!"))
                 listmsg += ('\n' + bulletpoint) + (await print_raid_timer(channel))
@@ -4700,130 +4715,6 @@ async def list(ctx):
                 return
         else:
             raise checks.errors.CityRaidChannelCheckFail()
-
-@list.command()
-@checks.activeraidchannel()
-async def mystic(ctx, tag=False):
-    "List mentions of the users that have RSVP'd to a raid.\n\n    Usage: !list tags\n    Works only in raid channels."
-    guild = ctx.guild
-    channel = ctx.channel
-    now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[guild.id]['offset'])
-    if checks.check_raidchannel(ctx):
-        if checks.check_raidactive(ctx):
-            listmsg = _('**Meowth!** ')
-            guild = ctx.guild
-            channel = ctx.channel
-            bulletpoint = parse_emoji(ctx.guild, config['team_dict']['mystic'])
-            starttime = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('starttime',None)
-            rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
-            if " 0 interested!" not in await _interest(ctx, tag, team="mystic"):
-                listmsg += ('\n' + bulletpoint) + (await _interest(ctx, tag, team="mystic"))
-            if " 0 on the way!" not in await _otw(ctx, tag, team="mystic"):
-                listmsg += ('\n' + bulletpoint) + (await _otw(ctx, tag, team="mystic"))
-            if " 0 waiting at the raid!" not in await _waiting(ctx, tag, team="mystic"):
-                listmsg += ('\n' + bulletpoint) + (await _waiting(ctx, tag, team="mystic"))
-            if " 0 in the lobby!" not in await _lobbylist(ctx, tag, team="mystic"):
-                listmsg += ('\n' + bulletpoint) + (await _lobbylist(ctx, tag, team="mystic"))
-            if (len(listmsg.splitlines()) <= 1):
-                listmsg +=  ('\n' + bulletpoint) + (" Nobody has updated their status yet!")
-            listmsg += ('\n' + bulletpoint) + (await print_raid_timer(channel))
-            if starttime and (starttime > now):
-                listmsg += _('\nThe next group will be starting at **{}**').format(starttime.strftime(_('%I:%M %p (%H:%M)')))
-            await channel.send(listmsg)
-            return
-
-@list.command()
-@checks.activeraidchannel()
-async def valor(ctx, tag=False):
-    "List mentions of the users that have RSVP'd to a raid.\n\n    Usage: !list tags\n    Works only in raid channels."
-    guild = ctx.guild
-    channel = ctx.channel
-    now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[guild.id]['offset'])
-    if checks.check_raidchannel(ctx):
-        if checks.check_raidactive(ctx):
-            listmsg = _('**Meowth!** ')
-            guild = ctx.guild
-            channel = ctx.channel
-            bulletpoint = parse_emoji(ctx.guild, config['team_dict']['valor'])
-            starttime = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('starttime',None)
-            rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
-            if " 0 interested!" not in await _interest(ctx, tag, team="valor"):
-                listmsg += ('\n' + bulletpoint) + (await _interest(ctx, tag, team="valor"))
-            if " 0 on the way!" not in await _otw(ctx, tag, team="valor"):
-                listmsg += ('\n' + bulletpoint) + (await _otw(ctx, tag, team="valor"))
-            if " 0 waiting at the raid!" not in await _waiting(ctx, tag, team="valor"):
-                listmsg += ('\n' + bulletpoint) + (await _waiting(ctx, tag, team="valor"))
-            if " 0 in the lobby!" not in await _lobbylist(ctx, tag, team="valor"):
-                listmsg += ('\n' + bulletpoint) + (await _lobbylist(ctx, tag, team="valor"))
-            if (len(listmsg.splitlines()) <= 1):
-                listmsg +=  ('\n' + bulletpoint) + (" Nobody has updated their status yet!")
-            listmsg += ('\n' + bulletpoint) + (await print_raid_timer(channel))
-            if starttime and (starttime > now):
-                listmsg += _('\nThe next group will be starting at **{}**').format(starttime.strftime(_('%I:%M %p (%H:%M)')))
-            await channel.send(listmsg)
-            return
-
-@list.command()
-@checks.activeraidchannel()
-async def instinct(ctx, tag=False):
-    "List mentions of the users that have RSVP'd to a raid.\n\n    Usage: !list tags\n    Works only in raid channels."
-    guild = ctx.guild
-    channel = ctx.channel
-    now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[guild.id]['offset'])
-    if checks.check_raidchannel(ctx):
-        if checks.check_raidactive(ctx):
-            listmsg = _('**Meowth!** ')
-            guild = ctx.guild
-            channel = ctx.channel
-            bulletpoint = parse_emoji(ctx.guild, config['team_dict']['instinct'])
-            starttime = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('starttime',None)
-            rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
-            if " 0 interested!" not in await _interest(ctx, tag, team="instinct"):
-                listmsg += ('\n' + bulletpoint) + (await _interest(ctx, tag, team="instinct"))
-            if " 0 on the way!" not in await _otw(ctx, tag, team="instinct"):
-                listmsg += ('\n' + bulletpoint) + (await _otw(ctx, tag, team="instinct"))
-            if " 0 waiting at the raid!" not in await _waiting(ctx, tag, team="instinct"):
-                listmsg += ('\n' + bulletpoint) + (await _waiting(ctx, tag, team="instinct"))
-            if " 0 in the lobby!" not in await _lobbylist(ctx, tag, team="instinct"):
-                listmsg += ('\n' + bulletpoint) + (await _lobbylist(ctx, tag, team="instinct"))
-            if (len(listmsg.splitlines()) <= 1):
-                listmsg +=  ('\n' + bulletpoint) + (" Nobody has updated their status yet!")
-            listmsg += ('\n' + bulletpoint) + (await print_raid_timer(channel))
-            if starttime and (starttime > now):
-                listmsg += _('\nThe next group will be starting at **{}**').format(starttime.strftime(_('%I:%M %p (%H:%M)')))
-            await channel.send(listmsg)
-            return
-
-@list.command()
-@checks.activeraidchannel()
-async def unknown(ctx, tag=False):
-    "List mentions of the users that have RSVP'd to a raid.\n\n    Usage: !list tags\n    Works only in raid channels."
-    guild = ctx.guild
-    channel = ctx.channel
-    now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[guild.id]['offset'])
-    if checks.check_raidchannel(ctx):
-        if checks.check_raidactive(ctx):
-            listmsg = _('**Meowth!** ')
-            guild = ctx.guild
-            channel = ctx.channel
-            bulletpoint = '❔'
-            starttime = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('starttime',None)
-            rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
-            if " 0 interested!" not in await _interest(ctx, tag, team="unknown"):
-                listmsg += ('\n' + bulletpoint) + (await _interest(ctx, tag, team="unknown"))
-            if " 0 on the way!" not in await _otw(ctx, tag, team="unknown"):
-                listmsg += ('\n' + bulletpoint) + (await _otw(ctx, tag, team="unknown"))
-            if " 0 waiting at the raid!" not in await _waiting(ctx, tag, team="unknown"):
-                listmsg += ('\n' + bulletpoint) + (await _waiting(ctx, tag, team="unknown"))
-            if " 0 in the lobby!" not in await _lobbylist(ctx, tag, team="unknown"):
-                listmsg += ('\n' + bulletpoint) + (await _lobbylist(ctx, tag, team="unknown"))
-            if (len(listmsg.splitlines()) <= 1):
-                listmsg +=  ('\n' + bulletpoint) + (" Nobody has updated their status yet!")
-            listmsg += ('\n' + bulletpoint) + (await print_raid_timer(channel))
-            if starttime and (starttime > now):
-                listmsg += _('\nThe next group will be starting at **{}**').format(starttime.strftime(_('%I:%M %p (%H:%M)')))
-            await channel.send(listmsg)
-            return
 
 @list.command()
 @checks.activeraidchannel()
@@ -5062,37 +4953,6 @@ async def _teamlist(ctx):
     else:
         listmsg = _(' Nobody has updated their status!')
     return listmsg
-
-@list.command()
-@checks.activeraidchannel()
-async def tags(ctx):
-    "List mentions of the users that have RSVP'd to a raid.\n\n    Usage: !list tags\n    Works only in raid channels."
-    guild = ctx.guild
-    channel = ctx.channel
-    now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[guild.id]['offset'])
-    if checks.check_raidchannel(ctx):
-        if checks.check_raidactive(ctx):
-            listmsg = _('**Meowth!** ')
-            guild = ctx.guild
-            channel = ctx.channel
-            bulletpoint = '🔹'
-            starttime = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('starttime',None)
-            rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
-            if " 0 interested!" not in await _interest(ctx):
-                listmsg += ('\n' + bulletpoint) + (await _interest(ctx, tag=True))
-            if " 0 on the way!" not in await _otw(ctx):
-                listmsg += ('\n' + bulletpoint) + (await _otw(ctx, tag=True))
-            if " 0 waiting at the raid!" not in await _waiting(ctx):
-                listmsg += ('\n' + bulletpoint) + (await _waiting(ctx, tag=True))
-            if " 0 in the lobby!" not in await _lobbylist(ctx):
-                listmsg += ('\n' + bulletpoint) + (await _lobbylist(ctx, tag=True))
-            if (len(listmsg.splitlines()) <= 1):
-                listmsg +=  ('\n' + bulletpoint) + (" Nobody has updated their status yet!")
-            listmsg += ('\n' + bulletpoint) + (await print_raid_timer(channel))
-            if starttime and (starttime > now):
-                listmsg += _('\nThe next group will be starting at **{}**').format(starttime.strftime(_('%I:%M %p (%H:%M)')))
-            await channel.send(listmsg)
-            return
 
 @list.command()
 @checks.wantset()

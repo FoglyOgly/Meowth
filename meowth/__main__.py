@@ -469,6 +469,11 @@ async def expiry_check(channel):
                         if guild_dict[guild.id]['raidchannel_dict'][channel.id]['exp'] <= time.time():
                             if guild_dict[guild.id]['raidchannel_dict'][channel.id]['type'] == 'egg':
                                 pokemon = guild_dict[guild.id]['raidchannel_dict'][channel.id]['pokemon']
+                                egglevel = guild_dict[guild.id]['raidchannel_dict'][channel.id]['egglevel']
+                                if not pokemon and len(raid_info['raid_eggs'][egglevel]['pokemon']) == 1:
+                                    pokemon = get_name(raid_info['raid_eggs'][egglevel]['pokemon'][0])
+                                elif not pokemon and egglevel == "5" and guild_dict[channel.guild.id].get('regional',None) in raid_info['raid_eggs']["5"]['pokemon']:
+                                    pokemon = get_name(guild_dict[channel.guild.id]['regional'])
                                 if pokemon:
                                     logger.info(
                                         'Expire_Channel - Egg Auto Hatched - ' + channel.name)
@@ -518,6 +523,7 @@ async def expire_channel(channel):
         logger.info('Expire_Channel - Channel Expired - ' + channel.name)
         dupecount = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('duplicate',0)
         archive = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('archive',False)
+        logs = guild_dict[channel.guild.id]['raidchannel_dict'][channel.id].get('logs', {})
         if dupecount >= 3:
             dupechannel = True
             guild_dict[guild.id]['raidchannel_dict'][channel.id]['duplicate'] = 0
@@ -534,7 +540,8 @@ async def expire_channel(channel):
                     if trainer_dict[trainer]['status']['maybe']:
                         user = channel.guild.get_member(trainer)
                         maybe_list.append(user.mention)
-                new_name = _('hatched-')
+                h = _('hatched-')
+                new_name = h if h not in channel.name else ''
                 new_name += channel.name
                 await channel.edit(name=new_name)
                 await channel.send(_("**This egg has hatched!**\n\n...or the time has just expired. Trainers {trainer_list}: Update the raid to the pokemon that hatched using **!raid <pokemon>** or reset the hatch timer with **!timerset**. This channel will be deactivated until I get an update and I'll delete it in 45 minutes if I don't hear anything.").format(trainer_list=', '.join(maybe_list)))
@@ -543,7 +550,8 @@ async def expire_channel(channel):
                 level=guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['egglevel'])
         else:
             if (not alreadyexpired):
-                new_name = _('expired-')
+                e = _('expired-')
+                new_name = e if e not in channel.name else ''
                 new_name += channel.name
                 await channel.edit(name=new_name)
                 await channel.send(_('This channel timer has expired! The channel has been deactivated and will be deleted in 5 minutes.\nTo reactivate the channel, use **!timerset** to set the timer again.'))
@@ -576,7 +584,7 @@ async def expire_channel(channel):
                 channel_exists = Meowth.get_channel(channel.id)
                 if channel_exists == None:
                     return
-                elif archive == False:
+                elif not archive and not logs:
                     try:
                         del guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]
                     except KeyError:
@@ -584,7 +592,7 @@ async def expire_channel(channel):
                     await channel_exists.delete()
                     logger.info(
                         'Expire_Channel - Channel Deleted - ' + channel.name)
-                elif archive == True:
+                elif archive or logs:
                     for overwrite in channel.overwrites:
                         if isinstance(overwrite[0], discord.Role):
                             if overwrite[0].permissions.manage_guild or overwrite[0].permissions.manage_channels:
@@ -599,31 +607,29 @@ async def expire_channel(channel):
                     for role in guild.role_hierarchy:
                         if role.permissions.manage_guild or role.permissions.manage_channels:
                             await channel.set_permissions(role, read_messages=True)
-                            continue
-                        else:
-                            break
+                        continue
                     await channel.set_permissions(guild.default_role, read_messages=False)
                     new_name = _('archived-')
-                    new_name += channel.name
-                    category = guild_dict[channel.guild.id].get('archive', {}).get('category', 'same')
-                    if category == 'same':
-                        newcat = channel.category
-                    else:
-                        newcat = channel.guild.get_channel(category)
-                    await channel.edit(name=new_name, category=newcat)
-                    await channel.send(_('-----------------------------------------------\n**The channel has been archived and removed from view for everybody but Meowth and those with Manage Channel permissions. Any messages that were deleted after the channel was marked for archival will be posted below. You will need to delete this channel manually.**\n-----------------------------------------------'))
-                    logs = guild_dict[channel.guild.id]['raidchannel_dict'][channel.id].get('logs', {})
-                    while logs:
-                        earliest = min(logs)
-                        embed = discord.Embed(colour=logs[earliest]['color_int'], description=logs[earliest]['content'], timestamp=logs[earliest]['created_at'])
-                        if logs[earliest]['author_nick']:
-                            embed.set_author(name="{name} [{nick}]".format(name=logs[earliest]['author_str'],nick=logs[earliest]['author_nick']), icon_url = logs[earliest]['author_avy'])
+                    if new_name not in channel.name:
+                        new_name += channel.name
+                        category = guild_dict[channel.guild.id].get('archive', {}).get('category', 'same')
+                        if category == 'same':
+                            newcat = channel.category
                         else:
-                            embed.set_author(name=logs[earliest]['author_str'], icon_url = logs[earliest]['author_avy'])
-                        await channel.send(embed=embed)
-                        del logs[earliest]
-                        await asyncio.sleep(.25)
-                    del guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]
+                            newcat = channel.guild.get_channel(category)
+                        await channel.edit(name=new_name, category=newcat)
+                        await channel.send(_('-----------------------------------------------\n**The channel has been archived and removed from view for everybody but Meowth and those with Manage Channel permissions. Any messages that were deleted after the channel was marked for archival will be posted below. You will need to delete this channel manually.**\n-----------------------------------------------'))
+                        while logs:
+                            earliest = min(logs)
+                            embed = discord.Embed(colour=logs[earliest]['color_int'], description=logs[earliest]['content'], timestamp=logs[earliest]['created_at'])
+                            if logs[earliest]['author_nick']:
+                                embed.set_author(name="{name} [{nick}]".format(name=logs[earliest]['author_str'],nick=logs[earliest]['author_nick']), icon_url = logs[earliest]['author_avy'])
+                            else:
+                                embed.set_author(name=logs[earliest]['author_str'], icon_url = logs[earliest]['author_avy'])
+                            await channel.send(embed=embed)
+                            del logs[earliest]
+                            await asyncio.sleep(.25)
+                        del guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]
         except:
             pass
 
@@ -995,6 +1001,8 @@ async def on_message_delete(message):
     channel = message.channel
     author = message.author
     if channel.id in guild_dict[guild.id]['raidchannel_dict']:
+        if message.content.strip() == "!archive":
+            guild_dict[guild.id]['raidchannel_dict'][channel.id]['archive'] = True
         if guild_dict[guild.id]['raidchannel_dict'][channel.id].get('archive', False):
             logs = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('logs', {})
             logs[message.id] = {'author_id': message.author.id, 'author_str': str(message.author),'author_avy':message.author.avatar_url,'author_nick':message.author.nick,'color_int':message.author.color.value,'content': message.clean_content,'created_at':message.created_at}
@@ -2151,6 +2159,8 @@ async def archive(ctx):
 
 async def _archive(channel):
     guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['archive'] = True
+    await asyncio.sleep(10)
+    guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['archive'] = True
 
 """
 Miscellaneous
@@ -2237,6 +2247,7 @@ async def team(ctx):
     high_roles = []
     guild_roles = []
     lowercase_roles = []
+    harmony = None
     for role in guild.roles:
         if (role.name.lower() in config['team_dict']) and (role.name not in guild_roles):
             guild_roles.append(role.name)
@@ -2552,10 +2563,10 @@ async def _wild(message):
         else:
             entered_wild = await autocorrect(entered_wild, message.channel, message.author)
         wild = discord.utils.get(message.guild.roles, name=entered_wild)
-        if wild == None:
-            wild = entered_wild.title()
+        if wild is None:
+            roletest = ""
         else:
-            wild = wild.mention
+            roletest = _("{pokemon} - ").format(pokemon=wild.mention)
         wild_number = pkmn_info['pokemon_list'].index(entered_wild) + 1
         wild_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn/{0}_.png?cache=2'.format(str(wild_number).zfill(3))
         wild_embed = discord.Embed(title=_('Meowth! Click here for my directions to the wild {pokemon}!').format(pokemon=entered_wild.capitalize()), description=_("Ask {author} if my directions aren't perfect!").format(author=message.author.name), url=wild_gmaps_link, colour=message.guild.me.colour)
@@ -2565,7 +2576,7 @@ async def _wild(message):
         else:
             wild_embed.set_footer(text=_('Reported by @{author} - {timestamp}').format(author=message.author.display_name, timestamp=timestamp), icon_url=message.author.default_avatar_url)
         wild_embed.set_thumbnail(url=wild_img_url)
-        wildreportmsg = await message.channel.send(content=_('Meowth! Wild {pokemon} reported by {member}! Details: {location_details}').format(pokemon=wild, member=message.author.mention, location_details=wild_details), embed=wild_embed)
+        wildreportmsg = await message.channel.send(content=_('{roletest}Meowth! Wild {pokemon} reported by {member}! Details: {location_details}').format(roletest=roletest,pokemon=entered_wild.title(), member=message.author.mention, location_details=wild_details), embed=wild_embed)
         expiremsg = _('**This {pokemon} has despawned!**').format(pokemon=entered_wild.capitalize())
         await asyncio.sleep(3600)
         try:
@@ -2676,9 +2687,9 @@ async def _raid(message):
     raid_channel = await message.guild.create_text_channel(raid_channel_name, overwrites=dict(message.channel.overwrites), category=raid_channel_category)
     raid = discord.utils.get(message.guild.roles, name=entered_raid)
     if raid == None:
-        raid = entered_raid.title()
+        roletest = ""
     else:
-        raid = raid.mention
+        roletest = _("{pokemon} - ").format(pokemon=raid.mention)
     raid_number = pkmn_info['pokemon_list'].index(entered_raid) + 1
     raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn/{0}_.png?cache=2'.format(str(raid_number).zfill(3))
     raid_embed = discord.Embed(title=_('Meowth! Click here for directions to the raid!'), url=raid_gmaps_link, colour=message.guild.me.colour)
@@ -2693,7 +2704,7 @@ async def _raid(message):
     raid_embed.set_thumbnail(url=raid_img_url)
     raidreport = await message.channel.send(content=_('Meowth! {pokemon} raid reported by {member}! Details: {location_details}. Coordinate in {raid_channel}').format(pokemon=entered_raid.capitalize(), member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention), embed=raid_embed)
     await asyncio.sleep(1)
-    raidmsg = _("Meowth! {pokemon} raid reported by {member} in {citychannel}! Details: {location_details}. Coordinate here!\n\nTo update your status, choose from the following commands: **!maybe**, **!coming**, **!here**, **!cancel**. If you are bringing more than one trainer/account, add in the number of accounts total on your first status update.\nExample: `!coming 5`\n\nTo see the list of trainers who have given their status:\n**!list interested**, **!list coming**, **!list here** or use just **!list** to see all lists. Use **!list teams** to see team distribution.\n\nSometimes I'm not great at directions, but I'll correct my directions if anybody sends me a maps link or uses **!location new <address>**. You can see the location of a raid by using **!location**\n\nYou can set the time remaining with **!timerset <minutes>** and access this with **!timer**.\nYou can set the start time with **!starttime [HH:MM AM/PM]** (you can also omit AM/PM and use 24-hour time) and access this with **!starttime**.\n\nMessage **!starting** when the raid is beginning to clear the raid's 'here' list.\n\nThis channel will be deleted five minutes after the timer expires.").format(pokemon=raid, member=message.author.mention, citychannel=message.channel.mention, location_details=raid_details)
+    raidmsg = _("{roletest}Meowth! {pokemon} raid reported by {member} in {citychannel}! Details: {location_details}. Coordinate here!\n\nTo update your status, choose from the following commands: **!maybe**, **!coming**, **!here**, **!cancel**. If you are bringing more than one trainer/account, add in the number of accounts total on your first status update.\nExample: `!coming 5`\n\nTo see the list of trainers who have given their status:\n**!list interested**, **!list coming**, **!list here** or use just **!list** to see all lists. Use **!list teams** to see team distribution.\n\nSometimes I'm not great at directions, but I'll correct my directions if anybody sends me a maps link or uses **!location new <address>**. You can see the location of a raid by using **!location**\n\nYou can set the time remaining with **!timerset <minutes>** and access this with **!timer**.\nYou can set the start time with **!starttime [HH:MM AM/PM]** (you can also omit AM/PM and use 24-hour time) and access this with **!starttime**.\n\nMessage **!starting** when the raid is beginning to clear the raid's 'here' list.\n\nThis channel will be deleted five minutes after the timer expires.").format(roletest=roletest, pokemon=entered_raid.title(), member=message.author.mention, citychannel=message.channel.mention, location_details=raid_details)
     raidmessage = await raid_channel.send(content=raidmsg, embed=raid_embed)
     await raidmessage.pin()
     guild_dict[message.guild.id]['raidchannel_dict'][raid_channel.id] = {
@@ -2863,9 +2874,9 @@ async def _eggassume(args, raid_channel, author=None):
     raid_gmaps_link = oldembed.url
     raidrole = discord.utils.get(raid_channel.guild.roles, name=entered_raid)
     if raidrole == None:
-        raidrole = entered_raid.title()
+        raidtest = ""
     else:
-        raidrole = raidrole.mention
+        roletest = _("{pokemon} - ").format(pokemon=raidrole.mention)
     raid_number = pkmn_info['pokemon_list'].index(entered_raid) + 1
     raid_img_url = 'https://raw.githubusercontent.com/doonce/Meowth/master/images/pkmn/{0}_.png?cache=nono'.format(str(raid_number).zfill(3))
     raid_embed = discord.Embed(title=_('Meowth! Click here for directions to the coming raid!'), url=raid_gmaps_link, colour=raid_channel.guild.me.colour)
@@ -2890,7 +2901,7 @@ async def _eggassume(args, raid_channel, author=None):
         egg_report = egg_report.id
     except discord.errors.NotFound:
         egg_report = None
-    await raid_channel.send(_('Meowth! This egg will be assumed to be {pokemon} when it hatches!').format(pokemon=raidrole))
+    await raid_channel.send(_('{roletest}Meowth! This egg will be assumed to be {pokemon} when it hatches!').format(roletest=roletest,pokemon=entered_raid.title()))
     guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id] = eggdetails
     return
 
@@ -2963,9 +2974,9 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
     raid_gmaps_link = oldembed.url
     raid = discord.utils.get(raid_channel.guild.roles, name=entered_raid)
     if raid == None:
-        raid = entered_raid.title()
+        roletest = ""
     else:
-        raid = raid.mention
+        roletest = _("{pokemon} - ").format(pokemon=raid.mention)
     raid_number = pkmn_info['pokemon_list'].index(entered_raid) + 1
     raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn/{0}_.png?cache=2'.format(str(raid_number).zfill(3))
     raid_embed = discord.Embed(title=_('Meowth! Click here for directions to the raid!'), url=raid_gmaps_link, colour=raid_channel.guild.me.colour)
@@ -2998,7 +3009,7 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
                 trainer_list.append(user.mention)
             except (discord.errors.NotFound, AttributeError):
                 continue
-    await raid_channel.send(content=_("Meowth! Trainers {trainer_list}: The raid egg has just hatched into a {pokemon} raid!\nIf you couldn't before, you're now able to update your status with **!coming** or **!here**. If you've changed your plans, use **!cancel**.").format(trainer_list=', '.join(trainer_list), pokemon=raid), embed=raid_embed)
+    await raid_channel.send(content=_("{roletest}Meowth! Trainers {trainer_list}: The raid egg has just hatched into a {pokemon} raid!\nIf you couldn't before, you're now able to update your status with **!coming** or **!here**. If you've changed your plans, use **!cancel**.").format(roletest=roletest,trainer_list=', '.join(trainer_list), pokemon=entered_raid.title()), embed=raid_embed)
     for field in oldembed.fields:
         t = _('team')
         s = _('status')
@@ -3543,13 +3554,18 @@ async def recover(ctx):
 
     Usage: !recover
     Only necessary after a crash."""
-    if checks.check_wantchannel(ctx) or checks.check_citychannel(ctx) or checks.check_raidchannel(ctx) or checks.check_eggchannel(ctx) or checks.check_exraidchannel(ctx):
+    if (checks.check_wantchannel(ctx) or checks.check_citychannel(ctx) or checks.check_raidchannel(ctx) or checks.check_eggchannel(ctx) or checks.check_exraidchannel(ctx)):
         await ctx.channel.send(_("Meowth! I can't recover this channel because I know about it already!"))
     else:
         channel = ctx.channel
         guild = channel.guild
         name = channel.name
         topic = channel.topic
+        h = _('hatched-')
+        e = _('expired-')
+        while h in name or e in name:
+            name = name.replace(h,'')
+            name = name.replace(e,'')
         egg = re.match(_('level-[1-5]-egg'), name)
         now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[guild.id]['offset'])
         reportchannel = None
@@ -4457,7 +4473,7 @@ async def starting(ctx, team: str = ''):
     ctx_startinglist = []
     id_startinglist = []
     team_list = []
-    team_names = ["mystic","valor","instinct"]
+    team_names = ["mystic","valor","instinct","unknown"]
     team = team if team and team.lower() in team_names else "all"
     trainer_dict = copy.deepcopy(guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict'])
     if guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id].get('type',None) == 'egg':
@@ -4507,7 +4523,7 @@ async def starting(ctx, team: str = ''):
             guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['starttime'] = None
         else:
             timestr = ' '
-        starting_str = _('Meowth! The group that was waiting{timestr}is starting the raid! Trainers {trainer_list}, if you are not in this group and are waiting for the next group, please respond with {here_emoji} or **!here**. If you need to ask those that just started to back out of their lobby, use **!backout**').format(timestr=timestr, trainer_list=', '.join(ctx_startinglist), here_emoji=parse_emoji(ctx.guild, config['here_id']))
+        starting_str = _('Starting - Meowth! The group that was waiting{timestr}is starting the raid! Trainers {trainer_list}, if you are not in this group and are waiting for the next group, please respond with {here_emoji} or **!here**. If you need to ask those that just started to back out of their lobby, use **!backout**').format(timestr=timestr, trainer_list=', '.join(ctx_startinglist), here_emoji=parse_emoji(ctx.guild, config['here_id']))
         guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['lobby'] = {"exp":time.time() + 120, "team":team}
         if starttime:
             starting_str += '\n\nThe start time has also been cleared, new groups can set a new start time wtih **!starttime HH:MM AM/PM** (You can also omit AM/PM and use 24-hour time!).'
@@ -4581,7 +4597,7 @@ async def backout(ctx):
             except KeyError:
                 pass
             return
-        await channel.send(_('Meowth! {author} has indicated that the group consisting of {lobby_list} and the people with them has backed out of the lobby! If this is inaccurate, please use **!lobby** or **!cancel** to help me keep my lists accurate!').format(author=author.mention, lobby_list=', '.join(lobby_list)))
+        await channel.send(_('Backout - Meowth! {author} has indicated that the group consisting of {lobby_list} and the people with them has backed out of the lobby! If this is inaccurate, please use **!lobby** or **!cancel** to help me keep my lists accurate!').format(author=author.mention, lobby_list=', '.join(lobby_list)))
         try:
             del guild_dict[guild.id]['raidchannel_dict'][channel.id]['lobby']
         except KeyError:
@@ -4598,7 +4614,7 @@ async def backout(ctx):
             await channel.send(_("Meowth! There's no one in the lobby for this raid!"))
             return
 
-        backoutmsg = await channel.send(_('Meowth! {author} has requested a backout! If one of the following trainers reacts with the check mark, I will assume the group is backing out of the raid lobby as requested! {lobby_list}').format(author=author.mention, lobby_list=', '.join(lobby_list)))
+        backoutmsg = await channel.send(_('Backout - Meowth! {author} has requested a backout! If one of the following trainers reacts with the check mark, I will assume the group is backing out of the raid lobby as requested! {lobby_list}').format(author=author.mention, lobby_list=', '.join(lobby_list)))
         res, reactuser = await ask(backoutmsg, channel, trainer_list, react_list=['✅'])
         if res.emoji == '✅':
             for trainer in trainer_list:
@@ -4719,17 +4735,32 @@ async def list(ctx):
                 return
         if checks.check_raidchannel(ctx):
             if checks.check_raidactive(ctx):
-                bulletpoint = '🔹'
+                team_list = ["mystic","valor","instinct","unknown"]
+                tag = False
+                team = False
                 starttime = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('starttime',None)
                 rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
-                if " 0 interested!" not in await _interest(ctx):
-                    listmsg += ('\n' + bulletpoint) + (await _interest(ctx))
-                if " 0 on the way!" not in await _otw(ctx):
-                    listmsg += ('\n' + bulletpoint) + (await _otw(ctx))
-                if " 0 waiting at the raid!" not in await _waiting(ctx):
-                    listmsg += ('\n' + bulletpoint) + (await _waiting(ctx))
-                if " 0 in the lobby!" not in await _lobbylist(ctx):
-                    listmsg += ('\n' + bulletpoint) + (await _lobbylist(ctx))
+                list_split = ctx.message.clean_content.lower().split()
+                if "tags" in list_split:
+                    tag = True
+                for word in list_split:
+                    if word in team_list:
+                        team = word.lower()
+                        break
+                if team == "mystic" or team == "valor" or team == "instinct":
+                    bulletpoint = parse_emoji(ctx.guild, config['team_dict'][team])
+                elif team == "unknown":
+                    bulletpoint = '❔'
+                else:
+                    bulletpoint = '🔹'
+                if " 0 interested!" not in await _interest(ctx, tag, team):
+                    listmsg += ('\n' + bulletpoint) + (await _interest(ctx, tag, team))
+                if " 0 on the way!" not in await _otw(ctx, tag, team):
+                    listmsg += ('\n' + bulletpoint) + (await _otw(ctx, tag, team))
+                if " 0 waiting at the raid!" not in await _waiting(ctx, tag, team):
+                    listmsg += ('\n' + bulletpoint) + (await _waiting(ctx, tag, team))
+                if " 0 in the lobby!" not in await _lobbylist(ctx, tag, team):
+                    listmsg += ('\n' + bulletpoint) + (await _lobbylist(ctx, tag, team))
                 if (len(listmsg.splitlines()) <= 1):
                     listmsg +=  ('\n' + bulletpoint) + (_(" Nobody has updated their status yet!"))
                 listmsg += ('\n' + bulletpoint) + (await print_raid_timer(channel))
@@ -4739,99 +4770,6 @@ async def list(ctx):
                 return
         else:
             raise checks.errors.CityRaidChannelCheckFail()
-
-@list.command()
-@checks.activeraidchannel()
-async def mystic(ctx, tag=False):
-    "List mentions of the users that have RSVP'd to a raid.\n\n    Usage: !list tags\n    Works only in raid channels."
-    guild = ctx.guild
-    channel = ctx.channel
-    now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[guild.id]['offset'])
-    if checks.check_raidchannel(ctx):
-        if checks.check_raidactive(ctx):
-            listmsg = _('**Meowth!** ')
-            guild = ctx.guild
-            channel = ctx.channel
-            bulletpoint = parse_emoji(ctx.guild, config['team_dict']['mystic'])
-            starttime = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('starttime',None)
-            rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
-            if " 0 interested!" not in await _interest(ctx, tag, team="mystic"):
-                listmsg += ('\n' + bulletpoint) + (await _interest(ctx, tag, team="mystic"))
-            if " 0 on the way!" not in await _otw(ctx, tag, team="mystic"):
-                listmsg += ('\n' + bulletpoint) + (await _otw(ctx, tag, team="mystic"))
-            if " 0 waiting at the raid!" not in await _waiting(ctx, tag, team="mystic"):
-                listmsg += ('\n' + bulletpoint) + (await _waiting(ctx, tag, team="mystic"))
-            if " 0 in the lobby!" not in await _lobbylist(ctx, tag, team="mystic"):
-                listmsg += ('\n' + bulletpoint) + (await _lobbylist(ctx, tag, team="mystic"))
-            if (len(listmsg.splitlines()) <= 1):
-                listmsg +=  ('\n' + bulletpoint) + (" Nobody has updated their status yet!")
-            listmsg += ('\n' + bulletpoint) + (await print_raid_timer(channel))
-            if starttime and (starttime > now):
-                listmsg += _('\nThe next group will be starting at **{}**').format(starttime.strftime(_('%I:%M %p (%H:%M)')))
-            await channel.send(listmsg)
-            return
-
-@list.command()
-@checks.activeraidchannel()
-async def valor(ctx, tag=False):
-    "List mentions of the users that have RSVP'd to a raid.\n\n    Usage: !list tags\n    Works only in raid channels."
-    guild = ctx.guild
-    channel = ctx.channel
-    now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[guild.id]['offset'])
-    if checks.check_raidchannel(ctx):
-        if checks.check_raidactive(ctx):
-            listmsg = _('**Meowth!** ')
-            guild = ctx.guild
-            channel = ctx.channel
-            bulletpoint = parse_emoji(ctx.guild, config['team_dict']['valor'])
-            starttime = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('starttime',None)
-            rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
-            if " 0 interested!" not in await _interest(ctx, tag, team="valor"):
-                listmsg += ('\n' + bulletpoint) + (await _interest(ctx, tag, team="valor"))
-            if " 0 on the way!" not in await _otw(ctx, tag, team="valor"):
-                listmsg += ('\n' + bulletpoint) + (await _otw(ctx, tag, team="valor"))
-            if " 0 waiting at the raid!" not in await _waiting(ctx, tag, team="valor"):
-                listmsg += ('\n' + bulletpoint) + (await _waiting(ctx, tag, team="valor"))
-            if " 0 in the lobby!" not in await _lobbylist(ctx, tag, team="valor"):
-                listmsg += ('\n' + bulletpoint) + (await _lobbylist(ctx, tag, team="valor"))
-            if (len(listmsg.splitlines()) <= 1):
-                listmsg +=  ('\n' + bulletpoint) + (" Nobody has updated their status yet!")
-            listmsg += ('\n' + bulletpoint) + (await print_raid_timer(channel))
-            if starttime and (starttime > now):
-                listmsg += _('\nThe next group will be starting at **{}**').format(starttime.strftime(_('%I:%M %p (%H:%M)')))
-            await channel.send(listmsg)
-            return
-
-@list.command()
-@checks.activeraidchannel()
-async def instinct(ctx, tag=False):
-    "List mentions of the users that have RSVP'd to a raid.\n\n    Usage: !list tags\n    Works only in raid channels."
-    guild = ctx.guild
-    channel = ctx.channel
-    now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[guild.id]['offset'])
-    if checks.check_raidchannel(ctx):
-        if checks.check_raidactive(ctx):
-            listmsg = _('**Meowth!** ')
-            guild = ctx.guild
-            channel = ctx.channel
-            bulletpoint = parse_emoji(ctx.guild, config['team_dict']['instinct'])
-            starttime = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('starttime',None)
-            rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
-            if " 0 interested!" not in await _interest(ctx, tag, team="instinct"):
-                listmsg += ('\n' + bulletpoint) + (await _interest(ctx, tag, team="instinct"))
-            if " 0 on the way!" not in await _otw(ctx, tag, team="instinct"):
-                listmsg += ('\n' + bulletpoint) + (await _otw(ctx, tag, team="instinct"))
-            if " 0 waiting at the raid!" not in await _waiting(ctx, tag, team="instinct"):
-                listmsg += ('\n' + bulletpoint) + (await _waiting(ctx, tag, team="instinct"))
-            if " 0 in the lobby!" not in await _lobbylist(ctx, tag, team="instinct"):
-                listmsg += ('\n' + bulletpoint) + (await _lobbylist(ctx, tag, team="instinct"))
-            if (len(listmsg.splitlines()) <= 1):
-                listmsg +=  ('\n' + bulletpoint) + (" Nobody has updated their status yet!")
-            listmsg += ('\n' + bulletpoint) + (await print_raid_timer(channel))
-            if starttime and (starttime > now):
-                listmsg += _('\nThe next group will be starting at **{}**').format(starttime.strftime(_('%I:%M %p (%H:%M)')))
-            await channel.send(listmsg)
-            return
 
 @list.command()
 @checks.activeraidchannel()
@@ -5070,37 +5008,6 @@ async def _teamlist(ctx):
     else:
         listmsg = _(' Nobody has updated their status!')
     return listmsg
-
-@list.command()
-@checks.activeraidchannel()
-async def tags(ctx):
-    "List mentions of the users that have RSVP'd to a raid.\n\n    Usage: !list tags\n    Works only in raid channels."
-    guild = ctx.guild
-    channel = ctx.channel
-    now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[guild.id]['offset'])
-    if checks.check_raidchannel(ctx):
-        if checks.check_raidactive(ctx):
-            listmsg = _('**Meowth!** ')
-            guild = ctx.guild
-            channel = ctx.channel
-            bulletpoint = '🔹'
-            starttime = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('starttime',None)
-            rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
-            if " 0 interested!" not in await _interest(ctx):
-                listmsg += ('\n' + bulletpoint) + (await _interest(ctx, tag=True))
-            if " 0 on the way!" not in await _otw(ctx):
-                listmsg += ('\n' + bulletpoint) + (await _otw(ctx, tag=True))
-            if " 0 waiting at the raid!" not in await _waiting(ctx):
-                listmsg += ('\n' + bulletpoint) + (await _waiting(ctx, tag=True))
-            if " 0 in the lobby!" not in await _lobbylist(ctx):
-                listmsg += ('\n' + bulletpoint) + (await _lobbylist(ctx, tag=True))
-            if (len(listmsg.splitlines()) <= 1):
-                listmsg +=  ('\n' + bulletpoint) + (" Nobody has updated their status yet!")
-            listmsg += ('\n' + bulletpoint) + (await print_raid_timer(channel))
-            if starttime and (starttime > now):
-                listmsg += _('\nThe next group will be starting at **{}**').format(starttime.strftime(_('%I:%M %p (%H:%M)')))
-            await channel.send(listmsg)
-            return
 
 @list.command()
 @checks.wantset()

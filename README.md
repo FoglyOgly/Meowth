@@ -200,7 +200,7 @@ pkmn = Pokemon
 | -------- |:-------------:| ------------|
 | **!timer** | *Raid Channel* | Shows the expiry time for the raid. |
 | **!timerset** \<timer\> | *Raid Channel* | Set the expiry time for the raid. |
-| **!starttime** \[HH:MM AM/PM\] | *Raid Channel* | Reports the raid as a duplicate channel. |
+| **!starttime** \[HH:MM AM/PM\] | *Raid Channel* | Set a time for a group to start a raid. |
 | **!location** | *Raid Channel* | Shows the raid location. |
 | **!location new** \<place/map\> | *Raid Channel* | Sets the raid location. |
 | **!recover** | *Raid Channel* | Recovers an unresponsive raid channel. |

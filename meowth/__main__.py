@@ -2874,7 +2874,7 @@ async def _eggassume(args, raid_channel, author=None):
     raid_gmaps_link = oldembed.url
     raidrole = discord.utils.get(raid_channel.guild.roles, name=entered_raid)
     if raidrole == None:
-        raidtest = ""
+        roletest = ""
     else:
         roletest = _("{pokemon} - ").format(pokemon=raidrole.mention)
     raid_number = pkmn_info['pokemon_list'].index(entered_raid) + 1

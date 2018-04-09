@@ -4,69 +4,32 @@ import discord
 import tempfile
 import json
 
-server_dict_new = {}
+
 
 with open('serverdict', "rb") as fd:
-	server_dict_old = pickle.load(fd)
+	guild_dict_convert = pickle.load(fd)
 
-for server in server_dict_old:
-	server_dict_new[int(server)] = {}
-	for key in server_dict_old[server]:
-		try:
-			server_dict_new[int(server)][key] = server_dict_old[server][key]
-		except:
-			pass
-	server_dict_new[int(server)]['raidchannel_dict'] = {}
-	server_dict_new[int(server)]['want_channel_list']= []
-	for channel in server_dict_old[server]['want_channel_list']:
-		server_dict_new[int(server)]['want_channel_list'].append(int(channel))
+for guildid in guild_dict_convert.keys():
+    for channelid in guild_dict_convert[guildid]['raidchannel_dict'].keys():
+        for trainerid in guild_dict_convert[guildid]['raidchannel_dict'][channelid]['trainer_dict'].keys():
+            if type(guild_dict_convert[guildid]['raidchannel_dict'][channelid]['trainer_dict'][trainerid]['party']) is not __builtins__.dict:
+                count = guild_dict_convert[guildid]['raidchannel_dict'][channelid]['trainer_dict'][trainerid].get('count',1)
+                party = guild_dict_convert[guildid]['raidchannel_dict'][channelid]['trainer_dict'][trainerid].get('party',[0,0,0,1])
+                status = guild_dict_convert[guildid]['raidchannel_dict'][channelid]['trainer_dict'][trainerid].get('status',"maybe")
+                party = {"mystic":party[0], "valor":party[1], "instinct":party[2], "unknown":party[3]}
+                if status == "maybe":
+                    status = {"maybe": count, "coming":0, "here":0, "lobby":0}
+                elif status == "omw":
+                    status = {"maybe": 0, "coming":count, "here":0, "lobby":0}
+                elif status == "waiting":
+                    status = {"maybe": 0, "coming":0, "here":count, "lobby":0}
+                elif status == "lobby":
+                    status = {"maybe": 0, "coming":0, "here":0, "lobby":count}
+                guild_dict_convert[guildid]['raidchannel_dict'][channelid]['trainer_dict'][trainerid]['party'] = party
+                guild_dict_convert[guildid]['raidchannel_dict'][channelid]['trainer_dict'][trainerid]['status'] = status
 
-	for channel in server_dict_old[server]['raidchannel_dict']:
-		try:
-
-			server_dict_new[int(server)]['raidchannel_dict'][int(channel)] = {
-				'address': server_dict_old[server]['raidchannel_dict'][channel]['address'],
-				'reportcity': server_dict_old[server]['raidchannel_dict'][channel]['reportcity'],
-				'trainer_dict' : {},
-				'exp': server_dict_old[server]['raidchannel_dict'][channel]['exp'],
-				'manual_timer' : server_dict_old[server]['raidchannel_dict'][channel]['manual_timer'],
-				'active': server_dict_old[server]['raidchannel_dict'][channel]['active'],
-				'raidmessage': int(server_dict_old[server]['raidchannel_dict'][channel]['raidmessage']) or None,
-				'raidreport': int(server_dict_old[server]['raidchannel_dict'][channel]['raidreport']) or None,
-				'type': server_dict_old[server]['raidchannel_dict'][channel]['type'],
-				'pokemon': server_dict_old[server]['raidchannel_dict'][channel]['pokemon'],
-				'egglevel': server_dict_old[server]['raidchannel_dict'][channel]['egglevel']
-				}
-		except TypeError:
-			pass
-		try:
-
-			for trainer in server_dict_old[server]['raidchannel_dict'][channel]['trainer_dict']:
-				server_dict_new[int(server)]['raidchannel_dict'][int(channel)]['trainer_dict'][int(trainer)] = server_dict_old[server]['raidchannel_dict'][channel]['trainer_dict'][trainer]
-		except KeyError:
-			pass
 
 with tempfile.NamedTemporaryFile('wb', delete=False) as tf:
-	pickle.dump(server_dict_new, tf)
+	pickle.dump(guild_dict_convert, tf)
 	tempname = tf.name
 os.rename(tempname, 'serverdict_converted')
-
-servercount_old = 0
-raidchannelcount_old = 0
-servercount_new = 0
-raidchannelcount_new = 0
-
-for server in server_dict_old:
-	servercount_old += 1
-	for channel in server_dict_old[server]['raidchannel_dict']:
-		raidchannelcount_old += 1
-
-for server in server_dict_new:
-	servercount_new += 1
-	for channel in server_dict_new[server]['raidchannel_dict']:
-		raidchannelcount_new += 1
-
-print("Old server count: {}".format(str(servercount_old)))
-print("New server count: {}".format(str(servercount_new)))
-print("Old raid count: {}".format(str(raidchannelcount_old)))
-print("New raid count: {}".format(str(raidchannelcount_new)))

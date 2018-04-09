@@ -1126,7 +1126,6 @@ async def exit(ctx):
     await Meowth.logout()
 
 @Meowth.group(name='set')
-@commands.has_permissions(manage_guild=True)
 async def _set(ctx):
     """Changes a setting."""
     if ctx.invoked_subcommand == None:
@@ -1176,6 +1175,53 @@ async def prefix(ctx, prefix=None):
 
 def _set_prefix(bot, guild, prefix):
     bot.guild_dict[guild.id]['prefix'] = prefix
+
+@_set.command()
+async def silph(ctx, silphid: str):
+    """Links a server member to a Silph Road Travelers Card."""
+    if not silphid:
+        await ctx.send(_('Silph Road Travelers Card cleared!'))
+        return
+    url = f'https://sil.ph/{silphid}.json'
+    async with ctx.typing():
+        async with aiohttp.ClientSession() as sess:
+            async with sess.get(url) as resp:
+                data = await resp.json()
+        if data.get('error', None):
+            if data['error']=="Private Travelers Card":
+                await ctx.send(_('This Travelers Card is private and cannot be linked!'))
+                return
+            elif data['error']=='Card not found':
+                await ctx.send(_('Travelers Card not found!'))
+                return
+        else:
+            socials = data['data'].get('socials', None)
+            if not socials:
+                await ctx.send(_('No Discord account found linked to this Travelers Card!'))
+                return
+            else:
+                disuser = ''
+                for social in socials:
+                    if social['vendor'] == "Discord":
+                        disuser = social['username']
+                        break
+                    else:
+                        continue
+                if not disuser:
+                    await ctx.send(_('No Discord account found linked to this Travelers Card!'))
+                    return
+                elif disuser != str(ctx.author):
+                    await ctx.send(_('This Travelers Card is linked to another Discord account!'))
+                    return
+                else:
+                    embed = _get_silph(ctx,data)
+                    trainers = guild_dict[ctx.guild.id].get('trainers', {})
+                    author = trainers.get(ctx.author.id,{})
+                    author['silphid'] = silphid
+                    trainers[ctx.author.id] = author
+                    guild_dict[ctx.guild.id]['trainers'] = trainers
+                    await ctx.send(_('This Travelers Card has been successfully linked to you!'),embed=embed)
+
 
 @Meowth.group(name='get')
 @commands.has_permissions(manage_guild=True)
@@ -2311,6 +2357,75 @@ async def team(ctx):
         except discord.Forbidden:
             await ctx.channel.send(_("Meowth! I can't add roles!"))
 
+@Meowth.command()
+async def silphcard(ctx, user: str = None):
+    if not user:
+        user = guild_dict[ctx.guild.id].get('trainers',{}).get(ctx.author.id,{}).get('silphid', None)
+    else:
+        if ctx.message.mentions:
+            user = guild_dict[ctx.guild.id].get('trainers', {}).get(ctx.message.mentions[0].id,{}).get('silphid', None)
+    if not user:
+        await ctx.send(_('Meowth! You did not provide a known Silph Road Traveler!'))
+        return
+    else:
+        url = f'https://sil.ph/{user}.json'
+        async with ctx.typing():
+            async with aiohttp.ClientSession() as sess:
+                async with sess.get(url) as resp:
+                    data = await resp.json()
+        if data.get('error', None):
+            await ctx.send(_(f"Meowth! {user} does not have a public Travelers Card!"))
+            return
+        embed = _get_silph(ctx,data)
+        await ctx.send(embed=embed)
+
+def _get_silph(ctx,data):
+    hyperlink_icon = "https://i.imgur.com/fn9E5nb.png"
+    silph_icon = "https://assets.thesilphroad.com/img/snoo_sr_icon.png"
+    card_id = data['data']['card_id']
+    home_region = data['data']['home_region']
+    pokedex_count = data['data']['pokedex_count']
+    raid_average = data['data']['raid_average']
+    team = data['data']['team']
+    playstyle = data['data']['playstyle']
+    modified = data['data']['modified']
+    modified_datetime = dateparser.parse(modified, settings={'TIMEZONE': 'UTC'})
+    local_datetime = modified_datetime + datetime.timedelta(hours=guild_dict[ctx.guild.id]['offset'])
+    local_date = local_datetime.date().isoformat()
+    goal = data['data']['goal']
+    trainer_level = data['data']['trainer_level']
+    nest_migrations = data['data']['nest_migrations']
+    title = data['data']['title']
+    avatar = data['data']['avatar']
+    ign = data['data']['in_game_username']
+    joined = data['data']['joined']
+    joined_datetime = datetime.datetime.strptime(joined, "%Y-%m-%d %H:%M:%S")
+    local_joined = joined_datetime + datetime.timedelta(hours=guild_dict[ctx.guild.id]['offset'])
+    joined_date = local_joined.date().isoformat()
+    badge_count = len(data['data']['badges'])
+    checkins = len(data['data']['checkins'])
+    handshakes = data['data']['handshakes']
+    socials = data['data']['socials']
+    disuser = ''
+    for social in socials:
+        if social['vendor'] == "Discord":
+            disuser = social['username']
+            break
+        else:
+            continue
+    if not disuser:
+        disstring = ":grey_question: **Discord Not Provided**"
+    else:
+        disstring = ":ballot_box_with_check: **Connected to Discord:**"
+    embed = discord.Embed(title="Playstyle", colour=discord.Colour(0xe8c13c), description=f"{playstyle}, working on {goal.lower()}.\nActive around {home_region}.\n\n{disstring} {disuser}")
+
+    embed.set_thumbnail(url=avatar)
+    embed.set_author(name=f"{title} {ign} - Level {trainer_level} {team}", url=f"https://sil.ph/{ign.lower()}", icon_url=hyperlink_icon)
+    embed.set_footer(text=f"Silph Road Travelers Card - ID{card_id} - Updated {local_date}", icon_url=silph_icon)
+
+    embed.add_field(name="__Silph Stats__", value=f"**Joined:** {joined_date}\n**Badges:** {badge_count}\n**Check-ins:** {checkins}\n**Handshakes:** {handshakes}\n**Migrations:** {nest_migrations}", inline=True)
+    embed.add_field(name="__Game Stats__", value=f"**Name:** {ign}\n**Team:** {team}\n**Level:** {trainer_level}\n**Pokedex:** {pokedex_count}\n**Raids:** {raid_average}/week", inline=True)
+    return embed
 
 
 @Meowth.command(hidden=True)

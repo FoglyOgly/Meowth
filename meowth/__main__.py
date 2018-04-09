@@ -3964,8 +3964,6 @@ async def counters(ctx, *, args = None):
     channel = ctx.channel
     guild = channel.guild
     user = None
-    weather = None
-    pkmn = None
     if args:
         args_split = args.split()
         for arg in args_split:
@@ -4874,19 +4872,34 @@ async def list(ctx):
             if activeraidnum:
                 listmsg += _("**Here's the current raids for {0}**\n\n").format(cty.capitalize())
             if raid_dict:
-                listmsg += _('**Active Raids:**\n').format(cty.capitalize())
+                listmsg += _('**Active Raids:**\n')
                 for (r, e) in sorted(raid_dict.items(), key=itemgetter(1)):
-                    listmsg += list_output(r)
+                    if len(listmsg) < 1800:
+                        listmsg += list_output(r)
+                    else:
+                        await channel.send(listmsg)
+                        listmsg = _('**Active Raids:** (continued)\n')
+                        listmsg += list_output(r)
                 listmsg += '\n'
             if egg_dict:
-                listmsg += _('**Raid Eggs:**\n').format(cty.capitalize())
+                listmsg += _('**Raid Eggs:**\n')
                 for (r, e) in sorted(egg_dict.items(), key=itemgetter(1)):
-                    listmsg += list_output(r)
+                    if len(listmsg) < 1800:
+                        listmsg += list_output(r)
+                    else:
+                        await channel.send(listmsg)
+                        listmsg = _('**Raid Eggs:** (continued)\n')
+                        listmsg += list_output(r)
                 listmsg += '\n'
             if exraid_list:
-                listmsg += _('**EX Raids:**\n').format(cty.capitalize())
+                listmsg += _('**EX Raids:**\n')
                 for r in exraid_list:
-                    listmsg += list_output(r)
+                    if len(listmsg) < 1800:
+                        listmsg += list_output(r)
+                    else:
+                        await channel.send(listmsg)
+                        listmsg = _('**EX Raids::** (continued)\n')
+                        listmsg += list_output(r)
             if activeraidnum == 0:
                 await channel.send(_('Meowth! No active raids! Report one with **!raid <name> <location>**.'))
                 return

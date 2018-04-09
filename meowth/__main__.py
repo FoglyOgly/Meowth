@@ -317,9 +317,13 @@ async def autocorrect(entered_word, destination, author):
         msg += _(' Did you mean **{correction}**?').format(correction=spellcheck(entered_word).title())
         question = await destination.send(msg)
         if author:
-            res, reactuser = await ask(question, destination, author.id)
+            try:
+                timeout = False
+                res, reactuser = await ask(question, destination, author.id)
+            except TypeError:
+                timeout = True
             await question.delete()
-            if res.emoji == '❎':
+            if timeout or res.emoji == '❎':
                 return
             elif res.emoji == '✅':
                 return spellcheck(entered_word)
@@ -1368,8 +1372,12 @@ async def announce(ctx, *, announce=None):
     msg += "❎ "
     msg += _("to cancel")
     rusure = await channel.send(msg.format(owner_msg_add))
-    res, reactuser = await ask(rusure, channel, author.id, react_list=reaction_list)
-    if res:
+    try:
+        timeout = False
+        res, reactuser = await ask(rusure, channel, author.id, react_list=reaction_list)
+    except TypeError:
+        timeout = True
+    if not timeout:
         await rusure.delete()
         if res.emoji == '❎':
             confirmation = await channel.send(_('Announcement Cancelled.'))
@@ -1583,11 +1591,19 @@ async def configure(ctx):
                             if welcomemessage.startswith("[") and welcomemessage.endswith("]"):
                                 embed = discord.Embed(colour=guild.me.colour, description=welcomemessage[1:-1].format(user=owner.mention))
                                 question = await owner.send(embed=embed)
-                                res, reactuser = await ask(question, owner, owner.id)
+                                try:
+                                    timeout = False
+                                    res, reactuser = await ask(question, owner, owner.id)
+                                except TypeError:
+                                    timeout = True
                             else:
                                 question = await owner.send(welcomemessage.format(user=owner.mention))
-                                res, reactuser = await ask(question, owner, owner.id)
-                        if res.emoji == '❎':
+                                try:
+                                    timeout = False
+                                    res, reactuser = await ask(question, owner, owner.id)
+                                except TypeError:
+                                    timeout = True
+                        if timeout or res.emoji == '❎':
                             await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Please enter a new welcome message, or reply with **N** to use the default.")))
                             continue
                         else:
@@ -2066,8 +2082,12 @@ async def raid_json(ctx, level=None, *, newlist=None):
             msg += ' '
         msg += _('\n\nContinue?')
         question = await ctx.channel.send(msg)
-        res, reactuser = await ask(question, ctx.channel, ctx.author.id)
-        if res.emoji == '❎':
+        try:
+            timeout = False
+            res, reactuser = await ask(question, ctx.channel, ctx.author.id)
+        except TypeError:
+            timeout = True
+        if timeout or res.emoji == '❎':
             return
         elif res.emoji == '✅':
             with open(os.path.join('data', 'raid_info.json'), 'r') as fd:
@@ -2106,7 +2126,7 @@ async def changeraid(ctx, newraid):
             p_name = get_name(p)
             p_type = get_type(message.guild, p)
             boss_list.append((((p_name + ' (') + str(p)) + ') ') + ''.join(p_type))
-        raid_img_url = 'https://raw.githubusercontent.com/doonce/Meowth/master/images/eggs/{}?cache=3'.format(str(egg_img))
+        raid_img_url = 'https://raw.githubusercontent.com/doonce/Meowth/master/images/eggs/{}?cache=4'.format(str(egg_img))
         raid_message = await channel.get_message(guild_dict[guild.id]['raidchannel_dict'][channel.id]['raidmessage'])
         report_channel = Meowth.get_channel(raid_message.raw_channel_mentions[0])
         report_message = await report_channel.get_message(guild_dict[guild.id]['raidchannel_dict'][channel.id]['raidreport'])
@@ -2152,9 +2172,13 @@ async def clearstatus(ctx):
     Only usable by admins."""
     msg = _("Are you sure you want to clear all status for this raid? Everybody will have to RSVP again. If you are wanting to clear one user's status, use `!setstatus <user> cancel`")
     question = await ctx.channel.send(msg)
-    res, reactuser = await ask(question, ctx.message.channel, ctx.message.author.id)
+    try:
+        timeout = False
+        res, reactuser = await ask(question, ctx.message.channel, ctx.message.author.id)
+    except TypeError:
+        timeout = True
     await question.delete()
-    if res.emoji == '❎':
+    if timeout or res.emoji == '❎':
         return
     elif res.emoji == '✅':
         pass
@@ -2534,7 +2558,7 @@ async def want(ctx):
     if (len(want_list) == 1) and ((len(added_list) == 1) or (len(spellcheck_dict) == 1) or (len(already_want_list) == 1)):
         if len(added_list) == 1:
             want_number = pkmn_info['pokemon_list'].index(added_list[0].lower()) + 1
-            want_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn/{0}_.png?cache=2'.format(str(want_number).zfill(3))
+            want_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn/{0}_.png?cache=4'.format(str(want_number).zfill(3))
             want_embed = discord.Embed(colour=guild.me.colour)
             want_embed.set_thumbnail(url=want_img_url)
             await channel.send(content=_('Meowth! Got it! {member} wants {pokemon}').format(member=ctx.author.mention, pokemon=added_list[0].capitalize()), embed=want_embed)
@@ -2683,7 +2707,7 @@ async def _wild(message):
         else:
             roletest = _("{pokemon} - ").format(pokemon=wild.mention)
         wild_number = pkmn_info['pokemon_list'].index(entered_wild) + 1
-        wild_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn/{0}_.png?cache=2'.format(str(wild_number).zfill(3))
+        wild_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn/{0}_.png?cache=4'.format(str(wild_number).zfill(3))
         wild_embed = discord.Embed(title=_('Meowth! Click here for my directions to the wild {pokemon}!').format(pokemon=entered_wild.capitalize()), description=_("Ask {author} if my directions aren't perfect!").format(author=message.author.name), url=wild_gmaps_link, colour=message.guild.me.colour)
         wild_embed.add_field(name=_('**Details:**'), value=_('{pokemon} ({pokemonnumber}) {type}').format(pokemon=entered_wild.capitalize(), pokemonnumber=str(wild_number), type=''.join(get_type(message.guild, wild_number)), inline=True))
         if message.author.avatar:
@@ -2806,7 +2830,7 @@ async def _raid(message):
     else:
         roletest = _("{pokemon} - ").format(pokemon=raid.mention)
     raid_number = pkmn_info['pokemon_list'].index(entered_raid) + 1
-    raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn/{0}_.png?cache=2'.format(str(raid_number).zfill(3))
+    raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn/{0}_.png?cache=4'.format(str(raid_number).zfill(3))
     raid_embed = discord.Embed(title=_('Meowth! Click here for directions to the raid!'), url=raid_gmaps_link, colour=message.guild.me.colour)
     raid_embed.add_field(name=_('**Details:**'), value=_('{pokemon} ({pokemonnumber}) {type}').format(pokemon=entered_raid.capitalize(), pokemonnumber=str(raid_number), type=''.join(get_type(message.guild, raid_number)), inline=True))
     raid_embed.add_field(name=_('**Weaknesses:**'), value=_('{weakness_list}').format(weakness_list=weakness_to_str(message.guild, get_weaknesses(entered_raid))), inline=True)
@@ -2917,7 +2941,7 @@ async def _raidegg(message):
         raid_channel_name += sanitize_channel_name(raid_details)
         raid_channel_category = get_category(message.channel, egg_level)
         raid_channel = await message.guild.create_text_channel(raid_channel_name, overwrites=dict(message.channel.overwrites), category=raid_channel_category)
-        raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/eggs/{}?cache=2'.format(str(egg_img))
+        raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/eggs/{}?cache=4'.format(str(egg_img))
         raid_embed = discord.Embed(title=_('Meowth! Click here for directions to the coming raid!'), url=raid_gmaps_link, colour=message.guild.me.colour)
         if len(egg_info['pokemon']) > 1:
             raid_embed.add_field(name=_('**Possible Bosses:**'), value=_('{bosslist1}').format(bosslist1='\n'.join(boss_list[::2])), inline=True)
@@ -2993,7 +3017,7 @@ async def _eggassume(args, raid_channel, author=None):
     else:
         roletest = _("{pokemon} - ").format(pokemon=raidrole.mention)
     raid_number = pkmn_info['pokemon_list'].index(entered_raid) + 1
-    raid_img_url = 'https://raw.githubusercontent.com/doonce/Meowth/master/images/pkmn/{0}_.png?cache=nono'.format(str(raid_number).zfill(3))
+    raid_img_url = 'https://raw.githubusercontent.com/doonce/Meowth/master/images/pkmn/{0}_.png?cache=4'.format(str(raid_number).zfill(3))
     raid_embed = discord.Embed(title=_('Meowth! Click here for directions to the coming raid!'), url=raid_gmaps_link, colour=raid_channel.guild.me.colour)
     raid_embed.add_field(name=_('**Details:**'), value=_('{pokemon} ({pokemonnumber}) {type}').format(pokemon=entered_raid.capitalize(), pokemonnumber=str(raid_number), type=''.join(get_type(raid_channel.guild, raid_number)), inline=True))
     raid_embed.add_field(name=_('**Weaknesses:**'), value=_('{weakness_list}').format(weakness_list=weakness_to_str(raid_channel.guild, get_weaknesses(entered_raid))), inline=True)
@@ -3093,7 +3117,7 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
     else:
         roletest = _("{pokemon} - ").format(pokemon=raid.mention)
     raid_number = pkmn_info['pokemon_list'].index(entered_raid) + 1
-    raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn/{0}_.png?cache=2'.format(str(raid_number).zfill(3))
+    raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn/{0}_.png?cache=4'.format(str(raid_number).zfill(3))
     raid_embed = discord.Embed(title=_('Meowth! Click here for directions to the raid!'), url=raid_gmaps_link, colour=raid_channel.guild.me.colour)
     raid_embed.add_field(name=_('**Details:**'), value=_('{pokemon} ({pokemonnumber}) {type}').format(pokemon=entered_raid.capitalize(), pokemonnumber=str(raid_number), type=''.join(get_type(raid_channel.guild, raid_number)), inline=True))
     raid_embed.add_field(name=_('**Weaknesses:**'), value=_('{weakness_list}').format(weakness_list=weakness_to_str(raid_channel.guild, get_weaknesses(entered_raid))), inline=True)
@@ -3206,17 +3230,26 @@ async def _exraid(ctx):
     raid_channel_overwrite_list = channel.overwrites
     meowth_overwrite = (Meowth.user, discord.PermissionOverwrite(send_messages=True))
     everyone_overwrite = (channel.guild.default_role, discord.PermissionOverwrite(send_messages=False))
-    for overwrite in raid_channel_overwrite_list:
-        if isinstance(overwrite[0], discord.Role):
-            if overwrite[0].permissions.manage_guild:
-                continue
-        overwrite[1].send_messages = False
     raid_channel_overwrite_list.append(meowth_overwrite)
     raid_channel_overwrite_list.append(everyone_overwrite)
+    for overwrite in raid_channel_overwrite_list:
+        if isinstance(overwrite[0], discord.Role):
+            if overwrite[0].permissions.manage_guild or overwrite[0].permissions.manage_channels or overwrite[0].permissions.manage_messages:
+                continue
+            overwrite[1].send_messages = False
+        elif isinstance(overwrite[0], discord.Member):
+            if overwrite[0].permissions.manage_guild or overwrite[0].permissions.manage_channels or overwrite[0].permissions.manage_messages:
+                continue
+            overwrite[1].send_messages = False
+        if (overwrite[0].name not in channel.guild.me.top_role.name) and (overwrite[0].name not in channel.guild.me.name):
+            overwrite[1].send_messages = False
     raid_channel_overwrites = dict(raid_channel_overwrite_list)
     raid_channel_category = get_category(message.channel,"EX")
     raid_channel = await message.guild.create_text_channel(raid_channel_name, overwrites=raid_channel_overwrites,category=raid_channel_category)
-    raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/eggs/{}?cache=2'.format(str(egg_img))
+    for role in channel.guild.role_hierarchy:
+        if role.permissions.manage_guild or role.permissions.manage_channels or role.permissions.manage_messages:
+            await raid_channel.set_permissions(role, send_messages=True)
+    raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/eggs/{}?cache=4'.format(str(egg_img))
     raid_embed = discord.Embed(title=_('Meowth! Click here for directions to the coming raid!'), url=raid_gmaps_link, colour=message.guild.me.colour)
     if len(egg_info['pokemon']) > 1:
         raid_embed.add_field(name=_('**Possible Bosses:**'), value=_('{bosslist1}').format(bosslist1='\n'.join(boss_list[::2])), inline=True)
@@ -3534,20 +3567,23 @@ async def starttime(ctx):
             return
         if alreadyset:
             rusure = await channel.send(_('Meowth! There is already a start time of **{start}** set! Do you want to change it?').format(start=alreadyset.strftime(_('%I:%M %p (%H:%M)'))))
-            res, reactuser = await ask(rusure, channel, author.id)
-            if res:
-                if res.emoji == '❎':
-                    await rusure.delete()
-                    confirmation = await channel.send(_('Start time change cancelled.'))
-                    await asyncio.sleep(10)
-                    await confirmation.delete()
-                    return
-                elif res.emoji == '✅':
-                    await rusure.delete()
-                    if now <= start:
-                        timeset = True
-                else:
-                    return
+            try:
+                timeout = False
+                res, reactuser = await ask(rusure, channel, author.id)
+            except TypeError:
+                timeout = True
+            if timeout or res.emoji == '❎':
+                await rusure.delete()
+                confirmation = await channel.send(_('Start time change cancelled.'))
+                await asyncio.sleep(10)
+                await confirmation.delete()
+                return
+            elif res.emoji == '✅':
+                await rusure.delete()
+                if now <= start:
+                    timeset = True
+            else:
+                return
         if now <= start or timeset:
             rc_d['starttime'] = start
             nextgroup = start.strftime(_('%I:%M %p (%H:%M)'))
@@ -3882,8 +3918,12 @@ async def duplicate(ctx):
     rc_d['duplicate'] = dupecount
     if dupecount >= 3:
         rusure = await channel.send(_('Meowth! Are you sure you wish to remove this raid?'))
-        res, reactuser = await ask(rusure, channel, author.id)
-        if res:
+        try:
+            timeout = False
+            res, reactuser = await ask(rusure, channel, author.id)
+        except TypeError:
+            timeout = True
+        if not timeout:
             if res.emoji == '❎':
                 await rusure.delete()
                 confirmation = await channel.send(_('Duplicate Report cancelled.'))
@@ -3953,7 +3993,7 @@ async def counters(ctx, *, args = None):
 
 
 async def _counters(ctx, pkmn, user = None, weather = None):
-    img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn/{0}_.png?cache=2'.format(str(get_number(pkmn)).zfill(3))
+    img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn/{0}_.png?cache=4'.format(str(get_number(pkmn)).zfill(3))
     level = get_level(pkmn) if get_level(pkmn).isdigit() else "5"
     url = "https://fight.pokebattler.com/raids/defenders/{pkmn}/levels/RAID_LEVEL_{level}/attackers/".format(pkmn=pkmn.replace('-','_').upper(),level=level)
     if user:
@@ -4625,8 +4665,12 @@ async def starting(ctx, team: str = ''):
         question = await ctx.channel.send(_("Are you sure you would like to start this raid?"))
     else:
         question = await ctx.channel.send(_("Are you sure you would like to start this raid? You can also do **!starting [team]** to start one team only."))
-    res, reactuser = await ask(question, ctx.channel, id_startinglist)
-    if res.emoji == '❎':
+    try:
+        timeout = False
+        res, reactuser = await ask(question, ctx.channel, id_startinglist)
+    except TypeError:
+        timeout = True
+    if timeout or res.emoji == '❎':
         await question.delete()
         return
     elif res.emoji == '✅':
@@ -4730,8 +4774,12 @@ async def backout(ctx):
             return
 
         backoutmsg = await channel.send(_('Backout - Meowth! {author} has requested a backout! If one of the following trainers reacts with the check mark, I will assume the group is backing out of the raid lobby as requested! {lobby_list}').format(author=author.mention, lobby_list=', '.join(lobby_list)))
-        res, reactuser = await ask(backoutmsg, channel, trainer_list, react_list=['✅'])
-        if res.emoji == '✅':
+        try:
+            timeout = False
+            res, reactuser = await ask(backoutmsg, channel, trainer_list, react_list=['✅'])
+        except TypeError:
+            timeout = True
+        if not timeout and res.emoji == '✅':
             for trainer in trainer_list:
                 count = trainer_dict[trainer]['count']
                 if trainer in trainer_dict:

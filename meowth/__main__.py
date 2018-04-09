@@ -3966,7 +3966,6 @@ async def counters(ctx, *, args = None):
     user = None
     weather = None
     pkmn = None
-    raidactive = checks.check_raidactive(ctx)
     if args:
         args_split = args.split()
         for arg in args_split:
@@ -3975,21 +3974,20 @@ async def counters(ctx, *, args = None):
                 break
         rgx = '[^a-zA-Z0-9]'
         pkmn = next((str(p) for p in get_raidlist() if not str(p).isdigit() and re.sub(rgx, '', str(p)) in re.sub(rgx, '', args.lower())), None)
-        if not pkmn and raidactive:
-            pkmn = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('pokemon', None)
+        if not pkmn:
+            pkmn = guild_dict[guild.id]['raidchannel_dict'].get(channel.id,{}).get('pokemon', None)
         weather_list = [_('none'), _('extreme'), _('clear'), _('sunny'), _('rainy'),
                         _('partlycloudy'), _('cloudy'), _('windy'), _('snow'), _('fog')]
         weather = next((w for w in weather_list if re.sub(rgx, '', w) in re.sub(rgx, '', args.lower())), None)
-        if not weather and raidactive:
-            weather = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('weather', None)
-    elif raidactive:
-        pkmn = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('pokemon', None)
-        weather = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('weather', None)
-    if not pkmn or (not args and not raidactive):
+        if not weather:
+            weather = guild_dict[guild.id]['raidchannel_dict'].get(channel.id,{}).get('weather', None)
+    else:
+        pkmn = guild_dict[guild.id]['raidchannel_dict'].get(channel.id,{}).get('pokemon', None)
+        weather = guild_dict[guild.id]['raidchannel_dict'].get(channel.id,{}).get('weather', None)
+    if not pkmn:
         await ctx.channel.send(_("Meowth! You're missing some details! Be sure to enter a pokemon that appears in raids! Usage: **!counters <pkmn> [weather] [user ID]**"))
         return
     await _counters(ctx, pkmn, user, weather)
-
 
 async def _counters(ctx, pkmn, user = None, weather = None):
     img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=1'.format(str(get_number(pkmn)).zfill(3))

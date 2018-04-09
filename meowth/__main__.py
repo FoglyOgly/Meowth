@@ -313,9 +313,13 @@ async def autocorrect(entered_word, destination, author):
         msg += _(' Did you mean **{correction}**?').format(correction=spellcheck(entered_word).title())
         question = await destination.send(msg)
         if author:
-            res, reactuser = await ask(question, destination, author.id)
+            try:
+                timeout = False
+                res, reactuser = await ask(question, destination, author.id)
+            except TypeError:
+                timeout = True
             await question.delete()
-            if res.emoji == '❎':
+            if timeout or res.emoji == '❎':
                 return
             elif res.emoji == '✅':
                 return spellcheck(entered_word)
@@ -1267,8 +1271,12 @@ async def announce(ctx, *, announce=None):
     msg += "❎ "
     msg += _("to cancel")
     rusure = await channel.send(msg.format(owner_msg_add))
-    res, reactuser = await ask(rusure, channel, author.id, react_list=reaction_list)
-    if res:
+    try:
+        timeout = False
+        res, reactuser = await ask(rusure, channel, author.id, react_list=reaction_list)
+    except TypeError:
+        timeout = True
+    if not timeout:
         await rusure.delete()
         if res.emoji == '❎':
             confirmation = await channel.send(_('Announcement Cancelled.'))
@@ -1482,11 +1490,19 @@ async def configure(ctx):
                             if welcomemessage.startswith("[") and welcomemessage.endswith("]"):
                                 embed = discord.Embed(colour=guild.me.colour, description=welcomemessage[1:-1].format(user=owner.mention))
                                 question = await owner.send(embed=embed)
-                                res, reactuser = await ask(question, owner, owner.id)
+                                try:
+                                    timeout = False
+                                    res, reactuser = await ask(question, owner, owner.id)
+                                except TypeError:
+                                    timeout = True
                             else:
                                 question = await owner.send(welcomemessage.format(user=owner.mention))
-                                res, reactuser = await ask(question, owner, owner.id)
-                        if res.emoji == '❎':
+                                try:
+                                    timeout = False
+                                    res, reactuser = await ask(question, owner, owner.id)
+                                except TypeError:
+                                    timeout = True
+                        if timeout or res.emoji == '❎':
                             await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Please enter a new welcome message, or reply with **N** to use the default.")))
                             continue
                         else:
@@ -1965,8 +1981,12 @@ async def raid_json(ctx, level=None, *, newlist=None):
             msg += ' '
         msg += _('\n\nContinue?')
         question = await ctx.channel.send(msg)
-        res, reactuser = await ask(question, ctx.channel, ctx.author.id)
-        if res.emoji == '❎':
+        try:
+            timeout = False
+            res, reactuser = await ask(question, ctx.channel, ctx.author.id)
+        except TypeError:
+            timeout = True
+        if timeout or res.emoji == '❎':
             return
         elif res.emoji == '✅':
             with open(os.path.join('data', 'raid_info.json'), 'r') as fd:
@@ -2051,9 +2071,13 @@ async def clearstatus(ctx):
     Only usable by admins."""
     msg = _("Are you sure you want to clear all status for this raid? Everybody will have to RSVP again. If you are wanting to clear one user's status, use `!setstatus <user> cancel`")
     question = await ctx.channel.send(msg)
-    res, reactuser = await ask(question, ctx.message.channel, ctx.message.author.id)
+    try:
+        timeout = False
+        res, reactuser = await ask(question, ctx.message.channel, ctx.message.author.id)
+    except TypeError:
+        timeout = True
     await question.delete()
-    if res.emoji == '❎':
+    if timeout or res.emoji == '❎':
         return
     elif res.emoji == '✅':
         pass
@@ -3373,20 +3397,23 @@ async def starttime(ctx):
             return
         if alreadyset:
             rusure = await channel.send(_('Meowth! There is already a start time of **{start}** set! Do you want to change it?').format(start=alreadyset.strftime(_('%I:%M %p (%H:%M)'))))
-            res, reactuser = await ask(rusure, channel, author.id)
-            if res:
-                if res.emoji == '❎':
-                    await rusure.delete()
-                    confirmation = await channel.send(_('Start time change cancelled.'))
-                    await asyncio.sleep(10)
-                    await confirmation.delete()
-                    return
-                elif res.emoji == '✅':
-                    await rusure.delete()
-                    if now <= start:
-                        timeset = True
-                else:
-                    return
+            try:
+                timeout = False
+                res, reactuser = await ask(rusure, channel, author.id)
+            except TypeError:
+                timeout = True
+            if timeout or res.emoji == '❎':
+                await rusure.delete()
+                confirmation = await channel.send(_('Start time change cancelled.'))
+                await asyncio.sleep(10)
+                await confirmation.delete()
+                return
+            elif res.emoji == '✅':
+                await rusure.delete()
+                if now <= start:
+                    timeset = True
+            else:
+                return
         if now <= start or timeset:
             rc_d['starttime'] = start
             nextgroup = start.strftime(_('%I:%M %p (%H:%M)'))
@@ -3721,8 +3748,12 @@ async def duplicate(ctx):
     rc_d['duplicate'] = dupecount
     if dupecount >= 3:
         rusure = await channel.send(_('Meowth! Are you sure you wish to remove this raid?'))
-        res, reactuser = await ask(rusure, channel, author.id)
-        if res:
+        try:
+            timeout = False
+            res, reactuser = await ask(rusure, channel, author.id)
+        except TypeError:
+            timeout = True
+        if not timeout:
             if res.emoji == '❎':
                 await rusure.delete()
                 confirmation = await channel.send(_('Duplicate Report cancelled.'))
@@ -4464,8 +4495,12 @@ async def starting(ctx, team: str = ''):
         question = await ctx.channel.send(_("Are you sure you would like to start this raid?"))
     else:
         question = await ctx.channel.send(_("Are you sure you would like to start this raid? You can also do **!starting [team]** to start one team only."))
-    res, reactuser = await ask(question, ctx.channel, id_startinglist)
-    if res.emoji == '❎':
+    try:
+        timeout = False
+        res, reactuser = await ask(question, ctx.channel, id_startinglist)
+    except TypeError:
+        timeout = True
+    if timeout or res.emoji == '❎':
         await question.delete()
         return
     elif res.emoji == '✅':
@@ -4569,8 +4604,12 @@ async def backout(ctx):
             return
 
         backoutmsg = await channel.send(_('Backout - Meowth! {author} has requested a backout! If one of the following trainers reacts with the check mark, I will assume the group is backing out of the raid lobby as requested! {lobby_list}').format(author=author.mention, lobby_list=', '.join(lobby_list)))
-        res, reactuser = await ask(backoutmsg, channel, trainer_list, react_list=['✅'])
-        if res.emoji == '✅':
+        try:
+            timeout = False
+            res, reactuser = await ask(backoutmsg, channel, trainer_list, react_list=['✅'])
+        except TypeError:
+            timeout = True
+        if not timeout and res.emoji == '✅':
             for trainer in trainer_list:
                 count = trainer_dict[trainer]['count']
                 if trainer in trainer_dict:

@@ -31,7 +31,6 @@ from operator import itemgetter
 from errors import custom_error_handling
 import dateparser
 import io
-import textwrap
 import traceback
 from contextlib import redirect_stdout
 tessdata_dir_config = "--tessdata-dir 'C:\\Program Files (x86)\\Tesseract-OCR\\tessdata' "

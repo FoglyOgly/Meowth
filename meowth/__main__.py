@@ -3954,40 +3954,40 @@ async def duplicate(ctx):
         return
 
 @Meowth.command()
-@checks.activeraidchannel()
 async def counters(ctx, *, args = None):
     """Simulate a Raid battle with Pokebattler.
 
     Usage: !counters [pokemon] [weather] [user]
     See !help weather for acceptable values for weather.
     If [user] is a valid Pokebattler user id, Meowth will simulate the Raid with that user's Pokebox.
-    Only usable in raid channels. Uses current boss and weather by default.
+    Uses current boss and weather by default if available.
     """
     channel = ctx.channel
     guild = channel.guild
+    user = None
+    weather = None
+    pkmn = None
+    raidactive = checks.check_raidactive(ctx)
     if args:
         args_split = args.split()
         for arg in args_split:
             if arg.isdigit():
                 user = arg
                 break
-        else:
-            user = None
         rgx = '[^a-zA-Z0-9]'
         pkmn = next((str(p) for p in get_raidlist() if not str(p).isdigit() and re.sub(rgx, '', str(p)) in re.sub(rgx, '', args.lower())), None)
-        if not pkmn:
+        if not pkmn and raidactive:
             pkmn = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('pokemon', None)
         weather_list = [_('none'), _('extreme'), _('clear'), _('sunny'), _('rainy'),
                         _('partlycloudy'), _('cloudy'), _('windy'), _('snow'), _('fog')]
         weather = next((w for w in weather_list if re.sub(rgx, '', w) in re.sub(rgx, '', args.lower())), None)
-        if not weather:
+        if not weather and raidactive:
             weather = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('weather', None)
-    else:
+    elif raidactive:
         pkmn = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('pokemon', None)
         weather = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('weather', None)
-        user = None
-    if not pkmn:
-        await ctx.channel.send("Meowth! Enter a Pokemon that appears in raids, or wait for this raid egg to hatch!")
+    if not pkmn or (not args and not raidactive):
+        await ctx.channel.send(_("Meowth! You're missing some details! Be sure to enter a pokemon that appears in raids! Usage: **!counters <pkmn> [weather] [user ID]**"))
         return
     await _counters(ctx, pkmn, user, weather)
 

@@ -2126,7 +2126,7 @@ async def changeraid(ctx, newraid):
             p_name = get_name(p)
             p_type = get_type(message.guild, p)
             boss_list.append((((p_name + ' (') + str(p)) + ') ') + ''.join(p_type))
-        raid_img_url = 'https://raw.githubusercontent.com/doonce/Meowth/master/images/eggs/{}?cache=4'.format(str(egg_img))
+        raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/eggs/{}?cache=1'.format(str(egg_img))
         raid_message = await channel.get_message(guild_dict[guild.id]['raidchannel_dict'][channel.id]['raidmessage'])
         report_channel = Meowth.get_channel(raid_message.raw_channel_mentions[0])
         report_message = await report_channel.get_message(guild_dict[guild.id]['raidchannel_dict'][channel.id]['raidreport'])
@@ -2558,7 +2558,7 @@ async def want(ctx):
     if (len(want_list) == 1) and ((len(added_list) == 1) or (len(spellcheck_dict) == 1) or (len(already_want_list) == 1)):
         if len(added_list) == 1:
             want_number = pkmn_info['pokemon_list'].index(added_list[0].lower()) + 1
-            want_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn/{0}_.png?cache=4'.format(str(want_number).zfill(3))
+            want_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=1'.format(str(want_number).zfill(3))
             want_embed = discord.Embed(colour=guild.me.colour)
             want_embed.set_thumbnail(url=want_img_url)
             await channel.send(content=_('Meowth! Got it! {member} wants {pokemon}').format(member=ctx.author.mention, pokemon=added_list[0].capitalize()), embed=want_embed)
@@ -2707,7 +2707,7 @@ async def _wild(message):
         else:
             roletest = _("{pokemon} - ").format(pokemon=wild.mention)
         wild_number = pkmn_info['pokemon_list'].index(entered_wild) + 1
-        wild_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn/{0}_.png?cache=4'.format(str(wild_number).zfill(3))
+        wild_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=1'.format(str(wild_number).zfill(3))
         wild_embed = discord.Embed(title=_('Meowth! Click here for my directions to the wild {pokemon}!').format(pokemon=entered_wild.capitalize()), description=_("Ask {author} if my directions aren't perfect!").format(author=message.author.name), url=wild_gmaps_link, colour=message.guild.me.colour)
         wild_embed.add_field(name=_('**Details:**'), value=_('{pokemon} ({pokemonnumber}) {type}').format(pokemon=entered_wild.capitalize(), pokemonnumber=str(wild_number), type=''.join(get_type(message.guild, wild_number)), inline=True))
         if message.author.avatar:
@@ -2830,7 +2830,7 @@ async def _raid(message):
     else:
         roletest = _("{pokemon} - ").format(pokemon=raid.mention)
     raid_number = pkmn_info['pokemon_list'].index(entered_raid) + 1
-    raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn/{0}_.png?cache=4'.format(str(raid_number).zfill(3))
+    raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=1'.format(str(raid_number).zfill(3))
     raid_embed = discord.Embed(title=_('Meowth! Click here for directions to the raid!'), url=raid_gmaps_link, colour=message.guild.me.colour)
     raid_embed.add_field(name=_('**Details:**'), value=_('{pokemon} ({pokemonnumber}) {type}').format(pokemon=entered_raid.capitalize(), pokemonnumber=str(raid_number), type=''.join(get_type(message.guild, raid_number)), inline=True))
     raid_embed.add_field(name=_('**Weaknesses:**'), value=_('{weakness_list}').format(weakness_list=weakness_to_str(message.guild, get_weaknesses(entered_raid))), inline=True)
@@ -2941,7 +2941,7 @@ async def _raidegg(message):
         raid_channel_name += sanitize_channel_name(raid_details)
         raid_channel_category = get_category(message.channel, egg_level)
         raid_channel = await message.guild.create_text_channel(raid_channel_name, overwrites=dict(message.channel.overwrites), category=raid_channel_category)
-        raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/eggs/{}?cache=4'.format(str(egg_img))
+        raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/eggs/{}?cache=1'.format(str(egg_img))
         raid_embed = discord.Embed(title=_('Meowth! Click here for directions to the coming raid!'), url=raid_gmaps_link, colour=message.guild.me.colour)
         if len(egg_info['pokemon']) > 1:
             raid_embed.add_field(name=_('**Possible Bosses:**'), value=_('{bosslist1}').format(bosslist1='\n'.join(boss_list[::2])), inline=True)
@@ -3017,7 +3017,7 @@ async def _eggassume(args, raid_channel, author=None):
     else:
         roletest = _("{pokemon} - ").format(pokemon=raidrole.mention)
     raid_number = pkmn_info['pokemon_list'].index(entered_raid) + 1
-    raid_img_url = 'https://raw.githubusercontent.com/doonce/Meowth/master/images/pkmn/{0}_.png?cache=4'.format(str(raid_number).zfill(3))
+    raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=1'.format(str(raid_number).zfill(3))
     raid_embed = discord.Embed(title=_('Meowth! Click here for directions to the coming raid!'), url=raid_gmaps_link, colour=raid_channel.guild.me.colour)
     raid_embed.add_field(name=_('**Details:**'), value=_('{pokemon} ({pokemonnumber}) {type}').format(pokemon=entered_raid.capitalize(), pokemonnumber=str(raid_number), type=''.join(get_type(raid_channel.guild, raid_number)), inline=True))
     raid_embed.add_field(name=_('**Weaknesses:**'), value=_('{weakness_list}').format(weakness_list=weakness_to_str(raid_channel.guild, get_weaknesses(entered_raid))), inline=True)
@@ -3117,7 +3117,7 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
     else:
         roletest = _("{pokemon} - ").format(pokemon=raid.mention)
     raid_number = pkmn_info['pokemon_list'].index(entered_raid) + 1
-    raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn/{0}_.png?cache=4'.format(str(raid_number).zfill(3))
+    raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=1'.format(str(raid_number).zfill(3))
     raid_embed = discord.Embed(title=_('Meowth! Click here for directions to the raid!'), url=raid_gmaps_link, colour=raid_channel.guild.me.colour)
     raid_embed.add_field(name=_('**Details:**'), value=_('{pokemon} ({pokemonnumber}) {type}').format(pokemon=entered_raid.capitalize(), pokemonnumber=str(raid_number), type=''.join(get_type(raid_channel.guild, raid_number)), inline=True))
     raid_embed.add_field(name=_('**Weaknesses:**'), value=_('{weakness_list}').format(weakness_list=weakness_to_str(raid_channel.guild, get_weaknesses(entered_raid))), inline=True)
@@ -3249,7 +3249,7 @@ async def _exraid(ctx):
     for role in channel.guild.role_hierarchy:
         if role.permissions.manage_guild or role.permissions.manage_channels or role.permissions.manage_messages:
             await raid_channel.set_permissions(role, send_messages=True)
-    raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/eggs/{}?cache=4'.format(str(egg_img))
+    raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/eggs/{}?cache=1'.format(str(egg_img))
     raid_embed = discord.Embed(title=_('Meowth! Click here for directions to the coming raid!'), url=raid_gmaps_link, colour=message.guild.me.colour)
     if len(egg_info['pokemon']) > 1:
         raid_embed.add_field(name=_('**Possible Bosses:**'), value=_('{bosslist1}').format(bosslist1='\n'.join(boss_list[::2])), inline=True)
@@ -3993,7 +3993,7 @@ async def counters(ctx, *, args = None):
 
 
 async def _counters(ctx, pkmn, user = None, weather = None):
-    img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/master/images/pkmn/{0}_.png?cache=4'.format(str(get_number(pkmn)).zfill(3))
+    img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=1'.format(str(get_number(pkmn)).zfill(3))
     level = get_level(pkmn) if get_level(pkmn).isdigit() else "5"
     url = "https://fight.pokebattler.com/raids/defenders/{pkmn}/levels/RAID_LEVEL_{level}/attackers/".format(pkmn=pkmn.replace('-','_').upper(),level=level)
     if user:

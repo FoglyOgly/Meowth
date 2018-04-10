@@ -3363,6 +3363,107 @@ async def _invite(ctx):
     await reply.delete()
     await exraidmsg.delete()
 
+@Meowth.command()
+async def research(ctx, *, args = None):
+    """Report Field research
+    Guided report method with just !research. If you supply arguments in one
+    line, avoid commas in anything but your separations between pokestop,
+    quest, reward. Order matters if you supply arguments. If a pokemon name
+    is included in reward, a @mention will be used if role exists.
+
+    Usage: !research [pokestop, quest, reward]"""
+    message = ctx.message
+    channel = message.channel
+    author = message.author
+    guild = message.guild
+    timestamp = (message.created_at + datetime.timedelta(hours=guild_dict[message.channel.guild.id]['offset']))
+    to_midnight = 24*60*60 - ((timestamp-timestamp.replace(hour=0, minute=0, second=0, microsecond=0)).seconds)
+    error = False
+    research_embed = discord.Embed(colour=message.guild.me.colour).set_thumbnail(url='https://raw.githubusercontent.com/doonce/Meowth/Rewrite/images/misc/field-research.png?cache=0')
+    research_embed.set_footer(text=_('Reported by @{author} - {timestamp}').format(author=author.display_name, timestamp=timestamp.strftime(_('%I:%M %p (%H:%M)'))), icon_url=author.avatar_url_as(format=None, static_format='jpg', size=32))
+    while True:
+        if args:
+            research_split = message.clean_content.replace("!research\n ","").split(", ")
+            if len(research_split) != 3:
+                error = _("entered an incorrect amount of arguments.\n\nUsage: **!research** or **!research <pokestop>, <quest>, <reward>**")
+                break
+            location, quest, reward = research_split
+            research_embed.add_field(name=_("**Location:**"),value='\n'.join(textwrap.wrap(location, width=30)),inline=True)
+            research_embed.add_field(name=_("**Quest:**"),value='\n'.join(textwrap.wrap(quest, width=30)),inline=True)
+            research_embed.add_field(name=_("**Reward:**"),value='\n'.join(textwrap.wrap(reward, width=30)),inline=True)
+            break
+        else:
+            research_embed.add_field(name=_('**New Research Report**'), value=_("Meowth! I'll help you report a research quest!\n\nFirst, I'll need to know what **pokestop** you received the quest from. Reply with the name of the **pokestop**. You can reply with **cancel** to stop anytime."), inline=False)
+            pokestopwait = await channel.send(embed=research_embed)
+            try:
+                pokestopmsg = await Meowth.wait_for('message', timeout=60, check=(lambda reply: reply.author == message.author))
+            except asyncio.TimeoutError:
+                pokestopmsg = None
+            await pokestopwait.delete()
+            if not pokestopmsg:
+                error = _("took too long to respond")
+                break
+            elif pokestopmsg.clean_content.lower() == "cancel":
+                error = _("cancelled the report")
+                break
+            elif pokestopmsg:
+                location = pokestopmsg.clean_content
+            await pokestopmsg.delete()
+            research_embed.add_field(name=_("**Location:**"),value='\n'.join(textwrap.wrap(location, width=30)),inline=True)
+            research_embed.set_field_at(0, name=research_embed.fields[0].name, value=_("Great! Now, reply with the **quest** that you received from **{location}**. You can reply with **cancel** to stop anytime.\n\nHere's what I have so far:").format(location=location), inline=False)
+            questwait = await channel.send(embed=research_embed)
+            try:
+                questmsg = await Meowth.wait_for('message', timeout=60, check=(lambda reply: reply.author == message.author))
+            except asyncio.TimeoutError:
+                questmsg = None
+            await questwait.delete()
+            if not questmsg:
+                error = _("took too long to respond")
+                break
+            elif questmsg.clean_content.lower() == "cancel":
+                error = _("cancelled the report")
+                break
+            elif questmsg:
+                quest = questmsg.clean_content
+            await questmsg.delete()
+            research_embed.add_field(name=_("**Quest:**"),value='\n'.join(textwrap.wrap(quest, width=30)),inline=True)
+            research_embed.set_field_at(0, name=research_embed.fields[0].name, value=_("Fantastic! Now, reply with the **reward** for the **{quest}** quest that you received from **{location}**. You can reply with **cancel** to stop anytime.\n\nHere's what I have so far:").format(quest=quest, location=location), inline=False)
+            rewardwait = await channel.send(embed=research_embed)
+            try:
+                rewardmsg = await Meowth.wait_for('message', timeout=60, check=(lambda reply: reply.author == message.author))
+            except asyncio.TimeoutError:
+                rewardmsg = None
+            await rewardwait.delete()
+            if not rewardmsg:
+                error = _("took too long to respond")
+                break
+            elif rewardmsg.clean_content.lower() == "cancel":
+                error = _("cancelled the report")
+                break
+            elif rewardmsg:
+                reward = rewardmsg.clean_content
+            await rewardmsg.delete()
+            research_embed.add_field(name=_("**Reward:**"),value='\n'.join(textwrap.wrap(reward, width=30)),inline=True)
+            research_embed.remove_field(0)
+            break
+    if not error:
+        pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub('[^a-zA-Z0-9]', '', p) == re.sub('[^a-zA-Z0-9]', '', reward.lower())), None)
+        roletest = ""
+        if pkmn_match:
+            role = discord.utils.get(guild.roles, name=pkmn_match)
+            if role:
+                roletest = _("{pokemon} - ").format(pokemon=role.mention)
+        research_msg = _("{roletest}Field Research reported by {author}").format(roletest=roletest,author=author.mention)
+        confirmation = await channel.send(research_msg,embed=research_embed)
+        await asyncio.sleep(to_midnight)
+        await confirmation.delete()
+    else:
+        research_embed.clear_fields()
+        research_embed.add_field(name='**Research Report Cancelled**', value=_("Meowth! Your report has been cancelled because you {error}! Retry when you're ready.").format(error=error), inline=False)
+        confirmation = await channel.send(embed=research_embed)
+        await asyncio.sleep(10)
+        await confirmation.delete()
+
 """
 Raid Channel Management
 """

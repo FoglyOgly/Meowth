@@ -2426,7 +2426,10 @@ def _get_silph(ctx,data):
     local_joined = joined_datetime + datetime.timedelta(hours=guild_dict[ctx.guild.id]['offset'])
     joined_date = local_joined.date().isoformat()
     badge_count = len(data['data']['badges'])
-    checkins = len(data['data']['checkins'])
+    if isinstance(data['data']['checkins'], __builtins__.list):
+        checkins = len(data['data']['checkins'])
+    else:
+        checkins = 0
     handshakes = data['data']['handshakes']
     socials = data['data']['socials']
     disuser = ''

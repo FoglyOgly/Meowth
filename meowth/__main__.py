@@ -3237,7 +3237,7 @@ async def _exraid(ctx):
                 continue
             overwrite[1].send_messages = False
         elif isinstance(overwrite[0], discord.Member):
-            if overwrite[0].permissions.manage_guild or overwrite[0].permissions.manage_channels or overwrite[0].permissions.manage_messages:
+            if channel.permissions_for(overwrite[0]).manage_guild or channel.permissions_for(overwrite[0]).manage_channels or channel.permissions_for(overwrite[0]).manage_messages:
                 continue
             overwrite[1].send_messages = False
         if (overwrite[0].name not in channel.guild.me.top_role.name) and (overwrite[0].name not in channel.guild.me.name):

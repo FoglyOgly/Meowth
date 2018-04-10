@@ -31,7 +31,6 @@ from operator import itemgetter
 from errors import custom_error_handling
 import dateparser
 import io
-import textwrap
 import traceback
 from contextlib import redirect_stdout
 tessdata_dir_config = "--tessdata-dir 'C:\\Program Files (x86)\\Tesseract-OCR\\tessdata' "
@@ -3954,43 +3953,39 @@ async def duplicate(ctx):
         return
 
 @Meowth.command()
-@checks.activeraidchannel()
 async def counters(ctx, *, args = None):
     """Simulate a Raid battle with Pokebattler.
 
     Usage: !counters [pokemon] [weather] [user]
     See !help weather for acceptable values for weather.
     If [user] is a valid Pokebattler user id, Meowth will simulate the Raid with that user's Pokebox.
-    Only usable in raid channels. Uses current boss and weather by default.
+    Uses current boss and weather by default if available.
     """
     channel = ctx.channel
     guild = channel.guild
+    user = None
     if args:
         args_split = args.split()
         for arg in args_split:
             if arg.isdigit():
                 user = arg
                 break
-        else:
-            user = None
         rgx = '[^a-zA-Z0-9]'
         pkmn = next((str(p) for p in get_raidlist() if not str(p).isdigit() and re.sub(rgx, '', str(p)) in re.sub(rgx, '', args.lower())), None)
         if not pkmn:
-            pkmn = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('pokemon', None)
+            pkmn = guild_dict[guild.id]['raidchannel_dict'].get(channel.id,{}).get('pokemon', None)
         weather_list = [_('none'), _('extreme'), _('clear'), _('sunny'), _('rainy'),
                         _('partlycloudy'), _('cloudy'), _('windy'), _('snow'), _('fog')]
         weather = next((w for w in weather_list if re.sub(rgx, '', w) in re.sub(rgx, '', args.lower())), None)
         if not weather:
-            weather = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('weather', None)
+            weather = guild_dict[guild.id]['raidchannel_dict'].get(channel.id,{}).get('weather', None)
     else:
-        pkmn = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('pokemon', None)
-        weather = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('weather', None)
-        user = None
+        pkmn = guild_dict[guild.id]['raidchannel_dict'].get(channel.id,{}).get('pokemon', None)
+        weather = guild_dict[guild.id]['raidchannel_dict'].get(channel.id,{}).get('weather', None)
     if not pkmn:
-        await ctx.channel.send("Meowth! Enter a Pokemon that appears in raids, or wait for this raid egg to hatch!")
+        await ctx.channel.send(_("Meowth! You're missing some details! Be sure to enter a pokemon that appears in raids! Usage: **!counters <pkmn> [weather] [user ID]**"))
         return
     await _counters(ctx, pkmn, user, weather)
-
 
 async def _counters(ctx, pkmn, user = None, weather = None):
     img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=1'.format(str(get_number(pkmn)).zfill(3))
@@ -4877,19 +4872,34 @@ async def list(ctx):
             if activeraidnum:
                 listmsg += _("**Here's the current raids for {0}**\n\n").format(cty.capitalize())
             if raid_dict:
-                listmsg += _('**Active Raids:**\n').format(cty.capitalize())
+                listmsg += _('**Active Raids:**\n')
                 for (r, e) in sorted(raid_dict.items(), key=itemgetter(1)):
-                    listmsg += list_output(r)
+                    if len(listmsg) < 1800:
+                        listmsg += list_output(r)
+                    else:
+                        await channel.send(listmsg)
+                        listmsg = _('**Active Raids:** (continued)\n')
+                        listmsg += list_output(r)
                 listmsg += '\n'
             if egg_dict:
-                listmsg += _('**Raid Eggs:**\n').format(cty.capitalize())
+                listmsg += _('**Raid Eggs:**\n')
                 for (r, e) in sorted(egg_dict.items(), key=itemgetter(1)):
-                    listmsg += list_output(r)
+                    if len(listmsg) < 1800:
+                        listmsg += list_output(r)
+                    else:
+                        await channel.send(listmsg)
+                        listmsg = _('**Raid Eggs:** (continued)\n')
+                        listmsg += list_output(r)
                 listmsg += '\n'
             if exraid_list:
-                listmsg += _('**EX Raids:**\n').format(cty.capitalize())
+                listmsg += _('**EX Raids:**\n')
                 for r in exraid_list:
-                    listmsg += list_output(r)
+                    if len(listmsg) < 1800:
+                        listmsg += list_output(r)
+                    else:
+                        await channel.send(listmsg)
+                        listmsg = _('**EX Raids::** (continued)\n')
+                        listmsg += list_output(r)
             if activeraidnum == 0:
                 await channel.send(_('Meowth! No active raids! Report one with **!raid <name> <location>**.'))
                 return

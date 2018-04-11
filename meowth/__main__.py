@@ -3415,6 +3415,7 @@ async def _invite(ctx):
     await exraidmsg.delete()
 
 @Meowth.command()
+@checks.nonraidchannel()
 async def research(ctx, *, args = None):
     """Report Field research
     Guided report method with just !research. If you supply arguments in one
@@ -3432,9 +3433,6 @@ async def research(ctx, *, args = None):
     error = False
     research_embed = discord.Embed(colour=message.guild.me.colour).set_thumbnail(url='https://raw.githubusercontent.com/doonce/Meowth/Rewrite/images/misc/field-research.png?cache=0')
     research_embed.set_footer(text=_('Reported by @{author} - {timestamp}').format(author=author.display_name, timestamp=timestamp.strftime(_('%I:%M %p (%H:%M)'))), icon_url=author.avatar_url_as(format=None, static_format='jpg', size=32))
-    if checks.check_raidchannel(ctx):
-        await message.channel.send(_('Meowth! Please restrict research reports to outside of raid channels!'))
-        return
     while True:
         if args:
             research_split = message.clean_content.replace("!research\n ","").split(", ")

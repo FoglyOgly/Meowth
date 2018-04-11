@@ -778,7 +778,7 @@ async def guild_cleanup(loop=True):
         await asyncio.sleep(7200)
         continue
 
-sync def report_cleanup(loop=True):
+async def report_cleanup(loop=True):
     while (not Meowth.is_closed()):
         logger.info('Report_Cleanup ------ BEGIN ------')
         guilddict_temp = copy.deepcopy(guild_dict)
@@ -786,7 +786,7 @@ sync def report_cleanup(loop=True):
             research_dict = guilddict_temp[guildid].get('questreport_dict',{})
             wild_dict = guilddict_temp[guildid].get('wildreport_dict',{})
             for questid in research_dict.keys():
-                if research_dict[questid]['exp'] < time.time():
+                if research_dict[questid]['exp'] <= (time.time() - (5 * 60)):
                     report_channel = Meowth.get_channel(research_dict[questid]['reportchannel'])
                     if report_channel:
                         try:
@@ -801,7 +801,7 @@ sync def report_cleanup(loop=True):
                             pass
                     del guild_dict[guildid]['questreport_dict'][questid]
             for wildid in wild_dict.keys():
-                if wild_dict[wildid]['exp'] < time.time():
+                if wild_dict[wildid]['exp'] <= (time.time() - (5 * 60)):
                     report_channel = Meowth.get_channel(wild_dict[wildid]['reportchannel'])
                     if report_channel:
                         try:

@@ -5369,6 +5369,52 @@ async def _wantlist(ctx):
         listmsg = _(" You don't have any wants! use **!want** to add some.")
     return listmsg
 
+@list.command()
+@checks.nonraidchannel()
+async def research(ctx):
+    """List the quests for the channel
+
+    Usage: !list research"""
+    listmsg = _('**Meowth!**')
+    listmsg += await _researchlist(ctx)
+    await ctx.channel.send(listmsg)
+
+async def _researchlist(ctx):
+    research_dict = copy.deepcopy(guild_dict[ctx.guild.id]['questreport_dict'])
+    questmsg = ""
+    for questid in research_dict:
+        if research_dict[questid]['reportchannel'] == ctx.message.channel.id:
+            questmsg += ('\n' + '🔹')
+            questmsg += _("**Location**: {location}, **Quest**: {quest}, **Reward**: {reward}".format(location=research_dict[questid]['location'].title(),quest=research_dict[questid]['quest'].title(),reward=research_dict[questid]['reward'].title()))
+    if questmsg:
+        listmsg = _(' **Here\'s the current research reports for {channel}**\n{questmsg}').format(channel=ctx.message.channel.name.capitalize(),questmsg=questmsg)
+    else:
+        listmsg = _(" There are no reported research reports. Report one with **!research**!")
+    return listmsg
+
+@list.command()
+@checks.citychannel()
+async def wilds(ctx):
+    """List the wilds for the channel
+
+    Usage: !list wilds"""
+    listmsg = _('**Meowth!**')
+    listmsg += await _wildlist(ctx)
+    await ctx.channel.send(listmsg)
+
+async def _wildlist(ctx):
+    wild_dict = copy.deepcopy(guild_dict[ctx.guild.id]['wildreport_dict'])
+    wildmsg = ""
+    for wildid in wild_dict:
+        if wild_dict[wildid]['reportchannel'] == ctx.message.channel.id:
+            wildmsg += ('\n' + '🔹')
+            wildmsg += _("**Pokemon**: {pokemon}, **Location**: {location}".format(pokemon=wild_dict[wildid]['pokemon'].title(),location=wild_dict[wildid]['location'].title()))
+    if wildmsg:
+        listmsg = _(' **Here\'s the current wild reports for {channel}**\n{wildmsg}').format(channel=ctx.message.channel.name.capitalize(),wildmsg=wildmsg)
+    else:
+        listmsg = _(" There are no reported wild pokemon. Report one with **!wild**!")
+    return listmsg
+
 try:
     event_loop.run_until_complete(Meowth.start(config['bot_token']))
 except discord.LoginFailure:

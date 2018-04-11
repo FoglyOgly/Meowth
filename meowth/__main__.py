@@ -2767,7 +2767,7 @@ async def _wild(message):
         wildreportmsg = await message.channel.send(content=_('{roletest}Meowth! Wild {pokemon} reported by {member}! Details: {location_details}').format(roletest=roletest,pokemon=entered_wild.title(), member=message.author.mention, location_details=wild_details), embed=wild_embed)
         wild_dict = copy.deepcopy(guild_dict[message.guild.id].get('wildreport_dict',{}))
         wild_dict[wildreportmsg.id] = {
-            'exp':time.time() + despawn,
+            'exp':time.time() + 3600,
             'reportmessage':message.id,
             'reportchannel':message.channel.id,
             'reportauthor':message.author.id,
@@ -3442,9 +3442,9 @@ async def research(ctx, *, args = None):
                 error = _("entered an incorrect amount of arguments.\n\nUsage: **!research** or **!research <pokestop>, <quest>, <reward>**")
                 break
             location, quest, reward = research_split
-            research_embed.add_field(name=_("**Location:**"),value='\n'.join(textwrap.wrap(location, width=30)),inline=True)
-            research_embed.add_field(name=_("**Quest:**"),value='\n'.join(textwrap.wrap(quest, width=30)),inline=True)
-            research_embed.add_field(name=_("**Reward:**"),value='\n'.join(textwrap.wrap(reward, width=30)),inline=True)
+            research_embed.add_field(name=_("**Location:**"),value='\n'.join(textwrap.wrap(location.title(), width=30)),inline=True)
+            research_embed.add_field(name=_("**Quest:**"),value='\n'.join(textwrap.wrap(quest.title(), width=30)),inline=True)
+            research_embed.add_field(name=_("**Reward:**"),value='\n'.join(textwrap.wrap(reward.title(), width=30)),inline=True)
             break
         else:
             research_embed.add_field(name=_('**New Research Report**'), value=_("Meowth! I'll help you report a research quest!\n\nFirst, I'll need to know what **pokestop** you received the quest from. Reply with the name of the **pokestop**. You can reply with **cancel** to stop anytime."), inline=False)
@@ -3463,7 +3463,7 @@ async def research(ctx, *, args = None):
             elif pokestopmsg:
                 location = pokestopmsg.clean_content
             await pokestopmsg.delete()
-            research_embed.add_field(name=_("**Location:**"),value='\n'.join(textwrap.wrap(location, width=30)),inline=True)
+            research_embed.add_field(name=_("**Location:**"),value='\n'.join(textwrap.wrap(location.title(), width=30)),inline=True)
             research_embed.set_field_at(0, name=research_embed.fields[0].name, value=_("Great! Now, reply with the **quest** that you received from **{location}**. You can reply with **cancel** to stop anytime.\n\nHere's what I have so far:").format(location=location), inline=False)
             questwait = await channel.send(embed=research_embed)
             try:
@@ -3480,7 +3480,7 @@ async def research(ctx, *, args = None):
             elif questmsg:
                 quest = questmsg.clean_content
             await questmsg.delete()
-            research_embed.add_field(name=_("**Quest:**"),value='\n'.join(textwrap.wrap(quest, width=30)),inline=True)
+            research_embed.add_field(name=_("**Quest:**"),value='\n'.join(textwrap.wrap(quest.title(), width=30)),inline=True)
             research_embed.set_field_at(0, name=research_embed.fields[0].name, value=_("Fantastic! Now, reply with the **reward** for the **{quest}** quest that you received from **{location}**. You can reply with **cancel** to stop anytime.\n\nHere's what I have so far:").format(quest=quest, location=location), inline=False)
             rewardwait = await channel.send(embed=research_embed)
             try:
@@ -3497,7 +3497,7 @@ async def research(ctx, *, args = None):
             elif rewardmsg:
                 reward = rewardmsg.clean_content
             await rewardmsg.delete()
-            research_embed.add_field(name=_("**Reward:**"),value='\n'.join(textwrap.wrap(reward, width=30)),inline=True)
+            research_embed.add_field(name=_("**Reward:**"),value='\n'.join(textwrap.wrap(reward.title(), width=30)),inline=True)
             research_embed.remove_field(0)
             break
     if not error:

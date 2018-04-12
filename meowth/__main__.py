@@ -5117,13 +5117,15 @@ async def list(ctx):
 
 @list.command()
 @checks.activeraidchannel()
-async def interested(ctx, tag=False):
+async def interested(ctx, tags: str = ''):
     """Lists the number and users who are interested in the raid.
 
     Usage: !list interested
     Works only in raid channels."""
     listmsg = _('**Meowth!**')
-    listmsg += await _interest(ctx)
+    if tags and tags.lower() == "tags" or tags.lower() == "tag":
+        tags = True
+    listmsg += await _interest(ctx, tags)
     await ctx.channel.send(listmsg)
 
 async def _interest(ctx, tag=False, team=False):
@@ -5154,13 +5156,15 @@ async def _interest(ctx, tag=False, team=False):
 
 @list.command()
 @checks.activeraidchannel()
-async def coming(ctx, tag=False):
+async def coming(ctx, tags: str = ''):
     """Lists the number and users who are coming to a raid.
 
     Usage: !list coming
     Works only in raid channels."""
     listmsg = _('**Meowth!**')
-    listmsg += await _otw(ctx)
+    if tags and tags.lower() == "tags" or tags.lower() == "tag":
+        tags = True
+    listmsg += await _otw(ctx, tags)
     await ctx.channel.send(listmsg)
 
 async def _otw(ctx, tag=False, team=False):
@@ -5191,13 +5195,15 @@ async def _otw(ctx, tag=False, team=False):
 
 @list.command()
 @checks.activeraidchannel()
-async def here(ctx, tag=False):
+async def here(ctx, tags: str = ''):
     """List the number and users who are present at a raid.
 
     Usage: !list here
     Works only in raid channels."""
     listmsg = _('**Meowth!**')
-    listmsg += await _waiting(ctx)
+    if tags and tags.lower() == "tags" or tags.lower() == "tag":
+        tags = True
+    listmsg += await _waiting(ctx, tags)
     await ctx.channel.send(listmsg)
 
 async def _waiting(ctx, tag=False, team=False):

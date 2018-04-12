@@ -1059,14 +1059,14 @@ async def on_message_delete(message):
             guild_dict[guild.id]['raidchannel_dict'][channel.id]['logs'] = logs
 
 @Meowth.event
-async def on_reaction_add(reaction, user):
-    message = reaction.message
+async def on_raw_reaction_add(emoji, message_id, channel_id, user_id):
+    channel = Meowth.get_channel(channel_id)
+    message = channel.get_message(message_id)
     guild = message.guild
-    channel = message.channel
     if channel.id in guild_dict[guild.id]['raidchannel_dict'] and message.id == guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrsmessage']:
         ctrs_dict = guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrs_dict']
         for i in ctrs_dict:
-            if ctrs_dict[i]['emoji'] == reaction.emoji:
+            if ctrs_dict[i]['emoji'] == emoji:
                 newembed = ctrs_dict[i]['embed']
                 moveset = i
                 break
@@ -2909,6 +2909,9 @@ async def _raid(message):
     if not weather:
         weather = guild_dict[message.guild.id]['raidchannel_dict'].get(message.channel.id,{}).get('weather', None)
     raid_details = raid_details.replace(str(weather), '', 1)
+    if raid_details == '':
+        await message.channel.send(_('Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**'))
+        return
     raid_gmaps_link = create_gmaps_query(raid_details, message.channel)
     raid_channel_name = (entered_raid + '-') + sanitize_channel_name(raid_details)
     raid_channel_category = get_category(message.channel, get_level(entered_raid))
@@ -3026,6 +3029,15 @@ async def _raidegg(message):
     if raid_details == '':
         await message.channel.send(_('Meowth! Give more details when reporting! Use at least: **!raidegg <level> <location>**. Type **!help** raidegg for more info.'))
         return
+    weather_list = [_('none'), _('extreme'), _('clear'), _('sunny'), _('rainy'),
+                    _('partlycloudy'), _('cloudy'), _('windy'), _('snow'), _('fog')]
+    weather = next((w for w in weather_list if re.sub(rgx, '', w) in re.sub(rgx, '', raid_details.lower())), None)
+    raid_details = raid_details.replace(str(weather), '', 1)
+    if not weather:
+        weather = guild_dict[message.guild.id]['raidchannel_dict'].get(message.channel.id,{}).get('weather', None)
+    if raid_details == '':
+        await message.channel.send(_('Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**'))
+        return
     raid_gmaps_link = create_gmaps_query(raid_details, message.channel)
     if (egg_level > 5) or (egg_level == 0):
         await message.channel.send(_('Meowth! Raid egg levels are only from 1-5!'))
@@ -3077,6 +3089,8 @@ async def _raidegg(message):
             'type': 'egg',
             'pokemon': '',
             'egglevel': egg_level,
+            'weather': weather,
+            'moveset': 0
         }
         if raidexp is not False:
             await _timerset(raid_channel, raidexp)
@@ -3093,6 +3107,7 @@ async def _eggassume(args, raid_channel, author=None):
     report_channel = Meowth.get_channel(eggdetails['reportcity'])
     egglevel = eggdetails['egglevel']
     manual_timer = eggdetails['manual_timer']
+    weather = eggdetails.get('weather', None)
     egg_report = await report_channel.get_message(eggdetails['raidreport'])
     raid_message = await raid_channel.get_message(eggdetails['raidmessage'])
     entered_raid = re.sub('[\\@]', '', args.lower().lstrip('assume').lstrip(' '))
@@ -3143,6 +3158,17 @@ async def _eggassume(args, raid_channel, author=None):
     except discord.errors.NotFound:
         egg_report = None
     await raid_channel.send(_('{roletest}Meowth! This egg will be assumed to be {pokemon} when it hatches!').format(roletest=roletest,pokemon=entered_raid.title()))
+    ctrs_dict = await _get_generic_counters(raid_channel.guild, entered_raid, weather)
+    ctrsmsg = "Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters.\n **Possible movesets:**\n"
+    for moveset in ctrs_dict:
+        ctrsmsg += f"{ctrs_dict[moveset]['emoji']}: {ctrs_dict[moveset]['moveset']}\n"
+    ctrsmessage = await raid_channel.send(content=ctrsmsg,embed=ctrs_dict[0]['embed'])
+    await ctrsmessage.pin()
+    for moveset in ctrs_dict:
+        await ctrsmessage.add_reaction(ctrs_dict[moveset]['emoji'])
+        await asyncio.sleep(0.25)
+    eggdetails['ctrs_dict'] = ctrs_dict
+    eggdetails['ctrsmessage'] = ctrsmessage.id
     guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id] = eggdetails
     return
 
@@ -3166,6 +3192,7 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
     manual_timer = eggdetails['manual_timer']
     trainer_dict = eggdetails['trainer_dict']
     egg_address = eggdetails['address']
+    weather = eggdetails.get('weather', None)
     raid_message = await raid_channel.get_message(eggdetails['raidmessage'])
     if not reportcitychannel:
         async for message in raid_channel.history(limit=500, reverse=True):
@@ -3266,6 +3293,15 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
         egg_report = egg_report.id
     except (discord.errors.NotFound, AttributeError):
         egg_report = None
+    ctrs_dict = await _get_generic_counters(raid_channel.guild, entered_raid, weather)
+    ctrsmsg = "Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters.\n **Possible movesets:**\n"
+    for moveset in ctrs_dict:
+        ctrsmsg += f"{ctrs_dict[moveset]['emoji']}: {ctrs_dict[moveset]['moveset']}\n"
+    ctrsmessage = await raid_channel.send(content=ctrsmsg,embed=ctrs_dict[0]['embed'])
+    await ctrsmessage.pin()
+    for moveset in ctrs_dict:
+        await ctrsmessage.add_reaction(ctrs_dict[moveset]['emoji'])
+        await asyncio.sleep(0.25)
     guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id] = {
         'reportcity': reportcitychannel.id,
         'trainer_dict': trainer_dict,
@@ -3278,6 +3314,9 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
         'type': hatchtype,
         'pokemon': entered_raid,
         'egglevel': '0',
+        'ctrs_dict': ctrs_dict,
+        'ctrsmessage': ctrsmessage.id,
+        'moveset': 0
     }
     guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id]['starttime'] = starttime
     guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id]['duplicate'] = duplicate
@@ -3340,7 +3379,7 @@ async def _exraid(ctx):
                 continue
             overwrite[1].send_messages = False
         elif isinstance(overwrite[0], discord.Member):
-            if overwrite[0].permissions.manage_guild or overwrite[0].permissions.manage_channels or overwrite[0].permissions.manage_messages:
+            if channel.permissions_for(overwrite[0]).manage_guild or channel.permissions_for(overwrite[0]).manage_channels or channel.permissions_for(overwrite[0]).manage_messages:
                 continue
             overwrite[1].send_messages = False
         if (overwrite[0].name not in channel.guild.me.top_role.name) and (overwrite[0].name not in channel.guild.me.name):

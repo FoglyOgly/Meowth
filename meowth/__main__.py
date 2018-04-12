@@ -778,15 +778,15 @@ async def guild_cleanup(loop=True):
         await asyncio.sleep(7200)
         continue
 
-async def report_cleanup(loop=True):
+async def message_cleanup(loop=True):
     while (not Meowth.is_closed()):
-        logger.info('Report_Cleanup ------ BEGIN ------')
+        logger.info('message_cleanup ------ BEGIN ------')
         guilddict_temp = copy.deepcopy(guild_dict)
         for guildid in guilddict_temp.keys():
             research_dict = guilddict_temp[guildid].get('questreport_dict',{})
             wild_dict = guilddict_temp[guildid].get('wildreport_dict',{})
             for questid in research_dict.keys():
-                if research_dict[questid]['exp'] <= (time.time() - (5 * 60)):
+                if research_dict[questid]['exp'] <= time.time():
                     report_channel = Meowth.get_channel(research_dict[questid]['reportchannel'])
                     if report_channel:
                         try:
@@ -801,7 +801,7 @@ async def report_cleanup(loop=True):
                             pass
                     del guild_dict[guildid]['questreport_dict'][questid]
             for wildid in wild_dict.keys():
-                if wild_dict[wildid]['exp'] <= (time.time() - (5 * 60)):
+                if wild_dict[wildid]['exp'] <= time.time():
                     report_channel = Meowth.get_channel(wild_dict[wildid]['reportchannel'])
                     if report_channel:
                         try:
@@ -817,12 +817,12 @@ async def report_cleanup(loop=True):
                             pass
                     del guild_dict[guildid]['wildreport_dict'][wildid]
         # save server_dict changes after cleanup
-        logger.info('Report_Cleanup - SAVING CHANGES')
+        logger.info('message_cleanup - SAVING CHANGES')
         try:
             await _save()
         except Exception as err:
-            logger.info('Report_Cleanup - SAVING FAILED' + err)
-        logger.info('Report_Cleanup ------ END ------')
+            logger.info('message_cleanup - SAVING FAILED' + err)
+        logger.info('message_cleanup ------ END ------')
         await asyncio.sleep(600)
         continue
 
@@ -838,7 +838,7 @@ async def maint_start():
     try:
         event_loop.create_task(guild_cleanup())
         event_loop.create_task(channel_cleanup())
-        event_loop.create_task(report_cleanup())
+        event_loop.create_task(message_cleanup())
         logger.info('Maintenance Tasks Started')
     except KeyboardInterrupt as e:
         tasks.cancel()
@@ -4788,6 +4788,7 @@ async def starting(ctx, team: str = ''):
     for a second group must reannounce with the :here: emoji or !here."""
     ctx_startinglist = []
     id_startinglist = []
+    name_startinglist = []
     team_list = []
     team_names = ["mystic","valor","instinct","unknown"]
     team = team if team and team.lower() in team_names else "all"
@@ -4812,25 +4813,29 @@ async def starting(ctx, team: str = ''):
             if trainer_dict[trainer]['status']['here'] and (user.id in team_list):
                 trainer_dict[trainer]['status'] = {'maybe':0, 'coming':0, 'here':herecount - teamcount, 'lobby':lobbycount + teamcount}
                 ctx_startinglist.append(user.mention)
+                name_startinglist.append('**'+user.display_name+'**')
                 id_startinglist.append(trainer)
         else:
             if trainer_dict[trainer]['status']['here'] and (user.id in team_list or team == "all"):
                 trainer_dict[trainer]['status'] = {'maybe':0, 'coming':0, 'here':0, 'lobby':count}
                 ctx_startinglist.append(user.mention)
+                name_startinglist.append('**'+user.display_name+'**')
                 id_startinglist.append(trainer)
     if len(ctx_startinglist) == 0:
         starting_str = _("Meowth! How can you start when there's no one waiting at this raid!?")
         await ctx.channel.send(starting_str)
         return
     if team in team_names:
-        question = await ctx.channel.send(_("Are you sure you would like to start this raid?"))
+        question = await ctx.channel.send(_("Are you sure you would like to start this raid? Trainers {trainer_list}, react to this message to confirm or cancel the start of the raid.").format(trainer_list=', '.join(ctx_startinglist)))
     else:
-        question = await ctx.channel.send(_("Are you sure you would like to start this raid? You can also do **!starting [team]** to start one team only."))
+        question = await ctx.channel.send(_("Are you sure you would like to start this raid? You can also use **!starting [team]** to start that team only. Trainers {trainer_list}, react to this message to confirm or cancel the start of the raid.").format(trainer_list=', '.join(ctx_startinglist)))
     try:
         timeout = False
         res, reactuser = await ask(question, ctx.channel, id_startinglist)
     except TypeError:
         timeout = True
+    if timeout:
+        await ctx.channel.send(_('Meowth! The **!starting** command was not confirmed. I\'m not sure if the group started.'))
     if timeout or res.emoji == '❎':
         await question.delete()
         return
@@ -5384,12 +5389,12 @@ async def _researchlist(ctx):
     questmsg = ""
     for questid in research_dict:
         if research_dict[questid]['reportchannel'] == ctx.message.channel.id:
-            questmsg += ('\n' + '🔹')
+            questmsg += _('\n🔹')
             questmsg += _("**Location**: {location}, **Quest**: {quest}, **Reward**: {reward}".format(location=research_dict[questid]['location'].title(),quest=research_dict[questid]['quest'].title(),reward=research_dict[questid]['reward'].title()))
     if questmsg:
         listmsg = _(' **Here\'s the current research reports for {channel}**\n{questmsg}').format(channel=ctx.message.channel.name.capitalize(),questmsg=questmsg)
     else:
-        listmsg = _(" There are no reported research reports. Report one with **!research**!")
+        listmsg = _(" There are no reported research reports. Report one with **!research**")
     return listmsg
 
 @list.command()
@@ -5407,12 +5412,12 @@ async def _wildlist(ctx):
     wildmsg = ""
     for wildid in wild_dict:
         if wild_dict[wildid]['reportchannel'] == ctx.message.channel.id:
-            wildmsg += ('\n' + '🔹')
+            wildmsg += ('\n🔹')
             wildmsg += _("**Pokemon**: {pokemon}, **Location**: {location}".format(pokemon=wild_dict[wildid]['pokemon'].title(),location=wild_dict[wildid]['location'].title()))
     if wildmsg:
         listmsg = _(' **Here\'s the current wild reports for {channel}**\n{wildmsg}').format(channel=ctx.message.channel.name.capitalize(),wildmsg=wildmsg)
     else:
-        listmsg = _(" There are no reported wild pokemon. Report one with **!wild**!")
+        listmsg = _(" There are no reported wild pokemon. Report one with **!wild <pokemon> <location>**")
     return listmsg
 
 try:

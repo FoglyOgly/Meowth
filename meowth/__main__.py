@@ -4365,7 +4365,7 @@ async def _get_generic_counters(guild, pkmn, weather=None):
             ctr_name = clean(ctr['pokemonId'])
             moveset = ctr['byMove'][-1]
             moves = _("{move1} | {move2}").format(move1=clean(moveset['move1'])[:-5], move2=clean(moveset['move2']))
-            name = _("#{index} - {ctr_name}").format(index=index, ctr_name=ctr_name)
+            name = _("#{index} - {ctr_name}").format(index=ctrindex, ctr_name=ctr_name)
             ctrs_embed.add_field(name=name,value=moves)
             ctrindex += 1
         ctrs_embed.add_field(name=_("Results with Level 30 attackers"), value=_("[See your personalized results!](https://www.pokebattler.com/raids/{pkmn})").format(pkmn=pkmn.replace('-','_').upper()))

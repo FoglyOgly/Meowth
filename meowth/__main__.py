@@ -778,6 +778,53 @@ async def guild_cleanup(loop=True):
         await asyncio.sleep(7200)
         continue
 
+async def message_cleanup(loop=True):
+    while (not Meowth.is_closed()):
+        logger.info('message_cleanup ------ BEGIN ------')
+        guilddict_temp = copy.deepcopy(guild_dict)
+        for guildid in guilddict_temp.keys():
+            research_dict = guilddict_temp[guildid].get('questreport_dict',{})
+            wild_dict = guilddict_temp[guildid].get('wildreport_dict',{})
+            for questid in research_dict.keys():
+                if research_dict[questid]['exp'] <= time.time():
+                    report_channel = Meowth.get_channel(research_dict[questid]['reportchannel'])
+                    if report_channel:
+                        try:
+                            report_message = await report_channel.get_message(questid)
+                            await report_message.delete()
+                        except discord.errors.NotFound:
+                            pass
+                        try:
+                            user_message = await report_channel.get_message(research_dict[questid]['reportmessage'])
+                            await user_message.delete()
+                        except discord.errors.NotFound:
+                            pass
+                    del guild_dict[guildid]['questreport_dict'][questid]
+            for wildid in wild_dict.keys():
+                if wild_dict[wildid]['exp'] <= time.time():
+                    report_channel = Meowth.get_channel(wild_dict[wildid]['reportchannel'])
+                    if report_channel:
+                        try:
+                            report_message = await report_channel.get_message(wildid)
+                            expiremsg = _('**This {pokemon} has despawned!**').format(pokemon=wild_dict[wildid]['pokemon'].title())
+                            await report_message.edit(embed=discord.Embed(description=expiremsg, colour=report_message.embeds[0].colour.value))
+                        except discord.errors.NotFound:
+                            pass
+                        try:
+                            user_message = await report_channel.get_message(wild_dict[wildid]['reportmessage'])
+                            await user_message.delete()
+                        except discord.errors.NotFound:
+                            pass
+                    del guild_dict[guildid]['wildreport_dict'][wildid]
+        # save server_dict changes after cleanup
+        logger.info('message_cleanup - SAVING CHANGES')
+        try:
+            await _save()
+        except Exception as err:
+            logger.info('message_cleanup - SAVING FAILED' + err)
+        logger.info('message_cleanup ------ END ------')
+        await asyncio.sleep(600)
+        continue
 
 async def _print(owner, message):
     if 'launcher' in sys.argv[1:]:
@@ -791,10 +838,10 @@ async def maint_start():
     try:
         event_loop.create_task(guild_cleanup())
         event_loop.create_task(channel_cleanup())
+        event_loop.create_task(message_cleanup())
         logger.info('Maintenance Tasks Started')
     except KeyboardInterrupt as e:
         tasks.cancel()
-
 
 event_loop = asyncio.get_event_loop()
 
@@ -2456,7 +2503,10 @@ def _get_silph(ctx,data):
     local_joined = joined_datetime + datetime.timedelta(hours=guild_dict[ctx.guild.id]['offset'])
     joined_date = local_joined.date().isoformat()
     badge_count = len(data['data']['badges'])
-    checkins = len(data['data']['checkins'])
+    if isinstance(data['data']['checkins'], __builtins__.list):
+        checkins = len(data['data']['checkins'])
+    else:
+        checkins = 0
     handshakes = data['data']['handshakes']
     socials = data['data']['socials']
     disuser = ''
@@ -2745,12 +2795,16 @@ async def _wild(message):
             wild_embed.set_footer(text=_('Reported by @{author} - {timestamp}').format(author=message.author.display_name, timestamp=timestamp), icon_url=message.author.default_avatar_url)
         wild_embed.set_thumbnail(url=wild_img_url)
         wildreportmsg = await message.channel.send(content=_('{roletest}Meowth! Wild {pokemon} reported by {member}! Details: {location_details}').format(roletest=roletest,pokemon=entered_wild.title(), member=message.author.mention, location_details=wild_details), embed=wild_embed)
-        expiremsg = _('**This {pokemon} has despawned!**').format(pokemon=entered_wild.capitalize())
-        await asyncio.sleep(3600)
-        try:
-            await wildreportmsg.edit(embed=discord.Embed(description=expiremsg, colour=message.guild.me.colour))
-        except discord.errors.NotFound:
-            pass
+        wild_dict = copy.deepcopy(guild_dict[message.guild.id].get('wildreport_dict',{}))
+        wild_dict[wildreportmsg.id] = {
+            'exp':time.time() + 3600,
+            'reportmessage':message.id,
+            'reportchannel':message.channel.id,
+            'reportauthor':message.author.id,
+            'location':wild_details,
+            'pokemon':entered_wild,
+        }
+        guild_dict[message.guild.id]['wildreport_dict'] = wild_dict
 
 @Meowth.command()
 @checks.cityeggchannel()
@@ -3408,6 +3462,118 @@ async def _invite(ctx):
     await ctx.message.delete()
     await reply.delete()
     await exraidmsg.delete()
+
+@Meowth.command()
+@checks.nonraidchannel()
+async def research(ctx, *, args = None):
+    """Report Field research
+    Guided report method with just !research. If you supply arguments in one
+    line, avoid commas in anything but your separations between pokestop,
+    quest, reward. Order matters if you supply arguments. If a pokemon name
+    is included in reward, a @mention will be used if role exists.
+
+    Usage: !research [pokestop, quest, reward]"""
+    message = ctx.message
+    channel = message.channel
+    author = message.author
+    guild = message.guild
+    timestamp = (message.created_at + datetime.timedelta(hours=guild_dict[message.channel.guild.id]['offset']))
+    to_midnight = 24*60*60 - ((timestamp-timestamp.replace(hour=0, minute=0, second=0, microsecond=0)).seconds)
+    error = False
+    research_embed = discord.Embed(colour=message.guild.me.colour).set_thumbnail(url='https://raw.githubusercontent.com/doonce/Meowth/Rewrite/images/misc/field-research.png?cache=0')
+    research_embed.set_footer(text=_('Reported by @{author} - {timestamp}').format(author=author.display_name, timestamp=timestamp.strftime(_('%I:%M %p (%H:%M)'))), icon_url=author.avatar_url_as(format=None, static_format='jpg', size=32))
+    while True:
+        if args:
+            research_split = message.clean_content.replace("!research\n ","").split(", ")
+            if len(research_split) != 3:
+                error = _("entered an incorrect amount of arguments.\n\nUsage: **!research** or **!research <pokestop>, <quest>, <reward>**")
+                break
+            location, quest, reward = research_split
+            research_embed.add_field(name=_("**Location:**"),value='\n'.join(textwrap.wrap(location.title(), width=30)),inline=True)
+            research_embed.add_field(name=_("**Quest:**"),value='\n'.join(textwrap.wrap(quest.title(), width=30)),inline=True)
+            research_embed.add_field(name=_("**Reward:**"),value='\n'.join(textwrap.wrap(reward.title(), width=30)),inline=True)
+            break
+        else:
+            research_embed.add_field(name=_('**New Research Report**'), value=_("Meowth! I'll help you report a research quest!\n\nFirst, I'll need to know what **pokestop** you received the quest from. Reply with the name of the **pokestop**. You can reply with **cancel** to stop anytime."), inline=False)
+            pokestopwait = await channel.send(embed=research_embed)
+            try:
+                pokestopmsg = await Meowth.wait_for('message', timeout=60, check=(lambda reply: reply.author == message.author))
+            except asyncio.TimeoutError:
+                pokestopmsg = None
+            await pokestopwait.delete()
+            if not pokestopmsg:
+                error = _("took too long to respond")
+                break
+            elif pokestopmsg.clean_content.lower() == "cancel":
+                error = _("cancelled the report")
+                break
+            elif pokestopmsg:
+                location = pokestopmsg.clean_content
+            await pokestopmsg.delete()
+            research_embed.add_field(name=_("**Location:**"),value='\n'.join(textwrap.wrap(location.title(), width=30)),inline=True)
+            research_embed.set_field_at(0, name=research_embed.fields[0].name, value=_("Great! Now, reply with the **quest** that you received from **{location}**. You can reply with **cancel** to stop anytime.\n\nHere's what I have so far:").format(location=location), inline=False)
+            questwait = await channel.send(embed=research_embed)
+            try:
+                questmsg = await Meowth.wait_for('message', timeout=60, check=(lambda reply: reply.author == message.author))
+            except asyncio.TimeoutError:
+                questmsg = None
+            await questwait.delete()
+            if not questmsg:
+                error = _("took too long to respond")
+                break
+            elif questmsg.clean_content.lower() == "cancel":
+                error = _("cancelled the report")
+                break
+            elif questmsg:
+                quest = questmsg.clean_content
+            await questmsg.delete()
+            research_embed.add_field(name=_("**Quest:**"),value='\n'.join(textwrap.wrap(quest.title(), width=30)),inline=True)
+            research_embed.set_field_at(0, name=research_embed.fields[0].name, value=_("Fantastic! Now, reply with the **reward** for the **{quest}** quest that you received from **{location}**. You can reply with **cancel** to stop anytime.\n\nHere's what I have so far:").format(quest=quest, location=location), inline=False)
+            rewardwait = await channel.send(embed=research_embed)
+            try:
+                rewardmsg = await Meowth.wait_for('message', timeout=60, check=(lambda reply: reply.author == message.author))
+            except asyncio.TimeoutError:
+                rewardmsg = None
+            await rewardwait.delete()
+            if not rewardmsg:
+                error = _("took too long to respond")
+                break
+            elif rewardmsg.clean_content.lower() == "cancel":
+                error = _("cancelled the report")
+                break
+            elif rewardmsg:
+                reward = rewardmsg.clean_content
+            await rewardmsg.delete()
+            research_embed.add_field(name=_("**Reward:**"),value='\n'.join(textwrap.wrap(reward.title(), width=30)),inline=True)
+            research_embed.remove_field(0)
+            break
+    if not error:
+        pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub('[^a-zA-Z0-9]', '', p) == re.sub('[^a-zA-Z0-9]', '', reward.lower())), None)
+        roletest = ""
+        if pkmn_match:
+            role = discord.utils.get(guild.roles, name=pkmn_match)
+            if role:
+                roletest = _("{pokemon} - ").format(pokemon=role.mention)
+        research_msg = _("{roletest}Field Research reported by {author}").format(roletest=roletest,author=author.mention)
+        confirmation = await channel.send(research_msg,embed=research_embed)
+        research_dict = copy.deepcopy(guild_dict[guild.id].get('questreport_dict',{}))
+        research_dict[confirmation.id] = {
+            'exp':time.time() + to_midnight,
+            'reportmessage':message.id,
+            'reportchannel':channel.id,
+            'reportauthor':author.id,
+            'location':location,
+            'quest':quest,
+            'reward':reward
+        }
+        guild_dict[guild.id]['questreport_dict'] = research_dict
+    else:
+        research_embed.clear_fields()
+        research_embed.add_field(name='**Research Report Cancelled**', value=_("Meowth! Your report has been cancelled because you {error}! Retry when you're ready.").format(error=error), inline=False)
+        confirmation = await channel.send(embed=research_embed)
+        await asyncio.sleep(10)
+        await confirmation.delete()
+        await message.delete()
 
 """
 Raid Channel Management
@@ -4756,6 +4922,7 @@ async def starting(ctx, team: str = ''):
     for a second group must reannounce with the :here: emoji or !here."""
     ctx_startinglist = []
     id_startinglist = []
+    name_startinglist = []
     team_list = []
     team_names = ["mystic","valor","instinct","unknown"]
     team = team if team and team.lower() in team_names else "all"
@@ -4780,25 +4947,29 @@ async def starting(ctx, team: str = ''):
             if trainer_dict[trainer]['status']['here'] and (user.id in team_list):
                 trainer_dict[trainer]['status'] = {'maybe':0, 'coming':0, 'here':herecount - teamcount, 'lobby':lobbycount + teamcount}
                 ctx_startinglist.append(user.mention)
+                name_startinglist.append('**'+user.display_name+'**')
                 id_startinglist.append(trainer)
         else:
             if trainer_dict[trainer]['status']['here'] and (user.id in team_list or team == "all"):
                 trainer_dict[trainer]['status'] = {'maybe':0, 'coming':0, 'here':0, 'lobby':count}
                 ctx_startinglist.append(user.mention)
+                name_startinglist.append('**'+user.display_name+'**')
                 id_startinglist.append(trainer)
     if len(ctx_startinglist) == 0:
         starting_str = _("Meowth! How can you start when there's no one waiting at this raid!?")
         await ctx.channel.send(starting_str)
         return
     if team in team_names:
-        question = await ctx.channel.send(_("Are you sure you would like to start this raid?"))
+        question = await ctx.channel.send(_("Are you sure you would like to start this raid? Trainers {trainer_list}, react to this message to confirm or cancel the start of the raid.").format(trainer_list=', '.join(ctx_startinglist)))
     else:
-        question = await ctx.channel.send(_("Are you sure you would like to start this raid? You can also do **!starting [team]** to start one team only."))
+        question = await ctx.channel.send(_("Are you sure you would like to start this raid? You can also use **!starting [team]** to start that team only. Trainers {trainer_list}, react to this message to confirm or cancel the start of the raid.").format(trainer_list=', '.join(ctx_startinglist)))
     try:
         timeout = False
         res, reactuser = await ask(question, ctx.channel, id_startinglist)
     except TypeError:
         timeout = True
+    if timeout:
+        await ctx.channel.send(_('Meowth! The **!starting** command was not confirmed. I\'m not sure if the group started.'))
     if timeout or res.emoji == '❎':
         await question.delete()
         return
@@ -5335,6 +5506,52 @@ async def _wantlist(ctx):
         listmsg = _(' Your current **!want** list is: ```{wantlist}```').format(wantlist=', '.join(wantlist))
     else:
         listmsg = _(" You don't have any wants! use **!want** to add some.")
+    return listmsg
+
+@list.command()
+@checks.nonraidchannel()
+async def research(ctx):
+    """List the quests for the channel
+
+    Usage: !list research"""
+    listmsg = _('**Meowth!**')
+    listmsg += await _researchlist(ctx)
+    await ctx.channel.send(listmsg)
+
+async def _researchlist(ctx):
+    research_dict = copy.deepcopy(guild_dict[ctx.guild.id]['questreport_dict'])
+    questmsg = ""
+    for questid in research_dict:
+        if research_dict[questid]['reportchannel'] == ctx.message.channel.id:
+            questmsg += _('\n🔹')
+            questmsg += _("**Location**: {location}, **Quest**: {quest}, **Reward**: {reward}".format(location=research_dict[questid]['location'].title(),quest=research_dict[questid]['quest'].title(),reward=research_dict[questid]['reward'].title()))
+    if questmsg:
+        listmsg = _(' **Here\'s the current research reports for {channel}**\n{questmsg}').format(channel=ctx.message.channel.name.capitalize(),questmsg=questmsg)
+    else:
+        listmsg = _(" There are no reported research reports. Report one with **!research**")
+    return listmsg
+
+@list.command()
+@checks.citychannel()
+async def wilds(ctx):
+    """List the wilds for the channel
+
+    Usage: !list wilds"""
+    listmsg = _('**Meowth!**')
+    listmsg += await _wildlist(ctx)
+    await ctx.channel.send(listmsg)
+
+async def _wildlist(ctx):
+    wild_dict = copy.deepcopy(guild_dict[ctx.guild.id]['wildreport_dict'])
+    wildmsg = ""
+    for wildid in wild_dict:
+        if wild_dict[wildid]['reportchannel'] == ctx.message.channel.id:
+            wildmsg += ('\n🔹')
+            wildmsg += _("**Pokemon**: {pokemon}, **Location**: {location}".format(pokemon=wild_dict[wildid]['pokemon'].title(),location=wild_dict[wildid]['location'].title()))
+    if wildmsg:
+        listmsg = _(' **Here\'s the current wild reports for {channel}**\n{wildmsg}').format(channel=ctx.message.channel.name.capitalize(),wildmsg=wildmsg)
+    else:
+        listmsg = _(" There are no reported wild pokemon. Report one with **!wild <pokemon> <location>**")
     return listmsg
 
 try:

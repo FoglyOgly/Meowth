@@ -1066,7 +1066,7 @@ async def on_raw_reaction_add(emoji, message_id, channel_id, user_id):
     if channel.id in guild_dict[guild.id]['raidchannel_dict'] and message.id == guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrsmessage']:
         ctrs_dict = guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrs_dict']
         for i in ctrs_dict:
-            if ctrs_dict[i]['emoji'] == emoji:
+            if ctrs_dict[i]['emoji'] == str(emoji):
                 newembed = ctrs_dict[i]['embed']
                 moveset = i
                 break

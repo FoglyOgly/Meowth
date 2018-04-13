@@ -783,39 +783,40 @@ async def message_cleanup(loop=True):
         logger.info('message_cleanup ------ BEGIN ------')
         guilddict_temp = copy.deepcopy(guild_dict)
         for guildid in guilddict_temp.keys():
-            research_dict = guilddict_temp[guildid].get('questreport_dict',{})
-            wild_dict = guilddict_temp[guildid].get('wildreport_dict',{})
-            for questid in research_dict.keys():
-                if research_dict[questid]['exp'] <= time.time():
-                    report_channel = Meowth.get_channel(research_dict[questid]['reportchannel'])
-                    if report_channel:
-                        try:
-                            report_message = await report_channel.get_message(questid)
-                            await report_message.delete()
-                        except discord.errors.NotFound:
-                            pass
-                        try:
-                            user_message = await report_channel.get_message(research_dict[questid]['reportmessage'])
-                            await user_message.delete()
-                        except discord.errors.NotFound:
-                            pass
-                    del guild_dict[guildid]['questreport_dict'][questid]
-            for wildid in wild_dict.keys():
-                if wild_dict[wildid]['exp'] <= time.time():
-                    report_channel = Meowth.get_channel(wild_dict[wildid]['reportchannel'])
-                    if report_channel:
-                        try:
-                            report_message = await report_channel.get_message(wildid)
-                            expiremsg = _('**This {pokemon} has despawned!**').format(pokemon=wild_dict[wildid]['pokemon'].title())
-                            await report_message.edit(embed=discord.Embed(description=expiremsg, colour=report_message.embeds[0].colour.value))
-                        except discord.errors.NotFound:
-                            pass
-                        try:
-                            user_message = await report_channel.get_message(wild_dict[wildid]['reportmessage'])
-                            await user_message.delete()
-                        except discord.errors.NotFound:
-                            pass
-                    del guild_dict[guildid]['wildreport_dict'][wildid]
+            questreport_dict = guilddict_temp[guildid].get('questreport_dict',{})
+            wildreport_dict = guilddict_temp[guildid].get('wildreport_dict',{})
+            report_dict_dict = {
+                'questreport_dict':questreport_dict,
+                'wildreport_dict':wildreport_dict,
+            }
+            report_edit_dict = {}
+            report_delete_dict = {}
+            for report_dict in report_dict_dict:
+                for reportid in report_dict_dict[report_dict].keys():
+                    if report_dict_dict[report_dict][reportid]['exp'] <= time.time():
+                        report_channel = Meowth.get_channel(report_dict_dict[report_dict][reportid]['reportchannel'])
+                        if report_channel:
+                            print(reportid)
+                            user_report = report_dict_dict[report_dict][reportid].get('reportmessage',None)
+                            if user_report:
+                                report_delete_dict[user_report] = {"action":"delete","channel":report_channel}
+                            if report_dict_dict[report_dict][reportid]['expaction'] == "delete":
+                                report_delete_dict[reportid] = {"action":report_dict_dict[report_dict][reportid]['expaction'],"channel":report_channel}
+                            else:
+                                report_edit_dict[reportid] = {"action":report_dict_dict[report_dict][reportid]['expaction'],"channel":report_channel}
+                    del guild_dict[guildid][report_dict][reportid]
+            for messageid in report_delete_dict.keys():
+                try:
+                    report_message = await report_delete_dict[messageid]['channel'].get_message(messageid)
+                    await report_message.delete()
+                except discord.errors.NotFound:
+                    pass
+            for messageid in report_edit_dict.keys():
+                try:
+                    report_message = await report_edit_dict[messageid]['channel'].get_message(messageid)
+                    await report_message.edit(embed=discord.Embed(description=report_edit_dict[messageid]['action'], colour=report_message.embeds[0].colour.value))
+                except discord.errors.NotFound:
+                    pass
         # save server_dict changes after cleanup
         logger.info('message_cleanup - SAVING CHANGES')
         try:
@@ -2757,6 +2758,7 @@ async def _wild(message):
             roletest = _("{pokemon} - ").format(pokemon=wild.mention)
         wild_number = pkmn_info['pokemon_list'].index(entered_wild) + 1
         wild_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=1'.format(str(wild_number).zfill(3))
+        expiremsg = _('**This {pokemon} has despawned!**').format(pokemon=entered_wild.title())
         wild_embed = discord.Embed(title=_('Meowth! Click here for my directions to the wild {pokemon}!').format(pokemon=entered_wild.capitalize()), description=_("Ask {author} if my directions aren't perfect!").format(author=message.author.name), url=wild_gmaps_link, colour=message.guild.me.colour)
         wild_embed.add_field(name=_('**Details:**'), value=_('{pokemon} ({pokemonnumber}) {type}').format(pokemon=entered_wild.capitalize(), pokemonnumber=str(wild_number), type=''.join(get_type(message.guild, wild_number)), inline=True))
         if message.author.avatar:
@@ -2768,6 +2770,7 @@ async def _wild(message):
         wild_dict = copy.deepcopy(guild_dict[message.guild.id].get('wildreport_dict',{}))
         wild_dict[wildreportmsg.id] = {
             'exp':time.time() + 3600,
+            'expaction': expiremsg,
             'reportmessage':message.id,
             'reportchannel':message.channel.id,
             'reportauthor':message.author.id,
@@ -3510,6 +3513,7 @@ async def research(ctx, *, args = None):
         research_dict = copy.deepcopy(guild_dict[guild.id].get('questreport_dict',{}))
         research_dict[confirmation.id] = {
             'exp':time.time() + to_midnight,
+            'expaction':"delete",
             'reportmessage':message.id,
             'reportchannel':channel.id,
             'reportauthor':author.id,

@@ -2965,7 +2965,8 @@ async def _raid(message):
         'pokemon': entered_raid,
         'egglevel': '0',
         'ctrs_dict': ctrs_dict,
-        'moveset': 0
+        'moveset': 0,
+        'weather': weather
     }
     if raidexp is not False:
         await _timerset(raid_channel, raidexp)
@@ -4217,9 +4218,38 @@ async def counters(ctx, *, args = None):
     If [user] is a valid Pokebattler user id, Meowth will simulate the Raid with that user's Pokebox.
     Uses current boss and weather by default if available.
     """
+    rgx = '[^a-zA-Z0-9]'
     channel = ctx.channel
     guild = channel.guild
     user = guild_dict[ctx.guild.id].get('trainers',{}).get(ctx.author.id,{}).get('pokebattlerid', None)
+    if checks.check_raidchannel(ctx):
+        if args:
+            args_split = args.split()
+            for arg in args_split:
+                if arg.isdigit():
+                    user = arg
+                    break
+        ctrsmessage = await channel.get_message(guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrsmessage'])
+        pkmn = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('pokemon', None)
+        if pkmn:
+            if not user:
+                ctrsmessage = await channel.get_message(guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrsmessage'])
+                await channel.send(content=ctrsmessage.content,embed=ctrsmessage.embeds[0])
+                return
+            moveset = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('moveset', 0)
+            movesetstr = guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrs_dict'][moveset]['moveset']
+            weather = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('weather', None)
+        else:
+            pkmn = next((str(p) for p in get_raidlist() if not str(p).isdigit() and re.sub(rgx, '', str(p)) in re.sub(rgx, '', args.lower())), None)
+            if not pkmn:
+                await ctx.channel.send(_("Meowth! You're missing some details! Be sure to enter a pokemon that appears in raids! Usage: **!counters <pkmn> [weather] [user ID]**"))
+                return
+        if not weather:
+            if args:
+                weather_list = [_('none'), _('extreme'), _('clear'), _('sunny'), _('rainy'),
+                                _('partlycloudy'), _('cloudy'), _('windy'), _('snow'), _('fog')]
+                weather = next((w for w in weather_list if re.sub(rgx, '', w) in re.sub(rgx, '', args.lower())), None)
+        return await _counters(ctx, pkmn, user, weather, movesetstr)
     if args:
         args_split = args.split()
         for arg in args_split:
@@ -4241,9 +4271,9 @@ async def counters(ctx, *, args = None):
     if not pkmn:
         await ctx.channel.send(_("Meowth! You're missing some details! Be sure to enter a pokemon that appears in raids! Usage: **!counters <pkmn> [weather] [user ID]**"))
         return
-    await _counters(ctx, pkmn, user, weather)
+    await _counters(ctx, pkmn, user, weather, "Unknown Moveset")
 
-async def _counters(ctx, pkmn, user = None, weather = None):
+async def _counters(ctx, pkmn, user = None, weather = None, movesetstr = "Unknown Moveset"):
     img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=4'.format(str(get_number(pkmn)).zfill(3))
     level = get_level(pkmn) if get_level(pkmn).isdigit() else "5"
     url = "https://fight.pokebattler.com/raids/defenders/{pkmn}/levels/RAID_LEVEL_{level}/attackers/".format(pkmn=pkmn.replace('-','_').upper(),level=level)
@@ -4276,10 +4306,22 @@ async def _counters(ctx, pkmn, user = None, weather = None):
         data = data['attackers'][0]
         raid_cp = data['cp']
         atk_levels = '30'
-        ctrs = data['randomMove']['defenders'][-6:]
+        if movesetstr == "Unknown Moveset":
+            ctrs = data['randomMove']['defenders'][-6:]
+        else:
+            for moveset in data['byMove']:
+                move1 = moveset['move1'][:-5].lower().title().replace('_', ' ')
+                move2 = moveset['move2'].lower().title().replace('_', ' ')
+                moveset_str = f'{move1} | {move2}'
+                if moveset_str == movesetstr:
+                    ctrs = moveset['defenders'][-6:]
+                    break
+            else:
+                movesetstr = "Unknown Moveset"
+                ctrs = data['randomMove']['defenders'][-6:]
         def clean(txt):
             return txt.replace('_', ' ').title()
-        title = _('{pkmn} | {weather}').format(pkmn=pkmn.title(),weather=weather_list[index].title())
+        title = _('{pkmn} | {weather} | {movesetstr}').format(pkmn=pkmn.title(),weather=weather_list[index].title(),movesetstr=movesetstr)
         stats_msg = _("**CP:** {raid_cp}\n").format(raid_cp=raid_cp)
         stats_msg += _("**Weather:** {weather}\n").format(weather=clean(weather))
         stats_msg += _("**Attacker Level:** {atk_levels}").format(atk_levels=atk_levels)

@@ -5150,12 +5150,12 @@ async def _interest(ctx, tag=False, team=False):
                 name_list.append(_('**{name} ({count})**').format(name=user.display_name, count=trainer_dict[trainer]['status']['maybe']))
                 maybe_list.append(_('{name} **({count})**').format(name=user.mention, count=trainer_dict[trainer]['status']['maybe']))
         elif (trainer_dict[trainer]['status']['maybe']) and user and team and trainer_dict[trainer]['party'][team]:
-            if trainer_dict[trainer]['count'] == 1:
+            if trainer_dict[trainer]['status']['maybe'] == 1:
                 name_list.append(_('**{name}**').format(name=user.display_name))
                 maybe_list.append(user.mention)
             else:
-                name_list.append(_('**{name} ({count})**').format(name=user.display_name, count=trainer_dict[trainer]['status']['maybe']))
-                maybe_list.append(_('{name} **({count})**').format(name=user.mention, count=trainer_dict[trainer]['status']['maybe']))
+                name_list.append(_('**{name} ({count})**').format(name=user.display_name, count=trainer_dict[trainer]['party'][team]))
+                maybe_list.append(_('{name} **({count})**').format(name=user.mention, count=trainer_dict[trainer]['party'][team]))
             ctx_maybecount += trainer_dict[trainer]['party'][team]
 
     if ctx_maybecount > 0:
@@ -5201,8 +5201,8 @@ async def _otw(ctx, tag=False, team=False):
                 name_list.append(_('**{name}**').format(name=user.display_name))
                 otw_list.append(user.mention)
             else:
-                name_list.append(_('**{name} ({count})**').format(name=user.display_name, count=trainer_dict[trainer]['status']['coming']))
-                otw_list.append(_('{name} **({count})**').format(name=user.mention, count=trainer_dict[trainer]['status']['coming']))
+                name_list.append(_('**{name} ({count})**').format(name=user.display_name, count=trainer_dict[trainer]['party'][team]))
+                otw_list.append(_('{name} **({count})**').format(name=user.mention, count=trainer_dict[trainer]['party'][team]))
             ctx_comingcount += trainer_dict[trainer]['party'][team]
 
     if ctx_comingcount > 0:
@@ -5249,8 +5249,8 @@ async def _waiting(ctx, tag=False, team=False):
                 name_list.append(_('**{name}**').format(name=user.display_name))
                 here_list.append(user.mention)
             else:
-                name_list.append(_('**{name} ({count})**').format(name=user.display_name, count=trainer_dict[trainer]['status']['here']))
-                here_list.append(_('{name} **({count})**').format(name=user.mention, count=trainer_dict[trainer]['status']['here']))
+                name_list.append(_('**{name} ({count})**').format(name=user.display_name, count=trainer_dict[trainer]['party'][team]))
+                here_list.append(_('{name} **({count})**').format(name=user.mention, count=trainer_dict[trainer]['party'][team]))
             ctx_herecount += trainer_dict[trainer]['party'][team]
             if raid_dict.get('lobby',{"team":"all"})['team'] == team or raid_dict.get('lobby',{"team":"all"})['team'] == "all":
                 ctx_herecount -= trainer_dict[trainer]['status']['lobby']
@@ -5297,8 +5297,8 @@ async def _lobbylist(ctx, tag=False, team=False):
                 name_list.append(_('**{name}**').format(name=user.display_name))
                 lobby_list.append(user.mention)
             else:
-                name_list.append(_('**{name} ({count})**').format(name=user.display_name, count=trainer_dict[trainer]['status']['lobby']))
-                lobby_list.append(_('{name} **({count})**').format(name=user.mention, count=trainer_dict[trainer]['status']['lobby']))
+                name_list.append(_('**{name} ({count})**').format(name=user.display_name, count=trainer_dict[trainer]['party'][team]))
+                lobby_list.append(_('{name} **({count})**').format(name=user.mention, count=trainer_dict[trainer]['party'][team]))
             if raid_dict.get('lobby',{"team":"all"})['team'] == team or raid_dict.get('lobby',{"team":"all"})['team'] == "all":
                 ctx_lobbycount += trainer_dict[trainer]['party'][team]
 

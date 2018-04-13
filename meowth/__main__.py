@@ -800,10 +800,10 @@ async def message_cleanup(loop=True):
                             user_report = report_dict_dict[report_dict][reportid].get('reportmessage',None)
                             if user_report:
                                 report_delete_dict[user_report] = {"action":"delete","channel":report_channel}
-                            if report_dict_dict[report_dict][reportid]['expaction'] == "delete":
-                                report_delete_dict[reportid] = {"action":report_dict_dict[report_dict][reportid]['expaction'],"channel":report_channel}
+                            if report_dict_dict[report_dict][reportid]['expedit'] == "delete":
+                                report_delete_dict[reportid] = {"action":report_dict_dict[report_dict][reportid]['expedit'],"channel":report_channel}
                             else:
-                                report_edit_dict[reportid] = {"action":report_dict_dict[report_dict][reportid]['expaction'],"channel":report_channel}
+                                report_edit_dict[reportid] = {"action":report_dict_dict[report_dict][reportid]['expedit'],"channel":report_channel}
                     del guild_dict[guildid][report_dict][reportid]
             for messageid in report_delete_dict.keys():
                 try:
@@ -814,7 +814,7 @@ async def message_cleanup(loop=True):
             for messageid in report_edit_dict.keys():
                 try:
                     report_message = await report_edit_dict[messageid]['channel'].get_message(messageid)
-                    await report_message.edit(embed=discord.Embed(description=report_edit_dict[messageid]['action'], colour=report_message.embeds[0].colour.value))
+                    await report_message.edit(content=report_edit_dict[messageid]['action']['content'],embed=discord.Embed(description=report_edit_dict[messageid]['action']['embedcontent'], colour=report_message.embeds[0].colour.value))
                 except discord.errors.NotFound:
                     pass
         # save server_dict changes after cleanup
@@ -2770,7 +2770,7 @@ async def _wild(message):
         wild_dict = copy.deepcopy(guild_dict[message.guild.id].get('wildreport_dict',{}))
         wild_dict[wildreportmsg.id] = {
             'exp':time.time() + 3600,
-            'expaction': expiremsg,
+            'expedit': {"content":wildreportmsg.content,"embedcontent":expiremsg},
             'reportmessage':message.id,
             'reportchannel':message.channel.id,
             'reportauthor':message.author.id,
@@ -3513,7 +3513,7 @@ async def research(ctx, *, args = None):
         research_dict = copy.deepcopy(guild_dict[guild.id].get('questreport_dict',{}))
         research_dict[confirmation.id] = {
             'exp':time.time() + to_midnight,
-            'expaction':"delete",
+            'expedit':"delete",
             'reportmessage':message.id,
             'reportchannel':channel.id,
             'reportauthor':author.id,

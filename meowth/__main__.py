@@ -3284,9 +3284,7 @@ async def _exraid(ctx):
     raid_channel_name = _('ex-raid-egg-')
     raid_channel_name += sanitize_channel_name(raid_details)
     raid_channel_overwrite_list = channel.overwrites
-    meowth_overwrite = (Meowth.user, discord.PermissionOverwrite(send_messages=True))
     everyone_overwrite = (channel.guild.default_role, discord.PermissionOverwrite(send_messages=False))
-    raid_channel_overwrite_list.append(meowth_overwrite)
     raid_channel_overwrite_list.append(everyone_overwrite)
     for overwrite in raid_channel_overwrite_list:
         if isinstance(overwrite[0], discord.Role):
@@ -3305,6 +3303,10 @@ async def _exraid(ctx):
     for role in channel.guild.role_hierarchy:
         if role.permissions.manage_guild or role.permissions.manage_channels or role.permissions.manage_messages:
             await raid_channel.set_permissions(role, send_messages=True)
+    ow = raid_channel.overwrites_for(Meowth.user)
+    ow.send_messages = True
+    ow.read_messages = True
+    await raid_channel.set_permissions(Meowth.user, overwrite = ow)
     raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/eggs/{}?cache=1'.format(str(egg_img))
     raid_embed = discord.Embed(title=_('Meowth! Click here for directions to the coming raid!'), url=raid_gmaps_link, colour=message.guild.me.colour)
     if len(egg_info['pokemon']) > 1:

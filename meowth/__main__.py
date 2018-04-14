@@ -796,7 +796,6 @@ async def message_cleanup(loop=True):
                     if report_dict_dict[report_dict][reportid]['exp'] <= time.time():
                         report_channel = Meowth.get_channel(report_dict_dict[report_dict][reportid]['reportchannel'])
                         if report_channel:
-                            print(reportid)
                             user_report = report_dict_dict[report_dict][reportid].get('reportmessage',None)
                             if user_report:
                                 report_delete_dict[user_report] = {"action":"delete","channel":report_channel}

@@ -1058,6 +1058,25 @@ async def on_message_delete(message):
             logs[message.id] = {'author_id': message.author.id, 'author_str': str(message.author),'author_avy':message.author.avatar_url,'author_nick':message.author.nick,'color_int':message.author.color.value,'content': message.clean_content,'created_at':message.created_at}
             guild_dict[guild.id]['raidchannel_dict'][channel.id]['logs'] = logs
 
+@Meowth.event
+async def on_raw_reaction_add(emoji, message_id, channel_id, user_id):
+    channel = Meowth.get_channel(channel_id)
+    message = await channel.get_message(message_id)
+    guild = message.guild
+    user = guild.get_member(user_id)
+    if channel.id in guild_dict[guild.id]['raidchannel_dict'] and message.id == guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrsmessage']:
+        ctrs_dict = guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrs_dict']
+        for i in ctrs_dict:
+            if ctrs_dict[i]['emoji'] == str(emoji):
+                newembed = ctrs_dict[i]['embed']
+                moveset = i
+                break
+        else:
+            return
+        await message.edit(embed=newembed)
+        await message.remove_reaction(emoji, user)
+        guild_dict[guild.id]['raidchannel_dict'][channel.id]['moveset'] = moveset
+
 
 """
 Admin Commands
@@ -1227,10 +1246,14 @@ def _set_prefix(bot, guild, prefix):
     bot.guild_dict[guild.id]['prefix'] = prefix
 
 @_set.command()
-async def silph(ctx, silphid: str):
+async def silph(ctx, silphid: str = ''):
     """Links a server member to a Silph Road Travelers Card."""
     if not silphid:
         await ctx.send(_('Silph Road Travelers Card cleared!'))
+        try:
+            del guild_dict[ctx.guild.id]['trainers'][ctx.author.id]['silphid']
+        except:
+            pass
         return
     url = f'https://sil.ph/{silphid}.json'
     async with ctx.typing():
@@ -1271,6 +1294,22 @@ async def silph(ctx, silphid: str):
                     trainers[ctx.author.id] = author
                     guild_dict[ctx.guild.id]['trainers'] = trainers
                     await ctx.send(_('This Travelers Card has been successfully linked to you!'),embed=embed)
+
+@_set.command()
+async def pokebattler(ctx, pbid: int = 0):
+    if not pbid:
+        await ctx.send(_('Pokebattler ID cleared!'))
+        try:
+            del guild_dict[ctx.guild.id]['trainers'][ctx.author.id]['pokebattlerid']
+        except:
+            pass
+        return
+    trainers = guild_dict[ctx.guild.id].get('trainers',{})
+    author = trainers.get(ctx.author.id,{})
+    author['pokebattlerid'] = pbid
+    trainers[ctx.author.id] = author
+    guild_dict[ctx.guild.id]['trainers'] = trainers
+    await ctx.send(_(f'Pokebattler ID set to {pbid}!'))
 
 
 @Meowth.group(name='get')
@@ -2875,6 +2914,15 @@ async def _raid(message):
     if raid_details == '':
         await message.channel.send(_('Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**'))
         return
+    weather_list = [_('none'), _('extreme'), _('clear'), _('sunny'), _('rainy'),
+                    _('partlycloudy'), _('cloudy'), _('windy'), _('snow'), _('fog')]
+    weather = next((w for w in weather_list if re.sub(rgx, '', w) in re.sub(rgx, '', raid_details.lower())), None)
+    if not weather:
+        weather = guild_dict[message.guild.id]['raidchannel_dict'].get(message.channel.id,{}).get('weather', None)
+    raid_details = raid_details.replace(str(weather), '', 1)
+    if raid_details == '':
+        await message.channel.send(_('Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**'))
+        return
     raid_gmaps_link = create_gmaps_query(raid_details, message.channel)
     raid_channel_name = (entered_raid + '-') + sanitize_channel_name(raid_details)
     raid_channel_category = get_category(message.channel, get_level(entered_raid))
@@ -2896,11 +2944,23 @@ async def _raid(message):
     else:
         raid_embed.set_footer(text=_('Reported by @{author} - {timestamp}').format(author=message.author.display_name, timestamp=timestamp), icon_url=message.author.default_avatar_url)
     raid_embed.set_thumbnail(url=raid_img_url)
-    raidreport = await message.channel.send(content=_('Meowth! {pokemon} raid reported by {member}! Details: {location_details}. Coordinate in {raid_channel}').format(pokemon=entered_raid.capitalize(), member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention), embed=raid_embed)
+    report_embed = raid_embed
+    raidreport = await message.channel.send(content=_('Meowth! {pokemon} raid reported by {member}! Details: {location_details}. Coordinate in {raid_channel}').format(pokemon=entered_raid.capitalize(), member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention), embed=report_embed)
     await asyncio.sleep(1)
     raidmsg = _("{roletest}Meowth! {pokemon} raid reported by {member} in {citychannel}! Details: {location_details}. Coordinate here!\n\nTo update your status, choose from the following commands: **!maybe**, **!coming**, **!here**, **!cancel**. If you are bringing more than one trainer/account, add in the number of accounts total on your first status update.\nExample: `!coming 5`\n\nTo see the list of trainers who have given their status:\n**!list interested**, **!list coming**, **!list here** or use just **!list** to see all lists. Use **!list teams** to see team distribution.\n\nSometimes I'm not great at directions, but I'll correct my directions if anybody sends me a maps link or uses **!location new <address>**. You can see the location of a raid by using **!location**\n\nYou can set the time remaining with **!timerset <minutes>** and access this with **!timer**.\nYou can set the start time with **!starttime [HH:MM AM/PM]** (you can also omit AM/PM and use 24-hour time) and access this with **!starttime**.\n\nMessage **!starting** when the raid is beginning to clear the raid's 'here' list.\n\nThis channel will be deleted five minutes after the timer expires.").format(roletest=roletest, pokemon=entered_raid.title(), member=message.author.mention, citychannel=message.channel.mention, location_details=raid_details)
     raidmessage = await raid_channel.send(content=raidmsg, embed=raid_embed)
     await raidmessage.pin()
+    level = get_level(entered_raid)
+    if level == "EX" or int(level) >= 3:
+        ctrs_dict = await _get_generic_counters(message.guild, entered_raid, weather)
+        ctrsmsg = "Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters."
+        ctrsmessage = await raid_channel.send(content=ctrsmsg,embed=ctrs_dict[0]['embed'])
+        await ctrsmessage.pin()
+        for moveset in ctrs_dict:
+            await ctrsmessage.add_reaction(ctrs_dict[moveset]['emoji'])
+            await asyncio.sleep(0.25)
+    else:
+        ctrs_dict = None
     guild_dict[message.guild.id]['raidchannel_dict'][raid_channel.id] = {
         'reportcity': message.channel.id,
         'trainer_dict': {
@@ -2911,10 +2971,14 @@ async def _raid(message):
         'active': True,
         'raidmessage': raidmessage.id,
         'raidreport': raidreport.id,
+        'ctrsmessage': ctrsmessage.id,
         'address': raid_details,
         'type': 'raid',
         'pokemon': entered_raid,
         'egglevel': '0',
+        'ctrs_dict': ctrs_dict,
+        'moveset': 0,
+        'weather': weather
     }
     if raidexp is not False:
         await _timerset(raid_channel, raidexp)
@@ -2979,6 +3043,16 @@ async def _raidegg(message):
     if raid_details == '':
         await message.channel.send(_('Meowth! Give more details when reporting! Use at least: **!raidegg <level> <location>**. Type **!help** raidegg for more info.'))
         return
+    rgx = '[^a-zA-Z0-9]'
+    weather_list = [_('none'), _('extreme'), _('clear'), _('sunny'), _('rainy'),
+                    _('partlycloudy'), _('cloudy'), _('windy'), _('snow'), _('fog')]
+    weather = next((w for w in weather_list if re.sub(rgx, '', w) in re.sub(rgx, '', raid_details.lower())), None)
+    raid_details = raid_details.replace(str(weather), '', 1)
+    if not weather:
+        weather = guild_dict[message.guild.id]['raidchannel_dict'].get(message.channel.id,{}).get('weather', None)
+    if raid_details == '':
+        await message.channel.send(_('Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**'))
+        return
     raid_gmaps_link = create_gmaps_query(raid_details, message.channel)
     if (egg_level > 5) or (egg_level == 0):
         await message.channel.send(_('Meowth! Raid egg levels are only from 1-5!'))
@@ -3030,6 +3104,8 @@ async def _raidegg(message):
             'type': 'egg',
             'pokemon': '',
             'egglevel': egg_level,
+            'weather': weather,
+            'moveset': 0
         }
         if raidexp is not False:
             await _timerset(raid_channel, raidexp)
@@ -3046,6 +3122,7 @@ async def _eggassume(args, raid_channel, author=None):
     report_channel = Meowth.get_channel(eggdetails['reportcity'])
     egglevel = eggdetails['egglevel']
     manual_timer = eggdetails['manual_timer']
+    weather = eggdetails.get('weather', None)
     egg_report = await report_channel.get_message(eggdetails['raidreport'])
     raid_message = await raid_channel.get_message(eggdetails['raidmessage'])
     entered_raid = re.sub('[\\@]', '', args.lower().lstrip('assume').lstrip(' '))
@@ -3096,6 +3173,18 @@ async def _eggassume(args, raid_channel, author=None):
     except discord.errors.NotFound:
         egg_report = None
     await raid_channel.send(_('{roletest}Meowth! This egg will be assumed to be {pokemon} when it hatches!').format(roletest=roletest,pokemon=entered_raid.title()))
+    if egglevel == "EX" or int(egglevel) >= 3:
+        ctrs_dict = await _get_generic_counters(raid_channel.guild, entered_raid, weather)
+        ctrsmsg = "Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters."
+        ctrsmessage = await raid_channel.send(content=ctrsmsg,embed=ctrs_dict[0]['embed'])
+        await ctrsmessage.pin()
+        for moveset in ctrs_dict:
+            await ctrsmessage.add_reaction(ctrs_dict[moveset]['emoji'])
+            await asyncio.sleep(0.25)
+    else:
+        ctrs_dict = None
+    eggdetails['ctrs_dict'] = ctrs_dict
+    eggdetails['ctrsmessage'] = ctrsmessage.id
     guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id] = eggdetails
     return
 
@@ -3119,6 +3208,7 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
     manual_timer = eggdetails['manual_timer']
     trainer_dict = eggdetails['trainer_dict']
     egg_address = eggdetails['address']
+    weather = eggdetails.get('weather', None)
     raid_message = await raid_channel.get_message(eggdetails['raidmessage'])
     if not reportcitychannel:
         async for message in raid_channel.history(limit=500, reverse=True):
@@ -3219,6 +3309,16 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
         egg_report = egg_report.id
     except (discord.errors.NotFound, AttributeError):
         egg_report = None
+    if egglevel == "EX" or int(egglevel) >= 3:
+        ctrs_dict = await _get_generic_counters(raid_channel.guild, entered_raid, weather)
+        ctrsmsg = "Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters."
+        ctrsmessage = await raid_channel.send(content=ctrsmsg,embed=ctrs_dict[0]['embed'])
+        await ctrsmessage.pin()
+        for moveset in ctrs_dict:
+            await ctrsmessage.add_reaction(ctrs_dict[moveset]['emoji'])
+            await asyncio.sleep(0.25)
+    else:
+        ctrs_dict = None
     guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id] = {
         'reportcity': reportcitychannel.id,
         'trainer_dict': trainer_dict,
@@ -3231,6 +3331,9 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
         'type': hatchtype,
         'pokemon': entered_raid,
         'egglevel': '0',
+        'ctrs_dict': ctrs_dict,
+        'ctrsmessage': ctrsmessage.id,
+        'moveset': 0
     }
     guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id]['starttime'] = starttime
     guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id]['duplicate'] = duplicate
@@ -4132,9 +4235,38 @@ async def counters(ctx, *, args = None):
     If [user] is a valid Pokebattler user id, Meowth will simulate the Raid with that user's Pokebox.
     Uses current boss and weather by default if available.
     """
+    rgx = '[^a-zA-Z0-9]'
     channel = ctx.channel
     guild = channel.guild
-    user = None
+    user = guild_dict[ctx.guild.id].get('trainers',{}).get(ctx.author.id,{}).get('pokebattlerid', None)
+    if checks.check_raidchannel(ctx):
+        if args:
+            args_split = args.split()
+            for arg in args_split:
+                if arg.isdigit():
+                    user = arg
+                    break
+        ctrsmessage = await channel.get_message(guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrsmessage'])
+        pkmn = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('pokemon', None)
+        if pkmn:
+            if not user:
+                ctrsmessage = await channel.get_message(guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrsmessage'])
+                await channel.send(content=ctrsmessage.content,embed=ctrsmessage.embeds[0])
+                return
+            moveset = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('moveset', 0)
+            movesetstr = guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrs_dict'][moveset]['moveset']
+            weather = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('weather', None)
+        else:
+            pkmn = next((str(p) for p in get_raidlist() if not str(p).isdigit() and re.sub(rgx, '', str(p)) in re.sub(rgx, '', args.lower())), None)
+            if not pkmn:
+                await ctx.channel.send(_("Meowth! You're missing some details! Be sure to enter a pokemon that appears in raids! Usage: **!counters <pkmn> [weather] [user ID]**"))
+                return
+        if not weather:
+            if args:
+                weather_list = [_('none'), _('extreme'), _('clear'), _('sunny'), _('rainy'),
+                                _('partlycloudy'), _('cloudy'), _('windy'), _('snow'), _('fog')]
+                weather = next((w for w in weather_list if re.sub(rgx, '', w) in re.sub(rgx, '', args.lower())), None)
+        return await _counters(ctx, pkmn, user, weather, movesetstr)
     if args:
         args_split = args.split()
         for arg in args_split:
@@ -4156,10 +4288,10 @@ async def counters(ctx, *, args = None):
     if not pkmn:
         await ctx.channel.send(_("Meowth! You're missing some details! Be sure to enter a pokemon that appears in raids! Usage: **!counters <pkmn> [weather] [user ID]**"))
         return
-    await _counters(ctx, pkmn, user, weather)
+    await _counters(ctx, pkmn, user, weather, "Unknown Moveset")
 
-async def _counters(ctx, pkmn, user = None, weather = None):
-    img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=1'.format(str(get_number(pkmn)).zfill(3))
+async def _counters(ctx, pkmn, user = None, weather = None, movesetstr = "Unknown Moveset"):
+    img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=4'.format(str(get_number(pkmn)).zfill(3))
     level = get_level(pkmn) if get_level(pkmn).isdigit() else "5"
     url = "https://fight.pokebattler.com/raids/defenders/{pkmn}/levels/RAID_LEVEL_{level}/attackers/".format(pkmn=pkmn.replace('-','_').upper(),level=level)
     if user:
@@ -4178,7 +4310,7 @@ async def _counters(ctx, pkmn, user = None, weather = None):
         index = weather_list.index(weather)
     weather = match_list[index]
     url += "strategies/CINEMATIC_ATTACK_WHEN_POSSIBLE/DEFENSE_RANDOM_MC?sort=OVERALL&"
-    url += "weatherCondition={weather}&dodgeStrategy=DODGE_REACTION_TIME&aggregation=AVERAGE".format(weather=weather)
+    url += "weatherCondition={weather}&dodgeStrategy=DODGE_REACTION_TIME&aggregation=AVERAGE&source=meowth".format(weather=weather)
     async with ctx.typing():
         async with aiohttp.ClientSession() as sess:
             async with sess.get(url) as resp:
@@ -4191,10 +4323,22 @@ async def _counters(ctx, pkmn, user = None, weather = None):
         data = data['attackers'][0]
         raid_cp = data['cp']
         atk_levels = '30'
-        ctrs = data['randomMove']['defenders'][-6:]
+        if movesetstr == "Unknown Moveset":
+            ctrs = data['randomMove']['defenders'][-6:]
+        else:
+            for moveset in data['byMove']:
+                move1 = moveset['move1'][:-5].lower().title().replace('_', ' ')
+                move2 = moveset['move2'].lower().title().replace('_', ' ')
+                moveset_str = f'{move1} | {move2}'
+                if moveset_str == movesetstr:
+                    ctrs = moveset['defenders'][-6:]
+                    break
+            else:
+                movesetstr = "Unknown Moveset"
+                ctrs = data['randomMove']['defenders'][-6:]
         def clean(txt):
             return txt.replace('_', ' ').title()
-        title = _('{pkmn} | {weather}').format(pkmn=pkmn.title(),weather=weather_list[index].title())
+        title = _('{pkmn} | {weather} | {movesetstr}').format(pkmn=pkmn.title(),weather=weather_list[index].title(),movesetstr=movesetstr)
         stats_msg = _("**CP:** {raid_cp}\n").format(raid_cp=raid_cp)
         stats_msg += _("**Weather:** {weather}\n").format(weather=clean(weather))
         stats_msg += _("**Attacker Level:** {atk_levels}").format(atk_levels=atk_levels)
@@ -4205,13 +4349,97 @@ async def _counters(ctx, pkmn, user = None, weather = None):
         index = 1
         for ctr in reversed(ctrs):
             ctr_name = clean(ctr['pokemonId'])
+            ctr_nick = clean(ctr.get('name',''))
+            ctr_cp = ctr['cp']
             moveset = ctr['byMove'][-1]
             moves = _("{move1} | {move2}").format(move1=clean(moveset['move1'])[:-5], move2=clean(moveset['move2']))
-            name = _("#{index} - {ctr_name}").format(index=index, ctr_name=ctr_name)
-            ctrs_embed.add_field(name=name,value=moves)
+            name = _("#{index} - {ctr_name}").format(index=index, ctr_name=(ctr_nick or ctr_name))
+            ctrs_embed.add_field(name=name,value=f"CP: {ctr_cp}\n{moves}")
             index += 1
         ctrs_embed.add_field(name=_("Results with {userstr} attackers").format(userstr=userstr), value=_("[See your personalized results!](https://www.pokebattler.com/raids/{pkmn})").format(pkmn=pkmn.replace('-','_').upper()))
         await ctx.channel.send(embed=ctrs_embed)
+
+async def _get_generic_counters(guild, pkmn, weather=None):
+    emoji_dict = {0: '0\u20e3', 1: '1\u20e3', 2: '2\u20e3', 3: '3\u20e3', 4: '4\u20e3', 5: '5\u20e3', 6: '6\u20e3', 7: '7\u20e3', 8: '8\u20e3', 9: '9\u20e3', 10: '10\u20e3'}
+    ctrs_dict = {}
+    ctrs_index = 0
+    ctrs_dict[ctrs_index] = {}
+    ctrs_dict[ctrs_index]['moveset'] = "Unknown Moveset"
+    ctrs_dict[ctrs_index]['emoji'] = '0\u20e3'
+    img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=4'.format(str(get_number(pkmn)).zfill(3))
+    level = get_level(pkmn) if get_level(pkmn).isdigit() else "5"
+    url = "https://fight.pokebattler.com/raids/defenders/{pkmn}/levels/RAID_LEVEL_{level}/attackers/".format(pkmn=pkmn.replace('-','_').upper(),level=level)
+    url += "levels/30/"
+    weather_list = [_('none'), _('extreme'), _('clear'), _('sunny'), _('rainy'),
+                    _('partlycloudy'), _('cloudy'), _('windy'), _('snow'), _('fog')]
+    match_list = ['NO_WEATHER','NO_WEATHER','CLEAR','CLEAR','RAINY',
+                        'PARTLY_CLOUDY','OVERCAST','WINDY','SNOW','FOG']
+    if not weather:
+        index = 0
+    else:
+        index = weather_list.index(weather)
+    weather = match_list[index]
+    url += "strategies/CINEMATIC_ATTACK_WHEN_POSSIBLE/DEFENSE_RANDOM_MC?sort=OVERALL&"
+    url += "weatherCondition={weather}&dodgeStrategy=DODGE_REACTION_TIME&aggregation=AVERAGE&source=meowth".format(weather=weather)
+    title_url = url.replace('https://fight', 'https://www')
+    hyperlink_icon = 'https://i.imgur.com/fn9E5nb.png'
+    pbtlr_icon = 'https://www.pokebattler.com/favicon-32x32.png'
+    async with aiohttp.ClientSession() as sess:
+        async with sess.get(url) as resp:
+            data = await resp.json()
+    data = data['attackers'][0]
+    raid_cp = data['cp']
+    atk_levels = '30'
+    ctrs = data['randomMove']['defenders'][-6:]
+    def clean(txt):
+        return txt.replace('_', ' ').title()
+    title = _('{pkmn} | {weather} | Unknown Moveset').format(pkmn=pkmn.title(),weather=weather_list[index].title())
+    stats_msg = _("**CP:** {raid_cp}\n").format(raid_cp=raid_cp)
+    stats_msg += _("**Weather:** {weather}\n").format(weather=clean(weather))
+    stats_msg += _("**Attacker Level:** {atk_levels}").format(atk_levels=atk_levels)
+    ctrs_embed = discord.Embed(colour=guild.me.colour)
+    ctrs_embed.set_author(name=title,url=title_url,icon_url=hyperlink_icon)
+    ctrs_embed.set_thumbnail(url=img_url)
+    ctrs_embed.set_footer(text=_('Results courtesy of Pokebattler'), icon_url=pbtlr_icon)
+    ctrindex = 1
+    for ctr in reversed(ctrs):
+        ctr_name = clean(ctr['pokemonId'])
+        moveset = ctr['byMove'][-1]
+        moves = _("{move1} | {move2}").format(move1=clean(moveset['move1'])[:-5], move2=clean(moveset['move2']))
+        name = _("#{index} - {ctr_name}").format(index=ctrindex, ctr_name=ctr_name)
+        ctrs_embed.add_field(name=name,value=moves)
+        ctrindex += 1
+    ctrs_dict[ctrs_index]['embed'] = ctrs_embed
+    for moveset in data['byMove']:
+        ctrs_index += 1
+        move1 = moveset['move1'][:-5].lower().title().replace('_', ' ')
+        move2 = moveset['move2'].lower().title().replace('_', ' ')
+        movesetstr = f'{move1} | {move2}'
+        ctrs = moveset['defenders'][-6:]
+        title = _(f'{pkmn.title()} | {weather_list[index].title()} | {movesetstr}')
+        ctrs_embed = discord.Embed(colour=guild.me.colour)
+        ctrs_embed.set_author(name=title,url=title_url,icon_url=hyperlink_icon)
+        ctrs_embed.set_thumbnail(url=img_url)
+        ctrs_embed.set_footer(text=_('Results courtesy of Pokebattler'), icon_url=pbtlr_icon)
+        ctrindex = 1
+        for ctr in reversed(ctrs):
+            ctr_name = clean(ctr['pokemonId'])
+            moveset = ctr['byMove'][-1]
+            moves = _("{move1} | {move2}").format(move1=clean(moveset['move1'])[:-5], move2=clean(moveset['move2']))
+            name = _("#{index} - {ctr_name}").format(index=ctrindex, ctr_name=ctr_name)
+            ctrs_embed.add_field(name=name,value=moves)
+            ctrindex += 1
+        ctrs_dict[ctrs_index] = {'moveset': movesetstr, 'embed': ctrs_embed, 'emoji': emoji_dict[ctrs_index]}
+    moveset_list = []
+    for moveset in ctrs_dict:
+        moveset_list.append(f"{ctrs_dict[moveset]['emoji']}: {ctrs_dict[moveset]['moveset']}\n")
+    for moveset in ctrs_dict:
+        ctrs_dict[moveset]['embed'].add_field(name="**Possible Movesets:**", value=f"{''.join(moveset_list[::2])}", inline=True)
+        ctrs_dict[moveset]['embed'].add_field(name="\u200b", value=f"{''.join(moveset_list[1::2])}",inline=True)
+        ctrs_dict[moveset]['embed'].add_field(name=_("Results with Level 30 attackers"), value=_("[See your personalized results!](https://www.pokebattler.com/raids/{pkmn})").format(pkmn=pkmn.replace('-','_').upper()),inline=False)
+
+    return ctrs_dict
+
 
 @Meowth.command()
 @checks.activeraidchannel()
@@ -4223,6 +4451,15 @@ async def weather(ctx, *, weather):
         return await ctx.channel.send(_("Meowth! Enter one of the following weather conditions: {}").format(", ".join(weather_list)))
     else:
         guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['weather'] = weather.lower()
+        pkmn = guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id].get('pokemon', None)
+        if pkmn:
+            if get_level(pkmn) == "EX" or int(get_level(pkmn)) >= 3:
+                ctrs_dict = await _get_generic_counters(ctx.guild,pkmn,weather.lower())
+                ctrsmessage = await ctx.channel.get_message(guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['ctrsmessage'])
+                moveset = guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['moveset']
+                newembed = ctrs_dict[moveset]['embed']
+                await ctrsmessage.edit(embed=newembed)
+                guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['ctrs_dict'] = ctrs_dict
         return await ctx.channel.send(_("Meowth! Weather set to {}!").format(weather.lower()))
 
 """

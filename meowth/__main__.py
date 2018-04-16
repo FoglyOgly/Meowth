@@ -5432,8 +5432,13 @@ async def _researchlist(ctx):
     questmsg = ""
     for questid in research_dict:
         if research_dict[questid]['reportchannel'] == ctx.message.channel.id:
-            questmsg += _('\n🔹')
-            questmsg += _("**Location**: {location}, **Quest**: {quest}, **Reward**: {reward}".format(location=research_dict[questid]['location'].title(),quest=research_dict[questid]['quest'].title(),reward=research_dict[questid]['reward'].title()))
+            try:
+                questreportmsg = await ctx.message.channel.get_message(questid)
+                questauthor = ctx.channel.guild.get_member(research_dict[questid]['reportauthor'])
+                questmsg += _('\n🔹')
+                questmsg += _("**Location**: {location}, **Quest**: {quest}, **Reward**: {reward}, **Reported By**: {author}".format(location=research_dict[questid]['location'].title(),quest=research_dict[questid]['quest'].title(),reward=research_dict[questid]['reward'].title(), author=questauthor.display_name))
+            except discord.errors.NotFound:
+                pass
     if questmsg:
         listmsg = _(' **Here\'s the current research reports for {channel}**\n{questmsg}').format(channel=ctx.message.channel.name.capitalize(),questmsg=questmsg)
     else:

@@ -1114,7 +1114,7 @@ async def on_raw_reaction_add(emoji, message_id, channel_id, user_id):
         guild_dict[guild.id]['raidchannel_dict'][channel.id]['moveset'] = moveset
     if message_id in guild_dict[guild.id]['wildreport_dict'] and user_id != Meowth.user.id:
         wild_dict = guild_dict[guild.id]['wildreport_dict'][message_id]
-        if str(emoji) == parse_emoji(guild,':omw:'):
+        if str(emoji) == '🏎':
             wild_dict['omw'].append(user.mention)
             guild_dict[guild.id]['wildreport_dict'][message_id] = wild_dict
         elif str(emoji) == '💨':
@@ -2853,7 +2853,7 @@ async def _wild(message):
         wild_embed.set_thumbnail(url=wild_img_url)
         wildreportmsg = await message.channel.send(content=_('{roletest}Meowth! Wild {pokemon} reported by {member}! Details: {location_details}').format(roletest=roletest,pokemon=entered_wild.title(), member=message.author.mention, location_details=wild_details), embed=wild_embed)
         await asyncio.sleep(0.25)
-        await wildreportmsg.add_reaction(discord.utils.get(Meowth.emojis, name='omw'))
+        await wildreportmsg.add_reaction('🏎')
         await asyncio.sleep(0.25)
         await wildreportmsg.add_reaction('💨')
         await asyncio.sleep(0.25)
@@ -3014,6 +3014,7 @@ async def _raid(message):
             await asyncio.sleep(0.25)
     else:
         ctrs_dict = None
+        ctrsmessage = None
     guild_dict[message.guild.id]['raidchannel_dict'][raid_channel.id] = {
         'reportcity': message.channel.id,
         'trainer_dict': {

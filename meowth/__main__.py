@@ -2844,7 +2844,7 @@ async def _wild(message):
         expiremsg = _('**This {pokemon} has despawned!**').format(pokemon=entered_wild.title())
         wild_embed = discord.Embed(title=_('Meowth! Click here for my directions to the wild {pokemon}!').format(pokemon=entered_wild.capitalize()), description=_("Ask {author} if my directions aren't perfect!").format(author=message.author.name), url=wild_gmaps_link, colour=message.guild.me.colour)
         wild_embed.add_field(name=_('**Details:**'), value=_('{pokemon} ({pokemonnumber}) {type}').format(pokemon=entered_wild.capitalize(), pokemonnumber=str(wild_number), type=''.join(get_type(message.guild, wild_number))), inline=False)
-        wild_embed.add_field(name='**Reactions:**', value=f"{parse_emoji(message.guild, config['omw_id'])}: I'm on my way!")
+        wild_embed.add_field(name='**Reactions:**', value="🏎: I'm on my way!")
         wild_embed.add_field(name='\u200b', value=f"{parse_emoji(message.guild, ':dash:')}: The Pokemon despawned!")
         if message.author.avatar:
             wild_embed.set_footer(text=_('Reported by @{author} - {timestamp}').format(author=message.author.display_name, timestamp=timestamp), icon_url='https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}.{format}?size={size}'.format(user=message.author, format='jpg', size=32))

@@ -3008,13 +3008,14 @@ async def _raid(message):
         ctrs_dict = await _get_generic_counters(message.guild, entered_raid, weather)
         ctrsmsg = "Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters."
         ctrsmessage = await raid_channel.send(content=ctrsmsg,embed=ctrs_dict[0]['embed'])
+        ctrsmessage_id = ctrsmessage.id
         await ctrsmessage.pin()
         for moveset in ctrs_dict:
             await ctrsmessage.add_reaction(ctrs_dict[moveset]['emoji'])
             await asyncio.sleep(0.25)
     else:
         ctrs_dict = None
-        ctrsmessage = None
+        ctrsmessage_id = None
     guild_dict[message.guild.id]['raidchannel_dict'][raid_channel.id] = {
         'reportcity': message.channel.id,
         'trainer_dict': {
@@ -3025,7 +3026,7 @@ async def _raid(message):
         'active': True,
         'raidmessage': raidmessage.id,
         'raidreport': raidreport.id,
-        'ctrsmessage': ctrsmessage.id,
+        'ctrsmessage': ctrsmessage_id,
         'address': raid_details,
         'type': 'raid',
         'pokemon': entered_raid,
@@ -3367,12 +3368,14 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
         ctrs_dict = await _get_generic_counters(raid_channel.guild, entered_raid, weather)
         ctrsmsg = "Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters."
         ctrsmessage = await raid_channel.send(content=ctrsmsg,embed=ctrs_dict[0]['embed'])
+        ctrsmessage_id = ctrsmessage.id
         await ctrsmessage.pin()
         for moveset in ctrs_dict:
             await ctrsmessage.add_reaction(ctrs_dict[moveset]['emoji'])
             await asyncio.sleep(0.25)
     else:
         ctrs_dict = None
+        ctrs_message = None
     guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id] = {
         'reportcity': reportcitychannel.id,
         'trainer_dict': trainer_dict,
@@ -3386,7 +3389,7 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
         'pokemon': entered_raid,
         'egglevel': '0',
         'ctrs_dict': ctrs_dict,
-        'ctrsmessage': ctrsmessage.id,
+        'ctrsmessage': ctrsmessage_id,
         'moveset': 0
     }
     guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id]['starttime'] = starttime
@@ -3578,7 +3581,7 @@ async def _invite(ctx):
     await exraidmsg.delete()
 
 @Meowth.command()
-@checks.citychannel()
+@checks.nonraidchannel()
 async def research(ctx, *, args = None):
     """Report Field research
     Guided report method with just !research. If you supply arguments in one
@@ -4306,9 +4309,12 @@ async def counters(ctx, *, args = None):
         pkmn = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('pokemon', None)
         if pkmn:
             if not user:
-                ctrsmessage = await channel.get_message(guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrsmessage'])
-                await channel.send(content=ctrsmessage.content,embed=ctrsmessage.embeds[0])
-                return
+                try:
+                    ctrsmessage = await channel.get_message(guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrsmessage'])
+                    await channel.send(content=ctrsmessage.content,embed=ctrsmessage.embeds[0])
+                    return
+                except:
+                    pass
             moveset = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('moveset', 0)
             movesetstr = guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrs_dict'][moveset]['moveset']
             weather = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('weather', None)
@@ -4366,7 +4372,7 @@ async def _counters(ctx, pkmn, user = None, weather = None, movesetstr = "Unknow
         index = weather_list.index(weather)
     weather = match_list[index]
     url += "strategies/CINEMATIC_ATTACK_WHEN_POSSIBLE/DEFENSE_RANDOM_MC?sort=OVERALL&"
-    url += "weatherCondition={weather}&dodgeStrategy=DODGE_REACTION_TIME&aggregation=AVERAGE&source=meowth".format(weather=weather)
+    url += "weatherCondition={weather}&dodgeStrategy=DODGE_REACTION_TIME&aggregation=AVERAGE".format(weather=weather)
     async with ctx.typing():
         async with aiohttp.ClientSession() as sess:
             async with sess.get(url) as resp:
@@ -4436,7 +4442,7 @@ async def _get_generic_counters(guild, pkmn, weather=None):
         index = weather_list.index(weather)
     weather = match_list[index]
     url += "strategies/CINEMATIC_ATTACK_WHEN_POSSIBLE/DEFENSE_RANDOM_MC?sort=OVERALL&"
-    url += "weatherCondition={weather}&dodgeStrategy=DODGE_REACTION_TIME&aggregation=AVERAGE&source=meowth".format(weather=weather)
+    url += "weatherCondition={weather}&dodgeStrategy=DODGE_REACTION_TIME&aggregation=AVERAGE".format(weather=weather)
     title_url = url.replace('https://fight', 'https://www')
     hyperlink_icon = 'https://i.imgur.com/fn9E5nb.png'
     pbtlr_icon = 'https://www.pokebattler.com/favicon-32x32.png'

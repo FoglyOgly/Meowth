@@ -482,6 +482,7 @@ async def expire_wild(message):
     try:
         expiremsg = _('**This {pokemon} has despawned!**').format(pokemon=guild_dict[guild.id]['wildreport_dict'][message.id]['pokemon'].title())
         await message.edit(embed=discord.Embed(description=expiremsg, colour=message.embeds[0].colour.value))
+        await message.clear_reactions()
     except discord.errors.NotFound:
         pass
     try:
@@ -3364,7 +3365,7 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
         egg_report = egg_report.id
     except (discord.errors.NotFound, AttributeError):
         egg_report = None
-    if egglevel == "EX" or int(egglevel) >= 3:
+    if (egglevel == "EX" or int(egglevel) >= 3) and not eggdetails.get('pokemon', None):
         ctrs_dict = await _get_generic_counters(raid_channel.guild, entered_raid, weather)
         ctrsmsg = "Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters."
         ctrsmessage = await raid_channel.send(content=ctrsmsg,embed=ctrs_dict[0]['embed'])
@@ -3375,7 +3376,7 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
             await asyncio.sleep(0.25)
     else:
         ctrs_dict = None
-        ctrs_message = None
+        ctrsmessage_id = None
     guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id] = {
         'reportcity': reportcitychannel.id,
         'trainer_dict': trainer_dict,

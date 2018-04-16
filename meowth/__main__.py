@@ -5428,7 +5428,7 @@ async def research(ctx):
     await ctx.channel.send(listmsg)
 
 async def _researchlist(ctx):
-    research_dict = copy.deepcopy(guild_dict[ctx.guild.id]['questreport_dict'])
+    research_dict = copy.deepcopy(guild_dict[ctx.guild.id].get('questreport_dict',{}))
     questmsg = ""
     for questid in research_dict:
         if research_dict[questid]['reportchannel'] == ctx.message.channel.id:
@@ -5456,7 +5456,7 @@ async def wilds(ctx):
     await ctx.channel.send(listmsg)
 
 async def _wildlist(ctx):
-    wild_dict = copy.deepcopy(guild_dict[ctx.guild.id]['wildreport_dict'])
+    wild_dict = copy.deepcopy(guild_dict[ctx.guild.id].get('wildreport_dict',{}))
     wildmsg = ""
     for wildid in wild_dict:
         if wild_dict[wildid]['reportchannel'] == ctx.message.channel.id:

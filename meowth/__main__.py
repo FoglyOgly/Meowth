@@ -3578,7 +3578,7 @@ async def _invite(ctx):
     await exraidmsg.delete()
 
 @Meowth.command()
-@checks.nonraidchannel()
+@checks.citychannel()
 async def research(ctx, *, args = None):
     """Report Field research
     Guided report method with just !research. If you supply arguments in one

@@ -1100,7 +1100,7 @@ async def on_raw_reaction_add(emoji, message_id, channel_id, user_id):
     message = await channel.get_message(message_id)
     guild = message.guild
     user = guild.get_member(user_id)
-    if channel.id in guild_dict[guild.id]['raidchannel_dict'] and message.id == guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrsmessage']:
+    if channel.id in guild_dict[guild.id]['raidchannel_dict'] and message.id == guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrsmessage'] and user_id != Meowth.user.id:
         ctrs_dict = guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrs_dict']
         for i in ctrs_dict:
             if ctrs_dict[i]['emoji'] == str(emoji):
@@ -1112,7 +1112,7 @@ async def on_raw_reaction_add(emoji, message_id, channel_id, user_id):
         await message.edit(embed=newembed)
         await message.remove_reaction(emoji, user)
         guild_dict[guild.id]['raidchannel_dict'][channel.id]['moveset'] = moveset
-    if message_id in guild_dict[guild.id]['wildreport_dict']:
+    if message_id in guild_dict[guild.id]['wildreport_dict'] and user_id != Meowth.user.id:
         wild_dict = guild_dict[guild.id]['wildreport_dict'][message_id]
         if str(emoji) == parse_emoji(guild,':omw:'):
             wild_dict['omw'].append(user.mention)

@@ -85,6 +85,7 @@ raid_info = {}
 
 
 active_raids = []
+active_wilds = []
 # Append path of this script to the path of
 # config files which we're loading.
 # Assumes that config files will always live in the same directory.
@@ -454,6 +455,41 @@ async def template(ctx, *, sample_message):
 Server Management
 """
 
+async def wild_expiry_check(message):
+    logger.info('Expiry_Check - ' + message.channel.name)
+    guild = message.channel.guild
+    global active_wilds
+    message = await message.channel.get_message(message.id)
+    if message not in active_wilds:
+        active_wilds.append(message)
+        logger.info(
+        'wild_expiry_check - Message added to watchlist - ' + message.channel.name
+        )
+        await asyncio.sleep(0.5)
+        while True:
+            try:
+                if guild_dict[guild.id]['wildreport_dict'][message.id]['exp'] <= time.time():
+                    await expire_wild(message)
+            except KeyError:
+                pass
+            await asyncio.sleep(30)
+            continue
+
+async def expire_wild(message):
+    guild = message.channel.guild
+    channel = message.channel
+    wild_dict = guild_dict[guild.id]['wildreport_dict']
+    try:
+        expiremsg = _('**This {pokemon} has despawned!**').format(pokemon=guild_dict[guild.id]['wildreport_dict'][message.id]['pokemon'].title())
+        await message.edit(embed=discord.Embed(description=expiremsg, colour=message.embeds[0].colour.value))
+    except discord.errors.NotFound:
+        pass
+    try:
+        user_message = await channel.get_message(wild_dict[message.id]['reportmessage'])
+        await user_message.delete()
+    except discord.errors.NotFound:
+        pass
+    del guild_dict[guild.id]['wildreport_dict'][message.id]
 
 async def expiry_check(channel):
     logger.info('Expiry_Check - ' + channel.name)
@@ -1076,6 +1112,15 @@ async def on_raw_reaction_add(emoji, message_id, channel_id, user_id):
         await message.edit(embed=newembed)
         await message.remove_reaction(emoji, user)
         guild_dict[guild.id]['raidchannel_dict'][channel.id]['moveset'] = moveset
+    if message_id in guild_dict[guild.id]['wildreport_dict']:
+        wild_dict = guild_dict[guild.id]['wildreport_dict'][message_id]
+        if str(emoji) == parse_emoji(guild,':omw:'):
+            wild_dict['omw'].append(user.mention)
+            guild_dict[guild.id]['wildreport_dict'][message_id] = wild_dict
+        elif str(emoji) == '💨':
+            await channel.send(f"{' '.join(wild_dict['omw'])}: the {wild_dict['pokemon'].title()} has despawned!")
+            await expire_wild(message)
+
 
 
 """
@@ -2796,24 +2841,30 @@ async def _wild(message):
             roletest = _("{pokemon} - ").format(pokemon=wild.mention)
         wild_number = pkmn_info['pokemon_list'].index(entered_wild) + 1
         wild_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=1'.format(str(wild_number).zfill(3))
-        expiremsg = _('**This {pokemon} has despawned!**').format(pokemon=entered_wild.title())
         wild_embed = discord.Embed(title=_('Meowth! Click here for my directions to the wild {pokemon}!').format(pokemon=entered_wild.capitalize()), description=_("Ask {author} if my directions aren't perfect!").format(author=message.author.name), url=wild_gmaps_link, colour=message.guild.me.colour)
-        wild_embed.add_field(name=_('**Details:**'), value=_('{pokemon} ({pokemonnumber}) {type}').format(pokemon=entered_wild.capitalize(), pokemonnumber=str(wild_number), type=''.join(get_type(message.guild, wild_number)), inline=True))
+        wild_embed.add_field(name=_('**Details:**'), value=_('{pokemon} ({pokemonnumber}) {type}').format(pokemon=entered_wild.capitalize(), pokemonnumber=str(wild_number), type=''.join(get_type(message.guild, wild_number))), inline=False)
+        wild_embed.add_field(name='**Reactions:**', value=f"{parse_emoji(message.guild, config['omw_id'])}: I'm on my way!")
+        wild_embed.add_field(name='\u200b', value=f"{parse_emoji(message.guild, ':dash:')}: The Pokemon despawned!")
         if message.author.avatar:
             wild_embed.set_footer(text=_('Reported by @{author} - {timestamp}').format(author=message.author.display_name, timestamp=timestamp), icon_url='https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}.{format}?size={size}'.format(user=message.author, format='jpg', size=32))
         else:
             wild_embed.set_footer(text=_('Reported by @{author} - {timestamp}').format(author=message.author.display_name, timestamp=timestamp), icon_url=message.author.default_avatar_url)
         wild_embed.set_thumbnail(url=wild_img_url)
         wildreportmsg = await message.channel.send(content=_('{roletest}Meowth! Wild {pokemon} reported by {member}! Details: {location_details}').format(roletest=roletest,pokemon=entered_wild.title(), member=message.author.mention, location_details=wild_details), embed=wild_embed)
+        await asyncio.sleep(0.25)
+        await wildreportmsg.add_reaction(discord.utils.get(Meowth.emojis, name='omw'))
+        await asyncio.sleep(0.25)
+        await wildreportmsg.add_reaction('💨')
+        await asyncio.sleep(0.25)
         wild_dict = copy.deepcopy(guild_dict[message.guild.id].get('wildreport_dict',{}))
         wild_dict[wildreportmsg.id] = {
             'exp':time.time() + 3600,
-            'expedit': {"content":wildreportmsg.content,"embedcontent":expiremsg},
             'reportmessage':message.id,
             'reportchannel':message.channel.id,
             'reportauthor':message.author.id,
             'location':wild_details,
             'pokemon':entered_wild,
+            'omw': []
         }
         guild_dict[message.guild.id]['wildreport_dict'] = wild_dict
 
@@ -3386,7 +3437,9 @@ async def _exraid(ctx):
     raid_channel_name = _('ex-raid-egg-')
     raid_channel_name += sanitize_channel_name(raid_details)
     raid_channel_overwrite_list = channel.overwrites
+    meowth_overwrite = (Meowth.user, discord.PermissionOverwrite(send_messages=True,read_messages=True))
     everyone_overwrite = (channel.guild.default_role, discord.PermissionOverwrite(send_messages=False))
+    raid_channel_overwrite_list.append(meowth_overwrite)
     raid_channel_overwrite_list.append(everyone_overwrite)
     for overwrite in raid_channel_overwrite_list:
         if isinstance(overwrite[0], discord.Role):
@@ -3617,7 +3670,6 @@ async def research(ctx, *, args = None):
         research_dict = copy.deepcopy(guild_dict[guild.id].get('questreport_dict',{}))
         research_dict[confirmation.id] = {
             'exp':time.time() + to_midnight,
-            'expedit':"delete",
             'reportmessage':message.id,
             'reportchannel':channel.id,
             'reportauthor':author.id,

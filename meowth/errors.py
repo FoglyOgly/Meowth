@@ -88,11 +88,11 @@ class WildReportChannelCheckFail(CommandError):
 async def delete_error(message, error):
     try:
         await message.delete()
-    except (discord.errors.NotFound, discord.errors.HTTPException):
+    except (discord.errors.Forbidden, discord.errors.HTTPException):
         pass
     try:
         await error.delete()
-    except (discord.errors.NotFound, discord.errors.HTTPException):
+    except (discord.errors.Forbidden, discord.errors.HTTPException):
         pass
 
 def missing_arg_msg(ctx):

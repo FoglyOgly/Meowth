@@ -1187,7 +1187,10 @@ async def on_raw_reaction_add(emoji, message_id, channel_id, user_id):
     except (discord.errors.NotFound, AttributeError):
         return
     guild = message.guild
-    user = guild.get_member(user_id)
+    try:
+        user = guild.get_member(user_id)
+    except AttributeError:
+        return
     if channel.id in guild_dict[guild.id]['raidchannel_dict'] and message.id == guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrsmessage'] and user_id != Meowth.user.id:
         ctrs_dict = guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrs_dict']
         for i in ctrs_dict:

@@ -872,8 +872,6 @@ event_loop = asyncio.get_event_loop()
 """
 Events
 """
-
-
 @Meowth.event
 async def on_ready():
     Meowth.owner = discord.utils.get(
@@ -887,67 +885,167 @@ async def on_ready():
     users = 0
     for guild in Meowth.guilds:
         users += len(guild.members)
+        #DELETE FROM HERE
+        # if guild.id in guild_dict:
+        #     configure_dict = copy.deepcopy(guild_dict[guild.id].get('configure_dict',{}))
+        #     configure_dict['welcome'] = {
+        #         "enabled":guild_dict[guild.id].get('welcome',False),
+        #         "welcomechan":guild_dict[guild.id].get('welcomechan',''),
+        #         "welcomemsg":guild_dict[guild.id].get('welcomemsg','default')
+        #     }
+        #     configure_dict['want'] = {
+        #         "enabled":guild_dict[guild.id].get('wantset',False),
+        #         "report_channels": guild_dict[guild.id].get('want_channel_list',[])
+        #     }
+        #     configure_dict['raid'] = {
+        #         "enabled":guild_dict[guild.id].get('raidset',False),
+        #         'report_channels': guild_dict[guild.id].get('city_channels',{}),
+        #         "categories":guild_dict[guild.id].get('categories',None),
+        #         "category_dict":guild_dict[guild.id].get('category_dict',{})
+        #     }
+        #     configure_dict['exraid'] = {
+        #         "enabled":guild_dict[guild.id].get('raidset',False),
+        #         'report_channels': guild_dict[guild.id].get('city_channels',{}),
+        #         "categories":guild_dict[guild.id].get('categories',None),
+        #         "category_dict":guild_dict[guild.id].get('category_dict',{}),
+        #         "permissions":"everyone"
+        #     }
+        #     configure_dict['wild'] = {
+        #         "enabled":guild_dict[guild.id].get('wildset',False),
+        #         'report_channels': guild_dict[guild.id].get('city_channels',{}),
+        #     }
+        #     configure_dict['research'] = {
+        #         "enabled":True,
+        #         'report_channels': guild_dict[guild.id].get('city_channels',{}),
+        #     }
+        #     configure_dict['archive'] = {
+        #         "enabled":True,
+        #         "category":guild_dict[guild.id].get('archive',{}).get('category','same'),
+        #         'list':guild_dict[guild.id].get('archive',{}).get('list',[])
+        #     }
+        #     configure_dict['invite'] = {
+        #         "enabled":True
+        #     }
+        #     configure_dict['team'] = {
+        #         "enabled":guild_dict[guild.id].get('team',False)
+        #     }
+        #     configure_dict['settings'] = {
+        #         "offset":guild_dict[guild.id].get('offset',0),
+        #         "regional":guild_dict[guild.id].get('regional',None),
+        #         "prefix":guild_dict[guild.id].get('prefix',None),
+        #         "done":guild_dict[guild.id].get('done',False)
+        #     }
+        #     guild_dict[guild.id]['configure_dict'] = configure_dict
+        #     try:
+        #         del guild_dict[guild.id]['want_channel_list']
+        #     except:
+        #         pass
+        #     try:
+        #         del guild_dict[guild.id]['offset']
+        #     except:
+        #         pass
+        #     try:
+        #         del guild_dict[guild.id]['welcome']
+        #     except:
+        #         pass
+        #     try:
+        #         del guild_dict[guild.id]['welcomechan']
+        #     except:
+        #         pass
+        #     try:
+        #         del guild_dict[guild.id]['wantset']
+        #     except:
+        #         pass
+        #     try:
+        #         del guild_dict[guild.id]['raidset']
+        #     except:
+        #         pass
+        #     try:
+        #         del guild_dict[guild.id]['wildset']
+        #     except:
+        #         pass
+        #     try:
+        #         del guild_dict[guild.id]['team']
+        #     except:
+        #         pass
+        #     try:
+        #         del guild_dict[guild.id]['want']
+        #     except:
+        #         pass
+        #     try:
+        #         del guild_dict[guild.id]['other']
+        #     except:
+        #         pass
+        #     try:
+        #         del guild_dict[guild.id]['done']
+        #     except:
+        #         pass
+            #DELETE TO HERE
         try:
             if guild.id not in guild_dict:
                 guild_dict[guild.id] = {
-                    'want_channel_list': [],
-                    'offset': 0,
-                    'welcome': False,
-                    'welcomechan': '',
-                    'wantset': False,
-                    'raidset': False,
-                    'wildset': False,
-                    'team': False,
-                    'want': False,
-                    'other': False,
-                    'done': False,
-                    'raidchannel_dict': {
-
+                    'configure_dict':{
+                        'welcome': {'enabled':False,'welcomechan':'','welcomemsg':''},
+                        'want': {'enabled':False, 'report_channels': []},
+                        'raid': {'enabled':False, 'report_channels': {}, 'categories':'same','category_dict':{}},
+                        'exraid': {'enabled':False, 'report_channels': {}, 'categories':'same','category_dict':{}, 'permissions':'everyone'},
+                        'wild': {'enabled':False, 'report_channels': {}},
+                        'research': {'enabled':False, 'report_channels': {}},
+                        'archive': {'enabled':False, 'category':'same','list':None},
+                        'invite': {'enabled':False},
+                        'team':{'enabled':False},
+                        'settings':{'offset':0,'regional':None,'done':False,'prefix':None},
                     },
+                    'wildreport_dict:':{},
+                    'questreport_dict':{},
+                    'raidchannel_dict':{},
+                    'trainers':{}
                 }
         except KeyError:
             guild_dict[guild.id] = {
-                'want_channel_list': [],
-                'offset': 0,
-                'welcome': False,
-                'welcomechan': '',
-                'wantset': False,
-                'raidset': False,
-                'wildset': False,
-                'team': False,
-                'want': False,
-                'other': False,
-                'done': False,
-                'raidchannel_dict': {
-
+                'configure_dict':{
+                    'welcome': {'enabled':False,'welcomechan':'','welcomemsg':''},
+                    'want': {'enabled':False, 'report_channels': []},
+                    'raid': {'enabled':False, 'report_channels': {}, 'categories':'same','category_dict':{}},
+                    'exraid': {'enabled':False, 'report_channels': {}, 'categories':'same','category_dict':{}, 'permissions':'everyone'},
+                    'wild': {'enabled':False, 'report_channels': {}},
+                    'research': {'enabled':False, 'report_channels': {}},
+                    'archive': {'enabled':False, 'category':'same','list':None},
+                    'invite': {'enabled':False},
+                    'team':{'enabled':False},
+                    'settings':{'offset':0,'regional':None,'done':False,'prefix':None},
                 },
+                'wildreport_dict:':{},
+                'questreport_dict':{},
+                'raidchannel_dict':{},
+                'trainers':{}
             }
         owners.append(guild.owner)
     await _print(Meowth.owner, _("Meowth! That's right!\n\n{server_count} servers connected.\n{member_count} members found.").format(server_count=guilds, member_count=users))
     await maint_start()
 
-
 @Meowth.event
 async def on_guild_join(guild):
     owner = guild.owner
     guild_dict[guild.id] = {
-        'want_channel_list': [],
-        'offset': 0,
-        'welcome': False,
-        'welcomechan': '',
-        'wantset': False,
-        'raidset': False,
-        'wildset': False,
-        'team': False,
-        'want': False,
-        'other': False,
-        'done': False,
-        'raidchannel_dict': {
-
+        'configure_dict':{
+            'welcome': {'enabled':False,'welcomechan':'','welcomemsg':''},
+            'want': {'enabled':False, 'report_channels': []},
+            'raid': {'enabled':False, 'report_channels': {}, 'categories':'same','category_dict':{}},
+            'exraid': {'enabled':False, 'report_channels': {}, 'categories':'same','category_dict':{}, 'permissions':'everyone'},
+            'wild': {'enabled':False, 'report_channels': {}},
+            'research': {'enabled':False, 'report_channels': {}},
+            'archive': {'enabled':False, 'category':'same','list':None},
+            'invite': {'enabled':False},
+            'team':{'enabled':False},
+            'settings':{'offset':0,'regional':None,'done':False,'prefix':None},
         },
+        'wildreport_dict:':{},
+        'questreport_dict':{},
+        'raidchannel_dict':{},
+        'trainers':{}
     }
     await owner.send(_("Meowth! I'm Meowth, a Discord helper bot for Pokemon Go communities, and someone has invited me to your server! Type **!help** to see a list of things I can do, and type **!configure** in any channel of your server to begin!"))
-
 
 @Meowth.event
 async def on_guild_remove(guild):
@@ -960,39 +1058,38 @@ async def on_guild_remove(guild):
     except KeyError:
         pass
 
-
 @Meowth.event
 async def on_member_join(member):
     'Welcome message to the server and some basic instructions.'
     guild = member.guild
     team_msg = _(' or ').join(['**!team {0}**'.format(team)
                            for team in config['team_dict'].keys()])
-    if (guild_dict[guild.id]['done'] == False) or (guild_dict[guild.id]['welcome'] == False):
+    if not guild_dict[guild.id]['configure_dict']['welcome']['enabled']:
         return
     # Build welcome message
-    if guild_dict[guild.id].get('welcomemsg', 'default') == "default":
+    if guild_dict[guild.id]['configure_dict']['welcome'].get('welcomemsg', 'default') == "default":
         admin_message = _(' If you have any questions just ask an admin.')
         welcomemessage = _('Meowth! Welcome to {server}, {user}! ')
-        if guild_dict[guild.id]['team'] == True:
+        if guild_dict[guild.id]['configure_dict']['team']['enabled']:
             welcomemessage += _('Set your team by typing {team_command}.').format(
                 team_command=team_msg)
         welcomemessage += admin_message
-
     else:
-        welcomemessage = guild_dict[guild.id]['welcomemsg']
+        welcomemessage = guild_dict[guild.id]['configure_dict']['welcome']['welcomemsg']
 
-    if guild_dict[guild.id]['welcomechan'] == 'dm':
+    if guild_dict[guild.id]['configure_dict']['welcome']['welcomechan'] == 'dm':
         if welcomemessage.startswith("[") and welcomemessage.endswith("]"):
             await member.send(embed=discord.Embed(colour=guild.me.colour, description=welcomemessage[1:-1].format(server=guild.name, user=member.mention)))
         else:
             await member.send(welcomemessage.format(server=guild.name, user=member.mention))
     else:
-        default = discord.utils.get(guild.text_channels, name=guild_dict[guild.id]['welcomechan'])
+        default = discord.utils.get(guild.text_channels, name=guild_dict[guild.id]['configure_dict']['welcome']['welcomechan'])
         if default:
             if welcomemessage.startswith("[") and welcomemessage.endswith("]"):
                 await default.send(embed=discord.Embed(colour=guild.me.colour, description=welcomemessage[1:-1].format(server=guild.name, user=member.mention)))
             else:
                 await default.send(welcomemessage.format(server=guild.name, user=member.mention))
+
 @Meowth.event
 async def on_message(message):
     if message.guild != None:

@@ -1182,7 +1182,10 @@ async def on_message_delete(message):
 @Meowth.event
 async def on_raw_reaction_add(emoji, message_id, channel_id, user_id):
     channel = Meowth.get_channel(channel_id)
-    message = await channel.get_message(message_id)
+    try:
+        message = await channel.get_message(message_id)
+    except (discord.errors.NotFound, AttributeError):
+        return
     guild = message.guild
     user = guild.get_member(user_id)
     if channel.id in guild_dict[guild.id]['raidchannel_dict'] and message.id == guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrsmessage'] and user_id != Meowth.user.id:

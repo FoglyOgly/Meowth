@@ -3376,8 +3376,8 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
             await ctrsmessage.add_reaction(ctrs_dict[moveset]['emoji'])
             await asyncio.sleep(0.25)
     else:
-        ctrs_dict = None
-        ctrsmessage_id = None
+        ctrs_dict = eggdetails.get('ctrs_dict',None)
+        ctrsmessage_id = eggdetails.get('ctrsmessage', None)
     guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id] = {
         'reportcity': reportcitychannel.id,
         'trainer_dict': trainer_dict,

@@ -845,13 +845,13 @@ async def message_cleanup(loop=True):
                 try:
                     report_message = await report_delete_dict[messageid]['channel'].get_message(messageid)
                     await report_message.delete()
-                except discord.errors.NotFound:
+                except (discord.errors.NotFound, discord.errors.Forbidden):
                     pass
             for messageid in report_edit_dict.keys():
                 try:
                     report_message = await report_edit_dict[messageid]['channel'].get_message(messageid)
                     await report_message.edit(content=report_edit_dict[messageid]['action']['content'],embed=discord.Embed(description=report_edit_dict[messageid]['action']['embedcontent'], colour=report_message.embeds[0].colour.value))
-                except discord.errors.NotFound:
+                except (discord.errors.NotFound, discord.errors.HTTPException):
                     pass
         # save server_dict changes after cleanup
         logger.info('message_cleanup - SAVING CHANGES')
@@ -5729,15 +5729,22 @@ async def research(ctx):
     await ctx.channel.send(listmsg)
 
 async def _researchlist(ctx):
-    research_dict = copy.deepcopy(guild_dict[ctx.guild.id]['questreport_dict'])
+    research_dict = copy.deepcopy(guild_dict[ctx.guild.id].get('questreport_dict',{}))
     questmsg = ""
     for questid in research_dict:
         if research_dict[questid]['reportchannel'] == ctx.message.channel.id:
             try:
                 questreportmsg = await ctx.message.channel.get_message(questid)
                 questauthor = ctx.channel.guild.get_member(research_dict[questid]['reportauthor'])
-                questmsg += _('\n🔹')
-                questmsg += _("**Location**: {location}, **Quest**: {quest}, **Reward**: {reward}, **Reported By**: {author}".format(location=research_dict[questid]['location'].title(),quest=research_dict[questid]['quest'].title(),reward=research_dict[questid]['reward'].title(), author=questauthor.display_name))
+                if len(questmsg) < 1500:
+                    questmsg += _('\n🔹')
+                    questmsg += _("**Location**: {location}, **Quest**: {quest}, **Reward**: {reward}, **Reported By**: {author}".format(location=research_dict[questid]['location'].title(),quest=research_dict[questid]['quest'].title(),reward=research_dict[questid]['reward'].title(), author=questauthor.display_name))
+                else:
+                    listmsg = _('Meowth! **Here\'s the current research reports for {channel}**\n{questmsg}').format(channel=ctx.message.channel.name.capitalize(),questmsg=questmsg)
+                    await ctx.channel.send(listmsg)
+                    questmsg = ""
+                    questmsg += _('\n🔹')
+                    questmsg += _("**Location**: {location}, **Quest**: {quest}, **Reward**: {reward}, **Reported By**: {author}".format(location=research_dict[questid]['location'].title(),quest=research_dict[questid]['quest'].title(),reward=research_dict[questid]['reward'].title(), author=questauthor.display_name))
             except discord.errors.NotFound:
                 pass
     if questmsg:
@@ -5757,12 +5764,24 @@ async def wilds(ctx):
     await ctx.channel.send(listmsg)
 
 async def _wildlist(ctx):
-    wild_dict = copy.deepcopy(guild_dict[ctx.guild.id]['wildreport_dict'])
+    wild_dict = copy.deepcopy(guild_dict[ctx.guild.id].get('wildreport_dict',{}))
     wildmsg = ""
     for wildid in wild_dict:
         if wild_dict[wildid]['reportchannel'] == ctx.message.channel.id:
-            wildmsg += ('\n🔹')
-            wildmsg += _("**Pokemon**: {pokemon}, **Location**: {location}".format(pokemon=wild_dict[wildid]['pokemon'].title(),location=wild_dict[wildid]['location'].title()))
+            try:
+                wildreportmsg = await ctx.message.channel.get_message(wildid)
+                wildauthor = ctx.channel.guild.get_member(wild_dict[wildid]['reportauthor'])
+                if len(wildmsg) < 1500:
+                    wildmsg += ('\n🔹')
+                    wildmsg += _("**Pokemon**: {pokemon}, **Location**: {location}, **Reported By**: {author}".format(pokemon=wild_dict[wildid]['pokemon'].title(),location=wild_dict[wildid]['location'].title(),author=wildauthor.display_name))
+                else:
+                    listmsg = _('Meowth! **Here\'s the current wild reports for {channel}**\n{wildmsg}').format(channel=ctx.message.channel.name.capitalize(),wildmsg=wildmsg)
+                    await ctx.channel.send(listmsg)
+                    wildmsg = ""
+                    wildmsg += ('\n🔹')
+                    wildmsg += _("**Pokemon**: {pokemon}, **Location**: {location}, **Reported By**: {author}".format(pokemon=wild_dict[wildid]['pokemon'].title(),location=wild_dict[wildid]['location'].title(),author=wildauthor.display_name))
+            except discord.errors.NotFound:
+                continue
     if wildmsg:
         listmsg = _(' **Here\'s the current wild reports for {channel}**\n{wildmsg}').format(channel=ctx.message.channel.name.capitalize(),wildmsg=wildmsg)
     else:

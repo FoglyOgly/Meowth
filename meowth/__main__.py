@@ -1672,8 +1672,14 @@ async def announce(ctx, *, announce=None):
 
 @Meowth.command()
 @commands.has_permissions(manage_guild=True)
-async def configure(ctx):
-    'Meowth Configuration\n\n    Usage: !configure\n    Meowth will DM you instructions on how to configure Meowth for your server.\n    If it is not your first time configuring, you can choose a section to jump to.'
+async def configure(ctx,*,configlist: str=""):
+    """Meowth Configuration
+
+    Usage: !configure [list]
+    Meowth will DM you instructions on how to configure Meowth for your server.
+    If it is not your first time configuring, you can choose a section to jump to.
+    You can also include a comma separated [list] of sections from the following:
+    all, team, welcome, raid, exraid, invite, wild, research, want, archive, timezone"""
     guild = ctx.message.guild
     owner = ctx.message.author
     config_dict_temp = copy.deepcopy(guild_dict[guild.id]['configure_dict'])
@@ -1684,13 +1690,24 @@ async def configure(ctx):
     config_error = False
     if not config_dict_temp['settings']['done']:
         firstconfig = True
+    if configlist and not firstconfig:
+        configlist = configlist.lower().replace("timezone","settings").split(", ")
+        configlist = [x.strip().lower() for x in configlist]
+        diff =  set(configlist) - set(all_commands)
+        if diff and "all" in diff:
+            configreplylist = all_commands
+        elif not diff:
+            configreplylist = configlist
+        else:
+            await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("I'm sorry, I couldn't understand some of what you entered. Let's just start here.")))
+            configreplylist = []
     configmessage = _("Meowth! That's Right! Welcome to the configuration for Meowth the Pokemon Go Helper Bot! I will be guiding you through some steps to get me setup on your server.\n\n**Role Setup**\nBefore you begin the configuration, please make sure my role is moved to the top end of the server role hierarchy. It can be under admins and mods, but must be above team and general roles. [Here is an example](http://i.imgur.com/c5eaX1u.png)")
-    if firstconfig == False:
+    if not firstconfig and not configreplylist:
+        configmessage += _("\n\n**Welcome Back**\nThis isn't your first time configuring. You can either reconfigure everything by replying with **all** or reply with a comma separated list to configure those commands. Example: `want, raid, wild`")
+        configmessage += _("\n\n**Enabled Commands:**\n{enabled_commands}").format(enabled_commands=", ".join(enabled_commands))
         for commandconfig in config_dict_temp.keys():
             if config_dict_temp[commandconfig].get('enabled',False):
                 enabled_commands.append(commandconfig)
-        configmessage += _("\n\n**Welcome Back**\nThis isn't your first time configuring. You can either reconfigure everything by replying with **all** or reply with a comma separated list to configure those commands. Example: `want, raid, wild`")
-        configmessage += _("\n\n**Enabled Commands:**\n{enabled_commands}").format(enabled_commands=", ".join(enabled_commands))
         configmessage += _("\n\n**All Commands:**\n**all** - To redo configuration\n**team** - For Team Assignment configuration\n**welcome** - For Welcome Message configuration\n**raid** - for raid command configuration\n**exraid** - for EX raid command configuration\n**invite** - for invite command configuration\n**wild** - for wild command configuration\n**research** - for !research command configuration\n**want** - for want/unwant command configuration\n**archive** - For !archive configuration\n**timezone** - For timezone configuration")
         configmessage += _('\n\nReply with **cancel** at any time throughout the questions to cancel the configure process.')
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=configmessage).set_author(name=_('Meowth Configuration - {0}').format(guild), icon_url=Meowth.user.avatar_url))
@@ -1698,11 +1715,12 @@ async def configure(ctx):
             def check(m):
                 return m.guild == None and m.author == owner
             configreply = await Meowth.wait_for('message', check=check)
+            configreply.content = configreply.content.replace("timezone", "settings")
             if configreply.content.lower() == 'cancel':
                 configcancel = True
                 await owner.send(embed=discord.Embed(colour=discord.Colour.red(), description=_('**CONFIG CANCELLED!**\n\nNo changes have been made.')))
                 return
-            elif configreply.content.lower() == 'all':
+            elif "all" in configreply.content.lower():
                 configreplylist = all_commands
                 break
             else:
@@ -1710,9 +1728,6 @@ async def configure(ctx):
                 configreplylist = [x.strip() for x in configreplylist]
                 for configreplyitem in configreplylist:
                     if configreplyitem not in all_commands:
-                        if configreplyitem == "timezone":
-                            configreplylist.append("settings")
-                            continue
                         config_error = True
                         break
             if config_error:

@@ -1211,9 +1211,11 @@ async def on_raw_reaction_add(emoji, message_id, channel_id, user_id):
             wild_dict['omw'].append(user.mention)
             guild_dict[guild.id]['wildreport_dict'][message_id] = wild_dict
         elif str(emoji) == '💨':
-            if wild_dict['omw']:
-                await channel.send(f"{' '.join(wild_dict['omw'])}: the {wild_dict['pokemon'].title()} has despawned!")
-            await expire_wild(message)
+            for reaction in message.reactions:
+                if reaction.emoji == '💨' and reaction.count >= 2:
+                    if wild_dict['omw']:
+                        await channel.send(f"{', '.join(wild_dict['omw'])}: the {wild_dict['pokemon'].title()} has despawned!")
+                    await expire_wild(message)
 
 """
 Admin Commands

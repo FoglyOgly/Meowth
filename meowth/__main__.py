@@ -293,11 +293,13 @@ def raise_admin_violation(message):
         command=message.content, user=message.author))
 
 def spellcheck(word):
-    suggestion = pkmn_match.get_pkmn(re.sub(r"[^A-Za-z0-9 ]+", '', word))
+    suggestion = spelling.correction(word)
+    return suggestion
     # If we have a spellcheck suggestion
-    if suggestion and suggestion != word:
-        result = pkmn_info['pokemon_list'][suggestion]
-        return result
+    if suggestion != word:
+        return _('Meowth! "{entered_word}" is not a Pokemon! Did you mean "{corrected_word}"?').format(entered_word=word, corrected_word=spelling.correction(word))
+    else:
+        return _('Meowth! "{entered_word}" is not a Pokemon! Check your spelling!').format(entered_word=word)
 
 async def autocorrect(entered_word, destination, author):
     msg = _("Meowth! **{word}** isn't a Pokemon!").format(word=entered_word.title())

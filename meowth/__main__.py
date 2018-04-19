@@ -916,6 +916,10 @@ async def on_ready():
         #         "enabled":guild_dict[guild.id].get('wildset',False),
         #         'report_channels': guild_dict[guild.id].get('city_channels',{}),
         #     }
+        #     configure_dict['counters'] = {
+        #        "enabled":True,
+        #        'auto_levels': ["3","4","5"],
+        #     }
         #     configure_dict['research'] = {
         #         "enabled":True,
         #         'report_channels': guild_dict[guild.id].get('city_channels',{}),
@@ -991,6 +995,7 @@ async def on_ready():
                         'want': {'enabled':False, 'report_channels': []},
                         'raid': {'enabled':False, 'report_channels': {}, 'categories':'same','category_dict':{}},
                         'exraid': {'enabled':False, 'report_channels': {}, 'categories':'same','category_dict':{}, 'permissions':'everyone'},
+                        'counters': {'enabled':False, 'auto_levels': []},
                         'wild': {'enabled':False, 'report_channels': {}},
                         'research': {'enabled':False, 'report_channels': {}},
                         'archive': {'enabled':False, 'category':'same','list':None},
@@ -1010,6 +1015,7 @@ async def on_ready():
                     'want': {'enabled':False, 'report_channels': []},
                     'raid': {'enabled':False, 'report_channels': {}, 'categories':'same','category_dict':{}},
                     'exraid': {'enabled':False, 'report_channels': {}, 'categories':'same','category_dict':{}, 'permissions':'everyone'},
+                    'counters': {'enabled':False, 'auto_levels': []},
                     'wild': {'enabled':False, 'report_channels': {}},
                     'research': {'enabled':False, 'report_channels': {}},
                     'archive': {'enabled':False, 'category':'same','list':None},
@@ -1035,6 +1041,7 @@ async def on_guild_join(guild):
             'want': {'enabled':False, 'report_channels': []},
             'raid': {'enabled':False, 'report_channels': {}, 'categories':'same','category_dict':{}},
             'exraid': {'enabled':False, 'report_channels': {}, 'categories':'same','category_dict':{}, 'permissions':'everyone'},
+            'counters': {'enabled':False, 'auto_levels': []},
             'wild': {'enabled':False, 'report_channels': {}},
             'research': {'enabled':False, 'report_channels': {}},
             'archive': {'enabled':False, 'category':'same','list':None},
@@ -2274,6 +2281,35 @@ async def configure(ctx,*,configlist: str=""):
             else:
                 await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description="I'm sorry I don't understand. Please reply with either **N** to disable, or **Y** to enable."))
                 continue
+    #configure counters
+    if (configcancel == False) and "counters" in configreplylist:
+        await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description='Do you want to generate an automatic counters list in newly created raid channels using PokeBattler?\nIf enabled, I will post a message containing the best counters for the raid boss in new raid channels. Users will still be able to use **!counters** to generate this list.\n\nRespond with: **N** to disable, or enable with a comma separated list of boss levels that you would like me to generate counters for. Example:`3,4,5,EX`').set_author(name='Automatic Counters Configuration', icon_url=Meowth.user.avatar_url))
+        while True:
+            countersconfigset = await Meowth.wait_for('message', check=(lambda message: (message.guild == None) and message.author == owner))
+            if countersconfigset.content.lower() == 'n':
+                config_dict_temp['counters']['enabled'] = False
+                await owner.send(embed=discord.Embed(colour=discord.Colour.red(), description='Automatic Counters disabled'))
+                break
+            elif countersconfigset.content.lower() == 'cancel':
+                configcancel = True
+                await owner.send(embed=discord.Embed(colour=discord.Colour.red(), description='**CONFIG CANCELLED!**\n\nNo changes have been made.'))
+                return
+            else:
+                raidlevel_list = countersconfigset.content.lower().split(',')
+                counterlevels = []
+                for level in raidlevel_list:
+                    if level.isdigit() and (int(level) <= 5):
+                        counterlevels.append(str(level))
+                    elif level.lower() == "ex":
+                        counterlevels.append("EX")
+                if len(counterlevels) > 0:
+                    config_dict_temp['counters']['enabled'] = True
+                    config_dict_temp['counters']['auto_levels'] = counterlevels
+                    await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description=_('Automatic Counter Levels set to: {levels}').format(levels=', '.join((str(x) for x in config_dict_temp['counters']['auto_levels'])))))
+                    break
+                else:
+                    await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description="Please enter at least one level from 1 to EX separated by comma. Ex: `4,5,EX` or **N** to turn off automatic counters."))
+                    continue
     #configure wild
     if (configcancel == False) and "wild" in configreplylist:
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Wild Reporting allows users to report wild spawns with **!wild**. Pokemon **wild** reports are contained within one or more channels. Each channel will be able to represent different areas/communities. I'll need you to provide a list of channels in your server you will allow reports from in this format: `channel-name, channel-name, channel-name`\n\nExample: `kansas-city-wilds, hull-wilds, sydney-wilds`\n\nIf you do not require **wild** reporting, you may want to disable this function.\n\nRespond with: **N** to disable, or the **channel-name** list to enable, each seperated with a comma and space:")).set_author(name=_('Wild Reporting Channels'), icon_url=Meowth.user.avatar_url))
@@ -3355,7 +3391,7 @@ async def _raid(message):
     raidmessage = await raid_channel.send(content=raidmsg, embed=raid_embed)
     await raidmessage.pin()
     level = get_level(entered_raid)
-    if level == "EX" or int(level) >= 3:
+    if guild_dict[message.guild.id]['configure_dict']['counters']['enabled'] and str(level) in guild_dict[message.guild.id]['configure_dict']['counters']['auto_levels']:
         ctrs_dict = await _get_generic_counters(message.guild, entered_raid, weather)
         ctrsmsg = "Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters."
         ctrsmessage = await raid_channel.send(content=ctrsmsg,embed=ctrs_dict[0]['embed'])
@@ -3580,7 +3616,7 @@ async def _eggassume(args, raid_channel, author=None):
     except discord.errors.NotFound:
         egg_report = None
     await raid_channel.send(_('{roletest}Meowth! This egg will be assumed to be {pokemon} when it hatches!').format(roletest=roletest,pokemon=entered_raid.title()))
-    if egglevel == "EX" or int(egglevel) >= 3:
+    if guild_dict[raid_channel.guild.id]['configure_dict']['counters']['enabled'] and str(egglevel) in guild_dict[raid_channel.guild.id]['configure_dict']['counters']['auto_levels']:
         ctrs_dict = await _get_generic_counters(raid_channel.guild, entered_raid, weather)
         ctrsmsg = "Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters."
         ctrsmessage = await raid_channel.send(content=ctrsmsg,embed=ctrs_dict[0]['embed'])
@@ -3722,7 +3758,7 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
         egg_report = egg_report.id
     except (discord.errors.NotFound, AttributeError):
         egg_report = None
-    if (egglevel == "EX" or int(egglevel) >= 3) and not eggdetails.get('pokemon', None):
+    if guild_dict[raid_channel.guild.id]['configure_dict']['counters']['enabled'] and str(level) in guild_dict[raid_channel.guild.id]['configure_dict']['counters']['auto_levels'] and not eggdetails.get('pokemon', None):
         ctrs_dict = await _get_generic_counters(raid_channel.guild, entered_raid, weather)
         ctrsmsg = "Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters."
         ctrsmessage = await raid_channel.send(content=ctrsmsg,embed=ctrs_dict[0]['embed'])
@@ -4887,7 +4923,7 @@ async def weather(ctx, *, weather):
         guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['weather'] = weather.lower()
         pkmn = guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id].get('pokemon', None)
         if pkmn:
-            if get_level(pkmn) == "EX" or int(get_level(pkmn)) >= 3:
+            if guild_dict[ctx.guild.id]['configure_dict']['counters']['enabled'] and str(get_level(pkmn)) in guild_dict[ctx.guild.id]['configure_dict']['counters']['auto_levels']:
                 ctrs_dict = await _get_generic_counters(ctx.guild,pkmn,weather.lower())
                 ctrsmessage = await ctx.channel.get_message(guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['ctrsmessage'])
                 moveset = guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['moveset']

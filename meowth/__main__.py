@@ -2296,11 +2296,12 @@ async def configure(ctx,*,configlist: str=""):
                 return
             else:
                 raidlevel_list = countersconfigset.content.lower().split(',')
+                raidlevel_list = [x.strip() for x in raidlevel_list]
                 counterlevels = []
                 for level in raidlevel_list:
                     if level.isdigit() and (int(level) <= 5):
                         counterlevels.append(str(level))
-                    elif level.lower() == "ex":
+                    elif level == "ex":
                         counterlevels.append("EX")
                 if len(counterlevels) > 0:
                     config_dict_temp['counters']['enabled'] = True

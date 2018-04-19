@@ -4905,7 +4905,7 @@ async def _get_generic_counters(guild, pkmn, weather=None):
     for moveset in ctrs_dict:
         moveset_list.append(f"{ctrs_dict[moveset]['emoji']}: {ctrs_dict[moveset]['moveset']}\n")
     for moveset in ctrs_dict:
-        ctrs_split = int(round(len(moveset_list)/2))
+        ctrs_split = int(round(len(moveset_list)/2+0.1))
         ctrs_dict[moveset]['embed'].add_field(name="**Possible Movesets:**", value=f"{''.join(moveset_list[:ctrs_split])}", inline=True)
         ctrs_dict[moveset]['embed'].add_field(name="\u200b", value=f"{''.join(moveset_list[ctrs_split:])}",inline=True)
         ctrs_dict[moveset]['embed'].add_field(name=_("Results with Level 30 attackers"), value=_("[See your personalized results!](https://www.pokebattler.com/raids/{pkmn})").format(pkmn=pkmn.replace('-','_').upper()),inline=False)

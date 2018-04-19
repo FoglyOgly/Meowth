@@ -173,7 +173,7 @@ pkmn = Pokemon
 | **!uptime** | - | Shows Meowth's uptime. |
 | **!team** \<team\> | - | Let's users set their team role. |
 | **!set silph** \<Silph name\> | - | Links user\'s Silph Road account to Meowth. |
-| **!silphcard** \[Silph name\] | - | Displays [Silph name]\'s or user\s trainer card. |
+| **!silphcard** \[Silph name\] | - | Displays [Silph name]\'s or user\'s trainer card. |
 
 ### Pokemon Notification Commands:
 

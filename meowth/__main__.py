@@ -1080,17 +1080,18 @@ async def on_member_join(member):
         welcomemessage = guild_dict[guild.id]['configure_dict']['welcome']['welcomemsg']
 
     if guild_dict[guild.id]['configure_dict']['welcome']['welcomechan'] == 'dm':
-        if welcomemessage.startswith("[") and welcomemessage.endswith("]"):
-            await member.send(embed=discord.Embed(colour=guild.me.colour, description=welcomemessage[1:-1].format(server=guild.name, user=member.mention)))
-        else:
-            await member.send(welcomemessage.format(server=guild.name, user=member.mention))
+        send_to = member
+    elif str(guild_dict[guild.id]['configure_dict']['welcome']['welcomechan']).isdigit():
+        send_to = discord.utils.get(guild.text_channels, id=int(guild_dict[guild.id]['configure_dict']['welcome']['welcomechan']))
     else:
-        default = discord.utils.get(guild.text_channels, name=guild_dict[guild.id]['configure_dict']['welcome']['welcomechan'])
-        if default:
-            if welcomemessage.startswith("[") and welcomemessage.endswith("]"):
-                await default.send(embed=discord.Embed(colour=guild.me.colour, description=welcomemessage[1:-1].format(server=guild.name, user=member.mention)))
-            else:
-                await default.send(welcomemessage.format(server=guild.name, user=member.mention))
+        send_to = discord.utils.get(guild.text_channels, name=guild_dict[guild.id]['configure_dict']['welcome']['welcomechan'])
+    if send_to:
+        if welcomemessage.startswith("[") and welcomemessage.endswith("]"):
+            await send_to.send(embed=discord.Embed(colour=guild.me.colour, description=welcomemessage[1:-1].format(server=guild.name, user=member.mention)))
+        else:
+            await send_to.send(welcomemessage.format(server=guild.name, user=member.mention))
+    else:
+        return
 
 @Meowth.event
 async def on_message(message):
@@ -1846,7 +1847,7 @@ async def configure(ctx,*,configlist: str=""):
                             await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description=_("Welcome Message set to:\n\n{}").format(config_dict_temp['welcome']['welcomemsg'])))
                             break
                     break
-                await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Which channel in your server would you like me to post the Welcome Messages? You can also choose to have them sent to the new member via Direct Message (DM) instead.\n\nRespond with: **channel-name** of a channel in your server or **DM** to Direct Message:")).set_author(name=_("Welcome Message Channel"), icon_url=Meowth.user.avatar_url))
+                await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Which channel in your server would you like me to post the Welcome Messages? You can also choose to have them sent to the new member via Direct Message (DM) instead.\n\nRespond with: **channel-name** or ID of a channel in your server or **DM** to Direct Message:")).set_author(name=_("Welcome Message Channel"), icon_url=Meowth.user.avatar_url))
                 while True:
                     welcomechannelreply = await Meowth.wait_for('message',check=lambda message: message.guild == None and message.author == owner)
                     if welcomechannelreply.content.lower() == "dm":
@@ -1861,16 +1862,28 @@ async def configure(ctx,*,configlist: str=""):
                         await owner.send(embed=discord.Embed(colour=discord.Colour.red(), description=_('**CONFIG CANCELLED!**\n\nNo changes have been made.')))
                         return
                     else:
-                        guild_channel_list = []
-                        for channel in guild.text_channels:
-                            guild_channel_list.append(channel.name)
-                        diff = set([welcomechannelreply.content.lower().strip()]) - set(guild_channel_list)
+                        item = welcomechannelreply.content
+                        channel = None
+                        if item.isdigit():
+                            channel = discord.utils.get(guild.text_channels, id=int(item))
+                        if not channel:
+                            item = re.sub('[^a-zA-Z0-9 _\\-]+', '', item)
+                            item = item.replace(" ","-")
+                            name = await letter_case(guild.text_channels, item.lower())
+                            channel = discord.utils.get(guild.text_channels, name=name)
+                        if channel:
+                            guild_channel_list = []
+                            for textchannel in guild.text_channels:
+                                guild_channel_list.append(textchannel.id)
+                            diff = set([channel.id]) - set(guild_channel_list)
+                        else:
+                            diff = True
                         if (not diff):
-                            config_dict_temp['welcome']['welcomechan'] = welcomechannelreply.content.lower()
+                            config_dict_temp['welcome']['welcomechan'] = channel.id
                             await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description=_('Welcome Channel set to {channel}').format(channel=welcomechannelreply.content.lower())))
                             break
                         else:
-                            await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("The channel you provided isn't in your server. Please double check your channel name and resend your response.")))
+                            await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("The channel you provided isn't in your server. Please double check your channel and resend your response.")))
                             continue
                     break
                 break

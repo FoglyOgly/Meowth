@@ -1910,23 +1910,19 @@ async def configure(ctx,*,configlist: str=""):
                 citychannel_names = []
                 citychannel_errors = []
                 for item in citychannel_list:
+                    channel = None
                     if item.isdigit():
                         channel = discord.utils.get(guild.text_channels, id=int(item))
-                        if channel:
-                            citychannel_ids.append(channel.id)
-                            citychannel_names.append(channel.name)
-                        else:
-                            citychannel_errors.append(item)
-                    else:
+                    if not channel:
                         item = re.sub('[^a-zA-Z0-9 _\\-]+', '', item)
                         item = item.replace(" ","-")
                         name = await letter_case(guild.text_channels, item.lower())
                         channel = discord.utils.get(guild.text_channels, name=name)
-                        if channel:
-                            citychannel_ids.append(channel.id)
-                            citychannel_names.append(channel.name)
-                        else:
-                            citychannel_errors.append(item)
+                    if channel:
+                        citychannel_ids.append(channel.id)
+                        citychannel_names.append(channel.name)
+                    else:
+                        citychannel_errors.append(item)
                 citychannel_list = citychannel_ids
                 diff = set(citychannel_list) - set(guild_channel_list)
                 if (not diff) and (not citychannel_errors):
@@ -1993,22 +1989,18 @@ async def configure(ctx,*,configlist: str=""):
                         regioncat_names = []
                         regioncat_errors = []
                         for item in regioncat_list:
+                            channel = None
                             if item.isdigit():
                                 category = discord.utils.get(guild.categories, id=int(item))
-                                if category:
-                                    regioncat_ids.append(category.id)
-                                    regioncat_names.append(category.name)
-                                else:
-                                    regioncat_errors.append(item)
-                            else:
+                            if not category:
                                 item = re.sub('[^a-zA-Z0-9 _\\-]+', '', item)
                                 name = await letter_case(guild.categories, item.lower())
                                 category = discord.utils.get(guild.categories, name=name)
-                                if category:
-                                    regioncat_ids.append(category.id)
-                                    regioncat_names.append(category.name)
-                                else:
-                                    regioncat_errors.append(item)
+                            if category:
+                                regioncat_ids.append(category.id)
+                                regioncat_names.append(category.name)
+                            else:
+                                regioncat_errors.append(item)
                         regioncat_list = regioncat_ids
                         if len(regioncat_list) == len(citychannel_list):
                             catdiff = set(regioncat_list) - set(guild_catlist)
@@ -2049,22 +2041,18 @@ async def configure(ctx,*,configlist: str=""):
                         levelcat_names = []
                         levelcat_errors = []
                         for item in levelcat_list:
+                            channel = None
                             if item.isdigit():
                                 category = discord.utils.get(guild.categories, id=int(item))
-                                if category:
-                                    levelcat_ids.append(category.id)
-                                    levelcat_names.append(category.name)
-                                else:
-                                    levelcat_errors.append(item)
-                            else:
+                            if not category:
                                 item = re.sub('[^a-zA-Z0-9 _\\-]+', '', item)
                                 name = await letter_case(guild.categories, item.lower())
                                 category = discord.utils.get(guild.categories, name=name)
-                                if category:
-                                    levelcat_ids.append(category.id)
-                                    levelcat_names.append(category.name)
-                                else:
-                                    levelcat_errors.append(item)
+                            if category:
+                                levelcat_ids.append(category.id)
+                                levelcat_names.append(category.name)
+                            else:
+                                levelcat_errors.append(item)
                         levelcat_list = levelcat_ids
                         if len(levelcat_list) == 5:
                             catdiff = set(levelcat_list) - set(guild_catlist)
@@ -2117,23 +2105,19 @@ async def configure(ctx,*,configlist: str=""):
                 citychannel_names = []
                 citychannel_errors = []
                 for item in citychannel_list:
+                    channel = None
                     if item.isdigit():
                         channel = discord.utils.get(guild.text_channels, id=int(item))
-                        if channel:
-                            citychannel_ids.append(channel.id)
-                            citychannel_names.append(channel.name)
-                        else:
-                            citychannel_errors.append(item)
-                    else:
+                    if not channel:
                         item = re.sub('[^a-zA-Z0-9 _\\-]+', '', item)
                         item = item.replace(" ","-")
                         name = await letter_case(guild.text_channels, item.lower())
                         channel = discord.utils.get(guild.text_channels, name=name)
-                        if channel:
-                            citychannel_ids.append(channel.id)
-                            citychannel_names.append(channel.name)
-                        else:
-                            citychannel_errors.append(item)
+                    if channel:
+                        citychannel_ids.append(channel.id)
+                        citychannel_names.append(channel.name)
+                    else:
+                        citychannel_errors.append(item)
                 citychannel_list = citychannel_ids
                 diff = set(citychannel_list) - set(guild_channel_list)
                 if (not diff) and (not citychannel_errors):
@@ -2200,22 +2184,18 @@ async def configure(ctx,*,configlist: str=""):
                         regioncat_names = []
                         regioncat_errors = []
                         for item in regioncat_list:
+                            channel = None
                             if item.isdigit():
                                 category = discord.utils.get(guild.categories, id=int(item))
-                                if category:
-                                    regioncat_ids.append(category.id)
-                                    regioncat_names.append(category.name)
-                                else:
-                                    regioncat_errors.append(item)
-                            else:
+                            if not category:
                                 item = re.sub('[^a-zA-Z0-9 _\\-]+', '', item)
                                 name = await letter_case(guild.categories, item.lower())
                                 category = discord.utils.get(guild.categories, name=name)
-                                if category:
-                                    regioncat_ids.append(category.id)
-                                    regioncat_names.append(category.name)
-                                else:
-                                    regioncat_errors.append(item)
+                            if category:
+                                regioncat_ids.append(category.id)
+                                regioncat_names.append(category.name)
+                            else:
+                                regioncat_errors.append(item)
                         regioncat_list = regioncat_ids
                         if len(regioncat_list) == len(citychannel_list):
                             catdiff = set(regioncat_list) - set(guild_catlist)
@@ -2306,23 +2286,19 @@ async def configure(ctx,*,configlist: str=""):
                 citychannel_names = []
                 citychannel_errors = []
                 for item in citychannel_list:
+                    channel = None
                     if item.isdigit():
                         channel = discord.utils.get(guild.text_channels, id=int(item))
-                        if channel:
-                            citychannel_ids.append(channel.id)
-                            citychannel_names.append(channel.name)
-                        else:
-                            citychannel_errors.append(item)
-                    else:
+                    if not channel:
                         item = re.sub('[^a-zA-Z0-9 _\\-]+', '', item)
                         item = item.replace(" ","-")
                         name = await letter_case(guild.text_channels, item.lower())
                         channel = discord.utils.get(guild.text_channels, name=name)
-                        if channel:
-                            citychannel_ids.append(channel.id)
-                            citychannel_names.append(channel.name)
-                        else:
-                            citychannel_errors.append(item)
+                    if channel:
+                        citychannel_ids.append(channel.id)
+                        citychannel_names.append(channel.name)
+                    else:
+                        citychannel_errors.append(item)
                 citychannel_list = citychannel_ids
                 diff = set(citychannel_list) - set(guild_channel_list)
                 if (not diff) and (not citychannel_errors):
@@ -2376,23 +2352,19 @@ async def configure(ctx,*,configlist: str=""):
                 citychannel_names = []
                 citychannel_errors = []
                 for item in citychannel_list:
+                    channel = None
                     if item.isdigit():
                         channel = discord.utils.get(guild.text_channels, id=int(item))
-                        if channel:
-                            citychannel_ids.append(channel.id)
-                            citychannel_names.append(channel.name)
-                        else:
-                            citychannel_errors.append(item)
-                    else:
+                    if not channel:
                         item = re.sub('[^a-zA-Z0-9 _\\-]+', '', item)
                         item = item.replace(" ","-")
                         name = await letter_case(guild.text_channels, item.lower())
                         channel = discord.utils.get(guild.text_channels, name=name)
-                        if channel:
-                            citychannel_ids.append(channel.id)
-                            citychannel_names.append(channel.name)
-                        else:
-                            citychannel_errors.append(item)
+                    if channel:
+                        citychannel_ids.append(channel.id)
+                        citychannel_names.append(channel.name)
+                    else:
+                        citychannel_errors.append(item)
                 citychannel_list = citychannel_ids
                 diff = set(citychannel_list) - set(guild_channel_list)
                 if (not diff) and (not citychannel_errors):
@@ -2444,23 +2416,19 @@ async def configure(ctx,*,configlist: str=""):
                 want_list_names = []
                 want_list_errors = []
                 for item in want_list:
+                    channel = None
                     if item.isdigit():
                         channel = discord.utils.get(guild.text_channels, id=int(item))
-                        if channel:
-                            want_list_ids.append(channel.id)
-                            want_list_names.append(channel.name)
-                        else:
-                            want_list_errors.append(item)
-                    else:
+                    if not channel:
                         item = re.sub('[^a-zA-Z0-9 _\\-]+', '', item)
                         item = item.replace(" ","-")
                         name = await letter_case(guild.text_channels, item.lower())
                         channel = discord.utils.get(guild.text_channels, name=name)
-                        if channel:
-                            want_list_ids.append(channel.id)
-                            want_list_names.append(channel.name)
-                        else:
-                            want_list_errors.append(item)
+                    if channel:
+                        want_list_ids.append(channel.id)
+                        want_list_names.append(channel.name)
+                    else:
+                        want_list_errors.append(item)
                 want_list_set = want_list_ids
                 diff = set(want_list_set) - set(guild_channel_list)
                 if (not diff) and (not want_list_errors):

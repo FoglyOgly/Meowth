@@ -52,7 +52,7 @@ def _get_prefix(bot, message):
     return set_prefix or default_prefix
 
 
-Meowth = commands.Bot(command_prefix=_get_prefix)
+Meowth = commands.Bot(command_prefix=_get_prefix, case_insensitive=True)
 custom_error_handling(Meowth, logger)
 try:
     with open(os.path.join('data', 'serverdict'), 'rb') as fd:
@@ -1160,11 +1160,6 @@ async def on_message(message):
                             otw_list.append(user.mention)
                     await message.channel.send(content=_('Meowth! Someone has suggested a different location for the raid! Trainers {trainer_list}: make sure you are headed to the right place!').format(trainer_list=', '.join(otw_list)), embed=newembed)
                     return
-    if message.content.startswith(_get_prefix(Meowth, message)):
-        messagelist = message.content.split(' ')
-        firstsplit = re.split('\n|\r', messagelist.pop(0))
-        command = firstsplit.pop(0).lower()
-        message.content = (((command + '\n') + '\n'.join(firstsplit)) + ' ') + ' '.join(messagelist)
     if (not message.author.bot):
         await Meowth.process_commands(message)
 
@@ -1182,35 +1177,36 @@ async def on_message_delete(message):
             guild_dict[guild.id]['raidchannel_dict'][channel.id]['logs'] = logs
 
 @Meowth.event
-async def on_raw_reaction_add(emoji, message_id, channel_id, user_id):
-    channel = Meowth.get_channel(channel_id)
+async def on_raw_reaction_add(payload):
+    channel = Meowth.get_channel(payload.channel_id)
     try:
-        message = await channel.get_message(message_id)
+        message = await channel.get_message(payload.channel_id)
     except (discord.errors.NotFound, AttributeError):
         return
     guild = message.guild
     try:
-        user = guild.get_member(user_id)
+        user = guild.get_member(payload.channel_id)
     except AttributeError:
         return
-    if channel.id in guild_dict[guild.id]['raidchannel_dict'] and message.id == guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrsmessage'] and user_id != Meowth.user.id:
+    guild = message.guild
+    if channel.id in guild_dict[guild.id]['raidchannel_dict'] and message.id == guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrsmessage'] and user.id != Meowth.user.id:
         ctrs_dict = guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrs_dict']
         for i in ctrs_dict:
-            if ctrs_dict[i]['emoji'] == str(emoji):
+            if ctrs_dict[i]['emoji'] == str(payload.emoji):
                 newembed = ctrs_dict[i]['embed']
                 moveset = i
                 break
         else:
             return
         await message.edit(embed=newembed)
-        await message.remove_reaction(emoji, user)
+        await message.remove_reaction(payload.emoji, user)
         guild_dict[guild.id]['raidchannel_dict'][channel.id]['moveset'] = moveset
-    if message_id in guild_dict[guild.id]['wildreport_dict'] and user_id != Meowth.user.id:
+    if message_id in guild_dict[guild.id]['wildreport_dict'] and user.id != Meowth.user.id:
         wild_dict = guild_dict[guild.id]['wildreport_dict'][message_id]
-        if str(emoji) == '🏎':
+        if str(payload.emoji) == '🏎':
             wild_dict['omw'].append(user.mention)
             guild_dict[guild.id]['wildreport_dict'][message_id] = wild_dict
-        elif str(emoji) == '💨':
+        elif str(payload.emoji) == '💨':
             for reaction in message.reactions:
                 if reaction.emoji == '💨' and reaction.count >= 2:
                     if wild_dict['omw']:
@@ -1332,7 +1328,7 @@ async def exit(ctx):
     Meowth._shutdown_mode = 0
     await Meowth.logout()
 
-@Meowth.group(name='set')
+@Meowth.group(name='set', case_insensitive=True)
 async def _set(ctx):
     """Changes a setting."""
     if ctx.invoked_subcommand == None:
@@ -1467,7 +1463,7 @@ async def pokebattler(ctx, pbid: int = 0):
     guild_dict[ctx.guild.id]['trainers'] = trainers
     await ctx.send(_(f'Pokebattler ID set to {pbid}!'))
 
-@Meowth.group(name='get')
+@Meowth.group(name='get', case_insensitive=True)
 @commands.has_permissions(manage_guild=True)
 async def _get(ctx):
     """Get a setting value"""
@@ -3089,7 +3085,7 @@ async def want(ctx):
             confirmation_msg += _('\n**{count} Not Valid:**').format(count=len(spellcheck_dict)) + spellcheckmsg
         await channel.send(content=confirmation_msg)
 
-@Meowth.group()
+@Meowth.group(case_insensitive=True)
 @checks.allowwant()
 async def unwant(ctx):
     """Remove a Pokemon from your wanted list.
@@ -4333,7 +4329,7 @@ async def starttime(ctx):
         elif not starttime:
             await channel.send(_('Meowth! No start time has been set, set one with **!starttime HH:MM AM/PM**! (You can also omit AM/PM and use 24-hour time!)'))
 
-@Meowth.group()
+@Meowth.group(case_insensitive=True)
 @checks.activeraidchannel()
 async def location(ctx):
     """Get raid location.
@@ -5655,7 +5651,7 @@ async def backout(ctx):
 List Commands
 """
 
-@Meowth.group(aliases=['lists'])
+@Meowth.group(aliases=['lists'], case_insensitive=True)
 async def list(ctx):
     """Lists all raid info for the current channel.
 

@@ -1458,6 +1458,7 @@ async def silph(ctx, silphid: str = ''):
 
 @_set.command()
 async def pokebattler(ctx, pbid: int = 0):
+    """Links a server member to a PokeBattler ID."""
     if not pbid:
         await ctx.send(_('Pokebattler ID cleared!'))
         try:
@@ -2673,7 +2674,10 @@ async def raid_json(ctx, level=None, *, newlist=None):
 @commands.has_permissions(manage_channels=True)
 @checks.raidchannel()
 async def changeraid(ctx, newraid):
-    'Changes raid boss.\n\n    Usage: !changeraid <new pokemon or level>\n    Only usable by admins.'
+    """Changes raid boss.
+
+    Usage: !changeraid <new pokemon or level>
+    Only usable by admins."""
     message = ctx.message
     guild = message.guild
     channel = message.channel
@@ -2777,6 +2781,9 @@ async def setstatus(ctx, member: discord.Member, status,*, status_counts: str = 
 @Meowth.command()
 @commands.has_permissions(manage_guild=True)
 async def cleanroles(ctx):
+    """Removes all 0 member pokemon roles.
+
+    Usage: !cleanroles"""
     cleancount = 0
     for role in copy.copy(ctx.guild.roles):
         if role.members == [] and role.name in pkmn_info['pokemon_list']:
@@ -2788,6 +2795,9 @@ async def cleanroles(ctx):
 @Meowth.command()
 @checks.allowarchive()
 async def archive(ctx):
+    """Marks a raid channel for archival.
+
+    Usage: !archive"""
     message = ctx.message
     channel = message.channel
     await ctx.message.delete()
@@ -2948,6 +2958,9 @@ async def team(ctx):
 
 @Meowth.command()
 async def silphcard(ctx, user: str = None):
+    """Displays a user's Silph Road Trainer Card.
+
+    Usage:!silphcard [user]"""
     if not user:
         user = guild_dict[ctx.guild.id].get('trainers',{}).get(ctx.author.id,{}).get('silphid', None)
     else:
@@ -4172,7 +4185,10 @@ async def print_raid_timer(channel):
 @Meowth.command()
 @checks.raidchannel()
 async def timerset(ctx, timer):
-    'Set the remaining duration on a raid.\n\n    Usage: !timerset <minutes>\n    Works only in raid channels, can be set or overridden by anyone.\n    Meowth displays the end time in HH:MM local time.'
+    """Set the remaining duration on a raid.
+    Usage: !timerset <minutes>
+    Works only in raid channels, can be set or overridden by anyone.
+    Meowth displays the end time in HH:MM local time."""
     message = ctx.message
     channel = message.channel
     guild = message.guild
@@ -4960,7 +4976,10 @@ async def _get_generic_counters(guild, pkmn, weather=None):
 @Meowth.command()
 @checks.activeraidchannel()
 async def weather(ctx, *, weather):
-    "Sets the weather for the raid. \nUsage: !weather <weather> \nOnly usable in raid channels. \n Acceptable options: none, extreme, clear, rainy, partlycloudy, cloudy, windy, snow, fog"
+    """Sets the weather for the raid.
+    Usage: !weather <weather>
+    Only usable in raid channels.
+    Acceptable options: none, extreme, clear, rainy, partlycloudy, cloudy, windy, snow, fog"""
     weather_list = [_('none'), _('extreme'), _('clear'), _('sunny'), _('rainy'),
                     _('partlycloudy'), _('cloudy'), _('windy'), _('snow'), _('fog')]
     if weather.lower() not in weather_list:
@@ -6070,7 +6089,10 @@ async def _lobbylist(ctx, tag=False, team=False):
 @list.command()
 @checks.activeraidchannel()
 async def bosses(ctx):
-    "List each possible boss and the number of users that have RSVP'd for it.\n\n    Usage: !list bosses\n   Works only in raid channels."
+    """List each possible boss and the number of users that have RSVP'd for it.
+
+    Usage: !list bosses
+    Works only in raid channels."""
     listmsg = _('**Meowth!**')
     listmsg += await _bosslist(ctx)
     await ctx.channel.send(listmsg)
@@ -6114,7 +6136,10 @@ async def _bosslist(ctx):
 @list.command()
 @checks.activeraidchannel()
 async def teams(ctx):
-    "List the teams for the users that have RSVP'd to a raid.\n\n    Usage: !list teams\n    Works only in raid channels."
+    """List the teams for the users that have RSVP'd to a raid.\
+
+    Usage: !list teams
+    Works only in raid channels."""
     listmsg = _('**Meowth!**')
     listmsg += await _teamlist(ctx)
     await ctx.channel.send(listmsg)
@@ -6155,7 +6180,10 @@ async def _teamlist(ctx):
 @list.command()
 @checks.allowwant()
 async def wants(ctx):
-    'List the wants for the user\n\n    Usage: !list wants\n    Works only in the want channel.'
+    """List the wants for the user
+
+    Usage: !list wants
+    Works only in the want channel."""
     listmsg = _('**Meowth!**')
     listmsg += await _wantlist(ctx)
     await ctx.channel.send(listmsg)

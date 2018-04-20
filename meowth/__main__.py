@@ -1197,7 +1197,7 @@ async def on_raw_reaction_add(payload):
     except AttributeError:
         return
     guild = message.guild
-    if channel.id in guild_dict[guild.id]['raidchannel_dict'] and message.id == guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrsmessage'] and user.id != Meowth.user.id:
+    if channel.id in guild_dict[guild.id]['raidchannel_dict'] and message.id == guild_dict[guild.id]['raidchannel_dict'][channel.id].get('ctrsmessage',None) and user.id != Meowth.user.id:
         ctrs_dict = guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrs_dict']
         for i in ctrs_dict:
             if ctrs_dict[i]['emoji'] == str(payload.emoji):
@@ -3403,7 +3403,7 @@ async def _raid(message):
             await ctrsmessage.add_reaction(ctrs_dict[moveset]['emoji'])
             await asyncio.sleep(0.25)
     else:
-        ctrs_dict = None
+        ctrs_dict = {}
         ctrsmessage_id = None
     guild_dict[message.guild.id]['raidchannel_dict'][raid_channel.id] = {
         'reportcity': message.channel.id,
@@ -3622,14 +3622,16 @@ async def _eggassume(args, raid_channel, author=None):
         ctrs_dict = await _get_generic_counters(raid_channel.guild, entered_raid, weather)
         ctrsmsg = "Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters."
         ctrsmessage = await raid_channel.send(content=ctrsmsg,embed=ctrs_dict[0]['embed'])
+        ctrsmessage_id = ctrsmessage.id
         await ctrsmessage.pin()
         for moveset in ctrs_dict:
             await ctrsmessage.add_reaction(ctrs_dict[moveset]['emoji'])
             await asyncio.sleep(0.25)
     else:
-        ctrs_dict = None
+        ctrs_dict = {}
+        ctrsmessage_id = eggdetails.get('ctrsmessage', None)
     eggdetails['ctrs_dict'] = ctrs_dict
-    eggdetails['ctrsmessage'] = ctrsmessage.id
+    eggdetails['ctrsmessage'] = ctrsmessage_id
     guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id] = eggdetails
     return
 
@@ -3770,7 +3772,7 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
             await ctrsmessage.add_reaction(ctrs_dict[moveset]['emoji'])
             await asyncio.sleep(0.25)
     else:
-        ctrs_dict = eggdetails.get('ctrs_dict',None)
+        ctrs_dict = eggdetails.get('ctrs_dict',{})
         ctrsmessage_id = eggdetails.get('ctrsmessage', None)
     guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id] = {
         'reportcity': reportcitychannel.id,
@@ -4715,18 +4717,24 @@ async def counters(ctx, *, args = None):
                 if arg.isdigit():
                     user = arg
                     break
-        ctrsmessage = await channel.get_message(guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrsmessage'])
+        try:
+            ctrsmessage = await channel.get_message(guild_dict[guild.id]['raidchannel_dict'][channel.id].get('ctrsmessage',None))
+        except (discord.errors.NotFound, discord.errors.Forbidden, discord.errors.HTTPException):
+            pass
         pkmn = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('pokemon', None)
         if pkmn:
             if not user:
                 try:
-                    ctrsmessage = await channel.get_message(guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrsmessage'])
-                    await channel.send(content=ctrsmessage.content,embed=ctrsmessage.embeds[0])
+                    ctrsmessage = await channel.get_message(guild_dict[guild.id]['raidchannel_dict'][channel.id].get('ctrsmessage',None))
+                    ctrsembed = ctrsmessage.embeds[0]
+                    ctrsembed.remove_field(6)
+                    ctrsembed.remove_field(7)
+                    await channel.send(content=ctrsmessage.content,embed=ctrsembed)
                     return
-                except:
+                except (discord.errors.NotFound, discord.errors.Forbidden, discord.errors.HTTPException):
                     pass
             moveset = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('moveset', 0)
-            movesetstr = guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrs_dict'][moveset]['moveset']
+            movesetstr = guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrs_dict'].get(moveset,{}).get('moveset',"Unknown Moveset")
             weather = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('weather', None)
         else:
             pkmn = next((str(p) for p in get_raidlist() if not str(p).isdigit() and re.sub(rgx, '', str(p)) in re.sub(rgx, '', args.lower())), None)
@@ -4927,10 +4935,13 @@ async def weather(ctx, *, weather):
         if pkmn:
             if str(get_level(pkmn)) in guild_dict[ctx.guild.id]['configure_dict']['counters']['auto_levels']:
                 ctrs_dict = await _get_generic_counters(ctx.guild,pkmn,weather.lower())
-                ctrsmessage = await ctx.channel.get_message(guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['ctrsmessage'])
-                moveset = guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['moveset']
-                newembed = ctrs_dict[moveset]['embed']
-                await ctrsmessage.edit(embed=newembed)
+                try:
+                    ctrsmessage = await ctx.channel.get_message(guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['ctrsmessage'])
+                    moveset = guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['moveset']
+                    newembed = ctrs_dict[moveset]['embed']
+                    await ctrsmessage.edit(embed=newembed)
+                except (discord.errors.NotFound, discord.errors.Forbidden, discord.errors.HTTPException):
+                    pass
                 guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['ctrs_dict'] = ctrs_dict
         return await ctx.channel.send(_("Meowth! Weather set to {}!").format(weather.lower()))
 

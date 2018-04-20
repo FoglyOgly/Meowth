@@ -281,7 +281,7 @@ def custom_error_handling(bot, logger):
                     else:
                         msg += '\n#deleted-channel'
             if egg_check == "egg":
-                msg += _('\nThis is an egg channel. The channel needs to be activated with **{prefix}raid <pokemon>** before I accept commands!')
+                msg += _('\nThis is an egg channel. The channel needs to be activated with **{prefix}raid <pokemon>** before I accept commands!').format(prefix=prefix)
             error = await ctx.channel.send(msg)
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)

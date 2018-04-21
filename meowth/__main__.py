@@ -552,8 +552,6 @@ async def expire_channel(channel):
             guild_dict[guild.id]['raidchannel_dict'][channel.id]['active'] = False
         logger.info('Expire_Channel - Channel Expired - ' + channel.name)
         dupecount = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('duplicate',0)
-        archive = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('archive',False)
-        logs = guild_dict[channel.guild.id]['raidchannel_dict'][channel.id].get('logs', {})
         if dupecount >= 3:
             dupechannel = True
             guild_dict[guild.id]['raidchannel_dict'][channel.id]['duplicate'] = 0
@@ -611,6 +609,8 @@ async def expire_channel(channel):
                     except:
                         pass
                     # channel doesn't exist anymore in serverdict
+                archive = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('archive',False)
+                logs = guild_dict[channel.guild.id]['raidchannel_dict'][channel.id].get('logs', {})
                 channel_exists = Meowth.get_channel(channel.id)
                 if channel_exists == None:
                     return

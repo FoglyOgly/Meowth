@@ -172,6 +172,8 @@ pkmn = Pokemon
 | **!about** | - | Shows info about Meowth. |
 | **!uptime** | - | Shows Meowth's uptime. |
 | **!team** \<team\> | - | Let's users set their team role. |
+| **!set silph** \<Silph name\> | - | Links user\'s Silph Road account to Meowth. |
+| **!silphcard** \[Silph name\] | - | Displays [Silph name]\'s or user\'s trainer card. |
 
 ### Pokemon Notification Commands:
 
@@ -192,7 +194,7 @@ pkmn = Pokemon
 | **!raid assume** \<pkmn\> | *Raid Egg Channel* | Assumes a pokemon on hatch. |
 | **!exraid** \<pkmn\> \<place\> | *Region Channel* | Creates an exraid channel. |
 | **!invite**  | *Region Channel* | Gain entry to exraids. |
-
+| **!research** \[pokestop name \[optional URL\], quest, reward\] | *Region Channel* | Reports field research. Guided version available with just **!research** |
 
 ### Raid Channel Management:
 
@@ -217,7 +219,7 @@ pkmn = Pokemon
 | **!coming** \[number\] \[teamcounts\] \[boss list or all\] | *Raid Channel* | Sets your status for the raid to 'coming'.  Teamcounts format is `m# v# i#`. You can also supply a list of bosses or 'all' that you are interested in. Aliases: !c |
 | **!here** \[number\] \[teamcounts\] \[boss list or all\] | *Raid Channel* | Sets your status for the raid to 'here'.  Teamcounts format is `m# v# i#`. You can also supply a list of bosses or 'all' that you are interested in. Aliases: !h |
 | **!lobby** \[number\] | *Raid Channel* | Indicate you are entering the raid lobby. Aliases: !l |
-| **!starting** | *Raid Channel* | Clears all members 'here', announce raid start. |
+| **!starting** \[team\] | *Raid Channel* | Clears all members 'here', announce raid start. |
 | **!backout** | *Raid Channel* | Request players in lobby to backout. |
 | **!cancel**  | *Raid Channel* | Cancel your status. Aliases: !x |
 
@@ -236,8 +238,11 @@ pkmn = Pokemon
 | **!list mystic** | *Raid Channel* | Lists teams of mystic members that have RSVPd. |
 | **!list valor** | *Raid Channel* | Lists teams of valor members that have RSVPd. |
 | **!list instinct** | *Raid Channel* | Lists teams of instinct members that have RSVPd. |
+| **!list unknown** | *Raid Channel* | Lists members with unknown team that have RSVPd. |
 | **!list bosses** | *Raid Channel* | Lists boss interest of members that have RSVPd. |
 | **!list wants** | *Want Channel* | List the wants for the user. |
+| **!list wilds** | *Region Channel* | List the wilds for the channel. |
+| **!list research** | *Region Channel* | List the research for the channel. |
 
 ## General notes on Meowth:
 

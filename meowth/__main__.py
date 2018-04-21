@@ -2603,7 +2603,7 @@ async def configure(ctx,*,configlist: str=""):
         config_dict_temp['settings']['done'] = True
         del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
         guild_dict[guild.id]['configure_dict'] = config_dict_temp
-        await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")))
+        await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name='Configuration Complete', icon_url=Meowth.user.avatar_url))
 
 @Meowth.command()
 @checks.is_owner()

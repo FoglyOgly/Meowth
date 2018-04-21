@@ -1189,12 +1189,12 @@ async def on_message_delete(message):
 async def on_raw_reaction_add(payload):
     channel = Meowth.get_channel(payload.channel_id)
     try:
-        message = await channel.get_message(payload.channel_id)
+        message = await channel.get_message(payload.message_id)
     except (discord.errors.NotFound, AttributeError):
         return
     guild = message.guild
     try:
-        user = guild.get_member(payload.channel_id)
+        user = guild.get_member(payload.user_id)
     except AttributeError:
         return
     guild = message.guild

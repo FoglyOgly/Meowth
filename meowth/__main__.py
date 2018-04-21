@@ -1760,6 +1760,7 @@ async def configure(ctx,*,configlist: str=""):
             else:
                 break
     elif firstconfig == True:
+        configmessage += _('\n\nReply with **cancel** at any time throughout the questions to cancel the configure process.')
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=configmessage).set_author(name=_('Meowth Configuration - {guild}').format(guild=guild.name), icon_url=Meowth.user.avatar_url))
         configreplylist = all_commands
     #configure team

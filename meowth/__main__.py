@@ -1210,11 +1210,11 @@ async def on_raw_reaction_add(payload):
         await message.edit(embed=newembed)
         await message.remove_reaction(payload.emoji, user)
         guild_dict[guild.id]['raidchannel_dict'][channel.id]['moveset'] = moveset
-    if message_id in guild_dict[guild.id]['wildreport_dict'] and user.id != Meowth.user.id:
-        wild_dict = guild_dict[guild.id]['wildreport_dict'][message_id]
+    if message.id in guild_dict[guild.id]['wildreport_dict'] and user.id != Meowth.user.id:
+        wild_dict = guild_dict[guild.id]['wildreport_dict'][message.id]
         if str(payload.emoji) == '🏎':
             wild_dict['omw'].append(user.mention)
-            guild_dict[guild.id]['wildreport_dict'][message_id] = wild_dict
+            guild_dict[guild.id]['wildreport_dict'][message.id] = wild_dict
         elif str(payload.emoji) == '💨':
             for reaction in message.reactions:
                 if reaction.emoji == '💨' and reaction.count >= 2:
@@ -2088,6 +2088,7 @@ async def configure(ctx,*,configlist: str=""):
                         levelcat_errors = []
                         for item in levelcat_list:
                             channel = None
+                            category = None
                             if item.isdigit():
                                 category = discord.utils.get(guild.categories, id=int(item))
                             if not category:

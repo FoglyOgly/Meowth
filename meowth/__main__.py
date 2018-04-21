@@ -2090,7 +2090,6 @@ async def configure(ctx,*,configlist: str=""):
                             if item.isdigit():
                                 category = discord.utils.get(guild.categories, id=int(item))
                             if not category:
-                                item = re.sub('[^a-zA-Z0-9 _\\-]+', '', item)
                                 name = await letter_case(guild.categories, item.lower())
                                 category = discord.utils.get(guild.categories, name=name)
                             if category:
@@ -2237,7 +2236,6 @@ async def configure(ctx,*,configlist: str=""):
                             if item.isdigit():
                                 category = discord.utils.get(guild.categories, id=int(item))
                             if not category:
-                                item = re.sub('[^a-zA-Z0-9 _\\-]+', '', item)
                                 name = await letter_case(guild.categories, item.lower())
                                 category = discord.utils.get(guild.categories, name=name)
                             if category:
@@ -2551,15 +2549,12 @@ async def configure(ctx,*,configlist: str=""):
                 item = archivemsg.content
                 if item.isdigit():
                     category = discord.utils.get(guild.categories, id=int(item))
-                    if not category:
-                        await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("I couldn't find the category you replied with! Please reply with **same** to leave archived channels in the same category, or give the name or ID of an existing category.")))
-                        continue
-                else:
+                if not category:
                     name = await letter_case(guild.categories, item.lower())
                     category = discord.utils.get(guild.categories, name=name)
-                    if not category:
-                        await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("I couldn't find the category you replied with! Please reply with **same** to leave archived channels in the same category, or give the name or ID of an existing category.")))
-                        continue
+                if not category:
+                    await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("I couldn't find the category you replied with! Please reply with **same** to leave archived channels in the same category, or give the name or ID of an existing category.")))
+                    continue
                 config_dict_temp['archive']['category'] = category.id
                 config_dict_temp['archive']['enabled'] = True
                 await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description=_('Archive category set.')))

@@ -5861,7 +5861,7 @@ async def list(ctx):
             else:
                 await channel.send(listmsg)
                 return
-        if checks.check_raidactive(ctx):
+        elif checks.check_raidactive(ctx):
             team_list = ["mystic","valor","instinct","unknown"]
             tag = False
             team = False

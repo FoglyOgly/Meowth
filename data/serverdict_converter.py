@@ -71,6 +71,22 @@ for guild in guild_dict_convert:
     except:
         pass
     try:
+        del guild_dict_convert[guild]['welcomemsg']
+    except:
+        pass
+    try:
+        del guild_dict_convert[guild]['city_channels']
+    except:
+        pass
+    try:
+        del guild_dict_convert[guild]['categories']
+    except:
+        pass
+    try:
+        del guild_dict_convert[guild]['category_dict']
+    except:
+        pass
+    try:
         del guild_dict_convert[guild]['offset']
     except:
         pass

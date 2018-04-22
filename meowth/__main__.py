@@ -4865,10 +4865,12 @@ async def _counters(ctx, pkmn, user = None, weather = None, movesetstr = "Unknow
                 moveset_str = f'{move1} | {move2}'
                 if moveset_str == movesetstr:
                     ctrs = moveset['defenders'][-6:]
+                    est = moveset['total']['estimator']
                     break
             else:
                 movesetstr = "Unknown Moveset"
                 ctrs = data['randomMove']['defenders'][-6:]
+                est = data['randomMove']['total']['estimator']
         def clean(txt):
             return txt.replace('_', ' ').title()
         title = _('{pkmn} | {weather} | {movesetstr}').format(pkmn=pkmn.title(),weather=weather_list[index].title(),movesetstr=movesetstr)
@@ -4890,6 +4892,10 @@ async def _counters(ctx, pkmn, user = None, weather = None, movesetstr = "Unknow
             ctrs_embed.add_field(name=name,value=f"CP: {ctr_cp}\n{moves}")
             index += 1
         ctrs_embed.add_field(name=_("Results with {userstr} attackers").format(userstr=userstr), value=_("[See your personalized results!](https://www.pokebattler.com/raids/{pkmn})").format(pkmn=pkmn.replace('-','_').upper()))
+        if user:
+            ctrs_embed.add_field(name=_("Pokebattler Estimator:"), value=_(f"Difficulty rating: {est}"))
+            await ctx.author.send(embed=ctrs_embed)
+            return
         await ctx.channel.send(embed=ctrs_embed)
 
 async def _get_generic_counters(guild, pkmn, weather=None):

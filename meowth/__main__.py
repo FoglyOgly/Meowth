@@ -1907,6 +1907,10 @@ async def configure(ctx,*,configlist: str=""):
                             diff = True
                         if (not diff):
                             config_dict_temp['welcome']['welcomechan'] = channel.id
+                            ow = channel.overwrites_for(Meowth.user)
+                            ow.send_messages = True
+                            ow.read_messages = True
+                            await channel.set_permissions(Meowth.user, overwrite = ow)
                             await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description=_('Welcome Channel set to {channel}').format(channel=welcomechannelreply.content.lower())))
                             break
                         else:
@@ -1948,7 +1952,7 @@ async def configure(ctx,*,configlist: str=""):
                 guild_channel_list = []
                 for channel in guild.text_channels:
                     guild_channel_list.append(channel.id)
-                citychannel_ids = []
+                citychannel_objs = []
                 citychannel_names = []
                 citychannel_errors = []
                 for item in citychannel_list:
@@ -1961,14 +1965,19 @@ async def configure(ctx,*,configlist: str=""):
                         name = await letter_case(guild.text_channels, item.lower())
                         channel = discord.utils.get(guild.text_channels, name=name)
                     if channel:
-                        citychannel_ids.append(channel.id)
+                        citychannel_objs.append(channel)
                         citychannel_names.append(channel.name)
                     else:
                         citychannel_errors.append(item)
-                citychannel_list = citychannel_ids
+                citychannel_list = [x.id for x in citychannel_objs]
                 diff = set(citychannel_list) - set(guild_channel_list)
                 if (not diff) and (not citychannel_errors):
                     await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description=_('Raid Reporting Channels enabled')))
+                    for channel in citychannel_objs:
+                        ow = channel.overwrites_for(Meowth.user)
+                        ow.send_messages = True
+                        ow.read_messages = True
+                        await channel.set_permissions(Meowth.user, overwrite = ow)
                     break
                 else:
                     await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("The channel list you provided doesn't match with your servers channels.\n\nThe following aren't in your server: **{invalid_channels}**\n\nPlease double check your channel list and resend your reponse.").format(invalid_channels=', '.join(citychannel_errors))))
@@ -2038,7 +2047,6 @@ async def configure(ctx,*,configlist: str=""):
                             if item.isdigit():
                                 category = discord.utils.get(guild.categories, id=int(item))
                             if not category:
-                                item = re.sub('[^a-zA-Z0-9 _\\-]+', '', item)
                                 name = await letter_case(guild.categories, item.lower())
                                 category = discord.utils.get(guild.categories, name=name)
                             if category:
@@ -2147,7 +2155,7 @@ async def configure(ctx,*,configlist: str=""):
                 guild_channel_list = []
                 for channel in guild.text_channels:
                     guild_channel_list.append(channel.id)
-                citychannel_ids = []
+                citychannel_objs = []
                 citychannel_names = []
                 citychannel_errors = []
                 for item in citychannel_list:
@@ -2160,14 +2168,19 @@ async def configure(ctx,*,configlist: str=""):
                         name = await letter_case(guild.text_channels, item.lower())
                         channel = discord.utils.get(guild.text_channels, name=name)
                     if channel:
-                        citychannel_ids.append(channel.id)
+                        citychannel_objs.append(channel)
                         citychannel_names.append(channel.name)
                     else:
                         citychannel_errors.append(item)
-                citychannel_list = citychannel_ids
+                citychannel_list = [x.id for x in citychannel_objs]
                 diff = set(citychannel_list) - set(guild_channel_list)
                 if (not diff) and (not citychannel_errors):
                     await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description=_('EX Raid Reporting Channels enabled')))
+                    for channel in citychannel_objs:
+                        ow = channel.overwrites_for(Meowth.user)
+                        ow.send_messages = True
+                        ow.read_messages = True
+                        await channel.set_permissions(Meowth.user, overwrite = ow)
                     break
                 else:
                     await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("The channel list you provided doesn't match with your servers channels.\n\nThe following aren't in your server: **{invalid_channels}**\n\nPlease double check your channel list and resend your reponse.").format(invalid_channels=', '.join(citychannel_errors))))
@@ -2365,7 +2378,7 @@ async def configure(ctx,*,configlist: str=""):
                 guild_channel_list = []
                 for channel in guild.text_channels:
                     guild_channel_list.append(channel.id)
-                citychannel_ids = []
+                citychannel_objs = []
                 citychannel_names = []
                 citychannel_errors = []
                 for item in citychannel_list:
@@ -2378,14 +2391,19 @@ async def configure(ctx,*,configlist: str=""):
                         name = await letter_case(guild.text_channels, item.lower())
                         channel = discord.utils.get(guild.text_channels, name=name)
                     if channel:
-                        citychannel_ids.append(channel.id)
+                        citychannel_objs.append(channel)
                         citychannel_names.append(channel.name)
                     else:
                         citychannel_errors.append(item)
-                citychannel_list = citychannel_ids
+                citychannel_list = [x.id for x in citychannel_objs]
                 diff = set(citychannel_list) - set(guild_channel_list)
                 if (not diff) and (not citychannel_errors):
                     await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description=_('Wild Reporting Channels enabled')))
+                    for channel in citychannel_objs:
+                        ow = channel.overwrites_for(Meowth.user)
+                        ow.send_messages = True
+                        ow.read_messages = True
+                        await channel.set_permissions(Meowth.user, overwrite = ow)
                     break
                 else:
                     await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("The channel list you provided doesn't match with your servers channels.\n\nThe following aren't in your server: **{invalid_channels}**\n\nPlease double check your channel list and resend your reponse.").format(invalid_channels=', '.join(citychannel_errors))))
@@ -2433,7 +2451,7 @@ async def configure(ctx,*,configlist: str=""):
                 guild_channel_list = []
                 for channel in guild.text_channels:
                     guild_channel_list.append(channel.id)
-                citychannel_ids = []
+                citychannel_objs = []
                 citychannel_names = []
                 citychannel_errors = []
                 for item in citychannel_list:
@@ -2446,14 +2464,19 @@ async def configure(ctx,*,configlist: str=""):
                         name = await letter_case(guild.text_channels, item.lower())
                         channel = discord.utils.get(guild.text_channels, name=name)
                     if channel:
-                        citychannel_ids.append(channel.id)
+                        citychannel_objs.append(channel)
                         citychannel_names.append(channel.name)
                     else:
                         citychannel_errors.append(item)
-                citychannel_list = citychannel_ids
+                citychannel_list = [x.id for x in citychannel_objs]
                 diff = set(citychannel_list) - set(guild_channel_list)
                 if (not diff) and (not citychannel_errors):
                     await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description=_('Research Reporting Channels enabled')))
+                    for channel in citychannel_objs:
+                        ow = channel.overwrites_for(Meowth.user)
+                        ow.send_messages = True
+                        ow.read_messages = True
+                        await channel.set_permissions(Meowth.user, overwrite = ow)
                     break
                 else:
                     await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("The channel list you provided doesn't match with your servers channels.\n\nThe following aren't in your server: **{invalid_channels}**\n\nPlease double check your channel list and resend your reponse.").format(invalid_channels=', '.join(citychannel_errors))))
@@ -2499,7 +2522,7 @@ async def configure(ctx,*,configlist: str=""):
                 guild_channel_list = []
                 for channel in guild.text_channels:
                     guild_channel_list.append(channel.id)
-                want_list_ids = []
+                want_list_objs = []
                 want_list_names = []
                 want_list_errors = []
                 for item in want_list:
@@ -2512,15 +2535,20 @@ async def configure(ctx,*,configlist: str=""):
                         name = await letter_case(guild.text_channels, item.lower())
                         channel = discord.utils.get(guild.text_channels, name=name)
                     if channel:
-                        want_list_ids.append(channel.id)
+                        want_list_objs.append(channel)
                         want_list_names.append(channel.name)
                     else:
                         want_list_errors.append(item)
-                want_list_set = want_list_ids
+                want_list_set = [x.id for x in want_list_objs]
                 diff = set(want_list_set) - set(guild_channel_list)
                 if (not diff) and (not want_list_errors):
                     config_dict_temp['want']['enabled'] = True
                     config_dict_temp['want']['report_channels'] = want_list_set
+                    for channel in want_list_objs:
+                        ow = channel.overwrites_for(Meowth.user)
+                        ow.send_messages = True
+                        ow.read_messages = True
+                        await channel.set_permissions(Meowth.user, overwrite = ow)
                     await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description=_('Pokemon Notifications enabled')))
                     break
                 else:
@@ -2586,6 +2614,7 @@ async def configure(ctx,*,configlist: str=""):
             if offsetmsg.content.lower() == 'cancel':
                 configcancel = True
                 await owner.send(embed=discord.Embed(colour=discord.Colour.red(), description=_('**CONFIG CANCELLED!**\n\nNo changes have been made.')))
+                del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
                 return
             else:
                 try:

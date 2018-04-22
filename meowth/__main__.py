@@ -2034,7 +2034,7 @@ async def configure(ctx,*,configlist: str=""):
                         regioncat_names = []
                         regioncat_errors = []
                         for item in regioncat_list:
-                            channel = None
+                            category = None
                             if item.isdigit():
                                 category = discord.utils.get(guild.categories, id=int(item))
                             if not category:
@@ -2087,7 +2087,6 @@ async def configure(ctx,*,configlist: str=""):
                         levelcat_names = []
                         levelcat_errors = []
                         for item in levelcat_list:
-                            channel = None
                             category = None
                             if item.isdigit():
                                 category = discord.utils.get(guild.categories, id=int(item))
@@ -2234,7 +2233,7 @@ async def configure(ctx,*,configlist: str=""):
                         regioncat_names = []
                         regioncat_errors = []
                         for item in regioncat_list:
-                            channel = None
+                            category = None
                             if item.isdigit():
                                 category = discord.utils.get(guild.categories, id=int(item))
                             if not category:
@@ -2549,6 +2548,7 @@ async def configure(ctx,*,configlist: str=""):
                 break
             else:
                 item = archivemsg.content
+                category = None
                 if item.isdigit():
                     category = discord.utils.get(guild.categories, id=int(item))
                 if not category:
@@ -3139,6 +3139,7 @@ async def want(ctx):
             want_embed = discord.Embed(colour=guild.me.colour)
             want_embed.set_thumbnail(url=want_img_url)
             await channel.send(content=_('Meowth! Got it! {member} wants {pokemon}').format(member=ctx.author.mention, pokemon=added_list[0].capitalize()), embed=want_embed)
+            return
             #If you want reaction
             #await ctx.message.add_reaction('☑')
         elif len(already_want_list) == 1:

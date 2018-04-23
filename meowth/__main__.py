@@ -1396,6 +1396,7 @@ async def prefix(ctx, prefix=None):
     """Changes server prefix."""
     if prefix == 'clear':
         prefix = None
+    prefix = prefix.strip()
     _set_prefix(Meowth, ctx.guild, prefix)
     if prefix != None:
         await ctx.channel.send(_('Prefix has been set to: `{}`').format(prefix))
@@ -4087,7 +4088,7 @@ async def research(ctx, *, args = None):
         return
     while True:
         if args:
-            research_split = message.clean_content.replace("!research ","").split(", ")
+            research_split = message.clean_content.replace("{prefix}research ".format(prefix=ctx.prefix),"").split(", ")
             if len(research_split) != 3:
                 error = _("entered an incorrect amount of arguments.\n\nUsage: **!research** or **!research <pokestop>, <quest>, <reward>**")
                 break
@@ -4545,7 +4546,7 @@ async def recover(ctx):
             name = name.replace(h,'')
             name = name.replace(e,'')
         egg = re.match(_('level-[1-5]-egg'), name)
-        now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[guild.id]['offset'])
+        now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[guild.id]['configure_dict']['settings']['offset'])
         reportchannel = None
         raidmessage = None
         trainer_dict = {
@@ -4573,7 +4574,7 @@ async def recover(ctx):
             else:
                 topicsplit = topic.split('|')
                 localhatch = datetime.datetime.strptime(topicsplit[0][:(- 9)], 'Hatches on %B %d at %I:%M %p')
-                utchatch = localhatch - datetime.timedelta(hours=guild_dict[guild.id]['offset'])
+                utchatch = localhatch - datetime.timedelta(hours=guild_dict[guild.id]['configure_dict']['settings']['offset'])
                 exp = utchatch.replace(year=now.year, tzinfo=datetime.timezone.utc).timestamp()
                 manual_timer = True
             pokemon = ''
@@ -4592,7 +4593,7 @@ async def recover(ctx):
                 manual_timer = False
             else:
                 localend = datetime.datetime.strptime(topic[:(- 8)], _('Ends on %B %d at %I:%M %p'))
-                utcend = localend - datetime.timedelta(hours=guild_dict[guild.id]['offset'])
+                utcend = localend - datetime.timedelta(hours=guild_dict[guild.id]['configure_dict']['settings']['offset'])
                 exp = utcend.replace(year=now.year, tzinfo=datetime.timezone.utc).timestamp()
                 manual_timer = True
         elif name.split('-')[0] == 'ex':
@@ -4610,7 +4611,7 @@ async def recover(ctx):
             else:
                 topicsplit = topic.split('|')
                 localhatch = datetime.datetime.strptime(topicsplit[0][:(- 9)], 'Hatches on %B %d at %I:%M %p')
-                utchatch = localhatch - datetime.timedelta(hours=guild_dict[guild.id]['offset'])
+                utchatch = localhatch - datetime.timedelta(hours=guild_dict[guild.id]['configure_dict']['settings']['offset'])
                 exp = utchatch.replace(year=now.year, tzinfo=datetime.timezone.utc).timestamp()
                 manual_timer = True
             pokemon = ''

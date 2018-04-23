@@ -41,18 +41,18 @@ else:
     tesseract_config = xtraconfig
 logger = init_loggers()
 
-
 def _get_prefix(bot, message):
     guild = message.guild
     try:
-        set_prefix = bot.guild_dict[guild.id]['prefix']
+        prefix = bot.guild_dict[guild.id]['configure_dict']['settings']['prefix']
     except (KeyError, AttributeError):
-        set_prefix = None
-    default_prefix = bot.config['default_prefix']
-    return set_prefix or default_prefix
+        prefix = None
+    if not prefix:
+        prefix = bot.config['default_prefix']
+    return commands.when_mentioned_or(prefix)(bot,message)
 
+Meowth = commands.Bot(command_prefix=_get_prefix, case_insensitive=True, activity=discord.Game(name="Raid Coordination"))
 
-Meowth = commands.Bot(command_prefix=_get_prefix, case_insensitive=True)
 custom_error_handling(Meowth, logger)
 try:
     with open(os.path.join('data', 'serverdict'), 'rb') as fd:
@@ -2911,7 +2911,7 @@ async def about(ctx):
 
 @Meowth.command()
 @checks.allowteam()
-async def team(ctx):
+async def team(ctx,*,content):
     """Set your team role.
 
     Usage: !team <team name>
@@ -2942,8 +2942,7 @@ async def team(ctx):
         await ctx.channel.send(_('Meowth! My roles are ranked lower than the following team roles: **{higher_roles_list}**\nPlease get an admin to move my roles above them!').format(higher_roles_list=', '.join(high_roles)))
         return
     role = None
-    team_split = ctx.message.clean_content.lower().split()
-    del team_split[0]
+    team_split = content.lower().split()
     entered_team = team_split[0]
     entered_team = ''.join([i for i in entered_team if i.isalpha()])
     if entered_team in lowercase_roles:
@@ -3087,7 +3086,7 @@ Notifications
 
 @Meowth.command()
 @checks.allowwant()
-async def want(ctx):
+async def want(ctx,*,content):
     """Add a Pokemon to your wanted list.
 
     Usage: !want <species>
@@ -3100,7 +3099,7 @@ async def want(ctx):
     message = ctx.message
     guild = message.guild
     channel = message.channel
-    want_split = message.clean_content.lower().split()
+    want_split = content.lower().split()
     want_list = []
     added_count = 0
     spellcheck_dict = {
@@ -3111,7 +3110,6 @@ async def want(ctx):
     already_want_list = []
     added_list = []
     role_list = []
-    del want_split[0]
     if ',' in ''.join(want_split):
         for pokemon in ''.join(want_split).split(','):
             if pokemon.isdigit():
@@ -3190,9 +3188,9 @@ async def want(ctx):
             confirmation_msg += _('\n**{count} Not Valid:**').format(count=len(spellcheck_dict)) + spellcheckmsg
         await channel.send(content=confirmation_msg)
 
-@Meowth.group(case_insensitive=True)
+@Meowth.group(case_insensitive=True, invoke_without_command=True)
 @checks.allowwant()
-async def unwant(ctx):
+async def unwant(ctx,*,content):
     """Remove a Pokemon from your wanted list.
 
     Usage: !unwant <species>
@@ -3204,9 +3202,8 @@ async def unwant(ctx):
     guild = message.guild
     channel = message.channel
     if ctx.invoked_subcommand == None:
-        unwant_split = message.clean_content.lower().split()
+        unwant_split = content.lower().split()
         unwant_list = []
-        del unwant_split[0]
         if ',' in ''.join(unwant_split):
             for pokemon in ''.join(unwant_split).split(','):
                 if pokemon.isdigit():
@@ -3269,18 +3266,17 @@ Reporting
 
 @Meowth.command()
 @checks.allowwildreport()
-async def wild(ctx):
+async def wild(ctx,*,content):
     """Report a wild Pokemon spawn location.
 
     Usage: !wild <species> <location>
     Meowth will insert the details (really just everything after the species name) into a
     Google maps link and post the link to the same channel the report was made in."""
-    await _wild(ctx.message)
+    await _wild(ctx.message, content)
 
-async def _wild(message):
+async def _wild(message, content):
     timestamp = (message.created_at + datetime.timedelta(hours=guild_dict[message.channel.guild.id]['configure_dict']['settings']['offset'])).strftime(_('%I:%M %p (%H:%M)'))
-    wild_split = message.clean_content.split()
-    del wild_split[0]
+    wild_split = content.split()
     if len(wild_split) <= 1:
         await message.channel.send(_('Meowth! Give more details when reporting! Usage: **!wild <pokemon name> <location>**'))
         return
@@ -3342,7 +3338,7 @@ async def _wild(message):
 
 @Meowth.command()
 @checks.allowraidreport()
-async def raid(ctx):
+async def raid(ctx,*,content):
     """Report an ongoing raid.
 
     Usage: !raid <species> <location> [minutes]
@@ -3351,9 +3347,9 @@ async def raid(ctx):
     Meowth's message will also include the type weaknesses of the boss.
 
     Finally, Meowth will create a separate channel for the raid report, for the purposes of organizing the raid."""
-    await _raid(ctx.message)
+    await _raid(ctx.message, content)
 
-async def _raid(message):
+async def _raid(message, content):
     fromegg = False
     timestamp = (message.created_at + datetime.timedelta(hours=guild_dict[message.channel.guild.id]['configure_dict']['settings']['offset'])).strftime(_('%I:%M %p (%H:%M)'))
     if message.channel.id not in guild_dict[message.guild.id]['configure_dict']['raid']['report_channels'].keys():
@@ -3364,8 +3360,7 @@ async def _raid(message):
         else:
             await message.channel.send(_('Meowth! Please restrict raid reports to a city channel!'))
             return
-    raid_split = message.clean_content.split()
-    del raid_split[0]
+    raid_split = content.split()
     if len(raid_split) == 0:
         await message.channel.send(_('Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**'))
         return
@@ -3513,7 +3508,7 @@ async def _raid(message):
 
 @Meowth.command()
 @checks.allowraidreport()
-async def raidegg(ctx):
+async def raidegg(ctx,*,content):
     """Report a raid egg.
 
     Usage: !raidegg <level> <location> [minutes]
@@ -3524,12 +3519,11 @@ async def raidegg(ctx):
     <level> - Required. Level of the egg. Levels are from 1 to 5.
     <location> - Required. Address/Location of the gym.
     <minutes-remaining> - Not required. Time remaining until the egg hatches into an open raid. 1-60 minutes will be accepted. If not provided, 1 hour is assumed. Whole numbers only."""
-    await _raidegg(ctx.message)
+    await _raidegg(ctx.message, content)
 
-async def _raidegg(message):
+async def _raidegg(message, content):
     timestamp = (message.created_at + datetime.timedelta(hours=guild_dict[message.channel.guild.id]['configure_dict']['settings']['offset'])).strftime(_('%I:%M %p (%H:%M)'))
-    raidegg_split = message.clean_content.split()
-    del raidegg_split[0]
+    raidegg_split = content.split()
     if raidegg_split[0].lower() == 'egg':
         del raidegg_split[0]
     if len(raidegg_split) <= 1:
@@ -3879,7 +3873,7 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
 
 @Meowth.command()
 @checks.allowexraidreport()
-async def exraid(ctx):
+async def exraid(ctx, *, content):
     """Report an upcoming EX raid.
 
     Usage: !exraid <location>
@@ -3888,15 +3882,14 @@ async def exraid(ctx):
     Meowth's message will also include the type weaknesses of the boss.
 
     Finally, Meowth will create a separate channel for the raid report, for the purposes of organizing the raid."""
-    await _exraid(ctx)
+    await _exraid(ctx, content)
 
-async def _exraid(ctx):
+async def _exraid(ctx, content):
     message = ctx.message
     channel = message.channel
     timestamp = (message.created_at + datetime.timedelta(hours=guild_dict[message.channel.guild.id]['configure_dict']['settings']['offset'])).strftime(_('%I:%M %p (%H:%M)'))
     fromegg = False
-    exraid_split = message.clean_content.split()
-    del exraid_split[0]
+    exraid_split = content.split()
     if len(exraid_split) <= 0:
         await channel.send(_('Meowth! Give more details when reporting! Usage: **!exraid <location>**'))
         return
@@ -4088,7 +4081,7 @@ async def research(ctx, *, args = None):
         return
     while True:
         if args:
-            research_split = message.clean_content.replace("{prefix}research ".format(prefix=ctx.prefix),"").split(", ")
+            research_split = args.split(", ")
             if len(research_split) != 3:
                 error = _("entered an incorrect amount of arguments.\n\nUsage: **!research** or **!research <pokestop>, <quest>, <reward>**")
                 break
@@ -4216,7 +4209,7 @@ async def print_raid_timer(channel):
 
 @Meowth.command()
 @checks.raidchannel()
-async def timerset(ctx, timer):
+async def timerset(ctx, *,timer):
     """Set the remaining duration on a raid.
     Usage: !timerset <minutes>
     Works only in raid channels, can be set or overridden by anyone.
@@ -4256,8 +4249,7 @@ async def timerset(ctx, timer):
     if checks.check_exraidchannel(ctx):
         if checks.check_eggchannel(ctx):
             now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[channel.guild.id]['configure_dict']['settings']['offset'])
-            timer_split = message.clean_content.lower().split()
-            del timer_split[0]
+            timer_split = timer.lower().split()
             try:
                 start = dateparser.parse(' '.join(timer_split).lower(), settings={'DATE_ORDER': 'MDY'})
             except:
@@ -4341,7 +4333,7 @@ async def timer(ctx):
 
 @Meowth.command()
 @checks.activeraidchannel()
-async def starttime(ctx):
+async def starttime(ctx,*,content):
     """Set a time for a group to start a raid
 
     Usage: !starttime [HH:MM AM/PM]
@@ -4354,7 +4346,7 @@ async def starttime(ctx):
     channel = message.channel
     author = message.author
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[guild.id]['configure_dict']['settings']['offset'])
-    start_split = message.clean_content.lower().split()
+    start_split = content.lower().split()
     rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
     if rc_d['type'] == 'egg':
         egglevel = rc_d['egglevel']
@@ -4364,7 +4356,6 @@ async def starttime(ctx):
         egglevel = get_level(rc_d['pokemon'])
         mintime = 0
         maxtime = (rc_d['exp'] - time.time()) / 60
-    del start_split[0]
     if len(start_split) > 0:
         alreadyset = rc_d.get('starttime',False)
         if ('am' in ' '.join(start_split).lower()) or ('pm' in ' '.join(start_split).lower()):
@@ -4468,15 +4459,13 @@ async def location(ctx):
 
 @location.command()
 @checks.activeraidchannel()
-async def new(ctx):
+async def new(ctx,*,content):
     """Change raid location.
 
     Usage: !location new <new address>
     Works only in raid channels. Changes the google map links."""
     message = ctx.message
-    location_split = message.content.lower().split()
-    del location_split[0]
-    del location_split[0]
+    location_split = content.lower().split()
     if len(location_split) < 1:
         await message.channel.send(_("Meowth! We're missing the new location details! Usage: **!location new <new address>**"))
         return

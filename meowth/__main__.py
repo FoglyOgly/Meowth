@@ -4884,6 +4884,7 @@ async def _counters(ctx, pkmn, user = None, weather = None, movesetstr = "Unknow
         atk_levels = '30'
         if movesetstr == "Unknown Moveset":
             ctrs = data['randomMove']['defenders'][-6:]
+            est = data['randomMove']['total']['estimator']
         else:
             for moveset in data['byMove']:
                 move1 = moveset['move1'][:-5].lower().title().replace('_', ' ')

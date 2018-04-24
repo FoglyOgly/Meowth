@@ -3937,9 +3937,10 @@ async def _exraid(ctx, content):
     raid_channel_overwrites = dict(raid_channel_overwrite_list)
     raid_channel_category = get_category(message.channel,"EX", type="exraid")
     raid_channel = await message.guild.create_text_channel(raid_channel_name, overwrites=raid_channel_overwrites,category=raid_channel_category)
-    for role in channel.guild.role_hierarchy:
-        if role.permissions.manage_guild or role.permissions.manage_channels or role.permissions.manage_messages:
-            await raid_channel.set_permissions(role, send_messages=True)
+    if guild_dict[channel.guild.id]['configure_dict']['invite']['enabled']:
+        for role in channel.guild.role_hierarchy:
+            if role.permissions.manage_guild or role.permissions.manage_channels or role.permissions.manage_messages:
+                await raid_channel.set_permissions(role, send_messages=True)
     raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/eggs/{}?cache=0'.format(str(egg_img))
     raid_embed = discord.Embed(title=_('Meowth! Click here for directions to the coming raid!'), url=raid_gmaps_link, colour=message.guild.me.colour)
     if len(egg_info['pokemon']) > 1:

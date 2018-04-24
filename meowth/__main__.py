@@ -3274,7 +3274,7 @@ async def wild(ctx,pokemon,*,location):
     Usage: !wild <species> <location>
     Meowth will insert the details (really just everything after the species name) into a
     Google maps link and post the link to the same channel the report was made in."""
-    content = str(pokemon) + " " + str(location)
+    content = f"{pokemon} {location}"
     await _wild(ctx.message, content)
 
 async def _wild(message, content):
@@ -3350,7 +3350,7 @@ async def raid(ctx,pokemon,*,locationtimer):
     Meowth's message will also include the type weaknesses of the boss.
 
     Finally, Meowth will create a separate channel for the raid report, for the purposes of organizing the raid."""
-    content = str(pokemon) + " " + str(locationtimer)
+    content = f"{pokemon} {locationtimer}"
     await _raid(ctx.message, content)
 
 async def _raid(message, content):
@@ -3523,7 +3523,7 @@ async def raidegg(ctx,egglevel,*,locationtimer):
     <level> - Required. Level of the egg. Levels are from 1 to 5.
     <location> - Required. Address/Location of the gym.
     <minutes-remaining> - Not required. Time remaining until the egg hatches into an open raid. 1-60 minutes will be accepted. If not provided, 1 hour is assumed. Whole numbers only."""
-    content = str(egglevel) + " " + str(locationtimer)
+    content = f"{egglevel} {locationtimer}"
     await _raidegg(ctx.message, content)
 
 async def _raidegg(message, content):

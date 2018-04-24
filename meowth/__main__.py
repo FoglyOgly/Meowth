@@ -4082,9 +4082,6 @@ async def research(ctx, *, details = None):
     loc_url = create_gmaps_query("", message.channel, type="research")
     research_embed = discord.Embed(colour=message.guild.me.colour).set_thumbnail(url='https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/misc/field-research.png?cache=0')
     research_embed.set_footer(text=_('Reported by @{author} - {timestamp}').format(author=author.display_name, timestamp=timestamp.strftime(_('%I:%M %p (%H:%M)'))), icon_url=author.avatar_url_as(format=None, static_format='jpg', size=32))
-    if checks.check_raidchannel(ctx):
-        await message.channel.send(_('Meowth! Please restrict research reports to outside of raid channels!'))
-        return
     while True:
         if details:
             research_split = details.split(", ")
@@ -4111,6 +4108,7 @@ async def research(ctx, *, details = None):
                 break
             elif pokestopmsg.clean_content.lower() == "cancel":
                 error = _("cancelled the report")
+                await pokestopmsg.delete()
                 break
             elif pokestopmsg:
                 location = pokestopmsg.clean_content
@@ -4130,6 +4128,7 @@ async def research(ctx, *, details = None):
                 break
             elif questmsg.clean_content.lower() == "cancel":
                 error = _("cancelled the report")
+                await questmsg.delete()
                 break
             elif questmsg:
                 quest = questmsg.clean_content
@@ -4147,6 +4146,7 @@ async def research(ctx, *, details = None):
                 break
             elif rewardmsg.clean_content.lower() == "cancel":
                 error = _("cancelled the report")
+                await rewardmsg.delete()
                 break
             elif rewardmsg:
                 reward = rewardmsg.clean_content

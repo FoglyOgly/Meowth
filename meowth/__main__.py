@@ -3369,7 +3369,7 @@ async def _raid(message, content):
         await message.channel.send(_('Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**'))
         return
     if raid_split[0] == 'egg':
-        await _raidegg(message)
+        await _raidegg(message, content)
         return
     if fromegg == True:
         eggdetails = guild_dict[message.guild.id]['raidchannel_dict'][message.channel.id]

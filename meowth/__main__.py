@@ -3341,7 +3341,7 @@ async def _wild(message, content):
 
 @Meowth.command()
 @checks.allowraidreport()
-async def raid(ctx,pokemon,*,location:commands.clean_content, timer=None):
+async def raid(ctx,pokemon,*,location:commands.clean_content="", timer=None):
     """Report an ongoing raid.
 
     Usage: !raid <species> <location> [minutes]
@@ -3512,7 +3512,7 @@ async def _raid(message, content):
 
 @Meowth.command()
 @checks.allowraidreport()
-async def raidegg(ctx,egglevel,*,location:commands.clean_content, timer=None):
+async def raidegg(ctx,egglevel,*,location:commands.clean_content="", timer=None):
     """Report a raid egg.
 
     Usage: !raidegg <level> <location> [minutes]
@@ -4339,7 +4339,7 @@ async def timer(ctx):
 
 @Meowth.command()
 @checks.activeraidchannel()
-async def starttime(ctx,*,time):
+async def starttime(ctx,*,start_time):
     """Set a time for a group to start a raid
 
     Usage: !starttime [HH:MM AM/PM]
@@ -4352,7 +4352,7 @@ async def starttime(ctx,*,time):
     channel = message.channel
     author = message.author
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[guild.id]['configure_dict']['settings']['offset'])
-    start_split = time.lower().split()
+    start_split = start_time.lower().split()
     rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
     if rc_d['type'] == 'egg':
         egglevel = rc_d['egglevel']

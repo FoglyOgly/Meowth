@@ -3212,7 +3212,7 @@ async def unwant(ctx,*,pokemon):
     guild = message.guild
     channel = message.channel
     if ctx.invoked_subcommand == None:
-        unwant_split = content.lower().split()
+        unwant_split = pokemon.lower().split()
         unwant_list = []
         if ',' in ''.join(unwant_split):
             for pkmn in ''.join(unwant_split).split(','):

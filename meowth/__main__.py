@@ -429,7 +429,6 @@ async def get_raidhelp(user):
     helpembed.add_field(name="Description", value="Hatches Egg channel\nSets in-game weather\nSets hatch/raid timer\nUpdates raid location\ninterested/coming/here\n# of trainers\n# from each team (ex. `3m` for 3 Mystic)")
     await user.send(embed=helpembed)
 
-
 @Meowth.command(hidden=True)
 async def template(ctx, *, sample_message):
     """Sample template messages to see how they would appear."""
@@ -3391,7 +3390,7 @@ async def _wild(message, content):
 
 @Meowth.command()
 @checks.allowraidreport()
-async def raid(ctx,pokemon,*,location:commands.clean_content(fix_channel_mentions=True)="", timer=None):
+async def raid(ctx,pokemon,*,location:commands.clean_content(fix_channel_mentions=True)="", weather=None, timer=None):
     """Report an ongoing raid.
 
     Usage: !raid <species> <location> [minutes]
@@ -3564,7 +3563,7 @@ async def _raid(message, content):
 
 @Meowth.command()
 @checks.allowraidreport()
-async def raidegg(ctx,egglevel,*,location:commands.clean_content(fix_channel_mentions=True)="", timer=None):
+async def raidegg(ctx,egglevel, *, location:commands.clean_content(fix_channel_mentions=True)="", weather=None, timer=None):
     """Report a raid egg.
 
     Usage: !raidegg <level> <location> [minutes]

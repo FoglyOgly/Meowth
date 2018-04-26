@@ -1408,10 +1408,10 @@ async def timezone(ctx,*, timezone: str = ''):
     try:
         timezone = float(timezone)
     except ValueError:
-        await ctx.channel.send(_("I couldn't convert your answer to an appropriate timezone! Please double check what you sent me and resend a number strarting from **-12** to **12**."))
+        await ctx.channel.send(_("I couldn't convert your answer to an appropriate timezone! Please double check what you sent me and resend a number from **-12** to **12**."))
         return
     if (not ((- 12) <= timezone <= 14)):
-        await ctx.channel.send(_("I couldn't convert your answer to an appropriate timezone! Please double check what you sent me and resend a number strarting from **-12** to **12**."))
+        await ctx.channel.send(_("I couldn't convert your answer to an appropriate timezone! Please double check what you sent me and resend a number from **-12** to **12**."))
         return
     _set_timezone(Meowth, ctx.guild, timezone)
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[ctx.channel.guild.id]['configure_dict']['settings']['offset'])
@@ -2671,10 +2671,10 @@ async def configure(ctx,*,configlist: str=""):
                 try:
                     offset = float(offsetmsg.content)
                 except ValueError:
-                    await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("I couldn't convert your answer to an appropriate timezone!\n\nPlease double check what you sent me and resend a number strarting from **-12** to **12**.")))
+                    await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("I couldn't convert your answer to an appropriate timezone!\n\nPlease double check what you sent me and resend a number from **-12** to **12**.")))
                     continue
                 if (not ((- 12) <= offset <= 14)):
-                    await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("I couldn't convert your answer to an appropriate timezone!\n\nPlease double check what you sent me and resend a number strarting from **-12** to **12**.")))
+                    await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("I couldn't convert your answer to an appropriate timezone!\n\nPlease double check what you sent me and resend a number from **-12** to **12**.")))
                     continue
                 else:
                     break

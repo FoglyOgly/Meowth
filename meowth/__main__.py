@@ -1357,8 +1357,7 @@ async def regional(ctx, regional):
     """Changes server regional pokemon."""
 
     if regional.isdigit():
-        if int(regional) in get_raidlist():
-            regional = int(regional)
+        regional = int(regional)
     else:
         regional = regional.lower()
         if regional == "reset":
@@ -1382,16 +1381,16 @@ async def regional(ctx, regional):
             return
         elif regional == 'clear':
             regional = None
+            _set_regional(Meowth, ctx.guild, regional)
             await ctx.message.channel.send(_("Meowth! Regional raid boss cleared!"))
-        else:
-            if regional in get_raidlist():
-                regional = get_number(regional)
-    if regional not in get_raidlist():
+            return
+    if regional in get_raidlist():
+        regional = get_number(regional)
+        _set_regional(Meowth, ctx.guild, regional)
+        await ctx.message.channel.send(_("Meowth! Regional raid boss set to **{boss}**!").format(boss=get_name(regional).title()))
+    else:
         await ctx.message.channel.send(_("Meowth! That Pokemon doesn't appear in raids!"))
         return
-    else:
-        await ctx.message.channel.send(_("Meowth! Regional raid boss set to **{boss}**!").format(boss=get_name(regional).title()))
-    _set_regional(Meowth, ctx.guild, regional)
 
 def _set_regional(bot, guild, regional):
     bot.guild_dict[guild.id]['configure_dict']['settings']['regional'] = regional

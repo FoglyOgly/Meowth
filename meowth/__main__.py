@@ -142,11 +142,17 @@ def get_type(guild, pkmn_number):
 
 def get_name(pkmn_number):
     pkmn_number = int(pkmn_number) - 1
-    name = pkmn_info['pokemon_list'][pkmn_number].capitalize()
+    try:
+        name = pkmn_info['pokemon_list'][pkmn_number]
+    except IndexError:
+        name = None
     return name
 
 def get_number(pkm_name):
-    number = pkmn_info['pokemon_list'].index(pkm_name) + 1
+    try:
+        number = pkmn_info['pokemon_list'].index(pkm_name) + 1
+    except ValueError:
+        number = None
     return number
 
 def get_level(pkmn):
@@ -2699,14 +2705,14 @@ async def raid_json(ctx, level=None, *, newlist=None):
         for level in raid_info['raid_eggs']:
             msg += _('\n**Level {level} raid list:** `{raidlist}` \n').format(level=level, raidlist=raid_info['raid_eggs'][level]['pokemon'])
             for pkmn in raid_info['raid_eggs'][level]['pokemon']:
-                msg += '{name} ({number})'.format(name=get_name(pkmn), number=pkmn)
+                msg += '{name} ({number})'.format(name=get_name(pkmn).title(), number=pkmn)
                 msg += ' '
             msg += '\n'
         return await ctx.channel.send(msg)
     elif level.isdigit() and (not newlist):
         msg += _('**Level {level} raid list:** `{raidlist}` \n').format(level=level, raidlist=raid_info['raid_eggs'][level]['pokemon'])
         for pkmn in raid_info['raid_eggs'][level]['pokemon']:
-            msg += '{name} ({number})'.format(name=get_name(pkmn), number=pkmn)
+            msg += '{name} ({number})'.format(name=get_name(pkmn).title(), number=pkmn)
             msg += ' '
         msg += '\n'
         return await ctx.channel.send(msg)
@@ -2716,12 +2722,12 @@ async def raid_json(ctx, level=None, *, newlist=None):
         msg += _('I will replace this:\n')
         msg += _('**Level {level} raid list:** `{raidlist}` \n').format(level=level, raidlist=raid_info['raid_eggs'][level]['pokemon'])
         for pkmn in raid_info['raid_eggs'][level]['pokemon']:
-            msg += '{name} ({number})'.format(name=get_name(pkmn), number=pkmn)
+            msg += '{name} ({number})'.format(name=get_name(pkmn).title(), number=pkmn)
             msg += ' '
         msg += _('\n\nWith this:\n')
         msg += _('**Level {level} raid list:** `{raidlist}` \n').format(level=level, raidlist=('[' + ', '.join(newlist)) + ']')
         for pkmn in newlist:
-            msg += '{name} ({number})'.format(name=get_name(pkmn), number=pkmn)
+            msg += '{name} ({number})'.format(name=get_name(pkmn).title(), number=pkmn)
             msg += ' '
         msg += _('\n\nContinue?')
         question = await ctx.channel.send(msg)
@@ -2769,7 +2775,7 @@ async def changeraid(ctx, newraid):
         egg_img = raid_info['raid_eggs'][newraid]['egg_img']
         boss_list = []
         for p in raid_info['raid_eggs'][newraid]['pokemon']:
-            p_name = get_name(p)
+            p_name = get_name(p).title()
             p_type = get_type(message.guild, p)
             boss_list.append((((p_name + ' (') + str(p)) + ') ') + ''.join(p_type))
         raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/eggs/{}?cache=0'.format(str(egg_img))
@@ -3656,7 +3662,7 @@ async def _raidegg(message, content):
         egg_img = egg_info['egg_img']
         boss_list = []
         for p in egg_info['pokemon']:
-            p_name = get_name(p)
+            p_name = get_name(p).title()
             p_type = get_type(message.guild, p)
             boss_list.append((((p_name + ' (') + str(p)) + ') ') + ''.join(p_type))
         raid_channel_name = _('level-{egg_level}-egg-').format(egg_level=egg_level)
@@ -3984,7 +3990,7 @@ async def _exraid(ctx, location):
     egg_img = egg_info['egg_img']
     boss_list = []
     for p in egg_info['pokemon']:
-        p_name = get_name(p)
+        p_name = get_name(p).title()
         p_type = get_type(message.guild, p)
         boss_list.append((((p_name + ' (') + str(p)) + ') ') + ''.join(p_type))
     raid_channel_name = _('ex-raid-egg-')
@@ -5139,7 +5145,7 @@ async def interested(ctx, *, teamcounts: str=None):
     rgx = '[^a-zA-Z0-9]'
     if teamcounts:
         if "all" in teamcounts.lower():
-            teamcounts = "{teamcounts} {bosslist}".format(teamcounts=teamcounts,bosslist=" ".join([get_name(s) for s in raid_info['raid_eggs'][egglevel]['pokemon']]))
+            teamcounts = "{teamcounts} {bosslist}".format(teamcounts=teamcounts,bosslist=" ".join([get_name(s).title() for s in raid_info['raid_eggs'][egglevel]['pokemon']]))
             teamcounts = teamcounts.lower().replace("all","").strip()
         pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, '', p) in re.sub(rgx, '', teamcounts.lower())), None)
     if pkmn_match and guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['type'] == "egg":
@@ -5223,7 +5229,7 @@ async def coming(ctx, *, teamcounts: str=None):
     pkmn_match = None
     if teamcounts:
         if "all" in teamcounts.lower():
-            teamcounts = "{teamcounts} {bosslist}".format(teamcounts=teamcounts,bosslist=" ".join([get_name(s) for s in raid_info['raid_eggs'][egglevel]['pokemon']]))
+            teamcounts = "{teamcounts} {bosslist}".format(teamcounts=teamcounts,bosslist=" ".join([get_name(s).title() for s in raid_info['raid_eggs'][egglevel]['pokemon']]))
             teamcounts = teamcounts.lower().replace("all","").strip()
         pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, '', p) in re.sub(rgx, '', teamcounts.lower())), None)
     if pkmn_match and guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['type'] == "egg":
@@ -5326,7 +5332,7 @@ async def here(ctx, *, teamcounts: str=None):
     pkmn_match = None
     if teamcounts:
         if "all" in teamcounts.lower():
-            teamcounts = "{teamcounts} {bosslist}".format(teamcounts=teamcounts,bosslist=" ".join([get_name(s) for s in raid_info['raid_eggs'][egglevel]['pokemon']]))
+            teamcounts = "{teamcounts} {bosslist}".format(teamcounts=teamcounts,bosslist=" ".join([get_name(s).title() for s in raid_info['raid_eggs'][egglevel]['pokemon']]))
             teamcounts = teamcounts.lower().replace("all","").strip()
         pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, '', p) in re.sub(rgx, '', teamcounts.lower())), None)
     if pkmn_match and guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['type'] == "egg":
@@ -5505,7 +5511,7 @@ async def _edit_party(channel, author=None):
         boss_list = []
         display_list = []
         for p in raid_info['raid_eggs'][egglevel]['pokemon']:
-            p_name = get_name(p)
+            p_name = get_name(p).title()
             boss_list.append(p_name.lower())
             p_type = get_type(channel.guild,p)
             boss_dict[p_name.lower()] = {"type": "{}".format(''.join(p_type)), "total": 0}
@@ -6216,7 +6222,7 @@ async def _bosslist(ctx):
     boss_list = []
     boss_dict["unspecified"] = {"type": "❔", "total": 0, "maybe": 0, "coming": 0, "here": 0}
     for p in egg_info['pokemon']:
-        p_name = get_name(p)
+        p_name = get_name(p).title()
         boss_list.append(p_name.lower())
         p_type = get_type(message.guild,p)
         boss_dict[p_name.lower()] = {"type": "{}".format(''.join(p_type)), "total": 0, "maybe": 0, "coming": 0, "here": 0}

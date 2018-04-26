@@ -1353,41 +1353,44 @@ async def _set(ctx):
 
 @_set.command()
 @commands.has_permissions(manage_guild=True)
-async def regional(ctx, regional=None):
+async def regional(ctx, regional):
     """Changes server regional pokemon."""
-    if regional.lower() == 'reset' and checks.is_owner_check(ctx):
-        msg = _("Are you sure you want to clear all regionals?`")
-        question = await ctx.channel.send(msg)
-        try:
-            timeout = False
-            res, reactuser = await ask(question, ctx.message.channel, ctx.message.author.id)
-        except TypeError:
-            timeout = True
-        await question.delete()
-        if timeout or res.emoji == '❎':
-            return
-        elif res.emoji == '✅':
-            pass
-        else:
-            return
-        guild_dict_copy = copy.deepcopy(guild_dict)
-        for guildid in guild_dict_copy.keys():
-            guild_dict[guildid]['configure_dict']['settings']['regional'] = None
-        return
-    elif regional.lower() == 'clear':
-        regional = None
-        await ctx.message.channel.send(_("Meowth! Regional raid boss cleared!"))
-    elif regional and regional.isdigit() and int(regional) in get_raidlist():
-        regional = int(regional)
-        await ctx.message.channel.send(_("Meowth! Regional raid boss set to **{boss}**!").format(boss=get_name(regional).title()))
-    elif regional and not regional.isdigit() and regional.lower() in get_raidlist():
-        await ctx.message.channel.send(_("Meowth! Regional raid boss set to **{boss}**!").format(boss=regional.title()))
-        regional = get_number(regional.lower())
+
+    if regional.isdigit():
+        if int(regional) in get_raidlist():
+            regional = int(regional)
     else:
+        regional = regional.lower()
+        if regional == "reset":
+            msg = _("Are you sure you want to clear all regionals?`")
+            question = await ctx.channel.send(msg)
+            try:
+                timeout = False
+                res, reactuser = await ask(question, ctx.message.channel, ctx.message.author.id)
+            except TypeError:
+                timeout = True
+            await question.delete()
+            if timeout or res.emoji == '❎':
+                return
+            elif res.emoji == '✅':
+                pass
+            else:
+                return
+            guild_dict_copy = copy.deepcopy(guild_dict)
+            for guildid in guild_dict_copy.keys():
+                guild_dict[guildid]['configure_dict']['settings']['regional'] = None
+            return
+        elif regional == 'clear':
+            regional = None
+            await ctx.message.channel.send(_("Meowth! Regional raid boss cleared!"))
+        else:
+            if regional in get_raidlist():
+                regional = get_number(regional)
+    if regional not in get_raidlist():
         await ctx.message.channel.send(_("Meowth! That Pokemon doesn't appear in raids!"))
         return
     _set_regional(Meowth, ctx.guild, regional)
-
+    await ctx.message.channel.send(_("Meowth! Regional raid boss set to **{boss}**!").format(boss=get_name(regional).title()))
 
 def _set_regional(bot, guild, regional):
     bot.guild_dict[guild.id]['configure_dict']['settings']['regional'] = regional

@@ -1356,6 +1356,20 @@ async def _set(ctx):
 async def regional(ctx, regional=None):
     """Changes server regional pokemon."""
     if regional.lower() == 'reset' and checks.is_owner_check(ctx):
+        msg = _("Are you sure you want to clear all regionals?`")
+        question = await ctx.channel.send(msg)
+        try:
+            timeout = False
+            res, reactuser = await ask(question, ctx.message.channel, ctx.message.author.id)
+        except TypeError:
+            timeout = True
+        await question.delete()
+        if timeout or res.emoji == '❎':
+            return
+        elif res.emoji == '✅':
+            pass
+        else:
+            return
         guild_dict_copy = copy.deepcopy(guild_dict)
         for guildid in guild_dict_copy.keys():
             guild_dict[guildid]['configure_dict']['settings']['regional'] = None

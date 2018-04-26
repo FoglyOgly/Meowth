@@ -1913,7 +1913,10 @@ async def configure(ctx,*,configlist: str=""):
                             ow = channel.overwrites_for(Meowth.user)
                             ow.send_messages = True
                             ow.read_messages = True
-                            await channel.set_permissions(Meowth.user, overwrite = ow)
+                            try:
+                                await channel.set_permissions(Meowth.user, overwrite = ow)
+                            except (discord.errors.Forbidden, discord.errors.HTTPException, discord.errors.InvalidArgument):
+                                await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_('I couldn\'t set my own permissions in this channel. Please ensure I have the correct permissions in {channel} using **{prefix}get perms**.').format(prefix=ctx.prefix, channel=channel.mention)))
                             await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description=_('Welcome Channel set to {channel}').format(channel=welcomechannelreply.content.lower())))
                             break
                         else:
@@ -1980,7 +1983,10 @@ async def configure(ctx,*,configlist: str=""):
                         ow = channel.overwrites_for(Meowth.user)
                         ow.send_messages = True
                         ow.read_messages = True
-                        await channel.set_permissions(Meowth.user, overwrite = ow)
+                        try:
+                            await channel.set_permissions(Meowth.user, overwrite = ow)
+                        except (discord.errors.Forbidden, discord.errors.HTTPException, discord.errors.InvalidArgument):
+                            await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_('I couldn\'t set my own permissions in this channel. Please ensure I have the correct permissions in {channel} using **{prefix}get perms**.').format(prefix=ctx.prefix, channel=channel.mention)))
                     break
                 else:
                     await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("The channel list you provided doesn't match with your servers channels.\n\nThe following aren't in your server: **{invalid_channels}**\n\nPlease double check your channel list and resend your reponse.").format(invalid_channels=', '.join(citychannel_errors))))
@@ -2183,7 +2189,10 @@ async def configure(ctx,*,configlist: str=""):
                         ow = channel.overwrites_for(Meowth.user)
                         ow.send_messages = True
                         ow.read_messages = True
-                        await channel.set_permissions(Meowth.user, overwrite = ow)
+                        try:
+                            await channel.set_permissions(Meowth.user, overwrite = ow)
+                        except (discord.errors.Forbidden, discord.errors.HTTPException, discord.errors.InvalidArgument):
+                            await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_('I couldn\'t set my own permissions in this channel. Please ensure I have the correct permissions in {channel} using **{prefix}get perms**.').format(prefix=ctx.prefix, channel=channel.mention)))
                     break
                 else:
                     await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("The channel list you provided doesn't match with your servers channels.\n\nThe following aren't in your server: **{invalid_channels}**\n\nPlease double check your channel list and resend your reponse.").format(invalid_channels=', '.join(citychannel_errors))))
@@ -2406,7 +2415,10 @@ async def configure(ctx,*,configlist: str=""):
                         ow = channel.overwrites_for(Meowth.user)
                         ow.send_messages = True
                         ow.read_messages = True
-                        await channel.set_permissions(Meowth.user, overwrite = ow)
+                        try:
+                            await channel.set_permissions(Meowth.user, overwrite = ow)
+                        except (discord.errors.Forbidden, discord.errors.HTTPException, discord.errors.InvalidArgument):
+                            await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_('I couldn\'t set my own permissions in this channel. Please ensure I have the correct permissions in {channel} using **{prefix}get perms**.').format(prefix=ctx.prefix, channel=channel.mention)))
                     break
                 else:
                     await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("The channel list you provided doesn't match with your servers channels.\n\nThe following aren't in your server: **{invalid_channels}**\n\nPlease double check your channel list and resend your reponse.").format(invalid_channels=', '.join(citychannel_errors))))
@@ -2479,7 +2491,10 @@ async def configure(ctx,*,configlist: str=""):
                         ow = channel.overwrites_for(Meowth.user)
                         ow.send_messages = True
                         ow.read_messages = True
-                        await channel.set_permissions(Meowth.user, overwrite = ow)
+                        try:
+                            await channel.set_permissions(Meowth.user, overwrite = ow)
+                        except (discord.errors.Forbidden, discord.errors.HTTPException, discord.errors.InvalidArgument):
+                            await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_('I couldn\'t set my own permissions in this channel. Please ensure I have the correct permissions in {channel} using **{prefix}get perms**.').format(prefix=ctx.prefix, channel=channel.mention)))
                     break
                 else:
                     await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("The channel list you provided doesn't match with your servers channels.\n\nThe following aren't in your server: **{invalid_channels}**\n\nPlease double check your channel list and resend your reponse.").format(invalid_channels=', '.join(citychannel_errors))))
@@ -2551,7 +2566,10 @@ async def configure(ctx,*,configlist: str=""):
                         ow = channel.overwrites_for(Meowth.user)
                         ow.send_messages = True
                         ow.read_messages = True
-                        await channel.set_permissions(Meowth.user, overwrite = ow)
+                        try:
+                            await channel.set_permissions(Meowth.user, overwrite = ow)
+                        except (discord.errors.Forbidden, discord.errors.HTTPException, discord.errors.InvalidArgument):
+                            await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_('I couldn\'t set my own permissions in this channel. Please ensure I have the correct permissions in {channel} using **{prefix}get perms**.').format(prefix=ctx.prefix, channel=channel.mention)))
                     await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description=_('Pokemon Notifications enabled')))
                     break
                 else:

@@ -3349,7 +3349,7 @@ async def _wild(message, content):
 
 @Meowth.command()
 @checks.allowraidreport()
-async def raid(ctx,pokemon,*,location:commands.clean_content="", timer=None):
+async def raid(ctx,pokemon,*,location:commands.clean_content(fix_channel_mentions=True)="", timer=None):
     """Report an ongoing raid.
 
     Usage: !raid <species> <location> [minutes]
@@ -3520,7 +3520,7 @@ async def _raid(message, content):
 
 @Meowth.command()
 @checks.allowraidreport()
-async def raidegg(ctx,egglevel,*,location:commands.clean_content="", timer=None):
+async def raidegg(ctx,egglevel,*,location:commands.clean_content(fix_channel_mentions=True)="", timer=None):
     """Report a raid egg.
 
     Usage: !raidegg <level> <location> [minutes]

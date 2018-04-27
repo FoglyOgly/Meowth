@@ -574,6 +574,10 @@ async def expire_channel(channel):
             delete_time = (guild_dict[guild.id]['raidchannel_dict'][channel.id]['exp'] + (1 * 60)) - time.time()
         elif guild_dict[guild.id]['raidchannel_dict'][channel.id]['type'] == 'egg':
             if (not alreadyexpired):
+                pkmn = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('pokemon', None)
+                if pkmn:
+                    await _eggtoraid(pkmn, channel)
+                    return
                 maybe_list = []
                 trainer_dict = copy.deepcopy(
                     guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['trainer_dict'])

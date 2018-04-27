@@ -1371,7 +1371,7 @@ async def regional(ctx, regional):
     else:
         regional = regional.lower()
         if regional == "reset":
-            msg = _("Are you sure you want to clear all regionals?`")
+            msg = _("Are you sure you want to clear all regionals?")
             question = await ctx.channel.send(msg)
             try:
                 timeout = False
@@ -1394,8 +1394,9 @@ async def regional(ctx, regional):
             _set_regional(Meowth, ctx.guild, regional)
             await ctx.message.channel.send(_("Meowth! Regional raid boss cleared!"))
             return
+        else:
+            regional = get_number(regional)
     if regional in get_raidlist():
-        regional = get_number(regional)
         _set_regional(Meowth, ctx.guild, regional)
         await ctx.message.channel.send(_("Meowth! Regional raid boss set to **{boss}**!").format(boss=get_name(regional).title()))
     else:
@@ -5245,7 +5246,7 @@ async def interested(ctx, *, teamcounts: str=None):
     Otherwise, this command expects at least one word in your message to be a number,
     and will assume you are a group with that many people.
 
-    Party is also optional. Format is #m #v #i to tell your party's teams."""
+    Party is also optional. Format is #m #v #i #u to tell your party's teams."""
     trainer_dict = guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict']
     entered_interest = trainer_dict.get(ctx.author.id, {}).get('interest', [])
     egglevel = guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['egglevel']
@@ -5338,7 +5339,7 @@ async def coming(ctx, *, teamcounts: str=None):
     Otherwise, this command expects at least one word in your message to be a number,
     and will assume you are a group with that many people.
 
-    Party is also optional. Format is #m #v #i to tell your party's teams."""
+    Party is also optional. Format is #m #v #i #u to tell your party's teams."""
     trainer_dict = guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict']
     rgx = '[^a-zA-Z0-9]'
     entered_interest = trainer_dict.get(ctx.author.id, {}).get('interest', [])
@@ -5442,7 +5443,7 @@ async def here(ctx, *, teamcounts: str=None):
     Otherwise, this command expects at least one word in your message to be a number,
     and will assume you are a group with that many people.
 
-    Party is also optional. Format is #m #v #i to tell your party's teams."""
+    Party is also optional. Format is #m #v #i #u to tell your party's teams."""
     trainer_dict = guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict']
     rgx = '[^a-zA-Z0-9]'
     entered_interest = trainer_dict.get(ctx.author.id, {}).get('interest', [])

@@ -154,6 +154,7 @@ pkmn = Pokemon
 | **!outputlog**  | *Server Manager Only* | Uploads the log file to hastebin and replies with the link. |
 | **!set prefix** \[prefix\] | *Server Manager Only* | Sets Meowth's prefix. |
 | **!set regional** \<pkmn\> | *Server Manager Only* | Sets server's regional raid boss. Accepts number or name. |
+| **!set timezone** \<UTC offset\> | *Server Manager Only* | Sets server's timezone. Accepts numbers from -12 to 14. |
 | **!get prefix** | *Server Manager Only* | Displays Meowth's prefix. |
 | **!get perms** \[channelid\] | *Server Manager Only* | Displays Meowth's permissions in guild and channel. |
 | **!welcome** \[user\] | *Owner Only* | Test welcome message on mentioned member |
@@ -215,20 +216,20 @@ pkmn = Pokemon
 
 | Commands | Requirements  | Description |
 | -------- |:-------------:| ------------|
-| **!interested** \[number\] \[teamcounts\] \[boss list or all\] | *Raid Channel* | Sets your status for the raid to 'interested'. Teamcounts format is `m# v# i#`. You can also supply a list of bosses or 'all' that you are interested in. Aliases: !i, !maybe |
-| **!coming** \[number\] \[teamcounts\] \[boss list or all\] | *Raid Channel* | Sets your status for the raid to 'coming'.  Teamcounts format is `m# v# i#`. You can also supply a list of bosses or 'all' that you are interested in. Aliases: !c |
-| **!here** \[number\] \[teamcounts\] \[boss list or all\] | *Raid Channel* | Sets your status for the raid to 'here'.  Teamcounts format is `m# v# i#`. You can also supply a list of bosses or 'all' that you are interested in. Aliases: !h |
-| **!lobby** \[number\] | *Raid Channel* | Indicate you are entering the raid lobby. Aliases: !l |
+| **!interested** \[number\] \[teamcounts\] \[boss list or all\] | *Raid Channel* | Sets your status for the raid to 'interested'. Teamcounts format is `m# v# i# u#`. You can also supply a list of bosses or 'all' that you are interested in. `Aliases: !i, !maybe` |
+| **!coming** \[number\] \[teamcounts\] \[boss list or all\] | *Raid Channel* | Sets your status for the raid to 'coming'.  Teamcounts format is `m# v# i# u#`. You can also supply a list of bosses or 'all' that you are interested in. `Aliases: !c` |
+| **!here** \[number\] \[teamcounts\] \[boss list or all\] | *Raid Channel* | Sets your status for the raid to 'here'.  Teamcounts format is `m# v# i# u#`. You can also supply a list of bosses or 'all' that you are interested in. `Aliases: !h` |
+| **!lobby** \[number\] | *Raid Channel* | Indicate you are entering the raid lobby. `Aliases: !l` |
 | **!starting** \[team\] | *Raid Channel* | Clears all members 'here', announce raid start. |
 | **!backout** | *Raid Channel* | Request players in lobby to backout. |
-| **!cancel**  | *Raid Channel* | Cancel your status. Aliases: !x |
+| **!cancel**  | *Raid Channel* | Cancel your status. `Aliases: !x` |
 
 ### List Commands:
 
 | Commands | Requirements  | Description |
 | -------- |:-------------:| ------------|
-| **!list** | *Region Channel* | Lists all raids from that region channel. Aliases: !lists|
-| **!list**  | *Raid Channel* | Lists all member status' for the raid. Aliases: !lists|
+| **!list** | *Region Channel* | Lists all raids from that region channel. `Aliases: !lists`|
+| **!list**  | *Raid Channel* | Lists all member status' for the raid. `Aliases: !lists`|
 | **!list tags** | *Raid Channel* | Same behavior as !list, but with @mentions. |
 | **!list interested** | *Raid Channel* | Lists 'interested' members for the raid. |
 | **!list coming**  | *Raid Channel* | Lists 'coming' members for the raid. |

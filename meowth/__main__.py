@@ -851,14 +851,14 @@ async def message_cleanup(loop=True):
                 try:
                     report_message = await report_delete_dict[messageid]['channel'].get_message(messageid)
                     await report_message.delete()
-                except (discord.errors.Forbidden, discord.errors.HTTPException):
+                except (discord.errors.NotFound, discord.errors.Forbidden, discord.errors.HTTPException):
                     pass
             for messageid in report_edit_dict.keys():
                 try:
                     report_message = await report_edit_dict[messageid]['channel'].get_message(messageid)
                     await report_message.edit(content=report_edit_dict[messageid]['action']['content'],embed=discord.Embed(description=report_edit_dict[messageid]['action']['embedcontent'], colour=report_message.embeds[0].colour.value))
                     await report_message.clear_reactions()
-                except (discord.errors.Forbidden, discord.errors.HTTPException):
+                except (discord.errors.NotFound, discord.errors.Forbidden, discord.errors.HTTPException):
                     pass
         # save server_dict changes after cleanup
         logger.info('message_cleanup - SAVING CHANGES')

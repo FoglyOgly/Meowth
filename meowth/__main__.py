@@ -320,13 +320,13 @@ async def autocorrect(entered_word, destination, author):
                 timeout = True
             await question.delete()
             if timeout or res.emoji == '❎':
-                return
+                return None
             elif res.emoji == '✅':
                 return spellcheck(entered_word)
             else:
-                return
+                return None
         else:
-            return
+            return None
     else:
         question = await destination.send(msg)
         return
@@ -3430,6 +3430,8 @@ async def unwant(ctx,*,pokemon):
                 entered_unwant = pkmn_match
             else:
                 entered_unwant = await autocorrect(entered_unwant, message.channel, message.author)
+            if not entered_unwant:
+                return
             # If user is not already wanting the Pokemon,
             # print a less noisy message
             role = discord.utils.get(guild.roles, name=entered_unwant)
@@ -3513,6 +3515,8 @@ async def _wild(message, content):
         entered_wild = pkmn_match
     else:
         entered_wild = await autocorrect(entered_wild, message.channel, message.author)
+    if not entered_wild:
+        return
     wild = discord.utils.get(message.guild.roles, name=entered_wild)
     if wild is None:
         roletest = ""
@@ -3632,6 +3636,8 @@ async def _raid(message, content):
         entered_raid = pkmn_match
     else:
         entered_raid = await autocorrect(entered_raid, message.channel, message.author)
+    if not entered_raid:
+        return
     raid_match = True if entered_raid in get_raidlist() else False
     if (not raid_match):
         await message.channel.send(_('Meowth! The Pokemon {pokemon} does not appear in raids!').format(pokemon=entered_raid.capitalize()))
@@ -3872,6 +3878,8 @@ async def _eggassume(args, raid_channel, author=None):
         entered_raid = pkmn_match
     else:
         entered_raid = await autocorrect(entered_raid, raid_channel, author)
+    if not entered_raid:
+        return
     raid_match = True if entered_raid in get_raidlist() else False
     if (not raid_match):
         await raid_channel.send(_('Meowth! The Pokemon {pokemon} does not appear in raids!').format(pokemon=entered_raid.capitalize()))
@@ -3937,6 +3945,8 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
         entered_raid = pkmn_match
     else:
         entered_raid = await autocorrect(entered_raid, raid_channel, author)
+    if not entered_raid:
+        return
     eggdetails = guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id]
     egglevel = eggdetails['egglevel']
     if egglevel == "0":
@@ -6109,7 +6119,7 @@ async def list(ctx):
                         listmsg = _('**EX Raids::** (continued)\n')
                         listmsg += list_output(r)
             if activeraidnum == 0:
-                await channel.send(_('Meowth! No active raids! Report one with **!raid <name> <location>**.'))
+                await channel.send(_('Meowth! No active raids! Report one with **!raid <name> <location> [weather] [timer]**.'))
                 return
             else:
                 await channel.send(listmsg)

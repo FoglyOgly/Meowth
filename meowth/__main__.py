@@ -3263,6 +3263,7 @@ async def leaderboard(ctx, type="total"):
     leaderboard = []
     rank = 1
     typelist = ["total", "raids", "exraids", "wilds", "research", "eggs"]
+    type = type.lower()
     if type not in typelist:
         await ctx.send(_("Leaderboard type not supported. Please select from: **total, raids, eggs, exraids, wilds, research**"))
         return

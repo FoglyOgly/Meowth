@@ -135,6 +135,33 @@ Launch Meowth with Auto-Restart:
 python3 launcher.py -s -r
 ```
 
+### How to Translate Meowth:
+We do not currently develop for any language other than English and self-hosting is the only way to translate Meowth currently.
+However, many people on our server have translated Meowth into a variety of languages. If you are wanting to translate Meowth to your language, check [there](https://discord.gg/hhVjAN8) first to see if the work has been done for you.
+To translate Meowth, we currently recommend using pygettext.py and translating the .pot file using [poedit](https://poedit.net/). To generate a .pot file:
+
+1. Nativate to `[pythonpath]\Python36\Tools\i18n\`
+
+2. Copy the file you would like to extract text from (usually \_\_main\_\_.py) into this folder
+
+3. Open a command prompt in this directory and run:
+
+Linux:
+```bash
+python3 pygettext.py -d meowth \_\_main\_\_.py
+```
+Windows:
+```bash
+py pygettext.py -d meowth \_\_main\_\_.py
+```
+
+4. This will generate a meowth.pot that you can then translate using poedit
+
+5. Place the po/mo files from poedit into the `/locale/<language abbreviation>/LC_MESSAGES` directory (use other languages for reference)
+
+6. Change Meowth's config.json `bot-language` and `pokemon-language` to `<language abbreviation>`
+
+
 ## Directions for using Meowth:
 Note: Avoid punctuation inside commands.
 
@@ -154,6 +181,7 @@ pkmn = Pokemon
 | **!outputlog**  | *Server Manager Only* | Uploads the log file to hastebin and replies with the link. |
 | **!set prefix** \[prefix\] | *Server Manager Only* | Sets Meowth's prefix. |
 | **!set regional** \<pkmn\> | *Server Manager Only* | Sets server's regional raid boss. Accepts number or name. |
+| **!set timezone** \<UTC offset\> | *Server Manager Only* | Sets server's timezone. Accepts numbers from -12 to 14. |
 | **!get prefix** | *Server Manager Only* | Displays Meowth's prefix. |
 | **!get perms** \[channelid\] | *Server Manager Only* | Displays Meowth's permissions in guild and channel. |
 | **!welcome** \[user\] | *Owner Only* | Test welcome message on mentioned member |
@@ -215,20 +243,20 @@ pkmn = Pokemon
 
 | Commands | Requirements  | Description |
 | -------- |:-------------:| ------------|
-| **!interested** \[number\] \[teamcounts\] \[boss list or all\] | *Raid Channel* | Sets your status for the raid to 'interested'. Teamcounts format is `m# v# i#`. You can also supply a list of bosses or 'all' that you are interested in. Aliases: !i, !maybe |
-| **!coming** \[number\] \[teamcounts\] \[boss list or all\] | *Raid Channel* | Sets your status for the raid to 'coming'.  Teamcounts format is `m# v# i#`. You can also supply a list of bosses or 'all' that you are interested in. Aliases: !c |
-| **!here** \[number\] \[teamcounts\] \[boss list or all\] | *Raid Channel* | Sets your status for the raid to 'here'.  Teamcounts format is `m# v# i#`. You can also supply a list of bosses or 'all' that you are interested in. Aliases: !h |
-| **!lobby** \[number\] | *Raid Channel* | Indicate you are entering the raid lobby. Aliases: !l |
+| **!interested** \[number\] \[teamcounts\] \[boss list or all\] | *Raid Channel* | Sets your status for the raid to 'interested'. Teamcounts format is `m# v# i# u#`. You can also supply a list of bosses or 'all' that you are interested in. `Aliases: !i, !maybe` |
+| **!coming** \[number\] \[teamcounts\] \[boss list or all\] | *Raid Channel* | Sets your status for the raid to 'coming'.  Teamcounts format is `m# v# i# u#`. You can also supply a list of bosses or 'all' that you are interested in. `Aliases: !c` |
+| **!here** \[number\] \[teamcounts\] \[boss list or all\] | *Raid Channel* | Sets your status for the raid to 'here'.  Teamcounts format is `m# v# i# u#`. You can also supply a list of bosses or 'all' that you are interested in. `Aliases: !h` |
+| **!lobby** \[number\] | *Raid Channel* | Indicate you are entering the raid lobby. `Aliases: !l` |
 | **!starting** \[team\] | *Raid Channel* | Clears all members 'here', announce raid start. |
 | **!backout** | *Raid Channel* | Request players in lobby to backout. |
-| **!cancel**  | *Raid Channel* | Cancel your status. Aliases: !x |
+| **!cancel**  | *Raid Channel* | Cancel your status. `Aliases: !x` |
 
 ### List Commands:
 
 | Commands | Requirements  | Description |
 | -------- |:-------------:| ------------|
-| **!list** | *Region Channel* | Lists all raids from that region channel. Aliases: !lists|
-| **!list**  | *Raid Channel* | Lists all member status' for the raid. Aliases: !lists|
+| **!list** | *Region Channel* | Lists all raids from that region channel. `Aliases: !lists`|
+| **!list**  | *Raid Channel* | Lists all member status' for the raid. `Aliases: !lists`|
 | **!list tags** | *Raid Channel* | Same behavior as !list, but with @mentions. |
 | **!list interested** | *Raid Channel* | Lists 'interested' members for the raid. |
 | **!list coming**  | *Raid Channel* | Lists 'coming' members for the raid. |

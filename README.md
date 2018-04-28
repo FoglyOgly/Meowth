@@ -135,6 +135,33 @@ Launch Meowth with Auto-Restart:
 python3 launcher.py -s -r
 ```
 
+### How to Translate Meowth:
+We do not currently develop for any language other than English and self-hosting is the only way to translate Meowth currently.
+However, many people on our server have translated Meowth into a variety of languages. If you are wanting to translate Meowth to your language, check [there](https://discord.gg/hhVjAN8) first to see if the work has been done for you.
+To translate Meowth, we currently recommend using pygettext.py and translating the .pot file using [poedit](https://poedit.net/). To generate a .pot file:
+
+1. Nativate to `[pythonpath]\Python36\Tools\i18n\`
+
+2. Copy the file you would like to extract text from (usually \_\_main\_\_.py) into this folder
+
+3. Open a command prompt in this directory and run:
+
+Linux:
+```bash
+python3 pygettext.py -d meowth \_\_main\_\_.py
+```
+Windows:
+```bash
+py pygettext.py -d meowth \_\_main\_\_.py
+```
+
+4. This will generate a meowth.pot that you can then translate using poedit
+
+5. Place the po/mo files from poedit into the `/locale/<language abbreviation>/LC_MESSAGES` directory (use other languages for reference)
+
+6. Change Meowth's config.json `bot-language` and `pokemon-language` to `<language abbreviation>`
+
+
 ## Directions for using Meowth:
 Note: Avoid punctuation inside commands.
 

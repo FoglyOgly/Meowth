@@ -3249,10 +3249,14 @@ async def profile(ctx, user: discord.Member = None):
     await ctx.send(embed=embed)
 
 @Meowth.command(hidden=True)
-async def leaderboard(ctx):
+async def leaderboard(ctx, type="total"):
     trainers = copy.deepcopy(guild_dict[ctx.guild.id]['trainers'])
     leaderboard = []
     rank = 1
+    typelist = ["total", "raids", "exraids", "wilds", "research", "eggs"]
+    if type not in typelist:
+        await ctx.send(_("Leaderboard type not supported. Please select from: **total, raids, eggs, exraids, wilds, research**"))
+        return
     for trainer in trainers.keys():
         raids = trainers[trainer].setdefault('raid_reports', 0)
         wilds = trainers[trainer].setdefault('wild_reports', 0)
@@ -3261,12 +3265,12 @@ async def leaderboard(ctx):
         research = trainers[trainer].setdefault('research_reports', 0)
         total_reports = raids + wilds + exraids + eggs + research
         leaderboard.append({'trainer':trainer, 'total':total_reports, 'raids':raids, 'wilds':wilds, 'research':research, 'exraids':exraids, 'eggs':eggs})
-    leaderboard = sorted(leaderboard,key= lambda x: x['total'], reverse=True)[:10]
+    leaderboard = sorted(leaderboard,key= lambda x: x[type], reverse=True)[:10]
     embed = discord.Embed(colour=ctx.guild.me.colour)
-    embed.set_author(name=_("Reporting Leaderboard"), icon_url=Meowth.user.avatar_url)
+    embed.set_author(name=_("Reporting Leaderboard ({type})").format(type=type.title()), icon_url=Meowth.user.avatar_url)
     for trainer in leaderboard:
         user = ctx.guild.get_member(trainer['trainer'])
-        embed.add_field(name=f"{rank}. {user.display_name} - Total: **{trainer['total']}**", value=f"Raids: **{trainer['raids']}** | Eggs: **{trainer['eggs']}** | EX Raids: **{trainer['exraids']}** | Wilds: **{trainer['wilds']}** | Research: **{trainer['research']}**", inline=False)
+        embed.add_field(name=f"{rank}. {user.display_name} - {type.title()}: **{trainer[type]}**", value=f"Raids: **{trainer['raids']}** | Eggs: **{trainer['eggs']}** | EX Raids: **{trainer['exraids']}** | Wilds: **{trainer['wilds']}** | Research: **{trainer['research']}**", inline=False)
         rank += 1
     await ctx.send(embed=embed)
 

@@ -1402,6 +1402,7 @@ async def regional(ctx, regional):
     if regional in get_raidlist():
         _set_regional(Meowth, ctx.guild, regional)
         await ctx.message.channel.send(_("Meowth! Regional raid boss set to **{boss}**!").format(boss=get_name(regional).title()))
+
     else:
         await ctx.message.channel.send(_("Meowth! That Pokemon doesn't appear in raids!"))
         return

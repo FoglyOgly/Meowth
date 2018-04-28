@@ -3347,7 +3347,7 @@ async def _wild(message, content):
     }
     guild_dict[message.guild.id]['wildreport_dict'] = wild_dict
 
-@Meowth.command()
+@Meowth.command(aliases=['r'])
 @checks.allowraidreport()
 async def raid(ctx,pokemon,*,location:commands.clean_content(fix_channel_mentions=True)="", timer=None):
     """Report an ongoing raid.
@@ -3518,7 +3518,7 @@ async def _raid(message, content):
     event_loop.create_task(expiry_check(raid_channel))
     return raid_channel
 
-@Meowth.command()
+@Meowth.command(aliases=['egg'])
 @checks.allowraidreport()
 async def raidegg(ctx,egglevel,*,location:commands.clean_content(fix_channel_mentions=True)="", timer=None):
     """Report a raid egg.
@@ -3884,7 +3884,7 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
         await _edit_party(raid_channel, author)
     event_loop.create_task(expiry_check(raid_channel))
 
-@Meowth.command()
+@Meowth.command(aliases=['ex'])
 @checks.allowexraidreport()
 async def exraid(ctx, *, location):
     """Report an upcoming EX raid.

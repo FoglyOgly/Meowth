@@ -148,11 +148,11 @@ To translate Meowth, we currently recommend using pygettext.py and translating t
 
 Linux:
 ```bash
-python3 pygettext.py -d meowth \_\_main\_\_.py
+python3 pygettext.py -d meowth __main__.py
 ```
 Windows:
 ```bash
-py pygettext.py -d meowth \_\_main\_\_.py
+py pygettext.py -d meowth __main__.py
 ```
 
 4. This will generate a meowth.pot that you can then translate using poedit

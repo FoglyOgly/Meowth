@@ -1864,9 +1864,15 @@ async def team(ctx):
     """!team command settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    if not guild_dict[guild.id]['configure_dict']['settings']['done']:
+        await _configure(ctx, "all")
+        return
+    config_sessions = guild_dict[ctx.guild.id]['configure_dict']['settings'].setdefault('config_sessions',{}).setdefault(owner.id,0) + 1
+    guild_dict[ctx.guild.id]['configure_dict']['settings']['config_sessions'][owner.id] = config_sessions
+    if guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id] > 1:
+        await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("**MULTIPLE SESSIONS!**\n\nIt looks like you have **{yoursessions}** active configure sessions. I recommend you send **cancel** first and then send your request again to avoid confusing me.\n\nYour Sessions: **{yoursessions}** | Total Sessions: **{allsessions}**").format(allsessions=sum(guild_dict[guild.id]['configure_dict']['settings']['config_sessions'].values()),yoursessions=guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id])))
     ctx = await _configure_team(ctx)
     if ctx:
-        ctx.config_dict_temp['settings']['done'] = True
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name='Configuration Complete', icon_url=Meowth.user.avatar_url))
     del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
@@ -1915,9 +1921,15 @@ async def welcome(ctx):
     """Welcome message settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    if not guild_dict[guild.id]['configure_dict']['settings']['done']:
+        await _configure(ctx, "all")
+        return
+    config_sessions = guild_dict[ctx.guild.id]['configure_dict']['settings'].setdefault('config_sessions',{}).setdefault(owner.id,0) + 1
+    guild_dict[ctx.guild.id]['configure_dict']['settings']['config_sessions'][owner.id] = config_sessions
+    if guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id] > 1:
+        await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("**MULTIPLE SESSIONS!**\n\nIt looks like you have **{yoursessions}** active configure sessions. I recommend you send **cancel** first and then send your request again to avoid confusing me.\n\nYour Sessions: **{yoursessions}** | Total Sessions: **{allsessions}**").format(allsessions=sum(guild_dict[guild.id]['configure_dict']['settings']['config_sessions'].values()),yoursessions=guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id])))
     ctx = await _configure_welcome(ctx)
     if ctx:
-        ctx.config_dict_temp['settings']['done'] = True
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name='Configuration Complete', icon_url=Meowth.user.avatar_url))
     del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
@@ -2064,9 +2076,15 @@ async def raid(ctx):
     """!raid reporting settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    if not guild_dict[guild.id]['configure_dict']['settings']['done']:
+        await _configure(ctx, "all")
+        return
+    config_sessions = guild_dict[ctx.guild.id]['configure_dict']['settings'].setdefault('config_sessions',{}).setdefault(owner.id,0) + 1
+    guild_dict[ctx.guild.id]['configure_dict']['settings']['config_sessions'][owner.id] = config_sessions
+    if guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id] > 1:
+        await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("**MULTIPLE SESSIONS!**\n\nIt looks like you have **{yoursessions}** active configure sessions. I recommend you send **cancel** first and then send your request again to avoid confusing me.\n\nYour Sessions: **{yoursessions}** | Total Sessions: **{allsessions}**").format(allsessions=sum(guild_dict[guild.id]['configure_dict']['settings']['config_sessions'].values()),yoursessions=guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id])))
     ctx = await _configure_raid(ctx)
     if ctx:
-        ctx.config_dict_temp['settings']['done'] = True
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name='Configuration Complete', icon_url=Meowth.user.avatar_url))
     del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
@@ -2278,9 +2296,15 @@ async def exraid(ctx):
     """!exraid reporting settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    if not guild_dict[guild.id]['configure_dict']['settings']['done']:
+        await _configure(ctx, "all")
+        return
+    config_sessions = guild_dict[ctx.guild.id]['configure_dict']['settings'].setdefault('config_sessions',{}).setdefault(owner.id,0) + 1
+    guild_dict[ctx.guild.id]['configure_dict']['settings']['config_sessions'][owner.id] = config_sessions
+    if guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id] > 1:
+        await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("**MULTIPLE SESSIONS!**\n\nIt looks like you have **{yoursessions}** active configure sessions. I recommend you send **cancel** first and then send your request again to avoid confusing me.\n\nYour Sessions: **{yoursessions}** | Total Sessions: **{allsessions}**").format(allsessions=sum(guild_dict[guild.id]['configure_dict']['settings']['config_sessions'].values()),yoursessions=guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id])))
     ctx = await _configure_exraid(ctx)
     if ctx:
-        ctx.config_dict_temp['settings']['done'] = True
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name='Configuration Complete', icon_url=Meowth.user.avatar_url))
     del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
@@ -2459,9 +2483,15 @@ async def invite(ctx):
     """!invite command settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    if not guild_dict[guild.id]['configure_dict']['settings']['done']:
+        await _configure(ctx, "all")
+        return
+    config_sessions = guild_dict[ctx.guild.id]['configure_dict']['settings'].setdefault('config_sessions',{}).setdefault(owner.id,0) + 1
+    guild_dict[ctx.guild.id]['configure_dict']['settings']['config_sessions'][owner.id] = config_sessions
+    if guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id] > 1:
+        await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("**MULTIPLE SESSIONS!**\n\nIt looks like you have **{yoursessions}** active configure sessions. I recommend you send **cancel** first and then send your request again to avoid confusing me.\n\nYour Sessions: **{yoursessions}** | Total Sessions: **{allsessions}**").format(allsessions=sum(guild_dict[guild.id]['configure_dict']['settings']['config_sessions'].values()),yoursessions=guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id])))
     ctx = await _configure_invite(ctx)
     if ctx:
-        ctx.config_dict_temp['settings']['done'] = True
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name='Configuration Complete', icon_url=Meowth.user.avatar_url))
     del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
@@ -2495,9 +2525,13 @@ async def counters(ctx):
     """Automatic counters settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
-    ctx = await _configure_counters(ctx, "counters")
+    if not guild_dict[guild.id]['configure_dict']['settings']['done']:
+        await _configure(ctx, "all")
+        return
+    config_sessions = guild_dict[ctx.guild.id]['configure_dict']['settings'].setdefault('config_sessions',{}).setdefault(owner.id,0) + 1
+    guild_dict[ctx.guild.id]['configure_dict']['settings']['config_sessions'][owner.id] = config_sessions
+    ctx = await _configure_counters(ctx)
     if ctx:
-        ctx.config_dict_temp['settings']['done'] = True
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name='Configuration Complete', icon_url=Meowth.user.avatar_url))
     del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
@@ -2542,9 +2576,15 @@ async def wild(ctx):
     """!wild reporting settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    if not guild_dict[guild.id]['configure_dict']['settings']['done']:
+        await _configure(ctx, "all")
+        return
+    config_sessions = guild_dict[ctx.guild.id]['configure_dict']['settings'].setdefault('config_sessions',{}).setdefault(owner.id,0) + 1
+    guild_dict[ctx.guild.id]['configure_dict']['settings']['config_sessions'][owner.id] = config_sessions
+    if guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id] > 1:
+        await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("**MULTIPLE SESSIONS!**\n\nIt looks like you have **{yoursessions}** active configure sessions. I recommend you send **cancel** first and then send your request again to avoid confusing me.\n\nYour Sessions: **{yoursessions}** | Total Sessions: **{allsessions}**").format(allsessions=sum(guild_dict[guild.id]['configure_dict']['settings']['config_sessions'].values()),yoursessions=guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id])))
     ctx = await _configure_wild(ctx)
     if ctx:
-        ctx.config_dict_temp['settings']['done'] = True
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name='Configuration Complete', icon_url=Meowth.user.avatar_url))
     del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
@@ -2632,9 +2672,15 @@ async def research(ctx):
     """!research reporting settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    if not guild_dict[guild.id]['configure_dict']['settings']['done']:
+        await _configure(ctx, "all")
+        return
+    config_sessions = guild_dict[ctx.guild.id]['configure_dict']['settings'].setdefault('config_sessions',{}).setdefault(owner.id,0) + 1
+    guild_dict[ctx.guild.id]['configure_dict']['settings']['config_sessions'][owner.id] = config_sessions
+    if guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id] > 1:
+        await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("**MULTIPLE SESSIONS!**\n\nIt looks like you have **{yoursessions}** active configure sessions. I recommend you send **cancel** first and then send your request again to avoid confusing me.\n\nYour Sessions: **{yoursessions}** | Total Sessions: **{allsessions}**").format(allsessions=sum(guild_dict[guild.id]['configure_dict']['settings']['config_sessions'].values()),yoursessions=guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id])))
     ctx = await _configure_research(ctx)
     if ctx:
-        ctx.config_dict_temp['settings']['done'] = True
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name='Configuration Complete', icon_url=Meowth.user.avatar_url))
     del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
@@ -2722,9 +2768,15 @@ async def want(ctx):
     """!want/!unwant settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    if not guild_dict[guild.id]['configure_dict']['settings']['done']:
+        await _configure(ctx, "all")
+        return
+    config_sessions = guild_dict[ctx.guild.id]['configure_dict']['settings'].setdefault('config_sessions',{}).setdefault(owner.id,0) + 1
+    guild_dict[ctx.guild.id]['configure_dict']['settings']['config_sessions'][owner.id] = config_sessions
+    if guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id] > 1:
+        await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("**MULTIPLE SESSIONS!**\n\nIt looks like you have **{yoursessions}** active configure sessions. I recommend you send **cancel** first and then send your request again to avoid confusing me.\n\nYour Sessions: **{yoursessions}** | Total Sessions: **{allsessions}**").format(allsessions=sum(guild_dict[guild.id]['configure_dict']['settings']['config_sessions'].values()),yoursessions=guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id])))
     ctx = await _configure_want(ctx)
     if ctx:
-        ctx.config_dict_temp['settings']['done'] = True
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name='Configuration Complete', icon_url=Meowth.user.avatar_url))
     del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
@@ -2793,9 +2845,15 @@ async def archive(ctx):
     """Configure !archive command settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    if not guild_dict[guild.id]['configure_dict']['settings']['done']:
+        await _configure(ctx, "all")
+        return
+    config_sessions = guild_dict[ctx.guild.id]['configure_dict']['settings'].setdefault('config_sessions',{}).setdefault(owner.id,0) + 1
+    guild_dict[ctx.guild.id]['configure_dict']['settings']['config_sessions'][owner.id] = config_sessions
+    if guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id] > 1:
+        await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("**MULTIPLE SESSIONS!**\n\nIt looks like you have **{yoursessions}** active configure sessions. I recommend you send **cancel** first and then send your request again to avoid confusing me.\n\nYour Sessions: **{yoursessions}** | Total Sessions: **{allsessions}**").format(allsessions=sum(guild_dict[guild.id]['configure_dict']['settings']['config_sessions'].values()),yoursessions=guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id])))
     ctx = await _configure_archive(ctx)
     if ctx:
-        ctx.config_dict_temp['settings']['done'] = True
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name='Configuration Complete', icon_url=Meowth.user.avatar_url))
     del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
@@ -2858,9 +2916,15 @@ async def timezone(ctx):
     """Configure timezone and other settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    if not guild_dict[guild.id]['configure_dict']['settings']['done']:
+        await _configure(ctx, "all")
+        return
+    config_sessions = guild_dict[ctx.guild.id]['configure_dict']['settings'].setdefault('config_sessions',{}).setdefault(owner.id,0) + 1
+    guild_dict[ctx.guild.id]['configure_dict']['settings']['config_sessions'][owner.id] = config_sessions
+    if guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id] > 1:
+        await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("**MULTIPLE SESSIONS!**\n\nIt looks like you have **{yoursessions}** active configure sessions. I recommend you send **cancel** first and then send your request again to avoid confusing me.\n\nYour Sessions: **{yoursessions}** | Total Sessions: **{allsessions}**").format(allsessions=sum(guild_dict[guild.id]['configure_dict']['settings']['config_sessions'].values()),yoursessions=guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id])))
     ctx = await _configure_settings(ctx)
     if ctx:
-        ctx.config_dict_temp['settings']['done'] = True
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name='Configuration Complete', icon_url=Meowth.user.avatar_url))
     del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
@@ -3353,7 +3417,9 @@ async def leaderboard(ctx, type="total"):
         eggs = trainers[trainer].setdefault('egg_reports', 0)
         research = trainers[trainer].setdefault('research_reports', 0)
         total_reports = raids + wilds + exraids + eggs + research
-        leaderboard.append({'trainer':trainer, 'total':total_reports, 'raids':raids, 'wilds':wilds, 'research':research, 'exraids':exraids, 'eggs':eggs})
+        trainer_stats = {'trainer':trainer, 'total':total_reports, 'raids':raids, 'wilds':wilds, 'research':research, 'exraids':exraids, 'eggs':eggs}
+        if trainer_stats[type] > 0:
+            leaderboard.append(trainer_stats)
     leaderboard = sorted(leaderboard,key= lambda x: x[type], reverse=True)[:10]
     embed = discord.Embed(colour=ctx.guild.me.colour)
     embed.set_author(name=_("Reporting Leaderboard ({type})").format(type=type.title()), icon_url=Meowth.user.avatar_url)
@@ -6590,13 +6656,13 @@ async def _researchlist(ctx):
                 questauthor = ctx.channel.guild.get_member(research_dict[questid]['reportauthor'])
                 if len(questmsg) < 1500:
                     questmsg += '\n🔹'
-                    questmsg += _("**Reward**: {reward}, **Pokestop**: {location}, **Quest**: {quest}, **Reported By**: {author}\n**Location**: {url}".format(location=research_dict[questid]['location'].title(),quest=research_dict[questid]['quest'].title(),reward=research_dict[questid]['reward'].title(), author=questauthor.display_name, url=research_dict[questid].get('url',None)))
+                    questmsg += _("**Reward**: {reward}, **Pokestop**: {location}, **Quest**: {quest}, **Reported By**: {author}\n**Location**: <{url}>".format(location=research_dict[questid]['location'].title(),quest=research_dict[questid]['quest'].title(),reward=research_dict[questid]['reward'].title(), author=questauthor.display_name, url=research_dict[questid].get('url',None)))
                 else:
                     listmsg = _('Meowth! **Here\'s the current research reports for {channel}**\n{questmsg}').format(channel=ctx.message.channel.name.capitalize(),questmsg=questmsg)
                     await ctx.channel.send(listmsg)
                     questmsg = ""
                     questmsg += '\n🔹'
-                    questmsg += _("**Reward**: {reward}, **Pokestop**: {location}, **Quest**: {quest}, **Reported By**: {author}\n**Location**: {url}".format(location=research_dict[questid]['location'].title(),quest=research_dict[questid]['quest'].title(),reward=research_dict[questid]['reward'].title(), author=questauthor.display_name, url=research_dict[questid].get('url',None)))
+                    questmsg += _("**Reward**: {reward}, **Pokestop**: {location}, **Quest**: {quest}, **Reported By**: {author}\n**Location**: <{url}>".format(location=research_dict[questid]['location'].title(),quest=research_dict[questid]['quest'].title(),reward=research_dict[questid]['reward'].title(), author=questauthor.display_name, url=research_dict[questid].get('url',None)))
             except discord.errors.NotFound:
                 continue
     if questmsg:
@@ -6625,13 +6691,13 @@ async def _wildlist(ctx):
                 wildauthor = ctx.channel.guild.get_member(wild_dict[wildid]['reportauthor'])
                 if len(wildmsg) < 1500:
                     wildmsg += '\n🔹'
-                    wildmsg += _("**Pokemon**: {pokemon}, **Location**: {location}, **Reported By**: {author}".format(pokemon=wild_dict[wildid]['pokemon'].title(),location=wild_dict[wildid]['location'].title(),author=wildauthor.display_name))
+                    wildmsg += _("**Pokemon**: {pokemon}, **Location**: {location}, **Reported By**: {author}\n**Location**: <{url}>".format(pokemon=wild_dict[wildid]['pokemon'].title(),location=wild_dict[wildid]['location'].title(),author=wildauthor.display_name, url=wild_dict[wildid].get('url',None)))
                 else:
                     listmsg = _('Meowth! **Here\'s the current wild reports for {channel}**\n{wildmsg}').format(channel=ctx.message.channel.name.capitalize(),wildmsg=wildmsg)
                     await ctx.channel.send(listmsg)
                     wildmsg = ""
                     wildmsg += '\n🔹'
-                    wildmsg += _("**Pokemon**: {pokemon}, **Location**: {location}, **Reported By**: {author}".format(pokemon=wild_dict[wildid]['pokemon'].title(),location=wild_dict[wildid]['location'].title(),author=wildauthor.display_name))
+                    wildmsg += _("**Pokemon**: {pokemon}, **Location**: {location}, **Reported By**: {author}\n**Location**: <{url}>".format(pokemon=wild_dict[wildid]['pokemon'].title(),location=wild_dict[wildid]['location'].title(),author=wildauthor.display_name, url=wild_dict[wildid].get('url',None)))
             except discord.errors.NotFound:
                 continue
     if wildmsg:

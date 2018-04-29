@@ -907,107 +907,6 @@ async def on_ready():
     users = 0
     for guild in Meowth.guilds:
         users += len(guild.members)
-        #DELETE FROM HERE
-        # if guild.id in guild_dict:
-        #     configure_dict = copy.deepcopy(guild_dict[guild.id].get('configure_dict',{}))
-        #     configure_dict['welcome'] = {
-        #         "enabled":guild_dict[guild.id].get('welcome',False),
-        #         "welcomechan":guild_dict[guild.id].get('welcomechan',''),
-        #         "welcomemsg":guild_dict[guild.id].get('welcomemsg','default')
-        #     }
-        #     configure_dict['want'] = {
-        #         "enabled":guild_dict[guild.id].get('wantset',False),
-        #         "report_channels": guild_dict[guild.id].get('want_channel_list',[])
-        #     }
-        #     configure_dict['raid'] = {
-        #         "enabled":guild_dict[guild.id].get('raidset',False),
-        #         'report_channels': guild_dict[guild.id].get('city_channels',{}),
-        #         "categories":guild_dict[guild.id].get('categories',None),
-        #         "category_dict":guild_dict[guild.id].get('category_dict',{})
-        #     }
-        #     configure_dict['exraid'] = {
-        #         "enabled":guild_dict[guild.id].get('raidset',False),
-        #         'report_channels': guild_dict[guild.id].get('city_channels',{}),
-        #         "categories":guild_dict[guild.id].get('categories',None),
-        #         "category_dict":guild_dict[guild.id].get('category_dict',{}),
-        #         "permissions":"everyone"
-        #     }
-        #     configure_dict['wild'] = {
-        #         "enabled":guild_dict[guild.id].get('wildset',False),
-        #         'report_channels': guild_dict[guild.id].get('city_channels',{}),
-        #     }
-        #     configure_dict['counters'] = {
-        #        "enabled":True,
-        #        'auto_levels': ["3","4","5"],
-        #     }
-        #     configure_dict['research'] = {
-        #         "enabled":True,
-        #         'report_channels': guild_dict[guild.id].get('city_channels',{}),
-        #     }
-        #     configure_dict['archive'] = {
-        #         "enabled":True,
-        #         "category":guild_dict[guild.id].get('archive',{}).get('category','same'),
-        #         'list':guild_dict[guild.id].get('archive',{}).get('list',[])
-        #     }
-        #     configure_dict['invite'] = {
-        #         "enabled":True
-        #     }
-        #     configure_dict['team'] = {
-        #         "enabled":guild_dict[guild.id].get('team',False)
-        #     }
-        #     configure_dict['settings'] = {
-        #         "offset":guild_dict[guild.id].get('offset',0),
-        #         "regional":guild_dict[guild.id].get('regional',None),
-        #         "prefix":guild_dict[guild.id].get('prefix',None),
-        #         "done":guild_dict[guild.id].get('done',False),
-        #         "config_sessions": {}
-        #     }
-        #     guild_dict[guild.id]['configure_dict'] = configure_dict
-        #     try:
-        #         del guild_dict[guild.id]['want_channel_list']
-        #     except:
-        #         pass
-        #     try:
-        #         del guild_dict[guild.id]['offset']
-        #     except:
-        #         pass
-        #     try:
-        #         del guild_dict[guild.id]['welcome']
-        #     except:
-        #         pass
-        #     try:
-        #         del guild_dict[guild.id]['welcomechan']
-        #     except:
-        #         pass
-        #     try:
-        #         del guild_dict[guild.id]['wantset']
-        #     except:
-        #         pass
-        #     try:
-        #         del guild_dict[guild.id]['raidset']
-        #     except:
-        #         pass
-        #     try:
-        #         del guild_dict[guild.id]['wildset']
-        #     except:
-        #         pass
-        #     try:
-        #         del guild_dict[guild.id]['team']
-        #     except:
-        #         pass
-        #     try:
-        #         del guild_dict[guild.id]['want']
-        #     except:
-        #         pass
-        #     try:
-        #         del guild_dict[guild.id]['other']
-        #     except:
-        #         pass
-        #     try:
-        #         del guild_dict[guild.id]['done']
-        #     except:
-        #         pass
-            #DELETE TO HERE
         try:
             if guild.id not in guild_dict:
                 guild_dict[guild.id] = {
@@ -3021,6 +2920,28 @@ async def raid_json(ctx, level=None, *, newlist=None):
             return
 
 @Meowth.command()
+@commands.has_permissions(manage_guild=True)
+async def reset_board(ctx, tgt_trainer: discord.Member = None):
+    guild = ctx.guild
+    trainers = guild_dict[guild.id]['trainers']
+    if tgt_trainer:
+        trainers[tgt_trainer.id]['raid_reports'] = 0
+        trainers[tgt_trainer.id]['wild_reports'] = 0
+        trainers[tgt_trainer.id]['ex_reports'] = 0
+        trainers[tgt_trainer.id]['egg_reports'] = 0
+        trainers[tgt_trainer.id]['research_reports'] = 0
+        await ctx.send(f"{tgt_trainer.display_name}'s report stats have been cleared!")
+        return
+    for trainer in trainers:
+        trainers[trainer]['raid_reports'] = 0
+        trainers[trainer]['wild_reports'] = 0
+        trainers[trainer]['ex_reports'] = 0
+        trainers[trainer]['egg_reports'] = 0
+        trainers[trainer]['research_reports'] = 0
+    await ctx.send("This server's report stats have been reset!")
+
+
+@Meowth.command()
 @commands.has_permissions(manage_channels=True)
 @checks.raidchannel()
 async def changeraid(ctx, newraid):
@@ -3400,8 +3321,12 @@ async def profile(ctx, user: discord.Member = None):
     embed.add_field(name="Research Reports", value=f"{guild_dict[ctx.guild.id]['trainers'].setdefault(user.id,{}).get('research_reports',0)}", inline=True)
     await ctx.send(embed=embed)
 
-@Meowth.command(hidden=True)
+@Meowth.command()
 async def leaderboard(ctx, type="total"):
+    """Displays the top ten reporters of a server.
+
+    Usage: !leaderboard [type]
+    Accepted types: raids, eggs, exraids, wilds, research"""
     trainers = copy.deepcopy(guild_dict[ctx.guild.id]['trainers'])
     leaderboard = []
     rank = 1

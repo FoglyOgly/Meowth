@@ -4,6 +4,6 @@ config.json
 data/serverdict_backup
 data/serverdict
 
-logs/meowth.log
+logs/
 __pychache__/
 *.py[cod]

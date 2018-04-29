@@ -5208,7 +5208,7 @@ async def counters(ctx, *, args = None):
                     ctrsmessage = await channel.get_message(guild_dict[guild.id]['raidchannel_dict'][channel.id].get('ctrsmessage',None))
                     ctrsembed = ctrsmessage.embeds[0]
                     ctrsembed.remove_field(6)
-                    ctrsembed.remove_field(7)
+                    ctrsembed.remove_field(6)
                     await channel.send(content=ctrsmessage.content,embed=ctrsembed)
                     return
                 except (discord.errors.NotFound, discord.errors.Forbidden, discord.errors.HTTPException):

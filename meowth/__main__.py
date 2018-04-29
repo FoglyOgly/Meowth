@@ -1864,9 +1864,13 @@ async def team(ctx):
     """!team command settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    if not guild_dict[guild.id]['configure_dict']['settings']['done']:
+        await _configure(ctx, "all")
+        return
+    config_sessions = guild_dict[ctx.guild.id]['configure_dict']['settings'].setdefault('config_sessions',{}).setdefault(owner.id,0) + 1
+    guild_dict[ctx.guild.id]['configure_dict']['settings']['config_sessions'][owner.id] = config_sessions
     ctx = await _configure_team(ctx)
     if ctx:
-        ctx.config_dict_temp['settings']['done'] = True
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name='Configuration Complete', icon_url=Meowth.user.avatar_url))
     del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
@@ -1915,9 +1919,13 @@ async def welcome(ctx):
     """Welcome message settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    if not guild_dict[guild.id]['configure_dict']['settings']['done']:
+        await _configure(ctx, "all")
+        return
+    config_sessions = guild_dict[ctx.guild.id]['configure_dict']['settings'].setdefault('config_sessions',{}).setdefault(owner.id,0) + 1
+    guild_dict[ctx.guild.id]['configure_dict']['settings']['config_sessions'][owner.id] = config_sessions
     ctx = await _configure_welcome(ctx)
     if ctx:
-        ctx.config_dict_temp['settings']['done'] = True
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name='Configuration Complete', icon_url=Meowth.user.avatar_url))
     del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
@@ -2064,9 +2072,13 @@ async def raid(ctx):
     """!raid reporting settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    if not guild_dict[guild.id]['configure_dict']['settings']['done']:
+        await _configure(ctx, "all")
+        return
+    config_sessions = guild_dict[ctx.guild.id]['configure_dict']['settings'].setdefault('config_sessions',{}).setdefault(owner.id,0) + 1
+    guild_dict[ctx.guild.id]['configure_dict']['settings']['config_sessions'][owner.id] = config_sessions
     ctx = await _configure_raid(ctx)
     if ctx:
-        ctx.config_dict_temp['settings']['done'] = True
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name='Configuration Complete', icon_url=Meowth.user.avatar_url))
     del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
@@ -2278,9 +2290,13 @@ async def exraid(ctx):
     """!exraid reporting settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    if not guild_dict[guild.id]['configure_dict']['settings']['done']:
+        await _configure(ctx, "all")
+        return
+    config_sessions = guild_dict[ctx.guild.id]['configure_dict']['settings'].setdefault('config_sessions',{}).setdefault(owner.id,0) + 1
+    guild_dict[ctx.guild.id]['configure_dict']['settings']['config_sessions'][owner.id] = config_sessions
     ctx = await _configure_exraid(ctx)
     if ctx:
-        ctx.config_dict_temp['settings']['done'] = True
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name='Configuration Complete', icon_url=Meowth.user.avatar_url))
     del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
@@ -2459,9 +2475,13 @@ async def invite(ctx):
     """!invite command settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    if not guild_dict[guild.id]['configure_dict']['settings']['done']:
+        await _configure(ctx, "all")
+        return
+    config_sessions = guild_dict[ctx.guild.id]['configure_dict']['settings'].setdefault('config_sessions',{}).setdefault(owner.id,0) + 1
+    guild_dict[ctx.guild.id]['configure_dict']['settings']['config_sessions'][owner.id] = config_sessions
     ctx = await _configure_invite(ctx)
     if ctx:
-        ctx.config_dict_temp['settings']['done'] = True
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name='Configuration Complete', icon_url=Meowth.user.avatar_url))
     del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
@@ -2495,9 +2515,13 @@ async def counters(ctx):
     """Automatic counters settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
-    ctx = await _configure_counters(ctx, "counters")
+    if not guild_dict[guild.id]['configure_dict']['settings']['done']:
+        await _configure(ctx, "all")
+        return
+    config_sessions = guild_dict[ctx.guild.id]['configure_dict']['settings'].setdefault('config_sessions',{}).setdefault(owner.id,0) + 1
+    guild_dict[ctx.guild.id]['configure_dict']['settings']['config_sessions'][owner.id] = config_sessions
+    ctx = await _configure_counters(ctx)
     if ctx:
-        ctx.config_dict_temp['settings']['done'] = True
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name='Configuration Complete', icon_url=Meowth.user.avatar_url))
     del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
@@ -2542,9 +2566,13 @@ async def wild(ctx):
     """!wild reporting settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    if not guild_dict[guild.id]['configure_dict']['settings']['done']:
+        await _configure(ctx, "all")
+        return
+    config_sessions = guild_dict[ctx.guild.id]['configure_dict']['settings'].setdefault('config_sessions',{}).setdefault(owner.id,0) + 1
+    guild_dict[ctx.guild.id]['configure_dict']['settings']['config_sessions'][owner.id] = config_sessions
     ctx = await _configure_wild(ctx)
     if ctx:
-        ctx.config_dict_temp['settings']['done'] = True
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name='Configuration Complete', icon_url=Meowth.user.avatar_url))
     del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
@@ -2632,9 +2660,13 @@ async def research(ctx):
     """!research reporting settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    if not guild_dict[guild.id]['configure_dict']['settings']['done']:
+        await _configure(ctx, "all")
+        return
+    config_sessions = guild_dict[ctx.guild.id]['configure_dict']['settings'].setdefault('config_sessions',{}).setdefault(owner.id,0) + 1
+    guild_dict[ctx.guild.id]['configure_dict']['settings']['config_sessions'][owner.id] = config_sessions
     ctx = await _configure_research(ctx)
     if ctx:
-        ctx.config_dict_temp['settings']['done'] = True
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name='Configuration Complete', icon_url=Meowth.user.avatar_url))
     del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
@@ -2722,9 +2754,13 @@ async def want(ctx):
     """!want/!unwant settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    if not guild_dict[guild.id]['configure_dict']['settings']['done']:
+        await _configure(ctx, "all")
+        return
+    config_sessions = guild_dict[ctx.guild.id]['configure_dict']['settings'].setdefault('config_sessions',{}).setdefault(owner.id,0) + 1
+    guild_dict[ctx.guild.id]['configure_dict']['settings']['config_sessions'][owner.id] = config_sessions
     ctx = await _configure_want(ctx)
     if ctx:
-        ctx.config_dict_temp['settings']['done'] = True
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name='Configuration Complete', icon_url=Meowth.user.avatar_url))
     del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
@@ -2793,9 +2829,13 @@ async def archive(ctx):
     """Configure !archive command settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    if not guild_dict[guild.id]['configure_dict']['settings']['done']:
+        await _configure(ctx, "all")
+        return
+    config_sessions = guild_dict[ctx.guild.id]['configure_dict']['settings'].setdefault('config_sessions',{}).setdefault(owner.id,0) + 1
+    guild_dict[ctx.guild.id]['configure_dict']['settings']['config_sessions'][owner.id] = config_sessions
     ctx = await _configure_archive(ctx)
     if ctx:
-        ctx.config_dict_temp['settings']['done'] = True
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name='Configuration Complete', icon_url=Meowth.user.avatar_url))
     del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
@@ -2858,9 +2898,13 @@ async def timezone(ctx):
     """Configure timezone and other settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    if not guild_dict[guild.id]['configure_dict']['settings']['done']:
+        await _configure(ctx, "all")
+        return
+    config_sessions = guild_dict[ctx.guild.id]['configure_dict']['settings'].setdefault('config_sessions',{}).setdefault(owner.id,0) + 1
+    guild_dict[ctx.guild.id]['configure_dict']['settings']['config_sessions'][owner.id] = config_sessions
     ctx = await _configure_settings(ctx)
     if ctx:
-        ctx.config_dict_temp['settings']['done'] = True
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name='Configuration Complete', icon_url=Meowth.user.avatar_url))
     del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]

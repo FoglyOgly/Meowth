@@ -757,7 +757,7 @@ async def channel_cleanup(loop=True):
 
                             continue
 
-                        elif channel not in active_raids:
+                        if channel not in active_raids:
                             # if channel is still active, make sure it's expiry is being monitored
                             event_loop.create_task(expiry_check(channel))
                             logger.info(

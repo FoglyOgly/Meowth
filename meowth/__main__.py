@@ -5449,7 +5449,12 @@ async def _maybe(channel, author, count, party, entered_interest=None):
             allunknown = count
         party = {'mystic':allblue, 'valor':allred, 'instinct':allyellow, 'unknown':allunknown}
     if count == 1:
-        await channel.send(_('Meowth! {member} is interested!').format(member=author.mention))
+        team_emoji = max(party, key=lambda key: party[key])
+        if team_emoji == "unknown":
+            team_emoji = "❔"
+        else:
+            team_emoji = parse_emoji(channel.guild, config['team_dict'][team_emoji])
+        await channel.send(_('Meowth! {member} is interested! {emoji}: 1').format(member=author.mention, emoji=team_emoji))
     else:
         msg = _('Meowth! {member} is interested with a total of {trainer_count} trainers!').format(member=author.mention, trainer_count=count)
         await channel.send('{msg} {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | ❔: {unknown}'.format(msg=msg, blue_emoji=parse_emoji(channel.guild, config['team_dict']['mystic']), mystic=party['mystic'], red_emoji=parse_emoji(channel.guild, config['team_dict']['valor']), valor=party['valor'], instinct=party['instinct'], yellow_emoji=parse_emoji(channel.guild, config['team_dict']['instinct']), unknown=party['unknown']))
@@ -5553,7 +5558,12 @@ async def _coming(channel, author, count, party, entered_interest=None):
             allunknown = count
         party = {'mystic':allblue, 'valor':allred, 'instinct':allyellow, 'unknown':allunknown}
     if count == 1:
-        await channel.send(_('Meowth! {member} is on the way!').format(member=author.mention))
+        team_emoji = max(party, key=lambda key: party[key])
+        if team_emoji == "unknown":
+            team_emoji = "❔"
+        else:
+            team_emoji = parse_emoji(channel.guild, config['team_dict'][team_emoji])
+        await channel.send(_('Meowth! {member} is on the way! {emoji}: 1').format(member=author.mention, emoji=team_emoji))
     else:
         msg = _('Meowth! {member} is on the way with a total of {trainer_count} trainers!').format(member=author.mention, trainer_count=count)
         await channel.send('{msg} {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | ❔: {unknown}'.format(msg=msg, blue_emoji=parse_emoji(channel.guild, config['team_dict']['mystic']), mystic=party['mystic'], red_emoji=parse_emoji(channel.guild, config['team_dict']['valor']), valor=party['valor'], instinct=party['instinct'], yellow_emoji=parse_emoji(channel.guild, config['team_dict']['instinct']), unknown=party['unknown']))
@@ -5662,7 +5672,12 @@ async def _here(channel, author, count, party, entered_interest=None):
             allunknown = count
         party = {'mystic':allblue, 'valor':allred, 'instinct':allyellow, 'unknown':allunknown}
     if count == 1:
-        msg = _('Meowth! {member} is at the raid!').format(member=author.mention)
+        team_emoji = max(party, key=lambda key: party[key])
+        if team_emoji == "unknown":
+            team_emoji = "❔"
+        else:
+            team_emoji = parse_emoji(channel.guild, config['team_dict'][team_emoji])
+        msg = _('Meowth! {member} is at the raid! {emoji}: 1').format(member=author.mention, emoji=team_emoji)
         await channel.send(msg + lobbymsg)
     else:
         msg = _('Meowth! {member} is at the raid with a total of {trainer_count} trainers!').format(member=author.mention, trainer_count=count)
@@ -6508,7 +6523,7 @@ async def _bosslist(ctx):
 @list.command()
 @checks.activeraidchannel()
 async def teams(ctx):
-    """List the teams for the users that have RSVP'd to a raid.\
+    """List the teams for the users that have RSVP'd to a raid.
 
     Usage: !list teams
     Works only in raid channels."""
@@ -6590,13 +6605,13 @@ async def _researchlist(ctx):
                 questreportmsg = await ctx.message.channel.get_message(questid)
                 questauthor = ctx.channel.guild.get_member(research_dict[questid]['reportauthor'])
                 if len(questmsg) < 1500:
-                    questmsg += '\n🔹'
+                    questmsg += ('\n🔹')
                     questmsg += _("**Reward**: {reward}, **Pokestop**: {location}, **Quest**: {quest}, **Reported By**: {author}\n**Location**: <{url}>".format(location=research_dict[questid]['location'].title(),quest=research_dict[questid]['quest'].title(),reward=research_dict[questid]['reward'].title(), author=questauthor.display_name, url=research_dict[questid].get('url',None)))
                 else:
                     listmsg = _('Meowth! **Here\'s the current research reports for {channel}**\n{questmsg}').format(channel=ctx.message.channel.name.capitalize(),questmsg=questmsg)
                     await ctx.channel.send(listmsg)
                     questmsg = ""
-                    questmsg += '\n🔹'
+                    questmsg += ('\n🔹')
                     questmsg += _("**Reward**: {reward}, **Pokestop**: {location}, **Quest**: {quest}, **Reported By**: {author}\n**Location**: <{url}>".format(location=research_dict[questid]['location'].title(),quest=research_dict[questid]['quest'].title(),reward=research_dict[questid]['reward'].title(), author=questauthor.display_name, url=research_dict[questid].get('url',None)))
             except discord.errors.NotFound:
                 continue
@@ -6625,14 +6640,14 @@ async def _wildlist(ctx):
                 wildreportmsg = await ctx.message.channel.get_message(wildid)
                 wildauthor = ctx.channel.guild.get_member(wild_dict[wildid]['reportauthor'])
                 if len(wildmsg) < 1500:
-                    wildmsg += '\n🔹'
-                    wildmsg += _("**Pokemon**: {pokemon}, **Location**: {location}, **Reported By**: {author}\n**Location**: <{url}>".format(pokemon=wild_dict[wildid]['pokemon'].title(),location=wild_dict[wildid]['location'].title(),author=wildauthor.display_name, url=wild_dict[wildid].get('url',None)))
+                    wildmsg += ('\n🔹')
+                    wildmsg += _("**Pokemon**: {pokemon}, **Location**: {location}, **Reported By**: {author}\n**Location**: <{url}>".format(pokemon=wild_dict[wildid]['pokemon'].title(),location=wild_dict[wildid]['location'].title(),author=wildauthor.display_name,url=wild_dict[wildid].get('url',None)))
                 else:
                     listmsg = _('Meowth! **Here\'s the current wild reports for {channel}**\n{wildmsg}').format(channel=ctx.message.channel.name.capitalize(),wildmsg=wildmsg)
                     await ctx.channel.send(listmsg)
                     wildmsg = ""
-                    wildmsg += '\n🔹'
-                    wildmsg += _("**Pokemon**: {pokemon}, **Location**: {location}, **Reported By**: {author}\n**Location**: <{url}>".format(pokemon=wild_dict[wildid]['pokemon'].title(),location=wild_dict[wildid]['location'].title(),author=wildauthor.display_name, url=wild_dict[wildid].get('url',None)))
+                    wildmsg += ('\n🔹')
+                    wildmsg += _("**Pokemon**: {pokemon}, **Location**: {location}, **Reported By**: {author}\n**Location**: <{url}>".format(pokemon=wild_dict[wildid]['pokemon'].title(),location=wild_dict[wildid]['location'].title(),author=wildauthor.display_name,url=wild_dict[wildid].get('url',None)))
             except discord.errors.NotFound:
                 continue
     if wildmsg:

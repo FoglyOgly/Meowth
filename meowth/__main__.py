@@ -431,9 +431,64 @@ def get_category(channel, level, type="raid"):
 async def get_raidhelp(user):
     helpembed = discord.Embed(colour=discord.Colour.lighter_grey()).set_author(name="Raid Coordination Help", icon_url=Meowth.user.avatar_url)
     helpembed.add_field(name="Key", value="<> denote required arguments, [] denote optional arguments", inline=False)
-    helpembed.add_field(name="Raid MGMT Commands", value="`!raid <species>`\n`!weather <weather>`\n`!timerset <minutes>`\n`<google maps link>`\n`!(i/c/h)...\n[total]...\n[team counts]`")
-    helpembed.add_field(name="Description", value="Hatches Egg channel\nSets in-game weather\nSets hatch/raid timer\nUpdates raid location\ninterested/coming/here\n# of trainers\n# from each team (ex. `3m` for 3 Mystic)")
+    helpembed.add_field(name="Raid MGMT Commands", value="`!raid <species>`\n`!weather <weather>`\n`!timerset <minutes>`\n`!starttime <time>`\n`<google maps link>`\n**RSVP**\n`!(i/c/h)...\n[total]...\n[team counts]`\n\n`!starting [team]`")
+    helpembed.add_field(name="Description", value="`Hatches Egg channel`\n`Sets in-game weather`\n`Sets hatch/raid timer`\n`Sets start time`\n`Updates raid location`\n\n`interested/coming/here`\n`# of trainers`\n`# from each team (ex. 3m for 3 Mystic)`\n\n`Moves [team] trainers (all trainers if [team] omitted) on 'here' list to a lobby.`")
     await user.send(embed=helpembed)
+
+def get_raidtext(type, pkmn, level, member, channel):
+    if type == "raid":
+        roletest = ""
+        role = discord.utils.get(channel.guild.roles, name=pkmn)
+        if role:
+            roletest = _("{pokemon} - ").format(pokemon=role.mention)
+            raidtext = _("{roletest}Meowth! {pkmn} raid reported by {member} in {channel}! Coordinate here!\n\nFor help, react to this message with the question mark and I will DM you a list of commands you can use!").format(roletest=roletest, pkmn=pkmn.title(), member=member.mention, channel=channel.mention)
+    elif type == "egg":
+        raidtext = _("Meowth! Level {level} raid egg reported by {member} in {channel}! Coordinate here!\n\nFor help, react to this message with the question mark and I will DM you a list of commands you can use!").format(level=level, member=member.mention, channel=channel.mention)
+    elif type == "exraid":
+        raidtext = _("Meowth! EX raid reported by {member} in {channel}! Coordinate here!\n\nFor help, react to this message with the question mark and I will DM you a list of commands you can use!").format(member=member.mention, channel=channel.mention)
+    return raidtext
+
+async def create_raid_channel(type, pkmn, level, details, report_channel):
+    guild = report_channel.guild
+    if type == "exraid":
+        name = "exraid-egg-"
+        raid_channel_overwrite_list = channel.overwrites
+        if guild_dict[guild.id]['configure_dict']['invite']['enabled']:
+            if guild_dict[guild.id]['configure_dict']['exraid']['permissions'] == "everyone":
+                everyone_overwrite = (guild.default_role, discord.PermissionOverwrite(send_messages=False))
+                raid_channel_overwrite_list.append(everyone_overwrite)
+            for overwrite in raid_channel_overwrite_list:
+                if isinstance(overwrite[0], discord.Role):
+                    if overwrite[0].permissions.manage_guild or overwrite[0].permissions.manage_channels or overwrite[0].permissions.manage_messages:
+                        continue
+                    overwrite[1].send_messages = False
+                elif isinstance(overwrite[0], discord.Member):
+                    if channel.permissions_for(overwrite[0]).manage_guild or channel.permissions_for(overwrite[0]).manage_channels or channel.permissions_for(overwrite[0]).manage_messages:
+                        continue
+                    overwrite[1].send_messages = False
+                if (overwrite[0].name not in guild.me.top_role.name) and (overwrite[0].name not in guild.me.name):
+                    overwrite[1].send_messages = False
+        else:
+            if guild_dict[guild.id]['configure_dict']['exraid']['permissions'] == "everyone":
+                everyone_overwrite = (guild.default_role, discord.PermissionOverwrite(send_messages=True))
+                raid_channel_overwrite_list.append(everyone_overwrite)
+        meowth_overwrite = (Meowth.user, discord.PermissionOverwrite(send_messages=True, read_messages=True, manage_roles=True))
+        raid_channel_overwrite_list.append(meowth_overwrite)
+        raid_channel = await guild.create_text_channel(raid_channel_name, overwrites=raid_channel_overwrites,category=raid_channel_category)
+        if guild_dict[guild.id]['configure_dict']['invite']['enabled']:
+            for role in guild.role_hierarchy:
+                if role.permissions.manage_guild or role.permissions.manage_channels or role.permissions.manage_messages:
+                    raid_channel_overwrite_list.append((role, discord.PermissionOverwrite(send_messages=True)))
+    elif type == "raid":
+        name = pkmn + "-"
+        raid_channel_overwrite_list = report_channel.overwrites
+    elif type == "egg":
+        name = str(level) + "-egg-"
+        raid_channel_overwrite_list = report_channel.overwrites
+    name += sanitize_channel_name(details)
+    cat = get_category(report_channel, level, type=type)
+    ow = dict(raid_channel_overwrite_list)
+    return await guild.create_text_channel(name, overwrites=ow, category=cat)
 
 @Meowth.command(hidden=True)
 async def template(ctx, *, sample_message):
@@ -3560,7 +3615,7 @@ async def all(ctx):
 Reporting
 """
 
-@Meowth.command()
+@Meowth.command(aliases=['w'])
 @checks.allowwildreport()
 async def wild(ctx,pokemon,*,location):
     """Report a wild Pokemon spawn location.
@@ -3638,7 +3693,7 @@ async def _wild(message, content):
     wild_reports = guild_dict[message.guild.id].setdefault('trainers',{}).setdefault(message.author.id,{}).setdefault('wild_reports',0) + 1
     guild_dict[message.guild.id]['trainers'][message.author.id]['wild_reports'] = wild_reports
 
-@Meowth.command()
+@Meowth.command(aliases=['r'])
 @checks.allowraidreport()
 async def raid(ctx,pokemon,*,location:commands.clean_content(fix_channel_mentions=True)="", weather=None, timer=None):
     """Report an ongoing raid.
@@ -3821,14 +3876,15 @@ async def _raid(message, content):
 async def raidegg(ctx,egglevel, *, location:commands.clean_content(fix_channel_mentions=True)="", weather=None, timer=None):
     """Report a raid egg.
 
-    Usage: !raidegg <level> <location> [minutes]
+    Usage: !raidegg <level> <location> [weather] [minutes]
 
     Meowth will give a map link to the entered location and create a channel for organising the coming raid in.
     Meowth will also provide info on the possible bosses that can hatch and their types.
 
     <level> - Required. Level of the egg. Levels are from 1 to 5.
     <location> - Required. Address/Location of the gym.
-    <minutes-remaining> - Not required. Time remaining until the egg hatches into an open raid. 1-60 minutes will be accepted. If not provided, 1 hour is assumed. Whole numbers only."""
+    [weather] - Not required. See !help weather for accepted arguments.
+    [minutes] - Not required. Time remaining until the egg hatches into an open raid. 1-60 minutes will be accepted. If not provided, 1 hour is assumed. Whole numbers only."""
     content = f"{egglevel} {location}"
     await _raidegg(ctx.message, content)
 
@@ -4191,7 +4247,7 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
         await _edit_party(raid_channel, author)
     event_loop.create_task(expiry_check(raid_channel))
 
-@Meowth.command()
+@Meowth.command(aliases=['ex'])
 @checks.allowexraidreport()
 async def exraid(ctx, *, location):
     """Report an upcoming EX raid.
@@ -4385,7 +4441,7 @@ async def _invite(ctx):
     await reply.delete()
     await exraidmsg.delete()
 
-@Meowth.command()
+@Meowth.command(aliases=['res'])
 @checks.allowresearchreport()
 async def research(ctx, *, details = None):
     """Report Field research
@@ -5086,6 +5142,17 @@ async def duplicate(ctx):
                 await rusure.delete()
                 await channel.send(_('Duplicate Confirmed'))
                 logger.info((('Duplicate Report - Channel Expired - ' + channel.name) + ' - Last Report by ') + author.name)
+                raidmsg = await channel.get_message(rc_d['raidmessage'])
+                reporter = raidmsg.mentions[0]
+                if 'egg' in raidmsg.content:
+                    egg_reports = guild_dict[guild.id]['trainers'][reporter.id]['egg_reports']
+                    guild_dict[guild.id]['trainers'][reporter.id]['egg_reports'] = egg_reports - 1
+                elif 'EX' in raidmsg.content:
+                    ex_reports = guild_dict[guild.id]['trainers'][reporter.id]['ex_reports']
+                    guild_dict[guild.id]['trainers'][reporter.id]['ex_reports'] = ex_reports - 1
+                else:
+                    raid_reports = guild_dict[guild.id]['trainers'][reporter.id]['raid_reports']
+                    guild_dict[guild.id]['trainers'][reporter.id]['raid_reports'] = raid_reports - 1
                 await expire_channel(channel)
                 return
         else:

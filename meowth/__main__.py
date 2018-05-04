@@ -3693,19 +3693,22 @@ async def _wild(message, content):
     wild_reports = guild_dict[message.guild.id].setdefault('trainers',{}).setdefault(message.author.id,{}).setdefault('wild_reports',0) + 1
     guild_dict[message.guild.id]['trainers'][message.author.id]['wild_reports'] = wild_reports
 
-@Meowth.command(aliases=['r'])
+@Meowth.command(aliases=['r', 're', 'egg', 'regg', 'raidegg'])
 @checks.allowraidreport()
 async def raid(ctx,pokemon,*,location:commands.clean_content(fix_channel_mentions=True)="", weather=None, timer=None):
-    """Report an ongoing raid.
+    """Report an ongoing raid or a raid egg.
 
-    Usage: !raid <species> <location> [minutes]
-    Meowth will insert the details (really just everything after the species name) into a
+    Usage: !raid <species/level> <location> [weather] [minutes]
+    Meowth will insert <location> into a
     Google maps link and post the link to the same channel the report was made in.
     Meowth's message will also include the type weaknesses of the boss.
 
     Finally, Meowth will create a separate channel for the raid report, for the purposes of organizing the raid."""
     content = f"{pokemon} {location}"
-    await _raid(ctx.message, content)
+    if pokemon.isdigit():
+        return await _raidegg(ctx.message, content)
+    else:
+        await _raid(ctx.message, content)
 
 async def _raid(message, content):
     fromegg = False
@@ -3870,23 +3873,6 @@ async def _raid(message, content):
     raid_reports = guild_dict[message.guild.id].setdefault('trainers',{}).setdefault(message.author.id,{}).setdefault('raid_reports',0) + 1
     guild_dict[message.guild.id]['trainers'][message.author.id]['raid_reports'] = raid_reports
     return raid_channel
-
-@Meowth.command()
-@checks.allowraidreport()
-async def raidegg(ctx,egglevel, *, location:commands.clean_content(fix_channel_mentions=True)="", weather=None, timer=None):
-    """Report a raid egg.
-
-    Usage: !raidegg <level> <location> [weather] [minutes]
-
-    Meowth will give a map link to the entered location and create a channel for organising the coming raid in.
-    Meowth will also provide info on the possible bosses that can hatch and their types.
-
-    <level> - Required. Level of the egg. Levels are from 1 to 5.
-    <location> - Required. Address/Location of the gym.
-    [weather] - Not required. See !help weather for accepted arguments.
-    [minutes] - Not required. Time remaining until the egg hatches into an open raid. 1-60 minutes will be accepted. If not provided, 1 hour is assumed. Whole numbers only."""
-    content = f"{egglevel} {location}"
-    await _raidegg(ctx.message, content)
 
 async def _raidegg(message, content):
     timestamp = (message.created_at + datetime.timedelta(hours=guild_dict[message.channel.guild.id]['configure_dict']['settings']['offset'])).strftime(_('%I:%M %p (%H:%M)'))

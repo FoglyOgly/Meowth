@@ -279,8 +279,7 @@ def create_gmaps_query(details, channel, type="raid"):
     #then channel location hints are not needed in the  maps query
     if re.match (r'^\s*-?\d{1,2}\.?\d*,\s*-?\d{1,3}\.?\d*\s*$', details): #regex looks for lat/long in the format similar to 42.434546, -83.985195.
         return "https://www.google.com/maps/search/?api=1&query={0}".format('+'.join(details_list))
-    loc_list = guild_dict[channel.guild.id]['configure_dict'][report]['report_channels'][channel.id].split(
-    )
+    loc_list = guild_dict[channel.guild.id]['configure_dict'][report]['report_channels'][channel.id].split()
     return 'https://www.google.com/maps/search/?api=1&query={0}+{1}'.format('+'.join(details_list), '+'.join(loc_list))
 
 # Given a User, check that it is Meowth's master
@@ -1115,7 +1114,8 @@ async def on_message(message):
                     await _here(message.channel, message.author, emoji_count, party=None)
                     return
                 if "/maps" in message.content and "http" in message.content:
-                    newloc = create_gmaps_query(message.content, message.channel, type=guild_dict[message.guild.id]['raidchannel_dict'][message.channel.id]['type'])
+                    newcontent = message.content.replace("<","").replace(">","")
+                    newloc = create_gmaps_query(newcontent, message.channel, type=guild_dict[message.guild.id]['raidchannel_dict'][message.channel.id]['type'])
                     oldraidmsg = await message.channel.get_message(guild_dict[message.guild.id]['raidchannel_dict'][message.channel.id]['raidmessage'])
                     report_channel = Meowth.get_channel(guild_dict[message.guild.id]['raidchannel_dict'][message.channel.id]['reportcity'])
                     oldreportmsg = await report_channel.get_message(guild_dict[message.guild.id]['raidchannel_dict'][message.channel.id]['raidreport'])
@@ -3405,8 +3405,9 @@ async def leaderboard(ctx, type="total"):
     embed.set_author(name=_("Reporting Leaderboard ({type})").format(type=type.title()), icon_url=Meowth.user.avatar_url)
     for trainer in leaderboard:
         user = ctx.guild.get_member(trainer['trainer'])
-        embed.add_field(name=f"{rank}. {user.display_name} - {type.title()}: **{trainer[type]}**", value=f"Raids: **{trainer['raids']}** | Eggs: **{trainer['eggs']}** | EX Raids: **{trainer['exraids']}** | Wilds: **{trainer['wilds']}** | Research: **{trainer['research']}**", inline=False)
-        rank += 1
+        if user:
+            embed.add_field(name=f"{rank}. {user.display_name} - {type.title()}: **{trainer[type]}**", value=f"Raids: **{trainer['raids']}** | Eggs: **{trainer['eggs']}** | EX Raids: **{trainer['exraids']}** | Wilds: **{trainer['wilds']}** | Research: **{trainer['research']}**", inline=False)
+            rank += 1
     await ctx.send(embed=embed)
 
 @Meowth.command(hidden=True)
@@ -4235,7 +4236,7 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
 
 @Meowth.command(aliases=['ex'])
 @checks.allowexraidreport()
-async def exraid(ctx, *, location):
+async def exraid(ctx, *,location:commands.clean_content=""):
     """Report an upcoming EX raid.
 
     Usage: !exraid <location>
@@ -4707,7 +4708,7 @@ async def timer(ctx):
 
 @Meowth.command()
 @checks.activeraidchannel()
-async def starttime(ctx,*,start_time):
+async def starttime(ctx,*,start_time=""):
     """Set a time for a group to start a raid
 
     Usage: !starttime [HH:MM AM/PM]

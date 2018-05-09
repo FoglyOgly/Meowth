@@ -18,7 +18,7 @@
         "3": {
             "egg": "rare",
             "egg_img": "3.png",
-            "pokemon": [68, 94, 124, 127, 210, 221],
+            "pokemon": [68, 94, 107, 124, 127, 210, 221],
             "hatchtime":60,
             "raidtime":45
         },

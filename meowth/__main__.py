@@ -6638,7 +6638,7 @@ async def research(ctx):
     Usage: !list research"""
     listmsg = _('**Meowth!**')
     listmsg += await _researchlist(ctx)
-    await ctx.channel.send(listmsg)
+    await ctx.channel.send(embed=discord.Embed(colour=ctx.guild.me.colour, description=listmsg))
 
 async def _researchlist(ctx):
     research_dict = copy.deepcopy(guild_dict[ctx.guild.id].get('questreport_dict',{}))
@@ -6650,13 +6650,13 @@ async def _researchlist(ctx):
                 questauthor = ctx.channel.guild.get_member(research_dict[questid]['reportauthor'])
                 if len(questmsg) < 1500:
                     questmsg += ('\n🔹')
-                    questmsg += _("**Reward**: {reward}, **Pokestop**: {location}, **Quest**: {quest}, **Reported By**: {author}\n**Location**: <{url}>".format(location=research_dict[questid]['location'].title(),quest=research_dict[questid]['quest'].title(),reward=research_dict[questid]['reward'].title(), author=questauthor.display_name, url=research_dict[questid].get('url',None)))
+                    questmsg += _("**Reward**: {reward}, **Pokestop**: [{location}]({url}), **Quest**: {quest}, **Reported By**: {author}".format(location=research_dict[questid]['location'].title(),quest=research_dict[questid]['quest'].title(),reward=research_dict[questid]['reward'].title(), author=questauthor.display_name, url=research_dict[questid].get('url',None)))
                 else:
                     listmsg = _('Meowth! **Here\'s the current research reports for {channel}**\n{questmsg}').format(channel=ctx.message.channel.name.capitalize(),questmsg=questmsg)
-                    await ctx.channel.send(listmsg)
+                    await ctx.channel.send(embed=discord.Embed(colour=ctx.guild.me.colour, description=listmsg))
                     questmsg = ""
                     questmsg += ('\n🔹')
-                    questmsg += _("**Reward**: {reward}, **Pokestop**: {location}, **Quest**: {quest}, **Reported By**: {author}\n**Location**: <{url}>".format(location=research_dict[questid]['location'].title(),quest=research_dict[questid]['quest'].title(),reward=research_dict[questid]['reward'].title(), author=questauthor.display_name, url=research_dict[questid].get('url',None)))
+                    questmsg += _("**Reward**: {reward}, **Pokestop**: [{location}]({url}), **Quest**: {quest}, **Reported By**: {author}".format(location=research_dict[questid]['location'].title(),quest=research_dict[questid]['quest'].title(),reward=research_dict[questid]['reward'].title(), author=questauthor.display_name, url=research_dict[questid].get('url',None)))
             except discord.errors.NotFound:
                 continue
     if questmsg:
@@ -6673,7 +6673,7 @@ async def wilds(ctx):
     Usage: !list wilds"""
     listmsg = _('**Meowth!**')
     listmsg += await _wildlist(ctx)
-    await ctx.channel.send(listmsg)
+    await ctx.channel.send(embed=discord.Embed(colour=ctx.guild.me.colour, description=listmsg))
 
 async def _wildlist(ctx):
     wild_dict = copy.deepcopy(guild_dict[ctx.guild.id].get('wildreport_dict',{}))
@@ -6685,13 +6685,13 @@ async def _wildlist(ctx):
                 wildauthor = ctx.channel.guild.get_member(wild_dict[wildid]['reportauthor'])
                 if len(wildmsg) < 1500:
                     wildmsg += ('\n🔹')
-                    wildmsg += _("**Pokemon**: {pokemon}, **Location**: {location}, **Reported By**: {author}\n**Location**: <{url}>".format(pokemon=wild_dict[wildid]['pokemon'].title(),location=wild_dict[wildid]['location'].title(),author=wildauthor.display_name,url=wild_dict[wildid].get('url',None)))
+                    wildmsg += _("**Pokemon**: {pokemon}, **Location**: [{location}]({url}), **Reported By**: {author}".format(pokemon=wild_dict[wildid]['pokemon'].title(),location=wild_dict[wildid]['location'].title(),author=wildauthor.display_name,url=wild_dict[wildid].get('url',None)))
                 else:
                     listmsg = _('Meowth! **Here\'s the current wild reports for {channel}**\n{wildmsg}').format(channel=ctx.message.channel.name.capitalize(),wildmsg=wildmsg)
-                    await ctx.channel.send(listmsg)
+                    await ctx.channel.send(embed=discord.Embed(colour=ctx.guild.me.colour, description=listmsg))
                     wildmsg = ""
                     wildmsg += ('\n🔹')
-                    wildmsg += _("**Pokemon**: {pokemon}, **Location**: {location}, **Reported By**: {author}\n**Location**: <{url}>".format(pokemon=wild_dict[wildid]['pokemon'].title(),location=wild_dict[wildid]['location'].title(),author=wildauthor.display_name,url=wild_dict[wildid].get('url',None)))
+                    wildmsg += _("**Pokemon**: {pokemon}, **Location**: [{location}]({url}), **Reported By**: {author}\n**Location**: <{url}>".format(pokemon=wild_dict[wildid]['pokemon'].title(),location=wild_dict[wildid]['location'].title(),author=wildauthor.display_name,url=wild_dict[wildid].get('url',None)))
             except discord.errors.NotFound:
                 continue
     if wildmsg:

@@ -368,7 +368,7 @@ def do_template(message, author, guild):
         elif match_type == '&':
             role = discord.utils.get(guild.roles, name=match)
             if match.isdigit() and (not role):
-                role = discord.utils.get(guild.roles, id=match)
+                role = discord.utils.get(guild.roles, id=int(match))
             if (not role):
                 not_found.append(full_match)
             return role.mention if role else full_match
@@ -1486,7 +1486,7 @@ async def prefix(ctx):
 @commands.has_permissions(manage_guild=True)
 async def perms(ctx, channel_id = None):
     """Show Meowth's permissions for the guild and channel."""
-    channel = discord.utils.get(ctx.bot.get_all_channels(), id=channel_id)
+    channel = discord.utils.get(ctx.bot.get_all_channels(), id=int(channel_id))
     guild = channel.guild if channel else ctx.guild
     channel = channel or ctx.channel
     guild_perms = guild.me.guild_permissions
@@ -2976,25 +2976,69 @@ async def raid_json(ctx, level=None, *, newlist=None):
 
 @Meowth.command()
 @commands.has_permissions(manage_guild=True)
-async def reset_board(ctx, tgt_trainer: discord.Member = None):
+async def reset_board(ctx, *, user=None, type=None):
     guild = ctx.guild
     trainers = guild_dict[guild.id]['trainers']
-    if tgt_trainer:
-        trainers[tgt_trainer.id]['raid_reports'] = 0
-        trainers[tgt_trainer.id]['wild_reports'] = 0
-        trainers[tgt_trainer.id]['ex_reports'] = 0
-        trainers[tgt_trainer.id]['egg_reports'] = 0
-        trainers[tgt_trainer.id]['research_reports'] = 0
-        await ctx.send(f"{tgt_trainer.display_name}'s report stats have been cleared!")
+    tgt_string = ""
+    if user:
+        converter = commands.MemberConverter()
+        for argument in user.split():
+            try:
+                tgt_trainer = await converter.convert(ctx, argument)
+                tgt_string = tgt_trainer.display_name
+            except:
+                tgt_trainer = None
+                tgt_string = _("every user")
+            if tgt_trainer:
+                user = user.replace(argument,"").strip()
+                break
+        for argument in user.split():
+            if "raid" in argument.lower():
+                type = "raid_reports"
+                break
+            elif "egg" in argument.lower():
+                type = "egg_reports"
+                break
+            elif "ex" in argument.lower():
+                type = "ex_reports"
+                break
+            elif "wild" in argument.lower():
+                type = "wild_reports"
+                break
+            elif "res" in argument.lower():
+                type = "research_reports"
+                break
+    if not type:
+        type = "total_reports"
+    msg = _("Are you sure you want to reset the **{type}** report stats for **{target}**?").format(type=type, target=tgt_string)
+    question = await ctx.channel.send(msg)
+    try:
+        timeout = False
+        res, reactuser = await ask(question, ctx.message.channel, ctx.message.author.id)
+    except TypeError:
+        timeout = True
+    await question.delete()
+    if timeout or res.emoji == '❎':
+        return
+    elif res.emoji == '✅':
+        pass
+    else:
         return
     for trainer in trainers:
-        trainers[trainer]['raid_reports'] = 0
-        trainers[trainer]['wild_reports'] = 0
-        trainers[trainer]['ex_reports'] = 0
-        trainers[trainer]['egg_reports'] = 0
-        trainers[trainer]['research_reports'] = 0
+        if tgt_trainer:
+            trainer = tgt_trainer.id
+        if type == "total_reports":
+            trainers[trainer]['raid_reports'] = 0
+            trainers[trainer]['wild_reports'] = 0
+            trainers[trainer]['ex_reports'] = 0
+            trainers[trainer]['egg_reports'] = 0
+            trainers[trainer]['research_reports'] = 0
+        else:
+            trainers[trainer][type] = 0
+        if tgt_trainer:
+            await ctx.send(f"{tgt_trainer.display_name}'s report stats have been cleared!")
+            return
     await ctx.send("This server's report stats have been reset!")
-
 
 @Meowth.command()
 @commands.has_permissions(manage_channels=True)

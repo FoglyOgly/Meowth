@@ -3385,6 +3385,7 @@ async def leaderboard(ctx, type="total"):
     trainers = copy.deepcopy(guild_dict[ctx.guild.id]['trainers'])
     leaderboard = []
     rank = 1
+    field_value = ""
     typelist = ["total", "raids", "exraids", "wilds", "research", "eggs"]
     type = type.lower()
     if type not in typelist:
@@ -3406,8 +3407,19 @@ async def leaderboard(ctx, type="total"):
     for trainer in leaderboard:
         user = ctx.guild.get_member(trainer['trainer'])
         if user:
-            embed.add_field(name=f"{rank}. {user.display_name} - {type.title()}: **{trainer[type]}**", value=f"Raids: **{trainer['raids']}** | Eggs: **{trainer['eggs']}** | EX Raids: **{trainer['exraids']}** | Wilds: **{trainer['wilds']}** | Research: **{trainer['research']}**", inline=False)
+            if guild_dict[ctx.guild.id]['configure_dict']['raid']['enabled']:
+                field_value += f"Raids: **{trainer['raids']}** | Eggs: **{trainer['eggs']}** | "
+            if guild_dict[ctx.guild.id]['configure_dict']['exraid']['enabled']:
+                field_value += f"EX Raids: **{trainer['exraids']}** | "
+            if guild_dict[ctx.guild.id]['configure_dict']['wild']['enabled']:
+                field_value += f"Wilds: **{trainer['wilds']}** | "
+            if guild_dict[ctx.guild.id]['configure_dict']['research']['enabled']:
+                field_value += f"Research: **{trainer['research']}** | "
+            embed.add_field(name=f"{rank}. {user.display_name} - {type.title()}: **{trainer[type]}**", value=field_value[:-3], inline=False)
+            field_value = ""
             rank += 1
+    if len(embed.fields) == 0:
+        embed.add_field(name=_("No Reports"), value=_("Nobody has made a report or this report type is disabled."))
     await ctx.send(embed=embed)
 
 @Meowth.command(hidden=True)

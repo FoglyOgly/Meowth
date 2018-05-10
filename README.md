@@ -192,6 +192,7 @@ pkmn = Pokemon
 | **!clearstatus**  | *Channel Manager<br/>Raid Channel* | Cancel everyone's status. |
 | **!setstatus** \<user\> \<status\> \[count\] | *Channel Manager<br/>Raid Channel* | Changes raid channel status lists. |
 | **!cleanroles** | *Channel Manager* | Removes all 0 member pokemon roles. |
+| **!reset_board** \[user\] \[type\] | *Server Manager* | Resets \[user\]'s or server's leaderboard by type or total. |
 
 ### Miscellaneous Commands
 | Commands | Requirements  | Description |
@@ -202,6 +203,8 @@ pkmn = Pokemon
 | **!team** \<team\> | - | Let's users set their team role. |
 | **!set silph** \<Silph name\> | - | Links user\'s Silph Road account to Meowth. |
 | **!silphcard** \[Silph name\] | - | Displays [Silph name]\'s or user\'s trainer card. |
+| **!profile** \[username\] | - | Displays [username]\'s or user\'s profile. |
+| **!leaderboard** \[type\] | - | Displays reporting leaderboard. Accepts total, raids, eggs, exraids, wilds, research. Defaults to total. |
 
 ### Pokemon Notification Commands:
 
@@ -215,14 +218,14 @@ pkmn = Pokemon
 
 | Commands | Requirements  | Description |
 | -------- |:-------------:| ------------|
-| **!wild** \<pkmn\> \<location\> | *Region Channel* | Reports a wild pokemon, notifying people who want it. |
-| **!raid** \<pkmn\> \<place\> \[timer\] | *Region Channel* | Creates an open raid channel. |
-| **!raidegg** \<level\> \<place\> \[timer\] | *Region Channel* | Creates a raid egg channel. |
+| **!wild** \<pkmn\> \<location\> | *Region Channel* | Reports a wild pokemon, notifying people who want it. `Aliases: !w` |
+| **!raid** \<pkmn\> \<place\> \[timer\] | *Region Channel* | Creates an open raid channel. `Aliases: !r`|
+| **!raidegg** \<level\> \<place\> \[timer\] | *Region Channel* | Creates a raid egg channel. `Aliases: !re, !regg, !egg` |
 | **!raid** \<pkmn\> | *Raid Egg Channel* | Converts raid egg to an open raid. |
 | **!raid assume** \<pkmn\> | *Raid Egg Channel* | Assumes a pokemon on hatch. |
-| **!exraid** \<pkmn\> \<place\> | *Region Channel* | Creates an exraid channel. |
+| **!exraid** \<pkmn\> \<place\> | *Region Channel* | Creates an exraid channel. `Aliases: !ex`|
 | **!invite**  | *Region Channel* | Gain entry to exraids. |
-| **!research** \[pokestop name \[optional URL\], quest, reward\] | *Region Channel* | Reports field research. Guided version available with just **!research** |
+| **!research** \[pokestop name \[optional URL\], quest, reward\] | *Region Channel* | Reports field research. Guided version available with just **!research** `Aliases: !res` |
 
 ### Raid Channel Management:
 

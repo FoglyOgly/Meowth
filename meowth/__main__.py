@@ -4806,13 +4806,13 @@ async def starttime(ctx,*,start_time=""):
             start = start.replace(year=hatch.year, month=hatch.month, day=hatch.day)
         diff = start - now
         total = diff.total_seconds() / 60
-        if total > maxtime:
+        if total > maxtime and egglevel != 'EX':
             await channel.send(_('Meowth! The raid will be over before that....'))
             return
-        if now > start:
+        if now > start and egglevel != 'EX':
             await channel.send(_('Meowth! Please enter a time in the future.'))
             return
-        if int(total) < int(mintime):
+        if int(total) < int(mintime) and egglevel != 'EX':
             await channel.send(_('Meowth! The egg will not hatch by then!'))
             return
         if alreadyset:

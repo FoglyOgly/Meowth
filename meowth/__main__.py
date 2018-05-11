@@ -18,7 +18,7 @@ from time import strftime
 from logs import init_loggers
 import discord
 from discord.ext import commands
-import spelling
+import pkmn_match
 from PIL import Image
 from PIL import ImageFilter
 from PIL import ImageEnhance
@@ -122,7 +122,7 @@ def load_config():
     with open(os.path.join('data', 'type_list.json'), 'r') as fd:
         type_list = json.load(fd)
     # Set spelling dictionary to our list of Pokemon
-    spelling.set_dictionary(pkmn_info['pokemon_list'])
+    pkmn_match.set_list(pkmn_info['pokemon_list'])
 
 
 load_config()
@@ -298,13 +298,11 @@ def raise_admin_violation(message):
         command=message.content, user=message.author))
 
 def spellcheck(word):
-    suggestion = spelling.correction(word)
-    return suggestion
+    suggestion = pkmn_match.get_pkmn(re.sub(r"[^A-Za-z0-9 ]+", '', word))
     # If we have a spellcheck suggestion
-    if suggestion != word:
-        return _('Meowth! "{entered_word}" is not a Pokemon! Did you mean "{corrected_word}"?').format(entered_word=word, corrected_word=spelling.correction(word))
-    else:
-        return _('Meowth! "{entered_word}" is not a Pokemon! Check your spelling!').format(entered_word=word)
+    if suggestion and suggestion != word:
+        result = pkmn_info['pokemon_list'][suggestion]
+        return result
 
 async def autocorrect(entered_word, destination, author):
     msg = _("Meowth! **{word}** isn't a Pokemon!").format(word=entered_word.title())
@@ -3694,17 +3692,17 @@ async def _wild(message, content):
     entered_wild = content.split(' ', 1)[0]
     entered_wild = get_name(entered_wild).lower() if entered_wild.isdigit() else entered_wild.lower()
     wild_details = content.split(' ', 1)[1]
-    if entered_wild not in pkmn_info['pokemon_list']:
+    pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, '', p) == re.sub(rgx, '', entered_wild)), None)
+    if (not pkmn_match):
         entered_wild2 = ' '.join([content.split(' ', 2)[0], content.split(' ', 2)[1]]).lower()
-        if entered_wild2 in pkmn_info['pokemon_list']:
+        pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, '', p) == re.sub(rgx, '', entered_wild2)), None)
+        if pkmn_match:
             entered_wild = entered_wild2
             try:
                 wild_details = content.split(' ', 2)[2]
             except IndexError:
                 await message.channel.send(_('Meowth! Give more details when reporting! Usage: **!wild <pokemon name> <location>**'))
                 return
-    wild_gmaps_link = create_gmaps_query(wild_details, message.channel, type="wild")
-    pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, '', p) == re.sub(rgx, '', entered_wild)), None)
     if pkmn_match:
         entered_wild = pkmn_match
     else:
@@ -3717,18 +3715,16 @@ async def _wild(message, content):
     else:
         roletest = _("{pokemon} - ").format(pokemon=wild.mention)
     wild_number = pkmn_info['pokemon_list'].index(entered_wild) + 1
-    wild_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=1'.format(str(wild_number).zfill(3))
+    wild_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=0'.format(str(wild_number).zfill(3))
     expiremsg = _('**This {pokemon} has despawned!**').format(pokemon=entered_wild.title())
-    wild_embed = discord.Embed(title=_('Meowth! Click here for my directions to the wild {pokemon}!').format(pokemon=entered_wild.capitalize()), description=_("Ask {author} if my directions aren't perfect!").format(author=message.author.name), url=wild_gmaps_link, colour=message.guild.me.colour)
+    wild_gmaps_link = create_gmaps_query(wild_details, message.channel, type="wild")
+    wild_embed = discord.Embed(title=_('Meowth! Click here for my directions to the wild {pokemon}!').format(pokemon=entered_wild.title()), description=_("Ask {author} if my directions aren't perfect!").format(author=message.author.name), url=wild_gmaps_link, colour=message.guild.me.colour)
     wild_embed.add_field(name=_('**Details:**'), value=_('{pokemon} ({pokemonnumber}) {type}').format(pokemon=entered_wild.capitalize(), pokemonnumber=str(wild_number), type=''.join(get_type(message.guild, wild_number))), inline=False)
-    wild_embed.add_field(name='**Reactions:**', value="🏎: I'm on my way!")
-    wild_embed.add_field(name='\u200b', value=f"{parse_emoji(message.guild, ':dash:')}: The Pokemon despawned!")
-    if message.author.avatar:
-        wild_embed.set_footer(text=_('Reported by @{author} - {timestamp}').format(author=message.author.display_name, timestamp=timestamp), icon_url='https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}.{format}?size={size}'.format(user=message.author, format='jpg', size=32))
-    else:
-        wild_embed.set_footer(text=_('Reported by @{author} - {timestamp}').format(author=message.author.display_name, timestamp=timestamp), icon_url=message.author.default_avatar_url)
-    wild_embed.set_thumbnail(url=wild_img_url)
     wildreportmsg = await message.channel.send(content=_('{roletest}Meowth! Wild {pokemon} reported by {member}! Details: {location_details}').format(roletest=roletest,pokemon=entered_wild.title(), member=message.author.mention, location_details=wild_details), embed=wild_embed)
+    wild_embed.set_thumbnail(url=wild_img_url)
+    wild_embed.add_field(name='**Reactions:**', value=_("🏎: I'm on my way!"))
+    wild_embed.add_field(name='\u200b', value=_("💨: The Pokemon despawned!"))
+    wild_embed.set_footer(text=_('Reported by @{author} - {timestamp}').format(author=message.author.display_name, timestamp=timestamp), icon_url=message.author.avatar_url_as(format=None, static_format='jpg', size=32))
     await asyncio.sleep(0.25)
     await wildreportmsg.add_reaction('🏎')
     await asyncio.sleep(0.25)

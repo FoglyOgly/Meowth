@@ -16,6 +16,7 @@ _pip_req_= [
     "pytesseract>=0.1.7",
     "hastebin.py>=0.2",
     "python-dateutil>=2.6.1",
+    "fuzzywuzzy>=0.15.1",    
     "dateparser>=0.6.0"
 ]
 

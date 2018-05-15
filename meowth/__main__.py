@@ -4309,6 +4309,8 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
     guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id]['duplicate'] = duplicate
     guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id]['archive'] = archive
     if author:
+        raid_reports = guild_dict[raid_channel.guild.id].setdefault('trainers',{}).setdefault(author.id,{}).setdefault('raid_reports',0) + 1
+        guild_dict[message.guild.id]['trainers'][author.id]['raid_reports'] = raid_reports
         await _edit_party(raid_channel, author)
     event_loop.create_task(expiry_check(raid_channel))
 

@@ -104,8 +104,6 @@ def check_raidactive(ctx):
     guild = ctx.guild
     return ctx.bot.guild_dict[guild.id].get('raidchannel_dict',{}).get(channel.id,{}).get('active',False)
 
-
-
 def check_exraidset(ctx):
     if ctx.guild is None:
         return False
@@ -134,6 +132,14 @@ def check_exraidchannel(ctx):
     level = ctx.bot.guild_dict[guild.id].get('raidchannel_dict',{}).get(channel.id,{}).get('egglevel',False)
     type =  ctx.bot.guild_dict[guild.id].get('raidchannel_dict',{}).get(channel.id,{}).get('type',False)
     return (level == 'EX') or (type == 'exraid')
+
+def check_meetupchannel(ctx):
+    if ctx.guild is None:
+        return False
+    channel = ctx.channel
+    guild = ctx.guild
+    meetup =  ctx.bot.guild_dict[guild.id].get('raidchannel_dict',{}).get(channel.id,{}).get('meetup',False)
+    return meetup
 
 def check_wildset(ctx):
     if ctx.guild is None:

@@ -4714,6 +4714,8 @@ async def print_raid_timer(channel):
         if guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['type'] == 'egg':
             if start:
                 timerstr += _("This event will start at {expiry_time}").format(expiry_time=start.strftime(_('%B %d at %I:%M %p (%H:%M)')))
+                if end:
+                    timerstr += _(" | This event will end at {expiry_time}").format(expiry_time=end.strftime(_('%B %d at %I:%M %p (%H:%M)')))
             else:
                 timerstr += _("Nobody has told me a start time! Set it with **!starttime**")
         if guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['type'] == 'exraid':

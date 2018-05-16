@@ -4888,6 +4888,7 @@ async def starttime(ctx,*,start_time=""):
     start_split = start_time.lower().split()
     rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
     timeset = False
+    start = None
     if rc_d.get('meetup',{}):
         try:
             start = dateparser.parse(' '.join(start_split).lower(), settings={'DATE_ORDER': 'MDY'})
@@ -4897,8 +4898,7 @@ async def starttime(ctx,*,start_time=""):
             timeset = True
             rc_d['meetup']['start'] = start
         except:
-            await channel.send(_("Meowth! Your timer wasn't formatted correctly. Change your **!starttime** to match this format: **MM/DD HH:MM AM/PM** (You can also omit AM/PM and use 24-hour time!)"))
-            return
+            pass
     if not timeset:
         if rc_d['type'] == 'egg':
             egglevel = rc_d['egglevel']
@@ -4955,12 +4955,11 @@ async def starttime(ctx,*,start_time=""):
                         timeset = True
                 else:
                     return
-    if now <= start or timeset:
+    if (start and now <= start) or timeset:
+        rc_d['starttime'] = start
         nextgroup = start.strftime(_('%I:%M %p (%H:%M)'))
         if rc_d.get('meetup',{}):
             nextgroup = start.strftime(_('%B %d at %I:%M %p (%H:%M)'))
-        else:
-            rc_d['starttime'] = start
         await channel.send(_('Meowth! The current start time has been set to: **{starttime}**').format(starttime=nextgroup))
         report_channel = Meowth.get_channel(rc_d['reportcity'])
         raidmsg = await channel.get_message(rc_d['raidmessage'])
@@ -6494,6 +6493,7 @@ async def list(ctx):
             tag = False
             team = False
             starttime = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('starttime',None)
+            meetup = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('meetup',{})
             rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
             list_split = ctx.message.clean_content.lower().split()
             if "tags" in list_split or "tag" in list_split:
@@ -6519,7 +6519,7 @@ async def list(ctx):
             if (len(listmsg.splitlines()) <= 1):
                 listmsg +=  ('\n' + bulletpoint) + (_(" Nobody has updated their status yet!"))
             listmsg += ('\n' + bulletpoint) + (await print_raid_timer(channel))
-            if starttime and (starttime > now):
+            if starttime and (starttime > now) and not meetup:
                 listmsg += _('\nThe next group will be starting at **{}**').format(starttime.strftime(_('%I:%M %p (%H:%M)')))
             await channel.send(listmsg)
             return

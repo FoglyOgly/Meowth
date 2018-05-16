@@ -4697,7 +4697,7 @@ async def _meetup(ctx, location):
         'meetup': {'start':None, 'end':None}
     }
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[raid_channel.guild.id]['configure_dict']['settings']['offset'])
-    await raid_channel.send(content=_('Meowth! Hey {member}, if you can, set the time that the event starts with **!starttime <date and time>** and also set the time that the event starts using **!timerset <date and time>**.').format(member=message.author.mention))
+    await raid_channel.send(content=_('Meowth! Hey {member}, if you can, set the time that the event starts with **!starttime <date and time>** and also set the time that the event ends using **!timerset <date and time>**.').format(member=message.author.mention))
     event_loop.create_task(expiry_check(raid_channel))
 
 """

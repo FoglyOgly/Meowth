@@ -3453,6 +3453,9 @@ async def leaderboard(ctx, type="total"):
         await ctx.send(_("Leaderboard type not supported. Please select from: **total, raids, eggs, exraids, wilds, research**"))
         return
     for trainer in trainers.keys():
+        user = ctx.guild.get_member(trainer)
+        if not user:
+            continue
         raids = trainers[trainer].setdefault('raid_reports', 0)
         wilds = trainers[trainer].setdefault('wild_reports', 0)
         exraids = trainers[trainer].setdefault('ex_reports', 0)
@@ -3466,19 +3469,17 @@ async def leaderboard(ctx, type="total"):
     embed = discord.Embed(colour=ctx.guild.me.colour)
     embed.set_author(name=_("Reporting Leaderboard ({type})").format(type=type.title()), icon_url=Meowth.user.avatar_url)
     for trainer in leaderboard:
-        user = ctx.guild.get_member(trainer['trainer'])
-        if user:
-            if guild_dict[ctx.guild.id]['configure_dict']['raid']['enabled']:
-                field_value += f"Raids: **{trainer['raids']}** | Eggs: **{trainer['eggs']}** | "
-            if guild_dict[ctx.guild.id]['configure_dict']['exraid']['enabled']:
-                field_value += f"EX Raids: **{trainer['exraids']}** | "
-            if guild_dict[ctx.guild.id]['configure_dict']['wild']['enabled']:
-                field_value += f"Wilds: **{trainer['wilds']}** | "
-            if guild_dict[ctx.guild.id]['configure_dict']['research']['enabled']:
-                field_value += f"Research: **{trainer['research']}** | "
-            embed.add_field(name=f"{rank}. {user.display_name} - {type.title()}: **{trainer[type]}**", value=field_value[:-3], inline=False)
-            field_value = ""
-            rank += 1
+        if guild_dict[ctx.guild.id]['configure_dict']['raid']['enabled']:
+            field_value += f"Raids: **{trainer['raids']}** | Eggs: **{trainer['eggs']}** | "
+        if guild_dict[ctx.guild.id]['configure_dict']['exraid']['enabled']:
+            field_value += f"EX Raids: **{trainer['exraids']}** | "
+        if guild_dict[ctx.guild.id]['configure_dict']['wild']['enabled']:
+            field_value += f"Wilds: **{trainer['wilds']}** | "
+        if guild_dict[ctx.guild.id]['configure_dict']['research']['enabled']:
+            field_value += f"Research: **{trainer['research']}** | "
+        embed.add_field(name=f"{rank}. {user.display_name} - {type.title()}: **{trainer[type]}**", value=field_value[:-3], inline=False)
+        field_value = ""
+        rank += 1
     if len(embed.fields) == 0:
         embed.add_field(name=_("No Reports"), value=_("Nobody has made a report or this report type is disabled."))
     await ctx.send(embed=embed)

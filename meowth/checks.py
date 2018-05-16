@@ -188,6 +188,20 @@ def check_researchreport(ctx):
     return channel.id in channel_list
 
 #Decorators
+def allowreports():
+    def predicate(ctx):
+        if check_raidreport(ctx) or (check_eggchannel(ctx) and check_raidchannel(ctx)):
+            return True
+        elif check_exraidreport(ctx) or check_exraidchannel(ctx):
+            return True
+        elif check_wildreport(ctx):
+            return True
+        elif check_researchreport(ctx):
+            return True
+        else:
+            raise errors.ReportCheckFail()
+    return commands.check(predicate)
+
 def allowraidreport():
     def predicate(ctx):
         if check_raidset(ctx):

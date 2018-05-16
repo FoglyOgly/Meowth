@@ -17,6 +17,10 @@ class WildSetCheckFail(CommandError):
     'Exception raised checks.wildset fails'
     pass
 
+class ReportCheckFail(CommandError):
+    'Exception raised checks.allowreport fails'
+    pass
+
 class RaidSetCheckFail(CommandError):
     'Exception raised checks.raidset fails'
     pass
@@ -157,6 +161,11 @@ def custom_error_handling(bot, logger):
             await delete_error(ctx.message, error)
         elif isinstance(error, WildSetCheckFail):
             msg = _('Meowth! Wild Reporting is not enabled on this server. **{prefix}{cmd_name}** is unable to be used.').format(cmd_name=ctx.invoked_with, prefix=prefix)
+            error = await ctx.channel.send(msg)
+            await asyncio.sleep(10)
+            await delete_error(ctx.message, error)
+        elif isinstance(error, ReportCheckFail):
+            msg = _('Meowth! Reporting is not enabled for this channel. **{prefix}{cmd_name}** is unable to be used.').format(cmd_name=ctx.invoked_with, prefix=prefix)
             error = await ctx.channel.send(msg)
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)

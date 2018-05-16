@@ -4956,10 +4956,11 @@ async def starttime(ctx,*,start_time=""):
                 else:
                     return
     if now <= start or timeset:
-        rc_d['starttime'] = start
         nextgroup = start.strftime(_('%I:%M %p (%H:%M)'))
         if rc_d.get('meetup',{}):
             nextgroup = start.strftime(_('%B %d at %I:%M %p (%H:%M)'))
+        else:
+            rc_d['starttime'] = start
         await channel.send(_('Meowth! The current start time has been set to: **{starttime}**').format(starttime=nextgroup))
         report_channel = Meowth.get_channel(rc_d['reportcity'])
         raidmsg = await channel.get_message(rc_d['raidmessage'])

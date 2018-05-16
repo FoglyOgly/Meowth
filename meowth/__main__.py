@@ -3454,8 +3454,6 @@ async def leaderboard(ctx, type="total"):
         return
     for trainer in trainers.keys():
         user = ctx.guild.get_member(trainer)
-        if not user:
-            continue
         raids = trainers[trainer].setdefault('raid_reports', 0)
         wilds = trainers[trainer].setdefault('wild_reports', 0)
         exraids = trainers[trainer].setdefault('ex_reports', 0)
@@ -3463,23 +3461,25 @@ async def leaderboard(ctx, type="total"):
         research = trainers[trainer].setdefault('research_reports', 0)
         total_reports = raids + wilds + exraids + eggs + research
         trainer_stats = {'trainer':trainer, 'total':total_reports, 'raids':raids, 'wilds':wilds, 'research':research, 'exraids':exraids, 'eggs':eggs}
-        if trainer_stats[type] > 0:
+        if trainer_stats[type] > 0 and user:
             leaderboard.append(trainer_stats)
     leaderboard = sorted(leaderboard,key= lambda x: x[type], reverse=True)[:10]
     embed = discord.Embed(colour=ctx.guild.me.colour)
     embed.set_author(name=_("Reporting Leaderboard ({type})").format(type=type.title()), icon_url=Meowth.user.avatar_url)
     for trainer in leaderboard:
-        if guild_dict[ctx.guild.id]['configure_dict']['raid']['enabled']:
-            field_value += f"Raids: **{trainer['raids']}** | Eggs: **{trainer['eggs']}** | "
-        if guild_dict[ctx.guild.id]['configure_dict']['exraid']['enabled']:
-            field_value += f"EX Raids: **{trainer['exraids']}** | "
-        if guild_dict[ctx.guild.id]['configure_dict']['wild']['enabled']:
-            field_value += f"Wilds: **{trainer['wilds']}** | "
-        if guild_dict[ctx.guild.id]['configure_dict']['research']['enabled']:
-            field_value += f"Research: **{trainer['research']}** | "
-        embed.add_field(name=f"{rank}. {user.display_name} - {type.title()}: **{trainer[type]}**", value=field_value[:-3], inline=False)
-        field_value = ""
-        rank += 1
+        user = ctx.guild.get_member(trainer['trainer'])
+        if user:
+            if guild_dict[ctx.guild.id]['configure_dict']['raid']['enabled']:
+                field_value += f"Raids: **{trainer['raids']}** | Eggs: **{trainer['eggs']}** | "
+            if guild_dict[ctx.guild.id]['configure_dict']['exraid']['enabled']:
+                field_value += f"EX Raids: **{trainer['exraids']}** | "
+            if guild_dict[ctx.guild.id]['configure_dict']['wild']['enabled']:
+                field_value += f"Wilds: **{trainer['wilds']}** | "
+            if guild_dict[ctx.guild.id]['configure_dict']['research']['enabled']:
+                field_value += f"Research: **{trainer['research']}** | "
+            embed.add_field(name=f"{rank}. {user.display_name} - {type.title()}: **{trainer[type]}**", value=field_value[:-3], inline=False)
+            field_value = ""
+            rank += 1
     if len(embed.fields) == 0:
         embed.add_field(name=_("No Reports"), value=_("Nobody has made a report or this report type is disabled."))
     await ctx.send(embed=embed)

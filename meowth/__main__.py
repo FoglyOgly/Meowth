@@ -608,7 +608,7 @@ async def expiry_check(channel):
                             logger.info(
                                 'Expire_Channel - Channel Expired And Removed From Watchlist - ' + channel.name)
                             break
-            except KeyError:
+            except:
                 pass
             await asyncio.sleep(30)
             continue

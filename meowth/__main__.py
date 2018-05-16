@@ -733,7 +733,7 @@ async def expire_channel(channel):
                     new_name = _('archived-')
                     if new_name not in channel.name:
                         new_name += channel.name
-                        category = guild_dict[channel.guild.id].get('archive', {}).get('category', 'same')
+                        category = guild_dict[channel.guild.id]['configure_dict'].get('archive', {}).get('category', 'same')
                         if category == 'same':
                             newcat = channel.category
                         else:

@@ -4321,7 +4321,7 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
 
 @Meowth.command(aliases=['ex'])
 @checks.allowexraidreport()
-async def exraid(ctx, *,location:commands.clean_content=""):
+async def exraid(ctx, *,location:commands.clean_content(fix_channel_mentions=True)=""):
     """Report an upcoming EX raid.
 
     Usage: !exraid <location>
@@ -4642,7 +4642,7 @@ async def research(ctx, *, details = None):
 
 @Meowth.command(aliases=['event'])
 @checks.allowexraidreport()
-async def meetup(ctx, *,location:commands.clean_content=""):
+async def meetup(ctx, *,location:commands.clean_content(fix_channel_mentions=True)=""):
     """Report an upcoming event.
 
     Usage: !meetup <location>

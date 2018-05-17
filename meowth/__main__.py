@@ -4865,6 +4865,11 @@ async def timerset(ctx, *,timer):
                     except ValueError:
                         await channel.send(_("Meowth! Your timer wasn't formatted correctly. Change your **!timerset** to match this format: **MM/DD HH:MM AM/PM** (You can also omit AM/PM and use 24-hour time!)"))
                         return
+            if checks.check_meetupchannel(ctx):
+                starttime = guild_dict[guild.id]['raidchannel_dict'][channel.id]['meetup'].get('start',False)
+                if starttime and start < starttime:
+                    await channel.send(_('Meowth! Please enter a time after your start time.'))
+                    return
             diff = start - now
             total = diff.total_seconds() / 60
             if now <= start:
@@ -4953,8 +4958,12 @@ async def starttime(ctx,*,start_time=""):
     if rc_d.get('meetup',{}):
         try:
             start = dateparser.parse(' '.join(start_split).lower(), settings={'DATE_ORDER': 'MDY'})
+            endtime = guild_dict[guild.id]['raidchannel_dict'][channel.id]['meetup'].get('end',False)
             if start < now:
                 await channel.send(_('Meowth! Please enter a time in the future.'))
+                return
+            if endtime and start > endtime:
+                await channel.send(_('Meowth! Please enter a time before your end time.'))
                 return
             timeset = True
             rc_d['meetup']['start'] = start

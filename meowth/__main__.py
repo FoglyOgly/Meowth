@@ -3914,6 +3914,7 @@ async def _wild(message, content):
     wild_embed.add_field(name='**Reactions:**', value=_("🏎: I'm on my way!"))
     wild_embed.add_field(name='\u200b', value=_("💨: The Pokemon despawned!"))
     wild_embed.set_footer(text=_('Reported by @{author} - {timestamp}').format(author=message.author.display_name, timestamp=timestamp), icon_url=message.author.avatar_url_as(format=None, static_format='jpg', size=32))
+    wildreportmsg = await message.channel.send(content=_('{roletest}Meowth! Wild {pokemon} reported by {member}! Details: {location_details}').format(roletest=roletest,pokemon=entered_wild.title(), member=message.author.mention, location_details=wild_details), embed=wild_embed)
     await asyncio.sleep(0.25)
     await wildreportmsg.add_reaction('🏎')
     await asyncio.sleep(0.25)

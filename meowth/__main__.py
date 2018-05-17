@@ -608,7 +608,7 @@ async def expiry_check(channel):
                             logger.info(
                                 'Expire_Channel - Channel Expired And Removed From Watchlist - ' + channel.name)
                             break
-            except KeyError:
+            except:
                 pass
             await asyncio.sleep(30)
             continue
@@ -733,7 +733,7 @@ async def expire_channel(channel):
                     new_name = _('archived-')
                     if new_name not in channel.name:
                         new_name += channel.name
-                        category = guild_dict[channel.guild.id].get('archive', {}).get('category', 'same')
+                        category = guild_dict[channel.guild.id]['configure_dict'].get('archive', {}).get('category', 'same')
                         if category == 'same':
                             newcat = channel.category
                         else:
@@ -3453,6 +3453,7 @@ async def leaderboard(ctx, type="total"):
         await ctx.send(_("Leaderboard type not supported. Please select from: **total, raids, eggs, exraids, wilds, research**"))
         return
     for trainer in trainers.keys():
+        user = ctx.guild.get_member(trainer)
         raids = trainers[trainer].setdefault('raid_reports', 0)
         wilds = trainers[trainer].setdefault('wild_reports', 0)
         exraids = trainers[trainer].setdefault('ex_reports', 0)
@@ -3460,7 +3461,7 @@ async def leaderboard(ctx, type="total"):
         research = trainers[trainer].setdefault('research_reports', 0)
         total_reports = raids + wilds + exraids + eggs + research
         trainer_stats = {'trainer':trainer, 'total':total_reports, 'raids':raids, 'wilds':wilds, 'research':research, 'exraids':exraids, 'eggs':eggs}
-        if trainer_stats[type] > 0:
+        if trainer_stats[type] > 0 and user:
             leaderboard.append(trainer_stats)
     leaderboard = sorted(leaderboard,key= lambda x: x[type], reverse=True)[:10]
     embed = discord.Embed(colour=ctx.guild.me.colour)

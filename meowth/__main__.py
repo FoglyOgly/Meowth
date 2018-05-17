@@ -1581,7 +1581,7 @@ async def outputlog(ctx):
         logdata = logfile.read()
     await ctx.channel.send(hastebin.post(logdata))
 
-@Meowth.command()
+@Meowth.command(aliases=['say'])
 @commands.has_permissions(manage_guild=True)
 async def announce(ctx, *, announce=None):
     """Repeats your message in an embed from Meowth.
@@ -1602,11 +1602,12 @@ async def announce(ctx, *, announce=None):
         else:
             confirmation = await channel.send(_("Meowth! You took too long to send me your announcement! Retry when you're ready."))
     embeddraft = discord.Embed(colour=guild.me.colour, description=announce)
-    title = _('Announcement')
-    if Meowth.user.avatar_url:
-        embeddraft.set_author(name=title, icon_url=Meowth.user.avatar_url)
-    else:
-        embeddraft.set_author(name=title)
+    if ctx.invoked_with == "announce":
+        title = _('Announcement')
+        if Meowth.user.avatar_url:
+            embeddraft.set_author(name=title, icon_url=Meowth.user.avatar_url)
+        else:
+            embeddraft.set_author(name=title)
     draft = await channel.send(embed=embeddraft)
     reaction_list = ['❔', '✅', '❎']
     owner_msg_add = ''

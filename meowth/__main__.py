@@ -566,7 +566,7 @@ async def expiry_check(channel):
                     end = guild_dict[guild.id]['raidchannel_dict'][channel.id]['meetup'].get('end',False)
                     if start and guild_dict[guild.id]['raidchannel_dict'][channel.id]['type'] == 'egg':
                         if start < now:
-                            await _eggtoraid("mewtwo", channel, author=None, huntr=False)
+                            await _eggtoraid("mewtwo", channel, author=None)
                             break
                     if end and guild_dict[guild.id]['raidchannel_dict'][channel.id]['type'] == 'exraid':
                         if end < now:

@@ -671,7 +671,8 @@ async def expire_channel(channel):
                 await channel.edit(name=new_name)
                 await channel.send(_('This channel timer has expired! The channel has been deactivated and will be deleted in 5 minutes.\nTo reactivate the channel, use **!timerset** to set the timer again.'))
             delete_time = (guild_dict[guild.id]['raidchannel_dict'][channel.id]['exp'] + (5 * 60)) - time.time()
-            expiremsg = _('**This {pokemon} raid has expired!**').format(
+            raidtype = "event" if guild_dict[guild.id]['raidchannel_dict'][channel.id].get('meetup',False) else " raid"
+            expiremsg = _('**This {pokemon}{raidtype} has expired!**').format(
                 pokemon=guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['pokemon'].capitalize())
         await asyncio.sleep(delete_time)
         # If the channel has already been deleted from the dict, someone
@@ -2734,6 +2735,176 @@ async def _configure_research(ctx):
     return ctx
 
 @configure.command()
+async def meetup(ctx):
+    """!meetup reporting settings"""
+    guild = ctx.message.guild
+    owner = ctx.message.author
+    if not guild_dict[guild.id]['configure_dict']['settings']['done']:
+        await _configure(ctx, "all")
+        return
+    config_sessions = guild_dict[ctx.guild.id]['configure_dict']['settings'].setdefault('config_sessions',{}).setdefault(owner.id,0) + 1
+    guild_dict[ctx.guild.id]['configure_dict']['settings']['config_sessions'][owner.id] = config_sessions
+    if guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id] > 1:
+        await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("**MULTIPLE SESSIONS!**\n\nIt looks like you have **{yoursessions}** active configure sessions. I recommend you send **cancel** first and then send your request again to avoid confusing me.\n\nYour Sessions: **{yoursessions}** | Total Sessions: **{allsessions}**").format(allsessions=sum(guild_dict[guild.id]['configure_dict']['settings']['config_sessions'].values()),yoursessions=guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id])))
+    ctx = await _configure_meetup(ctx)
+    if ctx:
+        guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
+        await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name='Configuration Complete', icon_url=Meowth.user.avatar_url))
+    del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+
+async def _configure_meetup(ctx):
+    guild = ctx.message.guild
+    owner = ctx.message.author
+    config_dict_temp = getattr(ctx, 'config_dict_temp',copy.deepcopy(guild_dict[guild.id]['configure_dict']))
+    await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meetup Reporting allows users to report meetups with **!meetup** or **!event**. Meetup reports are contained within one or more channels. Each channel will be able to represent different areas/communities. I'll need you to provide a list of channels in your server you will allow reports from in this format: `channel-name, channel-name, channel-name`\n\nExample: `kansas-city-meetups, hull-meetups, sydney-meetups`\n\nIf you do not require meetup reporting, you may want to disable this function.\n\nRespond with: **N** to disable, or the **channel-name** list to enable, each seperated with a comma and space:")).set_author(name=_('Meetup Reporting Channels'), icon_url=Meowth.user.avatar_url))
+    citychannel_dict = {}
+    while True:
+        citychannels = await Meowth.wait_for('message', check=(lambda message: (message.guild == None) and message.author == owner))
+        if citychannels.content.lower() == 'n':
+            config_dict_temp['meetup']['enabled'] = False
+            await owner.send(embed=discord.Embed(colour=discord.Colour.red(), description=_('Meetup Reporting disabled')))
+            break
+        elif citychannels.content.lower() == 'cancel':
+            await owner.send(embed=discord.Embed(colour=discord.Colour.red(), description=_('**CONFIG CANCELLED!**\n\nNo changes have been made.')))
+            return None
+        else:
+            config_dict_temp['meetup']['enabled'] = True
+            citychannel_list = citychannels.content.lower().split(',')
+            citychannel_list = [x.strip() for x in citychannel_list]
+            guild_channel_list = []
+            for channel in guild.text_channels:
+                guild_channel_list.append(channel.id)
+            citychannel_objs = []
+            citychannel_names = []
+            citychannel_errors = []
+            for item in citychannel_list:
+                channel = None
+                if item.isdigit():
+                    channel = discord.utils.get(guild.text_channels, id=int(item))
+                if not channel:
+                    item = re.sub('[^a-zA-Z0-9 _\\-]+', '', item)
+                    item = item.replace(" ","-")
+                    name = await letter_case(guild.text_channels, item.lower())
+                    channel = discord.utils.get(guild.text_channels, name=name)
+                if channel:
+                    citychannel_objs.append(channel)
+                    citychannel_names.append(channel.name)
+                else:
+                    citychannel_errors.append(item)
+            citychannel_list = [x.id for x in citychannel_objs]
+            diff = set(citychannel_list) - set(guild_channel_list)
+            if (not diff) and (not citychannel_errors):
+                await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description=_('Meetup Reporting Channels enabled')))
+                for channel in citychannel_objs:
+                    ow = channel.overwrites_for(Meowth.user)
+                    ow.send_messages = True
+                    ow.read_messages = True
+                    ow.manage_roles = True
+                    try:
+                        await channel.set_permissions(Meowth.user, overwrite = ow)
+                    except (discord.errors.Forbidden, discord.errors.HTTPException, discord.errors.InvalidArgument):
+                        await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_('I couldn\'t set my own permissions in this channel. Please ensure I have the correct permissions in {channel} using **{prefix}get perms**.').format(prefix=ctx.prefix, channel=channel.mention)))
+                break
+            else:
+                await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("The channel list you provided doesn't match with your servers channels.\n\nThe following aren't in your server: **{invalid_channels}**\n\nPlease double check your channel list and resend your reponse.").format(invalid_channels=', '.join(citychannel_errors))))
+                continue
+    if config_dict_temp['meetup']['enabled']:
+        await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_('For each report, I generate Google Maps links to give people directions to meetups! To do this, I need to know which suburb/town/region each report channel represents, to ensure we get the right location in the map. For each report channel you provided, I will need its corresponding general location using only letters and spaces, with each location seperated by a comma and space.\n\nExample: `kansas city mo, hull uk, sydney nsw australia`\n\nEach location will have to be in the same order as you provided the channels in the previous question.\n\nRespond with: **location info, location info, location info** each matching the order of the previous channel list below.')).set_author(name=_('Meetup Reporting Locations'), icon_url=Meowth.user.avatar_url))
+        await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_('{citychannel_list}').format(citychannel_list=citychannels.content.lower()[:2000])).set_author(name=_('Entered Channels'), icon_url=Meowth.user.avatar_url))
+        while True:
+            cities = await Meowth.wait_for('message', check=(lambda message: (message.guild == None) and message.author == owner))
+            if cities.content.lower() == 'cancel':
+                await owner.send(embed=discord.Embed(colour=discord.Colour.red(), description=_('**CONFIG CANCELLED!**\n\nNo changes have been made.')))
+                return None
+            city_list = cities.content.split(',')
+            city_list = [x.strip() for x in city_list]
+            if len(city_list) == len(citychannel_list):
+                for i in range(len(citychannel_list)):
+                    citychannel_dict[citychannel_list[i]] = city_list[i]
+                break
+            else:
+                await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("The number of cities doesn't match the number of channels you gave me earlier!\n\nI'll show you the two lists to compare:\n\n{channellist}\n{citylist}\n\nPlease double check that your locations match up with your provided channels and resend your response.").format(channellist=', '.join(citychannel_names), citylist=', '.join(city_list))))
+                continue
+        config_dict_temp['meetup']['report_channels'] = citychannel_dict
+        await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description=_('Meetup Reporting Locations are set')))
+        await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("How would you like me to categorize the meetup channels I create? Your options are:\n\n**none** - If you don't want them categorized\n**same** - If you want them in the same category as the reporting channel\n**other** - If you want them categorized in a provided category name or ID")).set_author(name=_('Meetup Reporting Categories'), icon_url=Meowth.user.avatar_url))
+        while True:
+            guild = Meowth.get_guild(guild.id)
+            guild_catlist = []
+            for cat in guild.categories:
+                guild_catlist.append(cat.id)
+            category_dict = {}
+            categories = await Meowth.wait_for('message', check=lambda message: message.guild == None and message.author == owner)
+            if categories.content.lower() == 'cancel':
+                await owner.send(embed=discord.Embed(colour=discord.Colour.red(), description=_('**CONFIG CANCELLED!**\n\nNo changes have been made.')))
+                return None
+            elif categories.content.lower() == 'none':
+                config_dict_temp['meetup']['categories'] = None
+                break
+            elif categories.content.lower() == 'same':
+                config_dict_temp['meetup']['categories'] = 'same'
+                break
+            elif categories.content.lower() == 'other':
+                while True:
+                    guild = Meowth.get_guild(guild.id)
+                    guild_catlist = []
+                    for cat in guild.categories:
+                        guild_catlist.append(cat.id)
+                    config_dict_temp['meetup']['categories'] = 'region'
+                    await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(),description=_("In the same order as they appear below, please give the names of the categories you would like raids reported in each channel to appear in. You do not need to use different categories for each channel, but they do need to be pre-existing categories. Separate each category name with a comma. Response can be either category name or ID.\n\nExample: `kansas city, hull, 1231231241561337813`\n\nYou have configured the following channels as meetup reporting channels.")).set_author(name=_('Meetup Reporting Categories'), icon_url=Meowth.user.avatar_url))
+                    await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_('{citychannel_list}').format(citychannel_list=citychannels.content.lower()[:2000])).set_author(name=_('Entered Channels'), icon_url=Meowth.user.avatar_url))
+                    regioncats = await Meowth.wait_for('message', check=lambda message: message.guild == None and message.author == owner)
+                    if regioncats.content.lower() == "cancel":
+                        await owner.send(embed=discord.Embed(colour=discord.Colour.red(), description=_('**CONFIG CANCELLED!**\n\nNo changes have been made.')))
+                        return None
+                    regioncat_list = regioncats.content.split(',')
+                    regioncat_list = [x.strip() for x in regioncat_list]
+                    regioncat_ids = []
+                    regioncat_names = []
+                    regioncat_errors = []
+                    for item in regioncat_list:
+                        category = None
+                        if item.isdigit():
+                            category = discord.utils.get(guild.categories, id=int(item))
+                        if not category:
+                            name = await letter_case(guild.categories, item.lower())
+                            category = discord.utils.get(guild.categories, name=name)
+                        if category:
+                            regioncat_ids.append(category.id)
+                            regioncat_names.append(category.name)
+                        else:
+                            regioncat_errors.append(item)
+                    regioncat_list = regioncat_ids
+                    if len(regioncat_list) == len(citychannel_list):
+                        catdiff = set(regioncat_list) - set(guild_catlist)
+                        if (not catdiff) and (not regioncat_errors):
+                            for i in range(len(citychannel_list)):
+                                category_dict[citychannel_list[i]] = regioncat_list[i]
+                            break
+                        else:
+                            msg = _("The category list you provided doesn't match with your server's categories.")
+                            if regioncat_errors:
+                                msg += _("\n\nThe following aren't in your server: **{invalid_categories}**").format(invalid_categories=', '.join(regioncat_errors))
+                            msg += _("\n\nPlease double check your category list and resend your response. If you just made these categories, try again.")
+                            await owner.send(embed=discord.Embed(colour=discord.Colour.orange(),description=msg))
+                            continue
+                    else:
+                        msg = _("The number of categories I found in your server doesn't match the number of channels you gave me earlier!\n\nI'll show you the two lists to compare:\n\n**Matched Channels:** {channellist}\n**Matched Categories:** {catlist}\n\nPlease double check that your categories match up with your provided channels and resend your response.").format(channellist=', '.join(citychannel_names), catlist=', '.join(regioncat_names) if len(regioncat_list)>0 else "None")
+                        if regioncat_errors:
+                            msg += _("\n\nThe following aren't in your server: **{invalid_categories}**").format(invalid_categories=', '.join(regioncat_errors))
+                        await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=msg))
+                        continue
+                    break
+            else:
+                await owner.send(embed=discord.Embed(colour=discord.Colour.orange(),description=_("Sorry, I didn't understand your answer! Try again.")))
+                continue
+            break
+        await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description=_('Meetup Categories are set')))
+        config_dict_temp['meetup']['category_dict'] = category_dict
+    ctx.config_dict_temp = config_dict_temp
+    return ctx
+
+@configure.command()
 async def want(ctx):
     """!want/!unwant settings"""
     guild = ctx.message.guild
@@ -4661,7 +4832,7 @@ async def research(ctx, *, details = None):
         await message.delete()
 
 @Meowth.command(aliases=['event'])
-@checks.allowexraidreport()
+@checks.allowmeetupreport()
 async def meetup(ctx, *,location:commands.clean_content(fix_channel_mentions=True)=""):
     """Report an upcoming event.
 
@@ -4682,11 +4853,11 @@ async def _meetup(ctx, location):
         return
     raid_details = ' '.join(event_split)
     raid_details = raid_details.strip()
-    raid_gmaps_link = create_gmaps_query(raid_details, message.channel, type="exraid")
+    raid_gmaps_link = create_gmaps_query(raid_details, message.channel, type="meetup")
     egg_info = raid_info['raid_eggs']['EX']
     raid_channel_name = _('meetup-')
     raid_channel_name += sanitize_channel_name(raid_details)
-    raid_channel_category = get_category(message.channel,"EX", type="exraid")
+    raid_channel_category = get_category(message.channel,"EX", type="meetup")
     raid_channel = await message.guild.create_text_channel(raid_channel_name, overwrites=dict(message.channel.overwrites), category=raid_channel_category)
     ow = raid_channel.overwrites_for(raid_channel.guild.default_role)
     ow.send_messages = True

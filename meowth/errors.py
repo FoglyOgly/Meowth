@@ -33,6 +33,10 @@ class ResearchSetCheckFail(CommandError):
     'Exception raised checks.researchset fails'
     pass
 
+class MeetupSetCheckFail(CommandError):
+    'Exception raised checks.meetupset fails'
+    pass
+
 class ArchiveSetCheckFail(CommandError):
     'Exception raised checks.archiveset fails'
     pass
@@ -82,6 +86,10 @@ class ExRaidChannelCheckFail(CommandError):
     pass
 
 class ResearchReportChannelCheckFail(CommandError):
+    'Exception raised checks.researchreport fails'
+    pass
+
+class MeetuphReportChannelCheckFail(CommandError):
     'Exception raised checks.researchreport fails'
     pass
 
@@ -181,6 +189,11 @@ def custom_error_handling(bot, logger):
             await delete_error(ctx.message, error)
         elif isinstance(error, ResearchSetCheckFail):
             msg = _('Meowth! Research Reporting is not enabled on this server. **{prefix}{cmd_name}** is unable to be used.').format(cmd_name=ctx.invoked_with, prefix=prefix)
+            error = await ctx.channel.send(msg)
+            await asyncio.sleep(10)
+            await delete_error(ctx.message, error)
+        elif isinstance(error, MeetupSetCheckFail):
+            msg = _('Meowth! Meetup Reporting is not enabled on this server. **{prefix}{cmd_name}** is unable to be used.').format(cmd_name=ctx.invoked_with, prefix=prefix)
             error = await ctx.channel.send(msg)
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)
@@ -366,6 +379,23 @@ def custom_error_handling(bot, logger):
             guild = ctx.guild
             msg = _('Meowth! Please use **{prefix}{cmd_name}** in ').format(cmd_name=ctx.invoked_with, prefix=prefix)
             city_channels = bot.guild_dict[guild.id]['configure_dict']['research']['report_channels']
+            if len(city_channels) > 10:
+                msg += _('a Region report channel.')
+            else:
+                msg += _('one of the following region channels:')
+                for c in city_channels:
+                    channel = discord.utils.get(guild.channels, id=c)
+                    if channel:
+                        msg += '\n' + channel.mention
+                    else:
+                        msg += '\n#deleted-channel'
+            error = await ctx.channel.send(msg)
+            await asyncio.sleep(10)
+            await delete_error(ctx.message, error)
+        elif isinstance(error, MeetupReportChannelCheckFail):
+            guild = ctx.guild
+            msg = _('Meowth! Please use **{prefix}{cmd_name}** in ').format(cmd_name=ctx.invoked_with, prefix=prefix)
+            city_channels = bot.guild_dict[guild.id]['configure_dict']['meetup']['report_channels']
             if len(city_channels) > 10:
                 msg += _('a Region report channel.')
             else:

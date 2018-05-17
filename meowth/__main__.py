@@ -568,17 +568,16 @@ async def expiry_check(channel):
                         if start < now:
                             pokemon = get_name(raid_info['raid_eggs']['EX']['pokemon'][0])
                             await _eggtoraid(pokemon, channel, author=None)
-                    if end and guild_dict[guild.id]['raidchannel_dict'][channel.id]['type'] == 'exraid':
-                        if end < now:
-                            event_loop.create_task(expire_channel(channel))
-                            try:
-                                active_raids.remove(channel)
-                            except ValueError:
-                                logger.info(
-                                    'Expire_Channel - Channel Removal From Active Raid Failed - Not in List - ' + channel.name)
+                    if end and end < now:
+                        event_loop.create_task(expire_channel(channel))
+                        try:
+                            active_raids.remove(channel)
+                        except ValueError:
                             logger.info(
-                                'Expire_Channel - Channel Expired And Removed From Watchlist - ' + channel.name)
-                            break
+                                'Expire_Channel - Channel Removal From Active Raid Failed - Not in List - ' + channel.name)
+                        logger.info(
+                            'Expire_Channel - Channel Expired And Removed From Watchlist - ' + channel.name)
+                        break
                 elif guild_dict[guild.id]['raidchannel_dict'][channel.id]['active']:
                     if guild_dict[guild.id]['raidchannel_dict'][channel.id]['exp']:
                         if guild_dict[guild.id]['raidchannel_dict'][channel.id]['exp'] <= time.time():
@@ -643,7 +642,7 @@ async def expire_channel(channel):
             if (not alreadyexpired):
                 await channel.send(_('This channel has been successfully reported as a duplicate and will be deleted in 1 minute. Check the channel list for the other raid channel to coordinate in!\nIf this was in error, reset the raid with **!timerset**'))
             delete_time = (guild_dict[guild.id]['raidchannel_dict'][channel.id]['exp'] + (1 * 60)) - time.time()
-        elif guild_dict[guild.id]['raidchannel_dict'][channel.id]['type'] == 'egg':
+        elif guild_dict[guild.id]['raidchannel_dict'][channel.id]['type'] == 'egg' and not guild_dict[guild.id]['raidchannel_dict'][channel.id].get('meetup',{}):
             if (not alreadyexpired):
                 pkmn = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('pokemon', None)
                 if pkmn:

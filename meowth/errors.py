@@ -89,7 +89,7 @@ class ResearchReportChannelCheckFail(CommandError):
     'Exception raised checks.researchreport fails'
     pass
 
-class MeetuphReportChannelCheckFail(CommandError):
+class MeetupReportChannelCheckFail(CommandError):
     'Exception raised checks.researchreport fails'
     pass
 

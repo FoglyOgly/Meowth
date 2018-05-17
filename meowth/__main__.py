@@ -4688,7 +4688,7 @@ async def _meetup(ctx, location):
     egg_info = raid_info['raid_eggs']['EX']
     raid_channel_name = _('meetup-')
     raid_channel_name += sanitize_channel_name(raid_details)
-    raid_channel_category = channel.category
+    raid_channel_category = get_category(message.channel,"EX", type="exraid")
     raid_channel = await message.guild.create_text_channel(raid_channel_name, overwrites=dict(message.channel.overwrites), category=raid_channel_category)
     ow = raid_channel.overwrites_for(raid_channel.guild.default_role)
     ow.send_messages = True

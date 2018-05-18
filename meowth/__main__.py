@@ -6132,6 +6132,7 @@ async def _here(channel, author, count, party, entered_interest=None):
     allyellow = 0
     allunknown = 0
     trainer_dict = guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['trainer_dict']
+    raidtype = "event" if guild_dict[channel.guild.id]['raidchannel_dict'][channel.id].get('meetup',False) else "raid"
     try:
         if guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['lobby']:
             lobbymsg += _('\nThere is a group already in the lobby! Use **!lobby** to join them or **!backout** to request a backout! Otherwise, you may have to wait for the next group!')
@@ -6157,10 +6158,10 @@ async def _here(channel, author, count, party, entered_interest=None):
             team_emoji = "❔"
         else:
             team_emoji = parse_emoji(channel.guild, config['team_dict'][team_emoji])
-        msg = _('Meowth! {member} is at the raid! {emoji}: 1').format(member=author.mention, emoji=team_emoji)
+        msg = _('Meowth! {member} is at the {raidtype}! {emoji}: 1').format(member=author.mention, emoji=team_emoji, raidtype=raidtype)
         await channel.send(msg + lobbymsg)
     else:
-        msg = _('Meowth! {member} is at the raid with a total of {trainer_count} trainers!').format(member=author.mention, trainer_count=count)
+        msg = _('Meowth! {member} is at the {raidtype} with a total of {trainer_count} trainers!').format(member=author.mention, trainer_count=count, raidtype=raidtype)
         msg += ' {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | ❔: {unknown}'.format(blue_emoji=parse_emoji(channel.guild, config['team_dict']['mystic']), mystic=party['mystic'], red_emoji=parse_emoji(channel.guild, config['team_dict']['valor']), valor=party['valor'], instinct=party['instinct'], yellow_emoji=parse_emoji(channel.guild, config['team_dict']['instinct']), unknown=party['unknown'])
         await channel.send(msg + lobbymsg)
     if author.id not in trainer_dict:
@@ -6395,6 +6396,7 @@ async def cancel(ctx):
 
 async def _cancel(channel, author):
     guild = channel.guild
+    raidtype = "event" if guild_dict[guild.id]['raidchannel_dict'][channel.id].get('meetup',False) else "raid"
     try:
         t_dict = guild_dict[guild.id]['raidchannel_dict'][channel.id]['trainer_dict'][author.id]
     except KeyError:
@@ -6407,9 +6409,9 @@ async def _cancel(channel, author):
             await channel.send(_('Meowth! {member} and their total of {trainer_count} trainers are no longer interested!').format(member=author.mention, trainer_count=t_dict['count']))
     if t_dict['status']['here']:
         if t_dict['count'] == 1:
-            await channel.send(_('Meowth! {member} has left the raid!').format(member=author.mention))
+            await channel.send(_('Meowth! {member} has {raidtype} the raid!').format(member=author.mention, raidtype=raidtype))
         else:
-            await channel.send(_('Meowth! {member} and their total of {trainer_count} trainers have left the raid!').format(member=author.mention, trainer_count=t_dict['count']))
+            await channel.send(_('Meowth! {member} and their total of {trainer_count} trainers have left the {raidtype}!').format(member=author.mention, trainer_count=t_dict['count'], raidtype=raidtype))
     if t_dict['status']['coming']:
         if t_dict['count'] == 1:
             await channel.send(_('Meowth! {member} is no longer on their way!').format(member=author.mention))

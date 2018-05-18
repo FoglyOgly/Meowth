@@ -6443,6 +6443,10 @@ async def starting(ctx, team: str = ''):
     team_names = ["mystic","valor","instinct","unknown"]
     team = team if team and team.lower() in team_names else "all"
     trainer_dict = copy.deepcopy(guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict'])
+    if guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id].get('meetup',{}):
+        starting_str = _("Meowth! **!starting** is disabled for events!")
+        await ctx.channel.send(starting_str)
+        return
     if guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id].get('type',None) == 'egg':
         starting_str = _("Meowth! How can you start when the egg hasn't hatched!?")
         await ctx.channel.send(starting_str)

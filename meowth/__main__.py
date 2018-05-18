@@ -1743,7 +1743,7 @@ async def _configure(ctx, configlist):
             if config_dict_temp[commandconfig].get('enabled',False):
                 enabled_commands.append(commandconfig)
         configmessage += _("\n\n**Enabled Commands:**\n{enabled_commands}").format(enabled_commands=", ".join(enabled_commands))
-        configmessage += _("\n\n**All Commands:**\n**all** - To redo configuration\n**team** - For Team Assignment configuration\n**welcome** - For Welcome Message configuration\n**raid** - for raid command configuration\n**exraid** - for EX raid command configuration\n**invite** - for invite command configuration\n**counters** - for automatic counters configuration\n**wild** - for wild command configuration\n**research** - for !research command configuration\n**want** - for want/unwant command configuration\n**archive** - For !archive configuration\n**timezone** - For timezone configuration")
+        configmessage += _("\n\n**All Commands:**\n**all** - To redo configuration\n**team** - For Team Assignment configuration\n**welcome** - For Welcome Message configuration\n**raid** - for raid command configuration\n**exraid** - for EX raid command configuration\n**invite** - for invite command configuration\n**counters** - for automatic counters configuration\n**wild** - for wild command configuration\n**research** - for !research command configuration\n**meetup** - for !meetup command configuration\n**want** - for want/unwant command configuration\n**archive** - For !archive configuration\n**timezone** - For timezone configuration")
         configmessage += _('\n\nReply with **cancel** at any time throughout the questions to cancel the configure process.')
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=configmessage).set_author(name=_('Meowth Configuration - {guild}').format(guild=guild.name), icon_url=Meowth.user.avatar_url))
         while True:
@@ -1836,6 +1836,10 @@ async def team(ctx):
     """!team command settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    try:
+        await ctx.message.delete()
+    except (discord.errors.Forbidden, discord.errors.HTTPException):
+        pass
     if not guild_dict[guild.id]['configure_dict']['settings']['done']:
         await _configure(ctx, "all")
         return
@@ -1893,6 +1897,10 @@ async def welcome(ctx):
     """Welcome message settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    try:
+        await ctx.message.delete()
+    except (discord.errors.Forbidden, discord.errors.HTTPException):
+        pass
     if not guild_dict[guild.id]['configure_dict']['settings']['done']:
         await _configure(ctx, "all")
         return
@@ -2048,6 +2056,10 @@ async def raid(ctx):
     """!raid reporting settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    try:
+        await ctx.message.delete()
+    except (discord.errors.Forbidden, discord.errors.HTTPException):
+        pass
     if not guild_dict[guild.id]['configure_dict']['settings']['done']:
         await _configure(ctx, "all")
         return
@@ -2268,6 +2280,10 @@ async def exraid(ctx):
     """!exraid reporting settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    try:
+        await ctx.message.delete()
+    except (discord.errors.Forbidden, discord.errors.HTTPException):
+        pass
     if not guild_dict[guild.id]['configure_dict']['settings']['done']:
         await _configure(ctx, "all")
         return
@@ -2455,6 +2471,10 @@ async def invite(ctx):
     """!invite command settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    try:
+        await ctx.message.delete()
+    except (discord.errors.Forbidden, discord.errors.HTTPException):
+        pass
     if not guild_dict[guild.id]['configure_dict']['settings']['done']:
         await _configure(ctx, "all")
         return
@@ -2497,6 +2517,10 @@ async def counters(ctx):
     """Automatic counters settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    try:
+        await ctx.message.delete()
+    except (discord.errors.Forbidden, discord.errors.HTTPException):
+        pass
     if not guild_dict[guild.id]['configure_dict']['settings']['done']:
         await _configure(ctx, "all")
         return
@@ -2548,6 +2572,10 @@ async def wild(ctx):
     """!wild reporting settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    try:
+        await ctx.message.delete()
+    except (discord.errors.Forbidden, discord.errors.HTTPException):
+        pass
     if not guild_dict[guild.id]['configure_dict']['settings']['done']:
         await _configure(ctx, "all")
         return
@@ -2644,6 +2672,10 @@ async def research(ctx):
     """!research reporting settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    try:
+        await ctx.message.delete()
+    except (discord.errors.Forbidden, discord.errors.HTTPException):
+        pass
     if not guild_dict[guild.id]['configure_dict']['settings']['done']:
         await _configure(ctx, "all")
         return
@@ -2740,6 +2772,10 @@ async def meetup(ctx):
     """!meetup reporting settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    try:
+        await ctx.message.delete()
+    except (discord.errors.Forbidden, discord.errors.HTTPException):
+        pass
     if not guild_dict[guild.id]['configure_dict']['settings']['done']:
         await _configure(ctx, "all")
         return
@@ -2910,6 +2946,10 @@ async def want(ctx):
     """!want/!unwant settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    try:
+        await ctx.message.delete()
+    except (discord.errors.Forbidden, discord.errors.HTTPException):
+        pass
     if not guild_dict[guild.id]['configure_dict']['settings']['done']:
         await _configure(ctx, "all")
         return
@@ -2987,6 +3027,10 @@ async def archive(ctx):
     """Configure !archive command settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    try:
+        await ctx.message.delete()
+    except (discord.errors.Forbidden, discord.errors.HTTPException):
+        pass
     if not guild_dict[guild.id]['configure_dict']['settings']['done']:
         await _configure(ctx, "all")
         return
@@ -3058,6 +3102,10 @@ async def timezone(ctx):
     """Configure timezone and other settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
+    try:
+        await ctx.message.delete()
+    except (discord.errors.Forbidden, discord.errors.HTTPException):
+        pass
     if not guild_dict[guild.id]['configure_dict']['settings']['done']:
         await _configure(ctx, "all")
         return

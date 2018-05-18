@@ -5947,7 +5947,8 @@ async def interested(ctx, *, teamcounts: str=None):
     elif (ctx.author.id in trainer_dict) and (sum(trainer_dict[ctx.author.id]['status'].values()) > 0):
         total = trainer_dict[ctx.author.id]['count']
     elif teamcounts:
-        total = sum([int(s) for s in teamcounts if s.isdigit()])
+        total = re.sub('[^0-9 ]','', teamcounts)
+        total = sum([int(x) for x in total.split()])
     else:
         total = 1
     result = await _party_status(ctx, total, teamcounts)
@@ -6056,7 +6057,8 @@ async def coming(ctx, *, teamcounts: str=None):
     elif (ctx.author.id in trainer_dict) and (sum(trainer_dict[ctx.author.id]['status'].values()) > 0):
         total = trainer_dict[ctx.author.id]['count']
     elif teamcounts:
-        total = sum([int(s) for s in teamcounts if s.isdigit()])
+        total = re.sub('[^0-9 ]','', teamcounts)
+        total = sum([int(x) for x in total.split()])
     else:
         total = 1
     result = await _party_status(ctx, total, teamcounts)
@@ -6164,7 +6166,8 @@ async def here(ctx, *, teamcounts: str=None):
     elif (ctx.author.id in trainer_dict) and (sum(trainer_dict[ctx.author.id]['status'].values()) > 0):
         total = trainer_dict[ctx.author.id]['count']
     elif teamcounts:
-        total = sum([int(s) for s in teamcounts if s.isdigit()])
+        total = re.sub('[^0-9 ]','', teamcounts)
+        total = sum([int(x) for x in total.split()])
     else:
         total = 1
     result = await _party_status(ctx, total, teamcounts)

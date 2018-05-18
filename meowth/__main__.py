@@ -673,7 +673,7 @@ async def expire_channel(channel):
             delete_time = (guild_dict[guild.id]['raidchannel_dict'][channel.id]['exp'] + (5 * 60)) - time.time()
             raidtype = "event" if guild_dict[guild.id]['raidchannel_dict'][channel.id].get('meetup',False) else " raid"
             expiremsg = _('**This {pokemon}{raidtype} has expired!**').format(
-                pokemon=guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['pokemon'].capitalize())
+                pokemon=guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['pokemon'].capitalize(), raidtype=raidtype)
         await asyncio.sleep(delete_time)
         # If the channel has already been deleted from the dict, someone
         # else got to it before us, so don't do anything.
@@ -2735,7 +2735,7 @@ async def _configure_research(ctx):
     ctx.config_dict_temp = config_dict_temp
     return ctx
 
-@configure.command()
+@configure.command(aliases=['event'])
 async def meetup(ctx):
     """!meetup reporting settings"""
     guild = ctx.message.guild
@@ -5516,6 +5516,7 @@ async def duplicate(ctx):
     rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
     t_dict = rc_d['trainer_dict']
     can_manage = channel.permissions_for(author).manage_channels
+    raidtype = "event" if guild_dict[guild.id]['raidchannel_dict'][channel.id].get('meetup',False) else "raid"
     if can_manage:
         dupecount = 2
         rc_d['duplicate'] = dupecount
@@ -5523,7 +5524,7 @@ async def duplicate(ctx):
         if author.id in t_dict:
             try:
                 if t_dict[author.id]['dupereporter']:
-                    dupeauthmsg = await channel.send(_("Meowth! You've already made a duplicate report for this raid!"))
+                    dupeauthmsg = await channel.send(_("Meowth! You've already made a duplicate report for this {raidtype}!").format(raidtype=raidtype))
                     await asyncio.sleep(10)
                     await dupeauthmsg.delete()
                     return
@@ -5544,7 +5545,7 @@ async def duplicate(ctx):
     dupecount += 1
     rc_d['duplicate'] = dupecount
     if dupecount >= 3:
-        rusure = await channel.send(_('Meowth! Are you sure you wish to remove this raid?'))
+        rusure = await channel.send(_('Meowth! Are you sure you wish to remove this {raidtype}?').format(raidtype=raidtype))
         try:
             timeout = False
             res, reactuser = await ask(rusure, channel, author.id)

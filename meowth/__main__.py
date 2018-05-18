@@ -5105,7 +5105,7 @@ async def timer(ctx):
     await ctx.channel.send(timerstr)
 
 @Meowth.command()
-@checks.activeraidchannel()
+@checks.activechannel()
 async def starttime(ctx,*,start_time=""):
     """Set a time for a group to start a raid
 
@@ -5224,7 +5224,7 @@ async def starttime(ctx,*,start_time=""):
             await channel.send(_('Meowth! No start time has been set, set one with **!starttime HH:MM AM/PM**! (You can also omit AM/PM and use 24-hour time!)'))
 
 @Meowth.group(case_insensitive=True)
-@checks.activeraidchannel()
+@checks.activechannel()
 async def location(ctx):
     """Get raid location.
 
@@ -5250,7 +5250,7 @@ async def location(ctx):
         await locationmsg.delete()
 
 @location.command()
-@checks.activeraidchannel()
+@checks.activechannel()
 async def new(ctx,*,content):
     """Change raid location.
 
@@ -5503,7 +5503,7 @@ async def recover(ctx):
         event_loop.create_task(expiry_check(channel))
 
 @Meowth.command()
-@checks.activeraidchannel()
+@checks.activechannel()
 async def duplicate(ctx):
     """A command to report a raid channel as a duplicate.
 
@@ -5605,7 +5605,7 @@ async def counters(ctx, *, args = None):
     channel = ctx.channel
     guild = channel.guild
     user = guild_dict[ctx.guild.id].get('trainers',{}).get(ctx.author.id,{}).get('pokebattlerid', None)
-    if checks.check_raidchannel(ctx):
+    if checks.check_raidchannel(ctx) and not checks.check_meetupchannel(ctx):
         if args:
             args_split = args.split()
             for arg in args_split:
@@ -5824,7 +5824,7 @@ async def _get_generic_counters(guild, pkmn, weather=None):
     return ctrs_dict
 
 @Meowth.command()
-@checks.activeraidchannel()
+@checks.activechannel()
 async def weather(ctx, *, weather):
     """Sets the weather for the raid.
     Usage: !weather <weather>
@@ -5855,7 +5855,7 @@ Status Management
 """
 
 @Meowth.command(aliases=['i', 'maybe'])
-@checks.activeraidchannel()
+@checks.activechannel()
 async def interested(ctx, *, teamcounts: str=None):
     """Indicate you are interested in the raid.
 
@@ -5951,7 +5951,7 @@ async def _maybe(channel, author, count, party, entered_interest=None):
     guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['trainer_dict'] = trainer_dict
 
 @Meowth.command(aliases=['c'])
-@checks.activeraidchannel()
+@checks.activechannel()
 async def coming(ctx, *, teamcounts: str=None):
     """Indicate you are on the way to a raid.
 
@@ -6060,7 +6060,7 @@ async def _coming(channel, author, count, party, entered_interest=None):
     guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['trainer_dict'] = trainer_dict
 
 @Meowth.command(aliases=['h'])
-@checks.activeraidchannel()
+@checks.activechannel()
 async def here(ctx, *, teamcounts: str=None):
     """Indicate you have arrived at the raid.
 
@@ -6443,10 +6443,6 @@ async def starting(ctx, team: str = ''):
     team_names = ["mystic","valor","instinct","unknown"]
     team = team if team and team.lower() in team_names else "all"
     trainer_dict = copy.deepcopy(guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict'])
-    if guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id].get('meetup',{}):
-        starting_str = _("Meowth! **!starting** is disabled for events!")
-        await ctx.channel.send(starting_str)
-        return
     if guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id].get('type',None) == 'egg':
         starting_str = _("Meowth! How can you start when the egg hasn't hatched!?")
         await ctx.channel.send(starting_str)
@@ -6639,6 +6635,7 @@ async def list(ctx):
 
             }
             exraid_list = []
+            event_list = []
             for r in rc_d:
                 reportcity = Meowth.get_channel(rc_d[r]['reportcity'])
                 if not reportcity:
@@ -6650,8 +6647,8 @@ async def list(ctx):
                     if (type == 'egg') and level.isdigit():
                         egg_dict[r] = exp
                     elif rc_d[r].get('meetup',{}):
-                        continue
-                    elif (type == 'exraid') or (level == 'EX'):
+                        event_list.append(r)
+                    elif ((type == 'exraid') or (level == 'EX')):
                         exraid_list.append(r)
                     else:
                         raid_dict[r] = exp
@@ -6683,21 +6680,32 @@ async def list(ctx):
                 else:
                     assumed_str = ''
                 starttime = rc_d[r].get('starttime',None)
-                if starttime and starttime > now:
+                meetup = rc_d[r].get('meetup',{})
+                if starttime and starttime > now and not meetup:
                     start_str = _(' Next group: **{}**').format(starttime.strftime(_('%I:%M %p (%H:%M)')))
-                elif not starttime:
+                else:
                     starttime = False
                 if rc_d[r]['egglevel'].isdigit() and (int(rc_d[r]['egglevel']) > 0):
                     expirytext = _(' - Hatches: {expiry}{is_assumed}').format(expiry=end.strftime(_('%I:%M %p (%H:%M)')), is_assumed=assumed_str)
-                elif (rc_d[r]['egglevel'] == 'EX') or (rc_d[r]['type'] == 'exraid'):
+                elif ((rc_d[r]['egglevel'] == 'EX') or (rc_d[r]['type'] == 'exraid')) and not meetup:
                     expirytext = _(' - Hatches: {expiry}{is_assumed}').format(expiry=end.strftime(_('%B %d at %I:%M %p (%H:%M)')), is_assumed=assumed_str)
+                elif meetup:
+                    meetupstart = meetup['start']
+                    meetupend = meetup['end']
+                    expirytext = ""
+                    if meetupstart:
+                        expirytext += _(' - Starts: {expiry}{is_assumed}').format(expiry=meetupstart.strftime(_('%B %d at %I:%M %p (%H:%M)')), is_assumed=assumed_str)
+                    if meetupend:
+                        expirytext += _(" - Ends: {expiry}{is_assumed}").format(expiry=meetupend.strftime(_('%B %d at %I:%M %p (%H:%M)')), is_assumed=assumed_str)
+                    if not meetupstart and not meetupend:
+                        expirytext = _(' - Starts: {expiry}{is_assumed}').format(expiry=end.strftime(_('%B %d at %I:%M %p (%H:%M)')), is_assumed=assumed_str)
                 else:
                     expirytext = _(' - Expiry: {expiry}{is_assumed}').format(expiry=end.strftime(_('%I:%M %p (%H:%M)')), is_assumed=assumed_str)
                 output += _('    {raidchannel}{expiry_text}\n').format(raidchannel=rchan.mention, expiry_text=expirytext)
                 output += _('    {interestcount} interested, {comingcount} coming, {herecount} here, {lobbycount} in the lobby.{start_str}\n').format(raidchannel=rchan.mention, interestcount=ctx_maybecount, comingcount=ctx_comingcount, herecount=ctx_herecount, lobbycount=ctx_lobbycount, start_str=start_str)
                 return output
             if activeraidnum:
-                listmsg += _("**Here's the current raids for {0}**\n\n").format(cty.capitalize())
+                listmsg += _("**Here's the current channels for {0}**\n\n").format(cty.capitalize())
             if raid_dict:
                 listmsg += _('**Active Raids:**\n')
                 for (r, e) in sorted(raid_dict.items(), key=itemgetter(1)):
@@ -6725,7 +6733,16 @@ async def list(ctx):
                         listmsg += list_output(r)
                     else:
                         await channel.send(listmsg)
-                        listmsg = _('**EX Raids::** (continued)\n')
+                        listmsg = _('**EX Raids:** (continued)\n')
+                        listmsg += list_output(r)
+            if event_list:
+                listmsg += _('**Meetups:**\n')
+                for r in event_list:
+                    if len(listmsg) < 1800:
+                        listmsg += list_output(r)
+                    else:
+                        await channel.send(listmsg)
+                        listmsg = _('**Meetups:** (continued)\n')
                         listmsg += list_output(r)
             if activeraidnum == 0:
                 await channel.send(_('Meowth! No active raids! Report one with **!raid <name> <location> [weather] [timer]**.'))
@@ -6772,7 +6789,7 @@ async def list(ctx):
             raise checks.errors.CityRaidChannelCheckFail()
 
 @list.command()
-@checks.activeraidchannel()
+@checks.activechannel()
 async def interested(ctx, tags: str = ''):
     """Lists the number and users who are interested in the raid.
 
@@ -6819,7 +6836,7 @@ async def _interest(ctx, tag=False, team=False):
     return listmsg
 
 @list.command()
-@checks.activeraidchannel()
+@checks.activechannel()
 async def coming(ctx, tags: str = ''):
     """Lists the number and users who are coming to a raid.
 
@@ -6866,7 +6883,7 @@ async def _otw(ctx, tag=False, team=False):
     return listmsg
 
 @list.command()
-@checks.activeraidchannel()
+@checks.activechannel()
 async def here(ctx, tags: str = ''):
     """List the number and users who are present at a raid.
 
@@ -7010,7 +7027,7 @@ async def _bosslist(ctx):
     return listmsg
 
 @list.command()
-@checks.activeraidchannel()
+@checks.activechannel()
 async def teams(ctx):
     """List the teams for the users that have RSVP'd to a raid.
 

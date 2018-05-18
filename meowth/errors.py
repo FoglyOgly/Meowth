@@ -69,6 +69,10 @@ class ActiveRaidChannelCheckFail(CommandError):
     'Exception raised checks.activeraidchannel fails'
     pass
 
+class ActiveChannelCheckFail(CommandError):
+    'Exception raised checks.activechannel fails'
+    pass
+
 class CityRaidChannelCheckFail(CommandError):
     'Exception raised checks.cityraidchannel fails'
     pass
@@ -290,8 +294,35 @@ def custom_error_handling(bot, logger):
             city_channels = bot.guild_dict[guild.id]['configure_dict']['raid']['report_channels']
             try:
                 egg_check = bot.guild_dict[guild.id]['raidchannel_dict'][ctx.channel.id].get('type',None)
+                meetup = bot.guild_dict[guild.id]['raidchannel_dict'][ctx.channel.id].get('meetup',{})
             except:
                 egg_check = ""
+                meetup = False
+            if len(city_channels) > 10:
+                msg += _('Region report channel to see active channels.')
+            else:
+                msg += _('of the following Region channels to see active channels:')
+                for c in city_channels:
+                    channel = discord.utils.get(guild.channels, id=c)
+                    if channel:
+                        msg += '\n' + channel.mention
+                    else:
+                        msg += '\n#deleted-channel'
+            if egg_check == "egg" and not meetup:
+                msg += _('\nThis is an egg channel. The channel needs to be activated with **{prefix}raid <pokemon>** before I accept commands!').format(prefix=prefix)
+            error = await ctx.channel.send(msg)
+            await asyncio.sleep(10)
+            await delete_error(ctx.message, error)
+        elif isinstance(error, ActiveChannelCheckFail):
+            guild = ctx.guild
+            msg = _('Meowth! Please use **{prefix}{cmd_name}** in an Active channel. Use **{prefix}list** in any ').format(cmd_name=ctx.invoked_with, prefix=prefix)
+            city_channels = bot.guild_dict[guild.id]['configure_dict']['raid']['report_channels']
+            try:
+                egg_check = bot.guild_dict[guild.id]['raidchannel_dict'][ctx.channel.id].get('type',None)
+                meetup = bot.guild_dict[guild.id]['raidchannel_dict'][ctx.channel.id].get('meetup',{})
+            except:
+                egg_check = ""
+                meetup = False
             if len(city_channels) > 10:
                 msg += _('Region report channel to see active raids.')
             else:
@@ -302,7 +333,7 @@ def custom_error_handling(bot, logger):
                         msg += '\n' + channel.mention
                     else:
                         msg += '\n#deleted-channel'
-            if egg_check == "egg":
+            if egg_check == "egg" and not meetup:
                 msg += _('\nThis is an egg channel. The channel needs to be activated with **{prefix}raid <pokemon>** before I accept commands!').format(prefix=prefix)
             error = await ctx.channel.send(msg)
             await asyncio.sleep(10)

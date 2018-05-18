@@ -343,8 +343,16 @@ def nonraidchannel():
 
 def activeraidchannel():
     def predicate(ctx):
-        if check_raidchannel(ctx):
+        if check_raidchannel(ctx) and not check_meetupchannel(ctx):
             if check_raidactive(ctx):
                 return True
         raise errors.ActiveRaidChannelCheckFail()
+    return commands.check(predicate)
+
+def activechannel():
+    def predicate(ctx):
+        if check_raidchannel(ctx):
+            if check_raidactive(ctx):
+                return True
+        raise errors.ActiveChannelCheckFail()
     return commands.check(predicate)

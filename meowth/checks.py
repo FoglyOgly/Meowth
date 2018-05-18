@@ -133,6 +133,20 @@ def check_exraidchannel(ctx):
     type =  ctx.bot.guild_dict[guild.id].get('raidchannel_dict',{}).get(channel.id,{}).get('type',False)
     return (level == 'EX') or (type == 'exraid')
 
+def check_meetupset(ctx):
+    if ctx.guild is None:
+        return False
+    guild = ctx.guild
+    return ctx.bot.guild_dict[guild.id]['configure_dict']['meetup'].get('enabled',False)
+
+def check_meetupreport(ctx):
+    if ctx.guild is None:
+        return False
+    channel = ctx.channel
+    guild = ctx.guild
+    channel_list = [x for x in ctx.bot.guild_dict[guild.id]['configure_dict']['meetup'].get('report_channels',{}).keys()]
+    return channel.id in channel_list
+
 def check_meetupchannel(ctx):
     if ctx.guild is None:
         return False
@@ -244,6 +258,17 @@ def allowresearchreport():
                 raise errors.ResearchReportChannelCheckFail()
         else:
             raise errors.ResearchSetCheckFail()
+    return commands.check(predicate)
+
+def allowmeetupreport():
+    def predicate(ctx):
+        if check_meetupset(ctx):
+            if check_meetupreport(ctx):
+                return True
+            else:
+                raise errors.MeetupReportChannelCheckFail()
+        else:
+            raise errors.MeetupSetCheckFail()
     return commands.check(predicate)
 
 def allowinvite():

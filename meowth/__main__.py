@@ -6409,7 +6409,7 @@ async def _cancel(channel, author):
             await channel.send(_('Meowth! {member} and their total of {trainer_count} trainers are no longer interested!').format(member=author.mention, trainer_count=t_dict['count']))
     if t_dict['status']['here']:
         if t_dict['count'] == 1:
-            await channel.send(_('Meowth! {member} has {raidtype} the raid!').format(member=author.mention, raidtype=raidtype))
+            await channel.send(_('Meowth! {member} has left the {raidtype}!').format(member=author.mention, raidtype=raidtype))
         else:
             await channel.send(_('Meowth! {member} and their total of {trainer_count} trainers have left the {raidtype}!').format(member=author.mention, trainer_count=t_dict['count'], raidtype=raidtype))
     if t_dict['status']['coming']:

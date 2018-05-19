@@ -18,7 +18,7 @@ def is_dev_check(ctx):
 
 def is_dev():
     def predicate(ctx):
-        if is_dev_check(ctx):
+        if is_dev_check(ctx) or is_owner_check(ctx):
             return True
         else:
             raise False

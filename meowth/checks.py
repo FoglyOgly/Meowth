@@ -11,6 +11,19 @@ def is_owner_check(ctx):
 def is_owner():
     return commands.check(is_owner_check)
 
+def is_dev_check(ctx):
+    author = ctx.author.id
+    dev_list = [132314336914833409, 288810647960158220, 174764205927432192, 263607303096369152]
+    return author in dev_list
+
+def is_dev():
+    def predicate(ctx):
+        if is_dev_check(ctx):
+            return True
+        else:
+            raise False
+    return commands.check(predicate)
+
 def check_permissions(ctx, perms):
     if (not perms):
         return False

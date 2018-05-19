@@ -32,7 +32,7 @@
         "5": {
             "egg": "legendary",
             "egg_img": "5.png",
-            "pokemon": [380, 381],
+            "pokemon": [250, 380, 381],
             "hatchtime":60,
             "raidtime":45
         },

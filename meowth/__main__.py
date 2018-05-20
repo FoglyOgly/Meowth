@@ -3770,6 +3770,10 @@ async def want(ctx,*,pokemon):
         pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, '', p) == re.sub(rgx, '', entered_want)), None)
         if pkmn_match:
             entered_want = pkmn_match
+        elif len(want_list) == 1 and entered_want == "list":
+            msg = _("Meowth! Did you mean **!list wants**?").format(word=entered_want.title())
+            question = await message.channel.send(msg)
+            return
         else:
             entered_want = spellcheck(entered_want)
             pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, "", p) == re.sub(rgx, "", entered_want)), None)

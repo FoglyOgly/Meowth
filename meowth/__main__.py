@@ -671,7 +671,7 @@ async def expire_channel(channel):
                 await channel.edit(name=new_name)
                 await channel.send(_('This channel timer has expired! The channel has been deactivated and will be deleted in 5 minutes.\nTo reactivate the channel, use **!timerset** to set the timer again.'))
             delete_time = (guild_dict[guild.id]['raidchannel_dict'][channel.id]['exp'] + (5 * 60)) - time.time()
-            raidtype = "event" if guild_dict[guild.id]['raidchannel_dict'][channel.id].get('meetup',False) else " raid"
+            raidtype = _("event") if guild_dict[guild.id]['raidchannel_dict'][channel.id].get('meetup',False) else _(" raid")
             expiremsg = _('**This {pokemon}{raidtype} has expired!**').format(
                 pokemon=guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['pokemon'].capitalize(), raidtype=raidtype)
         await asyncio.sleep(delete_time)
@@ -3156,7 +3156,7 @@ async def reload_json(ctx):
     await ctx.message.add_reaction('☑')
 
 @Meowth.command()
-@checks.is_owner()
+@checks.is_dev_or_owner()
 async def raid_json(ctx, level=None, *, newlist=None):
     'Edits or displays raid_info.json\n\n    Usage: !raid_json [level] [list]'
     msg = ''
@@ -5564,7 +5564,7 @@ async def duplicate(ctx):
     rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
     t_dict = rc_d['trainer_dict']
     can_manage = channel.permissions_for(author).manage_channels
-    raidtype = "event" if guild_dict[guild.id]['raidchannel_dict'][channel.id].get('meetup',False) else "raid"
+    raidtype = _("event") if guild_dict[guild.id]['raidchannel_dict'][channel.id].get('meetup',False) else _("raid")
     if can_manage:
         dupecount = 2
         rc_d['duplicate'] = dupecount
@@ -6183,7 +6183,7 @@ async def _here(channel, author, count, party, entered_interest=None):
     allyellow = 0
     allunknown = 0
     trainer_dict = guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['trainer_dict']
-    raidtype = "event" if guild_dict[channel.guild.id]['raidchannel_dict'][channel.id].get('meetup',False) else "raid"
+    raidtype = _("event") if guild_dict[channel.guild.id]['raidchannel_dict'][channel.id].get('meetup',False) else _("raid")
     try:
         if guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['lobby']:
             lobbymsg += _('\nThere is a group already in the lobby! Use **!lobby** to join them or **!backout** to request a backout! Otherwise, you may have to wait for the next group!')
@@ -6447,7 +6447,7 @@ async def cancel(ctx):
 
 async def _cancel(channel, author):
     guild = channel.guild
-    raidtype = "event" if guild_dict[guild.id]['raidchannel_dict'][channel.id].get('meetup',False) else "raid"
+    raidtype = _("event") if guild_dict[guild.id]['raidchannel_dict'][channel.id].get('meetup',False) else _("raid")
     try:
         t_dict = guild_dict[guild.id]['raidchannel_dict'][channel.id]['trainer_dict'][author.id]
     except KeyError:
@@ -6974,13 +6974,13 @@ async def _waiting(ctx, tag=False, team=False):
             ctx_herecount += trainer_dict[trainer]['party'][team]
             if raid_dict.get('lobby',{"team":"all"})['team'] == team or raid_dict.get('lobby',{"team":"all"})['team'] == "all":
                 ctx_herecount -= trainer_dict[trainer]['status']['lobby']
-
+    raidtype = _("event") if guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id].get('meetup',False) else _("raid")
     if ctx_herecount > 0:
         if (now.time() >= datetime.time(5, 0)) and (now.time() <= datetime.time(21, 0)) and (tag == True):
             here_exstr = _(" including {trainer_list} and the people with them! Be considerate and let them know if and when you'll be there").format(trainer_list=', '.join(here_list))
         else:
             here_exstr = _(" including {trainer_list} and the people with them! Be considerate and let them know if and when you'll be there").format(trainer_list=', '.join(name_list))
-    listmsg = _(' {trainer_count} waiting at the raid{including_string}!').format(trainer_count=str(ctx_herecount), including_string=here_exstr)
+    listmsg = _(' {trainer_count} waiting at the {raidtype}{including_string}!').format(trainer_count=str(ctx_herecount), raidtype=raidtype, including_string=here_exstr)
     return listmsg
 
 @list.command()

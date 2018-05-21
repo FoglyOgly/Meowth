@@ -13,7 +13,7 @@ def is_owner():
 
 def is_dev_check(ctx):
     author = ctx.author.id
-    dev_list = [132314336914833409, 174764205927432192, 263607303096369152]
+    dev_list = [371998231300931584]
     return author in dev_list
 
 def is_dev_or_owner():

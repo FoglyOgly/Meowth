@@ -1344,7 +1344,7 @@ async def regional(ctx, regional):
         regional = int(regional)
     else:
         regional = regional.lower()
-        if regional == "reset":
+        if regional == "reset" and checks.is_dev_or_owner(ctx):
             msg = _("Are you sure you want to clear all regionals?")
             question = await ctx.channel.send(msg)
             try:

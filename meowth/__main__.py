@@ -6032,12 +6032,12 @@ async def coming(ctx, *, teamcounts: str=None):
             if word.lower() in pkmn_info['pokemon_list']:
                 if word.lower() not in entered_interest:
                     entered_interest.append(word.lower())
-                if not get_number(word.lower()) in raid_info['raid_eggs'][egglevel]['pokemon']:
-                    await ctx.message.channel.send(_("{word} doesn't appear in level {egglevel} raids!").format(word=word.title(),egglevel=egglevel))
-                    unmatched_mons = True
+                    if not get_number(word.lower()) in raid_info['raid_eggs'][egglevel]['pokemon']:
+                        await ctx.message.channel.send(_("{word} doesn't appear in level {egglevel} raids!").format(word=word.title(),egglevel=egglevel))
+                        unmatched_mons = True
                 teamcounts = teamcounts.lower().replace(word.lower(),"").replace(",","").strip()
         if unmatched_mons:
-            await ctx.message.channel.send(_("Please try again."))
+            await ctx.message.channel.send(_("Invalid Pokemon detected. Please check the pinned message for the list of possible bosses and try again."))
             return
     else:
         try:

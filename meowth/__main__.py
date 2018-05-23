@@ -6027,20 +6027,23 @@ async def coming(ctx, *, teamcounts: str=None):
         pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, '', p) in re.sub(rgx, '', teamcounts.lower())), None)
     if pkmn_match and guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['type'] == "egg":
         entered_interest = []
+        unmatched_mons = False
         for word in re.split(' |,', teamcounts.lower()):
             if word.lower() in pkmn_info['pokemon_list']:
-                if get_number(word.lower()) in raid_info['raid_eggs'][egglevel]['pokemon']:
-                    if word.lower() not in entered_interest:
-                        entered_interest.append(word.lower())
-                else:
-                    await ctx.message.channel.send(_("{word} doesn't appear in level {egglevel} raids! Please try again.").format(word=word.title(),egglevel=egglevel))
-                    return
+                if word.lower() not in entered_interest:
+                    entered_interest.append(word.lower())
+                if not get_number(word.lower()) in raid_info['raid_eggs'][egglevel]['pokemon']:
+                    await ctx.message.channel.send(_("{word} doesn't appear in level {egglevel} raids!").format(word=word.title(),egglevel=egglevel))
+                    unmatched_mons = True
                 teamcounts = teamcounts.lower().replace(word.lower(),"").replace(",","").strip()
+        if unmatched_mons:
+            await ctx.message.channel.send(_("Please try again."))
+            return
     else:
         try:
             if guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['type'] == 'egg' and not checks.check_meetupchannel(ctx):
                 if guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['pokemon'] == '' and not entered_interest:
-                    await ctx.channel.send(_("Meowth! Specify which of the possible bosses you are interested in! Otherwise, please wait until the raid egg has hatched before announcing you're coming or present."))
+                    await ctx.channel.send(_("Meowth! Specify which of the possible bosses you are interested in using `{prefix}coming [boss1] [boss2]` (see the pinned message for the list of possible bosses)! Otherwise, please wait until the raid egg has hatched before announcing you're coming or present.".format(prefix=ctx.prefix)))
                     return
         except:
             pass

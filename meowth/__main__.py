@@ -105,16 +105,17 @@ def load_config():
     with open('config.json', 'r') as fd:
         config = json.load(fd)
     # Set up message catalog access
-    language = gettext.translation('meowth', localedir='locale', languages=[
-                                   config['bot-language']])
+    language = gettext.translation(
+        'meowth', localedir='locale', languages=[config['bot-language']])
     language.install()
     pokemon_language = [config['pokemon-language']]
     pokemon_path_source = os.path.join(
         'locale', '{0}', 'pkmn.json').format(config['pokemon-language'])
+    raid_path_source = os.path.join('data', 'raid_info.json')
     # Load Pokemon list and raid info
     with open(pokemon_path_source, 'r') as fd:
         pkmn_info = json.load(fd)
-    with open(os.path.join('data', 'raid_info.json'), 'r') as fd:
+    with open(raid_path_source, 'r') as fd:
         raid_info = json.load(fd)
     # Load type information
     with open(os.path.join('data', 'type_chart.json'), 'r') as fd:
@@ -123,14 +124,39 @@ def load_config():
         type_list = json.load(fd)
     # Set spelling dictionary to our list of Pokemon
     pkmn_match.set_list(pkmn_info['pokemon_list'])
+    return (pokemon_path_source, raid_path_source)
 
-
-load_config()
+pkmn_path, raid_path = load_config()
 Meowth.config = config
+Meowth.pkmn_info_path = pkmn_path
+Meowth.raid_json_path = raid_path
+
+default_exts = ['datahandler']
+
+for ext in default_exts:
+    try:
+        Meowth.load_extension(ext)
+    except Exception as e:
+        print(f'**Error when loading extension {ext}:**\n{type(e).__name__}: {e}')
+    else:
+        if 'debug' in sys.argv[1:]:
+            print(f'Loaded {ext} extension.')
+
+@Meowth.command(name='load')
+@checks.is_owner()
+async def _load(ctx, *extensions):
+    for ext in extensions:
+        try:
+            ctx.bot.unload_extension(ext)
+            ctx.bot.load_extension(ext)
+        except Exception as e:
+            await ctx.send(f'**Error when loading extension {ext}:**\n'
+                           f'{type(e).__name__}: {e}')
+        else:
+            await ctx.send(f'**Extension {ext} Loaded.**\n')
 
 # Given a Pokemon name, return a list of its
 # weaknesses as defined in the type chart
-
 
 def get_type(guild, pkmn_number):
     pkmn_number = int(pkmn_number) - 1
@@ -1201,7 +1227,11 @@ async def on_raw_reaction_add(payload):
         await message.edit(embed=newembed)
         await message.remove_reaction(payload.emoji, user)
         guild_dict[guild.id]['raidchannel_dict'][channel.id]['moveset'] = moveset
-    if message.id in guild_dict[guild.id]['wildreport_dict'] and user.id != Meowth.user.id:
+    try:
+        wildreport_dict = guild_dict[guild.id]['wildreport_dict']
+    except KeyError:
+        wildreport_dict = []
+    if message.id in wildreport_dict and user.id != Meowth.user.id:
         wild_dict = guild_dict[guild.id]['wildreport_dict'][message.id]
         if str(payload.emoji) == '🏎':
             wild_dict['omw'].append(user.mention)

@@ -3168,16 +3168,19 @@ async def raid_json(ctx, level=None, *, newlist=None):
                 msg += ' '
             msg += '\n'
         return await ctx.channel.send(msg)
-    elif level.isdigit() and (not newlist):
+    elif level in raid_info['raid_eggs'] and (not newlist):
         msg += _('**Level {level} raid list:** `{raidlist}` \n').format(level=level, raidlist=raid_info['raid_eggs'][level]['pokemon'])
         for pkmn in raid_info['raid_eggs'][level]['pokemon']:
             msg += '{name} ({number})'.format(name=get_name(pkmn).title(), number=pkmn)
             msg += ' '
         msg += '\n'
         return await ctx.channel.send(msg)
-    elif level.isdigit() and newlist:
-        newlist = newlist.strip('[]').replace(' ', '').split(',')
-        intlist = [int(x) for x in newlist]
+    elif level in raid_info['raid_eggs'] and newlist:
+        newlist = [item.strip() for item in newlist.strip('[]').split(',')]
+        try:
+            intlist = [int(x) for x in newlist]
+        except:
+            return await ctx.channel.send(_("I couldn't understand the list you supplied! Please use a comma-separated list of Pokemon species numbers."))
         msg += _('I will replace this:\n')
         msg += _('**Level {level} raid list:** `{raidlist}` \n').format(level=level, raidlist=raid_info['raid_eggs'][level]['pokemon'])
         for pkmn in raid_info['raid_eggs'][level]['pokemon']:
@@ -3196,7 +3199,7 @@ async def raid_json(ctx, level=None, *, newlist=None):
         except TypeError:
             timeout = True
         if timeout or res.emoji == '❎':
-            return
+            return await ctx.channel.send(_("Configuration cancelled!"))
         elif res.emoji == '✅':
             with open(os.path.join('data', 'raid_info.json'), 'r') as fd:
                 data = json.load(fd)
@@ -4779,7 +4782,7 @@ async def research(ctx, *, details = None):
     research_embed.set_footer(text=_('Reported by @{author} - {timestamp}').format(author=author.display_name, timestamp=timestamp.strftime(_('%I:%M %p (%H:%M)'))), icon_url=author.avatar_url_as(format=None, static_format='jpg', size=32))
     while True:
         if details:
-            research_split = details.split(", ")
+            research_split = details.split(",")
             if len(research_split) != 3:
                 error = _("entered an incorrect amount of arguments.\n\nUsage: **!research** or **!research <pokestop>, <quest>, <reward>**")
                 break

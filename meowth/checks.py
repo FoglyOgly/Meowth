@@ -25,7 +25,7 @@ def is_dev_or_owner():
     return commands.check(predicate)
 
 def check_permissions(ctx, perms):
-    if (not perms):
+    if not perms:
         return False
     ch = ctx.channel
     author = ctx.author
@@ -150,6 +150,8 @@ def check_meetupset(ctx):
     if ctx.guild is None:
         return False
     guild = ctx.guild
+    if not ctx.bot.guild_dict[guild.id]['configure_dict'].get('meetup'):
+        return False
     return ctx.bot.guild_dict[guild.id]['configure_dict']['meetup'].get('enabled',False)
 
 def check_meetupreport(ctx):
@@ -157,6 +159,8 @@ def check_meetupreport(ctx):
         return False
     channel = ctx.channel
     guild = ctx.guild
+    if not ctx.bot.guild_dict[guild.id]['configure_dict'].get('meetup'):
+        return False
     channel_list = [x for x in ctx.bot.guild_dict[guild.id]['configure_dict']['meetup'].get('report_channels',{}).keys()]
     return channel.id in channel_list
 

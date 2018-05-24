@@ -3199,7 +3199,7 @@ async def raid_json(ctx, level=None, *, newlist=None):
         except TypeError:
             timeout = True
         if timeout or res.emoji == '❎':
-            return await ctx.channel.send(_("Configuration cancelled!"))
+            return await ctx.channel.send(_("Meowth! Configuration cancelled!"))
         elif res.emoji == '✅':
             with open(os.path.join('data', 'raid_info.json'), 'r') as fd:
                 data = json.load(fd)
@@ -3210,8 +3210,9 @@ async def raid_json(ctx, level=None, *, newlist=None):
             load_config()
             await question.clear_reactions()
             await question.add_reaction('☑')
+            return await ctx.channel.send(_("Meowth! Configuration successful!"))
         else:
-            return
+            return await ctx.channel.send(_("Meowth! I'm not sure what went wrong, but configuration is cancelled!"))
 
 @Meowth.command()
 @commands.has_permissions(manage_guild=True)

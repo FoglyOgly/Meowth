@@ -41,6 +41,7 @@ class DataHandler:
 
     @commands.group(invoke_without_command=True)
     async def raiddata(self, ctx, level=None):
+        """Show all raid Pokemon, showing only the raid level if provided."""
         data = []
         title = None
         if level:
@@ -66,6 +67,11 @@ class DataHandler:
 
     @raiddata.command(name='remove', aliases=['rm', 'del', 'delete'])
     async def remove_rd(self, ctx, *raid_pokemon):
+        """Removes all pokemon provided as arguments from the raid data.
+
+        Note: If a multi-word pokemon name is used, wrap in quote marks:
+        Example: !raiddata remove "Mr Mime" Jynx
+        """
         results = []
         for pokemon in raid_pokemon:
             if not pokemon.isdigit():
@@ -85,6 +91,12 @@ class DataHandler:
 
     @raiddata.command(name='add')
     async def add_rd(self, ctx, level, *raid_pokemon):
+        """Adds all pokemon provided as arguments to the specified raid
+        level in the raid data.
+        
+        Note: If a multi-word pokemon name is used, wrap in quote marks:
+        Example: !raiddata add "Mr Mime" Jynx
+        """
         results = []
         if level not in self.raid_info['raid_eggs'].keys():
             return await ctx.send("Invalid raid level specified.")
@@ -101,6 +113,7 @@ class DataHandler:
 
     @raiddata.command(name='save', aliases=['commit'])
     async def save_rd(self, ctx):
+        """Saves the current raid data state to the json file."""
         with open(ctx.bot.raid_json_path, 'w') as fd:
             json.dump(self.raid_info, fd, indent=4)
         await ctx.message.add_reaction('\u2705')

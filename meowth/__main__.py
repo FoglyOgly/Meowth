@@ -418,6 +418,33 @@ async def ask(message, destination, user_list=None, *, react_list=['✅', '❎']
         await message.clear_reactions()
         return
 
+def get_gyms(guild_id):
+    gym_matching_cog = Meowth.cogs.get('GymMatching')
+    if not gym_matching_cog:
+        return None
+    gyms = gym_matching_cog.get_gyms(guild_id)
+    return gyms
+
+async def gym_match_prompt(channel, author_id, gym_name, gyms):
+    gym_matching_cog = Meowth.cogs.get('GymMatching')
+    match, score = gym_matching_cog.gym_match(gym_name, gyms)
+    if not match:
+        return None
+    if score < 80:
+        try:
+            question = _("Did you mean: '{0}'").format(match)
+            q_msg = await channel.send(question)
+            reaction, __ = await ask(q_msg, channel, author_id)
+        except TypeError:
+            return None
+        if not reaction:
+            return None
+        if reaction.emoji == '✅':
+            await q_msg.delete()
+            return match
+        return None
+    return match
+
 async def letter_case(iterable, find, *, limits=None):
     servercase_list = []
     lowercase_list = []
@@ -4129,7 +4156,18 @@ async def _raid(message, content):
     if raid_details == '':
         await message.channel.send(_('Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**'))
         return
-    raid_gmaps_link = create_gmaps_query(raid_details, message.channel, type="raid")
+    gyms = get_gyms(message.guild.id)
+    if gyms:
+        match = await gym_match_prompt(message.channel, message.author.id, raid_details, gyms)
+        if not match:
+            return await message.channel.send(_("Meowth! I couldn't find a gym named '{0}'.").format(raid_details))
+        gym = gyms[match]
+        raid_details = match
+        gym_coords = gym['coordinates']
+        gym_note = gym.get('notes', _('No notes for this gym.'))
+        raid_gmaps_link = create_gmaps_query(gym_coords, message.channel, type="raid")
+    else:
+        raid_gmaps_link = create_gmaps_query(raid_details, message.channel, type="raid")
     raid_channel_name = (entered_raid + '-') + sanitize_channel_name(raid_details)
     raid_channel_category = get_category(message.channel, get_level(entered_raid), type="raid")
     raid_channel = await message.guild.create_text_channel(raid_channel_name, overwrites=dict(message.channel.overwrites), category=raid_channel_category)
@@ -4147,6 +4185,9 @@ async def _raid(message, content):
     raid_number = pkmn_info['pokemon_list'].index(entered_raid) + 1
     raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=0'.format(str(raid_number).zfill(3))
     raid_embed = discord.Embed(title=_('Meowth! Click here for directions to the raid!'), url=raid_gmaps_link, colour=message.guild.me.colour)
+    if gyms:
+        gym_info = _("**Name:** {0}\n**Notes:** {1}").format(raid_details, gym_note)
+        raid_embed.add_field(name=_('**Gym:**'), value=gym_info, inline=False)
     raid_embed.add_field(name=_('**Details:**'), value=_('{pokemon} ({pokemonnumber}) {type}').format(pokemon=entered_raid.capitalize(), pokemonnumber=str(raid_number), type=''.join(get_type(message.guild, raid_number)), inline=True))
     raid_embed.add_field(name=_('**Weaknesses:**'), value=_('{weakness_list}').format(weakness_list=weakness_to_str(message.guild, get_weaknesses(entered_raid))), inline=True)
     raid_embed.add_field(name=_('**Next Group:**'), value=_('Set with **!starttime**'), inline=True)
@@ -4271,7 +4312,18 @@ async def _raidegg(message, content):
     if raid_details == '':
         await message.channel.send(_('Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**'))
         return
-    raid_gmaps_link = create_gmaps_query(raid_details, message.channel, type="raid")
+    gyms = get_gyms(message.guild.id)
+    if gyms:
+        match = await gym_match_prompt(message.channel, message.author.id, raid_details, gyms)
+        if not match:
+            return await message.channel.send(_("Meowth! I couldn't find a gym named '{0}'.").format(raid_details))
+        gym = gyms[match]
+        raid_details = match
+        gym_coords = gym['coordinates']
+        gym_note = gym.get('notes', _('No notes for this gym.'))
+        raid_gmaps_link = create_gmaps_query(gym_coords, message.channel, type="raid")
+    else:
+        raid_gmaps_link = create_gmaps_query(raid_details, message.channel, type="raid")
     if (egg_level > 5) or (egg_level == 0):
         await message.channel.send(_('Meowth! Raid egg levels are only from 1-5!'))
         return
@@ -4296,6 +4348,9 @@ async def _raidegg(message, content):
             pass
         raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/eggs/{}?cache=0'.format(str(egg_img))
         raid_embed = discord.Embed(title=_('Meowth! Click here for directions to the coming raid!'), url=raid_gmaps_link, colour=message.guild.me.colour)
+        if gyms:
+            gym_info = _("**Name:** {0}\n**Notes:** {1}").format(raid_details, gym_note)
+            raid_embed.add_field(name=_('**Gym:**'), value=gym_info, inline=False)
         if len(egg_info['pokemon']) > 1:
             raid_embed.add_field(name=_('**Possible Bosses:**'), value=_('{bosslist1}').format(bosslist1='\n'.join(boss_list[::2])), inline=True)
             raid_embed.add_field(name='\u200b', value=_('{bosslist2}').format(bosslist2='\n'.join(boss_list[1::2])), inline=True)

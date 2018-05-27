@@ -1,40 +1,42 @@
 
+import asyncio
+import copy
+import datetime
+import functools
+import gettext
+import io
+import json
 import os
+import pickle
+import re
 import sys
 import tempfile
-import asyncio
-import gettext
-import re
-import pickle
-import json
-import time
-import datetime
-from dateutil.relativedelta import relativedelta
-from dateutil import tz
-import copy
-import functools
 import textwrap
+import time
+import traceback
+
+from contextlib import redirect_stdout
+from io import BytesIO
+from operator import itemgetter
 from time import strftime
-from logs import init_loggers
+
+import aiohttp
+import dateparser
+import hastebin
+from dateutil import tz
+from dateutil.relativedelta import relativedelta
+
+
 import discord
 from discord.ext import commands
-import pkmn_match
-import aiohttp
-from io import BytesIO
+
 import checks
-import hastebin
-from operator import itemgetter
+import pkmn_match
+
+from bot import MeowthBot
 from errors import custom_error_handling
-import dateparser
-import io
-import traceback
-from contextlib import redirect_stdout
-tessdata_dir_config = "--tessdata-dir 'C:\\Program Files (x86)\\Tesseract-OCR\\tessdata' "
-xtraconfig = '-l eng -c tessedit_char_blacklist=&|=+%#^*[]{};<> -psm 6'
-if os.name == 'nt':
-    tesseract_config = tessdata_dir_config + xtraconfig
-else:
-    tesseract_config = xtraconfig
+from logs import init_loggers
+
 logger = init_loggers()
 
 def _get_prefix(bot, message):
@@ -47,7 +49,7 @@ def _get_prefix(bot, message):
         prefix = bot.config['default_prefix']
     return commands.when_mentioned_or(prefix)(bot,message)
 
-Meowth = commands.Bot(command_prefix=_get_prefix, case_insensitive=True, activity=discord.Game(name="Pokemon Go"))
+Meowth = MeowthBot(command_prefix=_get_prefix, case_insensitive=True, activity=discord.Game(name="Pokemon Go"))
 
 custom_error_handling(Meowth, logger)
 try:

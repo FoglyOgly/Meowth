@@ -19,10 +19,6 @@ from logs import init_loggers
 import discord
 from discord.ext import commands
 import pkmn_match
-from PIL import Image
-from PIL import ImageFilter
-from PIL import ImageEnhance
-import pytesseract
 import aiohttp
 from io import BytesIO
 import checks
@@ -4865,20 +4861,6 @@ async def invite(ctx):
 
     Usage: !invite"""
     await _invite(ctx)
-
-def invite_processing(invite_bytes: bytes) -> BytesIO:
-    with Image.open(BytesIO(invite_bytes)) as img:
-        (width, height) = img.size
-        new_height = 3500
-        new_width = int((new_height * width) / height)
-        img = img.resize((new_width, new_height), Image.BICUBIC)
-        img = img.filter(ImageFilter.EDGE_ENHANCE)
-        enh = ImageEnhance.Brightness(img)
-        img = enh.enhance(0.4)
-        enh = ImageEnhance.Contrast(img)
-        img = enh.enhance(4)
-        txt = pytesseract.image_to_string(img, config=tesseract_config)
-    return txt
 
 async def _invite(ctx):
     bot = ctx.bot

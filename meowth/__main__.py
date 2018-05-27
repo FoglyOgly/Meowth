@@ -3799,19 +3799,46 @@ async def tutorial(ctx):
         await tutorial_channel.send(f"This server utilizes the **{prefix}want** command to help members receive push notifications about Pokemon they want! I create Discord roles for each Pokemon that people want, and @mentioning these roles will send a notification to anyone who **{prefix}want**-ed that Pokemon!\nTry the {prefix}want command!\nEx: `{prefix}want unown`")
         def check(c):
             return c.channel == tutorial_channel and c.author == newbie and c.command.name == 'want'
-        want_command = await Meowth.wait_for('command_completion', check=check)
+        try:
+            want_command = await Meowth.wait_for('command_completion', check=check, timeout=300)
+            await tutorial_channel.send("Great job! Let's continue.")
+            await asyncio.sleep(1)
+        except asyncio.TimeoutError:
+            await tutorial_channel.send(f"You took too long to complete the **{prefix}want** command! This channel will be deleted in ten seconds.")
+            await asyncio.sleep(10)
+            await tutorial_channel.delete()
+            guild_dict[guild.id]['configure_dict']['want']['report_channels'].remove(tutorial_channel.id)
+            return
+        guild_dict[guild.id]['configure_dict']['want']['report_channels'].remove(tutorial_channel.id)
     if 'wild' in enabled_commands:
         guild_dict[guild.id]['configure_dict']['wild']['report_channels'][tutorial_channel.id] = 'test'
         await tutorial_channel.send(f"This server utilizes the **{prefix}wild** command to report wild spawns! When you use it, I will send a message summarizing the report and containing a link to my best guess of the spawn location. If the reported Pokemon has an associated role on the server, I will @mention the role in my message! Your report must contain the name of the Pokemon followed by its location. Try reporting a wild spawn!\nEx: `{prefix}wild magikarp some park`")
         def check(c):
             return c.channel == tutorial_channel and c.author == newbie and c.command.name == 'wild'
-        wild_command = await Meowth.wait_for('command_completion', check=check)
+        try:
+            wild_command = await Meowth.wait_for('command_completion', check=check, timeout=300)
+            await tutorial_channel.send("Great job! Let's continue!")
+            await asyncio.sleep(1)
+        except asyncio.TimeoutError:
+            await tutorial_channel.send(f"You took too long to complete the **{prefix}wild** command! This channel will be deleted in ten seconds.")
+            await asyncio.sleep(10)
+            await tutorial_channel.delete()
+            del guild_dict[guild.id]['configure_dict']['wild']['report_channels'][tutorial_channel.id]
+            return
+        del guild_dict[guild.id]['configure_dict']['wild']['report_channels'][tutorial_channel.id]
     if 'raid' in enabled_commands:
         guild_dict[guild.id]['configure_dict']['raid']['report_channels'][tutorial_channel.id] = 'test'
         await tutorial_channel.send(f"This server utilizes the **{prefix}raid** command to report raids! When you use it, I will send a message summarizing the report and create a text channel for coordination. \nThe report must contain, in this order: The Pokemon (if an active raid) or raid level (if an egg), and the location;\n the report may optionally contain the weather (see **{prefix}help weather** for accepted options) and the minutes remaining until hatch or expiry (at the end of the report) \n\nTry reporting a raid!\nEx: `{prefix}raid magikarp local church cloudy 42`\n`{prefix}raid 3 local church sunny 27`")
         def check(c):
             return c.channel == tutorial_channel and c.author == newbie and c.command.name == 'raid'
-        raid_command = await Meowth.wait_for('command_completion', check=check)
+        try:
+            raid_command = await Meowth.wait_for('command_completion', check=check, timeout=300)
+        except asyncio.TimeoutError:
+            await tutorial_channel.send(f"You took too long to complete the **{prefix}raid** command! This channel will be deleted in ten seconds.")
+            await asyncio.sleep(10)
+            await tutorial_channel.delete()
+            del guild_dict[guild.id]['configure_dict']['raid']['report_channels'][tutorial_channel.id]
+            return
         await asyncio.sleep(1)
         async for message in tutorial_channel.history(limit=5, after=raid_command.message):
             if message.author.id == guild.me.id:
@@ -3819,14 +3846,97 @@ async def tutorial(ctx):
                 break
         helpembed = await get_raidhelp()
         await raid_channel.send(f"This is an example of a raid channel. Here is a list of commands that can be used in here:", embed=helpembed)
-        await raid_channel.send(f"Try RSVPing to this raid!\n\nEx: `{prefix}interested 2`")
+        await raid_channel.send(f"Try expressing interest in this raid!\n\nEx: `{prefix}interested 5 m3 i1 v1` would mean 5 trainers: 3 Mystic, 1 Instinct, 1 Valor")
         def check(c):
-            rsvp_list = ['interested', 'coming', 'here']
-            return c.channel == raid_channel and c.author == newbie and c.command.name in rsvp_list
-        rsvp_command = await Meowth.wait_for('command_completion',check=check)
+            return c.channel == raid_channel and c.author == newbie and c.command.name == 'interested'
+        try:
+            i_command = await Meowth.wait_for('command_completion',check=check, timeout=300)
+        except asyncio.TimeoutError:
+            await raid_channel.send(f"You took too long to complete the **{prefix}interested** command! This channel and the tutorial channel will be deleted in ten seconds.")
+            await asyncio.sleep(10)
+            await tutorial_channel.delete()
+            await expire_channel(raid_channel)
+            await raid_channel.delete()
+            del guild_dict[guild.id]['configure_dict']['raid']['report_channels'][tutorial_channel.id]
+            return
+        await asyncio.sleep(1)
+        await raid_channel.send(f"Great job! To save time, you can also use **{prefix}i** as an alias for **{prefix}interested**.")
+        await asyncio.sleep(1)
+        await raid_channel.send(f"Now try letting people know that you are on your way!\n\nEx: `{prefix}coming`")
+        def check(c):
+            return c.channel == raid_channel and c.author == newbie and c.command.name == 'coming'
+        try:
+            c_command = await Meowth.wait_for('command_completion',check=check, timeout=300)
+        except asyncio.TimeoutError:
+            await raid_channel.send(f"You took too long to complete the **{prefix}coming** command! This channel and the tutorial channel will be deleted in ten seconds.")
+            await asyncio.sleep(10)
+            await tutorial_channel.delete()
+            await expire_channel(raid_channel)
+            await raid_channel.delete()
+            del guild_dict[guild.id]['configure_dict']['raid']['report_channels'][tutorial_channel.id]
+            return
+        await asyncio.sleep(1)
+        await raid_channel.send(f"Great! Note that if you have already specified your party in a previous command, you do not have to again for the current raid unless you are changing it. Also, **{prefix}c** is an alias for **{prefix}coming**.")
+        await asyncio.sleep(1)
+        await raid_channel.send(f"Now try letting people know that you have arrived at the raid!\n\nEx: `{prefix}here`")
+        def check(c):
+            return c.channel == raid_channel and c.author == newbie and c.command.name == 'here'
+        try:
+            h_command = await Meowth.wait_for('command_completion',check=check,timeout=300)
+        except asyncio.TimeoutError:
+            await raid_channel.send(f"You took too long to complete the **{prefix}here** command! This channel and the tutorial channel will be deleted in ten seconds.")
+            await asyncio.sleep(10)
+            await tutorial_channel.delete()
+            await expire_channel(raid_channel)
+            await raid_channel.delete()
+            del guild_dict[guild.id]['configure_dict']['raid']['report_channels'][tutorial_channel.id]
+            return
+        await asyncio.sleep(1)
+        await raid_channel.send(f"Good! Please note that **{prefix}h** is an alias for **{prefix}here**")
+        await asyncio.sleep(1)
+        await raid_channel.send(f"Now try checking to see everyone's RSVP status for this raid!\n\nEx: `{prefix}list`")
+        def check(c):
+            return c.channel == raid_channel and c.author == newbie and c.command.name == 'list'
+        try:
+            l_command = await Meowth.wait_for('command_completion',check=check,timeout=300)
+        except asyncio.TimeoutError:
+            await raid_channel.send(f"You took too long to complete the **{prefix}list** command! This channel and the tutorial channel will be deleted in ten seconds.")
+            await asyncio.sleep(10)
+            await tutorial_channel.delete()
+            await expire_channel(raid_channel)
+            await raid_channel.delete()
+            del guild_dict[guild.id]['configure_dict']['raid']['report_channels'][tutorial_channel.id]
+            return
+        await asyncio.sleep(1)
+        await raid_channel.send(f"Awesome! Since no one else is on their way, try using the **{prefix}starting** command to move everyone on the 'here' list to a lobby!")
+        def check(c):
+            return c.channel == raid_channel and c.author == newbie and c.command.name == 'starting'
+        try:
+            s_command = await Meowth.wait_for('command',check=check,timeout=300)
+        except asyncio.TimeoutError:
+            await raid_channel.send(f"You took too long to complete the **{prefix}starting** command! This channel and the tutorial channel will be deleted in ten seconds.")
+            await asyncio.sleep(10)
+            await tutorial_channel.delete()
+            await expire_channel(raid_channel)
+            await raid_channel.delete()
+            del guild_dict[guild.id]['configure_dict']['raid']['report_channels'][tutorial_channel.id]
+            return
+        await asyncio.sleep(1)
+        await raid_channel.send(f"Great! You are now listed as being 'in the lobby', where you will remain for two minutes until the raid begins. In that time, anyone can request a backout with the **{prefix}backout** command. If the person requesting is in the lobby, the backout is automatic. If it is someone who arrived at the raid afterward, confirmation will be requested from a lobby member. When a backout is confirmed, all members will be returned to the 'here' list.")
+        await asyncio.sleep(1)
+        await raid_channel.send(f"A couple of notes about raid channels. Meowth has partnered with Pokebattler to give you the best counters for each raid boss in every situation. You can set the weather in the initial raid report, or with the **{prefix}weather** command. You can select the moveset using the reactions in the initial counters message. If you have a Pokebattler account, you can use **{prefix}set pokebattler <id>** to link them! After that, the **{prefix}counters**  command will DM you your own counters pulled from your Pokebox.")
+        await asyncio.sleep(1)
+        await raid_channel.send(f"Last thing: if you need to update the expiry time, use **{prefix}timerset <minutes left>**\n\nFeel free to play around with the commands here for a while. When you're finished, type `{prefix}timerset 0` and the raid will expire.")
+        def check(c):
+            return c.channel == raid_channel and c.author == newbie and c.command.name == 'timerset'
+        try:
+            t_command = await Meowth.wait_for('command_completion',check=check,timeout=300)
+        except asyncio.TimeoutError:
+            await raid_channel.send(f"Your time is up here!")
         await raid_channel.send(f"Great! Now return to {tutorial_channel.mention} to continue the tutorial. This channel will be deleted in ten seconds.")
         await asyncio.sleep(10)
         await raid_channel.delete()
+        del guild_dict[guild.id]['configure_dict']['raid']['report_channels'][tutorial_channel.id]
     if 'exraid' in enabled_commands:
         invitestr = ""
         if 'invite' in enabled_commands:
@@ -3837,16 +3947,29 @@ async def tutorial(ctx):
         await tutorial_channel.send(f"This server utilizes the **{prefix}research** command to report field research tasks! There are two ways to use this command: **{prefix}research** will start an interactive session where I will prompt you for the task, location, and reward of the research task. You can also use **{prefix}research <pokestop>, <task>, <reward>** to submit the report all at once.\n\nTry it out by typing `{prefix}research`")
         def check(c):
             return c.channel == tutorial_channel and c.author == newbie and c.command.name == 'research'
-        res_command = await Meowth.wait_for('command_completion',check=check)
+        try:
+            res_command = await Meowth.wait_for('command_completion',check=check,timeout=300)
+        except asyncio.TimeoutError:
+            await tutorial_channel.send(f"You took too long to use the **{prefix}research** command! This channel will be deleted in ten seconds.")
+            await asyncio.sleep(10)
+            await tutorial_channel.delete()
+            del guild_dict[guild.id]['configure_dict']['research']['report_channels'][tutorial_channel.id]
+            return
+        del guild_dict[guild.id]['configure_dict']['research']['report_channels'][tutorial_channel.id]
     if 'team' in enabled_commands:
         await tutorial_channel.send(f"This server utilizes the **{prefix}team** command to allow members to select which Pokemon Go team they belong to! Type `{prefix}team mystic` for example if you are in Team Mystic.")
         def check(c):
             return c.channel == tutorial_channel and c.author == newbie and c.command.name == 'team'
-        team_command = await Meowth.wait_for('command_completion',check=check)
+        try:
+            team_command = await Meowth.wait_for('command_completion',check=check,timeout=300)
+        except asyncio.TimeoutError:
+            await tutorial_channel.send(f"You took too long to use the **{prefix}team** command! This channel will be deleted in ten seconds.")
+            await asyncio.sleep(10)
+            await tutorial_channel.delete()
     await tutorial_channel.send(f"This concludes the Meowth tutorial! This channel will be deleted in ten seconds.")
     await asyncio.sleep(10)
     await tutorial_channel.delete()
-            			
+
 """
 'configure_dict':{
             'welcome': {'enabled':False,'welcomechan':'','welcomemsg':''},
@@ -4151,6 +4274,8 @@ async def raid(ctx,pokemon,*,location:commands.clean_content(fix_channel_mention
 
 async def _raid(message, content):
     fromegg = False
+    if guild_dict[message.channel.guild.id]['raidchannel_dict'].get(message.channel.id,{}).get('type') == "egg":
+        fromegg = True
     timestamp = (message.created_at + datetime.timedelta(hours=guild_dict[message.channel.guild.id]['configure_dict']['settings']['offset'])).strftime(_('%I:%M %p (%H:%M)'))
     raid_split = content.split()
     if len(raid_split) == 0:

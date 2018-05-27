@@ -3341,6 +3341,12 @@ async def changeraid(ctx, newraid):
             pass
         await channel.edit(name=raid_channel_name, topic=channel.topic)
     elif newraid and not newraid.isdigit():
+        # What a hack, subtract raidtime from exp time because _eggtoraid will add it back
+        egglevel = guild_dict[guild.id]['raidchannel_dict'][channel.id]['egglevel']
+        if egglevel == "0":
+            egglevel = get_level(newraid)
+        guild_dict[guild.id]['raidchannel_dict'][channel.id]['exp'] -= 60 * raid_info['raid_eggs'][egglevel]['raidtime']
+        
         await _eggtoraid(newraid, channel, author=message.author)
 
 @Meowth.command()

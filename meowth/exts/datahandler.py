@@ -10,19 +10,12 @@ class DataHandler:
 
     def __init__(self, bot):
         self.bot = bot
-        self.raid_info = None
-        self.pkmn_info = None
-        self.init_json(bot.raid_json_path, bot.pkmn_info_path)
+        self.raid_info = bot.raid_info
+        self.pkmn_info = bot.pkmn_info
         self.pkmn_match = partial(utils.get_match, self.pkmn_info['pokemon_list'])
 
     def __local_check(self, ctx):
         return checks.is_owner_check(ctx) or checks.is_dev_check(ctx)
-
-    def init_json(self, raid_path, pkmn_path):
-        with open(raid_path) as fd:
-            self.raid_info = json.load(fd)
-        with open(pkmn_path) as fd:
-            self.pkmn_info = json.load(fd)
 
     def get_name(self, pkmn_number):
         pkmn_number = int(pkmn_number) - 1
@@ -65,6 +58,12 @@ class DataHandler:
         data_str = '\n'.join(data)
         await ctx.send(f"**{title}**\n{data_str}")
 
+    def in_list(self, pokemon_no):
+        for pkmnlvl, vals in self.raid_info['raid_eggs'].items():
+            if pokemon_no in vals["pokemon"]:
+                return pkmnlvl
+        return None
+
     @raiddata.command(name='remove', aliases=['rm', 'del', 'delete'])
     async def remove_rd(self, ctx, *raid_pokemon):
         """Removes all pokemon provided as arguments from the raid data.
@@ -93,7 +92,7 @@ class DataHandler:
     async def add_rd(self, ctx, level, *raid_pokemon):
         """Adds all pokemon provided as arguments to the specified raid
         level in the raid data.
-        
+
         Note: If a multi-word pokemon name is used, wrap in quote marks:
         Example: !raiddata add "Mr Mime" Jynx
         """
@@ -106,8 +105,16 @@ class DataHandler:
                 if not pokemon:
                     return await ctx.send('Invalid Pokemon Name')
                 pokemon = self.get_number(pokemon)
-            self.raid_info['raid_eggs'][level]['pokemon'].append(pokemon)
+            raid_list = self.raid_info['raid_eggs'][level]['pokemon']
+            in_level = self.in_list(pokemon)
+            if in_level:
+                if in_level == level:
+                    continue
+                self.raid_info['raid_eggs'][in_level]['pokemon'].remove(pokemon)
+            raid_list.append(pokemon)
             results.append(f"#{pokemon} {self.get_name(pokemon)}")
+        if not results:
+            return await ctx.send(f"No Pokemon added to Raid {level}.")
         results_st = '\n'.join(results)
         await ctx.send(f"**Pokemon added to Raid {level}**\n{results_st}")
 

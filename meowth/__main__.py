@@ -83,7 +83,6 @@ type_chart = {}
 type_list = []
 raid_info = {}
 
-
 active_raids = []
 active_wilds = []
 # Append path of this script to the path of
@@ -127,6 +126,10 @@ def load_config():
     return (pokemon_path_source, raid_path_source)
 
 pkmn_path, raid_path = load_config()
+
+Meowth.pkmn_info = pkmn_info
+Meowth.raid_info = raid_info
+
 Meowth.config = config
 Meowth.pkmn_info_path = pkmn_path
 Meowth.raid_json_path = raid_path
@@ -135,7 +138,7 @@ default_exts = ['datahandler']
 
 for ext in default_exts:
     try:
-        Meowth.load_extension(ext)
+        Meowth.load_extension(f"exts.{ext}")
     except Exception as e:
         print(f'**Error when loading extension {ext}:**\n{type(e).__name__}: {e}')
     else:
@@ -147,13 +150,22 @@ for ext in default_exts:
 async def _load(ctx, *extensions):
     for ext in extensions:
         try:
-            ctx.bot.unload_extension(ext)
-            ctx.bot.load_extension(ext)
+            ctx.bot.unload_extension(f"exts.{ext}")
+            ctx.bot.load_extension(f"exts.{ext}")
         except Exception as e:
             await ctx.send(f'**Error when loading extension {ext}:**\n'
                            f'{type(e).__name__}: {e}')
         else:
             await ctx.send(f'**Extension {ext} Loaded.**\n')
+
+@Meowth.command(name='unload')
+@checks.is_owner()
+async def _unload(ctx, *extensions):
+    exts = [e for e in extensions if f"exts.{e}" in Meowth.extensions]
+    for ext in exts:
+        ctx.bot.unload_extension(f"exts.{ext}")
+    s = 's' if len(exts) > 1 else ''
+    await ctx.send(f"**Extension{s} {', '.join(exts)} unloaded.**\n")
 
 # Given a Pokemon name, return a list of its
 # weaknesses as defined in the type chart

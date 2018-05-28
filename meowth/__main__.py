@@ -6823,73 +6823,56 @@ async def starting(ctx, team: str = ''):
         starting_str = _("Meowth! How can you start when there's no one waiting at this raid!?")
         await ctx.channel.send(starting_str)
         return
-    if team in team_names:
-        question = await ctx.channel.send(_("Are you sure you would like to start this raid? Trainers {trainer_list}, react to this message to confirm or cancel the start of the raid.").format(trainer_list=', '.join(ctx_startinglist)))
+    guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict'] = trainer_dict
+    starttime = guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id].get('starttime',None)
+    if starttime:
+        timestr = _(' to start at **{}** ').format(starttime.strftime(_('%I:%M %p (%H:%M)')))
+        guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['starttime'] = None
     else:
-        question = await ctx.channel.send(_("Are you sure you would like to start this raid? You can also use **!starting [team]** to start that team only. Trainers {trainer_list}, react to this message to confirm or cancel the start of the raid.").format(trainer_list=', '.join(ctx_startinglist)))
-    try:
-        timeout = False
-        res, reactuser = await ask(question, ctx.channel, id_startinglist)
-    except TypeError:
-        timeout = True
-    if timeout:
-        await ctx.channel.send(_('Meowth! The **!starting** command was not confirmed. I\'m not sure if the group started.'))
-    if timeout or res.emoji == '❎':
-        await question.delete()
-        return
-    elif res.emoji == '✅':
-        await question.delete()
-        guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict'] = trainer_dict
-        starttime = guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id].get('starttime',None)
-        if starttime:
-            timestr = _(' to start at **{}** ').format(starttime.strftime(_('%I:%M %p (%H:%M)')))
-            guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['starttime'] = None
-        else:
-            timestr = ' '
-        starting_str = _('Starting - Meowth! The group that was waiting{timestr}is starting the raid! Trainers {trainer_list}, if you are not in this group and are waiting for the next group, please respond with {here_emoji} or **!here**. If you need to ask those that just started to back out of their lobby, use **!backout**').format(timestr=timestr, trainer_list=', '.join(ctx_startinglist), here_emoji=parse_emoji(ctx.guild, config['here_id']))
-        guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['lobby'] = {"exp":time.time() + 120, "team":team}
-        if starttime:
-            starting_str += '\n\nThe start time has also been cleared, new groups can set a new start time wtih **!starttime HH:MM AM/PM** (You can also omit AM/PM and use 24-hour time!).'
-            report_channel = Meowth.get_channel(guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['reportcity'])
-            raidmsg = await ctx.channel.get_message(guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['raidmessage'])
-            reportmsg = await report_channel.get_message(guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['raidreport'])
-            embed = raidmsg.embeds[0]
-            embed.set_field_at(2, name=_("**Next Group**"), value="Set with **!starttime**", inline=True)
-            try:
-                await raidmsg.edit(content=raidmsg.content,embed=embed)
-            except discord.errors.NotFound:
-                pass
-            try:
-                await reportmsg.edit(content=reportmsg.content,embed=embed)
-            except discord.errors.NotFound:
-                pass
-        await ctx.channel.send(starting_str)
-        await asyncio.sleep(120)
-        if ('lobby' not in guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]) or (time.time() < guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['lobby']['exp']):
-            return
-        ctx_lobbycount = 0
-        trainer_delete_list = []
-        for trainer in trainer_dict:
-            if trainer_dict[trainer]['status']['lobby']:
-                ctx_lobbycount += trainer_dict[trainer]['status']['lobby']
-                trainer_delete_list.append(trainer)
-        if ctx_lobbycount > 0:
-            await ctx.channel.send(_('Meowth! The group of {count} in the lobby has entered the raid! Wish them luck!').format(count=str(ctx_lobbycount)))
-        for trainer in trainer_delete_list:
-            if team in team_names:
-                trainer_dict[trainer]['status'] = {'maybe':0, 'coming':0, 'here':herecount - teamcount, 'lobby': lobbycount}
-                trainer_dict[trainer]['party'][team] = 0
-                trainer_dict[trainer]['count'] = trainer_dict[trainer]['count'] - teamcount
-            else:
-                del trainer_dict[trainer]
+        timestr = ' '
+    starting_str = _('Starting - Meowth! The group that was waiting{timestr}is starting the raid! Trainers {trainer_list}, if you are not in this group and are waiting for the next group, please respond with {here_emoji} or **!here**. If you need to ask those that just started to back out of their lobby, use **!backout**').format(timestr=timestr, trainer_list=', '.join(ctx_startinglist), here_emoji=parse_emoji(ctx.guild, config['here_id']))
+    guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['lobby'] = {"exp":time.time() + 120, "team":team}
+    if starttime:
+        starting_str += '\n\nThe start time has also been cleared, new groups can set a new start time wtih **!starttime HH:MM AM/PM** (You can also omit AM/PM and use 24-hour time!).'
+        report_channel = Meowth.get_channel(guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['reportcity'])
+        raidmsg = await ctx.channel.get_message(guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['raidmessage'])
+        reportmsg = await report_channel.get_message(guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['raidreport'])
+        embed = raidmsg.embeds[0]
+        embed.set_field_at(2, name=_("**Next Group**"), value="Set with **!starttime**", inline=True)
         try:
-            del guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['lobby']
-        except KeyError:
+            await raidmsg.edit(content=raidmsg.content,embed=embed)
+        except discord.errors.NotFound:
             pass
-        await _edit_party(ctx.channel, ctx.author)
-        guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict'] = trainer_dict
-    else:
+        try:
+            await reportmsg.edit(content=reportmsg.content,embed=embed)
+        except discord.errors.NotFound:
+            pass
+    await ctx.channel.send(starting_str)
+    await asyncio.sleep(120)
+    if ('lobby' not in guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]) or (time.time() < guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['lobby']['exp']):
         return
+    ctx_lobbycount = 0
+    trainer_delete_list = []
+    for trainer in trainer_dict:
+        if trainer_dict[trainer]['status']['lobby']:
+            ctx_lobbycount += trainer_dict[trainer]['status']['lobby']
+            trainer_delete_list.append(trainer)
+    if ctx_lobbycount > 0:
+        await ctx.channel.send(_('Meowth! The group of {count} in the lobby has entered the raid! Wish them luck!').format(count=str(ctx_lobbycount)))
+    for trainer in trainer_delete_list:
+        if team in team_names:
+            trainer_dict[trainer]['status'] = {'maybe':0, 'coming':0, 'here':herecount - teamcount, 'lobby': lobbycount}
+            trainer_dict[trainer]['party'][team] = 0
+            trainer_dict[trainer]['count'] = trainer_dict[trainer]['count'] - teamcount
+        else:
+            del trainer_dict[trainer]
+    try:
+        del guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['lobby']
+    except KeyError:
+        pass
+    await _edit_party(ctx.channel, ctx.author)
+    guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict'] = trainer_dict
+
 
 @Meowth.command()
 @checks.activeraidchannel()

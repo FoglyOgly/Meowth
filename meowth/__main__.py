@@ -1,44 +1,42 @@
 
+import asyncio
+import copy
+import datetime
+import functools
+import gettext
+import io
+import json
 import os
+import pickle
+import re
 import sys
 import tempfile
-import asyncio
-import gettext
-import re
-import pickle
-import json
-import time
-import datetime
-from dateutil.relativedelta import relativedelta
-from dateutil import tz
-import copy
-import functools
 import textwrap
+import time
+import traceback
+
+from contextlib import redirect_stdout
+from io import BytesIO
+from operator import itemgetter
 from time import strftime
-from logs import init_loggers
+
+import aiohttp
+import dateparser
+import hastebin
+from dateutil import tz
+from dateutil.relativedelta import relativedelta
+
+
 import discord
 from discord.ext import commands
-import pkmn_match
-from PIL import Image
-from PIL import ImageFilter
-from PIL import ImageEnhance
-import pytesseract
-import aiohttp
-from io import BytesIO
+
 import checks
-import hastebin
-from operator import itemgetter
+import pkmn_match
+
+from bot import MeowthBot
 from errors import custom_error_handling
-import dateparser
-import io
-import traceback
-from contextlib import redirect_stdout
-tessdata_dir_config = "--tessdata-dir 'C:\\Program Files (x86)\\Tesseract-OCR\\tessdata' "
-xtraconfig = '-l eng -c tessedit_char_blacklist=&|=+%#^*[]{};<> -psm 6'
-if os.name == 'nt':
-    tesseract_config = tessdata_dir_config + xtraconfig
-else:
-    tesseract_config = xtraconfig
+from logs import init_loggers
+
 logger = init_loggers()
 
 def _get_prefix(bot, message):
@@ -51,7 +49,7 @@ def _get_prefix(bot, message):
         prefix = bot.config['default_prefix']
     return commands.when_mentioned_or(prefix)(bot,message)
 
-Meowth = commands.Bot(command_prefix=_get_prefix, case_insensitive=True, activity=discord.Game(name="Pokemon Go"))
+Meowth = MeowthBot(command_prefix=_get_prefix, case_insensitive=True, activity=discord.Game(name="Pokemon Go"))
 
 custom_error_handling(Meowth, logger)
 try:
@@ -82,7 +80,6 @@ pkmn_info = {}
 type_chart = {}
 type_list = []
 raid_info = {}
-
 
 active_raids = []
 active_wilds = []
@@ -127,6 +124,10 @@ def load_config():
     return (pokemon_path_source, raid_path_source)
 
 pkmn_path, raid_path = load_config()
+
+Meowth.pkmn_info = pkmn_info
+Meowth.raid_info = raid_info
+
 Meowth.config = config
 Meowth.pkmn_info_path = pkmn_path
 Meowth.raid_json_path = raid_path
@@ -135,7 +136,7 @@ default_exts = ['datahandler']
 
 for ext in default_exts:
     try:
-        Meowth.load_extension(ext)
+        Meowth.load_extension(f"exts.{ext}")
     except Exception as e:
         print(f'**Error when loading extension {ext}:**\n{type(e).__name__}: {e}')
     else:
@@ -147,13 +148,22 @@ for ext in default_exts:
 async def _load(ctx, *extensions):
     for ext in extensions:
         try:
-            ctx.bot.unload_extension(ext)
-            ctx.bot.load_extension(ext)
+            ctx.bot.unload_extension(f"exts.{ext}")
+            ctx.bot.load_extension(f"exts.{ext}")
         except Exception as e:
             await ctx.send(f'**Error when loading extension {ext}:**\n'
                            f'{type(e).__name__}: {e}')
         else:
             await ctx.send(f'**Extension {ext} Loaded.**\n')
+
+@Meowth.command(name='unload')
+@checks.is_owner()
+async def _unload(ctx, *extensions):
+    exts = [e for e in extensions if f"exts.{e}" in Meowth.extensions]
+    for ext in exts:
+        ctx.bot.unload_extension(f"exts.{ext}")
+    s = 's' if len(exts) > 1 else ''
+    await ctx.send(f"**Extension{s} {', '.join(exts)} unloaded.**\n")
 
 # Given a Pokemon name, return a list of its
 # weaknesses as defined in the type chart
@@ -3406,6 +3416,12 @@ async def changeraid(ctx, newraid):
             pass
         await channel.edit(name=raid_channel_name, topic=channel.topic)
     elif newraid and not newraid.isdigit():
+        # What a hack, subtract raidtime from exp time because _eggtoraid will add it back
+        egglevel = guild_dict[guild.id]['raidchannel_dict'][channel.id]['egglevel']
+        if egglevel == "0":
+            egglevel = get_level(newraid)
+        guild_dict[guild.id]['raidchannel_dict'][channel.id]['exp'] -= 60 * raid_info['raid_eggs'][egglevel]['raidtime']
+        
         await _eggtoraid(newraid, channel, author=message.author)
 
 @Meowth.command()
@@ -4276,7 +4292,7 @@ async def raid(ctx,pokemon,*,location:commands.clean_content(fix_channel_mention
 
 async def _raid(message, content):
     fromegg = False
-    if guild_dict[message.channel.guild.id]['raidchannel_dict'].get(message.channel.id,{}).get('type') == "egg":
+    if guild_dict[message.channel.guild.id]['raidchannel_dict'].get(message.channel.id, {}).get('type') == "egg":
         fromegg = True
     timestamp = (message.created_at + datetime.timedelta(hours=guild_dict[message.channel.guild.id]['configure_dict']['settings']['offset'])).strftime(_('%I:%M %p (%H:%M)'))
     raid_split = content.split()
@@ -4980,20 +4996,6 @@ async def invite(ctx):
 
     Usage: !invite"""
     await _invite(ctx)
-
-def invite_processing(invite_bytes: bytes) -> BytesIO:
-    with Image.open(BytesIO(invite_bytes)) as img:
-        (width, height) = img.size
-        new_height = 3500
-        new_width = int((new_height * width) / height)
-        img = img.resize((new_width, new_height), Image.BICUBIC)
-        img = img.filter(ImageFilter.EDGE_ENHANCE)
-        enh = ImageEnhance.Brightness(img)
-        img = enh.enhance(0.4)
-        enh = ImageEnhance.Contrast(img)
-        img = enh.enhance(4)
-        txt = pytesseract.image_to_string(img, config=tesseract_config)
-    return txt
 
 async def _invite(ctx):
     bot = ctx.bot
@@ -6943,8 +6945,8 @@ async def backout(ctx):
 List Commands
 """
 
-@Meowth.group(aliases=['lists'], case_insensitive=True)
-async def list(ctx):
+@Meowth.group(name="list", aliases=['lists'], case_insensitive=True)
+async def _list(ctx):
     """Lists all raid info for the current channel.
 
     Usage: !list
@@ -7119,7 +7121,7 @@ async def list(ctx):
         else:
             raise checks.errors.CityRaidChannelCheckFail()
 
-@list.command()
+@_list.command()
 @checks.activechannel()
 async def interested(ctx, tags: str = ''):
     """Lists the number and users who are interested in the raid.
@@ -7166,7 +7168,7 @@ async def _interest(ctx, tag=False, team=False):
     listmsg = _(' {trainer_count} interested{including_string}!').format(trainer_count=str(ctx_maybecount), including_string=maybe_exstr)
     return listmsg
 
-@list.command()
+@_list.command()
 @checks.activechannel()
 async def coming(ctx, tags: str = ''):
     """Lists the number and users who are coming to a raid.
@@ -7213,7 +7215,7 @@ async def _otw(ctx, tag=False, team=False):
     listmsg = _(' {trainer_count} on the way{including_string}!').format(trainer_count=str(ctx_comingcount), including_string=otw_exstr)
     return listmsg
 
-@list.command()
+@_list.command()
 @checks.activechannel()
 async def here(ctx, tags: str = ''):
     """List the number and users who are present at a raid.
@@ -7263,7 +7265,7 @@ async def _waiting(ctx, tag=False, team=False):
     listmsg = _(' {trainer_count} waiting at the {raidtype}{including_string}!').format(trainer_count=str(ctx_herecount), raidtype=raidtype, including_string=here_exstr)
     return listmsg
 
-@list.command()
+@_list.command()
 @checks.activeraidchannel()
 async def lobby(ctx, tag=False):
     """List the number and users who are in the raid lobby.
@@ -7310,7 +7312,7 @@ async def _lobbylist(ctx, tag=False, team=False):
     listmsg = _(' {trainer_count} in the lobby{including_string}!').format(trainer_count=str(ctx_lobbycount), including_string=lobby_exstr)
     return listmsg
 
-@list.command()
+@_list.command()
 @checks.activeraidchannel()
 async def bosses(ctx):
     """List each possible boss and the number of users that have RSVP'd for it.
@@ -7357,7 +7359,7 @@ async def _bosslist(ctx):
         listmsg = _(' Nobody has told me what boss they want!')
     return listmsg
 
-@list.command()
+@_list.command()
 @checks.activechannel()
 async def teams(ctx):
     """List the teams for the users that have RSVP'd to a raid.
@@ -7401,7 +7403,7 @@ async def _teamlist(ctx):
         listmsg = _(' Nobody has updated their status!')
     return listmsg
 
-@list.command()
+@_list.command()
 @checks.allowwant()
 async def wants(ctx):
     """List the wants for the user
@@ -7423,7 +7425,7 @@ async def _wantlist(ctx):
         listmsg = _(" You don\'t have any wants! use **!want** to add some.")
     return listmsg
 
-@list.command()
+@_list.command()
 @checks.allowresearchreport()
 async def research(ctx):
     """List the quests for the channel
@@ -7459,7 +7461,7 @@ async def _researchlist(ctx):
         listmsg = _(" There are no reported research reports. Report one with **!research**")
     return listmsg
 
-@list.command()
+@_list.command()
 @checks.allowwildreport()
 async def wilds(ctx):
     """List the wilds for the channel

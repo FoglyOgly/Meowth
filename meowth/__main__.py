@@ -4161,6 +4161,8 @@ async def raid(ctx,pokemon,*,location:commands.clean_content(fix_channel_mention
 
 async def _raid(message, content):
     fromegg = False
+    if guild_dict[message.channel.guild.id]['raidchannel_dict'].get(message.channel.id, {}).get('type') == "egg":
+        fromegg = True
     timestamp = (message.created_at + datetime.timedelta(hours=guild_dict[message.channel.guild.id]['configure_dict']['settings']['offset'])).strftime(_('%I:%M %p (%H:%M)'))
     raid_split = content.split()
     if len(raid_split) == 0:

@@ -3787,13 +3787,14 @@ async def tutorial(ctx):
         guild.me: discord.PermissionOverwrite(read_messages=True)}
     name = sanitize_channel_name(ctx.author.display_name) + "-tutorial"
     tutorial_channel = await guild.create_text_channel(name,overwrites=ows)
+    await ctx.message.delete()
     enabled_commands = []
     config_dict = guild_dict[guild.id]['configure_dict']
     prefix = ctx.prefix
     for key in config_dict:
         if config_dict[key].get('enabled',False):
             enabled_commands.append(key)
-    await tutorial_channel.send(f"Hi {ctx.author.mention}! I'm Meowth, a Discord helper bot for Pokemon Go communities! I created this channel to teach you all about the things I can do to help you on this server! You can send `stop` at any point to abort this tutorial. Let's get started!")
+    await tutorial_channel.send(f"Hi {ctx.author.mention}! I'm Meowth, a Discord helper bot for Pokemon Go communities! I created this channel to teach you all about the things I can do to help you on this server! You can abandon this tutorial at any time and I'll delete this channel after five minutes. Let's get started!")
     if 'want' in enabled_commands:
         guild_dict[guild.id]['configure_dict']['want']['report_channels'].append(tutorial_channel.id)
         await tutorial_channel.send(f"This server utilizes the **{prefix}want** command to help members receive push notifications about Pokemon they want! I create Discord roles for each Pokemon that people want, and @mentioning these roles will send a notification to anyone who **{prefix}want**-ed that Pokemon!\nTry the {prefix}want command!\nEx: `{prefix}want unown`")
@@ -3934,6 +3935,7 @@ async def tutorial(ctx):
         except asyncio.TimeoutError:
             await raid_channel.send(f"Your time is up here!")
         await raid_channel.send(f"Great! Now return to {tutorial_channel.mention} to continue the tutorial. This channel will be deleted in ten seconds.")
+        await tutorial_channel.send(f"Hey {newbie.mention}, once I'm done cleaning up the raid channel, the tutorial will continue here!")
         await asyncio.sleep(10)
         await raid_channel.delete()
         del guild_dict[guild.id]['configure_dict']['raid']['report_channels'][tutorial_channel.id]

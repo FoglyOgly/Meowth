@@ -6829,8 +6829,8 @@ async def backout(ctx):
 List Commands
 """
 
-@Meowth.group(aliases=['lists'], case_insensitive=True)
-async def list(ctx):
+@Meowth.group(name="list", aliases=['lists'], case_insensitive=True)
+async def _list(ctx):
     """Lists all raid info for the current channel.
 
     Usage: !list
@@ -7005,7 +7005,7 @@ async def list(ctx):
         else:
             raise checks.errors.CityRaidChannelCheckFail()
 
-@list.command()
+@_list.command()
 @checks.activechannel()
 async def interested(ctx, tags: str = ''):
     """Lists the number and users who are interested in the raid.
@@ -7052,7 +7052,7 @@ async def _interest(ctx, tag=False, team=False):
     listmsg = _(' {trainer_count} interested{including_string}!').format(trainer_count=str(ctx_maybecount), including_string=maybe_exstr)
     return listmsg
 
-@list.command()
+@_list.command()
 @checks.activechannel()
 async def coming(ctx, tags: str = ''):
     """Lists the number and users who are coming to a raid.
@@ -7099,7 +7099,7 @@ async def _otw(ctx, tag=False, team=False):
     listmsg = _(' {trainer_count} on the way{including_string}!').format(trainer_count=str(ctx_comingcount), including_string=otw_exstr)
     return listmsg
 
-@list.command()
+@_list.command()
 @checks.activechannel()
 async def here(ctx, tags: str = ''):
     """List the number and users who are present at a raid.
@@ -7149,7 +7149,7 @@ async def _waiting(ctx, tag=False, team=False):
     listmsg = _(' {trainer_count} waiting at the {raidtype}{including_string}!').format(trainer_count=str(ctx_herecount), raidtype=raidtype, including_string=here_exstr)
     return listmsg
 
-@list.command()
+@_list.command()
 @checks.activeraidchannel()
 async def lobby(ctx, tag=False):
     """List the number and users who are in the raid lobby.
@@ -7196,7 +7196,7 @@ async def _lobbylist(ctx, tag=False, team=False):
     listmsg = _(' {trainer_count} in the lobby{including_string}!').format(trainer_count=str(ctx_lobbycount), including_string=lobby_exstr)
     return listmsg
 
-@list.command()
+@_list.command()
 @checks.activeraidchannel()
 async def bosses(ctx):
     """List each possible boss and the number of users that have RSVP'd for it.
@@ -7243,7 +7243,7 @@ async def _bosslist(ctx):
         listmsg = _(' Nobody has told me what boss they want!')
     return listmsg
 
-@list.command()
+@_list.command()
 @checks.activechannel()
 async def teams(ctx):
     """List the teams for the users that have RSVP'd to a raid.
@@ -7287,7 +7287,7 @@ async def _teamlist(ctx):
         listmsg = _(' Nobody has updated their status!')
     return listmsg
 
-@list.command()
+@_list.command()
 @checks.allowwant()
 async def wants(ctx):
     """List the wants for the user
@@ -7309,7 +7309,7 @@ async def _wantlist(ctx):
         listmsg = _(" You don\'t have any wants! use **!want** to add some.")
     return listmsg
 
-@list.command()
+@_list.command()
 @checks.allowresearchreport()
 async def research(ctx):
     """List the quests for the channel
@@ -7345,7 +7345,7 @@ async def _researchlist(ctx):
         listmsg = _(" There are no reported research reports. Report one with **!research**")
     return listmsg
 
-@list.command()
+@_list.command()
 @checks.allowwildreport()
 async def wilds(ctx):
     """List the wilds for the channel

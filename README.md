@@ -33,26 +33,33 @@ If you want to tinker with Meowth yourself, you can still download this repo, ma
 
 
 1. Install Python 3.6 and ensure PIP is also installed with it.
-https://www.python.org/downloads/release/python-364/
+https://www.python.org/downloads/release/python-365/
 
-2. Install the packages needed to run meowth by running install.py:
+2. Install the rewrite version of discord.py:
 
 Linux:
 ```bash
-python3 install.py
+python3 -m pip install -U git+https://github.com/Rapptz/discord.py@rewrite
 ```
 Windows:
 ```bash
-py install.py
+py -m pip install -U git+https://github.com/Rapptz/discord.py@rewrite
 ```
-Tesseract-OCR has to be installed with a standard binary installer on Windows.
-Get the installer [HERE](https://github.com/tesseract-ocr/tesseract/wiki/Downloads)
 
-3. Make sure the Tesseract-OCR install folder and your python install folder are added to your system environment PATH variable.
+3. Install dependencies:
+
+Linux:
+```bash
+python3 -m pip install "requests>=2.18.4" "hastebin.py>=0.2" "python-dateutil>=2.6.1" "fuzzywuzzy>=0.15.1" "dateparser>=0.6.0"
+```
+Windows:
+```bash
+py -m pip install "requests>=2.18.4" "hastebin.py>=0.2" "python-dateutil>=2.6.1" "fuzzywuzzy>=0.15.1" "dateparser>=0.6.0"
+```
 
 4. Download the files in this repository. The main source code is in meowth/\_\_main\_\_.py and bot config is in config.json.
 
-5. Go to https://discordapp.com/developers/applications/me#top and create a new app.
+5. Go to https://discordapp.com/developers/applications/me and create a new app.
 
 6. Name it and upload the avatar of your choice.
 
@@ -71,50 +78,27 @@ Get the installer [HERE](https://github.com/tesseract-ocr/tesseract/wiki/Downloa
 
 13. Select the server you want to add Meowth to and complete the prompts. If you get to an empty screen and didn't get to see the Google new reCaptcha tickbox, disable your adblocker. It is important to invite Meowth to your server before proceeding.
 
-14. Make sure you have git installed and update your discord.py file to latest version using:
+14. Run the launcher from the command prompt or terminal window:
 
 Linux:
 ```bash
-python3 -m pip install -U git+https://github.com/Rapptz/discord.py@rewrite
+python3 launcher.py
 ```
 Windows:
 ```bash
-py -m pip install -U git+https://github.com/Rapptz/discord.py@rewrite
-```
-
-15. Install dependencies from the command prompt or terminal window:
-
-Linux:
-```bash
-python3 install.py
-```
-Windows:
-```bash
-py install.py
-```
-
-16. Run the launcher from the command prompt or terminal window:
-
-Linux:
-```bash
-python3 launcher.py -s
-```
-Windows:
-```bash
-py launcher.py -s
+py launcher.py
 ```
 
 If successful, it should show "Meowth! That's right!".
 
-17. The bot should have sent you DM in Discord. Add the team roles: mystic, instinct and valor. Ensure they're below the bot role in the server role hierarchy.
+15. The bot should have sent you DM in Discord. Add the team roles: mystic, instinct and valor. Ensure they're below the bot role in the server role hierarchy.
 
-18. Simply type !configure in your server to start the configuration process.
+16. Simply type !configure in your server to start the configuration process.
 
 ### Launcher Reference:
 Arguments:
 ```
   --help, -h          Show the help message
-  --start, -s         Starts Meowth
   --auto-restart, -r  Auto-Restarts Meowth in case of a crash.
   --debug, -d         Prevents output being sent to Discord DM, as restarting
                       could occur often.
@@ -122,17 +106,17 @@ Arguments:
 
 Launch Meowth normally:
 ```bash
-python3 launcher.py -s
+python3 launcher.py
 ```
 
 Launch Meowth in debug mode if working on code changes:
 ```bash
-python3 launcher.py -s -d
+python3 launcher.py -d
 ```
 
 Launch Meowth with Auto-Restart:
 ```bash
-python3 launcher.py -s -r
+python3 launcher.py -r
 ```
 
 ### How to Translate Meowth:

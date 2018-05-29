@@ -373,3 +373,14 @@ def activechannel():
                 return True
         raise errors.ActiveChannelCheckFail()
     return commands.check(predicate)
+
+def feature_enabled(names, ensure_all=False):
+    def predicate(ctx):
+        cfg = ctx.bot.guild_dict[ctx.guild.id]['configure_dict']
+        enabled = [k for k, v in cfg.items() if v.get('enabled', False)]
+        if isinstance(names, list):
+            result = [n in enabled for n in names]
+            return all(*result) if ensure_all else any(*result)
+        if isinstance(names, str):
+            return names in enabled
+    return commands.check(predicate)

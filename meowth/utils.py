@@ -1,3 +1,5 @@
+import re
+
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 
@@ -121,3 +123,55 @@ def convert_to_bool(argument):
         return False
     else:
         return None
+
+def sanitize_channel_name(name):
+    """Converts a given string into a compatible discord channel name."""
+    # Remove all characters other than alphanumerics,
+    # dashes, underscores, and spaces
+    ret = re.sub('[^a-zA-Z0-9 _\\-]', '', name)
+    # Replace spaces with dashes
+    ret = ret.replace(' ', '-')
+    return ret
+
+async def get_raid_help(prefix, avatar, user=None):
+    helpembed = discord.Embed(colour=discord.Colour.lighter_grey())
+    helpembed.set_author(name="Raid Coordination Help", icon_url=avatar)
+    helpembed.add_field(
+        name="Key",
+        value="<> denote required arguments, [] denote optional arguments",
+        inline=False)
+    helpembed.add_field(
+        name="Raid MGMT Commands",
+        value=(
+            f"`{prefix}raid <species>`\n"
+            f"`{prefix}weather <weather>`\n"
+            f"`{prefix}timerset <minutes>`\n"
+            f"`{prefix}starttime <time>`\n"
+            "`<google maps link>`\n"
+            "**RSVP**\n"
+            f"`{prefix}(i/c/h)...\n"
+            "[total]...\n"
+            "[team counts]`\n"
+            "**Lists**\n"
+            f"`{prefix}list [status]`\n"
+            f"`{prefix}list [status] tags`\n"
+            f"`{prefix}list teams`\n\n"
+            f"`{prefix}starting [team]`"))
+    helpembed.add_field(
+        name="Description",
+        value=(
+            "`Hatches Egg channel`\n"
+            "`Sets in-game weather`\n"
+            "`Sets hatch/raid timer`\n"
+            "`Sets start time`\n"
+            "`Updates raid location`\n\n"
+            "`interested/coming/here`\n"
+            "`# of trainers`\n"
+            "`# from each team (ex. 3m for 3 Mystic)`\n\n"
+            "`Lists trainers by status`\n"
+            "`@mentions trainers by status`\n"
+            "`Lists trainers by team`\n\n"
+            "`Moves trainers on 'here' list to a lobby.`"))
+    if not user:
+        return helpembed
+    await user.send(embed=helpembed)

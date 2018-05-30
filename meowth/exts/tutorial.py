@@ -136,6 +136,7 @@ class Tutorial:
                 await self.bot.expire_channel(raid_channel)
                 await raid_channel.delete()
             del report_channels[tutorial_channel.id]
+            del category_dict[tutorial_channel.id]
             return
 
         await tutorial_channel.send(

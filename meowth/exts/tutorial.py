@@ -115,12 +115,16 @@ class Tutorial:
 
     async def raid_tutorial(self, ctx, config):
         report_channels = config['raid']['report_channels']
+        category_dict = config['raid']['category_dict']
         tutorial_channel = ctx.tutorial_channel
         prefix = ctx.prefix
         raid_channel = None
 
         # add tutorial channel to valid want report channels
         report_channels[tutorial_channel.id] = 'test'
+        
+        if config['raid']['categories'] == "region":
+            category_dict[tutorial_channel.id] = tutorial_channel.category_id
 
         async def timeout_raid(cmd):
             await tutorial_channel.send(

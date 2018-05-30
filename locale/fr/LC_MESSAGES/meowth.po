@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-05-30 16:38+0200\n"
-"PO-Revision-Date: 2018-05-30 17:47+0200\n"
+"PO-Revision-Date: 2018-05-30 21:17+0200\n"
 "Last-Translator: Scragly\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -531,7 +531,6 @@ msgstr ""
 "{enabled_commands}"
 
 #: __main__.py:1815
-#, fuzzy
 msgid ""
 "\n"
 "\n"
@@ -559,13 +558,16 @@ msgstr ""
 "**raid** - Pour configurer la commande de raid \n"
 "**exraid** - Pour configurer la commande de raid EX\n"
 "**invite** - Pour configurer la commande  d’invite à un raid\n"
-"**counters** - for automatic counters configuration\n"
-"**wild** - for wild command configuration\n"
-"**research** - for !research command configuration\n"
-"**meetup** - for !meetup command configuration\n"
-"**want** - for want/unwant command configuration\n"
-"**archive** - For !archive configuration\n"
-"**timezone** - For timezone configuration"
+"**counters** - Pour configurer les compteurs automatiques\n"
+"**wild** - Pour configurer la commande !wild, la déclaration de Pokémon "
+"découvert\n"
+"**research** - Pour configurer la commande !research, la déclaration des "
+"quêtes découvertes\n"
+"**meetup** - Pour configurer la commande !meetup\n"
+"**want** - Pour configurer la commande !want/unwant, la déclaration de "
+"recherche de Pokémons\n"
+"**archive** - Pour configurer la commande !archive\n"
+"**timezone** - Pour configurer votre time-zone"
 
 #: __main__.py:1816 __main__.py:1843
 msgid ""
@@ -574,10 +576,14 @@ msgid ""
 "Reply with **cancel** at any time throughout the questions to cancel the "
 "configure process."
 msgstr ""
+"\n"
+"\n"
+"Répondre avec **cancel** à tout moment pendant les questions pour annuler le "
+"processus de configuration."
 
 #: __main__.py:1817 __main__.py:1844
 msgid "Meowth Configuration - {guild}"
-msgstr ""
+msgstr "Configuration Meowth - {guild}"
 
 #: __main__.py:1824 __main__.py:1956 __main__.py:2023 __main__.py:2074
 #: __main__.py:2115 __main__.py:2158 __main__.py:2207 __main__.py:2229
@@ -591,10 +597,15 @@ msgid ""
 "\n"
 "No changes have been made."
 msgstr ""
+"**CONFIGURATION ANNULÉ!**\n"
+"\n"
+"Aucun changement n’a été réalisé."
 
 #: __main__.py:1838
 msgid "I'm sorry I don't understand. Please reply with the choices above."
 msgstr ""
+"Je suis désolé, je ne comprends pas. Merci de répondre avec les choix ci-"
+"dessus."
 
 #: __main__.py:1895 __main__.py:1922 __main__.py:1983 __main__.py:2142
 #: __main__.py:2366 __main__.py:2557 __main__.py:2601 __main__.py:2658
@@ -605,10 +616,13 @@ msgid ""
 "need to change any of these settings, just type **!configure** in your "
 "server again."
 msgstr ""
+"Meowth! Alright! Vos paramètres ont été enregistrés et je suis prêt à "
+"commencer! Si vous devez modifier l’un de ces paramètres, tapez à nouveau **!"
+"configure** sur votre serveur."
 
 #: __main__.py:1930
 msgid "Team Assignments"
-msgstr ""
+msgstr "Affectations d’équipe"
 
 #: __main__.py:1930
 msgid ""
@@ -622,14 +636,24 @@ msgid ""
 "\n"
 "Respond here with: **N** to disable, **Y** to enable:"
 msgstr ""
+"L’affectation d’équipe permet aux utilisateurs d’attribuer leur rôle "
+"d’équipe Pokemon Go à l’aide de la commande **!team**. Si vous avez déjà un "
+"bot qui gère cela, vous pouvez désactiver cette fonctionnalité.\n"
+"\n"
+"Si vous devez utiliser cette fonctionnalité, assurez-vous que les rôles "
+"d’équipe existants sont les suivants: mystic, valor, instinct. Ceux-ci "
+"doivent être toutes en minuscules. Si elles n’existent pas encore, j’en "
+"ferai pour vous.\n"
+"\n"
+"Répondez ici avec: **N** pour désactiver, **Y** pour activer:"
 
 #: __main__.py:1949
 msgid "Team Assignments enabled!"
-msgstr ""
+msgstr "Affectations d’équipe activées"
 
 #: __main__.py:1953
 msgid "Team Assignments disabled!"
-msgstr ""
+msgstr "Affectations d’équipe désactivées"
 
 #: __main__.py:1990
 msgid ""
@@ -637,6 +661,9 @@ msgid ""
 "example, but it is customizable:\n"
 "\n"
 msgstr ""
+"Je peux accueillir de nouveaux membres sur le serveur avec un court message. "
+"Voici un exemple, mais il est personnalisable:\n"
+"\n"
 
 #: __main__.py:1992
 #, fuzzy
@@ -671,14 +698,21 @@ msgid ""
 "\n"
 "Respond with: **N** to disable, **Y** to enable:"
 msgstr ""
+"\n"
+"\n"
+"Ce message de bienvenue peut être envoyé dans une chaine spécifique ou par "
+"message direct. Si vous avez déjà un bot qui gère cela, vous pouvez "
+"désactiver cette fonctionnalité.\n"
+"\n"
+"Répondre avec: **N** pour désactiver, **Y** pour activer:"
 
 #: __main__.py:1996 __main__.py:2013
 msgid "Welcome Message"
-msgstr ""
+msgstr "Message de bienvenue"
 
 #: __main__.py:2001
 msgid "Welcome Message enabled!"
-msgstr ""
+msgstr "Message de bienvenue activé!"
 
 #: __main__.py:2004
 msgid ""
@@ -697,19 +731,39 @@ msgid ""
 "Surround your message with [] to send it as an embed. **Warning:** Mentions "
 "within embeds may be broken on mobile, this is a Discord bug."
 msgstr ""
+"Voulez-vous un message de bienvenue personnalisé ? Vous pouvez répondre avec "
+"**N** pour utiliser le message par défaut ci-dessus ou entrer le vôtre ci-"
+"dessous.\n"
+"\n"
+"Je peux lire tout [formatage discord] (https://support.discordapp.com/hc/en-"
+"us/articles/210298617-Markdown-Text-101-Chat-Formatting-Bold-Italic-"
+"Underline-) et j’ai la liste de modèles de Tag suivants:\n"
+"\n"
+"**{@member}** - Remplace le membre par son nom d’utilisateur ou son ID\n"
+"**{# channel}** - Remplace la chaîne par le nom ou l’identifiant de la "
+"chaîne\n"
+"**{& role}** - Remplace le nom ou l’ID du rôle (affiche en tant qu’aperçu DM "
+"du rôle supprimé)\n"
+"**{user}** - Va mentionner le nouvel utilisateur\n"
+"**{server}** - Imprime le nom de votre serveur\n"
+"Entourez votre message avec [] pour l’envoyer en tant que embed. **Attention:"
+"** Les mentions au sein des embeds peuvent être cassées sur mobile, ceci est "
+"un bug de Discord."
 
 #: __main__.py:2015
 msgid "Current Welcome Message"
-msgstr ""
+msgstr "Message de bienvenue actuel"
 
 #: __main__.py:2020
 msgid "Default welcome message set"
-msgstr ""
+msgstr "Message de bienvenue par défaut"
 
 #: __main__.py:2026
 msgid ""
 "Please shorten your message to less than 500 characters. You entered {count}."
 msgstr ""
+"Veuillez raccourcir votre message à moins de 500 caractères. Vous avez entré "
+"{count}."
 
 #: __main__.py:2036
 msgid ""
@@ -718,16 +772,22 @@ msgid ""
 "**Warning:**\n"
 "The following could not be found: {errors}"
 msgstr ""
+"{msg}\n"
+"\n"
+"**Attention:**\n"
+"Impossible de trouver ce qui suit: {erreurs}"
 
 #: __main__.py:2037
 msgid ""
 "Please check the data given and retry a new welcome message, or reply with "
 "**N** to use the default."
 msgstr ""
+"Veuillez vérifier les données fournies et réessayer un nouveau message de "
+"bienvenue, ou répondez par **N** pour utiliser la valeur par défaut."
 
 #: __main__.py:2042
 msgid "Here's what you sent. Does it look ok?"
-msgstr ""
+msgstr "Voici ce que vous avez envoyé. Est-ce que ça a l’air ok ?"
 
 #: __main__.py:2049
 msgid ""
@@ -735,6 +795,9 @@ msgid ""
 "\n"
 "{welcome}"
 msgstr ""
+"Voici ce que vous avez envoyé. Est-ce que ça a l’air ok?\n"
+"\n"
+"{welcome}"
 
 #: __main__.py:2060
 msgid ""
@@ -742,10 +805,13 @@ msgid ""
 "\n"
 "{}"
 msgstr ""
+"Le message de bienvenue suivant à été enregistré :\n"
+"\n"
+"{}"
 
 #: __main__.py:2063
 msgid "Welcome Message Channel"
-msgstr ""
+msgstr "Message de bienvenue de chaine"
 
 #: __main__.py:2063
 msgid ""
@@ -756,16 +822,24 @@ msgid ""
 "Respond with: **channel-name** or ID of a channel in your server or **DM** "
 "to Direct Message:"
 msgstr ""
+"Dans quelle chaine de votre serveur souhaitez-vous que je publie les "
+"messages de bienvenue ? Vous pouvez également choisir de les envoyer au "
+"nouveau membre via Message Direct  (DM) à la place.\n"
+"\n"
+"Répondez avec: **nom-chaîne** ou ID d’une chaîne sur votre serveur ou **DM** "
+"vers un Message Direct:"
 
 #: __main__.py:2068
 msgid "Welcome DM set"
-msgstr ""
+msgstr "Message de bienvenue en Message Direct enregistré"
 
 #: __main__.py:2071
 msgid ""
 "Channel names can't contain spaces, sorry. Please double check the name and "
 "send your response again."
 msgstr ""
+"Les noms de chaînes ne peuvent pas contenir d’espaces, désolé. Veuillez "
+"vérifier le nom et renvoyer votre réponse."
 
 #: __main__.py:2102 __main__.py:2196 __main__.py:2420 __main__.py:2712
 #: __main__.py:2812 __main__.py:2912 __main__.py:3085
@@ -773,30 +847,37 @@ msgid ""
 "I couldn't set my own permissions in this channel. Please ensure I have the "
 "correct permissions in {channel} using **{prefix}get perms**."
 msgstr ""
+"Je n’ai pas pu définir mes propres autorisations dans cette chaine. Veuillez "
+"vous assurer que j’ai les permissions correctes dans {channel} en utilisant "
+"**{prefix} get perms**."
 
 #: __main__.py:2103
 msgid "Welcome Channel set to {channel}"
-msgstr ""
+msgstr "Le message de bienvenue à été affecté à la chaine {channel}"
 
 #: __main__.py:2106
 msgid ""
 "The channel you provided isn't in your server. Please double check your "
 "channel and resend your response."
 msgstr ""
+"La chaîne que vous avez fournie n’est pas dans votre serveur. Veuillez "
+"vérifier votre chaîne et renvoyer votre réponse."
 
 #: __main__.py:2112
 msgid "Welcome Message disabled!"
-msgstr ""
+msgstr "Message de bienvenue désactivé!"
 
 #: __main__.py:2118
 msgid ""
 "I'm sorry I don't understand. Please reply with either **N** to disable, or "
 "**Y** to enable."
 msgstr ""
+"Je suis désolé, je ne comprends pas. Veuillez répondre avec **N** pour "
+"désactiver ou **Y** pour activer."
 
 #: __main__.py:2149
 msgid "Raid Reporting Channels"
-msgstr ""
+msgstr "Chaine de rapport de Raids"
 
 #: __main__.py:2149
 msgid ""
@@ -815,14 +896,28 @@ msgid ""
 "Respond with: **N** to disable, or the **channel-name** list to enable, each "
 "seperated with a comma and space:"
 msgstr ""
+"Le rapport de Raid permet aux utilisateurs de signaler des raids actifs avec "
+"**!raid ** ou des œufs de raid avec **!raidegg **. Les rapports peuvent se "
+"faire dans une ou plusieurs chaines. Chaque chaine pourra représenter "
+"différentes zones / communautés. Je vais avoir besoin que vous fournissiez "
+"une liste des chaines dans votre serveur, vous autoriserez les rapports dans "
+"ce format: `nom-canal, nom-canal, nom-canal`\n"
+"\n"
+"Exemple: `kansas-city-raids, coque-raids, sydney-raids`\n"
+"\n"
+"Si vous n’avez pas besoin de rapports sur les raids ou les raids, vous "
+"pouvez désactiver cette fonction.\n"
+"\n"
+"Répondez avec: **N** pour désactiver, ou la liste **channel-name** pour "
+"activer, chacune séparée par une virgule et un espace:"
 
 #: __main__.py:2155
 msgid "Raid Reporting disabled"
-msgstr ""
+msgstr "Rapport de Raid désactivé"
 
 #: __main__.py:2187
 msgid "Raid Reporting Channels enabled"
-msgstr ""
+msgstr "Rapport de Raid activé"
 
 #: __main__.py:2199 __main__.py:2423 __main__.py:2715 __main__.py:2815
 #: __main__.py:2915 __main__.py:3089
@@ -833,6 +928,13 @@ msgid ""
 "\n"
 "Please double check your channel list and resend your reponse."
 msgstr ""
+"La liste des chaînes que vous avez fournie ne correspond pas aux chaînes de "
+"vos serveurs.\n"
+"\n"
+"Les éléments suivants ne se trouvent pas sur votre serveur: "
+"**{channel_invalides}**\n"
+"\n"
+"Veuillez vérifier votre liste de chaînes et renvoyer votre réponse."
 
 #: __main__.py:2202
 msgid ""
@@ -851,20 +953,36 @@ msgid ""
 "Respond with: **location info, location info, location info** each matching "
 "the order of the previous channel list below."
 msgstr ""
+"Pour chaque rapport, je génère des liens Google Maps pour donner aux gens "
+"des indications sur le raid ou l’œuf! Pour ce faire, j’ai besoin de savoir "
+"quelle banlieue / ville / région chaque canal de rapport représente, pour "
+"s’assurer que nous obtenons le bon emplacement sur la carte. Pour chaque "
+"chaine de rapport que vous avez fourni, j’ai besoin de son emplacement "
+"général correspondant en utilisant uniquement des lettres et des espaces, "
+"chaque emplacement étant séparé par une virgule et un espace.\n"
+"\n"
+"Exemple: `kansas city mo, coque uk, sydney nsw australie`\n"
+"\n"
+"Chaque emplacement devra être dans le même ordre que vous avez fourni les "
+"chaines dans la question précédente.\n"
+"\n"
+"Répondre avec: **informations de localisation, informations de localisation, "
+"informations de localisation** correspondant chacune à l’ordre de la liste "
+"de chaînes précédente ci-dessous."
 
 #: __main__.py:2202
 msgid "Raid Reporting Locations"
-msgstr ""
+msgstr "Localisation des Rapports de Raid"
 
 #: __main__.py:2203 __main__.py:2245 __main__.py:2427 __main__.py:2469
 #: __main__.py:2719 __main__.py:2819 __main__.py:2919 __main__.py:2961
 msgid "Entered Channels"
-msgstr ""
+msgstr "Chaines saisies"
 
 #: __main__.py:2203 __main__.py:2245 __main__.py:2427 __main__.py:2469
 #: __main__.py:2719 __main__.py:2819 __main__.py:2919 __main__.py:2961
 msgid "{citychannel_list}"
-msgstr ""
+msgstr "{citychannel_list}"
 
 #: __main__.py:2216 __main__.py:2440 __main__.py:2732 __main__.py:2832
 #: __main__.py:2932
@@ -880,10 +998,20 @@ msgid ""
 "Please double check that your locations match up with your provided channels "
 "and resend your response."
 msgstr ""
+"Le nombre de villes ne correspond pas au nombre de chaînes que vous m’avez "
+"donné plus tôt!\n"
+"\n"
+"Je vais vous montrer les deux listes à comparer:\n"
+"\n"
+"{liste des chaînes}\n"
+"{citylist}\n"
+"\n"
+"Veuillez vérifier que vos emplacements correspondent aux chaines que vous "
+"avez fournies et renvoyer votre réponse."
 
 #: __main__.py:2219
 msgid "Raid Reporting Locations are set"
-msgstr ""
+msgstr "La localisation des rapports de Raids à été définie"
 
 #: __main__.py:2220
 msgid ""

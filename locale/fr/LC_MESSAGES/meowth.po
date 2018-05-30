@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-05-30 16:38+0200\n"
-"PO-Revision-Date: 2018-05-30 21:17+0200\n"
+"PO-Revision-Date: 2018-05-30 23:18+0200\n"
 "Last-Translator: Scragly\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -877,7 +877,7 @@ msgstr ""
 
 #: __main__.py:2149
 msgid "Raid Reporting Channels"
-msgstr "Chaine de rapport de Raids"
+msgstr "Chaines de signalement de Raids"
 
 #: __main__.py:2149
 msgid ""
@@ -896,16 +896,16 @@ msgid ""
 "Respond with: **N** to disable, or the **channel-name** list to enable, each "
 "seperated with a comma and space:"
 msgstr ""
-"Le rapport de Raid permet aux utilisateurs de signaler des raids actifs avec "
-"**!raid ** ou des œufs de raid avec **!raidegg **. Les rapports peuvent se "
-"faire dans une ou plusieurs chaines. Chaque chaine pourra représenter "
-"différentes zones / communautés. Je vais avoir besoin que vous fournissiez "
-"une liste des chaines dans votre serveur, vous autoriserez les rapports dans "
-"ce format: `nom-canal, nom-canal, nom-canal`\n"
+"Le signalement de Raid permet aux utilisateurs de signaler des raids actifs "
+"avec **!raid ** ou des œufs de raid avec **!raidegg **. Les signalements "
+"peuvent se faire dans une ou plusieurs chaines. Chaque chaine pourra "
+"représenter différentes zones / communautés. Je vais avoir besoin que vous "
+"fournissiez une liste des chaines dans votre serveur, vous autoriserez les "
+"signalements dans ce format: `nom-canal, nom-canal, nom-canal`\n"
 "\n"
 "Exemple: `kansas-city-raids, coque-raids, sydney-raids`\n"
 "\n"
-"Si vous n’avez pas besoin de rapports sur les raids ou les raids, vous "
+"Si vous n’avez pas besoin de signalements sur les raids ou les raids, vous "
 "pouvez désactiver cette fonction.\n"
 "\n"
 "Répondez avec: **N** pour désactiver, ou la liste **channel-name** pour "
@@ -913,11 +913,11 @@ msgstr ""
 
 #: __main__.py:2155
 msgid "Raid Reporting disabled"
-msgstr "Rapport de Raid désactivé"
+msgstr "Signalement de Raid désactivé"
 
 #: __main__.py:2187
 msgid "Raid Reporting Channels enabled"
-msgstr "Rapport de Raid activé"
+msgstr "Signalement de Raid activé"
 
 #: __main__.py:2199 __main__.py:2423 __main__.py:2715 __main__.py:2815
 #: __main__.py:2915 __main__.py:3089
@@ -953,13 +953,13 @@ msgid ""
 "Respond with: **location info, location info, location info** each matching "
 "the order of the previous channel list below."
 msgstr ""
-"Pour chaque rapport, je génère des liens Google Maps pour donner aux gens "
-"des indications sur le raid ou l’œuf! Pour ce faire, j’ai besoin de savoir "
-"quelle banlieue / ville / région chaque canal de rapport représente, pour "
-"s’assurer que nous obtenons le bon emplacement sur la carte. Pour chaque "
-"chaine de rapport que vous avez fourni, j’ai besoin de son emplacement "
-"général correspondant en utilisant uniquement des lettres et des espaces, "
-"chaque emplacement étant séparé par une virgule et un espace.\n"
+"Pour chaque signalement, je génère des liens Google Maps pour donner aux "
+"gens des indications sur le raid ou l’œuf! Pour ce faire, j’ai besoin de "
+"savoir quelle banlieue / ville / région chaque canal de rapport représente, "
+"pour s’assurer que nous obtenons le bon emplacement sur la carte. Pour "
+"chaque chaine de signalement que vous avez fourni, j’ai besoin de son "
+"emplacement général correspondant en utilisant uniquement des lettres et des "
+"espaces, chaque emplacement étant séparé par une virgule et un espace.\n"
 "\n"
 "Exemple: `kansas city mo, coque uk, sydney nsw australie`\n"
 "\n"
@@ -972,7 +972,7 @@ msgstr ""
 
 #: __main__.py:2202
 msgid "Raid Reporting Locations"
-msgstr "Localisation des Rapports de Raid"
+msgstr "Localisation des Signalements de Raid"
 
 #: __main__.py:2203 __main__.py:2245 __main__.py:2427 __main__.py:2469
 #: __main__.py:2719 __main__.py:2819 __main__.py:2919 __main__.py:2961
@@ -1011,7 +1011,7 @@ msgstr ""
 
 #: __main__.py:2219
 msgid "Raid Reporting Locations are set"
-msgstr "La localisation des rapports de Raids à été définie"
+msgstr "La localisation des signalements de Raids à été définie"
 
 #: __main__.py:2220
 msgid ""
@@ -1023,10 +1023,18 @@ msgid ""
 "**region** - If you want them categorized by region\n"
 "**level** - If you want them categorized by level."
 msgstr ""
+"Comment voulez-vous que je catégorise les chaînes de raid que je crée? Vos "
+"options sont:\n"
+"\n"
+"**none** - Si vous ne voulez pas les catégoriser\n"
+"**same** - Si vous les voulez dans la même catégorie que la chaîne de "
+"signalement\n"
+"**region** - Si vous voulez les classer par région\n"
+"**level** - Si vous voulez les classer par niveau."
 
 #: __main__.py:2220 __main__.py:2244 __main__.py:2295
 msgid "Raid Reporting Categories"
-msgstr ""
+msgstr "Catégories de Signalements de Raid"
 
 #: __main__.py:2244
 msgid ""
@@ -1040,11 +1048,24 @@ msgid ""
 "\n"
 "You have configured the following channels as raid reporting channels."
 msgstr ""
+"Dans le même ordre que celui indiqué ci-dessous, indiquez le nom des "
+"catégories dans lesquelles vous souhaitez que les raids signalés dans chaque "
+"chaine apparaissent. Vous n’avez pas besoin d’utiliser des catégories "
+"différentes pour chaque chaines, mais elles doivent être des catégories "
+"préexistantes . Séparez chaque nom de catégorie par une virgule. La réponse "
+"peut être le nom de la catégorie ou l’ID.\n"
+"\n"
+"Exemple: `kansas city, coque, 1231231241561337813`\n"
+"\n"
+"Vous avez configuré les chaines suivantes en tant que chaines de signalement "
+"de Raid."
 
 #: __main__.py:2275 __main__.py:2326 __main__.py:2499 __main__.py:2991
 msgid ""
 "The category list you provided doesn't match with your server's categories."
 msgstr ""
+"La liste de catégories que vous avez fournie ne correspond pas aux "
+"catégories de votre serveur."
 
 #: __main__.py:2277 __main__.py:2284 __main__.py:2328 __main__.py:2335
 #: __main__.py:2501 __main__.py:2508 __main__.py:2993 __main__.py:3000
@@ -1053,6 +1074,10 @@ msgid ""
 "\n"
 "The following aren't in your server: **{invalid_categories}**"
 msgstr ""
+"\n"
+"\n"
+"Les éléments suivants ne sont pas dans votre serveur: **{invalid_categories}"
+"**"
 
 #: __main__.py:2278 __main__.py:2329 __main__.py:2502 __main__.py:2994
 msgid ""
@@ -1061,6 +1086,10 @@ msgid ""
 "Please double check your category list and resend your response. If you just "
 "made these categories, try again."
 msgstr ""
+"\n"
+"\n"
+"Veuillez vérifier votre liste de catégories et renvoyer votre réponse. Si "
+"vous venez de créer ces catégories, réessayez."
 
 #: __main__.py:2282 __main__.py:2506 __main__.py:2998
 msgid ""
@@ -1075,6 +1104,16 @@ msgid ""
 "Please double check that your categories match up with your provided "
 "channels and resend your response."
 msgstr ""
+"Le nombre de catégories que j’ai trouvées sur votre serveur ne correspond "
+"pas au nombre de chaînes que vous m’avez donné plus tôt!\n"
+"\n"
+"Je vais vous montrer les deux listes à comparer:\n"
+"\n"
+"**Chaînes correspondantes:** {channelliste}\n"
+"**Catégories assorties:** {catlist}\n"
+"\n"
+"Veuillez vérifier que vos catégories correspondent aux chaînes que vous avez "
+"fournies et renvoyer votre réponse."
 
 #: __main__.py:2295
 msgid ""
@@ -1088,6 +1127,16 @@ msgid ""
 "\n"
 "Example: `level 1-3, level 1-3, level 1-3, level 4, 1231231241561337813`"
 msgstr ""
+"Pokemon Go dispose actuellement de cinq niveaux de raids. Veuillez indiquer "
+"les noms des catégories dans lesquelles vous souhaitez que chaque niveau de "
+"raid apparaisse. Utilisez l’ordre suivant: 1, 2, 3, 4, 5\n"
+"\n"
+"Vous n’avez pas besoin d’utiliser différentes catégories pour chaque niveau, "
+"mais elles doivent être des catégories préexistantes. Séparez chaque nom de "
+"catégorie par une virgule. La réponse peut être le nom de la catégorie ou "
+"l’ID.\n"
+"\n"
+"Exemple: `niveau 1-3, niveau 1-3, niveau 1-3, niveau 4, 1231231241561337813"
 
 #: __main__.py:2333
 msgid ""
@@ -1100,18 +1149,27 @@ msgid ""
 "\n"
 "Please double check your categories."
 msgstr ""
+"Le nombre de catégories que j’ai trouvées sur votre serveur ne correspond "
+"pas au nombre de niveaux de raid! Assurez-vous de me donner exactement six "
+"catégories, une pour chaque niveau de raid. Vous pouvez utiliser la même "
+"catégorie pour plusieurs niveaux si vous le souhaitez, mais j’ai besoin de "
+"voir six noms de catégories.\n"
+"\n"
+"**Catégories assorties:** {catlist}\n"
+"\n"
+"S’il vous plaît vérifier vos catégories."
 
 #: __main__.py:2339 __main__.py:2513 __main__.py:3005
 msgid "Sorry, I didn't understand your answer! Try again."
-msgstr ""
+msgstr "Désolé, je n’ai pas compris votre réponse! Réessayer."
 
 #: __main__.py:2342
 msgid "Raid Categories are set"
-msgstr ""
+msgstr "Les catégories de raid sont définies"
 
 #: __main__.py:2373
 msgid "EX Raid Reporting Channels"
-msgstr ""
+msgstr "Chaînes de signalement de Raid EX"
 
 #: __main__.py:2373
 msgid ""
@@ -1129,18 +1187,32 @@ msgid ""
 "Respond with: **N** to disable, or the **channel-name** list to enable, each "
 "seperated with a comma and space:"
 msgstr ""
+"Le signalement de Raid EX permet aux utilisateurs de signaler les raids EX "
+"avec **!exraid**. Les signalements de raid Pokemon EX peuvent se faire dans "
+"une ou plusieurs chaines. Chaque chaine pourra représenter différentes "
+"zones / communautés. Je vais avoir besoin que vous fournissiez une liste de "
+"chaines dans votre serveur, vous autoriserez les signalements dans ce "
+"format: `nom-canal, nom-canal, nom-canal`\n"
+"\n"
+"Exemple: `kansas-city-raids, coque-raids, sydney-raids`\n"
+"\n"
+"Si vous n’avez pas besoin de signalements de Raid EX, vous pouvez désactiver "
+"cette fonction.\n"
+"\n"
+"Répondez avec: **N** pour désactiver, ou la liste **channel-name** pour "
+"activer, chacune séparée par une virgule et un espace:"
 
 #: __main__.py:2379
 msgid "EX Raid Reporting disabled"
-msgstr ""
+msgstr "Chaînes de signalement de Raid EX désactivées"
 
 #: __main__.py:2411
 msgid "EX Raid Reporting Channels enabled"
-msgstr ""
+msgstr "Chaînes de signalement de Raid EX activées"
 
 #: __main__.py:2426
 msgid "EX Raid Reporting Locations"
-msgstr ""
+msgstr "Localisation des signalement de Raid EX"
 
 #: __main__.py:2426
 msgid ""
@@ -1159,10 +1231,27 @@ msgid ""
 "Respond with: **location info, location info, location info** each matching "
 "the order of the previous channel list below."
 msgstr ""
+"Pour chaque rapport, je génère des liens Google Maps pour donner aux "
+"utilisateurs des indications sur les Raids EX! Pour ce faire, j’ai besoin de "
+"savoir quelle banlieue / ville / région chaque chaine de signalement "
+"représente, pour s’assurer que nous obtenons le bon emplacement sur la "
+"carte. Pour chaque chaine de signalement que vous avez fourni, j’ai besoin "
+"de son emplacement général correspondant en utilisant uniquement des lettres "
+"et des espaces, chaque emplacement étant séparé par une virgule et un "
+"espace.\n"
+"\n"
+"Exemple: `kansas city mo, coque uk, sydney nsw australie`\n"
+"\n"
+"Chaque emplacement devra être dans le même ordre que vous avez fourni les "
+"chaines dans la question précédente.\n"
+"\n"
+"Répondre avec: ** informations de localisation, informations de "
+"localisation, informations de localisation ** correspondant chacune à "
+"l’ordre de la liste de chaînes précédente ci-dessous."
 
 #: __main__.py:2443
 msgid "EX Raid Reporting Locations are set"
-msgstr ""
+msgstr "La localisation des signalement de Raid EX est définie"
 
 #: __main__.py:2444
 msgid ""
@@ -1173,10 +1262,18 @@ msgid ""
 "**same** - If you want them in the same category as the reporting channel\n"
 "**other** - If you want them categorized in a provided category name or ID"
 msgstr ""
+"Comment voulez-vous que je catégorise les chaînes de raid EX que je crée? "
+"Vos options sont:\n"
+"\n"
+"**none** - Si vous ne voulez pas les catégoriser\n"
+"**same** - Si vous les voulez dans la même catégorie que la chaîne de "
+"signalement\n"
+"**other** - Si vous voulez les classer dans un nom de catégorie ou un ID "
+"fourni"
 
 #: __main__.py:2444 __main__.py:2468
 msgid "EX Raid Reporting Categories"
-msgstr ""
+msgstr "Catégories des Signalement de Raid EX"
 
 #: __main__.py:2468
 msgid ""
@@ -1190,14 +1287,25 @@ msgid ""
 "\n"
 "You have configured the following channels as EX raid reporting channels."
 msgstr ""
+"Dans le même ordre que celui indiqué ci-dessous, indiquez le nom des "
+"catégories dans lesquelles vous souhaitez que les raids signalés dans chaque "
+"chaine apparaissent. Vous n’avez pas besoin d’utiliser des catégories "
+"différentes pour chaque chaine, mais elles doivent être des catégories "
+"préexistantes . Séparez chaque nom de catégorie par une virgule. La réponse "
+"peut être le nom de la catégorie ou l’ID.\n"
+"\n"
+"Exemple: `kansas city, coque, 1231231241561337813`\n"
+"\n"
+"Vous avez configuré les chaines suivantes en tant que chaine de signalement "
+"de RAID EX."
 
 #: __main__.py:2516
 msgid "EX Raid Categories are set"
-msgstr ""
+msgstr "Les catégories des Signalement de Raid EX sont définies"
 
 #: __main__.py:2518
 msgid "EX Raid Channel Read Permissions"
-msgstr ""
+msgstr "Permissions de lecture des chaines de Raid Ex"
 
 #: __main__.py:2518
 msgid ""
@@ -1207,14 +1315,20 @@ msgid ""
 "**everyone** - To have everyone be able to see all reported EX Raids\n"
 "**same** - To only allow those with access to the reporting channel."
 msgstr ""
+"Qui voulez-vous être en mesure de **voir** les chaînes Raid EX ? Vos options "
+"sont:\n"
+"\n"
+"**everyone** - Pour que tout le monde puisse voir tous les Raids EX "
+"signalés\n"
+"**same** - Autoriser uniquement ceux qui ont accès au canal de signalement."
 
 #: __main__.py:2631
 msgid "Automatic Counter Levels set to: {levels}"
-msgstr ""
+msgstr "Niveaux de compteurs automatiques définis sur: {levels}"
 
 #: __main__.py:2665
 msgid "Wild Reporting Channels"
-msgstr ""
+msgstr "Chaines de signalement de Pokémon sauvage"
 
 #: __main__.py:2665
 msgid ""
@@ -1232,14 +1346,28 @@ msgid ""
 "Respond with: **N** to disable, or the **channel-name** list to enable, each "
 "seperated with a comma and space:"
 msgstr ""
+"Le signalement de Pokémon sauvage permet aux utilisateurs de signaler des "
+"spawns sauvages avec **!wild **. LLes signalements peuvent se faire dans une "
+"ou plusieurs chaines. Chaque chaine pourra représenter différentes zones / "
+"communautés. Je vais avoir besoin que vous fournissiez une liste de chaine "
+"de votre serveur, vous autoriserez les rapports dans ce format: `nom-canal, "
+"nom-canal, nom-canal`\n"
+"\n"
+"Exemple: `kansas-city-wilds, coque-wilds, sydney-wilds`\n"
+"\n"
+"Si vous n’avez pas besoin de générer des rapports **wild**, vous pouvez "
+"désactiver cette fonction.\n"
+"\n"
+"Répondez avec: **N** pour désactiver, ou la liste **channel-name** pour "
+"activer, chacune séparée par une virgule et un espace:"
 
 #: __main__.py:2671
 msgid "Wild Reporting disabled"
-msgstr ""
+msgstr "Signalement de Pokémon sauvage désactivé"
 
 #: __main__.py:2703
 msgid "Wild Reporting Channels enabled"
-msgstr ""
+msgstr "Chaines de signalement de Pokémon sauvage activés"
 
 #: __main__.py:2718
 msgid ""
@@ -1258,14 +1386,32 @@ msgid ""
 "Respond with: **location info, location info, location info** each matching "
 "the order of the previous channel list below."
 msgstr ""
+"Pour chaque rapport, je génère des liens Google Maps pour donner aux gens "
+"des indications sur les spawns sauvages! Pour ce faire, j’ai besoin de "
+"savoir quelle banlieue / ville / région chaque chaine de signalement "
+"représente, pour s’assurer que nous obtenons le bon emplacement sur la "
+"carte. Pour chaque chaine de signalement que vous avez fourni, j’ai besoin "
+"de son emplacement général correspondant en utilisant uniquement des lettres "
+"et des espaces, chaque emplacement étant séparé par une virgule et un "
+"espace.\n"
+"\n"
+"Exemple: `kansas city mo, coque uk, sydney nsw australie`\n"
+"\n"
+"Chaque emplacement devra être dans le même ordre que vous avez fourni les "
+"chaines dans la question précédente.\n"
+"\n"
+"Répondre avec: **informations de localisation, informations de localisation, "
+"informations de localisation** correspondant chacune à l’ordre de la liste "
+"de chaînes précédente ci-dessous."
 
 #: __main__.py:2718
 msgid "Wild Reporting Locations"
-msgstr ""
+msgstr "Localisation des chaines de signalement de Pokémon sauvage"
 
 #: __main__.py:2735
 msgid "Wild Reporting Locations are set"
 msgstr ""
+"La localisation des chaines de signalement de Pokémon sauvage est définie"
 
 #: __main__.py:2765
 msgid "Research Reporting Channels"

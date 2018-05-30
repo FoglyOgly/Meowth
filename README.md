@@ -5,146 +5,193 @@
 # Meowth
 A Discord helper bot for Pokemon Go communities.
 
-Meowth is a Discord bot written in Python 3.6 using version 1.0.0a of the discord.py library.
+Meowth is a Discord bot written in Python 3.6.1+ built with [discord.py v1.0.0a (rewrite branch)](https://github.com/Rapptz/discord.py/tree/rewrite)
 
-## Meowth 2.0 is here! Now with Category Support!
+## Meowth v2 Features
 
-Meowth is now able to handle being on multiple servers of any size in any part of the world and can be invited to your server without having to install Python or run anything on a local machine yourself. The configuration process is now handled completely on Discord via DM with the server owner. First, a list of current features:
+Meowth assists with organising Pokemon Go communities with support for:
 
-1. User-driven (not automated) wild spawn and raid reporting.
-2. Role management for each Pokemon species (Discord limits a server to 250 roles, however) that allows each user to opt-in only for the Pokemon they want. These roles are mentioned when spawns or raids are reported.
-3. Raid reporting: Report either !raidegg, !raid or !exraid on the server to have meowth create channels to organise in. Certain commands can be used within raid channels, such as updating your stauts with !interested, !coming and !here. Users can easily determine the status of involved members with the !list command. Meowth also queries Google Maps to get a guess of the raid location (no access to the game means no list of gyms), or you can paste a maps link in the channel after creation to update it to exact coordinates.
-4. Optional team management and new member welcome functions.
+ - Team assignments
+ - Server greetings
+ - Wild Pokemon reporting
+ - Raid reporting and RSVP
+ - Research reporting
+ - Pokebattler integration for raid counters
+ - Silph card integration
+ - Gym matching extension for self-hosters
 
-## Directions for inviting a remotely hosted Meowth to your server:
-Note: You must have manage_server permissions to invite.
-1. Use [THIS LINK](https://discordapp.com/oauth2/authorize?client_id=346759953006198784&scope=bot&permissions=268822608) to invite Meowth.   
-2. Select your server.
-3. In your server, type !configure.
-4. Meowth will DM you to setup your server. Be sure to read the prompts properly.
-5. That's it! Enjoy!
+#### *`Note: All reports are provided by your active server members. Meowth does not support any TOS breaking features such as spoofing, Pokemon Go bot accounts and automated raid reporting.`*
 
-
-You can join the Meowth server here for updates, setup help, feature requests, or just to test out the bot before you add it. https://discord.gg/hhVjAN8
-
-If you want to tinker with Meowth yourself, you can still download this repo, make whatever changes you want (or keep everything if you want) and run Meowth locally. The configure process is the same except you'll have to use your own bot token.
-
-## Directions for installing and running the bot on your server:
+# Invite Public Meowth (no hosting required)
 
 
-1. Install Python 3.6 and ensure PIP is also installed with it.
-https://www.python.org/downloads/release/python-365/
+1. Use [THIS LINK](https://discordapp.com/oauth2/authorize?client_id=346759953006198784&scope=bot&permissions=268822608) to invite Meowth  
+1. Select your server and click Authorize
+1. Verify you aren't a robot (if the captcha doesn't appear, disable your adblocker)
+1. In your server, type `!configure`
+1. Go through the DM configuration session with Meowth to setup your server  
+   *Be sure to read the prompts carefully and join the [support server](https://discord.gg/hhVjAN8) if you get stuck*
+1. That's it! Enjoy!
 
-2. Install the rewrite version of discord.py:
+#### *``Note: You must have the manage_server permission to invite a bot.``*
 
-Linux:
+You can join the Meowth Discord Support Server for updates, setup help, feature requests, or just to test out the bot before you add it:  
+https://discord.gg/hhVjAN8
+
+# Install your own Meowth
+
+## Dependancies
+
+## **`Python 3.6.1+`**
+
+[Go here](https://github.com/FoglyOgly/Meowth#installing-python) for details on how to install Python 3.6.
+
+**For all future CLI commands, replace the command name `python3` with the relevant interpreter command name for your system (such as the common `py` command name on Windows). See details [here](https://github.com/FoglyOgly/Meowth#installing-python).**
+
+## **`Discord.py v1.0.0a (Rewrite Branch)`**
+
+The [rewrite branch of discord.py](https://github.com/Rapptz/discord.py/tree/rewrite) is an in-development branch that does not yet have an official stable release, however the default/master branch is feature-frozen, and lacks support for some of the newer features in discord such as categories.
+
+If you intend to fork Meowth and alter any code, ensure you keep up to date with any breaking changes that might occur in this branch of discord.py.
+
 ```bash
 python3 -m pip install -U git+https://github.com/Rapptz/discord.py@rewrite
 ```
-Windows:
+
+#### *``Note: You will receive the following warning on your first run, which can be disregarded:``*
+`PyNaCl is not installed, voice will NOT be supported`
+
+## **`Git`**
+
+To clone the files from our repository or your own forked repository on GitHub, you will need to have `git` installed.
+
+### Windows
+
+Download the [Git for Windows](https://git-scm.com/download/win) software.
+
+On install, ensure the following:
+ - `Windows Explorer integration` component (and all sub-components) is selected.
+ - `Use Git from the Windows Command Prompt` is selected in the PATH adjustment step.
+ - `Checkout as-is, commit Unix-style line endings` is selected in the line ending config step.
+ 
+ ### Linux
+
+First check if it's already installed with:
 ```bash
-py -m pip install -U git+https://github.com/Rapptz/discord.py@rewrite
+git --version
 ```
 
-3. Install dependencies:
+If it's not already installed, use your relevant package manager to install it.
+
+For Debian and Ubuntu, it would usually be:
+```bash
+sudo apt-get install git
+```
+
+## **`Required Python Packages`**
 
 Linux:
 ```bash
 python3 -m pip install "requests>=2.18.4" "hastebin.py>=0.2" "python-dateutil>=2.6.1" "fuzzywuzzy>=0.15.1" "dateparser>=0.6.0"
 ```
-Windows:
+
+## **`Optional Python Packages`**
+
+`python-Levenstein` is an optional package that increases the speed of fuzzy matching strings, which we use for matching up pokemon names, gym names and possibly other things in future. It also removes the `Using slow pure-python SequenceMatcher` warning emitted from the `fuzzywuzzy` python package, which can otherwise be ignored.
+
 ```bash
-py -m pip install "requests>=2.18.4" "hastebin.py>=0.2" "python-dateutil>=2.6.1" "fuzzywuzzy>=0.15.1" "dateparser>=0.6.0"
+python3 -m pip install python-Levenstein
 ```
 
-4. Download the files in this repository. The main source code is in meowth/\_\_main\_\_.py and bot config is in config.json.
+The above may not be supported on all systems. You can sometimes find a suitable wheel [here](https://www.lfd.uci.edu/~gohlke/pythonlibs/#python-levenshtein) to install with, or you may have to look around for details suitable for your specific system.
 
-5. Go to https://discordapp.com/developers/applications/me and create a new app.
+## **`Meowth`**
 
-6. Name it and upload the avatar of your choice.
+1. Create a Bot user in the [Discord Developers panel](https://discordapp.com/developers/applications/me):
+   - Click `New App`
+   - Add an App Name, Description and App Icon (which will be intial bot avatar image)
+   - Click `Create App`
+   - Click `Create a Bot User`
+   - Copy down your Client ID in the App Details box at the very top
+   - In the App Bot User box, click to reveal Token and copy it down
+   - *Optional:* Tick the Public Bot tickbox if you want to allow others to invite your bot to their own server.
 
-7. Create a bot user for your app and reveal the bot token to copy it.
+1. Download the files in this repository, or your own fork if you intend to modify source  
+   #### *``Note: If you alter the code significantly, adapt to support platforms we don't or integrate any TOS-breaking features, we ask you don't name your instance Meowth to avoid confusion to users between our instance and yours.``*
 
-8. Copy config_blank.json and rename to config.json.
+1. Copy the bot config template `config_blank.json`, rename to `config.json` and edit it:
+   - `bot_token` is the Token you copied down earlier from the Discord Developers page and requires quotes as it's a string.
+   - `default_prefix` is the prefix the bot will use by default until a guild specifies otherwise with the `set prefix` command
+   - `master` is your personal discord account ID. This should be a long set of numbers like `174764205927432192` and should not have quotes around it, as it's an `int` not a string.
+     * You can get your ID by enabling Developer Mode on the Discord Client, in `User Settings` > `Appearance` > `Advanced`, which then enables you to right-click your username in chat and select the option `Copy ID`
+     * Another method is to mention yourself in chat and add `\` directly behind the mention for it to escape the mention string that's created, revealing your ID.
+   - `type_id_dict` specifies what Pokemon Type emojis to use for your bot.  
+      - By default, it assumes you have the emojis in your own discord guild, and doesn't use the specific external emoji format.  If you intend to allow the bot on multiple guilds, you will want to setup the external emoji strings.
 
-9. Open config.json in a text editor (a good one to use is Notepad++) and paste the bot token into the value for "bot_token", replacing the "yourtoken" string.
+1. Invite your Bot's User to your guild:
+   - Get the Client ID you copied earlier from the Discord Developers page and replace the text `<CLIENT_ID>` with it in the following URL:  
+   `https://discordapp.com/oauth2/authorize?client_id=<CLIENT_ID>&scope=bot&permissions=268822608`
+   - Go to the URL, select your server and click `Authorize`
+   - Verify you aren't a robot (if the captcha doesn't appear, disable your adblocker)
+  
 
-10. Replace the "master" value in config.json with your user ID from discord.
 
-11. Go back to your Discord application page and copy the Client ID.
+1. Run the launcher from the command prompt or terminal window:  
+   `python3 launcher.py`
 
-12. Go to the following link, replacing <CLIENT_ID> with the Client ID you copied.
-`https://discordapp.com/oauth2/authorize?client_id=<CLIENT_ID>&scope=bot&permissions=268822608`
+   If successful, it should send "Meowth! That's right!" as well as basic info on startup.
 
-13. Select the server you want to add Meowth to and complete the prompts. If you get to an empty screen and didn't get to see the Google new reCaptcha tickbox, disable your adblocker. It is important to invite Meowth to your server before proceeding.
+1. Simply type `!configure` in your server to start the configuration process as normal.
 
-14. Run the launcher from the command prompt or terminal window:
+## Launcher Reference:
+### Arguments
+```
+  --help, -h           Show the help message
+  --auto-restart, -r   Auto-Restarts Meowth in case of a crash.
+  --debug, -d          Prevents output being sent to Discord DM, as restarting
+                       could occur often.
+```
 
-Linux:
+### Launch Meowth normally
 ```bash
 python3 launcher.py
 ```
-Windows:
-```bash
-py launcher.py
-```
 
-If successful, it should show "Meowth! That's right!".
-
-15. The bot should have sent you DM in Discord. Add the team roles: mystic, instinct and valor. Ensure they're below the bot role in the server role hierarchy.
-
-16. Simply type !configure in your server to start the configuration process.
-
-### Launcher Reference:
-Arguments:
-```
-  --help, -h          Show the help message
-  --auto-restart, -r  Auto-Restarts Meowth in case of a crash.
-  --debug, -d         Prevents output being sent to Discord DM, as restarting
-                      could occur often.
-```
-
-Launch Meowth normally:
-```bash
-python3 launcher.py
-```
-
-Launch Meowth in debug mode if working on code changes:
+### Launch Meowth in debug mode if working on code changes
 ```bash
 python3 launcher.py -d
 ```
 
-Launch Meowth with Auto-Restart:
+### Launch Meowth with Auto-Restart
 ```bash
 python3 launcher.py -r
 ```
 
-### How to Translate Meowth:
-We do not currently develop for any language other than English and self-hosting is the only way to translate Meowth currently.
-However, many people on our server have translated Meowth into a variety of languages. If you are wanting to translate Meowth to your language, check [there](https://discord.gg/hhVjAN8) first to see if the work has been done for you.
-To translate Meowth, we currently recommend using pygettext.py and translating the .pot file using [poedit](https://poedit.net/). To generate a .pot file:
+## How to Translate Meowth:
+
+We currently only support English with our public bot, with self-hosting being the only way to support other languages.
+
+However, we have quite a few people [on our support server](https://discord.gg/hhVjAN8) who have been working on their own translations in a variety of languages.
+
+If you are wanting to translate Meowth to your language, check there in our `#non-english-support` channel to see if someone might be able to share what they've worked on in the language you need.
+
+To translate Meowth yourself, you can use pygettext.py and edit the generated translation files using [Poedit](https://poedit.net/). 
+
+To generate a .pot file in Windows for example:
 
 1. Nativate to `[pythonpath]\Python36\Tools\i18n\`
 
-2. Copy the file you would like to extract text from (usually \_\_main\_\_.py) into this folder
+1. Open Command Prompt or PowerShell in this directory and run:
 
-3. Open a command prompt in this directory and run:
+   `py pygettext.py -d <RESULTING FILENAME> <PATH TO SPECIFIC *.PY FILE>`
 
-Linux:
-```bash
-python3 pygettext.py -d meowth __main__.py
-```
-Windows:
-```bash
-py pygettext.py -d meowth __main__.py
-```
+1. This will generate a meowth.pot that you can then translate using Poedit
 
-4. This will generate a meowth.pot that you can then translate using poedit
+1. Place the po/mo files from poedit into the `/locale/<language abbreviation>/LC_MESSAGES` directory (use other languages for reference)
 
-5. Place the po/mo files from poedit into the `/locale/<language abbreviation>/LC_MESSAGES` directory (use other languages for reference)
+1. Change Meowth's config.json `bot-language` and `pokemon-language` to `<language abbreviation>`
 
-6. Change Meowth's config.json `bot-language` and `pokemon-language` to `<language abbreviation>`
-
+#### *``Note: Since moving to Python 3.6 we have utlised f-strings in our source code in order to take advantage of the cleanliness and additional performance it brings. Unfortunately, we have later found out it is incompatible with pygettext's string extraction and replacement methods. As such, any strings that require translating that use f-strings will need to be edited in source to use str.format() instead.``*
 
 ## Directions for using Meowth:
 Note: Avoid punctuation inside commands.
@@ -268,3 +315,53 @@ If you are having trouble getting Meowth running in your server, we have found t
 ## Known issues:
 
 Compatibility with Python 3.6 on Mac OS X requires running "Install Certificates.command" in the Python 3.6 folder.
+
+# Installing Python
+
+## Windows
+
+Install the latest Python 3.6 package from the official site if you have not already got it. At the time of writing, Python 3.6.5 was the latest maintenance release.  
+https://www.python.org/downloads/release/python-365/
+
+Python must be added the the environment's PATH, which is typically done automatically on install.
+
+Your newly installed Python interpreter can be run in CLI in either Command Prompt or PowerShell typically with one of the following commands:
+
+> `python`  
+> `py`  
+> `py -3`  
+> `py -3.6`
+
+To check your referenced interpreter version, use:
+```bash
+python --version
+```
+
+Be sure to replace all instructions that specify a certain interpreter command with the one relevant to your system, as this differs between each individual OS, configuration and environment.
+
+#### Linux
+
+If you're using Linux, you will likely have a version of Python 3 already installed on your system. Check your current version with:
+```bash
+python3 --version
+```
+
+If the version is not `3.6.1` or above, or `python3` is not found, you will need to install it on your system. You do not need to remove any existing versions from your system and it is usually not recommended to uninstal the default package as other system packages may rely on it.
+
+**There are a large variety of flavours of linux, so be sure to reference online guides on how to install the required Python version with your specific system and package manager.**
+
+If you're on a version of Debian or Ubuntu and there is not a suitable ready-made package to install, the following is how to build and install Python 3.6.5 tailored for your specific system:
+```bash
+sudo apt-get update &&
+sudo apt-get install ca-certificates libexpat1 libffi6 libgdbm3 libreadline7 libsqlite3-0 libssl1.1 dpkg-dev gcc libbz2-dev libc6-dev libexpat1-dev libffi-dev libgdbm-dev liblzma-dev libncursesw5-dev libreadline-dev libsqlite3-dev libssl-dev make tcl-dev tk-dev wget xz-utils zlib1g-dev gnupg dirmngr
+wget https://www.python.org/ftp/python/3.6.5/Python-3.6.5.tar.xz
+wget https://www.python.org/ftp/python/3.6.5/Python-3.6.5.tar.xz.asc
+gpg --keyserver ha.pool.sks-keyservers.net --recv-keys 0D96DF4D4110E5C43FBFB17F2D347EA6AA65421D
+gpg --batch --verify Python-3.6.5.tar.xz.asc Python-3.6.5.tar.xz
+tar -xf Python-3.6.5.tar.xz
+cd Python-3.6.5
+./configure --enable-optimizations --enable-loadable-sqlite-extensions --enable-shared --with-system-expat --with-system-ffi
+sudo make -j "$(nproc)"
+sudo make altinstall
+```
+#### *``Credits to Devon from the discord.py support server for testing and providing the above script.``*

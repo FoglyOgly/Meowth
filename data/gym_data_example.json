@@ -1,0 +1,18 @@
+{
+    "344960572649111552":{
+        "gym_name_to_match_with":
+        {
+            "coordinates": "-33.877055, 151.207662",
+            "notes": "these are notes about gym_name_to_match_with"
+        },
+        "another_gym":
+        {
+            "coordinates": "-33.876516, 151.203160"
+        },
+        "last_gym_sample":
+        {
+            "coordinates": "-33.875804, 151.210955",
+            "notes": "these are notes about last_gym_sample"
+        }
+    }
+}

@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-05-30 16:38+0200\n"
-"PO-Revision-Date: 2018-05-30 16:59+0200\n"
+"PO-Revision-Date: 2018-05-30 17:47+0200\n"
 "Last-Translator: Scragly\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -287,23 +287,23 @@ msgstr "Une erreur s'est produite lors de l'enregistrement de sauvegarde!"
 
 #: __main__.py:1380
 msgid "Restarting..."
-msgstr ""
+msgstr "Redémarrage…"
 
 #: __main__.py:1396
 msgid "Shutting down..."
-msgstr ""
+msgstr "Arrêt…"
 
 #: __main__.py:1417
 msgid "Are you sure you want to clear all regionals?"
-msgstr ""
+msgstr "Êtes-vous sûr de vouloir effacer tous les régionaux ?"
 
 #: __main__.py:1438
 msgid "Meowth! Regional raid boss cleared!"
-msgstr ""
+msgstr "Meowth! Le boss de raid régional à été supprimé !"
 
 #: __main__.py:1444
 msgid "Meowth! Regional raid boss set to **{boss}**!"
-msgstr ""
+msgstr "Meowth! Le boss de raid régional à été définie à **{boss}**!"
 
 #: __main__.py:1447
 #, fuzzy
@@ -316,120 +316,133 @@ msgid ""
 "I couldn't convert your answer to an appropriate timezone! Please double "
 "check what you sent me and resend a number from **-12** to **12**."
 msgstr ""
+"Je n’ai pas pu convertir votre réponse en un fuseau horaire approprié! "
+"Veuillez vérifier ce que vous m’avez envoyé et renvoyer un numéro de **-12** "
+"à **12**."
 
 #: __main__.py:1467
 msgid ""
 "Timezone has been set to: `UTC{offset}`\n"
 "The current time is **{now}**"
 msgstr ""
+"Le fuseau horaire a été défini comme suit: `UTC {offset}`\n"
+"L’heure actuelle est **{now}**"
 
 #: __main__.py:1481
 msgid "Prefix has been set to: `{}`"
-msgstr ""
+msgstr "Le préfixe a été défini sur: `{}`"
 
 #: __main__.py:1484
 msgid "Prefix has been reset to default: `{}`"
-msgstr ""
+msgstr "Le préfixe a été réinitialisé à la valeur par défaut: `{}`"
 
 #: __main__.py:1493
 msgid "Silph Road Travelers Card cleared!"
-msgstr ""
+msgstr "Silph Road Travelers Card effacée!"
 
 #: __main__.py:1506
 msgid "This Travelers Card is private and cannot be linked!"
-msgstr ""
+msgstr "Cette Travelers Card est privée et ne peut pas être liée!"
 
 #: __main__.py:1509
 msgid "Travelers Card not found!"
-msgstr ""
+msgstr "Travelers Card non trouvée!"
 
 #: __main__.py:1514 __main__.py:1525
 msgid "No Discord account found linked to this Travelers Card!"
-msgstr ""
+msgstr "Aucun compte Discord trouvé lié à cette Travelers Card !"
 
 #: __main__.py:1528
 msgid "This Travelers Card is linked to another Discord account!"
-msgstr ""
+msgstr "Cette Travelers Card est liée à un autre compte Discord !"
 
 #: __main__.py:1537
 msgid "This Travelers Card has been successfully linked to you!"
-msgstr ""
+msgstr "Cette Travelers Card à été rattachée à votre compte!"
 
 #: __main__.py:1543
 msgid "Pokebattler ID cleared!"
-msgstr ""
+msgstr "Pokebattler ID supprimé !"
 
 #: __main__.py:1569
 msgid "Prefix for this server is: `{}`"
-msgstr ""
+msgstr "Le préfixe de ce serveur est : `{}`"
 
 #: __main__.py:1665
 msgid "I'll wait for your announcement!"
-msgstr ""
+msgstr "Je vais attendre votre annonce!"
 
 #: __main__.py:1672 __main__.py:1728
 msgid ""
 "Meowth! You took too long to send me your announcement! Retry when you're "
 "ready."
 msgstr ""
+"Meowth! Vous avez pris trop de temps pour m’envoyer votre annonce! Réessayez "
+"quand vous êtes prêt."
 
 #: __main__.py:1675
 msgid "Announcement"
-msgstr ""
+msgstr "Annonce"
 
 #: __main__.py:1685
 msgid "to send it to all servers, "
-msgstr ""
+msgstr "pour l’envoyer à tous les serveurs, "
 
 #: __main__.py:1693
 msgid "That's what you sent, does it look good? React with "
 msgstr ""
+"C’est ce que vous avez envoyé, est-ce que ça a l’air bien? Réagir avec "
 
 #: __main__.py:1695
 msgid "to send to another channel, "
-msgstr ""
+msgstr "envoyer à une autre chaîne, "
 
 #: __main__.py:1697
 msgid "to send it to this channel, or "
-msgstr ""
+msgstr "pour l’envoyer à cette chaîne, ou "
 
 #: __main__.py:1699
 msgid "to cancel"
-msgstr ""
+msgstr "annuler"
 
 #: __main__.py:1709
 msgid "Announcement Cancelled."
-msgstr ""
+msgstr "Annonce annulée."
 
 #: __main__.py:1712 __main__.py:1724
 msgid "Announcement Sent."
-msgstr ""
+msgstr "Annonce envoyée."
 
 #: __main__.py:1714
 msgid "What channel would you like me to send it to?"
-msgstr ""
+msgstr "À quelle chaîne voulez-vous que je l’envoie?"
 
 #: __main__.py:1726
 msgid "Meowth! That channel doesn't exist! Retry when you're ready."
-msgstr ""
+msgstr "Meowth! Cette chaine n’existe pas! Réessayez quand vous êtes prêt."
 
 #: __main__.py:1739 __main__.py:3560
 msgid "For support, contact us on our Discord server. Invite Code: hhVjAN8"
 msgstr ""
+"Pour obtenir de l’aide, contactez-nous sur notre serveur Discord. Invite "
+"Code: hhVjAN8"
 
 #: __main__.py:1753
 msgid "Announcement sent to {} server owners: {} successful, {} failed."
 msgstr ""
+"L’annonce envoyée aux {} propriétaires du serveur: {} réussi, {} a échoué."
 
 #: __main__.py:1758
 msgid "Announcement Timed Out."
-msgstr ""
+msgstr "Annonce expirée."
 
 #: __main__.py:1805
 msgid ""
 "I'm sorry, I couldn't understand some of what you entered. Let's just start "
 "here."
 msgstr ""
+"Je suis désolé, je ne comprends pas ce que vous avez saisi. Commençons juste "
+"ici."
 
 #: __main__.py:1807 __main__.py:1918 __main__.py:1979 __main__.py:2138
 #: __main__.py:2362 __main__.py:2553 __main__.py:2654 __main__.py:2754
@@ -443,6 +456,14 @@ msgid ""
 "\n"
 "Your Sessions: **{yoursessions}** | Total Sessions: **{allsessions}**"
 msgstr ""
+"**SESSIONS MULTIPLES!**\n"
+"\n"
+"Il semble que vous ayez **{yoursessions}** sessions de configuration "
+"actives. Je vous recommande d’envoyer **cancel** d’abord, puis renvoyez "
+"votre demande pour éviter toute confusion.\n"
+"\n"
+"Vos sessions: **{yoursessions}** | Nombre total de sessions: **{allsessions}"
+"**"
 
 #: __main__.py:1808
 #, fuzzy
@@ -490,6 +511,12 @@ msgid ""
 "everything by replying with **all** or reply with a comma separated list to "
 "configure those commands. Example: `want, raid, wild`"
 msgstr ""
+"\n"
+"\n"
+"**Bon retour**\n"
+"Ce n’est pas votre première configuration. Vous pouvez soit reconfigurer "
+"tout en répondant avec **all**, soit répondre avec une liste séparée par des "
+"virgules pour configurer ces commandes. Exemple: `want, raid, wild`"
 
 #: __main__.py:1814
 msgid ""
@@ -498,8 +525,13 @@ msgid ""
 "**Enabled Commands:**\n"
 "{enabled_commands}"
 msgstr ""
+"\n"
+"\n"
+"**Commandes activées:**\n"
+"{enabled_commands}"
 
 #: __main__.py:1815
+#, fuzzy
 msgid ""
 "\n"
 "\n"
@@ -518,6 +550,22 @@ msgid ""
 "**archive** - For !archive configuration\n"
 "**timezone** - For timezone configuration"
 msgstr ""
+"\n"
+"\n"
+"**Toutes les commandes:**\n"
+"**all** - Pour rétablir la configuration\n"
+"**team** - Pour configurer l’assignation d’équipe\n"
+"**welcome** - Pour configurer le message d’acceuil\n"
+"**raid** - Pour configurer la commande de raid \n"
+"**exraid** - Pour configurer la commande de raid EX\n"
+"**invite** - Pour configurer la commande  d’invite à un raid\n"
+"**counters** - for automatic counters configuration\n"
+"**wild** - for wild command configuration\n"
+"**research** - for !research command configuration\n"
+"**meetup** - for !meetup command configuration\n"
+"**want** - for want/unwant command configuration\n"
+"**archive** - For !archive configuration\n"
+"**timezone** - For timezone configuration"
 
 #: __main__.py:1816 __main__.py:1843
 msgid ""

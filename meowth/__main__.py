@@ -3284,6 +3284,7 @@ async def reset_board(ctx, *, user=None, type=None):
     guild = ctx.guild
     trainers = guild_dict[guild.id]['trainers']
     tgt_string = ""
+    tgt_trainer = None
     if user:
         converter = commands.MemberConverter()
         for argument in user.split():

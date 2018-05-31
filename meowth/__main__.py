@@ -198,7 +198,7 @@ def get_level(pkmn):
         pkmn_number = get_number(pkmn)
     for level in raid_info['raid_eggs']:
         for level, pkmn_list in raid_info['raid_eggs'].items():
-            if str(pkmn_number) in pkmn_list["pokemon"]:
+            if pkmn_number in pkmn_list["pokemon"]:
                 return level
 
 def get_raidlist():
@@ -470,12 +470,12 @@ async def letter_case(iterable, find, *, limits=None):
     else:
         return None
 
-def get_category(channel, level, type="raid"):
+def get_category(channel, level, category_type="raid"):
     guild = channel.guild
-    if type == "raid" or type == "egg":
+    if category_type == "raid" or category_type == "egg":
         report = "raid"
     else:
-        report = type
+        report = category_type
     catsort = guild_dict[guild.id]['configure_dict'][report].get('categories', None)
     if catsort == "same":
         return channel.category
@@ -540,7 +540,7 @@ async def create_raid_channel(type, pkmn, level, details, report_channel):
         name = str(level) + "-egg-"
         raid_channel_overwrite_list = report_channel.overwrites
     name += sanitize_channel_name(details)
-    cat = get_category(report_channel, str(level), type=type)
+    cat = get_category(report_channel, str(level), category_type=type)
     ow = dict(raid_channel_overwrite_list)
     return await guild.create_text_channel(name, overwrites=ow, category=cat)
 
@@ -4106,7 +4106,7 @@ async def _raid(message, content):
     else:
         raid_gmaps_link = create_gmaps_query(raid_details, message.channel, type="raid")
     raid_channel_name = (entered_raid + '-') + sanitize_channel_name(raid_details)
-    raid_channel_category = get_category(message.channel, get_level(entered_raid), type="raid")
+    raid_channel_category = get_category(message.channel, get_level(entered_raid), category_type="raid")
     raid_channel = await message.guild.create_text_channel(raid_channel_name, overwrites=dict(message.channel.overwrites), category=raid_channel_category)
     ow = raid_channel.overwrites_for(raid_channel.guild.default_role)
     ow.send_messages = True
@@ -4278,7 +4278,7 @@ async def _raidegg(message, content):
             boss_list.append((((p_name + ' (') + str(p)) + ') ') + ''.join(p_type))
         raid_channel_name = _('level-{egg_level}-egg-').format(egg_level=egg_level)
         raid_channel_name += sanitize_channel_name(raid_details)
-        raid_channel_category = get_category(message.channel, egg_level, type="raid")
+        raid_channel_category = get_category(message.channel, egg_level, category_type="raid")
         raid_channel = await message.guild.create_text_channel(raid_channel_name, overwrites=dict(message.channel.overwrites), category=raid_channel_category)
         ow = raid_channel.overwrites_for(raid_channel.guild.default_role)
         ow.send_messages = True
@@ -4653,7 +4653,7 @@ async def _exraid(ctx, location):
     meowth_overwrite = (Meowth.user, discord.PermissionOverwrite(send_messages=True, read_messages=True, manage_roles=True))
     raid_channel_overwrite_list.append(meowth_overwrite)
     raid_channel_overwrites = dict(raid_channel_overwrite_list)
-    raid_channel_category = get_category(message.channel,"EX", type="exraid")
+    raid_channel_category = get_category(message.channel,"EX", category_type="exraid")
     raid_channel = await message.guild.create_text_channel(raid_channel_name, overwrites=raid_channel_overwrites,category=raid_channel_category)
     if guild_dict[channel.guild.id]['configure_dict']['invite']['enabled']:
         for role in channel.guild.role_hierarchy:
@@ -4923,7 +4923,7 @@ async def _meetup(ctx, location):
     egg_info = raid_info['raid_eggs']['EX']
     raid_channel_name = _('meetup-')
     raid_channel_name += sanitize_channel_name(raid_details)
-    raid_channel_category = get_category(message.channel,"EX", type="meetup")
+    raid_channel_category = get_category(message.channel,"EX", category_type="meetup")
     raid_channel = await message.guild.create_text_channel(raid_channel_name, overwrites=dict(message.channel.overwrites), category=raid_channel_category)
     ow = raid_channel.overwrites_for(raid_channel.guild.default_role)
     ow.send_messages = True

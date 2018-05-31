@@ -990,15 +990,21 @@ msgid "For each report, I generate Google Maps links to give people directions t
 "Each location will have to be in the same order as you provided the channels in the previous question.\n"
 "\n"
 "Respond with: **location info, location info, location info** each matching the order of the previous channel list below."
-msgstr ""
+msgstr "Pour chaque signalement, je génère des liens Google Maps pour donner aux utilisateurs des indications sur la quête sur le terrain! Pour ce faire, j'ai besoin de savoir quelle banlieue / ville / région chaque chaine de signalement représente, pour s'assurer que nous obtenons le bon emplacement sur la carte. Pour chaque chaine de signalement que vous avez fourni, j'ai besoin de son emplacement général correspondant en utilisant uniquement des lettres et des espaces, chaque emplacement étant séparé par une virgule et un espace.\n"
+"\n"
+"Exemple: `kansas city mo, coque uk, sydney nsw australie`\n"
+"\n"
+"Chaque emplacement devra être dans le même ordre que vous avez fourni les canaux dans la question précédente.\n"
+"\n"
+"Répondre avec: **informations de localisation, informations de localisation, informations de localisation** correspondant chacune à l'ordre de la liste de chaînes précédente ci-dessous."
 
 #: __main__.py:2818
 msgid "Research Reporting Locations"
-msgstr ""
+msgstr "Localisation des Signalements de Quêtes"
 
 #: __main__.py:2835
 msgid "Research Reporting Locations are set"
-msgstr ""
+msgstr "La localisation des signalements de Quêtes est définie"
 
 #: __main__.py:2865
 msgid "Meetup Reporting Channels"

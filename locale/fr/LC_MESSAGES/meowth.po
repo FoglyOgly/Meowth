@@ -1008,7 +1008,7 @@ msgstr "La localisation des signalements de Quêtes est définie"
 
 #: __main__.py:2865
 msgid "Meetup Reporting Channels"
-msgstr ""
+msgstr "Chaine d'annonce d'Évènements (Meetup)"
 
 #: __main__.py:2865
 msgid "Meetup Reporting allows users to report meetups with **!meetup** or **!event**. Meetup reports are contained within one or more channels. Each channel will be able to represent different areas/communities. I'll need you to provide a list of channels in your server you will allow reports from in this format: `channel-name, channel-name, channel-name`\n"
@@ -1018,15 +1018,21 @@ msgid "Meetup Reporting allows users to report meetups with **!meetup** or **!ev
 "If you do not require meetup reporting, you may want to disable this function.\n"
 "\n"
 "Respond with: **N** to disable, or the **channel-name** list to enable, each seperated with a comma and space:"
-msgstr ""
+msgstr "La création d'annonce d'Évènements (Meetup) permet aux utilisateurs de signaler les rencontres avec **!meetup ** ou **!event **. Les annonces d'Évènements (Meetup) peuvent se faire dans une ou plusieurs chaines. Chaque chine pourra représenter différentes zones / communautés. Je vais avoir besoin que vous fournissiez une liste de chaines de votre serveur, vous autoriserez les rapports dans ce format: `nom-canal, nom-canal, nom-canal`\n"
+"\n"
+"Exemple: `kansas-city-meetups, coque-meetups, sydney-meetups`\n"
+"\n"
+"Si vous n'avez pas besoin d'un rapport de meetup, vous pouvez désactiver cette fonction.\n"
+"\n"
+"Répondez avec: **N** pour désactiver, ou la liste **channel-name** pour activer, chacune séparée par une virgule et un espace:"
 
 #: __main__.py:2871
 msgid "Meetup Reporting disabled"
-msgstr ""
+msgstr "Annonce d'Évènements (Meetup) désactivé"
 
 #: __main__.py:2903
 msgid "Meetup Reporting Channels enabled"
-msgstr ""
+msgstr "Annonce d'Évènements (Meetup) activé"
 
 #: __main__.py:2918
 msgid "For each report, I generate Google Maps links to give people directions to meetups! To do this, I need to know which suburb/town/region each report channel represents, to ensure we get the right location in the map. For each report channel you provided, I will need its corresponding general location using only letters and spaces, with each location seperated by a comma and space.\n"
@@ -1036,15 +1042,21 @@ msgid "For each report, I generate Google Maps links to give people directions t
 "Each location will have to be in the same order as you provided the channels in the previous question.\n"
 "\n"
 "Respond with: **location info, location info, location info** each matching the order of the previous channel list below."
-msgstr ""
+msgstr "Pour chaque annonce, je génère des liens Google Maps pour donner aux gens des directions pour les meetups! Pour ce faire, j'ai besoin de savoir quelle banlieue / ville / région chaque chaine d'annonce représente, pour s'assurer que nous obtenons le bon emplacement sur la carte. Pour chaque chaine d'annonce que vous avez fourni, j'ai besoin de son emplacement général correspondant en utilisant uniquement des lettres et des espaces, chaque emplacement étant séparé par une virgule et un espace.\n"
+"\n"
+"Exemple: `kansas city mo, coque uk, sydney nsw australie`\n"
+"\n"
+"Chaque emplacement devra être dans le même ordre que vous avez fourni les canaux dans la question précédente.\n"
+"\n"
+"Répondre avec: **informations de localisation, informations de localisation, informations de localisation** correspondant chacune à l'ordre de la liste de chaînes précédente ci-dessous."
 
 #: __main__.py:2918
 msgid "Meetup Reporting Locations"
-msgstr ""
+msgstr "Localisation d'annonce d'Évènements (Meetup)"
 
 #: __main__.py:2935
 msgid "Meetup Reporting Locations are set"
-msgstr ""
+msgstr "La localisation d'annonce d'Évènements (Meetup) est définie"
 
 #: __main__.py:2936
 msgid "How would you like me to categorize the meetup channels I create? Your options are:\n"
@@ -1052,11 +1064,15 @@ msgid "How would you like me to categorize the meetup channels I create? Your op
 "**none** - If you don't want them categorized\n"
 "**same** - If you want them in the same category as the reporting channel\n"
 "**other** - If you want them categorized in a provided category name or ID"
-msgstr ""
+msgstr "Comment voulez-vous que je catégorise les chaines d'annonce d'Évènements (Meetup) que je crée? Vos options sont:\n"
+"\n"
+"**none** - Si vous ne voulez pas les catégoriser\n"
+"**same** - Si vous les voulez dans la même catégorie que la chaîne de reporting\n"
+"**other** - Si vous voulez les classer dans un nom de catégorie ou un ID fourni"
 
 #: __main__.py:2936 __main__.py:2960
 msgid "Meetup Reporting Categories"
-msgstr ""
+msgstr "Catégories d'Évènements (Meetup)"
 
 #: __main__.py:2960
 msgid "In the same order as they appear below, please give the names of the categories you would like raids reported in each channel to appear in. You do not need to use different categories for each channel, but they do need to be pre-existing categories. Separate each category name with a comma. Response can be either category name or ID.\n"
@@ -1064,15 +1080,19 @@ msgid "In the same order as they appear below, please give the names of the cate
 "Example: `kansas city, hull, 1231231241561337813`\n"
 "\n"
 "You have configured the following channels as meetup reporting channels."
-msgstr ""
+msgstr "Dans le même ordre que celui indiqué ci-dessous, indiquez le nom des catégories dans lesquelles vous souhaitez que les raids signalés dans chaque canal apparaissent. Vous n'avez pas besoin d'utiliser des catégories différentes pour chaque canal, mais elles doivent être des catégories préexistantes . Séparez chaque nom de catégorie par une virgule. La réponse peut être le nom de la catégorie ou l'ID.\n"
+"\n"
+"Exemple: `kansas city, coque, 1231231241561337813`\n"
+"\n"
+"Vous avez configuré les chaines suivantes en tant que chaines de d'annonce d'Évènements (Meetup)."
 
 #: __main__.py:3008
 msgid "Meetup Categories are set"
-msgstr ""
+msgstr "Catégories d'Évènements (Meetup) sont définies"
 
 #: __main__.py:3039
 msgid "Pokemon Notifications"
-msgstr ""
+msgstr "Notifications de Pokémon"
 
 #: __main__.py:3039
 msgid "The **!want** and **!unwant** commands let you add or remove roles for Pokemon that will be mentioned in reports. This let you get notifications on the Pokemon you want to track. I just need to know what channels you want to allow people to manage their pokemon with the **!want** and **!unwant** command.\n"

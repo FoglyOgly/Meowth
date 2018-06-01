@@ -1263,7 +1263,7 @@ async def on_raw_reaction_add(payload):
             await message.remove_reaction(payload.emoji, user)
         elif message.id == guild_dict[guild.id]['raidchannel_dict'][channel.id].get('raidmessage',None):
             if str(payload.emoji) == '\u2754':
-                prefix = guild_dict[guild_id]['configure_dict']['settings']['prefix']
+                prefix = guild_dict[guild.id]['configure_dict']['settings']['prefix']
                 avatar = Meowth.user.avatar_url
                 await utils.get_raid_help(prefix, avatar, user)
             await message.remove_reaction(payload.emoji, user)

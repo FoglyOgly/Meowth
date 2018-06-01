@@ -151,8 +151,8 @@ async def _load(ctx, *extensions):
             ctx.bot.unload_extension(f"exts.{ext}")
             ctx.bot.load_extension(f"exts.{ext}")
         except Exception as e:
-            s = _('**Error when loading extension')
-            await ctx.send(f'{s} {ext}:**\n'
+            error_title = _('**Error when loading extension')
+            await ctx.send(f'{error_title} {ext}:**\n'
                            f'{type(e).__name__}: {e}')
         else:
             await ctx.send(_('**Extension {ext} Loaded.**\n').format(ext=ext))
@@ -1281,8 +1281,8 @@ async def on_raw_reaction_add(payload):
             for reaction in message.reactions:
                 if reaction.emoji == '💨' and reaction.count >= 2:
                     if wild_dict['omw']:
-                        despwn = _("has despawned")
-                        await channel.send(f"{', '.join(wild_dict['omw'])}: {wild_dict['pokemon'].title()} {despwn}!")
+                        despawn = _("has despawned")
+                        await channel.send(f"{', '.join(wild_dict['omw'])}: {wild_dict['pokemon'].title()} {despawn}!")
                     await expire_wild(message)
 
 """
@@ -1600,11 +1600,11 @@ async def perms(ctx, channel_id = None):
         true_perms_str = '\n'.join(true_perms)
         if not meet_req:
             missing = '\n'.join([p for p in false_perms if p in req_perms_list])
-            s = _("**MISSING**")
-            data.append(f"{s} \n{missing} \n")
+            meet_req_result = _("**MISSING**")
+            data.append(f"{meet_req_result} \n{missing} \n")
         if true_perms_str:
-            s = _("**ENABLED**")
-            data.append(f"{s} \n{true_perms_str} \n")
+            meet_req_result = _("**ENABLED**")
+            data.append(f"{meet_req_result} \n{true_perms_str} \n")
         return '\n'.join(data)
     guild_msg.append(perms_result(guild_perms))
     chan_msg.append(perms_result(chan_perms))
@@ -3968,8 +3968,8 @@ async def _wild(message, content):
     wild_embed = discord.Embed(title=_('Meowth! Click here for my directions to the wild {pokemon}!').format(pokemon=entered_wild.title()), description=_("Ask {author} if my directions aren't perfect!").format(author=message.author.name), url=wild_gmaps_link, colour=message.guild.me.colour)
     wild_embed.add_field(name=_('**Details:**'), value=_('{pokemon} ({pokemonnumber}) {type}').format(pokemon=entered_wild.capitalize(), pokemonnumber=str(wild_number), type=''.join(get_type(message.guild, wild_number))), inline=False)
     wild_embed.set_thumbnail(url=wild_img_url)
-    wild_embed.add_field(name=_('**Reactions:**'), value="🏎: "+ _("I'm on my way!"))
-    wild_embed.add_field(name='\u200b', value="💨: " + _("The Pokemon despawned!"))
+    wild_embed.add_field(name=_('**Reactions:**'), value=_("{emoji}: I'm on my way!").format("🏎"))
+    wild_embed.add_field(name='\u200b', value=_("{emoji}: The Pokemon despawned!").format("💨"))
     wild_embed.set_footer(text=_('Reported by @{author} - {timestamp}').format(author=message.author.display_name, timestamp=timestamp), icon_url=message.author.avatar_url_as(format=None, static_format='jpg', size=32))
     wildreportmsg = await message.channel.send(content=_('{roletest}Meowth! Wild {pokemon} reported by {member}! Details: {location_details}').format(roletest=roletest,pokemon=entered_wild.title(), member=message.author.mention, location_details=wild_details), embed=wild_embed)
     await asyncio.sleep(0.25)
@@ -4206,7 +4206,7 @@ async def _raidegg(message, content):
         raidexp = int(raidegg_split[(- 1)])
         del raidegg_split[(- 1)]
     elif ':' in raidegg_split[(- 1)]:
-        msg = _("Did you mean egg hatch time ") + "🥚" + _("or time remaining before hatch ") + "⏲?"
+        msg = _("Did you mean egg hatch time {0} or time remaining before hatch {1}?").format("🥚", "⏲")
         question = await message.channel.send(msg)
         try:
             timeout = False
@@ -5035,7 +5035,7 @@ async def timerset(ctx, *,timer):
         if timer.isdigit():
             raidexp = int(timer)
         elif type == 'egg' and ':' in timer:
-            msg = _("Did you mean egg hatch time ") + "🥚" + _("or time remaining before hatch ") + "⏲?"
+            msg = _("Did you mean egg hatch time {0} or time remaining before hatch {1}?").format("🥚", "⏲")
             question = await ctx.channel.send(msg)
             try:
                 timeout = False

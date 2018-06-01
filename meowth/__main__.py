@@ -1267,7 +1267,6 @@ async def on_raw_reaction_add(payload):
                 avatar = Meowth.user.avatar_url
                 await utils.get_raid_help(prefix, avatar, user)
             await message.remove_reaction(payload.emoji, user)
-        guild_dict[guild.id]['raidchannel_dict'][channel.id]['moveset'] = moveset
     try:
         wildreport_dict = guild_dict[guild.id]['wildreport_dict']
     except KeyError:

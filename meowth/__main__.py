@@ -26,16 +26,16 @@ import hastebin
 from dateutil import tz
 from dateutil.relativedelta import relativedelta
 
-
 import discord
 from discord.ext import commands
 
 import checks
 import pkmn_match
 
-from bot import MeowthBot
-from errors import custom_error_handling
-from logs import init_loggers
+from meowth import utils
+from meowth.bot import MeowthBot
+from meowth.errors import custom_error_handling
+from meowth.logs import init_loggers
 
 logger = init_loggers()
 

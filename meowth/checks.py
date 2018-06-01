@@ -314,10 +314,8 @@ def allowwant():
     def predicate(ctx):
         if check_wantset(ctx):
             if check_wantchannel(ctx):
-                print(1)
                 return True
             else:
-                print(2)
                 raise errors.WantChannelCheckFail()
         raise errors.WantSetCheckFail()
     return commands.check(predicate)

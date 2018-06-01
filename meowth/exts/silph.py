@@ -292,10 +292,22 @@ class Silph:
     @commands.command()
     async def silphcard(self, ctx, silph_user: str = None):
         """Displays a user's Silph Road Trainer Card."""
+        guild_data = ctx.bot.guild_dict[ctx.guild.id]
+        if not silph_user:
+            if not silph_user:
+                return await ctx.error(f"You haven't setup a silphcard!")
+        else:
+            if ctx.message.mentions:
+                mentioned = ctx.message.mentions[0]
+                silph_user = guild_data['trainers'].setdefault(
+                    mentioned.id, {}).get('silphid', None)
+                if not silph_user:
+                    return await ctx.error(
+                        f"{mentioned.display_name} hasn't setup a silphcard!")
         async with ctx.typing():
             card = await SilphCard.get_trainer_card(silph_user)
         try:
-            offset = ctx.bot.guild_dict[ctx.guild.id]['configure_dict']['settings']['offset']
+            offset = guild_data['configure_dict']['settings']['offset']
         except KeyError:
             offset = None
         if card:

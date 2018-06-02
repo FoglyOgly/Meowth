@@ -33,7 +33,7 @@ class SilphBadge:
             return None
         date = dateparser.parse(self._awarded, settings={'TIMEZONE': 'UTC'})
         if utc_offset:
-            date = datetime.timedelta(hours=utc_offset)
+            date = date + datetime.timedelta(hours=utc_offset)
         return date.date().isoformat()
 
 class SilphCheckin:
@@ -69,7 +69,7 @@ class SilphCheckin:
             return None
         date = dateparser.parse(self._created, settings={'TIMEZONE': 'UTC'})
         if utc_offset:
-            date = datetime.timedelta(hours=utc_offset)
+            date = date + datetime.timedelta(hours=utc_offset)
         return date.date().isoformat()
 
 class SilphCard:
@@ -184,7 +184,7 @@ class SilphCard:
             return None
         date = dateparser.parse(self._joined, settings={'TIMEZONE': 'UTC'})
         if utc_offset:
-            date = datetime.timedelta(hours=utc_offset)
+            date = date + datetime.timedelta(hours=utc_offset)
         return date.date().isoformat()
 
     def modified(self, utc_offset=None):
@@ -192,7 +192,7 @@ class SilphCard:
             return None
         date = dateparser.parse(self._modified, settings={'TIMEZONE': 'UTC'})
         if utc_offset:
-            date = datetime.timedelta(hours=utc_offset)
+            date = date + datetime.timedelta(hours=utc_offset)
         return date.date().isoformat()
 
     def embed(self, utc_offset=None):

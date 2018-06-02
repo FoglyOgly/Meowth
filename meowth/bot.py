@@ -1,5 +1,5 @@
 from discord.ext import commands
-from context import Context
+from meowth.context import Context
 
 class MeowthBot(commands.AutoShardedBot):
     """Custom Discord Bot class for Meowth"""

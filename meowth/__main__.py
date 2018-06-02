@@ -29,9 +29,8 @@ from dateutil.relativedelta import relativedelta
 import discord
 from discord.ext import commands
 
-import checks
-import pkmn_match
-
+from meowth import checks
+from meowth import pkmn_match
 from meowth import utils
 from meowth.bot import MeowthBot
 from meowth.errors import custom_error_handling
@@ -47,9 +46,11 @@ def _get_prefix(bot, message):
         prefix = None
     if not prefix:
         prefix = bot.config['default_prefix']
-    return commands.when_mentioned_or(prefix)(bot,message)
+    return commands.when_mentioned_or(prefix)(bot, message)
 
-Meowth = MeowthBot(command_prefix=_get_prefix, case_insensitive=True, activity=discord.Game(name="Pokemon Go"))
+Meowth = MeowthBot(
+    command_prefix=_get_prefix, case_insensitive=True,
+    activity=discord.Game(name="Pokemon Go"))
 
 custom_error_handling(Meowth, logger)
 try:
@@ -136,7 +137,7 @@ default_exts = ['datahandler', 'tutorial', 'silph', 'utilities']
 
 for ext in default_exts:
     try:
-        Meowth.load_extension(f"exts.{ext}")
+        Meowth.load_extension(f"meowth.exts.{ext}")
     except Exception as e:
         print(f'**Error when loading extension {ext}:**\n{type(e).__name__}: {e}')
     else:
@@ -148,8 +149,8 @@ for ext in default_exts:
 async def _load(ctx, *extensions):
     for ext in extensions:
         try:
-            ctx.bot.unload_extension(f"exts.{ext}")
-            ctx.bot.load_extension(f"exts.{ext}")
+            ctx.bot.unload_extension(f"meowth.exts.{ext}")
+            ctx.bot.load_extension(f"meowth.exts.{ext}")
         except Exception as e:
             error_title = _('**Error when loading extension')
             await ctx.send(f'{error_title} {ext}:**\n'

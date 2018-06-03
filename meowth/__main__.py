@@ -3346,7 +3346,7 @@ async def reset_board(ctx, *, user=None, type=None):
         if tgt_trainer:
             await ctx.send(_("{trainer}'s report stats have been cleared!").format(trainer=tgt_trainer.display_name))
             return
-    await ctx.send("This server's report stats have been reset!")
+    await ctx.send(_("This server's report stats have been reset!"))
 
 @Meowth.command()
 @commands.has_permissions(manage_channels=True)
@@ -4147,7 +4147,7 @@ async def _raid(message, content):
     if str(level) in guild_dict[message.guild.id]['configure_dict']['counters']['auto_levels']:
         try:
             ctrs_dict = await _get_generic_counters(message.guild, entered_raid, weather)
-            ctrsmsg = "Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters."
+            ctrsmsg = _("Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters.")
             ctrsmessage = await raid_channel.send(content=ctrsmsg,embed=ctrs_dict[0]['embed'])
             ctrsmessage_id = ctrsmessage.id
             await ctrsmessage.pin()
@@ -4559,7 +4559,7 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
         egg_report = None
     if str(egglevel) in guild_dict[raid_channel.guild.id]['configure_dict']['counters']['auto_levels'] and not eggdetails.get('pokemon', None):
         ctrs_dict = await _get_generic_counters(raid_channel.guild, entered_raid, weather)
-        ctrsmsg = "Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters."
+        ctrsmsg = _("Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters.")
         ctrsmessage = await raid_channel.send(content=ctrsmsg,embed=ctrs_dict[0]['embed'])
         ctrsmessage_id = ctrsmessage.id
         await ctrsmessage.pin()
@@ -5424,7 +5424,7 @@ async def recover(ctx):
                 manual_timer = False
             else:
                 topicsplit = topic.split('|')
-                localhatch = datetime.datetime.strptime(topicsplit[0][:(- 9)], 'Hatches on %B %d at %I:%M %p')
+                localhatch = datetime.datetime.strptime(topicsplit[0][:(- 9)], _('Hatches on %B %d at %I:%M %p'))
                 utchatch = localhatch - datetime.timedelta(hours=guild_dict[guild.id]['configure_dict']['settings']['offset'])
                 exp = utchatch.replace(year=now.year, tzinfo=datetime.timezone.utc).timestamp()
                 manual_timer = True
@@ -5461,7 +5461,7 @@ async def recover(ctx):
                 manual_timer = False
             else:
                 topicsplit = topic.split('|')
-                localhatch = datetime.datetime.strptime(topicsplit[0][:(- 9)], 'Hatches on %B %d at %I:%M %p')
+                localhatch = datetime.datetime.strptime(topicsplit[0][:(- 9)], _('Hatches on %B %d at %I:%M %p'))
                 utchatch = localhatch - datetime.timedelta(hours=guild_dict[guild.id]['configure_dict']['settings']['offset'])
                 exp = utchatch.replace(year=now.year, tzinfo=datetime.timezone.utc).timestamp()
                 manual_timer = True
@@ -5480,7 +5480,7 @@ async def recover(ctx):
                 manual_timer = False
             else:
                 topicsplit = topic.split('|')
-                localhatch = datetime.datetime.strptime(topicsplit[0][:(- 9)], 'Hatches on %B %d at %I:%M %p')
+                localhatch = datetime.datetime.strptime(topicsplit[0][:(- 9)], _('Hatches on %B %d at %I:%M %p'))
                 utchatch = localhatch - datetime.timedelta(hours=guild_dict[guild.id]['configure_dict']['settings']['offset'])
                 exp = utchatch.replace(year=now.year, tzinfo=datetime.timezone.utc).timestamp()
                 manual_timer = True
@@ -5698,7 +5698,7 @@ async def counters(ctx, *, args = None):
                 except (discord.errors.NotFound, discord.errors.Forbidden, discord.errors.HTTPException):
                     pass
             moveset = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('moveset', 0)
-            movesetstr = guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrs_dict'].get(moveset,{}).get('moveset',"Unknown Moveset")
+            movesetstr = guild_dict[guild.id]['raidchannel_dict'][channel.id]['ctrs_dict'].get(moveset,{}).get('moveset',_("Unknown Moveset"))
             weather = guild_dict[guild.id]['raidchannel_dict'][channel.id].get('weather', None)
         else:
             pkmn = next((str(p) for p in get_raidlist() if not str(p).isdigit() and re.sub(rgx, '', str(p)) in re.sub(rgx, '', args.lower())), None)
@@ -5734,7 +5734,7 @@ async def counters(ctx, *, args = None):
         return
     await _counters(ctx, pkmn, user, weather, "Unknown Moveset")
 
-async def _counters(ctx, pkmn, user = None, weather = None, movesetstr = "Unknown Moveset"):
+async def _counters(ctx, pkmn, user = None, weather = None, movesetstr = _("Unknown Moveset")):
     img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=4'.format(str(get_number(pkmn)).zfill(3))
     level = get_level(pkmn) if get_level(pkmn).isdigit() else "5"
     url = "https://fight.pokebattler.com/raids/defenders/{pkmn}/levels/RAID_LEVEL_{level}/attackers/".format(pkmn=pkmn.replace('-','_').upper(),level=level)
@@ -5767,7 +5767,7 @@ async def _counters(ctx, pkmn, user = None, weather = None, movesetstr = "Unknow
         data = data['attackers'][0]
         raid_cp = data['cp']
         atk_levels = '30'
-        if movesetstr == "Unknown Moveset":
+        if movesetstr == _("Unknown Moveset"):
             ctrs = data['randomMove']['defenders'][-6:]
             est = data['randomMove']['total']['estimator']
         else:
@@ -5780,7 +5780,7 @@ async def _counters(ctx, pkmn, user = None, weather = None, movesetstr = "Unknow
                     est = moveset['total']['estimator']
                     break
             else:
-                movesetstr = "Unknown Moveset"
+                movesetstr = _("Unknown Moveset")
                 ctrs = data['randomMove']['defenders'][-6:]
                 est = data['randomMove']['total']['estimator']
         def clean(txt):
@@ -5816,7 +5816,7 @@ async def _get_generic_counters(guild, pkmn, weather=None):
     ctrs_dict = {}
     ctrs_index = 0
     ctrs_dict[ctrs_index] = {}
-    ctrs_dict[ctrs_index]['moveset'] = "Unknown Moveset"
+    ctrs_dict[ctrs_index]['moveset'] = _("Unknown Moveset")
     ctrs_dict[ctrs_index]['emoji'] = '0\u20e3'
     img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=4'.format(str(get_number(pkmn)).zfill(3))
     level = get_level(pkmn) if get_level(pkmn).isdigit() else "5"
@@ -5845,7 +5845,7 @@ async def _get_generic_counters(guild, pkmn, weather=None):
     ctrs = data['randomMove']['defenders'][-6:]
     def clean(txt):
         return txt.replace('_', ' ').title()
-    title = _('{pkmn} | {weather} | Unknown Moveset').format(pkmn=pkmn.title(),weather=weather_list[index].title())
+    title = _('{pkmn} | {weather} | {movesetstr}').format(pkmn=pkmn.title(),weather=weather_list[index].title(),movesetstr=ctrs_dict[ctrs_index]['moveset'].title())
     stats_msg = _("**CP:** {raid_cp}\n").format(raid_cp=raid_cp)
     stats_msg += _("**Weather:** {weather}\n").format(weather=clean(weather))
     stats_msg += _("**Attacker Level:** {atk_levels}").format(atk_levels=atk_levels)
@@ -6822,13 +6822,13 @@ async def _list(ctx):
                 bulletpoint = '❔'
             else:
                 bulletpoint = '🔹'
-            if " 0 interested!" not in await _interest(ctx, tag, team):
+            if _(" 0 interested!") not in await _interest(ctx, tag, team):
                 listmsg += ('\n' + bulletpoint) + (await _interest(ctx, tag, team))
-            if " 0 on the way!" not in await _otw(ctx, tag, team):
+            if _(" 0 on the way!") not in await _otw(ctx, tag, team):
                 listmsg += ('\n' + bulletpoint) + (await _otw(ctx, tag, team))
-            if " 0 waiting at the raid!" not in await _waiting(ctx, tag, team):
+            if _(" 0 waiting at the raid!") not in await _waiting(ctx, tag, team):
                 listmsg += ('\n' + bulletpoint) + (await _waiting(ctx, tag, team))
-            if " 0 in the lobby!" not in await _lobbylist(ctx, tag, team):
+            if _(" 0 in the lobby!") not in await _lobbylist(ctx, tag, team):
                 listmsg += ('\n' + bulletpoint) + (await _lobbylist(ctx, tag, team))
             if (len(listmsg.splitlines()) <= 1):
                 listmsg +=  ('\n' + bulletpoint) + (_(" Nobody has updated their status yet!"))

@@ -97,10 +97,10 @@ python3 -m pip install "requests>=2.18.4" "hastebin.py>=0.2" "python-dateutil>=2
 
 ## **`Optional Python Packages`**
 
-`python-Levenstein` is an optional package that increases the speed of fuzzy matching strings, which we use for matching up pokemon names, gym names and possibly other things in future. It also removes the `Using slow pure-python SequenceMatcher` warning emitted from the `fuzzywuzzy` python package, which can otherwise be ignored.
+`python-Levenshtein` is an optional package that increases the speed of fuzzy matching strings, which we use for matching up pokemon names, gym names and possibly other things in future. It also removes the `Using slow pure-python SequenceMatcher` warning emitted from the `fuzzywuzzy` python package, which can otherwise be ignored.
 
 ```bash
-python3 -m pip install python-Levenstein
+python3 -m pip install python-Levenshtein
 ```
 
 The above may not be supported on all systems. You can sometimes find a suitable wheel [here](https://www.lfd.uci.edu/~gohlke/pythonlibs/#python-levenshtein) to install with, or you may have to look around for details suitable for your specific system.

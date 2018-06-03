@@ -1,7 +1,7 @@
 
 from discord.ext import commands
 import discord.utils
-import errors
+from meowth import errors
 
 def is_owner_check(ctx):
     author = ctx.author.id
@@ -314,10 +314,8 @@ def allowwant():
     def predicate(ctx):
         if check_wantset(ctx):
             if check_wantchannel(ctx):
-                print(1)
                 return True
             else:
-                print(2)
                 raise errors.WantChannelCheckFail()
         raise errors.WantSetCheckFail()
     return commands.check(predicate)

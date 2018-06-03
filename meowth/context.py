@@ -3,12 +3,15 @@ import textwrap
 import discord
 from discord.ext import commands
 
-from utils import convert_to_bool, make_embed, bold
+from meowth.utils import convert_to_bool, make_embed, bold
+from meowth import settings
 
 class Context(commands.Context):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.get = GetTools(self)
+        guild_data = self.bot.guild_dict[self.guild.id]
+        self.data = settings.GuildData(self, guild_data)
 
     async def codeblock(self, contents, syntax="py", send=True, title=None):
         paginator = commands.Paginator(prefix=f'```{syntax}', max_size=1900)

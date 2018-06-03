@@ -3,8 +3,9 @@ import asyncio
 import discord
 from discord.ext import commands
 
-import utils
-import checks
+
+from meowth import utils
+from meowth import checks
 
 class Tutorial:
     def __init__(self, bot):
@@ -115,6 +116,7 @@ class Tutorial:
 
     async def raid_tutorial(self, ctx, config):
         report_channels = config['raid']['report_channels']
+        category_dict = config['raid']['category_dict']
         tutorial_channel = ctx.tutorial_channel
         prefix = ctx.prefix
         raid_channel = None
@@ -122,16 +124,20 @@ class Tutorial:
         # add tutorial channel to valid want report channels
         report_channels[tutorial_channel.id] = 'test'
 
+        if config['raid']['categories'] == "region":
+            category_dict[tutorial_channel.id] = tutorial_channel.category_id
+
         async def timeout_raid(cmd):
             await tutorial_channel.send(
                 f"You took too long to complete the **{prefix}{cmd}** "
                 "command! This channel will be deleted in ten seconds.")
             await asyncio.sleep(10)
             await tutorial_channel.delete()
-            if raid_channel:
-                await self.bot.expire_channel(raid_channel)
-                await raid_channel.delete()
             del report_channels[tutorial_channel.id]
+            del category_dict[tutorial_channel.id]
+            if raid_channel:
+                await raid_channel.delete()
+                ctx.bot.loop.create_task(self.bot.expire_channel(raid_channel))
             return
 
         await tutorial_channel.send(

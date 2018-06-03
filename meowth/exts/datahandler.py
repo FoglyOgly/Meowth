@@ -2,8 +2,8 @@ import json
 from functools import partial
 
 from discord.ext import commands
-import utils
-import checks
+from meowth import utils
+from meowth import checks
 
 class DataHandler:
     """Data Loading and Saving Test Cog."""
@@ -30,7 +30,7 @@ class DataHandler:
             number = self.pkmn_info['pokemon_list'].index(pkm_name) + 1
         except ValueError:
             number = None
-        return number
+        return int(number)
 
     @commands.group(invoke_without_command=True)
     async def raiddata(self, ctx, level=None):
@@ -60,7 +60,7 @@ class DataHandler:
 
     def in_list(self, pokemon_no):
         for pkmnlvl, vals in self.raid_info['raid_eggs'].items():
-            if pokemon_no in vals["pokemon"]:
+            if int(pokemon_no) in vals["pokemon"]:
                 return pkmnlvl
         return None
 
@@ -172,6 +172,11 @@ class DataHandler:
     @raiddata.command(name='save', aliases=['commit'])
     async def save_rd(self, ctx):
         """Saves the current raid data state to the json file."""
+        for pkmn_lvl in self.raid_info['raid_eggs']:
+            data = self.raid_info['raid_eggs'][pkmn_lvl]["pokemon"]
+            pkmn_ints = [int(p) for p in data]
+            self.raid_info['raid_eggs'][pkmn_lvl]["pokemon"] = pkmn_ints
+
         with open(ctx.bot.raid_json_path, 'w') as fd:
             json.dump(self.raid_info, fd, indent=4)
         await ctx.message.add_reaction('\u2705')

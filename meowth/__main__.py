@@ -7178,7 +7178,7 @@ async def _researchlist(ctx):
     if questmsg:
         listmsg = _(' **Here\'s the current research reports for {channel}**\n{questmsg}').format(channel=ctx.message.channel.name.capitalize(),questmsg=questmsg)
     else:
-        listmsg = _(" There are no reported research reports. Report one with **!research**")
+        listmsg = _(" There are no reported research reports. Report one with **{prefix}research**").format(prefix=ctx.prefix)
     return listmsg
 
 @_list.command()

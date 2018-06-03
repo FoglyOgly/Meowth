@@ -2,8 +2,8 @@ import json
 from functools import partial
 
 from discord.ext import commands
-import utils
-import checks
+from meowth import utils
+from meowth import checks
 
 class DataHandler:
     """Data Loading and Saving Test Cog."""

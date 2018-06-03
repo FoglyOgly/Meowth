@@ -2,7 +2,8 @@ import os
 import json
 
 from discord.ext import commands
-import utils
+
+from meowth import utils
 
 class GymMatching:
     def __init__(self, bot):

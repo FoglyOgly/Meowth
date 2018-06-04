@@ -1729,7 +1729,7 @@ msgstr ""
 #: __main__.py:4310
 #, fuzzy
 msgid "Meowth! Level {level} raid egg reported by {member}! Details: {location_details}. Coordinate in {raid_channel}"
-msgstr "Meowth! Un {pokemon} a été reporté dans un raid par {member}! Détails: {location_details}. Coordonnés dans {raid_channel}"
+msgstr "Meowth! Oeuf de raid level {level} a été reporté par {member}! Détails: {location_details}. Coordonnés dans {raid_channel}"
 
 #: __main__.py:4312
 msgid "Meowth! Level {level} raid egg reported by {member} in {citychannel}! Details: {location_details}. Coordinate here!\n"
@@ -1737,7 +1737,11 @@ msgid "Meowth! Level {level} raid egg reported by {member} in {citychannel}! Det
 "Click the question mark reaction to get help on the commands that work in here.\n"
 "\n"
 "This channel will be deleted five minutes after the timer expires."
-msgstr ""
+msgstr "Meowth! Oeuf de raid level {level} signalé par {member} dans {citychannel}! Détails: {location_details}. Coordonnez ici!\n"
+"\n"
+"Cliquez sur la réaction du point d'interrogation pour obtenir de l'aide sur les commandes qui fonctionnent ici.\n"
+"\n"
+"Ce canal sera supprimé cinq minutes après l'expiration du délai."
 
 #: __main__.py:4336
 #, fuzzy

@@ -1510,11 +1510,11 @@ async def silph(ctx, silph_user: str = None):
         if not card:
             return await ctx.send(_('Silph Card for {silph_user} not found.').format(silph_user=silph_user))
 
-    if not card.discord_username:
+    if not card.discord_name:
         return await ctx.send(
             _('No Discord account found linked to this Travelers Card!'))
 
-    if card.discord_username != str(ctx.author):
+    if card.discord_name != str(ctx.author):
         return await ctx.send(
             _('This Travelers Card is linked to another Discord account!'))
 

@@ -34,21 +34,27 @@ msgstr "{pokemon} - "
 msgid "{roletest}Meowth! {pkmn} raid reported by {member} in {channel}! Coordinate here!\n"
 "\n"
 "For help, react to this message with the question mark and I will DM you a list of commands you can use!"
-msgstr "Meowth! Un raid {0} a été reporté par {1} ! Détails : {2}. Instructions ici ! Merci de répondre (ne pas réagir) à ce message avec {3} pour informer que vous êtes en chemin, ou avec {4} si vous êtes déjà sur place !"
+msgstr "{roletest} Meowth! {pkmn} raid signalé par {membre} dans {canal}! Coordonnez ici!\n"
+"\n"
+"Pour obtenir de l'aide, réagissez à ce message avec le point d'interrogation et je vais vous DM une liste de commandes que vous pouvez utiliser!"
 
 #: __main__.py:501
 #, fuzzy
 msgid "Meowth! Level {level} raid egg reported by {member} in {channel}! Coordinate here!\n"
 "\n"
 "For help, react to this message with the question mark and I will DM you a list of commands you can use!"
-msgstr "Meowth! Un raid {0} a été reporté par {1} ! Détails : {2}. Instructions ici ! Merci de répondre (ne pas réagir) à ce message avec {3} pour informer que vous êtes en chemin, ou avec {4} si vous êtes déjà sur place !"
+msgstr "Meowth! Oeuf de raid niveau {level} signalé par {member} dans {channel}! Coordonnez ici!\n"
+"\n"
+"Pour obtenir de l'aide, réagissez à ce message avec le point d'interrogation et je vais vous DM une liste de commandes que vous pouvez utiliser!"
 
 #: __main__.py:503
 #, fuzzy
 msgid "Meowth! EX raid reported by {member} in {channel}! Coordinate here!\n"
 "\n"
 "For help, react to this message with the question mark and I will DM you a list of commands you can use!"
-msgstr "Meowth! Un raid {0} a été reporté par {1} ! Détails : {2}. Instructions ici ! Merci de répondre (ne pas réagir) à ce message avec {3} pour informer que vous êtes en chemin, ou avec {4} si vous êtes déjà sur place !"
+msgstr "Meowth! Raid EX signalé par {member} dans {channel}! Coordonnez ici!\n"
+"\n"
+"Pour obtenir de l'aide, réagissez à ce message avec le point d'interrogation et je vais vous DM une liste de commandes que vous pouvez utiliser!"
 
 #: __main__.py:558 __main__.py:2032
 msgid "The following could not be found:\n"
@@ -124,9 +130,9 @@ msgstr "archivé-"
 msgid "-----------------------------------------------\n"
 "**The channel has been archived and removed from view for everybody but Meowth and those with Manage Channel permissions. Any messages that were deleted after the channel was marked for archival will be posted below. You will need to delete this channel manually.**\n"
 "-----------------------------------------------"
-msgstr "———————————————————————\n"
+msgstr "-----------------------------------------------\n"
 "** La chaîne a été archivée et retirée de la vue pour tout le monde, à l’exception de Meowth et de ceux qui ont les permissions Gérer la chaîne. Tous les messages qui ont été supprimés après que la chaîne a été marquée pour l’archivage seront affichés ci-dessous. Vous devrez supprimer cette chaîne manuellement. **\n"
-"———————————————————————"
+"-----------------------------------------------"
 
 #: __main__.py:1032
 msgid "Starting up..."
@@ -222,15 +228,15 @@ msgstr "Le préfixe a été réinitialisé à la valeur par défaut: `{}`"
 
 #: __main__.py:1496
 msgid "Silph Road Travelers Card cleared!"
-msgstr "Silph Road Travelers Card effacée!"
+msgstr "Silph Road Travelers Card effacée !"
 
 #: __main__.py:1506
 msgid "This Travelers Card is private and cannot be linked!"
-msgstr "Cette Travelers Card est privée et ne peut pas être liée!"
+msgstr "Cette Travelers Card est privée et ne peut pas être liée !"
 
 #: __main__.py:1509
 msgid "Travelers Card not found!"
-msgstr "Travelers Card non trouvée!"
+msgstr "Travelers Card non trouvée !"
 
 #: __main__.py:1515
 msgid "No Discord account found linked to this Travelers Card!"
@@ -254,7 +260,7 @@ msgstr "Le préfixe de ce serveur est : `{}`"
 
 #: __main__.py:1664
 msgid "I'll wait for your announcement!"
-msgstr "Je vais attendre votre annonce!"
+msgstr "Je vais attendre votre annonce !"
 
 #: __main__.py:1671 __main__.py:1727
 msgid "Meowth! You took too long to send me your announcement! Retry when you're ready."
@@ -294,11 +300,11 @@ msgstr "Annonce envoyée."
 
 #: __main__.py:1713
 msgid "What channel would you like me to send it to?"
-msgstr "À quelle chaîne voulez-vous que je l’envoie?"
+msgstr "À quelle chaîne voulez-vous que je l’envoie ?"
 
 #: __main__.py:1725
 msgid "Meowth! That channel doesn't exist! Retry when you're ready."
-msgstr "Meowth! Cette chaine n’existe pas! Réessayez quand vous êtes prêt."
+msgstr "Meowth! Cette chaine n’existe pas ! Réessayez quand vous êtes prêt."
 
 #: __main__.py:1738 __main__.py:3560
 msgid "For support, contact us on our Discord server. Invite Code: hhVjAN8"
@@ -336,12 +342,10 @@ msgid "Meowth! That's Right! Welcome to the configuration for Meowth the Pokemon
 "\n"
 "**Role Setup**\n"
 "Before you begin the configuration, please make sure my role is moved to the top end of the server role hierarchy. It can be under admins and mods, but must be above team and general roles. [Here is an example](http://i.imgur.com/c5eaX1u.png)"
-msgstr "__**Configuration de Meowth**__\n"
+msgstr "Meowth! C'est cool ! Bienvenue dans la configuration de Meowth le robot d'aide de Pokemon Go! Je vais vous guider à travers quelques étapes pour me faire installer sur votre serveur.\n"
 "\n"
-"Meowth! Bienvenue dans la configuration de Meowth, le robot assistant de Pokémon Go! Je vais vous guider à travers certaines étapes d'installation pour me configurer sur votre serveur.\n"
-"\n"
-"**Configuration de l'équipe**\n"
-"Tout d'abord, j'ai une fonctionnalité qui permet aux utilisateurs d'assigner leur équipe Pokémon Go en utilisant les rôles. Si vous avez un robot qui le gère déjà, ou si vous ne voulez pas cette fonctionnalité, tapez N, sinon tapez Y pour activer la fonctionnalité!"
+"**Configuration du rôle**\n"
+"Avant de commencer la configuration, assurez-vous que mon rôle est déplacé vers le haut de la hiérarchie des rôles du serveur. Il peut être sous les administrateurs et les mods, mais doit être au-dessus des rôles d'équipe et généraux. [Voici un exemple](http://i.imgur.com/c5eaX1u.png)"
 
 #: __main__.py:1809
 msgid "\n"
@@ -453,29 +457,29 @@ msgstr "L’affectation d’équipe permet aux utilisateurs d’attribuer leur r
 
 #: __main__.py:1948
 msgid "Team Assignments enabled!"
-msgstr "Affectations d’équipe activées"
+msgstr "Affectations d’équipe activées !"
 
 #: __main__.py:1952
 msgid "Team Assignments disabled!"
-msgstr "Affectations d’équipe désactivées"
+msgstr "Affectations d’équipe désactivées !"
 
 #: __main__.py:1989
 msgid "I can welcome new members to the server with a short message. Here is an example, but it is customizable:\n"
 "\n"
 ""
-msgstr "Je peux accueillir de nouveaux membres sur le serveur avec un court message. Voici un exemple, mais il est personnalisable:\n"
+msgstr "Je peux accueillir de nouveaux membres sur le serveur avec un court message. Voici un exemple, mais il est personnalisable :\n"
 "\n"
 ""
 
 #: __main__.py:1991
 #, fuzzy
 msgid "Meowth! Welcome to {server_name}, {owner_name.mention}! Set your team by typing '**!team mystic**' or '**!team valor**' or '**!team instinct**' without quotations. If you have any questions just ask an admin."
-msgstr "Exemple de message:```Meowth! Bienvenue sur [SERVER], @[MEMBER]! Choisir votre équipe en tapant «!team mystic» ou «!team valor» ou «!team instinct» sans guillemets. Si vous avez des questions, demandez à un administrateur.```"
+msgstr "Meowth! Bienvenue sur {server_name}, {owner_name.mention}! Définissez votre équipe en tapant '**!team mystic**' ou '**!team valor**' ou '**!team instinct**' sans les guillemets. Si vous avez des questions, demandez à un administrateur."
 
 #: __main__.py:1993
 #, fuzzy
 msgid "Meowth! Welcome to {server_name}, {owner_name.mention}! If you have any questions just ask an admin."
-msgstr "Meowth! Bienvenue à {server.name}, {new_member_name.mention}! "
+msgstr "Meowth! Bienvenue à {server.name}, {new_member_name.mention}! Si vous avez la moindre question, demandez aux admins."
 
 #: __main__.py:1994
 msgid "\n"
@@ -495,7 +499,7 @@ msgstr "Message de bienvenue"
 
 #: __main__.py:2000
 msgid "Welcome Message enabled!"
-msgstr "Message de bienvenue activé!"
+msgstr "Message de bienvenue activé !"
 
 #: __main__.py:2003
 msgid "Would you like a custom welcome message? You can reply with **N** to use the default message above or enter your own below.\n"
@@ -513,8 +517,8 @@ msgstr "Voulez-vous un message de bienvenue personnalisé ? Vous pouvez répondr
 "Je peux lire tout [formatage discord] (https://support.discordapp.com/hc/en-us/articles/210298617-Markdown-Text-101-Chat-Formatting-Bold-Italic-Underline-) et j’ai la liste de modèles de Tag suivants:\n"
 "\n"
 "**{@member}** - Remplace le membre par son nom d’utilisateur ou son ID\n"
-"**{# channel}** - Remplace la chaîne par le nom ou l’identifiant de la chaîne\n"
-"**{& role}** - Remplace le nom ou l’ID du rôle (affiche en tant qu’aperçu DM du rôle supprimé)\n"
+"**{#channel}** - Remplace la chaîne par le nom ou l’identifiant de la chaîne\n"
+"**{&role}** - Remplace le nom ou l’ID du rôle (affiche en tant qu’aperçu DM du rôle supprimé)\n"
 "**{user}** - Va mentionner le nouvel utilisateur\n"
 "**{server}** - Imprime le nom de votre serveur\n"
 "Entourez votre message avec [] pour l’envoyer en tant que embed. **Attention:** Les mentions au sein des embeds peuvent être cassées sur mobile, ceci est un bug de Discord."
@@ -600,7 +604,7 @@ msgstr "La chaîne que vous avez fournie n’est pas dans votre serveur. Veuille
 
 #: __main__.py:2111
 msgid "Welcome Message disabled!"
-msgstr "Message de bienvenue désactivé!"
+msgstr "Message de bienvenue désactivé !"
 
 #: __main__.py:1958 __main__.py:2117 __main__.py:2532 __main__.py:2578
 msgid "I'm sorry I don't understand. Please reply with either **N** to disable, or **Y** to enable."
@@ -787,7 +791,7 @@ msgid "The number of categories I found in your server doesn't match the number 
 "**Matched Categories:** {catlist}\n"
 "\n"
 "Please double check your categories."
-msgstr "Le nombre de catégories que j’ai trouvées sur votre serveur ne correspond pas au nombre de niveaux de raid! Assurez-vous de me donner exactement six catégories, une pour chaque niveau de raid. Vous pouvez utiliser la même catégorie pour plusieurs niveaux si vous le souhaitez, mais j’ai besoin de voir six noms de catégories.\n"
+msgstr "Le nombre de catégories que j’ai trouvées sur votre serveur ne correspond pas au nombre de niveaux de raid ! Assurez-vous de me donner exactement six catégories, une pour chaque niveau de raid. Vous pouvez utiliser la même catégorie pour plusieurs niveaux si vous le souhaitez, mais j’ai besoin de voir six noms de catégories.\n"
 "\n"
 "**Catégories assorties:** {catlist}\n"
 "\n"
@@ -795,7 +799,7 @@ msgstr "Le nombre de catégories que j’ai trouvées sur votre serveur ne corre
 
 #: __main__.py:2338 __main__.py:2512 __main__.py:3004
 msgid "Sorry, I didn't understand your answer! Try again."
-msgstr "Désolé, je n’ai pas compris votre réponse! Réessayer."
+msgstr "Désolé, je n’ai pas compris votre réponse ! Réessayer."
 
 #: __main__.py:2341
 msgid "Raid Categories are set"
@@ -901,7 +905,7 @@ msgstr "Qui voulez-vous être en mesure de **voir** les chaînes Raid EX ? Vos o
 
 #: __main__.py:2630
 msgid "Automatic Counter Levels set to: {levels}"
-msgstr "Niveaux de compteurs automatiques définis sur: {levels}"
+msgstr "Niveaux de compteurs automatiques définis sur : {levels}"
 
 #: __main__.py:2664
 msgid "Wild Reporting Channels"
@@ -915,7 +919,7 @@ msgid "Wild Reporting allows users to report wild spawns with **!wild**. Pokemon
 "If you do not require **wild** reporting, you may want to disable this function.\n"
 "\n"
 "Respond with: **N** to disable, or the **channel-name** list to enable, each seperated with a comma and space:"
-msgstr "Le signalement de Pokémon sauvage permet aux utilisateurs de signaler des spawns sauvages avec **!wild **. LLes signalements peuvent se faire dans une ou plusieurs chaines. Chaque chaine pourra représenter différentes zones / communautés. Je vais avoir besoin que vous fournissiez une liste de chaine de votre serveur, vous autoriserez les rapports dans ce format: `nom-canal, nom-canal, nom-canal`\n"
+msgstr "Le signalement de Pokémon sauvage permet aux utilisateurs de signaler des spawns sauvages avec **!wild **. Les signalements peuvent se faire dans une ou plusieurs chaines. Chaque chaine pourra représenter différentes zones / communautés. Je vais avoir besoin que vous fournissiez une liste de chaine de votre serveur, vous autoriserez les rapports dans ce format: `nom-canal, nom-canal, nom-canal`\n"
 "\n"
 "Exemple: `kansas-city-wilds, coque-wilds, sydney-wilds`\n"
 "\n"
@@ -1065,7 +1069,7 @@ msgid "How would you like me to categorize the meetup channels I create? Your op
 "**none** - If you don't want them categorized\n"
 "**same** - If you want them in the same category as the reporting channel\n"
 "**other** - If you want them categorized in a provided category name or ID"
-msgstr "Comment voulez-vous que je catégorise les chaines d'annonce d'Évènements (Meetup) que je crée? Vos options sont:\n"
+msgstr "Comment voulez-vous que je catégorise les chaines d'annonce d'Évènements (Meetup) que je crée ? Vos options sont:\n"
 "\n"
 "**none** - Si vous ne voulez pas les catégoriser\n"
 "**same** - Si vous les voulez dans la même catégorie que la chaîne de reporting\n"
@@ -1101,33 +1105,39 @@ msgid "The **!want** and **!unwant** commands let you add or remove roles for Po
 "If you don't want to allow the management of tracked Pokemon roles, then you may want to disable this feature.\n"
 "\n"
 "Repond with: **N** to disable, or the **channel-name** list to enable, each seperated by a comma and space."
-msgstr ""
+msgstr "Les commandes **!want ** et **!unwant ** vous permettent d'ajouter ou de supprimer des rôles pour Pokemon qui seront mentionnés dans les rapports. Cela vous permet d'obtenir des notifications sur le Pokémon que vous voulez suivre. J'ai juste besoin de savoir quels canaux vous voulez permettre aux gens de gérer leur pokemon avec la commande **!want** et **!unwant **.\n"
+"\n"
+"Si vous ne voulez pas autoriser la gestion des rôles Pokémon suivis, vous pouvez désactiver cette fonctionnalité.\n"
+"\n"
+"Repondez avec: **N** pour désactiver, ou la liste **channel-name** pour activer, chacune étant séparée par une virgule et un espace."
 
 #: __main__.py:3043
 msgid "Pokemon Notifications disabled"
-msgstr ""
+msgstr "Notifications de Pokemon désactivées !"
 
 #: __main__.py:3085
 msgid "Pokemon Notifications enabled"
-msgstr ""
+msgstr "Notifications de Pokemon activées !"
 
 #: __main__.py:3119
 msgid "The **!archive** command marks temporary raid channels for archival rather than deletion. This can be useful for investigating potential violations of your server's rules in these channels.\n"
 "\n"
 "If you would like to disable this feature, reply with **N**. Otherwise send the category you would like me to place archived channels in. You can say **same** to keep them in the same category, or type the name or ID of a category in your server."
-msgstr ""
+msgstr "La commande **!archive ** marque les canaux de raid temporaires pour l'archivage plutôt que pour la suppression. Cela peut être utile pour étudier les violations potentielles des règles de votre serveur dans ces canaux.\n"
+"\n"
+"Si vous souhaitez désactiver cette fonctionnalité, répondez avec **N**. Sinon, envoyez la catégorie dans laquelle vous souhaitez placer les chaînes archivées. Vous pouvez dire **same** pour les garder dans la même catégorie, ou tapez le nom ou l'identifiant d'une catégorie sur votre serveur."
 
 #: __main__.py:3119 __main__.py:3151
 msgid "Archive Configuration"
-msgstr ""
+msgstr "Configuration de l'Archivage de chaines"
 
 #: __main__.py:3129
 msgid "Archived channels will remain in the same category."
-msgstr ""
+msgstr "Les chaines archivées resteront dans la même catégorie."
 
 #: __main__.py:3133
 msgid "Archived Channels disabled."
-msgstr ""
+msgstr "Archivage des chaines désactivé."
 
 #: __main__.py:3144
 msgid "I couldn't find the category you replied with! Please reply with **same** to leave archived channels in the same category, or give the name or ID of an existing category."

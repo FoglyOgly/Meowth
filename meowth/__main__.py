@@ -4777,7 +4777,7 @@ async def _invite(ctx):
     await reply.delete()
     await exraidmsg.delete()
 
-@Meowth.command(aliases=['res'])
+@Meowth.command(aliases=['res', 'task', 'quest'])
 @checks.allowresearchreport()
 async def research(ctx, *, details = None):
     """Report Field research
@@ -5926,7 +5926,7 @@ async def weather(ctx, *, weather):
 Status Management
 """
 
-@Meowth.command(aliases=['i', 'maybe'])
+@Meowth.command(aliases=['i', 'maybe', 'może', 'moze', 'zainteresowany'])
 @checks.activechannel()
 async def interested(ctx, *, teamcounts: str=None):
     """Indicate you are interested in the raid.
@@ -6026,7 +6026,7 @@ async def _maybe(channel, author, count, party, entered_interest=None):
     await _edit_party(channel, author)
     guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['trainer_dict'] = trainer_dict
 
-@Meowth.command(aliases=['c'])
+@Meowth.command(aliases=['c', 'idę', 'ide', 'wdrodze', 'jadę', 'jade'])
 @checks.activechannel()
 async def coming(ctx, *, teamcounts: str=None):
     """Indicate you are on the way to a raid.
@@ -6133,7 +6133,7 @@ async def _coming(channel, author, count, party, entered_interest=None):
     await _edit_party(channel, author)
     guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['trainer_dict'] = trainer_dict
 
-@Meowth.command(aliases=['h'])
+@Meowth.command(aliases=['h', 'namiejscu', 'jestem', 'czekam'])
 @checks.activechannel()
 async def here(ctx, *, teamcounts: str=None):
     """Indicate you have arrived at the raid.
@@ -6453,7 +6453,7 @@ async def _lobby(message, count):
     trainer_dict[message.author.id]['count'] = count
     guild_dict[message.guild.id]['raidchannel_dict'][message.channel.id]['trainer_dict'] = trainer_dict
 
-@Meowth.command(aliases=['x'])
+@Meowth.command(aliases=['x', 'anuluj'])
 @checks.raidchannel()
 async def cancel(ctx):
     """Indicate you are no longer interested in a raid.

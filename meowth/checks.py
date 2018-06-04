@@ -9,7 +9,13 @@ def is_owner_check(ctx):
     return author == owner
 
 def is_owner():
-    return commands.check(is_owner_check)
+    def predicate(ctx):
+        if is_dev_check(ctx) or is_owner_check(ctx):
+            return True
+        else:
+            return False
+    return commands.check(predicate)
+    #return commands.check(is_owner_check)
 
 def is_dev_check(ctx):
     author = ctx.author.id

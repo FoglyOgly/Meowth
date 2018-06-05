@@ -128,7 +128,7 @@ def sanitize_channel_name(name):
     """Converts a given string into a compatible discord channel name."""
     # Remove all characters other than alphanumerics,
     # dashes, underscores, and spaces
-    ret = re.sub('[^a-zA-Z0-9 _\\-]', '', name)
+    ret = re.sub(r'[^a-zA-Z0-9ąćęłńóśżźĄĆĘŁŃÓŚŻŹ _\\-]', '', name)
     # Replace spaces with dashes
     ret = ret.replace(' ', '-')
     return ret

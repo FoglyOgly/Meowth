@@ -264,7 +264,7 @@ def weakness_to_str(guild, weak_list):
 def sanitize_channel_name(name):
     # Remove all characters other than alphanumerics,
     # dashes, underscores, and spaces
-    ret = re.sub('[^a-zA-Z0-9 _\\-]', '', name)
+    ret = re.sub(r'[^a-zA-Z0-9ąćęłńóśżźĄĆĘŁŃÓŚŻŹ _\\-]', '', name)
     # Replace spaces with dashes
     ret = ret.replace(' ', '-')
     return ret
@@ -2079,7 +2079,7 @@ async def _configure_welcome(ctx):
                     if item.isdigit():
                         channel = discord.utils.get(guild.text_channels, id=int(item))
                     if not channel:
-                        item = re.sub('[^a-zA-Z0-9 _\\-]+', '', item)
+                        item = re.sub('[^a-zA-Z0-9ąćęłńóśżźĄĆĘŁŃÓŚŻŹ _\\-]+', '', item)
                         item = item.replace(" ","-")
                         name = await letter_case(guild.text_channels, item.lower())
                         channel = discord.utils.get(guild.text_channels, name=name)
@@ -2172,7 +2172,7 @@ async def _configure_raid(ctx):
                 if item.isdigit():
                     channel = discord.utils.get(guild.text_channels, id=int(item))
                 if not channel:
-                    item = re.sub('[^a-zA-Z0-9 _\\-]+', '', item)
+                    item = re.sub('[^a-zA-Z0-9ąćęłńóśżźĄĆĘŁŃÓŚŻŹ _\\-]+', '', item)
                     item = item.replace(" ","-")
                     name = await letter_case(guild.text_channels, item.lower())
                     channel = discord.utils.get(guild.text_channels, name=name)
@@ -2396,7 +2396,7 @@ async def _configure_exraid(ctx):
                 if item.isdigit():
                     channel = discord.utils.get(guild.text_channels, id=int(item))
                 if not channel:
-                    item = re.sub('[^a-zA-Z0-9 _\\-]+', '', item)
+                    item = re.sub('[^a-zA-Z0-9ąćęłńóśżźĄĆĘŁŃÓŚŻŹ _\\-]+', '', item)
                     item = item.replace(" ","-")
                     name = await letter_case(guild.text_channels, item.lower())
                     channel = discord.utils.get(guild.text_channels, name=name)
@@ -2688,7 +2688,7 @@ async def _configure_wild(ctx):
                 if item.isdigit():
                     channel = discord.utils.get(guild.text_channels, id=int(item))
                 if not channel:
-                    item = re.sub('[^a-zA-Z0-9 _\\-]+', '', item)
+                    item = re.sub('[^a-zA-Z0-9ąćęłńóśżźĄĆĘŁŃÓŚŻŹ _\\-]+', '', item)
                     item = item.replace(" ","-")
                     name = await letter_case(guild.text_channels, item.lower())
                     channel = discord.utils.get(guild.text_channels, name=name)
@@ -2788,7 +2788,7 @@ async def _configure_research(ctx):
                 if item.isdigit():
                     channel = discord.utils.get(guild.text_channels, id=int(item))
                 if not channel:
-                    item = re.sub('[^a-zA-Z0-9 _\\-]+', '', item)
+                    item = re.sub('[^a-zA-Z0-9ąćęłńóśżźĄĆĘŁŃÓŚŻŹ _\\-]+', '', item)
                     item = item.replace(" ","-")
                     name = await letter_case(guild.text_channels, item.lower())
                     channel = discord.utils.get(guild.text_channels, name=name)
@@ -2888,7 +2888,7 @@ async def _configure_meetup(ctx):
                 if item.isdigit():
                     channel = discord.utils.get(guild.text_channels, id=int(item))
                 if not channel:
-                    item = re.sub('[^a-zA-Z0-9 _\\-]+', '', item)
+                    item = re.sub('[^a-zA-Z0-9ąćęłńóśżźĄĆĘŁŃÓŚŻŹ _\\-]+', '', item)
                     item = item.replace(" ","-")
                     name = await letter_case(guild.text_channels, item.lower())
                     channel = discord.utils.get(guild.text_channels, name=name)
@@ -3060,7 +3060,7 @@ async def _configure_want(ctx):
                 if item.isdigit():
                     channel = discord.utils.get(guild.text_channels, id=int(item))
                 if not channel:
-                    item = re.sub('[^a-zA-Z0-9 _\\-]+', '', item)
+                    item = re.sub('[^a-zA-Z0-9ąćęłńóśżźĄĆĘŁŃÓŚŻŹ _\\-]+', '', item)
                     item = item.replace(" ","-")
                     name = await letter_case(guild.text_channels, item.lower())
                     channel = discord.utils.get(guild.text_channels, name=name)

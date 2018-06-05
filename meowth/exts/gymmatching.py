@@ -1,14 +1,20 @@
+import asyncio
 import os
 import json
 
-from discord.ext import commands
+from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
 
-from meowth import utils
+import discord
+from discord.ext import commands
 
 class GymMatching:
     def __init__(self, bot):
         self.bot = bot
         self.gym_data = self.init_json()
+        self.num_to_emoji = {0: '0\u20e3', 1: '1\u20e3', 2: '2\u20e3', 3: '3\u20e3', 4: '4\u20e3', 5: '5\u20e3',
+                             6: '6\u20e3', 7: '7\u20e3', 8: '8\u20e3', 9: '9\u20e3'}
+        self.emoji_to_num = {v: k for k, v in self.num_to_emoji.items()}
 
     def init_json(self):
         with open(os.path.join('data', 'gym_data.json')) as fd:
@@ -18,25 +24,113 @@ class GymMatching:
         return self.gym_data.get(str(guild_id))
 
     def gym_match(self, gym_name, gyms):
-        return utils.get_match(list(gyms.keys()), gym_name)
+        return self._get_n_match(list(gyms.keys()), gym_name, 1)
 
-    @commands.command(hidden=True)
-    async def gym_match_test(self, ctx, gym_name):
+    def _get_n_match(self, gyms: list, gym: str, max_count: int = 9):
+        """Uses fuzzywuzzy to see if gym is close to entries in gyms
+
+        Returns a list of tuples of (MATCH, SCORE)
+        """
+        result = process.extract(gym, gyms, scorer=fuzz.token_set_ratio, limit=max_count)
+        return [] if not result else result
+
+    def _create_embed_gyms(self, ctx, gym, add_emoji = False):
         gyms = self.get_gyms(ctx.guild.id)
         if not gyms:
-            await ctx.send('Gym matching has not been set up for this server.')
-            return
-        match, score = self.gym_match(gym_name, gyms)
-        if match:
+            return None
+        result = self._get_n_match(list(gyms.keys()), gym, 9)
+        if len(result) == 0:
+            return None
+        embed = discord.Embed(colour=ctx.guild.me.colour,
+                              description=f"Dla podanej nazwy **\"{gym}\"** znaleziono następujące gymy")
+        printed = []
+        for match, score in result:
+            if score < 70:
+                continue
+            if len(printed) > 9:
+                continue
             gym_info = gyms[match]
             coords = gym_info['coordinates']
-            notes = gym_info.get('notes', 'No notes for this gym.')
-            gym_info_str = (f"**Coordinates:** {coords}\n"
-                            f"**Notes:** {notes}")
-            await ctx.send(f"Successful match with `{match}` "
-                           f"with a score of `{score}`\n{gym_info_str}")
+            coords_link = "https://www.google.com/maps/search/?api=1&query={0}".format('+'.join(coords.split()))
+            coords_str = f"Współrzędne: [{coords}]({coords_link})"
+            notes = gym_info.get('notes', None)
+            notes_str = "" if notes is None else f"\nDodatkowe informacje: {notes}"
+            districts = gym_info.get('districts', None)
+            districts_str = '' if districts is None else f"\nDzielnice: **{districts}**"
+            is_ex = gym_info.get('is_ex', None)
+            can_be_ex = gym_info.get('can_be_ex', None)
+            ex_status = ''
+            if is_ex == "Yes":
+                ex_status = 'ex-raidowy'
+            else:
+                if can_be_ex == "Yes":
+                    ex_status = 'potencjalnie ex-rajdowy'
+                else:
+                    if is_ex is not None and can_be_ex is not None:
+                        ex_status = 'zwykły'
+                    else:
+                        ex_status = 'nieznany'
+            ex_status_str = f"\nTyp gymu: **{ex_status}**"
+            emoji = "" if add_emoji is False else self.num_to_emoji[len(printed)] + " "
+            embed.add_field(name=f"{emoji}{match}",
+                            value=f"{coords_str}{districts_str}{ex_status_str}{notes_str}", inline=False)
+            printed.append((match, districts))
+        return embed, printed
+
+    @commands.command(aliases=['znajdźgym', 'znajdzgym', 'szukajgym', 'szukajgyma', 'szukajgymu'])
+    async def findgym(self, ctx, *, gym):
+        guild = ctx.guild
+        gyms = self.get_gyms(guild.id)
+        if not gyms:
+            await ctx.send('Gym matching nie został poprawnie skonfigurowany {}.'.format(guild.id))
+            return
+        embed, printed = self._create_embed_gyms(ctx, gym)
+        if embed is not None and len(printed) > 0:
+            await ctx.send(embed=embed)
         else:
-            await ctx.send("No match found.")
+            await ctx.send(f"Nie znaleziono żadnego gymu pasującego do \"{gym}\".")
+
+    @commands.command()
+    async def pickgym(self, ctx, *, gym):
+        match, districts = await self.pick_gym_prompt(ctx, gym)
+        if not match:
+            return await ctx.send(f"Nie znaleziono żadnego gymu pasującego do \"{gym}\".")
+        if match == "__TIMEOUT__":
+            return await ctx.send(f"Za wolno.. spróbuj jeszcze raz.")
+        return await ctx.send(f"Znaleziono dopasowanie: {match} w dzielnicach {districts}")
+
+    async def pick_gym_prompt(self, ctx, gym):
+        embed, printed = self._create_embed_gyms(ctx, gym, add_emoji=True)
+        if embed is None or len(printed) == 0:
+            return None, None
+        if len(printed) == 1:
+            return printed[0]
+        try:
+            q_msg = await ctx.send(embed=embed)
+            reaction, user = await self._ask(ctx, q_msg, [ctx.message.author.id], [self.num_to_emoji[key] for key in range(len(printed))])
+        except TypeError:
+            await q_msg.delete()
+            return None, None
+        await q_msg.delete()
+        if not reaction:
+            return "__TIMEOUT__", None
+        if reaction.emoji not in self.emoji_to_num:
+            return None, None
+        return printed[self.emoji_to_num[reaction.emoji]]
+
+    async def _ask(self, ctx, message, user_list: list, react_list: list):
+        def check(reaction, user):
+            return (user.id in user_list) and (reaction.message.id == message.id) and (reaction.emoji in react_list)
+
+        for r in react_list:
+            await asyncio.sleep(0.25)
+            await message.add_reaction(r)
+        try:
+            reaction, user = await ctx.bot.wait_for('reaction_add', check=check, timeout=10)
+            return reaction, user
+        except asyncio.TimeoutError:
+            await message.clear_reactions()
+            return
 
 def setup(bot):
     bot.add_cog(GymMatching(bot))

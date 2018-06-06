@@ -39,6 +39,18 @@ def colour(*args):
     else:
         return discord.Colour.lighter_grey()
 
+def get_embed_index(embed_fields, field_names: list):
+    """Returns an index of embed filed name present in filed_names.
+
+    If none of filed_names is present in embed_fields None is returned.
+    """
+    index = 0
+    for embed_proxy in embed_fields:
+        if embed_proxy.name in field_names:
+            return index
+        index += 1
+    return None
+
 def make_embed(msg_type='', title=None, icon=None, content=None,
                msg_colour=None, guild=None, title_url=None,
                thumbnail='', image=''):

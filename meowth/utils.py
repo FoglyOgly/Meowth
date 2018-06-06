@@ -39,6 +39,46 @@ def colour(*args):
     else:
         return discord.Colour.lighter_grey()
 
+def get_embed_index(embed_fields, field_names: list):
+    """Returns an index of embed filed name present in filed_names.
+
+    If none of filed_names is present in embed_fields None is returned.
+    """
+    index = 0
+    for embed_proxy in embed_fields:
+        if embed_proxy.name in field_names:
+            return index
+        index += 1
+    return None
+
+def add_embed_field(newembed, oldembed, fields_names: list, name_overrride=None, value_override=None, inline_override=None):
+    """Return newembed with possibly new field added.
+
+    New filed is added if any of field_names is present in oldembed. By default new filed added has
+    the values from oldembed, but each filed can be overriden.
+    """
+    index = get_embed_index(oldembed.fields, fields_names)
+    if index is not None:
+        new_name = oldembed.fields[index].name if name_overrride is None else name_overrride
+        new_value = oldembed.fields[index].value if value_override is None else value_override
+        new_inline = oldembed.fields[index].inline if inline_override is None else inline_override
+        newembed.add_field(name=new_name, value=new_value, inline=new_inline)
+    return newembed
+
+def update_embed_field(newembed, oldembed, fields_names: list, name_overrride=None, value_override=None, inline_override=None):
+    """Return newembed with possibly updated field.
+
+    The filed gets updated if any of field_names is present in oldembed. By default new filed is updated with
+    the values from oldembed, but each filed can be overriden.
+    """
+    index = get_embed_index(oldembed.fields, fields_names)
+    if index is not None:
+        new_name = oldembed.fields[index].name if name_overrride is None else name_overrride
+        new_value = oldembed.fields[index].value if value_override is None else value_override
+        new_inline = oldembed.fields[index].inline if inline_override is None else inline_override
+        newembed.set_field_at(index, name=new_name, value=new_value, inline=new_inline)
+    return newembed
+
 def make_embed(msg_type='', title=None, icon=None, content=None,
                msg_colour=None, guild=None, title_url=None,
                thumbnail='', image=''):

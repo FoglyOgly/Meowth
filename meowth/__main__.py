@@ -5152,7 +5152,10 @@ async def _timerset(raidchannel, exptime):
     raidmsg = await raidchannel.get_message(guild_dict[guild.id]['raidchannel_dict'][raidchannel.id]['raidmessage'])
     reportmsg = await report_channel.get_message(guild_dict[guild.id]['raidchannel_dict'][raidchannel.id]['raidreport'])
     embed = raidmsg.embeds[0]
-    embed.set_field_at(3, name=embed.fields[3].name, value=endtime, inline=True)
+    index = utils.get_embed_index(embed.fields, [_('**Expires:**'), _('**Hatches:**'), _('**Event Ends:**')])
+    if not index:
+        return
+    embed.set_field_at(index, name=embed.fields[index].name, value=endtime, inline=True)
     try:
         await raidmsg.edit(content=raidmsg.content,embed=embed)
     except discord.errors.NotFound:
@@ -5274,7 +5277,10 @@ async def starttime(ctx,*,start_time=""):
         raidmsg = await channel.get_message(rc_d['raidmessage'])
         reportmsg = await report_channel.get_message(rc_d['raidreport'])
         embed = raidmsg.embeds[0]
-        embed.set_field_at(2, name=embed.fields[2].name, value=nextgroup, inline=True)
+        index = utils.get_embed_index(embed.fields, [_('**Next Group:**'), _('**Event Starts:**')])
+        if not index:
+            return
+        embed.set_field_at(index, name=embed.fields[index].name, value=nextgroup, inline=True)
         try:
             await raidmsg.edit(content=raidmsg.content,embed=embed)
         except discord.errors.NotFound:
@@ -6585,7 +6591,10 @@ async def starting(ctx, team: str = ''):
         raidmsg = await ctx.channel.get_message(guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['raidmessage'])
         reportmsg = await report_channel.get_message(guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['raidreport'])
         embed = raidmsg.embeds[0]
-        embed.set_field_at(2, name=_("**Next Group**"), value=_("Set with **!starttime**"), inline=True)
+        index = utils.get_embed_index(embed.fields, [_('**Next Group:**')])
+        if not index:
+            return
+        embed.set_field_at(index, name=_("**Next Group**"), value=_("Set with **!starttime**"), inline=True)
         try:
             await raidmsg.edit(content=raidmsg.content,embed=embed)
         except discord.errors.NotFound:

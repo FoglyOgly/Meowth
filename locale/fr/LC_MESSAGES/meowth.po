@@ -622,7 +622,7 @@ msgid "Raid Reporting allows users to report active raids with **!raid** or raid
 "If you do not require raid or raid egg reporting, you may want to disable this function.\n"
 "\n"
 "Respond with: **N** to disable, or the **channel-name** list to enable, each seperated with a comma and space:"
-msgstr "L'annonce de Raid permet aux utilisateurs de signaler des raids actifs avec **!raid ** ou des œufs de raid avec **!raidegg **. Les signalements peuvent se faire dans une ou plusieurs chaines. Chaque chaine pourra représenter différentes zones / communautés. Je vais avoir besoin que vous fournissiez une liste des chaines dans votre serveur, vous autoriserez les signalements dans ce format: `nom-canal, nom-canal, nom-canal`\n"
+msgstr "L'annonce de Raid permet aux utilisateurs de signaler des raids actifs avec **!raid** ou des œufs de raid avec **!raidegg**. Les signalements peuvent se faire dans une ou plusieurs chaines. Chaque chaine pourra représenter différentes zones / communautés. Je vais avoir besoin que vous fournissiez une liste des chaines dans votre serveur, vous autoriserez les signalements dans ce format: `nom-canal, nom-canal, nom-canal`\n"
 "\n"
 "Exemple: `kansas-city-raids, coque-raids, sydney-raids`\n"
 "\n"
@@ -1746,16 +1746,16 @@ msgstr "Meowth! Oeuf de raid level {level} signalé par {member} dans {citychann
 #: __main__.py:4336
 #, fuzzy
 msgid "Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset <minutes>** so others can check it with **!timer**."
-msgstr "Meowth! {member}, si vous le pouvez, définissez le temps restant sur le raid en utilisant **!timerset H:MM** afin que les autres puissent le voir avec **!timer**."
+msgstr "Meowth!Hey {member}, si vous le pouvez, définissez le temps restant jusqu'à ce que l'oeuf éclose en utilisant **!timerset <minutes>** afin que les autres puissent le vérifier avec **!timer **."
 
 #: __main__.py:4369 __main__.py:4474
 #, fuzzy
 msgid "Meowth! The Pokemon {pokemon} does not hatch from level {level} raid eggs!"
-msgstr "Meowth! Le Pokemon {pokemon} n'apparaît pas en raid!"
+msgstr "Meowth! Le Pokemon {pokemon} n'éclot pas à partir des œufs de raid de niveau {level}!"
 
 #: __main__.py:4403
 msgid "{roletest}Meowth! This egg will be assumed to be {pokemon} when it hatches!"
-msgstr ""
+msgstr "{roletest} Meowth! Cet œuf sera supposé être {pokemon} quand il éclot!"
 
 #: __main__.py:4448 __main__.py:5339 __main__.py:5409 __main__.py:6374
 msgid "Coordinate here"
@@ -1776,7 +1776,11 @@ msgid "Meowth! The egg reported by {member} in {citychannel} hatched into a {pok
 "Click the question mark reaction to get help on the commands that work in here.\n"
 "\n"
 "This channel will be deleted five minutes after the timer expires."
-msgstr ""
+msgstr "Meowth! L'œuf signalé par {member} dans {citychannel} a éclos en un raid {pokemon}! Détails: {location_details}. Coordonnez ici!\n"
+"\n"
+"Cliquez sur la réaction du point d'interrogation pour obtenir de l'aide sur les commandes qui fonctionnent ici.\n"
+"\n"
+"Ce canal sera supprimé cinq minutes après l'expiration du délai."
 
 #: __main__.py:4497 __main__.py:4684
 msgid "Use the **!invite** command to gain access and coordinate"
@@ -1793,7 +1797,7 @@ msgstr ""
 #: __main__.py:4502
 #, fuzzy
 msgid "Meowth! The EX egg has hatched into a {pokemon} raid! Details: {location_details}. {invitemsgstr} coordinate in {raid_channel}"
-msgstr "Meowth! Un {pokemon} a été reporté dans un raid par {member}! Détails: {location_details}. Coordonnés dans {raid_channel}"
+msgstr "Meowth! L'œuf EX a éclos dans un raid {pokemon}! Détails: {location_details}. {invitemsgstr} coordonnée dans {raid_channel}"
 
 #: __main__.py:4503
 msgid "Meowth! {pokemon} EX raid reported by {member} in {citychannel}! Details: {location_details}. Coordinate here{invitemsgstr2}!\n"
@@ -1818,7 +1822,8 @@ msgstr ""
 #: __main__.py:4545
 msgid "{roletest}Meowth! Trainers {trainer_list}: The raid egg has just hatched into a {pokemon} raid!\n"
 "If you couldn't before, you're now able to update your status with **!coming** or **!here**. If you've changed your plans, use **!cancel**."
-msgstr ""
+msgstr "{roletest} Meowth! Trainers {trainer_list}: L'œuf de raid vient d'éclore dans un raid {pokemon}!\n"
+"Si vous ne pouviez pas auparavant, vous pouvez maintenant mettre à jour votre statut avec **!coming** ou **!here**. Si vous avez modifié vos plans, utilisez **!cancel**."
 
 #: __main__.py:4618 __main__.py:4625
 #, fuzzy
@@ -1832,7 +1837,7 @@ msgstr ""
 #: __main__.py:4689
 #, fuzzy
 msgid "Meowth! EX raid egg reported by {member}! Details: {location_details}. {invitemsgstr} in {raid_channel}"
-msgstr "Meowth! Un {pokemon} a été reporté dans un raid par {member}! Détails: {location_details}. Coordonnés dans {raid_channel}"
+msgstr "Meowth! Oeuf de raid EX signalé par {membre}! Détails: {location_details}. {invitemsgstr} dans {raid_channel}"
 
 #: __main__.py:4691
 msgid "Meowth! EX raid reported by {member} in {citychannel}! Details: {location_details}. Coordinate here{invitemsgstr2}!\n"
@@ -1845,7 +1850,7 @@ msgstr ""
 #: __main__.py:4713
 #, fuzzy
 msgid "Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset <date and time>** so others can check it with **!timer**. **<date and time>** can just be written exactly how it appears on your EX Raid Pass."
-msgstr "Meowth! {member}, si vous le pouvez, définissez le temps restant sur le raid en utilisant **!timerset H:MM** afin que les autres puissent le voir avec **!timer**."
+msgstr "Meowth! Hey {member}, si vous le pouvez, définissez le temps restant jusqu'à ce que l'oeuf éclate en utilisant **!timerset <date et heure>** afin que les autres puissent le vérifier avec **!timer**. **<date et heure>** peut être écrit exactement comme il apparaît sur votre Pass Raid EX."
 
 #: __main__.py:4749
 msgid "Meowth! No EX Raids have been reported in this server! Use **!exraid** to report one!"
@@ -2119,7 +2124,7 @@ msgstr "Meowth! Le raid se termine à {expiry_time}!"
 #: __main__.py:5245
 #, fuzzy
 msgid "Meowth! The egg will not hatch by then!"
-msgstr "Meowth! Le raid se termine à {expiry_time}!"
+msgstr "Meowth! L'œuf n'éclosera pas d'ici là"
 
 #: __main__.py:5248
 msgid "Meowth! There is already a start time of **{start}** set! Do you want to change it?"
@@ -2304,7 +2309,7 @@ msgstr "Meowth! {member} a quitté le raid!"
 
 #: __main__.py:5966 __main__.py:6166
 msgid "{word} doesn't appear in level {egglevel} raids! Please try again."
-msgstr ""
+msgstr "{word} n'apparaît pas dans les raids de niveau {egglevel}! Veuillez réessayer."
 
 #: __main__.py:6012
 #, fuzzy
@@ -2317,7 +2322,7 @@ msgstr "Meowth! {member} est intéressé(e) avec un total de {trainer_count} jou
 
 #: __main__.py:6059
 msgid "{word} doesn't appear in level {egglevel} raids!"
-msgstr ""
+msgstr "{mot} n'apparaît pas dans les raids de niveau {egglevel}!"
 
 #: __main__.py:6063
 msgid "Invalid Pokemon detected. Please check the pinned message for the list of possible bosses and try again."
@@ -2559,12 +2564,12 @@ msgstr ""
 #: __main__.py:6773
 msgid "**Raid Eggs:**\n"
 ""
-msgstr ""
+msgstr "**Oeufs de Raid:**"
 
 #: __main__.py:6779
 msgid "**Raid Eggs:** (continued)\n"
 ""
-msgstr ""
+msgstr "**Oeufs de Raid:** (suite)"
 
 #: __main__.py:6783
 msgid "**EX Raids:**\n"
@@ -2928,7 +2933,7 @@ msgstr ""
 
 #: __main__.py:4210 __main__.py:5039
 msgid "Did you mean egg hatch time {0} or time remaining before hatch {1}?"
-msgstr ""
+msgstr "Voulez-vous dire temps d'éclosion des oeufs {0} ou temps restant avant l'éclosion {1}?"
 
 #: __main__.py:4900
 msgid "**Research Report Cancelled**"

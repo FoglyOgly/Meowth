@@ -206,7 +206,7 @@ msgstr "Meowth! Le boss de raid régional à été définie à **{boss}**!"
 #: __main__.py:1450
 #, fuzzy
 msgid "Meowth! That Pokemon doesn't appear in raids!"
-msgstr "Meowth! Le Pokemon {pokemon} n'apparaît pas en raid!"
+msgstr "Ce Pokémon n'apparaît pas dans les raids!"
 
 #: __main__.py:1463 __main__.py:1466
 msgid "I couldn't convert your answer to an appropriate timezone! Please double check what you sent me and resend a number from **-12** to **12**."
@@ -1566,7 +1566,7 @@ msgstr "Meowth! Le Pokemon {pokemon} n'apparaît pas en raid!"
 #: __main__.py:4082
 #, fuzzy
 msgid "Meowth! The Pokemon {pokemon} only appears in EX Raids! Use **!exraid** to report one!"
-msgstr "Meowth! Le Pokemon {pokemon} n'apparaît pas en raid!"
+msgstr "Meowth! Le Pokemon {pokemon} n'apparaît que dans les raids EX! Utilisez **!exraid** pour en signaler un!"
 
 #: __main__.py:4086
 #, fuzzy

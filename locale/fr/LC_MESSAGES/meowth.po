@@ -2417,7 +2417,7 @@ msgstr "Meowth! {member} est en chemin avec un total de {trainer_count} joueurs!
 msgid "\n"
 "There is a group already in the lobby! Use **!lobby** to join them or **!backout** to request a backout! Otherwise, you may have to wait for the next group!"
 msgstr "\n"
-"Il y a déjà un groupe dans le lobby! Utilisez **!lobby** pour les rejoindre ou **!backout** pour demander que tout le monde sorte! Sinon, vous devrez peut-être attendre le prochain groupe!"
+"Il y a déjà un groupe dans le lobby! Utilisez **!lobby** pour les rejoindre ou **!backout** (sortie de lobby) pour demander que tout le monde sorte! Sinon, vous devrez peut-être attendre le prochain groupe!"
 
 #: __main__.py:6229
 #, fuzzy
@@ -2525,12 +2525,12 @@ msgstr "Meowth! {member} et le total de {trainer_count} dresseurs avec lui ne so
 #: __main__.py:6490
 #, fuzzy
 msgid "Meowth! {member} has backed out of the lobby!"
-msgstr "Meowth! {member} est sorti de lobby!"
+msgstr "Meowth! {member} est sorti du lobby (backout)!"
 
 #: __main__.py:6492
 #, fuzzy
 msgid "Meowth! {member} and their total of {trainer_count} trainers have backed out of the lobby!"
-msgstr "Meowth! {member} et le total de {trainer_count} dresseurs avec lui ont quitté le raid!"
+msgstr "Meowth! {member} et le total de {trainer_count} dresseurs avec lui ont quitté le lobby (backout)!"
 
 #: __main__.py:6510
 msgid "Meowth! The group of {count} in the lobby has entered the raid! Wish them luck!"
@@ -2551,92 +2551,96 @@ msgstr "Meowth! Comment pouvez-vous commencer quand il n'y a personne en attente
 
 #: __main__.py:6575
 msgid " to start at **{}** "
-msgstr ""
+msgstr " commence à **{}** "
 
 #: __main__.py:6579
 #, fuzzy
 msgid "Starting - Meowth! The group that was waiting{timestr}is starting the raid! Trainers {trainer_list}, if you are not in this group and are waiting for the next group, please respond with {here_emoji} or **!here**. If you need to ask those that just started to back out of their lobby, use **!backout**"
-msgstr "Meowth! Le groupe qui attendait vient de lancer le raid! Joueurs {trainer_list}, merci de répondre avec {here_emoji} ou avec **!here** si vous faites un autre groupe!"
+msgstr "Début - Meowth! Le groupe qui attendait {timestr} commence le raid! Les dresseurs {trainer_list}, si vous n'êtes pas dans ce groupe et attendez le prochain groupe, répondez avec {here_emoji} ou **!here**. Si vous devez demander à ceux qui ont juste commencé à quitter leur lobby, utilisez **!backout** (sortie de lobby)"
 
 #: __main__.py:6587
 msgid "**Next Group**"
-msgstr ""
+msgstr "**Groupe suivant**"
 
 #: __main__.py:6622
 #, fuzzy
 msgid "Meowth! There's no one else in the lobby for this raid!"
-msgstr "Meowth! Comment pouvez-vous commencer quand il n'y a personne en attente pour ce raid!?"
+msgstr "Meowth! Il n'y a personne d'autre dans le lobby pour ce raid!"
 
 #: __main__.py:6628
 msgid "Backout - Meowth! {author} has indicated that the group consisting of {lobby_list} and the people with them has backed out of the lobby! If this is inaccurate, please use **!lobby** or **!cancel** to help me keep my lists accurate!"
-msgstr ""
+msgstr "Backout (sortie de lobby) - Meowth! {author} a indiqué que le groupe composé de {lobby_list} et les personnes qui les accompagnaient ont quitté le lobby! Si cela est inexact, veuillez utiliser **!lobby** ou **!cancel** pour m'aider à garder mes listes exactes!"
 
 #: __main__.py:6642
 #, fuzzy
 msgid "Meowth! There's no one in the lobby for this raid!"
-msgstr "Meowth! Comment pouvez-vous commencer quand il n'y a personne en attente pour ce raid!?"
+msgstr "Meowth! Il n'y a personne dans le lobby pour ce raid!"
 
 #: __main__.py:6645
 msgid "Backout - Meowth! {author} has requested a backout! If one of the following trainers reacts with the check mark, I will assume the group is backing out of the raid lobby as requested! {lobby_list}"
-msgstr ""
+msgstr "Backout - Meowth! {author} a demandé un backout (sortie de lobby)! Si l'un des entraîneurs suivants réagit avec la coche, je suppose que le groupe se retire du lobby du raid comme demandé! {lobby_list}"
 
 #: __main__.py:6656
 msgid "Meowth! {user} confirmed the group is backing out!"
-msgstr ""
+msgstr "Meowth! {utilisateur} a confirmé que le groupe se retire (sortie de lobby)!"
 
 #: __main__.py:6676
 msgid "**Meowth!** "
-msgstr ""
+msgstr "**Meowth!** "
 
 #: __main__.py:6732
 msgid " (assumed)"
-msgstr ""
+msgstr " (assumé)"
 
 #: __main__.py:6738
 msgid " Next group: **{}**"
-msgstr ""
+msgstr " Groupe suivant: **{}**"
 
 #: __main__.py:6742 __main__.py:6744
 msgid " - Hatches: {expiry}{is_assumed}"
-msgstr ""
+msgstr " - Eclos: {expiry}{is_assumed}"
 
 #: __main__.py:6750 __main__.py:6754
 msgid " - Starts: {expiry}{is_assumed}"
-msgstr ""
+msgstr " - Commence: {expiry}{is_assumed}"
 
 #: __main__.py:6752
 msgid " - Ends: {expiry}{is_assumed}"
-msgstr ""
+msgstr " - Termine: {expiry}{is_assumed}"
 
 #: __main__.py:6756
 msgid " - Expiry: {expiry}{is_assumed}"
-msgstr ""
+msgstr " - Expire: {expiry}{is_assumed}"
 
 #: __main__.py:6757
 msgid "    {raidchannel}{expiry_text}\n"
 ""
-msgstr ""
+msgstr "    {raidchannel}{expiry_text}"
 
 #: __main__.py:6758
 msgid "    {interestcount} interested, {comingcount} coming, {herecount} here, {lobbycount} in the lobby.{start_str}\n"
 ""
-msgstr ""
+msgstr "    {interestcount} interested, {comingcount} coming, {herecount} here, {lobbycount} dans le lobby.{start_str}"
 
 #: __main__.py:6761
 msgid "**Here's the current channels for {0}**\n"
 "\n"
 ""
-msgstr ""
+msgstr "** Voici les chaines actuelles pour {0} **"
 
 #: __main__.py:6763
 msgid "**Active Raids:**\n"
 ""
-msgstr ""
+msgstr "**Raids actifs:**\n"
+"\n"
+""
 
 #: __main__.py:6769
 msgid "**Active Raids:** (continued)\n"
 ""
-msgstr ""
+msgstr "**Raids actifs:** (suite)\n"
+"\n"
+""
 
 #: __main__.py:6773
 msgid "**Raid Eggs:**\n"
@@ -2651,61 +2655,70 @@ msgstr "**Oeufs de Raid:** (suite)"
 #: __main__.py:6783
 msgid "**EX Raids:**\n"
 ""
-msgstr ""
+msgstr "**Raids EX:**\n"
+"\n"
+""
 
 #: __main__.py:6789
 msgid "**EX Raids:** (continued)\n"
 ""
-msgstr ""
+msgstr "**Raids EX:** (suite)\n"
+"\n"
+""
 
 #: __main__.py:6792
 msgid "**Meetups:**\n"
 ""
-msgstr ""
+msgstr "**Évènements (Meetup):**\n"
+"\n"
+""
 
 #: __main__.py:6798
 msgid "**Meetups:** (continued)\n"
 ""
-msgstr ""
+msgstr "**Évènements (Meetup):** (suite)\n"
+"\n"
+""
 
 #: __main__.py:6801
 #, fuzzy
 msgid "Meowth! No active raids! Report one with **!raid <name> <location> [weather] [timer]**."
-msgstr "Meowth! Il n'y a pas de raids actifs! Signaler un avec: **!raid <nom du pokemon> <localisation>**."
+msgstr "Meowth! Il n'y a pas de raids actifs! Signaler un avec: **!raid <name> <location> [weather] [timer]**."
 
 #: __main__.py:6835
 msgid " Nobody has updated their status yet!"
-msgstr ""
+msgstr " Personne n'a encore mis à jour son statut!"
 
 #: __main__.py:6838
 msgid "\n"
 "The next group will be starting at **{}**"
-msgstr ""
+msgstr "\n"
+"Le prochain groupe commencera à ** {} **"
 
 #: __main__.py:6851 __main__.py:6898 __main__.py:6945 __main__.py:6995
 #: __main__.py:7042 __main__.py:7089 __main__.py:7133 __main__.py:7154
 #: __main__.py:7190
 msgid "**Meowth!**"
-msgstr ""
+msgstr "**Meowth!**"
 
 #: __main__.py:6869 __main__.py:6876 __main__.py:6916 __main__.py:6923
 #: __main__.py:6964 __main__.py:6971 __main__.py:7012 __main__.py:7019
 msgid "**{name}**"
-msgstr ""
+msgstr "**{name}**"
 
 #: __main__.py:6872 __main__.py:6879 __main__.py:6919 __main__.py:6926
 #: __main__.py:6967 __main__.py:6974 __main__.py:7015 __main__.py:7022
 msgid "**{name} ({count})**"
-msgstr ""
+msgstr "**{name} ({count})**"
 
 #: __main__.py:6873 __main__.py:6880 __main__.py:6920 __main__.py:6927
 #: __main__.py:6968 __main__.py:6975 __main__.py:7016 __main__.py:7023
 msgid "{name} **({count})**"
-msgstr ""
+msgstr "{name} **({count})**"
 
 #: __main__.py:6885 __main__.py:6887
 msgid " including {trainer_list} and the people with them! Let them know if there is a group forming"
-msgstr " avec {trainer_list} et les joueurs avec eux! Faites-leur savoir s'il y a un groupe qui se forme."
+msgstr " avec {trainer_list} et les dresseurs avec eux! Faites-leur savoir s'il y a un groupe qui se forme."
 
 #: __main__.py:6888
 #, fuzzy
@@ -2714,7 +2727,7 @@ msgstr "Meowth! {trainer_count} intéressé(s){including_string}!"
 
 #: __main__.py:6932 __main__.py:6934
 msgid " including {trainer_list} and the people with them! Be considerate and wait for them if possible"
-msgstr " avec {trainer_list} et les joueurs avec eux! Merci de les attendre si possible."
+msgstr " avec {trainer_list} et les dresseurs avec eux! Merci de les attendre si possible."
 
 #: __main__.py:6935
 #, fuzzy
@@ -2723,7 +2736,7 @@ msgstr "Meowth! {trainer_count} en chemin{including_string}!"
 
 #: __main__.py:6982 __main__.py:6984
 msgid " including {trainer_list} and the people with them! Be considerate and let them know if and when you'll be there"
-msgstr " avec {trainer_list} et les personnes avec eux! Merci de préciser dans combien de temps vous arrivez."
+msgstr " avec {trainer_list} et les dresseurs avec eux! Merci de préciser si vous venez et dans combien de temps vous arrivez."
 
 #: __main__.py:6985
 #, fuzzy
@@ -2733,7 +2746,7 @@ msgstr "Meowth! {trainer_count} attend(ent) au raid{including_string}!"
 #: __main__.py:7029 __main__.py:7031
 #, fuzzy
 msgid " including {trainer_list} and the people with them! Use **!lobby** if you are joining them or **!backout** to request a backout"
-msgstr " avec {trainer_list} et les joueurs avec eux! Faites-leur savoir s'il y a un groupe qui se forme."
+msgstr " y compris {trainer_list} et les dresseurs avec eux! Utilisez **!lobby** si vous vous joignez à eux ou **!backout** pour demander un backout (sortie du lobby)"
 
 #: __main__.py:7032
 #, fuzzy

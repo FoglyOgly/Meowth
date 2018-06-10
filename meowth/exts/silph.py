@@ -294,6 +294,7 @@ class Silph:
         """Displays a user's Silph Road Trainer Card."""
         guild_data = ctx.bot.guild_dict[ctx.guild.id]
         if not silph_user:
+            silph_user = guild_data['trainers'].setdefault(ctx.author.id, {}).get('silphid', None)
             if not silph_user:
                 return await ctx.error(f"You haven't setup a silphcard!")
         else:

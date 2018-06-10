@@ -1555,7 +1555,7 @@ msgstr "Meowth! Cliquez ici pour obtenir les directions vers le {pokemon} sauvag
 
 #: __main__.py:3969 __main__.py:4880
 msgid "Ask {author} if my directions aren't perfect!"
-msgstr "Demandé {author} si le localisation n'est pas parfaite!"
+msgstr "Demander à {author} si la localisation n'est pas parfaite!"
 
 #: __main__.py:3970 __main__.py:4134 __main__.py:4382 __main__.py:4513
 msgid "**Details:**"
@@ -2170,7 +2170,7 @@ msgstr "Termine à {end}"
 
 #: __main__.py:5141
 msgid "%B %d at %I:%M %p (%H:%M) | "
-msgstr "%B %d at %I:%M %p (%H:%M) |␣"
+msgstr "%B %d at %I:%M %p (%H:%M) | "
 
 #: __main__.py:5141
 msgid "Hatches on {expiry}"
@@ -3019,7 +3019,7 @@ msgstr "Pokémons sauvage: **{wilds}** | "
 
 #: __main__.py:3704
 msgid "Research: **{research}** | "
-msgstr "Étude de terrain: **{research}** |␣"
+msgstr "Étude de terrain: **{research}** | "
 
 #: __main__.py:3972
 msgid "**Reactions:**"

@@ -1613,52 +1613,52 @@ msgstr "Meowth... c'est trop long. Les raids ne durent actuellement pas plus de 
 #: __main__.py:4093 __main__.py:4252 __main__.py:5711 __main__.py:5725
 #: __main__.py:5748 __main__.py:5826 __main__.py:5904
 msgid "clear"
-msgstr "clear/dégagé"
+msgstr "dégagé"
 
 #: __main__.py:4093 __main__.py:4252 __main__.py:5711 __main__.py:5725
 #: __main__.py:5748 __main__.py:5826 __main__.py:5904
 msgid "extreme"
-msgstr "extreme/tempète"
+msgstr "tempête"
 
 #: __main__.py:4093 __main__.py:4252 __main__.py:5711 __main__.py:5725
 #: __main__.py:5748 __main__.py:5826 __main__.py:5904
 msgid "none"
-msgstr "aucun"
+msgstr "none (aucun)"
 
 #: __main__.py:4093 __main__.py:4252 __main__.py:5711 __main__.py:5725
 #: __main__.py:5748 __main__.py:5826 __main__.py:5904
 msgid "rainy"
-msgstr "rainy/pluvieux"
+msgstr "pluvieux"
 
 #: __main__.py:4093 __main__.py:4252 __main__.py:5711 __main__.py:5725
 #: __main__.py:5748 __main__.py:5826 __main__.py:5904
 msgid "sunny"
-msgstr "sunny/ensoleillé"
+msgstr "ensoleillé"
 
 #: __main__.py:4094 __main__.py:4253 __main__.py:5712 __main__.py:5726
 #: __main__.py:5749 __main__.py:5827 __main__.py:5905
 msgid "cloudy"
-msgstr "cloudy/nuageux"
+msgstr "nuageux"
 
 #: __main__.py:4094 __main__.py:4253 __main__.py:5712 __main__.py:5726
 #: __main__.py:5749 __main__.py:5827 __main__.py:5905
 msgid "fog"
-msgstr "fog/brouillard"
+msgstr "brouillard"
 
 #: __main__.py:4094 __main__.py:4253 __main__.py:5712 __main__.py:5726
 #: __main__.py:5749 __main__.py:5827 __main__.py:5905
 msgid "partlycloudy"
-msgstr "partycloudy/partiellement nuageux"
+msgstr "couvert"
 
 #: __main__.py:4094 __main__.py:4253 __main__.py:5712 __main__.py:5726
 #: __main__.py:5749 __main__.py:5827 __main__.py:5905
 msgid "snow"
-msgstr "snow/neige"
+msgstr "neige"
 
 #: __main__.py:4094 __main__.py:4253 __main__.py:5712 __main__.py:5726
 #: __main__.py:5749 __main__.py:5827 __main__.py:5905
 msgid "windy"
-msgstr "windy/venteux"
+msgstr "venteux"
 
 #: __main__.py:4106 __main__.py:4265
 msgid "Meowth! I couldn't find a gym named '{0}'."
@@ -2471,7 +2471,7 @@ msgstr "Maybe: **{channelmaybe}** | Coming: **{channelcoming}** | Here: **{chann
 
 #: __main__.py:6395
 msgid "**Team List**"
-msgstr "**Liste d'équipe\""
+msgstr "**Liste d'équipe**"
 
 #: __main__.py:6430
 msgid "Meowth! I can't understand how many are in your group. Just say **!here** if you're by yourself, or **!coming 5** for example if there are 5 in your group."

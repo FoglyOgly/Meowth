@@ -2751,47 +2751,49 @@ msgstr " y compris {trainer_list} et les dresseurs avec eux! Utilisez **!lobby**
 #: __main__.py:7032
 #, fuzzy
 msgid " {trainer_count} in the lobby{including_string}!"
-msgstr "Meowth! {trainer_count} en chemin{including_string}!"
+msgstr " {trainer_count} dans le lobby{including_string}!"
 
 #: __main__.py:7075
 msgid "{type}{name}: **{total} total,** {interested} interested, {coming} coming, {here} waiting{type}\n"
 ""
-msgstr ""
+msgstr "{type}{name}: **{total} total,** {interested} interested, {coming} coming, {here} waiting{type}"
 
 #: __main__.py:7077
 msgid " Boss numbers for the raid:\n"
 "{}"
-msgstr ""
+msgstr "␣Numéro des Bosses pour le raid:\n"
+"{}"
 
 #: __main__.py:7079
 msgid " Nobody has told me what boss they want!"
-msgstr ""
+msgstr "␣Personne ne m'a dit quel boss il veut!"
 
 #: __main__.py:7114
 msgid "{emoji} **{total} total,** {interested} interested, {coming} coming, {here} waiting {emoji}\n"
 ""
-msgstr ""
+msgstr "{emoji} **{total} total,** {interested} interested, {coming} coming, {here} waiting {emoji}"
 
 #: __main__.py:7117
 msgid "**{grey_number} total,** {greymaybe} interested, {greycoming} coming, {greyhere} waiting"
-msgstr ""
+msgstr "**{grey_number} total,** {greymaybe} interested, {greycoming} coming, {greyhere} waiting"
 
 #: __main__.py:7121
 msgid " Team numbers for the raid:\n"
 "{}"
-msgstr ""
+msgstr " Numéros d'équipe pour le raid:\n"
+"{}"
 
 #: __main__.py:7123
 msgid " Nobody has updated their status!"
-msgstr ""
+msgstr " Personne n'a mis à jour son statut!"
 
 #: __main__.py:7143
 msgid " Your current **!want** list is: ```{wantlist}```"
-msgstr ""
+msgstr " Votre liste **!want ** actuelle est: ```{wantlist}```"
 
 #: __main__.py:7145
 msgid " You don't have any wants! use **!want** to add some."
-msgstr ""
+msgstr " Vous n'avez aucun Pokémon souhaité! Utilisez **!want ** pour en ajouter."
 
 #: __main__.py:7171
 msgid "Meowth! **Here's the current research reports for {channel}**\n"
@@ -2807,189 +2809,197 @@ msgstr " **Voici les études de terrain en cours pour {channel}**\n"
 
 #: __main__.py:7181
 msgid " There are no reported research reports. Report one with **!research**"
-msgstr "␣Il n'y a pas d'études de terrain annoncée. Annoncée en une avec **!research**"
+msgstr "␣Il n'y a pas d'études de terrain annoncée. Annoncez en une avec **!research**"
 
 #: __main__.py:7207
 msgid "Meowth! **Here's the current wild reports for {channel}**\n"
 "{wildmsg}"
-msgstr ""
+msgstr "Meowth! **Voici les annonces de Pokémon sauvages actuelles pour {channel}**\n"
+"{wildmsg}"
 
 #: __main__.py:7215
 msgid " **Here's the current wild reports for {channel}**\n"
 "{wildmsg}"
-msgstr ""
+msgstr " **Voici les annonces de Pokémon sauvages actuelles pour {channel}**\n"
+"{wildmsg}"
 
 #: __main__.py:7217
 #, fuzzy
 msgid " There are no reported wild pokemon. Report one with **!wild <pokemon> <location>**"
-msgstr "Meowth! Il n'y a pas de raids actifs! Signaler un avec: **!raid <nom du pokemon> <localisation>**."
+msgstr " Il n'y a aucun pokémon sauvage rapporté. Signaler un avec **!wild <pokemon> <location>**"
 
 #: __main__.py:155
 msgid "**Error when loading extension"
-msgstr ""
+msgstr "**Erreur lors du chargement de l'extension"
 
 #: __main__.py:159
 msgid "**Extension {ext} Loaded.**\n"
 ""
-msgstr ""
+msgstr "**Extension {ext} chargée.**"
 
 #: __main__.py:168
 msgid "**Extension{plural} {est} unloaded.**\n"
 ""
-msgstr ""
+msgstr "**Extension{pluriel} {est} déchargée.**"
 
 #: __main__.py:509
 msgid "exraid-egg-"
-msgstr ""
+msgstr "exraid-egg-"
 
 #: __main__.py:542
 msgid "level-{level}-egg-"
-msgstr ""
+msgstr "level-{level}-egg-"
 
 #: __main__.py:1284
 msgid "has despawned"
-msgstr ""
+msgstr "à despawned"
 
 #: __main__.py:1506
 msgid "The Silph Extension isn't accessible at the moment, sorry!"
-msgstr ""
+msgstr "L'extension Silph n'est pas accessible pour le moment, désolé!"
 
 #: __main__.py:1511
 msgid "Silph Card for {silph_user} not found."
-msgstr ""
+msgstr "Silph Card pour {silph_user} introuvable."
 
 #: __main__.py:1551
 msgid "Pokebattler ID set to {pbid}!"
-msgstr ""
+msgstr "ID de Pokebattler définie à  {pbid}!"
 
 #: __main__.py:1580
 msgid "Bot Permissions"
-msgstr ""
+msgstr "Permissions du Bot"
 
 #: __main__.py:1595
 msgid "**FAIL**"
-msgstr ""
+msgstr "**FAIL**"
 
 #: __main__.py:1595
 msgid "**PASS**"
-msgstr ""
+msgstr "**PASS**"
 
 #: __main__.py:1603
 msgid "**MISSING**"
-msgstr ""
+msgstr "**MISSING**"
 
 #: __main__.py:1606
 msgid "**ENABLED**"
-msgstr ""
+msgstr "**ENABLED**"
 
 #: __main__.py:1611
 msgid "GUILD"
-msgstr ""
+msgstr "GUILD"
 
 #: __main__.py:1616
 msgid "CATEGORY"
-msgstr ""
+msgstr "CATEGORY"
 
 #: __main__.py:1617
 msgid "CHANNEL"
-msgstr ""
+msgstr "CHANNEL"
 
 #: __main__.py:1624
 msgid "I couldn't send an embed here, so I've sent you a DM"
-msgstr ""
+msgstr "Je ne pouvais pas envoyer un embed ici, donc je vous ai envoyé un DM"
 
 #: __main__.py:1894 __main__.py:1921 __main__.py:1982 __main__.py:2141
 #: __main__.py:2365 __main__.py:2556 __main__.py:2600 __main__.py:2657
 #: __main__.py:2757 __main__.py:2857 __main__.py:3031 __main__.py:3112
 #: __main__.py:3187
 msgid "Configuration Complete"
-msgstr ""
+msgstr "Configuration complete"
 
 #: __main__.py:2055
 msgid "Please enter a new welcome message, or reply with **N** to use the default."
-msgstr ""
+msgstr "Veuillez entrer un nouveau message de bienvenue ou répondez par **N** pour utiliser la valeur par défaut."
 
 #: __main__.py:2522
 msgid "Everyone permission enabled"
-msgstr ""
+msgstr "Autorisation accordée à tous"
 
 #: __main__.py:2526
 msgid "Same permission enabled"
-msgstr ""
+msgstr "Même autorisation activée"
 
 #: __main__.py:2563
 msgid "Do you want access to EX raids controlled through members using the **!invite** command?\n"
 "If enabled, members will have read-only permissions for all EX Raids until they use **!invite** to gain access. If disabled, EX Raids will inherit the permissions from their reporting channels.\n"
 "\n"
 "Respond with: **N** to disable, or **Y** to enable:"
-msgstr ""
+msgstr "Voulez-vous accéder aux raids EX contrôlés par les membres à l'aide de la commande **!invite**?\n"
+"Si cette option est activée, les membres disposeront d'autorisations en lecture seule pour tous les raids EX jusqu'à ce qu'ils utilisent **!invite** pour y accéder. Si désactivé, les raids EX héritent des autorisations de leurs canaux de génération de rapports.\n"
+"\n"
+"Répondre avec: **N** pour désactiver ou **Y** pour activer:"
 
 #: __main__.py:2563
 msgid "Invite Configuration"
-msgstr ""
+msgstr "Configuration d'invitation"
 
 #: __main__.py:2568
 msgid "Invite Command enabled"
-msgstr ""
+msgstr "Command d'invitation activée"
 
 #: __main__.py:2572
 msgid "Invite Command disabled"
-msgstr ""
+msgstr "Command d'invitation désactivée"
 
 #: __main__.py:2607
 msgid "Automatic Counters Configuration"
-msgstr ""
+msgstr "Configuration automatique des compteurs"
 
 #: __main__.py:2607
 msgid "Do you want to generate an automatic counters list in newly created raid channels using PokeBattler?\n"
 "If enabled, I will post a message containing the best counters for the raid boss in new raid channels. Users will still be able to use **!counters** to generate this list.\n"
 "\n"
 "Respond with: **N** to disable, or enable with a comma separated list of boss levels that you would like me to generate counters for. Example:`3,4,5,EX`"
-msgstr ""
+msgstr "Voulez-vous générer une liste de compteurs automatiques dans les canaux de raid nouvellement créés en utilisant PokeBattler?\n"
+"Si activé, je posterai un message contenant les meilleurs compteurs pour le boss du raid dans les nouveaux canaux de raid. Les utilisateurs pourront toujours utiliser **!counters** pour générer cette liste.\n"
+"\n"
+"Répondez avec: **N** pour désactiver ou activer avec une liste de niveaux de boss séparés par des virgules pour lesquels vous aimeriez générer des compteurs. Exemple: `3,4,5, EX`"
 
 #: __main__.py:2613
 msgid "Automatic Counters disabled"
-msgstr ""
+msgstr "Compteurs automatiques désactivés"
 
 #: __main__.py:2633
 msgid "Please enter at least one level from 1 to EX separated by comma. Ex: `4,5,EX` or **N** to turn off automatic counters."
-msgstr ""
+msgstr "Veuillez entrer au moins un niveau entre 1 et EX séparés par une virgule. Ex: `4,5, EX` ou **N** pour désactiver les compteurs automatiques."
 
 #: __main__.py:3348
 msgid "{trainer}'s report stats have been cleared!"
-msgstr ""
+msgstr "Les statistiques d'annonces de {trainer} ont été effacées!"
 
 #: __main__.py:3652
 msgid "Traveler Card"
-msgstr ""
+msgstr "Traveler Card"
 
 #: __main__.py:3654
 msgid "{user}'s Trainer Profile"
-msgstr ""
+msgstr "Profil de dresseur de {user}"
 
 #: __main__.py:3656
 msgid "Silph Road"
-msgstr ""
+msgstr "Silph Road"
 
 #: __main__.py:3657
 msgid "Pokebattler"
-msgstr ""
+msgstr "Pokebattler"
 
 #: __main__.py:3658
 msgid "Raid Reports"
-msgstr ""
+msgstr "Annonces de raid"
 
 #: __main__.py:3659
 msgid "Egg Reports"
-msgstr ""
+msgstr "Annonces d'oeuf de raid"
 
 #: __main__.py:3660
 msgid "EX Raid Reports"
-msgstr ""
+msgstr "Annonces de Raid Ex"
 
 #: __main__.py:3661
 msgid "Wild Reports"
-msgstr ""
+msgstr "Annonces de Pokémon sauvage"
 
 #: __main__.py:3662
 msgid "Research Reports"
@@ -2997,15 +3007,15 @@ msgstr "Annonces d'Étude de terrain"
 
 #: __main__.py:3698
 msgid "Raids: **{raids}** | Eggs: **{eggs}** | "
-msgstr ""
+msgstr "Raids: **{raids}** | Oeufs de raid: **{eggs}** |"
 
 #: __main__.py:3700
 msgid "EX Raids: **{exraids}** | "
-msgstr ""
+msgstr "EX Raids: **{exraids}** | "
 
 #: __main__.py:3702
 msgid "Wilds: **{wilds}** | "
-msgstr ""
+msgstr "Pokémons sauvage: **{wilds}** |"
 
 #: __main__.py:3704
 msgid "Research: **{research}** | "
@@ -3013,15 +3023,15 @@ msgstr "Étude de terrain: **{research}** |␣"
 
 #: __main__.py:3972
 msgid "**Reactions:**"
-msgstr ""
+msgstr "**Reactions:**"
 
 #: __main__.py:3972
 msgid "{emoji}: I'm on my way!"
-msgstr ""
+msgstr "{emoji}: Je suis en chemin!"
 
 #: __main__.py:3973
 msgid "{emoji}: The Pokemon despawned!"
-msgstr ""
+msgstr "{emoji}: Le Pokémon à despawn!"
 
 #: __main__.py:4210 __main__.py:5039
 msgid "Did you mean egg hatch time {0} or time remaining before hatch {1}?"
@@ -3033,26 +3043,27 @@ msgstr "Annonces d'Étude de terrain annulée"
 
 #: __main__.py:5805
 msgid "CP"
-msgstr ""
+msgstr "CP"
 
 #: __main__.py:5810
 msgid "Difficulty rating: {est}"
-msgstr ""
+msgstr "Niveau de difficulté: {est}"
 
 #: __main__.py:5891
 msgid "**Possible Movesets:**"
-msgstr ""
+msgstr "**Movesets possibles:**"
 
 #: __main__.py:7169 __main__.py:7175
 msgid "**Reward**: {reward}, **Pokestop**: [{location}]({url}), **Quest**: {quest}, **Reported By**: {author}"
-msgstr ""
+msgstr "**Récompense**: {reward}, **Pokestop**: [{location}]({url}), **Quête**: {quest}, **Rapporté par**: {author}"
 
 #: __main__.py:7205
 msgid "**Pokemon**: {pokemon}, **Location**: [{location}]({url}), **Reported By**: {author}"
-msgstr ""
+msgstr "**Pokemon**: {pokemon}, **Location**: [{location}]({url}), **Rapporté par**: {author}"
 
 #: __main__.py:7211
 msgid "**Pokemon**: {pokemon}, **Location**: [{location}]({url}), **Reported By**: {author}\n"
 "**Location**: <{url}>"
-msgstr ""
+msgstr "**Pokemon**: {pokemon}, **Location**: [{location}]({url}), **Rapporté par**: {author}\n"
+"**Location**: <{url}>"
 

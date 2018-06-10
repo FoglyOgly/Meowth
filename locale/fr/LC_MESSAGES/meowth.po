@@ -2984,3 +2984,133 @@ msgid "**Pokemon**: {pokemon}, **Location**: [{location}]({url}), **Reported By*
 msgstr "**Pokemon**: {pokemon}, **Location**: [{location}]({url}), **Rapporté par**: {author}\n"
 "**Location**: <{url}>"
 
+#: errors.py:132
+msgid "Meowth! I'm missing some details! Usage: {prefix}{command}"
+msgstr "Meowth! Il me manque quelques détails! Utilisation: {prefix} {command}"
+
+#: errors.py:165
+msgid "Meowth! Team Management is not enabled on this server. **{prefix}{cmd_name}** is unable to be used."
+msgstr "Meowth! La gestion des Team n'est pas activée sur ce serveur. **{prefix} {cmd_name}** ne peut pas être utilisé."
+
+#: errors.py:170
+msgid "Meowth! Pokemon Notifications are not enabled on this server. **{prefix}{cmd_name}** is unable to be used."
+msgstr "Meowth! Les notifications Pokemon ne sont pas activées sur ce serveur. **{prefix} {cmd_name}** ne peut pas être utilisé."
+
+#: errors.py:175
+msgid "Meowth! Wild Reporting is not enabled on this server. **{prefix}{cmd_name}** is unable to be used."
+msgstr "Meowth! La gestion des annonces de Pokémons sauvage n'est pas activée sur ce serveur. **{prefix} {cmd_name}** ne peut pas être utilisé."
+
+#: errors.py:180
+msgid "Meowth! Reporting is not enabled for this channel. **{prefix}{cmd_name}** is unable to be used."
+msgstr "Meowth! La gestion des Annonces n'est pas activée sur ce serveur. **{prefix} {cmd_name}** ne peut pas être utilisé."
+
+#: errors.py:185
+msgid "Meowth! Raid Management is not enabled on this server. **{prefix}{cmd_name}** is unable to be used."
+msgstr "Meowth! La gestion des Raids n'est pas activée sur ce serveur. **{prefix} {cmd_name}** ne peut pas être utilisé."
+
+#: errors.py:190
+msgid "Meowth! EX Raid Management is not enabled on this server. **{prefix}{cmd_name}** is unable to be used."
+msgstr "Meowth! La gestion des Raids EX n'est pas activée sur ce serveur. **{prefix} {cmd_name}** ne peut pas être utilisé."
+
+#: errors.py:195
+msgid "Meowth! Research Reporting is not enabled on this server. **{prefix}{cmd_name}** is unable to be used."
+msgstr "Meowth! La gestion des Etudes de terrain n'est pas activée sur ce serveur. **{prefix} {cmd_name}** ne peut pas être utilisé."
+
+#: errors.py:200
+msgid "Meowth! Meetup Reporting is not enabled on this server. **{prefix}{cmd_name}** is unable to be used."
+msgstr "Meowth! La gestion des Évènement (Meetup) n'est pas activée sur ce serveur. **{prefix} {cmd_name}** ne peut pas être utilisé."
+
+#: errors.py:205
+msgid "Meowth! Channel Archiving is not enabled on this server. **{prefix}{cmd_name}** is unable to be used."
+msgstr "Meowth! La gestion de l'archivage des Chaines n'est pas activée sur ce serveur. **{prefix} {cmd_name}** ne peut pas être utilisé."
+
+#: errors.py:210
+msgid "Meowth! EX Raid Invite is not enabled on this server. **{prefix}{cmd_name}** is unable to be used."
+msgstr "Meowth! La gestion des Invitations aux Raids EX n'est pas activée sur ce serveur. **{prefix} {cmd_name}** ne peut pas être utilisé."
+
+#: errors.py:216 errors.py:411 errors.py:428 errors.py:445
+msgid "Meowth! Please use **{prefix}{cmd_name}** in "
+msgstr "Meowth! S'il vous plait, utilisez **{prefix}{cmd_name}** dans "
+
+#: errors.py:219 errors.py:346 errors.py:363 errors.py:380 errors.py:397
+#: errors.py:414 errors.py:431 errors.py:448
+msgid "a Region report channel."
+msgstr "une chaine d'annonce régionnale"
+
+#: errors.py:221 errors.py:348 errors.py:365 errors.py:382 errors.py:399
+#: errors.py:416 errors.py:433 errors.py:450
+msgid "one of the following region channels:"
+msgstr "une des chaines régionales suivantes :"
+
+#: errors.py:233
+msgid "Meowth! Please use **{prefix}{cmd_name}** in the following channel"
+msgstr "Meowth! S'il vous plait, utilisez **{prefix}{cmd_name}** dans la chaine suivante"
+
+#: errors.py:236
+msgid "s:\n"
+""
+msgstr "s:\n"
+"\n"
+""
+
+#: errors.py:238
+msgid ": "
+msgstr ": "
+
+#: errors.py:254
+msgid "Meowth! Please use **{prefix}{cmd_name}** in a Raid channel. Use **{prefix}list** in any "
+msgstr "Meowth! S'il vous plait, utilisez **{prefix}{cmd_name}** dans une chaine d'annonce de Raid. Utilisez **{prefix}list** dans tous "
+
+#: errors.py:257 errors.py:274 errors.py:327
+msgid "Region report channel to see active raids."
+msgstr "Chaine d'annonce régionale pour voir les raids actifs."
+
+#: errors.py:259 errors.py:276 errors.py:329
+msgid "of the following Region channels to see active raids:"
+msgstr "des chaines d'annonce régionale suivante pour voir les raids actifs:"
+
+#: errors.py:271
+msgid "Meowth! Please use **{prefix}{cmd_name}** in an Egg channel. Use **{prefix}list** in any "
+msgstr ""
+
+#: errors.py:287
+msgid "Meowth! **{prefix}{cmd_name}** can't be used in a Raid channel."
+msgstr ""
+
+#: errors.py:293
+msgid "Meowth! Please use **{prefix}{cmd_name}** in an Active Raid channel. Use **{prefix}list** in any "
+msgstr ""
+
+#: errors.py:302
+msgid "Region report channel to see active channels."
+msgstr ""
+
+#: errors.py:304
+msgid "of the following Region channels to see active channels:"
+msgstr ""
+
+#: errors.py:312 errors.py:337
+msgid "\n"
+"This is an egg channel. The channel needs to be activated with **{prefix}raid <pokemon>** before I accept commands!"
+msgstr ""
+
+#: errors.py:318
+msgid "Meowth! Please use **{prefix}{cmd_name}** in an Active channel. Use **{prefix}list** in any "
+msgstr ""
+
+#: errors.py:343
+msgid "Meowth! Please use **{prefix}{cmd_name}** in either a Raid channel or "
+msgstr ""
+
+#: errors.py:360
+msgid "Meowth! Please use **{prefix}{cmd_name}** in either a Raid Egg channel or "
+msgstr ""
+
+#: errors.py:377
+msgid "Meowth! Please use **{prefix}{cmd_name}** in either a EX Raid channel or one of the following region channels:"
+msgstr ""
+
+#: errors.py:394
+msgid "Meowth! Please use **{prefix}{cmd_name}** in a EX Raid channel. Use **{prefix}list** in any of the following region channels to see active raids:"
+msgstr ""
+

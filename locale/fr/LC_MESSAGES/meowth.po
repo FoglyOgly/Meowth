@@ -658,7 +658,7 @@ msgid "For each report, I generate Google Maps links to give people directions t
 "Each location will have to be in the same order as you provided the channels in the previous question.\n"
 "\n"
 "Respond with: **location info, location info, location info** each matching the order of the previous channel list below."
-msgstr "Pour chaque annonce, je génère des liens Google Maps pour donner aux gens des indications sur le raid ou l’œuf! Pour ce faire, j’ai besoin de savoir quelle banlieue / ville / région chaque canal de rapport représente, pour s’assurer que nous obtenons le bon emplacement sur la carte. Pour chaque chaine de signalement que vous avez fourni, j’ai besoin de son emplacement général correspondant en utilisant uniquement des lettres et des espaces, chaque emplacement étant séparé par une virgule et un espace.\n"
+msgstr "Pour chaque annonce, je génère des liens Google Maps pour donner aux gens des indications sur le raid ou l’œuf! Pour ce faire, j’ai besoin de savoir quelle banlieue / ville / région chaque chaine de rapport représente, pour s’assurer que nous obtenons le bon emplacement sur la carte. Pour chaque chaine de signalement que vous avez fourni, j’ai besoin de son emplacement général correspondant en utilisant uniquement des lettres et des espaces, chaque emplacement étant séparé par une virgule et un espace.\n"
 "\n"
 "Exemple: `kansas city mo, coque uk, sydney nsw australie`\n"
 "\n"
@@ -900,7 +900,7 @@ msgid "Who do you want to be able to **see** the EX Raid channels? Your options 
 msgstr "Qui voulez-vous être en mesure de **voir** les chaînes Raid EX ? Vos options sont:\n"
 "\n"
 "**everyone** - Pour que tout le monde puisse voir tous les Raids EX signalés\n"
-"**same** - Autoriser uniquement ceux qui ont accès au canal de signalement."
+"**same** - Autoriser uniquement ceux qui ont accès à la chaine de signalement."
 
 #: __main__.py:2630
 msgid "Automatic Counter Levels set to: {levels}"
@@ -1084,7 +1084,7 @@ msgid "In the same order as they appear below, please give the names of the cate
 "Example: `kansas city, hull, 1231231241561337813`\n"
 "\n"
 "You have configured the following channels as meetup reporting channels."
-msgstr "Dans le même ordre que celui indiqué ci-dessous, indiquez le nom des catégories dans lesquelles vous souhaitez que les raids signalés dans chaque canal apparaissent. Vous n'avez pas besoin d'utiliser des catégories différentes pour chaque canal, mais elles doivent être des catégories préexistantes . Séparez chaque nom de catégorie par une virgule. La réponse peut être le nom de la catégorie ou l'ID.\n"
+msgstr "Dans le même ordre que celui indiqué ci-dessous, indiquez le nom des catégories dans lesquelles vous souhaitez que les raids signalés dans chaque chaine apparaissent. Vous n'avez pas besoin d'utiliser des catégories différentes pour chaque chaine, mais elles doivent être des catégories préexistantes . Séparez chaque nom de catégorie par une virgule. La réponse peut être le nom de la catégorie ou l'ID.\n"
 "\n"
 "Exemple: `kansas city, coque, 1231231241561337813`\n"
 "\n"
@@ -1177,7 +1177,7 @@ msgid "There are a few settings available that are not within **!configure**. To
 "The current 24-hr time UTC is {utctime}. How many hours off from that are you?\n"
 "\n"
 "Respond with: A number from **-12** to **12**:"
-msgstr "Il y a quelques paramètres disponibles qui ne sont pas dans **!configure**. Pour les définir, utilisez **!set <setting>** dans n'importe quel canal pour définir ce paramètre.\n"
+msgstr "Il y a quelques paramètres disponibles qui ne sont pas dans **!configure**. Pour les définir, utilisez **!set <setting>** dans n'importe quel chaine pour définir ce paramètre.\n"
 "\n"
 "Ceux-ci inclus:\n"
 "**!set regional <nom ou numéro>** - Pour définir le boss régional du raid d'un serveur\n"
@@ -1581,7 +1581,7 @@ msgstr "Annoncé par @{author} - {timestamp}"
 #: __main__.py:3975
 #, fuzzy
 msgid "{roletest}Meowth! Wild {pokemon} reported by {member}! Details: {location_details}"
-msgstr "Meowth! Un {pokemon} sauvage a été reporté par {member}! Détails: {location_details}"
+msgstr "{roletest}Meowth! Un {pokemon} sauvage a été reporté par {member}! Détails: {location_details}"
 
 #: __main__.py:4022 __main__.py:4050 __main__.py:4091 __main__.py:4100
 #: __main__.py:4259
@@ -1781,7 +1781,7 @@ msgstr "Meowth! Oeuf de raid level {level} signalé par {member} dans {citychann
 "\n"
 "Cliquez sur la réaction du point d'interrogation pour obtenir de l'aide sur les commandes qui fonctionnent ici.\n"
 "\n"
-"Ce canal sera supprimé cinq minutes après l'expiration du délai."
+"Cette chaine sera supprimé cinq minutes après l'expiration du délai."
 
 #: __main__.py:4336
 #, fuzzy
@@ -2826,7 +2826,7 @@ msgstr " **Voici les annonces de Pokémon sauvages actuelles pour {channel}**\n"
 #: __main__.py:7217
 #, fuzzy
 msgid " There are no reported wild pokemon. Report one with **!wild <pokemon> <location>**"
-msgstr " Il n'y a aucun pokémon sauvage rapporté. Signaler un avec **!wild <pokemon> <location>**"
+msgstr " Il n'y a aucun pokémon sauvage signalé. Signaler un avec **!wild <pokemon> <location>**"
 
 #: __main__.py:155
 msgid "**Error when loading extension"
@@ -2999,7 +2999,7 @@ msgstr "Annonces de Raid Ex"
 
 #: __main__.py:3661
 msgid "Wild Reports"
-msgstr "Annonces de Pokémon sauvage"
+msgstr "Signalement de Pokémon sauvage"
 
 #: __main__.py:3662
 msgid "Research Reports"
@@ -3015,7 +3015,7 @@ msgstr "EX Raids: **{exraids}** | "
 
 #: __main__.py:3702
 msgid "Wilds: **{wilds}** | "
-msgstr "Pokémons sauvage: **{wilds}** |"
+msgstr "Pokémons sauvage: **{wilds}** | "
 
 #: __main__.py:3704
 msgid "Research: **{research}** | "

@@ -1765,7 +1765,7 @@ msgstr "Meowth! Cliquer ici pour obtenir l'itinéraire pour le raid!"
 #: __main__.py:4307 __main__.py:4385
 #, fuzzy
 msgid "**Hatches:**"
-msgstr "**Couvé:**"
+msgstr "**Éclos:**"
 
 #: __main__.py:4310
 msgid "Meowth! Level {level} raid egg reported by {member}! Details: {location_details}. Coordinate in {raid_channel}"

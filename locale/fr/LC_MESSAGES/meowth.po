@@ -1836,7 +1836,7 @@ msgstr "{roletest} Meowth! Trainers {trainer_list}: L'œuf de raid vient d'éclo
 
 #: __main__.py:4618 __main__.py:4625
 msgid "Meowth! Give more details when reporting! Usage: **!exraid <location>**"
-msgstr "Meowth! Donnez moi plus d'informations s'il vous plaît! Utilisez: **!raid <nom du pokemon> <localisation>**"
+msgstr "Meowth! Donnez moi plus d'informations s'il vous plaît! Utilisez: **!exraid <localisation>**"
 
 #: __main__.py:4637
 msgid "ex-raid-egg-"

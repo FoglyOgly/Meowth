@@ -32,7 +32,7 @@ msgstr "{pokemon} - "
 msgid "{roletest}Meowth! {pkmn} raid reported by {member} in {channel}! Coordinate here!\n"
 "\n"
 "For help, react to this message with the question mark and I will DM you a list of commands you can use!"
-msgstr "{roletest} Meowth! {pkmn} raid signalé par {membre} dans {channel}! Coordonné ici!\n"
+msgstr "{roletest} Meowth! {pkmn} raid signalé par {member} dans {channel}! Coordonné ici!\n"
 "\n"
 "Pour obtenir de l'aide, réagissez à ce message avec le point d'interrogation et je vais vous DM une liste de commandes que vous pouvez utiliser!"
 
@@ -1844,7 +1844,7 @@ msgstr "ex-raid-egg-"
 
 #: __main__.py:4689
 msgid "Meowth! EX raid egg reported by {member}! Details: {location_details}. {invitemsgstr} in {raid_channel}"
-msgstr "Meowth! Oeuf de raid EX signalé par {membre}! Détails: {location_details}. {invitemsgstr} dans {raid_channel}"
+msgstr "Meowth! Oeuf de raid EX signalé par {member}! Détails: {location_details}. {invitemsgstr} dans {raid_channel}"
 
 #: __main__.py:4691
 msgid "Meowth! EX raid reported by {member} in {citychannel}! Details: {location_details}. Coordinate here{invitemsgstr2}!\n"

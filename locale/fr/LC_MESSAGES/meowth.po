@@ -2213,7 +2213,7 @@ msgstr "Meowth! La minuterie de ce {raidtype} a déjà expiré à partir de {exp
 
 #: __main__.py:5005
 msgid "This {raidtype} will {raidaction} on {expiry}!"
-msgstr "Meowth! Le {raidtype} se termine à {expiry_time}!"
+msgstr "Meowth! Le {raidtype} se termine à {expiry}!"
 
 #: __main__.py:5007
 msgid "No one told me when the {raidtype} will {raidaction}, so I'm assuming it will {raidaction} on {expiry}!"

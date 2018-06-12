@@ -5586,7 +5586,7 @@ async def duplicate(ctx):
     guild = ctx.guild
     rc_d = guild_dict[guild.id]['raidchannel_dict'][channel.id]
     t_dict = rc_d['trainer_dict']
-    can_manage = channel.permissions_for(author).manage_channels
+    can_manage = channel.permissions_for(author).manage_channels or checks.is_dev_or_owner()
     raidtype = _("event") if guild_dict[guild.id]['raidchannel_dict'][channel.id].get('meetup',False) else _("raid")
     if can_manage:
         dupecount = 2

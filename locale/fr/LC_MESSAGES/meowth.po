@@ -2531,7 +2531,7 @@ msgstr "Format invalide, veuillez vérifier et réessayer."
 
 #: __main__.py:6314
 msgid "Team counts are higher than the total, double check your counts and try again. You entered **"
-msgstr "Le nombre d'équipes est supérieur au total, vérifiez vos comptes et réessayez. Tu es entré**"
+msgstr "Le nombre de dresseur est supérieur à l’équipe indiquée, vérifiez vos comptes et réessayez. Tu as entré **"
 
 #: __main__.py:6315
 msgid "** total and **"
@@ -2835,7 +2835,7 @@ msgid ""
 " Team numbers for the raid:\n"
 "{}"
 msgstr ""
-" Numéros d'équipe pour le raid:\n"
+" Nombre de dresseurs par équipe pour le raid:\n"
 "{}"
 
 #: __main__.py:7123

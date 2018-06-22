@@ -500,7 +500,7 @@ msgid ""
 "I can welcome new members to the server with a short message. Here is an example, but it is customizable:\n"
 "\n"
 msgstr ""
-"Je peux accueillir de nouveaux membres sur le serveur avec un court message. Voici un exemple, mais il est personnalisable :\n"
+"Je peux accueillir de nouveaux membres sur le serveur avec un court message. Voici un exemple, mais il est personnalisables :\n"
 "\n"
 
 #: __main__.py:1991
@@ -2184,7 +2184,7 @@ msgstr " | L’évènement se termine à {expiry_time}!"
 
 #: __main__.py:4991
 msgid "This event will end at {expiry_time}"
-msgstr "Meowth! Le raid se termine à {expiry_time}!"
+msgstr "Le raid se termine à {expiry_time}!"
 
 #: __main__.py:4993
 msgid "Nobody has told me a end time! Set it with **!timerset**"
@@ -2209,11 +2209,11 @@ msgstr "fin"
 
 #: __main__.py:5002
 msgid "This {raidtype}'s timer has already expired as of {expiry_time}!"
-msgstr "Meowth! La minuterie de ce {raidtype} a déjà expiré à partir de {expiry_time}!"
+msgstr "La minuterie de ce {raidtype} a déjà expiré à partir de {expiry_time}!"
 
 #: __main__.py:5005
 msgid "This {raidtype} will {raidaction} on {expiry}!"
-msgstr "Meowth! Le {raidtype} se termine à {expiry}!"
+msgstr "Le {raidtype} {raidaction} à {expiry}!"
 
 #: __main__.py:5007
 msgid "No one told me when the {raidtype} will {raidaction}, so I'm assuming it will {raidaction} on {expiry}!"
@@ -2455,7 +2455,7 @@ msgstr "[Voir vos résultats personnalisés!](https://www.pokebattler.com/raids/
 
 #: __main__.py:5810
 msgid "Pokebattler Estimator:"
-msgstr "Estimateur de Pokebattler:"
+msgstr "Estimatimation de Pokebattler:"
 
 #: __main__.py:5849
 msgid "{pkmn} | {weather} | Unknown Moveset"

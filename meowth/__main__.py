@@ -133,7 +133,7 @@ Meowth.config = config
 Meowth.pkmn_info_path = pkmn_path
 Meowth.raid_json_path = raid_path
 
-default_exts = ['datahandler', 'tutorial', 'silph', 'utilities', 'gymmatching']
+default_exts = ['datahandler', 'tutorial-fr', 'silph', 'utilities-fr', 'gymmatching']
 
 for ext in default_exts:
     try:
@@ -1343,10 +1343,10 @@ async def _eval(ctx, *, body: str):
 @Meowth.command()
 @checks.is_owner()
 async def save(ctx):
-    """Save persistent state to file.
+    """Enregistrer l'état persistant dans le fichier.
 
-    Usage: !save
-    File path is relative to current directory."""
+     Utilisation:!save
+     Le chemin du fichier est relatif au répertoire courant."""
     try:
         await _save()
         logger.info('CONFIG SAVED')
@@ -1372,10 +1372,10 @@ async def _save():
 @Meowth.command()
 @checks.is_owner()
 async def restart(ctx):
-    """Restart after saving.
+    """Redémarrez après l'enregistrement.
 
-    Usage: !restart.
-    Calls the save function and restarts Meowth."""
+     Utilisation:!restart.
+     Appelle la fonction de sauvegarde et redémarre Meowth."""
     try:
         await _save()
     except Exception as err:
@@ -1388,10 +1388,10 @@ async def restart(ctx):
 @Meowth.command()
 @checks.is_owner()
 async def exit(ctx):
-    """Exit after saving.
+    """Quitter après l'enregistrement.
 
-    Usage: !exit.
-    Calls the save function and quits the script."""
+     Utilisation:!exit.
+     Appelle la fonction de sauvegarde et quitte le script."""
     try:
         await _save()
     except Exception as err:
@@ -1403,7 +1403,7 @@ async def exit(ctx):
 
 @Meowth.group(name='set', case_insensitive=True)
 async def _set(ctx):
-    """Changes a setting."""
+    """Change un paramètre."""
     if ctx.invoked_subcommand == None:
         raise commands.BadArgument()
         return
@@ -1411,7 +1411,7 @@ async def _set(ctx):
 @_set.command()
 @commands.has_permissions(manage_guild=True)
 async def regional(ctx, regional):
-    """Changes server regional pokemon."""
+    """Change le pokemon régional du serveur."""
 
     if regional.isdigit():
         regional = int(regional)
@@ -1457,7 +1457,7 @@ def _set_regional(bot, guild, regional):
 @_set.command()
 @commands.has_permissions(manage_guild=True)
 async def timezone(ctx,*, timezone: str = ''):
-    """Changes server timezone."""
+    """Modifie le fuseau horaire du serveur."""
     try:
         timezone = float(timezone)
     except ValueError:
@@ -1476,7 +1476,7 @@ def _set_timezone(bot, guild, timezone):
 @_set.command()
 @commands.has_permissions(manage_guild=True)
 async def prefix(ctx, prefix=None):
-    """Changes server prefix."""
+    """Change le préfixe du serveur."""
     if prefix == 'clear':
         prefix = None
     prefix = prefix.strip()
@@ -1492,7 +1492,7 @@ def _set_prefix(bot, guild, prefix):
 
 @_set.command()
 async def silph(ctx, silph_user: str = None):
-    """Links a server member to a Silph Road Travelers Card."""
+    """Lie un membre du serveur à une carte Silph Road Travelers."""
     if not silph_user:
         await ctx.send(_('Silph Road Travelers Card cleared!'))
         try:
@@ -1536,7 +1536,7 @@ async def silph(ctx, silph_user: str = None):
 
 @_set.command()
 async def pokebattler(ctx, pbid: int = 0):
-    """Links a server member to a PokeBattler ID."""
+    """Lie un membre du serveur à un ID PokeBattler."""
     if not pbid:
         await ctx.send(_('Pokebattler ID cleared!'))
         try:
@@ -1554,7 +1554,7 @@ async def pokebattler(ctx, pbid: int = 0):
 @Meowth.group(name='get', case_insensitive=True)
 @commands.has_permissions(manage_guild=True)
 async def _get(ctx):
-    """Get a setting value"""
+    """Obtenir une valeur de paramètre"""
     if ctx.invoked_subcommand == None:
         raise commands.BadArgument()
         return
@@ -1562,14 +1562,14 @@ async def _get(ctx):
 @_get.command()
 @commands.has_permissions(manage_guild=True)
 async def prefix(ctx):
-    """Get server prefix."""
+    """Obtenir le préfixe du serveur."""
     prefix = _get_prefix(Meowth, ctx.message)
     await ctx.channel.send(_('Prefix for this server is: `{}`').format(prefix))
 
 @_get.command()
 @commands.has_permissions(manage_guild=True)
 async def perms(ctx, channel_id = None):
-    """Show Meowth's permissions for the guild and channel."""
+    """Afficher les autorisations de Miaoussier pour la guilde et la chaîne."""
     channel = discord.utils.get(ctx.bot.get_all_channels(), id=channel_id)
     guild = channel.guild if channel else ctx.guild
     channel = channel or ctx.channel
@@ -1632,9 +1632,9 @@ async def perms(ctx, channel_id = None):
 @Meowth.command()
 @commands.has_permissions(manage_guild=True)
 async def welcome(ctx, user: discord.Member=None):
-    """Test welcome on yourself or mentioned member.
+    """Test de bienvenue sur vous-même ou membre mentionné.
 
-    Usage: !welcome [@member]"""
+     Utilisation:!welcome [@member]"""
     if (not user):
         user = ctx.author
     await on_member_join(user)
@@ -1642,10 +1642,10 @@ async def welcome(ctx, user: discord.Member=None):
 @Meowth.command(hidden=True)
 @commands.has_permissions(manage_guild=True)
 async def outputlog(ctx):
-    """Get current Meowth log.
+    """Obtenez le journal Miaou actuel.
 
-    Usage: !outputlog
-    Output is a link to hastebin."""
+     Utilisation:!outputlog
+     La sortie est un lien vers hastebin."""
     with open(os.path.join('logs', 'meowth.log'), 'r', encoding='latin-1', errors='replace') as logfile:
         logdata = logfile.read()
     await ctx.channel.send(hastebin.post(logdata))
@@ -1653,10 +1653,10 @@ async def outputlog(ctx):
 @Meowth.command(aliases=['say'])
 @commands.has_permissions(manage_guild=True)
 async def announce(ctx, *, announce=None):
-    """Repeats your message in an embed from Meowth.
+    """Répète votre message dans un embed de Meowth.
 
-    Usage: !announce [announcement]
-    If the announcement isn't added at the same time as the command, Meowth will wait 3 minutes for a followup message containing the announcement."""
+     Utilisation:!announce [annonce]
+     Si l'annonce n'est pas ajoutée en même temps que la commande, Miaouss attendra 3 minutes pour un message de suivi contenant l'annonce."""
     message = ctx.message
     channel = message.channel
     guild = message.guild
@@ -1764,13 +1764,13 @@ async def announce(ctx, *, announce=None):
 @Meowth.group(case_insensitive=True, invoke_without_command=True)
 @commands.has_permissions(manage_guild=True)
 async def configure(ctx, *, configlist: str=""):
-    """Meowth Configuration
+    """Configuration de Meowth
 
-    Usage: !configure [list]
-    Meowth will DM you instructions on how to configure Meowth for your server.
-    If it is not your first time configuring, you can choose a section to jump to.
-    You can also include a comma separated [list] of sections from the following:
-    all, team, welcome, raid, exraid, invite, counters, wild, research, want, archive, timezone"""
+     Utilisation:!configure [list]
+     Meowth vous indiquera comment configurer Meowth pour votre serveur.
+     Si ce n'est pas la première fois que vous configurez, vous pouvez choisir une section à laquelle vous souhaitez accéder.
+     Vous pouvez également inclure une [liste] de sections séparées par des virgules parmi les suivantes:
+     tous, équipe, bienvenue, raid, effrayer, inviter, compteurs, sauvage, recherche, vouloir, archive, fuseau horaire"""
     await _configure(ctx, configlist)
 
 async def _configure(ctx, configlist):
@@ -1897,7 +1897,7 @@ async def _configure(ctx, configlist):
 
 @configure.command(name='all')
 async def configure_all(ctx):
-    """All settings"""
+    """Tous les paramètres"""
     await _configure(ctx, "all")
 
 @configure.command()
@@ -3217,10 +3217,10 @@ async def _configure_settings(ctx):
 @Meowth.command()
 @checks.is_owner()
 async def reload_json(ctx):
-    """Reloads the JSON files for the server
+    """Recharge les fichiers JSON pour le serveur
 
-    Usage: !reload_json
-    Useful to avoid a full restart if boss list changed"""
+     Utilisation:!reload_json
+     Utile pour éviter un redémarrage complet si la liste des boss a été modifiée"""
     load_config()
     await ctx.message.add_reaction('☑')
 
@@ -3354,10 +3354,10 @@ async def reset_board(ctx, *, user=None, type=None):
 @commands.has_permissions(manage_channels=True)
 @checks.raidchannel()
 async def changeraid(ctx, newraid):
-    """Changes raid boss.
+    """Change le boss du raid.
 
-    Usage: !changeraid <new pokemon or level>
-    Only usable by admins."""
+     Utilisation:!changeraid <nouveau pokemon ou niveau>
+     Seulement utilisable par les administrateurs."""
     message = ctx.message
     guild = message.guild
     channel = message.channel
@@ -3423,10 +3423,10 @@ async def changeraid(ctx, newraid):
 @commands.has_permissions(manage_channels=True)
 @checks.raidchannel()
 async def clearstatus(ctx):
-    """Clears raid channel status lists.
+    """Efface les listes d'état des raids de raid.
 
-    Usage: !clearstatus
-    Only usable by admins."""
+     Utilisation:!clearstatus
+     Seulement utilisable par les administrateurs."""
     msg = _("Are you sure you want to clear all status for this raid? Everybody will have to RSVP again. If you are wanting to clear one user's status, use `!setstatus <user> cancel`")
     question = await ctx.channel.send(msg)
     try:
@@ -3451,11 +3451,11 @@ async def clearstatus(ctx):
 @commands.has_permissions(manage_channels=True)
 @checks.raidchannel()
 async def setstatus(ctx, member: discord.Member, status,*, status_counts: str = ''):
-    """Changes raid channel status lists.
+    """Modifie les listes d'état des canaux de raid.
 
-    Usage: !setstatus <user> <status> [count]
-    User can be a mention or ID number. Status can be maybeinterested/i, coming/c, here/h, or cancel/x
-    Only usable by admins."""
+     Utilisation:!setstatus <utilisateur> <statut> [nombre]
+     L'utilisateur peut être une mention ou un numéro d'identification. Le statut peut être interested/i, coming/c, here/h, or cancel/x
+     Seulement utilisable par les administrateurs."""
     valid_status_list = ['interested', 'i', 'maybe', 'coming', 'c', 'here', 'h', 'cancel','x']
     if status not in valid_status_list:
         await ctx.message.channel.send(_("Meowth! {status} is not a valid status!").format(status=status))
@@ -3467,9 +3467,9 @@ async def setstatus(ctx, member: discord.Member, status,*, status_counts: str = 
 @Meowth.command()
 @commands.has_permissions(manage_guild=True)
 async def cleanroles(ctx):
-    """Removes all 0 member pokemon roles.
+    """Supprime tous les rôles pokemon de 0 membre.
 
-    Usage: !cleanroles"""
+     Utilisation:!cleanroles"""
     cleancount = 0
     for role in copy.copy(ctx.guild.roles):
         if role.members == [] and role.name in pkmn_info['pokemon_list']:
@@ -3481,9 +3481,9 @@ async def cleanroles(ctx):
 @Meowth.command()
 @checks.allowarchive()
 async def archive(ctx):
-    """Marks a raid channel for archival.
+    """Marque un canal de raid pour l'archivage.
 
-    Usage: !archive"""
+     Utilisation:!archive"""
     message = ctx.message
     channel = message.channel
     await ctx.message.delete()
@@ -3567,10 +3567,10 @@ async def about(ctx):
 @Meowth.command()
 @checks.allowteam()
 async def team(ctx,*,content):
-    """Set your team role.
+    """Définissez votre rôle d'équipe.
 
-    Usage: !team <team name>
-    The team roles have to be created manually beforehand by the server administrator."""
+     Utilisation:!team <nom de l'équipe>
+     Les rôles d'équipe doivent être préalablement créés manuellement par l'administrateur du serveur."""
     guild = ctx.guild
     toprole = guild.me.top_role.name
     position = guild.me.top_role.position
@@ -3643,9 +3643,9 @@ async def team(ctx,*,content):
 
 @Meowth.command(hidden=True)
 async def profile(ctx, user: discord.Member = None):
-    """Displays a user's social and reporting profile.
+    """Affiche le profil social et de rapport d'un utilisateur.
 
-    Usage:!profile [user]"""
+     Utilisation:!profile [utilisateur]"""
     if not user:
         user = ctx.message.author
     silph = guild_dict[ctx.guild.id]['trainers'].setdefault(user.id,{}).get('silphid',None)
@@ -3665,10 +3665,10 @@ async def profile(ctx, user: discord.Member = None):
 
 @Meowth.command()
 async def leaderboard(ctx, type="total"):
-    """Displays the top ten reporters of a server.
+    """Affiche les dix premiers journalistes d'un serveur.
 
-    Usage: !leaderboard [type]
-    Accepted types: raids, eggs, exraids, wilds, research"""
+     Utilisation:!leaderboard [type]
+     Types acceptés: raids, oeufs, exraids, wilds, recherche"""
     trainers = copy.deepcopy(guild_dict[ctx.guild.id]['trainers'])
     leaderboard = []
     rank = 1
@@ -3736,15 +3736,15 @@ Notifications
 @Meowth.command()
 @checks.allowwant()
 async def want(ctx,*,pokemon):
-    """Add a Pokemon to your wanted list.
+    """Ajouter un Pokémon à votre liste de recherche.
 
-    Usage: !want <species>
-    Meowth will mention you if anyone reports seeing
-    this species in their !wild or !raid command."""
+     Utilisation:!want <espèces>
+     Miaouss vous mentionnera si quelqu'un rapporte avoir vu
+     cette espèce dans leur commande!wild ou!raid."""
 
-    """Behind the scenes, Meowth tracks user !wants by
-    creating a server role for the Pokemon species, and
-    assigning it to the user."""
+    """Dans les coulisses, Meowth suit l'utilisateur!
+     créer un rôle de serveur pour l'espèce Pokemon, et
+     l'assigner à l'utilisateur."""
     message = ctx.message
     guild = message.guild
     channel = message.channel
@@ -3844,13 +3844,13 @@ async def want(ctx,*,pokemon):
 @Meowth.group(case_insensitive=True, invoke_without_command=True)
 @checks.allowwant()
 async def unwant(ctx,*,pokemon):
-    """Remove a Pokemon from your wanted list.
+    """Retirer un Pokemon de votre liste de recherche.
 
-    Usage: !unwant <species>
-    You will no longer be notified of reports about this Pokemon."""
+     Utilisation:!unwant <espèces>
+     Vous ne serez plus informé des rapports sur ce Pokémon."""
 
-    """Behind the scenes, Meowth removes the user from
-    the server role for the Pokemon species."""
+    """Dans les coulisses, Meowth retire l'utilisateur de
+     le rôle de serveur pour les espèces Pokémon."""
     message = ctx.message
     guild = message.guild
     channel = message.channel
@@ -3888,13 +3888,13 @@ async def unwant(ctx,*,pokemon):
 @unwant.command(name='all')
 @checks.allowwant()
 async def unwant_all(ctx):
-    """Remove all Pokemon from your wanted list.
+    """Retirez tous les Pokemon de votre liste de recherche.
 
-    Usage: !unwant all
-    All Pokemon roles are removed."""
+     Utilisation:!unwant all
+     Tous les rôles Pokemon sont supprimés."""
 
-    """Behind the scenes, Meowth removes the user from
-    the server role for the Pokemon species."""
+    """Dans les coulisses, Meowth supprime l'utilisateur du
+    rôle de serveur pour les espèces Pokémon."""
     message = ctx.message
     guild = message.guild
     channel = message.channel
@@ -3922,11 +3922,11 @@ Reporting
 @Meowth.command(aliases=['w'])
 @checks.allowwildreport()
 async def wild(ctx,pokemon,*,location):
-    """Report a wild Pokemon spawn location.
+    """Signalez un emplacement de spawn Pokemon sauvage.
 
-    Usage: !wild <species> <location>
-    Meowth will insert the details (really just everything after the species name) into a
-    Google maps link and post the link to the same channel the report was made in."""
+     Utilisation:!wild <species> <location>
+     Miaoussier va insérer les détails (vraiment juste tout après le nom de l'espèce) dans un
+     Lien Google Maps et publiez le lien vers le même canal que le rapport a été créé."""
     content = f"{pokemon} {location}"
     await _wild(ctx.message, content)
 
@@ -3998,14 +3998,14 @@ async def _wild(message, content):
 @Meowth.command(aliases=['r', 're', 'egg', 'regg', 'raidegg'])
 @checks.allowraidreport()
 async def raid(ctx,pokemon,*,location:commands.clean_content(fix_channel_mentions=True)="", weather=None, timer=None):
-    """Report an ongoing raid or a raid egg.
+    """Signaler un raid en cours ou un œuf de raid.
 
-    Usage: !raid <species/level> <location> [weather] [minutes]
-    Meowth will insert <location> into a
-    Google maps link and post the link to the same channel the report was made in.
-    Meowth's message will also include the type weaknesses of the boss.
+     Utilisation:!raid <espèce / niveau> <lieu> [météo] [minutes]
+     Meowth va insérer <location> dans un
+     Lien Google Maps et publiez le lien vers le même canal que le rapport a été créé.
+     Le message de Miaouss inclura également les faiblesses de type du boss.
 
-    Finally, Meowth will create a separate channel for the raid report, for the purposes of organizing the raid."""
+     Enfin, Meowth va créer un canal séparé pour le rapport de raid, dans le but d'organiser le raid."""
     content = f"{pokemon} {location}"
     if pokemon.isdigit():
         new_channel = await _raidegg(ctx.message, content)
@@ -4599,14 +4599,14 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
 @Meowth.command(aliases=['ex'])
 @checks.allowexraidreport()
 async def exraid(ctx, *,location:commands.clean_content(fix_channel_mentions=True)=""):
-    """Report an upcoming EX raid.
+    """Signaler un raid EX à venir.
 
-    Usage: !exraid <location>
-    Meowth will insert the details (really just everything after the species name) into a
-    Google maps link and post the link to the same channel the report was made in.
-    Meowth's message will also include the type weaknesses of the boss.
+     Utilisation:!exraid <emplacement>
+     Miaoussier va insérer les détails (vraiment juste tout après le nom de l'espèce) dans un
+     Lien Google Maps et publiez le lien vers le même canal que le rapport a été créé.
+     Le message de Miaouss inclura également les faiblesses de type du boss.
 
-    Finally, Meowth will create a separate channel for the raid report, for the purposes of organizing the raid."""
+     Enfin, Meowth va créer un canal séparé pour le rapport de raid, dans le but d'organiser le raid."""
     await _exraid(ctx, location)
 
 async def _exraid(ctx, location):
@@ -4719,9 +4719,9 @@ async def _exraid(ctx, location):
 @Meowth.command()
 @checks.allowinvite()
 async def invite(ctx):
-    """Join an EX Raid.
+    """Rejoignez un raid EX.
 
-    Usage: !invite"""
+     Utilisation:!invite"""
     await _invite(ctx)
 
 async def _invite(ctx):
@@ -4780,13 +4780,13 @@ async def _invite(ctx):
 @Meowth.command(aliases=['res'])
 @checks.allowresearchreport()
 async def research(ctx, *, details = None):
-    """Report Field research
-    Guided report method with just !research. If you supply arguments in one
-    line, avoid commas in anything but your separations between pokestop,
-    quest, reward. Order matters if you supply arguments. If a pokemon name
-    is included in reward, a @mention will be used if role exists.
+    """Rapport de recherche sur le terrain
+     Méthode de rapport guidé avec juste! Si vous fournissez des arguments dans un
+     évitez les virgules, sauf vos séparations entre pokestop,
+     quête, récompense. L'ordre compte si vous fournissez des arguments. Si un nom de pokemon
+     est inclus dans la récompense, un @mention sera utilisé si le rôle existe.
 
-    Usage: !research [pokestop name [optional URL], quest, reward]"""
+     Utilisation:!research [nom du pokestop [URL optionnelle], quête, récompense]"""
     message = ctx.message
     channel = message.channel
     author = message.author
@@ -4907,13 +4907,13 @@ async def research(ctx, *, details = None):
 @Meowth.command(aliases=['event'])
 @checks.allowmeetupreport()
 async def meetup(ctx, *,location:commands.clean_content(fix_channel_mentions=True)=""):
-    """Report an upcoming event.
+    """Signaler un événement à venir
 
-    Usage: !meetup <location>
-    Meowth will insert the details (really just everything after the species name) into a
-    Google maps link and post the link to the same channel the report was made in.
+     Utilisation:!meetup <emplacement>
+     Miaoussier va insérer les détails (vraiment juste tout après le nom de l'espèce) dans un
+     Lien Google Maps et publiez le lien vers le même canal que le rapport a été créé.
 
-    Finally, Meowth will create a separate channel for the report, for the purposes of organizing the event."""
+     Enfin, Meowth créera un canal séparé pour le rapport, dans le but d'organiser l'événement."""
     await _meetup(ctx, location)
 
 async def _meetup(ctx, location):
@@ -5015,11 +5015,11 @@ async def print_raid_timer(channel):
 @Meowth.command()
 @checks.raidchannel()
 async def timerset(ctx, *,timer):
-    """Set the remaining duration on a raid.
+    """Définissez la durée restante sur un raid.
 
-    Usage: !timerset <minutes>
-    Works only in raid channels, can be set or overridden by anyone.
-    Meowth displays the end time in HH:MM local time."""
+     Utilisation:!timerset <minutes>
+     Fonctionne uniquement dans les canaux de raid, peut être défini ou remplacé par n'importe qui.
+     Miaouss affiche l'heure de fin en HH: MM heure locale."""
     message = ctx.message
     channel = message.channel
     guild = message.guild
@@ -5167,10 +5167,10 @@ async def _timerset(raidchannel, exptime):
 @Meowth.command()
 @checks.raidchannel()
 async def timer(ctx):
-    """Have Meowth resend the expire time message for a raid.
+    """Avoir Meowth renvoyer le message d'expiration d'un raid.
 
-    Usage: !timer
-    The expiry time should have been previously set with !timerset."""
+     Utilisation:!timer
+     L'heure d'expiration doit avoir été préalablement définie avec !timerset."""
     timerstr = _('Meowth!')
     timerstr += await print_raid_timer(ctx.channel)
     await ctx.channel.send(timerstr)
@@ -5178,13 +5178,13 @@ async def timer(ctx):
 @Meowth.command()
 @checks.activechannel()
 async def starttime(ctx,*,start_time=""):
-    """Set a time for a group to start a raid
+    """Définir une heure pour un groupe pour lancer un raid
 
-    Usage: !starttime [HH:MM AM/PM]
-    (You can also omit AM/PM and use 24-hour time!)
-    Works only in raid channels. Sends a message and sets a group start time that
-    can be seen using !starttime (without a time). One start time is allowed at
-    a time and is visibile in !list output. Cleared with !starting."""
+     Utilisation:!starttime [HH:MM AM/PM]
+     (Vous pouvez également omettre AM/PM et utiliser l'heure de 24 heures!)
+     Fonctionne uniquement dans les canaux de raid. Envoie un message et définit une heure de début de groupe
+     peut être vu en utilisant! starttime (sans temps). Une heure de début est autorisée à
+     une fois et est visible dans! liste de sortie. Effacé avec !starting."""
     message = ctx.message
     guild = message.guild
     channel = message.channel
@@ -5297,10 +5297,10 @@ async def starttime(ctx,*,start_time=""):
 @Meowth.group(case_insensitive=True)
 @checks.activechannel()
 async def location(ctx):
-    """Get raid location.
+    """Obtenez l'emplacement de raid.
 
-    Usage: !location
-    Works only in raid channels. Gives the raid location link."""
+     Utilisation:!location
+     Fonctionne uniquement dans les canaux de raid. Donne le lien d'emplacement de raid."""
     if ctx.invoked_subcommand == None:
         message = ctx.message
         guild = message.guild
@@ -5323,10 +5323,10 @@ async def location(ctx):
 @location.command()
 @checks.activechannel()
 async def new(ctx,*,content):
-    """Change raid location.
+    """Changer l'emplacement du raid.
 
-    Usage: !location new <new address>
-    Works only in raid channels. Changes the google map links."""
+     Utilisation:!location new <nouvelle adresse>
+     Fonctionne uniquement dans les canaux de raid. Change les liens de Google Maps."""
     message = ctx.message
     location_split = content.lower().split()
     if len(location_split) < 1:
@@ -5381,10 +5381,10 @@ async def new(ctx,*,content):
 
 @Meowth.command()
 async def recover(ctx):
-    """Recover a raid channel if it is no longer responding to commands
+    """Récupérer un canal RAID s'il ne répond plus aux commandes
 
-    Usage: !recover
-    Only necessary after a crash."""
+     Utilisation:!recover
+     Seulement nécessaire après un accident."""
     if (checks.check_wantchannel(ctx) or checks.check_citychannel(ctx) or checks.check_raidchannel(ctx) or checks.check_eggchannel(ctx) or checks.check_exraidchannel(ctx)):
         await ctx.channel.send(_("Meowth! I can't recover this channel because I know about it already!"))
     else:
@@ -5576,11 +5576,11 @@ async def recover(ctx):
 @Meowth.command()
 @checks.activechannel()
 async def duplicate(ctx):
-    """A command to report a raid channel as a duplicate.
+    """Une commande pour signaler un canal RAID en tant que doublon.
 
-    Usage: !duplicate
-    Works only in raid channels. When three users report a channel as a duplicate,
-    Meowth deactivates the channel and marks it for deletion."""
+     Utilisation:!duplicate
+     Fonctionne uniquement dans les canaux de raid. Lorsque trois utilisateurs signalent un canal en double,
+     Miaou désactive le canal et le marque pour suppression."""
     channel = ctx.channel
     author = ctx.author
     guild = ctx.guild
@@ -5665,12 +5665,12 @@ async def duplicate(ctx):
 
 @Meowth.command()
 async def counters(ctx, *, args = None):
-    """Simulate a Raid battle with Pokebattler.
+    """Simulez une bataille de Raid avec Pokebattler.
 
-    Usage: !counters [pokemon] [weather] [user]
-    See !help weather for acceptable values for weather.
-    If [user] is a valid Pokebattler user id, Meowth will simulate the Raid with that user's Pokebox.
-    Uses current boss and weather by default if available.
+     Utilisation:!counters [pokemon] [météo] [utilisateur]
+     Voir! Aidez le temps pour des valeurs acceptables pour la météo.
+     Si [utilisateur] est un identifiant d'utilisateur Pokebattler valide, Miaouss simulera le Raid avec la Pokebox de cet utilisateur.
+     Utilise le boss actuel et la météo par défaut si disponible.
     """
     rgx = '[^a-zA-Z0-9]'
     channel = ctx.channel
@@ -5898,10 +5898,10 @@ async def _get_generic_counters(guild, pkmn, weather=None):
 @Meowth.command()
 @checks.activechannel()
 async def weather(ctx, *, weather):
-    """Sets the weather for the raid.
-    Usage: !weather <weather>
-    Only usable in raid channels.
-    Acceptable options: none, extreme, clear, rainy, partlycloudy, cloudy, windy, snow, fog"""
+    """Définit la météo pour le raid.
+    Utilisation: !weather <weather>
+    Uniquement utilisable dans les canaux raid.
+    Acceptable options: aucun, tempête, dégagé, ensoleillé, pluvieux, couvert, nuageux, venteux, neige, brouillard"""
     weather_list = [_('none'), _('extreme'), _('clear'), _('sunny'), _('rainy'),
                     _('partlycloudy'), _('cloudy'), _('windy'), _('snow'), _('fog')]
     if weather.lower() not in weather_list:
@@ -5929,14 +5929,14 @@ Status Management
 @Meowth.command(aliases=['i', 'maybe'])
 @checks.activechannel()
 async def interested(ctx, *, teamcounts: str=None):
-    """Indicate you are interested in the raid.
+    """Indiquez que vous êtes intéressé par le raid.
 
-    Usage: !interested [count] [party]
-    Works only in raid channels. If count is omitted, assumes you are a group of 1.
-    Otherwise, this command expects at least one word in your message to be a number,
-    and will assume you are a group with that many people.
+     Utilisation:!interest [count] [party]
+     Fonctionne uniquement dans les canaux de raid. Si count est omis, suppose que vous êtes un groupe de 1.
+     Sinon, cette commande s'attend à ce qu'au moins un mot de votre message soit un nombre,
+     et supposera que vous êtes un groupe avec autant de gens.
 
-    Party is also optional. Format is #m #v #i #u to tell your party's teams."""
+     La participation est également facultative. Le format est #m #v #i #u pour informer les équipes de votre groupe."""
     trainer_dict = guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict']
     entered_interest = trainer_dict.get(ctx.author.id, {}).get('interest', [])
     egglevel = guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['egglevel']
@@ -6029,16 +6029,16 @@ async def _maybe(channel, author, count, party, entered_interest=None):
 @Meowth.command(aliases=['c'])
 @checks.activechannel()
 async def coming(ctx, *, teamcounts: str=None):
-    """Indicate you are on the way to a raid.
+    """Indiquez que vous êtes sur le chemin d'un raid.
 
-    Usage: !coming [count] [party]
-    Works only in raid channels. If count is omitted, checks for previous !maybe
-    command and takes the count from that. If it finds none, assumes you are a group
-    of 1.
-    Otherwise, this command expects at least one word in your message to be a number,
-    and will assume you are a group with that many people.
+     Utilisation:!coming [count] [party]
+     Fonctionne uniquement dans les canaux de raid. Si count est omis, vérifie s'il y a déjà eu!
+     commande et prend le compte de cela. S'il n'en trouve aucun, suppose que vous êtes un groupe
+     de 1.
+     Sinon, cette commande s'attend à ce qu'au moins un mot de votre message soit un nombre,
+     et supposera que vous êtes un groupe avec autant de gens.
 
-    Party is also optional. Format is #m #v #i #u to tell your party's teams."""
+     La participation est également facultative. Le format est #m #v #i #u pour informer les équipes de votre groupe."""
     trainer_dict = guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict']
     rgx = '[^a-zA-Z0-9]'
     entered_interest = trainer_dict.get(ctx.author.id, {}).get('interest', [])
@@ -6136,16 +6136,16 @@ async def _coming(channel, author, count, party, entered_interest=None):
 @Meowth.command(aliases=['h'])
 @checks.activechannel()
 async def here(ctx, *, teamcounts: str=None):
-    """Indicate you have arrived at the raid.
+    """Indiquez que vous êtes arrivé au raid.
 
-    Usage: !here [count] [party]
-    Works only in raid channels. If message is omitted, and
-    you have previously issued !coming, then preserves the count
-    from that command. Otherwise, assumes you are a group of 1.
-    Otherwise, this command expects at least one word in your message to be a number,
-    and will assume you are a group with that many people.
+     Utilisation:!here [compte] [fête]
+     Fonctionne uniquement dans les canaux de raid. Si le message est omis, et
+     vous avez déjà émis! à venir, puis préserve le compte
+     de cette commande. Sinon, suppose que vous êtes un groupe de 1.
+     Sinon, cette commande s'attend à ce qu'au moins un mot de votre message soit un nombre,
+     et supposera que vous êtes un groupe avec autant de gens.
 
-    Party is also optional. Format is #m #v #i #u to tell your party's teams."""
+     La participation est également facultative. Le format est #m #v #i #u pour informer les équipes de votre groupe."""
     trainer_dict = guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict']
     rgx = '[^a-zA-Z0-9]'
     entered_interest = trainer_dict.get(ctx.author.id, {}).get('interest', [])
@@ -6408,14 +6408,14 @@ async def _edit_party(channel, author=None):
 @Meowth.command(aliases=['l'])
 @checks.activeraidchannel()
 async def lobby(ctx, *, count: str=None):
-    """Indicate you are entering the raid lobby.
+    """Indiquez que vous entrez dans le lobby du raid.
 
-    Usage: !lobby [message]
-    Works only in raid channels. If message is omitted, and
-    you have previously issued !coming, then preserves the count
-    from that command. Otherwise, assumes you are a group of 1.
-    Otherwise, this command expects at least one word in your message to be a number,
-    and will assume you are a group with that many people."""
+     Utilisation:!lobby [message]
+     Fonctionne uniquement dans les canaux de raid. Si le message est omis, et
+     vous avez déjà émis! à venir, puis préserve le compte
+     de cette commande. Sinon, suppose que vous êtes un groupe de 1.
+     Sinon, cette commande s'attend à ce qu'au moins un mot de votre message soit un nombre,
+     et supposera que vous êtes un groupe avec autant de gens."""
     try:
         if guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['type'] == 'egg':
             if guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['pokemon'] == '':
@@ -6456,11 +6456,11 @@ async def _lobby(message, count):
 @Meowth.command(aliases=['x'])
 @checks.raidchannel()
 async def cancel(ctx):
-    """Indicate you are no longer interested in a raid.
+    """Indiquez que vous n'êtes plus intéressé par un raid.
 
-    Usage: !cancel
-    Works only in raid channels. Removes you and your party
-    from the list of trainers who are "otw" or "here"."""
+     Utilisation:!cancel
+     Fonctionne uniquement dans les canaux de raid. Supprime vous et votre fête
+     de la liste des formateurs qui sont "otw" ou "here"."""
     await _cancel(ctx.channel, ctx.author)
 
 async def _cancel(channel, author):
@@ -6526,11 +6526,11 @@ async def lobby_countdown(ctx):
 @Meowth.command()
 @checks.activeraidchannel()
 async def starting(ctx, team: str = ''):
-    """Signal that a raid is starting.
+    """Signaler qu'un raid commence.
 
-    Usage: !starting [team]
-    Works only in raid channels. Sends a message and clears the waiting list. Users who are waiting
-    for a second group must reannounce with the :here: emoji or !here."""
+     Utilisation:!starting [équipe]
+     Fonctionne uniquement dans les canaux de raid. Envoie un message et efface la liste d'attente. Les utilisateurs qui attendent
+     pour un deuxième groupe doit se relire avec le :here: emoji or !here."""
     ctx_startinglist = []
     id_startinglist = []
     name_startinglist = []
@@ -6600,10 +6600,10 @@ async def starting(ctx, team: str = ''):
 @Meowth.command()
 @checks.activeraidchannel()
 async def backout(ctx):
-    """Request players in lobby to backout
+    """Demander aux joueurs du lobby de se retirer
 
-    Usage: !backout
-    Will alert all trainers in the lobby that a backout is requested."""
+     Utilisation:!backout
+     Alertera tous les dresseurs dans le lobby qu'un backout est demandé."""
     message = ctx.message
     channel = message.channel
     author = message.author
@@ -6668,11 +6668,11 @@ List Commands
 
 @Meowth.group(name="list", aliases=['lists'], case_insensitive=True)
 async def _list(ctx):
-    """Lists all raid info for the current channel.
+    """Répertorie toutes les informations de raid pour le canal actuel.
 
-    Usage: !list
-    Works only in raid or city channels. Calls the interested, waiting, and here lists. Also prints
-    the raid timer. In city channels, lists all active raids."""
+     Utilisation:!list
+     Fonctionne uniquement dans les raids ou les canaux de la ville. Appelle les listes intéressées, en attente et ici. Imprime également
+     le minuteur du raid. Dans les canaux de la ville, liste tous les raids actifs."""
     if ctx.invoked_subcommand == None:
         listmsg = _('**Meowth!** ')
         guild = ctx.guild
@@ -6892,10 +6892,10 @@ async def _interest(ctx, tag=False, team=False):
 @_list.command()
 @checks.activechannel()
 async def coming(ctx, tags: str = ''):
-    """Lists the number and users who are coming to a raid.
+    """Liste le nombre et les utilisateurs qui viennent à un raid.
 
-    Usage: !list coming
-    Works only in raid channels."""
+     Utilisation:!list coming
+     Fonctionne uniquement dans les canaux de raid."""
     listmsg = _('**Meowth!**')
     if tags and tags.lower() == "tags" or tags.lower() == "tag":
         tags = True
@@ -6939,10 +6939,10 @@ async def _otw(ctx, tag=False, team=False):
 @_list.command()
 @checks.activechannel()
 async def here(ctx, tags: str = ''):
-    """List the number and users who are present at a raid.
+    """Liste le nombre et les utilisateurs qui sont présents lors d'un raid.
 
-    Usage: !list here
-    Works only in raid channels."""
+     Utilisation:!list here
+     Fonctionne uniquement dans les canaux de raid."""
     listmsg = _('**Meowth!**')
     if tags and tags.lower() == "tags" or tags.lower() == "tag":
         tags = True
@@ -6989,10 +6989,10 @@ async def _waiting(ctx, tag=False, team=False):
 @_list.command()
 @checks.activeraidchannel()
 async def lobby(ctx, tag=False):
-    """List the number and users who are in the raid lobby.
+    """Liste le nombre et les utilisateurs qui sont dans le lobby RAID.
 
-    Usage: !list lobby
-    Works only in raid channels."""
+     Utilisation:!list lobby
+     Fonctionne uniquement dans les canaux de raid."""
     listmsg = _('**Meowth!**')
     listmsg += await _lobbylist(ctx)
     await ctx.channel.send(listmsg)
@@ -7036,10 +7036,10 @@ async def _lobbylist(ctx, tag=False, team=False):
 @_list.command()
 @checks.activeraidchannel()
 async def bosses(ctx):
-    """List each possible boss and the number of users that have RSVP'd for it.
+    """Dressez la liste de chaque boss possible et du nombre d'utilisateurs qui ont répondu à cet appel.
 
-    Usage: !list bosses
-    Works only in raid channels."""
+     Utilisation:!list bosses
+     Fonctionne uniquement dans les canaux de raid."""
     listmsg = _('**Meowth!**')
     listmsg += await _bosslist(ctx)
     await ctx.channel.send(listmsg)
@@ -7083,10 +7083,10 @@ async def _bosslist(ctx):
 @_list.command()
 @checks.activechannel()
 async def teams(ctx):
-    """List the teams for the users that have RSVP'd to a raid.
+    """Liste les équipes pour les utilisateurs qui ont RSVP'd à un raid.
 
-    Usage: !list teams
-    Works only in raid channels."""
+     Utilisation:!list teams
+     Fonctionne uniquement dans les canaux de raid."""
     listmsg = _('**Meowth!**')
     listmsg += await _teamlist(ctx)
     await ctx.channel.send(listmsg)
@@ -7127,10 +7127,10 @@ async def _teamlist(ctx):
 @_list.command()
 @checks.allowwant()
 async def wants(ctx):
-    """List the wants for the user
+    """Liste les désirs pour l'utilisateur
 
-    Usage: !list wants
-    Works only in the want channel."""
+     Utilisation:!list wants
+     Fonctionne uniquement dans le canal de recherche."""
     listmsg = _('**Meowth!**')
     listmsg += await _wantlist(ctx)
     await ctx.channel.send(listmsg)
@@ -7149,9 +7149,9 @@ async def _wantlist(ctx):
 @_list.command()
 @checks.allowresearchreport()
 async def research(ctx):
-    """List the quests for the channel
+    """Liste les quêtes pour la chaîne
 
-    Usage: !list research"""
+     Utilisation:!list research"""
     listmsg = _('**Meowth!**')
     listmsg += await _researchlist(ctx)
     await ctx.channel.send(embed=discord.Embed(colour=ctx.guild.me.colour, description=listmsg))
@@ -7185,9 +7185,9 @@ async def _researchlist(ctx):
 @_list.command()
 @checks.allowwildreport()
 async def wilds(ctx):
-    """List the wilds for the channel
+    """Liste les wilds pour la chaîne
 
-    Usage: !list wilds"""
+     Utilisation:!list wilds"""
     listmsg = _('**Meowth!**')
     listmsg += await _wildlist(ctx)
     await ctx.channel.send(embed=discord.Embed(colour=ctx.guild.me.colour, description=listmsg))

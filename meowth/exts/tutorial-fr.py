@@ -141,19 +141,19 @@ class Tutorial:
             return
 
         await tutorial_channel.send(
-            f"This server utilizes the **{prefix}raid** command to "
-            "report raids! When you use it, I will send a message "
-            "summarizing the report and create a text channel for "
+            f"Ce serveur utilise la commande **{prefix}raid** pour "
+            "signaler les raids! Quand vous l'utiliserez, j'enverrai un message "
+            "résumant le signalement et je créerai un canal de texte pour "
             "coordination. \n"
-            "The report must contain, in this order: The Pokemon (if an "
-            "active raid) or raid level (if an egg), and the location;\n"
-            "the report may optionally contain the weather (see "
-            f"**{prefix}help weather** for accepted options) and the "
-            "minutes remaining until hatch or expiry (at the end of the "
-            "report) \n\n"
-            "Try reporting a raid!\n"
-            f"Ex: `{prefix}raid magikarp local church cloudy 42`\n"
-            f"`{prefix}raid 3 local church sunny 27`")
+            "Le rapport doit contenir, dans cet ordre: Le Pokémon (si un "
+            "raid actif) ou niveau de raid (si un oeuf), et l'emplacement;\n"
+            "le rapport peut éventuellement contenir le temps (voir "
+            f"**{prefix}help weather** pour les options acceptées) et les "
+            "minutes restantes jusqu'à l'éclosion ou l'expiration (à la fin du "
+            "signalement) \n\n"
+            "Essayez de signaler un raid!\n"
+            f"Ex: `{prefix}raid magicarpe local church ensoleillé 42`\n"
+            f"`{prefix}raid 3 local church ensoleillé 27`")
 
         try:
             while True:
@@ -168,14 +168,13 @@ class Tutorial:
 
                 # acknowledge failure and redo wait_for
                 await tutorial_channel.send(
-                    "Doesn't look like it worked. Make sure you're not "
-                    "missing any arguments from your raid command and "
-                    "try again.")
+                    "Ça n'a pas l'air de fonctionner. Assurez-vous de n'avoir oublié "
+                    "aucun parametres à votre commande !raid et réessayez.")
 
             # acknowledge and redirect to new raid channel
             await tutorial_channel.send(
-                "Great job! Let's head into the new raid channel you just "
-                f"created: {raid_channel.mention}")
+                "Bon boulot! Retrouvons-nous dans la chaine que vous venez de "
+                f"créer: {raid_channel.mention}")
             await asyncio.sleep(1)
 
         # if no response for 5 minutes, close tutorial
@@ -188,12 +187,12 @@ class Tutorial:
             ctx.prefix, ctx.bot.user.avatar_url)
 
         await raid_channel.send(
-            f"This is an example of a raid channel. Here is a list of "
-            "commands that can be used in here:", embed=helpembed)
+            f"Ceci est une chaine d'exepmle pour les Raid. Voici une liste "
+            "de commandes que vous pouvez utiliser ici:", embed=helpembed)
 
         await raid_channel.send(
-            f"Try expressing interest in this raid!\n\n"
-            f"Ex: `{prefix}interested 5 m3 i1 v1` would mean 5 trainers: "
+            f"Essayez de montrer votre intéret pour ce raid!\n\n"
+            f"Ex: `{prefix}interested 5 m3 i1 v1` Veut dire 5 dresseurs: "
             "3 Mystic, 1 Instinct, 1 Valor")
 
         # wait for interested status update
@@ -209,12 +208,12 @@ class Tutorial:
         # acknowledge and continue with pauses between
         await asyncio.sleep(1)
         await raid_channel.send(
-            f"Great job! To save time, you can also use **{prefix}i** "
-            f"as an alias for **{prefix}interested**.")
+            f"Super ! Pour aller plus vite, vous pouvez aussi utiliser **{prefix}i** "
+            f"c'est un alias pour la command **{prefix}interested**.")
 
         await asyncio.sleep(1)
         await raid_channel.send(
-            "Now try letting people know that you are on your way!\n\n"
+            "Maintenant, essayons d'informer les autres que vous arrivez!\n\n"
             f"Ex: `{prefix}coming`")
 
         # wait for coming status update
@@ -229,15 +228,15 @@ class Tutorial:
 
         # acknowledge and continue with pauses between
         await asyncio.sleep(1)
-        await raid_channel.send(
-            "Great! Note that if you have already specified your party "
-            "in a previous command, you do not have to again for the "
-            "current raid unless you are changing it. Also, "
-            f"**{prefix}c** is an alias for **{prefix}coming**.")
+        await raid_channel.send(  
+            "Parfait! Notez que si vous avez déjà spécifié votre participation "
+            "dans une commande précédente, vous n'avez pas à nouveau pour "
+            "le raid en cours à moins que vous l'ayez modifié. De même, "
+            f"**{prefix}c** est un alias pour **{prefix}coming**.")
 
         await asyncio.sleep(1)
         await raid_channel.send(
-            "Now try letting people know that you have arrived at the "
+            "Maintenant, essayez de faire savoir aux gens que vous êtes arrivé au "
             "raid!\n\n"
             f"Ex: `{prefix}here`")
 
@@ -254,7 +253,7 @@ class Tutorial:
         # acknowledge and continue with pauses between
         await asyncio.sleep(1)
         await raid_channel.send(
-            f"Good! Please note that **{prefix}h** is an alias for "
+            f"Good! Notez que  **{prefix}h** est un alias pour "
             f"**{prefix}here**")
 
         await asyncio.sleep(1)

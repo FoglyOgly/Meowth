@@ -175,3 +175,18 @@ async def get_raid_help(prefix, avatar, user=None):
     if not user:
         return helpembed
     await user.send(embed=helpembed)
+
+def get_number(bot, pkm_name):
+    try:
+        number = bot.pkmn_info['pokemon_list'].index(pkm_name) + 1
+    except ValueError:
+        number = None
+    return number
+
+def get_name(bot, pkmn_number):
+    pkmn_number = int(pkmn_number) - 1
+    try:
+        name = bot.pkmn_info['pokemon_list'][pkmn_number]
+    except IndexError:
+        name = None
+    return name

@@ -3227,7 +3227,7 @@ async def reload_json(ctx):
 @Meowth.command()
 @checks.is_dev_or_owner()
 async def raid_json(ctx, level=None, *, newlist=None):
-    'Edits or displays raid_info.json\n\n    Usage: !raid_json [level] [list]'
+    'Modifie ou affiche raid_info.json\n\n    Utilisation: !raid_json [level] [list]'
     msg = ''
     if (not level) and (not newlist):
         for level in raid_info['raid_eggs']:
@@ -3500,7 +3500,7 @@ Miscellaneous
 
 @Meowth.command(name='uptime')
 async def cmd_uptime(ctx):
-    "Shows Meowth's uptime"
+    "Affiche le temps de fonctionnement de Meowth"
     guild = ctx.guild
     channel = ctx.channel
     embed_colour = guild.me.colour or discord.Colour.lighter_grey()
@@ -3532,7 +3532,7 @@ async def _uptime(bot):
 
 @Meowth.command()
 async def about(ctx):
-    'Shows info about Meowth'
+    'Affiche des infos sur Meowth'
     author_repo = 'https://github.com/FoglyOgly'
     author_name = 'FoglyOgly'
     bot_repo = author_repo + '/Meowth'

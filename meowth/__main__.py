@@ -6044,10 +6044,10 @@ async def interested(ctx, *, teamcounts: str=None):
     egglevel = guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['egglevel']
     if (not teamcounts):
         if ctx.author.id in trainer_dict:
-            bluecount = str(trainer_dict[ctx.author.id]['party']['mystic']) + 'm '
-            redcount = str(trainer_dict[ctx.author.id]['party']['valor']) + 'v '
-            yellowcount = str(trainer_dict[ctx.author.id]['party']['instinct']) + 'i '
-            unknowncount = str(trainer_dict[ctx.author.id]['party']['unknown']) + 'u '
+            bluecount = str(trainer_dict[ctx.author.id]['party']['mystic']) + _('m ')
+            redcount = str(trainer_dict[ctx.author.id]['party']['valor']) + _('v ')
+            yellowcount = str(trainer_dict[ctx.author.id]['party']['instinct']) + _('i ')
+            unknowncount = str(trainer_dict[ctx.author.id]['party']['unknown']) + _('u ')
             teamcounts = ((((str(trainer_dict[ctx.author.id]['count']) + ' ') + bluecount) + redcount) + yellowcount) + unknowncount
         else:
             teamcounts = '1'
@@ -6170,10 +6170,10 @@ async def coming(ctx, *, teamcounts: str=None):
     trainer_dict = guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict']
     if (not teamcounts):
         if ctx.author.id in trainer_dict:
-            bluecount = str(trainer_dict[ctx.author.id]['party']['mystic']) + 'm '
-            redcount = str(trainer_dict[ctx.author.id]['party']['valor']) + 'v '
-            yellowcount = str(trainer_dict[ctx.author.id]['party']['instinct']) + 'i '
-            unknowncount = str(trainer_dict[ctx.author.id]['party']['unknown']) + 'u '
+            bluecount = str(trainer_dict[ctx.author.id]['party']['mystic']) + _('m ')
+            redcount = str(trainer_dict[ctx.author.id]['party']['valor']) + _('v ')
+            yellowcount = str(trainer_dict[ctx.author.id]['party']['instinct']) + _('i ')
+            unknowncount = str(trainer_dict[ctx.author.id]['party']['unknown']) + _('u ')
             teamcounts = ((((str(trainer_dict[ctx.author.id]['count']) + ' ') + bluecount) + redcount) + yellowcount) + unknowncount
         else:
             teamcounts = '1'
@@ -6274,10 +6274,10 @@ async def here(ctx, *, teamcounts: str=None):
 
     if (not teamcounts):
         if ctx.author.id in trainer_dict:
-            bluecount = str(trainer_dict[ctx.author.id]['party']['mystic']) + 'm '
-            redcount = str(trainer_dict[ctx.author.id]['party']['valor']) + 'v '
-            yellowcount = str(trainer_dict[ctx.author.id]['party']['instinct']) + 'i '
-            unknowncount = str(trainer_dict[ctx.author.id]['party']['unknown']) + 'u '
+            bluecount = str(trainer_dict[ctx.author.id]['party']['mystic']) + _('m ')
+            redcount = str(trainer_dict[ctx.author.id]['party']['valor']) + _('v ')
+            yellowcount = str(trainer_dict[ctx.author.id]['party']['instinct']) + _('i ')
+            unknowncount = str(trainer_dict[ctx.author.id]['party']['unknown']) + _('u ')
             teamcounts = ((((str(trainer_dict[ctx.author.id]['count']) + ' ') + bluecount) + redcount) + yellowcount) + unknowncount
         else:
             teamcounts = '1'
@@ -6372,23 +6372,23 @@ async def _party_status(ctx, total, teamcounts):
     valor = ['valor', 0]
     unknown = ['unknown', 0]
     team_aliases = {
-        'mystic': mystic,
-        'blue': mystic,
-        'm': mystic,
-        'b': mystic,
-        'instinct': instinct,
-        'yellow': instinct,
-        'i': instinct,
-        'y': instinct,
-        'valor': valor,
-        'red': valor,
-        'v': valor,
-        'r': valor,
-        'unknown': unknown,
-        'grey': unknown,
-        'gray': unknown,
-        'u': unknown,
-        'g': unknown,
+        _('mystic'): mystic,
+        _('blue'): mystic,
+        _('m'): mystic,
+        _('b'): mystic,
+        _('instinct'): instinct,
+        _('yellow'): instinct,
+        _('i'): instinct,
+        _('y'): instinct,
+        _('valor'): valor,
+        _('red'): valor,
+        _('v'): valor,
+        _('r'): valor,
+        _('unknown'): unknown,
+        _('grey'): unknown,
+        _('gray'): unknown,
+        _('u'): unknown,
+        _('g'): unknown,
     }
     regx = re.compile('([a-zA-Z]+)([0-9]+)|([0-9]+)([a-zA-Z]+)')
     for count in teamcounts:

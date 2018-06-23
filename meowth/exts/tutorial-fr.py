@@ -129,8 +129,8 @@ class Tutorial:
 
         async def timeout_raid(cmd):
             await tutorial_channel.send(
-                f"Vous avez pris trop de temps pour compléter la commande "
-                f"**{ctx.prefix}{cmd}** ! Cette chaîne sera supprimée dans dix secondes.")
+                "Vous avez pris trop de temps pour compléter la commande "
+                f"**{prefix}{cmd}** ! Cette chaîne sera supprimée dans dix secondes.")
             await asyncio.sleep(10)
             await tutorial_channel.delete()
             del report_channels[tutorial_channel.id]
@@ -169,7 +169,8 @@ class Tutorial:
                 # acknowledge failure and redo wait_for
                 await tutorial_channel.send(
                     "Ça n'a pas l'air de fonctionner. Assurez-vous de n'avoir oublié "
-                    "aucun parametres à votre commande !raid et réessayez.")
+                    "aucun parametres à votre commande raid "
+                    "et réessayez.")
 
             # acknowledge and redirect to new raid channel
             await tutorial_channel.send(
@@ -187,7 +188,7 @@ class Tutorial:
             ctx.prefix, ctx.bot.user.avatar_url)
 
         await raid_channel.send(
-            f"Ceci est une chaine d'exepmle pour les Raid. Voici une liste "
+            f"Ceci est une chaine d'exemple pour les Raid. Voici une liste "
             "de commandes que vous pouvez utiliser ici:", embed=helpembed)
 
         await raid_channel.send(

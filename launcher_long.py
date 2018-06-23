@@ -50,7 +50,9 @@ def run_meowth(autorestart):
     if interpreter is None:
         raise RuntimeError("Python could not be found")
 
-    cmd = [interpreter, "meowth", "launcher_long"]
+    cmd = [interpreter, "-m", "meowth", "launcher"]
+
+    retries = 0
 
     while True:
         if args.debug:
@@ -65,18 +67,25 @@ def run_meowth(autorestart):
                 break
             elif code == 26:
                 #standard restart
+                retries = 0
                 print("")
                 print("Restarting Meowth")
-                logging.info("Restarting Meowth")
                 print("")
                 continue
             else:
                 if not autorestart:
                     break
+                retries += 1
+                wait_time = min([retries^2, 60])
                 print("")
-                print("Restarting Meowth from crash")
-                logging.info("Restarting Meowth from crash")
+                print("Meowth experienced a crash.")
                 print("")
+                for i in range(wait_time, 0, -1):
+                    sys.stdout.write("\r")
+                    sys.stdout.write(
+                        "Restarting Meowth from crash in {:0d}".format(i))
+                    sys.stdout.flush()
+                    time.sleep()
 
     print("Meowth has closed. Exit code: {exit_code}".format(exit_code=code))
 
@@ -87,5 +96,4 @@ if __name__ == '__main__':
     dirname = os.path.dirname(abspath)
     os.chdir(dirname)
     print("Launching Meowth...")
-    logging.info("Launching Meowth...")
     run_meowth(autorestart=args.auto_restart)

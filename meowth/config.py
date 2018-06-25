@@ -45,6 +45,11 @@ class Config:
         for k, v in team_lang_info.items():
             for a, b in v.items():
                 self.team_info[k][a] = b
+        # set default roles
+        for team in self.team_info.values():
+            if not 'role' in team:
+                team['role'] = team['name']
+
 
     def get_pokemon_list(self):
         return self.pkmn_info['pokemon_list']

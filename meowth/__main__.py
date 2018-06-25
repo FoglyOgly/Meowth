@@ -3714,6 +3714,7 @@ async def team(ctx,*,content):
     entered_team = team_split[0]
     entered_team = ''.join([i for i in entered_team if i.isalpha()])
     logger.debug("Enterred team: %s" % entered_team)
+    logger.debug("lower roles: %s" % lowercase_roles)
     map_team_by_name = {t['name']: (k, t) for k, t in cf.team_info.items()}
     if entered_team in map_team_by_name:
         index = lowercase_roles.index(map_team_by_name[entered_team][1]['role'].lower())

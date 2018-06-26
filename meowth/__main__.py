@@ -128,6 +128,8 @@ pkmn_path, raid_path = load_config()
 
 Meowth.pkmn_info = pkmn_info
 Meowth.raid_info = raid_info
+Meowth.type_list = type_list
+Meowth.type_chart = type_chart
 
 Meowth.config = config
 Meowth.pkmn_info_path = pkmn_path
@@ -992,7 +994,7 @@ async def message_cleanup(loop=True):
                     report_message = await report_edit_dict[messageid]['channel'].get_message(messageid)
                     await report_message.edit(content=report_edit_dict[messageid]['action']['content'],embed=discord.Embed(description=report_edit_dict[messageid]['action']['embedcontent'], colour=report_message.embeds[0].colour.value))
                     await report_message.clear_reactions()
-                except (discord.errors.NotFound, discord.errors.Forbidden, discord.errors.HTTPException):
+                except (discord.errors.NotFound, discord.errors.Forbidden, discord.errors.HTTPException, IndexError):
                     pass
         # save server_dict changes after cleanup
         logger.info('message_cleanup - SAVING CHANGES')

@@ -190,3 +190,21 @@ def get_name(bot, pkmn_number):
     except IndexError:
         name = None
     return name
+
+def get_raidlist(bot):
+    raidlist = []
+    for level in bot.raid_info['raid_eggs']:
+        for pokemon in bot.raid_info['raid_eggs'][level]['pokemon']:
+            raidlist.append(pokemon)
+            raidlist.append(get_name(pokemon).lower())
+    return raidlist
+
+def get_level(bot, pkmn):
+    if str(pkmn).isdigit():
+        pkmn_number = pkmn
+    else:
+        pkmn_number = get_number(bot, pkmn)
+    for level in bot.raid_info['raid_eggs']:
+        for level, pkmn_list in bot.raid_info['raid_eggs'].items():
+            if pkmn_number in pkmn_list["pokemon"]:
+                return level

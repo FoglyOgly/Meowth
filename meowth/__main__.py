@@ -4009,12 +4009,13 @@ async def raid(ctx,pokemon,*,location:commands.clean_content(fix_channel_mention
     Finally, Meowth will create a separate channel for the raid report, for the purposes of organizing the raid."""
     content = f"{pokemon} {location}"
     if pokemon.isdigit():
-        new_channel = await _raidegg(ctx.message, content)
+        new_channel = await _raidegg(ctx, content)
     else:
-        new_channel = await _raid(ctx.message, content)
+        new_channel = await _raid(ctx, content)
     ctx.raid_channel = new_channel
 
-async def _raid(message, content):
+async def _raid(ctx, content):
+    message = ctx.message
     fromegg = False
     if guild_dict[message.channel.guild.id]['raidchannel_dict'].get(message.channel.id,{}).get('type') == "egg":
         fromegg = True
@@ -4024,7 +4025,7 @@ async def _raid(message, content):
         await message.channel.send(_('Meowth! Give more details when reporting! Usage: **!raid <pokemon name> <location>**'))
         return
     if raid_split[0] == 'egg':
-        await _raidegg(message, content)
+        await _raidegg(ctx, content)
         return
     if fromegg == True:
         eggdetails = guild_dict[message.guild.id]['raidchannel_dict'][message.channel.id]
@@ -4103,9 +4104,13 @@ async def _raid(message, content):
         return
     gyms = get_gyms(message.guild.id)
     if gyms:
-        match = await gym_match_prompt(message.channel, message.author.id, raid_details, gyms)
+        gym_matching_cog = Meowth.cogs.get('GymMatching')
+        match, districts = await gym_matching_cog.pick_gym_prompt(ctx, raid_details)
         if not match:
-            return await message.channel.send(_("Meowth! I couldn't find a gym named '{0}'.").format(raid_details))
+            return await message.channel.send(f"Nie znaleziono żadnego gymu pasującego do \"{raid_details}\".")
+        if match == "__TIMEOUT__":
+            return await message.channel.send(f"Za wolno... spróbuj jeszcze raz.")
+        #gymy-exowe, raidy-xxxxx vs districts
         gym = gyms[match]
         raid_details = match
         gym_coords = gym['coordinates']
@@ -4189,7 +4194,8 @@ async def _raid(message, content):
     guild_dict[message.guild.id]['trainers'][message.author.id]['raid_reports'] = raid_reports
     return raid_channel
 
-async def _raidegg(message, content):
+async def _raidegg(ctx, content):
+    message = ctx.message
     timestamp = (message.created_at + datetime.timedelta(hours=guild_dict[message.channel.guild.id]['configure_dict']['settings']['offset'])).strftime(_('%I:%M %p (%H:%M)'))
     raidexp = False
     hourminute = False
@@ -4262,9 +4268,13 @@ async def _raidegg(message, content):
         return
     gyms = get_gyms(message.guild.id)
     if gyms:
-        match = await gym_match_prompt(message.channel, message.author.id, raid_details, gyms)
+        gym_matching_cog = Meowth.cogs.get('GymMatching')
+        match, districts = await gym_matching_cog.pick_gym_prompt(ctx, raid_details)
         if not match:
-            return await message.channel.send(_("Meowth! I couldn't find a gym named '{0}'.").format(raid_details))
+            return await message.channel.send(f"Nie znaleziono żadnego gymu pasującego do \"{raid_details}\".")
+        if match == "__TIMEOUT__":
+            return await message.channel.send(f"Za wolno... spróbuj jeszcze raz.")
+        #gymy-exowe, raidy-xxxxx vs districts
         gym = gyms[match]
         raid_details = match
         gym_coords = gym['coordinates']

@@ -59,12 +59,14 @@ class Pokemon():
     """
 
     __slots__ = ('name', 'id', 'types', 'bot', 'guild', 'pkmn_list',
-                 'pb_raid', 'weather', 'moveset', 'shiny')
+                 'pb_raid', 'weather', 'moveset', 'shiny', 'legendary', 'mythical')
 
     def __init__(self, bot, pkmn, guild=None, **attribs):
         self.bot = bot
         self.guild = guild
         self.pkmn_list = bot.pkmn_info['pokemon_list']
+        lgnd_list = [144, 145, 146, 150, 243, 244, 245, 377, 378, 379, 380, 381, 382, 383, 384]
+        mythical_list = [151]
         if pkmn.isdigit():
             try:
                 pkmn = self.pkmn_list[int(pkmn)-1]
@@ -79,6 +81,14 @@ class Pokemon():
         self.weather = attribs.get('weather', None)
         self.moveset = attribs.get('moveset', [])
         self.shiny = attribs.get('shiny', False)
+        if self.id in lgnd_list:
+            self.legendary = True
+        elif self.id in mythical_list:
+            self.mythical = True
+        else:
+            self.legendary = False
+            self.mythical = False
+
 
     def __str__(self):
         if self.shiny:

@@ -164,7 +164,20 @@ class Trading:
                 await message.clear_reactions()
                 await message.add_reaction('\u2705')
                 await message.add_reaction('\u274e')
-                await trade.author(self.bot).send(f'Meowth! {trade.trader(self.bot).display_name} has offered a {str(trade.trader_offers)} in trade for your {str(trade.author_offers)}! Head to {message.channel.mention} to accept or reject the offer!')
+                offermsg = await trade.author(self.bot).send((f'Meowth! {trade.trader(self.bot).mention} has offered a {str(trade.trader_offers)} in trade for your {str(trade.author_offers)}!'
+                    ' React with :white_check_mark: to accept the offer, or with :negative_squared_cross_mark: to reject it!'), embed=trade.embed(self.bot))
+                await offermsg.add_reaction('\u2705')
+                await offermsg.add_reaction('\u274e')
+                def check(p):
+                    emoji_list = ['\u2705', '\u274e']
+                    return p.user_id == trade.author_id and p.emoji in emoji_list and p.message_id == offermsg.id
+                raw_reaction = await self.bot.wait_for('raw_reaction_add', check=check)
+                if raw_reaction.emoji == '\u2705':
+                    await trade.accept_offer(self.bot, message)
+                    await trade.accept_offer(self.bot, offermsg)
+                elif raw_reaction.emoji == '\u274e':
+                    await trade.clear_offer(self.bot, message)
+                    await trade.clear_offer(self.bot, offermsg)
             else:
                 await message.remove_reaction(payload.emoji, user)
             trade_dict[message.id]['trade'] = trade

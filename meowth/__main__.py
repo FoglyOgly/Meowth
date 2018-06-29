@@ -135,7 +135,7 @@ Meowth.config = config
 Meowth.pkmn_info_path = pkmn_path
 Meowth.raid_json_path = raid_path
 
-default_exts = ['datahandler', 'tutorial', 'silph', 'utilities']
+default_exts = ['datahandler', 'tutorial', 'silph', 'utilities', 'trade']
 
 for ext in default_exts:
     try:
@@ -1105,7 +1105,8 @@ async def on_guild_join(guild):
         'wildreport_dict:':{},
         'questreport_dict':{},
         'raidchannel_dict':{},
-        'trainers':{}
+        'trainers':{},
+        'trade_dict': {}
     }
     await owner.send(_("Meowth! I'm Meowth, a Discord helper bot for Pokemon Go communities, and someone has invited me to your server! Type **!help** to see a list of things I can do, and type **!configure** in any channel of your server to begin!"))
 

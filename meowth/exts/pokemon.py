@@ -334,6 +334,9 @@ class Pokemon():
 
         return result
 
+    # __slots__ = ('name', 'id', 'types', 'bot', 'guild', 'pkmn_list',
+    #              'pb_raid', 'weather', 'moveset', 'shiny', 'legendary', 'mythical')
+        # def __init__(self, bot, pkmn, guild=None, **attribs):
 # class RaidEgg:
 #
 #     @classmethod

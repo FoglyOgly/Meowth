@@ -1,19 +1,18 @@
 import asyncio
-import re
 import functools
 
 import discord
 from discord.ext import commands
 
-from meowth import utils
-from meowth import checks
-from meowth import pkmn_match
-from meowth import context
+from meowth import utils, checks
 
 from meowth.exts import pokemon
 
 
 class Trade:
+
+    icon_url = ("https://raw.githubusercontent.com/FoglyOgly/Meowth/"
+                "trade-beta/images/misc/trade_icon_small.png")
 
     __slots__ = [
         'bot', '_data', 'lister_id', 'listing_id', 'report_channel_id',
@@ -43,28 +42,27 @@ class Trade:
 
     async def on_raw_reaction_add(self, payload):
 
+        emoji = payload.emoji.name
+
         # ignore if not relevant to this trade object
         if payload.message_id != self.listing_id:
             return
 
-
-
         emoji_check = [
-            '\u20e3' in payload.emoji.name, # keycap 1-9
-            '\u23f9' == payload.emoji.name # stop button
+            '\u20e3' in emoji, # keycap 1-9
+            emoji == '\u23f9' # stop button
         ]
 
         if not any(emoji_check):
             return
 
-        if payload.user_id != self.lister_id and '\u20e3' in payload.emoji.name:
-            i = int(payload.emoji.name[0])
+        if payload.user_id != self.lister_id and '\u20e3' in emoji:
+            i = int(emoji[0])
             offer = self.wanted_pokemon[i-1]
             await self.make_offer(payload.user_id, offer)
 
-        elif payload.user_id == self.lister_id and payload.emoji.name == '\u23f9':
+        elif payload.user_id == self.lister_id and emoji == '\u23f9':
             await self.cancel_trade()
-
 
     @property
     def guild(self):
@@ -86,10 +84,6 @@ class Trade:
     @staticmethod
     def make_trade_embed(lister, wanted_pokemon, offered_pokemon):
         """Returns a formatted embed message with trade details."""
-        icon_url = (
-            "https://raw.githubusercontent.com/FoglyOgly/Meowth/"
-            "trade-beta/images/misc/trade_icon_small.png"
-        )
 
         wants = [
             f'{i+1}\u20e3: {pkmn}' for i, pkmn in enumerate(wanted_pokemon)
@@ -98,7 +92,7 @@ class Trade:
         return utils.make_embed(
             title="Pokemon Trade - {}".format(lister.display_name),
             msg_colour=0x63b2f7,
-            icon=icon_url,
+            icon=Trade.icon_url,
             fields={
                 "Wants":'\n'.join(wants),
                 "Offers": str(offered_pokemon)
@@ -106,28 +100,23 @@ class Trade:
             inline=True,
             footer=lister.display_name,
             footer_icon=lister.avatar_url_as(format='png', size=256),
-            thumbnail = offered_pokemon.img_url
+            thumbnail=offered_pokemon.img_url
         )
 
     @staticmethod
     def make_offer_embed(trader, listed_pokemon, offer):
-        icon_url = (
-            "https://raw.githubusercontent.com/FoglyOgly/Meowth/"
-            "trade-beta/images/misc/trade_icon_small.png"
-        )
-
         return utils.make_embed(
-            title = "Pokemon Trade Offer - {}".format(trader.display_name),
-            msg_colour = 0x63b2f7,
-            icon = icon_url,
-            fields = {
+            title="Pokemon Trade Offer - {}".format(trader.display_name),
+            msg_colour=0x63b2f7,
+            icon=Trade.icon_url,
+            fields={
                 "You Offered": str(listed_pokemon),
                 "They Offer": str(offer)
                 },
             inline=True,
-            footer = trader.display_name,
-            footer_icon = trader.avatar_url_as(format='png', size=256),
-            thumbnail = offer.img_url
+            footer=trader.display_name,
+            footer_icon=trader.avatar_url_as(format='png', size=256),
+            thumbnail=offer.img_url
         )
 
     @classmethod
@@ -137,25 +126,26 @@ class Trade:
         trade_embed = cls.make_trade_embed(
             ctx.author, wanted_pokemon, offered_pokemon)
 
-        offer_str = "Meowth! {lister} offers a {pkmn} up for trade!".format(
-            lister=ctx.author.display_name,
-            pkmn=offered_pokemon
-        )
+        offer_str = ("Meowth! {lister} offers a {pkmn} up for trade!"
+                     "").format(lister=ctx.author.display_name,
+                                pkmn=offered_pokemon)
 
         instructions = "React to this message to make an offer!"
-        cancel_inst = "{lister} may cancel the trade with :stop_button:".format(
-            lister = ctx.author.display_name
-        )
+        cancel_inst = ("{lister} may cancel the trade with :stop_button:"
+                       "").format(lister=ctx.author.display_name)
 
-        trade_msg = await ctx.send(f"{offer_str}\n\n{instructions}\n\n{cancel_inst}", embed=trade_embed)
+        trade_msg = await ctx.send(
+            f"{offer_str}\n\n{instructions}\n\n{cancel_inst}",
+            embed=trade_embed)
+
         for i in range(len(wanted_pokemon)):
             await trade_msg.add_reaction(f'{i+1}\u20e3')
-            await asyncio.sleep(0.25)
         await trade_msg.add_reaction('\u23f9')
 
         trade = cls(
             ctx.bot, ctx.author.id, trade_msg.id, ctx.channel.id, ctx.guild.id,
-            wanted_pokemon, offered_pokemon)
+            wanted_pokemon, offered_pokemon
+        )
 
         ctx.bot.add_listener(trade.on_raw_reaction_add)
 
@@ -178,42 +168,58 @@ class Trade:
     async def make_offer(self, trader_id, pkmn):
         self.offers[trader_id] = str(pkmn)
         trader = self.guild.get_member(trader_id)
-        offer_embed = self.make_offer_embed(
-            trader, self.offered_pokemon, pkmn
-        )
+        offer_embed = self.make_offer_embed(trader, self.offered_pokemon, pkmn)
+
         offermsg = await self.lister.send(
             ("Meowth! {} offers to trade their {} for your {}! "
-            "React with :white_check_mark: to accept the offer or :negative_squared_cross_mark: to reject it!".format(
-                trader.display_name, pkmn, self.offered_pokemon)),
-            embed = offer_embed)
-        reaction, user = await utils.ask(self.bot, offermsg, timeout=None)
+             "React with :white_check_mark: to accept the offer or "
+             ":negative_squared_cross_mark: to reject it!").format(
+                 trader.display_name, pkmn, self.offered_pokemon),
+            embed=offer_embed)
+
+        reaction, __ = await utils.ask(self.bot, offermsg, timeout=None)
+
         if reaction.emoji == '\u2705':
             await self.accept_offer(trader_id)
+
         elif reaction.emoji == '\u274e':
             await self.reject_offer(trader_id)
             await offermsg.delete()
-
 
     async def accept_offer(self, offer_id):
         offer = self.offers[offer_id]
         trader = self.guild.get_member(offer_id)
         lister = self.lister
         listingmsg = await self.get_listmsg()
-        acceptedmsg = ("Meowth! {} has agreed to trade their {} for {}'s {}\n\n"
+
+        acceptedmsg = (
+            "Meowth! {} has agreed to trade their {} for {}'s {}\n\n"
             "Please DM them to coordinate the trade! "
-            "React with :ballot_box_with_check: when the trade has been completed! "
-            "To reject or cancel this offer, react with :stop_button:".format(
-                self.lister.mention, self.offered_pokemon, trader.mention, offer)
-            )
-        special_check = [self.offered_pokemon.shiny, self.offered_pokemon.legendary,
-            offer.shiny, offer.legendary]
+            "React with :ballot_box_with_check: when the trade has been "
+            "completed! To reject or cancel this offer, react with "
+            ":stop_button:").format(
+                self.lister.mention,
+                self.offered_pokemon,
+                trader.mention,
+                offer)
+
+        special_check = [
+            self.offered_pokemon.shiny,
+            self.offered_pokemon.legendary,
+            offer.shiny,
+            offer.legendary
+        ]
+
         if any(special_check):
-            acceptedmsg += ('\n\nThis is a Special Trade! These can only be completed'
-                ' once per day and can cost up to 1 million stardust! '
-                'Significant discounts can be earned by leveling up your friendship '
-                'before the trade is made!')
+            acceptedmsg += (
+                "\n\nThis is a Special Trade! These can only be "
+                "completed once per day and can cost up to 1 million "
+                "stardust! Significant discounts can be earned by leveling "
+                "up your friendship before the trade is made!")
+
         tradermsg = await trader.send(acceptedmsg)
         listermsg = await lister.send(acceptedmsg)
+
         await tradermsg.add_reaction('\u2611')
         await tradermsg.add_reaction('\u23f9')
         await listermsg.add_reaction('\u2611')
@@ -222,11 +228,18 @@ class Trade:
         for offerid in self.offers.keys():
             if offerid != offer_id:
                 reject = self.guild.get_member(offerid)
-                await reject.send("Meowth... {} accepted a competing offer for their {}. ".format(
-                    self.lister.display_name, self.offered_pokemon))
+
+                await reject.send((
+                    "Meowth... {} accepted a competing offer for their {}. "
+                    "").format(self.lister.display_name, self.offered_pokemon))
+
                 del self.offers[offerid]
 
-        await listingmsg.edit(content='Meowth! {} has accepted an offer!'.format(self.lister.display_name), embed=self.embed)
+        await listingmsg.edit(
+            content="Meowth! {} has accepted an offer!".format(
+                self.lister.display_name),
+            embed=self.embed)
+
         await listingmsg.clear_reactions()
 
         trader_confirms = False
@@ -257,6 +270,7 @@ class Trade:
                 return await self.confirm_trade()
             else:
                 continue
+
         # update the listing message if it still exists
         # dm others who offered saying the trade was completed
         # dm the member with the successful offer with details for trade
@@ -265,40 +279,47 @@ class Trade:
     async def withdraw_offer(self, offer_id):
         listingmsg = await self.get_listmsg()
         trader = self.guild.get_member(offer_id)
-        await self.lister.send('Meowth... {} withdrew their trade offer of {}.'.format(
-            trader.display_name, self.offers[offer_id]
-        ))
+        await self.lister.send(
+            "Meowth... {} withdrew their trade offer of {}.".format(
+                trader.display_name, self.offers[offer_id]))
 
         offer_str = "Meowth! {lister} offers a {pkmn} up for trade!".format(
-            lister=self.lister.display_name,
-            pkmn=self.offered_pokemon
-        )
+            lister=self.lister.display_name, pkmn=self.offered_pokemon)
 
         instructions = "React to this message to make an offer!"
         cancel_inst = "{lister} may cancel the trade with :stop_button:".format(
-            lister = self.lister.display_name
-        )
+            lister=self.lister.display_name)
 
-        await listingmsg.edit(content=f"{offer_str}\n\n{instructions}\n\n{cancel_inst}", embed=self.embed)
+        await listingmsg.edit(
+            content=f"{offer_str}\n\n{instructions}\n\n{cancel_inst}",
+            embed=self.embed)
+
         for i in range(len(self.wanted_pokemon)):
             await listingmsg.add_reaction(f'{i+1}\u20e3')
             await asyncio.sleep(0.25)
+
         await listingmsg.add_reaction('\u23f9')
         del self.offers[offer_id]
 
-
     async def reject_offer(self, offer_id):
         trader = self.guild.get_member(offer_id)
-        await trader.send('Meowth... {} rejected your offer for their {}.'.format(
-            self.lister.display_name, self.offered_pokemon))
+
+        await trader.send(
+            "Meowth... {} rejected your offer for their {}.".format(
+                self.lister.display_name, self.offered_pokemon))
+
         del self.offers[offer_id]
 
     async def cancel_trade(self):
         for offerid in self.offers:
             reject = self.guild.get_member(offerid)
-            await reject.send('Meowth... {} canceled their trade offer of {}'.format(
-                self.lister.display_name, self.offered_pokemon))
+
+            await reject.send(
+                "Meowth... {} canceled their trade offer of {}".format(
+                    self.lister.display_name, self.offered_pokemon))
+
         self.close_trade()
+
         # update the listing message if it still exists
         # dm those who offered saying the trade was cancelled
 
@@ -309,8 +330,6 @@ class Trade:
         self.close_trade()
 
     def close_trade(self):
-        listingmsg = await self.get_listmsg()
-        await listingmsg.delete()
         self.bot.remove_listener(self.on_raw_reaction_add)
         try:
             guild_trades = self.bot.guild_dict[self.guild_id]
@@ -326,8 +345,8 @@ class Trading:
             for channel_id in trade_dict:
                 trade_channel_data = trade_dict[channel_id]
                 for message_id in trade_channel_data:
-                    trade = Trade.from_data(self.bot,
-                        message_id, trade_channel_data[message_id])
+                    Trade.from_data(
+                        self.bot, message_id, trade_channel_data[message_id])
 
     async def on_message(self, message):
         ctx = await self.bot.get_context(message)
@@ -335,9 +354,8 @@ class Trading:
             await asyncio.sleep(1)
             try:
                 await message.delete()
-            except:
+            except discord.HTTPException:
                 pass
-
 
     @commands.command()
     @checks.allowtrade()

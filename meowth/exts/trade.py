@@ -8,6 +8,7 @@ from discord.ext import commands
 from meowth import utils
 from meowth import checks
 from meowth import pkmn_match
+from meowth import context
 
 from meowth.exts import pokemon
 
@@ -28,7 +29,7 @@ class Trade:
             'report_channel_id' : channel_id,
             'guild_id'          : guild_id,
             'wanted_pokemon'    : wanted_pokemon,
-            'offered_pokemon'   : offered_pokemon,
+            'offered_pokemon'   : str(offered_pokemon),
             'offers'            : {}
         }
         self._data = trade_channel_data[message_id]
@@ -175,15 +176,15 @@ class Trade:
         return await self.listing_channel.get_message(self.listing_id)
 
     async def make_offer(self, trader_id, pkmn):
-        self.offers[trader_id] = pkmn
+        self.offers[trader_id] = str(pkmn)
         trader = self.guild.get_member(trader_id)
         offer_embed = self.make_offer_embed(
             trader, self.offered_pokemon, pkmn
         )
         offermsg = await self.lister.send(
-            """Meowth! {} offers to trade their {} for your {}!
-        React with :white_check_mark: to accept the offer or :negative_squared_cross_mark: to reject it!""".format(
-                trader.display_name, pkmn, self.offered_pokemon),
+            ("Meowth! {} offers to trade their {} for your {}! "
+            "React with :white_check_mark: to accept the offer or :negative_squared_cross_mark: to reject it!".format(
+                trader.display_name, pkmn, self.offered_pokemon)),
             embed = offer_embed)
         reaction, user = await utils.ask(self.bot, offermsg, timeout=None)
         if reaction.emoji == '\u2705':
@@ -198,11 +199,12 @@ class Trade:
         trader = self.guild.get_member(offer_id)
         lister = self.lister
         listingmsg = await self.get_listmsg()
-        acceptedmsg = """Meowth! {} has agreed to trade their {} for {}'s {}\n\n
-            Please DM them to coordinate the trade!
-            React with :ballot_box_with_check: when the trade has been completed!
-            To reject or cancel this offer, react with :stop_button:""".format(
+        acceptedmsg = ("Meowth! {} has agreed to trade their {} for {}'s {}\n\n"
+            "Please DM them to coordinate the trade! "
+            "React with :ballot_box_with_check: when the trade has been completed! "
+            "To reject or cancel this offer, react with :stop_button:".format(
                 self.lister.mention, self.offered_pokemon, trader.mention, offer)
+            )
         special_check = [self.offered_pokemon.shiny, self.offered_pokemon.legendary,
             offer.shiny, offer.legendary]
         if any(special_check):
@@ -318,18 +320,26 @@ class Trade:
 class Trading:
     def __init__(self, bot):
         self.bot = bot
-
-    async def on_ready(self):
         for guild_id in self.bot.guild_dict:
-            trade_dict = bot.guild_dict[guild_id].setdefault('trade_dict', {})
+            trade_dict = self.bot.guild_dict[guild_id].setdefault('trade_dict', {})
             for channel_id in trade_dict:
                 trade_channel_data = trade_dict[channel_id]
                 for message_id in trade_channel_data:
                     trade = Trade.from_data(self.bot,
                         message_id, trade_channel_data[message_id])
 
+    async def on_message(self, message):
+        ctx = await self.bot.get_context(message)
+        if checks.check_tradereport(ctx) and message.author != ctx.guild.me:
+            await asyncio.sleep(1)
+            try:
+                await message.delete()
+            except:
+                pass
+
 
     @commands.command()
+    @checks.allowtrade()
     async def trade(self, ctx, *, offer: pokemon.Pokemon):
         """Create a trade listing."""
 
@@ -350,9 +360,10 @@ class Trading:
         pkmn_convert = functools.partial(pokemon.Pokemon.convert, ctx)
 
         wants = map(str.strip, wants)
-        wants = [await pkmn_convert(want) for want in wants]
+        wants = [str(await pkmn_convert(want)) for want in wants]
 
         await Trade.create_trade(ctx, wants, offer)
+        await ctx.message.delete()
 
 
 def setup(bot):

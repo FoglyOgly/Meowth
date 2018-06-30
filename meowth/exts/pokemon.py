@@ -173,7 +173,7 @@ class Pokemon():
         else:
             shiny_str = ""
         return ('https://raw.githubusercontent.com/FoglyOgly/'
-                f'Meowth/discordpy-v1/images/pkmn/{pkmn_no}_{shiny_str}?cache=1.png')
+                f'Meowth/trade-beta/images/pkmn/{pkmn_no}_{shiny_str}?cache=2.png')
 
     # async def colour(self):
     #     """:class:`discord.Colour` : Discord colour based on Pokemon sprite."""
@@ -334,14 +334,7 @@ class Pokemon():
 
         return result
 
-    # __slots__ = ('name', 'id', 'types', 'bot', 'guild', 'pkmn_list',
-    #              'pb_raid', 'weather', 'moveset', 'shiny', 'legendary', 'mythical')
-        # def __init__(self, bot, pkmn, guild=None, **attribs):
-# class RaidEgg:
-#
-#     @classmethod
-#     async def convert(cls, ctx, argument):
-#         return cls(argument)
+
 
 def setup(bot):
     bot.add_cog(Pokedex(bot))

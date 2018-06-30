@@ -12,7 +12,7 @@ from meowth.exts import pokemon
 class Trade:
 
     icon_url = ("https://raw.githubusercontent.com/FoglyOgly/Meowth/"
-                "trade-beta/images/misc/trade_icon_small.png")
+                "discordpy-v1/images/misc/trade_icon_small.png")
 
     __slots__ = [
         'bot', '_data', 'lister_id', 'listing_id', 'report_channel_id',

@@ -6313,6 +6313,7 @@ async def here(ctx, *, teamcounts: str=None):
         partylist = result[1]
         await _here(ctx.channel, ctx.author, count, partylist, entered_interest)
 
+
 async def _here(channel, author, count, party, entered_interest=None):
     lobbymsg = ''
     allblue = 0
@@ -6326,20 +6327,22 @@ async def _here(channel, author, count, party, entered_interest=None):
             lobbymsg += _('\nThere is a group already in the lobby! Use **!lobby** to join them or **!backout** to request a backout! Otherwise, you may have to wait for the next group!')
     except KeyError:
         pass
+    logger.debug("party: %s" % party)
     if not party:
         for role in author.roles:
-            if role.name.lower() == 'mystic':
+            if role.name.lower() == cf.get_team_info('mystic')['role'].lower():
                 allblue = count
                 break
-            elif role.name.lower() == 'valor':
+            elif role.name.lower() == cf.get_team_info('valor')['role'].lower():
                 allred = count
                 break
-            elif role.name.lower() == 'instinct':
+            elif role.name.lower() == cf.get_team_info('instinct')['role'].lower():
                 allyellow = count
                 break
         else:
             allunknown = count
-        party = {'mystic':allblue, 'valor':allred, 'instinct':allyellow, 'unknown':allunknown}
+        party = {'mystic': allblue, 'valor': allred, 'instinct': allyellow, 'unknown': allunknown}
+    logger.debug("party: %s" % party)
     if count == 1:
         team_emoji = max(party, key=lambda key: party[key])
         if team_emoji == "unknown":
@@ -6347,6 +6350,7 @@ async def _here(channel, author, count, party, entered_interest=None):
         else:
             team_emoji = parse_emoji(channel.guild, cf.get_team_info(team_emoji)['emoji'])
         msg = _('Meowth! {member} is at the {raidtype}! {emoji}: 1').format(member=author.mention, emoji=team_emoji, raidtype=raidtype)
+        logger.debug(msg)
         await channel.send(msg + lobbymsg)
     else:
         msg = _('Meowth! {member} is at the {raidtype} with a total of {trainer_count} trainers!').format(member=author.mention, trainer_count=count, raidtype=raidtype)
@@ -6366,14 +6370,14 @@ async def _here(channel, author, count, party, entered_interest=None):
 async def _party_status(ctx, total, teamcounts):
     channel = ctx.channel
     author = ctx.author
-    for role in ctx.author.roles:
-        if role.name.lower() == 'mystic':
+    for role in author.roles:
+        if role.name.lower() == cf.get_team_info('mystic')['role'].lower():
             my_team = 'mystic'
             break
-        elif role.name.lower() == 'valor':
+        elif role.name.lower() == cf.get_team_info('valor')['role'].lower():
             my_team = 'valor'
             break
-        elif role.name.lower() == 'instinct':
+        elif role.name.lower() == cf.get_team_info('instinct')['role'].lower():
             my_team = 'instinct'
             break
     else:
@@ -6389,13 +6393,16 @@ async def _party_status(ctx, total, teamcounts):
     unknown = ['unknown', 0]
     regx = re.compile('([a-zA-Z]+)([0-9]+)|([0-9]+)([a-zA-Z]+)')
     team_aliases = {
-        cf.get_team_info('mystic')['name'] : mystic,
+        'mystic' : mystic,
+        cf.get_team_info('mystic')['name']: mystic,
         cf.get_team_info('mystic')['color']: mystic,
         cf.get_team_info('mystic')['short']: mystic,
-        cf.get_team_info('instinct')['name'] : instinct,
+        'instinct': instinct,
+        cf.get_team_info('instinct')['name']: instinct,
         cf.get_team_info('instinct')['color']: instinct,
         cf.get_team_info('instinct')['short']: instinct,
-        cf.get_team_info('valor')['name'] : valor,
+        'valor': valor,
+        cf.get_team_info('valor')['name']: valor,
         cf.get_team_info('valor')['color']: valor,
         cf.get_team_info('valor')['short']: valor,
         'unknown': unknown,
@@ -6438,7 +6445,7 @@ async def _party_status(ctx, total, teamcounts):
                 unknown[1] = total - team_total
             else:
                 team_aliases[my_team][1] = total - team_total
-    partylist = {'mystic':mystic[1], 'valor':valor[1], 'instinct':instinct[1], 'unknown':unknown[1]}
+    partylist = {'mystic': mystic[1], 'valor': valor[1], 'instinct': instinct[1], 'unknown': unknown[1]}
     result = [total, partylist]
     return result
 

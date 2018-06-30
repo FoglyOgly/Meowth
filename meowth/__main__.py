@@ -4522,7 +4522,7 @@ async def _eggassume(args, raid_channel, author=None):
     await raid_channel.send(_('{roletest}Meowth! This egg will be assumed to be {pokemon} when it hatches!').format(roletest=roletest,pokemon=entered_raid.title()))
     if str(egglevel) in guild_dict[raid_channel.guild.id]['configure_dict']['counters']['auto_levels']:
         ctrs_dict = await _get_generic_counters(raid_channel.guild, entered_raid, weather)
-        ctrsmsg = "Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters."
+        ctrsmsg = _("Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters.")
         ctrsmessage = await raid_channel.send(content=ctrsmsg,embed=ctrs_dict[0]['embed'])
         ctrsmessage_id = ctrsmessage.id
         await ctrsmessage.pin()
@@ -4679,7 +4679,7 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
         egg_report = None
     if str(egglevel) in guild_dict[raid_channel.guild.id]['configure_dict']['counters']['auto_levels'] and not eggdetails.get('pokemon', None):
         ctrs_dict = await _get_generic_counters(raid_channel.guild, entered_raid, weather)
-        ctrsmsg = "Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters."
+        ctrsmsg = _("Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters.")
         ctrsmessage = await raid_channel.send(content=ctrsmsg,embed=ctrs_dict[0]['embed'])
         ctrsmessage_id = ctrsmessage.id
         await ctrsmessage.pin()
@@ -6058,7 +6058,7 @@ async def interested(ctx, *, teamcounts: str=None):
     trainer_dict = guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict']
     entered_interest = trainer_dict.get(ctx.author.id, {}).get('interest', [])
     egglevel = guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['egglevel']
-    if (not teamcounts):
+    if not teamcounts:
         if ctx.author.id in trainer_dict:
             bluecount = str(trainer_dict[ctx.author.id]['party']['mystic']) + _('m ')
             redcount = str(trainer_dict[ctx.author.id]['party']['valor']) + _('v ')
@@ -6076,7 +6076,7 @@ async def interested(ctx, *, teamcounts: str=None):
         pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, '', p) in re.sub(rgx, '', teamcounts.lower())), None)
     if pkmn_match and guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['type'] == "egg":
         entered_interest = []
-        for word in re.split(' |,', teamcounts.lower()):
+        for word in re.split('[ ,]', teamcounts.lower()):
             if word.lower() in pkmn_info['pokemon_list']:
                 if get_number(word.lower()) in raid_info['raid_eggs'][egglevel]['pokemon']:
                     if word.lower() not in entered_interest:
@@ -6092,7 +6092,7 @@ async def interested(ctx, *, teamcounts: str=None):
     elif (ctx.author.id in trainer_dict) and (sum(trainer_dict[ctx.author.id]['status'].values()) > 0):
         total = trainer_dict[ctx.author.id]['count']
     elif teamcounts:
-        total = re.sub('[^0-9 ]','', teamcounts)
+        total = re.sub('[^0-9 ]', '', teamcounts)
         total = sum([int(x) for x in total.split()])
     else:
         total = 1
@@ -6102,13 +6102,14 @@ async def interested(ctx, *, teamcounts: str=None):
         partylist = result[1]
         await _maybe(ctx.channel, ctx.author, count, partylist, entered_interest)
 
+
 async def _maybe(channel, author, count, party, entered_interest=None):
     trainer_dict = guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['trainer_dict']
     allblue = 0
     allred = 0
     allyellow = 0
     allunknown = 0
-    if (not party):
+    if not party:
         for role in author.roles:
             if role.name.lower() == 'mystic':
                 allblue = count
@@ -6325,7 +6326,7 @@ async def _here(channel, author, count, party, entered_interest=None):
             lobbymsg += _('\nThere is a group already in the lobby! Use **!lobby** to join them or **!backout** to request a backout! Otherwise, you may have to wait for the next group!')
     except KeyError:
         pass
-    if (not party):
+    if not party:
         for role in author.roles:
             if role.name.lower() == 'mystic':
                 allblue = count
@@ -6352,9 +6353,7 @@ async def _here(channel, author, count, party, entered_interest=None):
         msg += ' {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | ❔: {unknown}'.format(blue_emoji=parse_emoji(channel.guild, cf.get_team_info('mystic')['emoji']), mystic=party['mystic'], red_emoji=parse_emoji(channel.guild, cf.get_team_info('valor')['emoji']), valor=party['valor'], instinct=party['instinct'], yellow_emoji=parse_emoji(channel.guild, cf.get_team_info('instinct')['emoji']), unknown=party['unknown'])
         await channel.send(msg + lobbymsg)
     if author.id not in trainer_dict:
-        trainer_dict[author.id] = {
-
-        }
+        trainer_dict[author.id] = {}
     trainer_dict[author.id]['status'] = {'maybe':0, 'coming':0, 'here':count, 'lobby':0}
     trainer_dict[author.id]['count'] = count
     trainer_dict[author.id]['party'] = party
@@ -6362,6 +6361,7 @@ async def _here(channel, author, count, party, entered_interest=None):
         trainer_dict[author.id]['interest'] = entered_interest
     await _edit_party(channel, author)
     guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['trainer_dict'] = trainer_dict
+
 
 async def _party_status(ctx, total, teamcounts):
     channel = ctx.channel
@@ -6387,26 +6387,23 @@ async def _party_status(ctx, total, teamcounts):
     instinct = ['instinct', 0]
     valor = ['valor', 0]
     unknown = ['unknown', 0]
-    team_aliases = {
-        _('mystic'): mystic,
-        _('blue'): mystic,
-        _('m'): mystic,
-        _('b'): mystic,
-        _('instinct'): instinct,
-        _('yellow'): instinct,
-        _('i'): instinct,
-        _('y'): instinct,
-        _('valor'): valor,
-        _('red'): valor,
-        _('v'): valor,
-        _('r'): valor,
-        _('unknown'): unknown,
-        _('grey'): unknown,
-        _('gray'): unknown,
-        _('u'): unknown,
-        _('g'): unknown,
-    }
     regx = re.compile('([a-zA-Z]+)([0-9]+)|([0-9]+)([a-zA-Z]+)')
+    team_aliases = {
+        cf.get_team_info('mystic')['name'] : mystic,
+        cf.get_team_info('mystic')['color']: mystic,
+        cf.get_team_info('mystic')['short']: mystic,
+        cf.get_team_info('instinct')['name'] : instinct,
+        cf.get_team_info('instinct')['color']: instinct,
+        cf.get_team_info('instinct')['short']: instinct,
+        cf.get_team_info('valor')['name'] : valor,
+        cf.get_team_info('valor')['color']: valor,
+        cf.get_team_info('valor')['short']: valor,
+        'unknown': unknown,
+        'grey': unknown,
+        'gray': unknown,
+        'u': unknown,
+        'g': unknown,
+    }
     for count in teamcounts:
         if count.isdigit():
             if total:
@@ -6444,6 +6441,7 @@ async def _party_status(ctx, total, teamcounts):
     partylist = {'mystic':mystic[1], 'valor':valor[1], 'instinct':instinct[1], 'unknown':unknown[1]}
     result = [total, partylist]
     return result
+
 
 async def _edit_party(channel, author=None):
     egglevel = guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['egglevel']

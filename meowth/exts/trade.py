@@ -294,8 +294,6 @@ class Trade:
         del self.offers[offer_id]
 
     async def cancel_trade(self):
-        listingmsg = await self.get_listmsg()
-        await listingmsg.delete()
         for offerid in self.offers:
             reject = self.guild.get_member(offerid)
             await reject.send('Meowth... {} canceled their trade offer of {}'.format(
@@ -307,9 +305,12 @@ class Trade:
     async def confirm_trade(self):
         listingmsg = await self.get_listmsg()
         await listingmsg.edit(content='Meowth! This trade has been completed!', embed=None)
+        await asyncio.sleep(5)
         self.close_trade()
 
     def close_trade(self):
+        listingmsg = await self.get_listmsg()
+        await listingmsg.delete()
         self.bot.remove_listener(self.on_raw_reaction_add)
         try:
             guild_trades = self.bot.guild_dict[self.guild_id]

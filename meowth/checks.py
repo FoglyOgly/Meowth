@@ -172,6 +172,20 @@ def check_meetupchannel(ctx):
     meetup =  ctx.bot.guild_dict[guild.id].get('raidchannel_dict',{}).get(channel.id,{}).get('meetup',False)
     return meetup
 
+def check_tradeset(ctx):
+    if ctx.guild is None:
+        return False
+    guild = ctx.guild
+    return ctx.bot.guild_dict[guild.id]['configure_dict'].setdefault('trade', {}).get('enabled', False)
+
+def check_tradereport(ctx):
+    if ctx.guild is None:
+        return False
+    channel = ctx.channel
+    guild = ctx.guild
+    channel_list = [x for x in ctx.bot.guild_dict[guild.id]['configure_dict'].setdefault('trade', {}).get('report_channels',[])]
+    return channel.id in channel_list
+
 def check_wildset(ctx):
     if ctx.guild is None:
         return False
@@ -318,6 +332,17 @@ def allowwant():
             else:
                 raise errors.WantChannelCheckFail()
         raise errors.WantSetCheckFail()
+    return commands.check(predicate)
+
+def allowtrade():
+    def predicate(ctx):
+        if check_tradeset(ctx):
+            if check_tradereport(ctx):
+                return True
+            else:
+                raise errors.TradeChannelCheckFail()
+        else:
+            raise errors.TradeSetCheckFail()
     return commands.check(predicate)
 
 def allowarchive():

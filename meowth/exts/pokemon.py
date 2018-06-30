@@ -304,7 +304,7 @@ class Pokemon():
         :exc:`discord.ext.commands.BadArgument`
             The argument didn't match a Pokemon ID or name.
         """
-        if 'shiny' in argument:
+        if 'shiny' in argument.lower():
             shiny = True
             argument = argument.replace('shiny','').strip()
         else:
@@ -334,6 +334,27 @@ class Pokemon():
 
         return result
 
+    @classmethod
+    def get_pokemon(cls, ctx, argument):
+        if 'shiny' in argument.lower():
+            shiny = True
+            argument = argument.replace('shiny', '').strip()
+        else:
+            shiny = False
+
+        if argument.isdigit():
+            try:
+                match = ctx.bot.pkmn_info['pokemon_list'][int(argument)-1]
+            except IndexError:
+                return None
+        else:
+            pkmn_list = ctx.bot.pkmn_info['pokemon_list']
+            match = utils.get_match(pkmn_list, argument)[0]
+
+        if not match:
+            return None
+
+        return cls(ctx.bot, str(match), ctx.guild, shiny=shiny)
 
 
 def setup(bot):

@@ -16,7 +16,7 @@ class Trade:
 
     __slots__ = [
         'bot', '_data', 'lister_id', 'listing_id', 'report_channel_id',
-        'guild_id', 'wanted_pokemon', 'offered_pokemon', 'offers']
+        'guild_id', 'offers']
 
     def __init__(self, bot, lister_id, message_id, channel_id, guild_id,
                  wanted_pokemon, offered_pokemon):
@@ -27,7 +27,7 @@ class Trade:
             'lister_id'         : lister_id,
             'report_channel_id' : channel_id,
             'guild_id'          : guild_id,
-            'wanted_pokemon'    : wanted_pokemon,
+            'wanted_pokemon'    : [str(want) for want in wanted_pokemon],
             'offered_pokemon'   : str(offered_pokemon),
             'offers'            : {}
         }
@@ -36,8 +36,6 @@ class Trade:
         self.listing_id = message_id
         self.report_channel_id = self._data['report_channel_id']
         self.guild_id = self._data['guild_id']
-        self.wanted_pokemon = self._data['wanted_pokemon']
-        self.offered_pokemon = self._data['offered_pokemon']
         self.offers = self._data['offers']
 
     async def on_raw_reaction_add(self, payload):
@@ -56,9 +54,10 @@ class Trade:
         if not any(emoji_check):
             return
 
-        if payload.user_id != self.lister_id and '\u20e3' in emoji:
+        if payload.user_id != self.lister_id and payload.user_id != self.bot.user.id and '\u20e3' in emoji:
+            wanted_pokemon = await self.wanted_pokemon()
             i = int(emoji[0])
-            offer = self.wanted_pokemon[i-1]
+            offer = wanted_pokemon[i-1]
             await self.make_offer(payload.user_id, offer)
 
         elif payload.user_id == self.lister_id and emoji == '\u23f9':
@@ -75,11 +74,6 @@ class Trade:
     @property
     def lister(self):
         return self.guild.get_member(self.lister_id)
-
-    @property
-    def embed(self):
-        return self.make_trade_embed(
-            self.lister, self.wanted_pokemon, self.offered_pokemon)
 
     @staticmethod
     def make_trade_embed(lister, wanted_pokemon, offered_pokemon):
@@ -165,16 +159,29 @@ class Trade:
     async def get_listmsg(self):
         return await self.listing_channel.get_message(self.listing_id)
 
+    async def offered_pokemon(self):
+        listingmsg = await self.get_listmsg()
+        ctx =  await self.bot.get_context(listingmsg)
+        return pokemon.Pokemon.get_pokemon(ctx, self._data['offered_pokemon'])
+
+    async def wanted_pokemon(self):
+        listingmsg = await self.get_listmsg()
+        ctx = await self.bot.get_context(listingmsg)
+        return [pokemon.Pokemon.get_pokemon(ctx, want) for want in self._data['wanted_pokemon']]
+
     async def make_offer(self, trader_id, pkmn):
+        offered_pokemon = await self.offered_pokemon()
         self.offers[trader_id] = str(pkmn)
+        listingmsg = await self.get_listmsg()
+        ctx = await self.bot.get_context(listingmsg)
         trader = self.guild.get_member(trader_id)
-        offer_embed = self.make_offer_embed(trader, self.offered_pokemon, pkmn)
+        offer_embed = self.make_offer_embed(trader, offered_pokemon, pkmn)
 
         offermsg = await self.lister.send(
             ("Meowth! {} offers to trade their {} for your {}! "
              "React with :white_check_mark: to accept the offer or "
              ":negative_squared_cross_mark: to reject it!").format(
-                 trader.display_name, pkmn, self.offered_pokemon),
+                 trader.display_name, pkmn, offered_pokemon),
             embed=offer_embed)
 
         reaction, __ = await utils.ask(self.bot, offermsg, timeout=None)
@@ -192,6 +199,10 @@ class Trade:
         lister = self.lister
         listingmsg = await self.get_listmsg()
 
+        ctx = await self.bot.get_context(listingmsg)
+        offer = pokemon.Pokemon.get_pokemon(ctx, offer)
+        offered_pokemon = await self.offered_pokemon()
+
         acceptedmsg = (
             "Meowth! {} has agreed to trade their {} for {}'s {}\n\n"
             "Please DM them to coordinate the trade! "
@@ -199,13 +210,13 @@ class Trade:
             "completed! To reject or cancel this offer, react with "
             ":stop_button:").format(
                 self.lister.mention,
-                self.offered_pokemon,
+                offered_pokemon,
                 trader.mention,
                 offer)
 
         special_check = [
-            self.offered_pokemon.shiny,
-            self.offered_pokemon.legendary,
+            offered_pokemon.shiny,
+            offered_pokemon.legendary,
             offer.shiny,
             offer.legendary
         ]
@@ -228,17 +239,19 @@ class Trade:
         for offerid in self.offers.keys():
             if offerid != offer_id:
                 reject = self.guild.get_member(offerid)
+                try:
+                    await reject.send((
+                        "Meowth... {} accepted a competing offer for their {}. "
+                        "").format(self.lister.display_name, offered_pokemon))
+                except discord.HTTPException:
+                    pass
 
-                await reject.send((
-                    "Meowth... {} accepted a competing offer for their {}. "
-                    "").format(self.lister.display_name, self.offered_pokemon))
 
-                del self.offers[offerid]
 
         await listingmsg.edit(
             content="Meowth! {} has accepted an offer!".format(
                 self.lister.display_name),
-            embed=self.embed)
+            )
 
         await listingmsg.clear_reactions()
 
@@ -277,6 +290,8 @@ class Trade:
         # maybe ask the lister to provide a friend code optionally before dm
 
     async def withdraw_offer(self, offer_id):
+        offered_pokemon = await self.offered_pokemon()
+        wanted_pokemon = await self.wanted_pokemon()
         listingmsg = await self.get_listmsg()
         trader = self.guild.get_member(offer_id)
         await self.lister.send(
@@ -284,7 +299,7 @@ class Trade:
                 trader.display_name, self.offers[offer_id]))
 
         offer_str = "Meowth! {lister} offers a {pkmn} up for trade!".format(
-            lister=self.lister.display_name, pkmn=self.offered_pokemon)
+            lister=self.lister.display_name, pkmn=offered_pokemon)
 
         instructions = "React to this message to make an offer!"
         cancel_inst = "{lister} may cancel the trade with :stop_button:".format(
@@ -292,33 +307,52 @@ class Trade:
 
         await listingmsg.edit(
             content=f"{offer_str}\n\n{instructions}\n\n{cancel_inst}",
-            embed=self.embed)
+            )
 
-        for i in range(len(self.wanted_pokemon)):
+        for i in range(len(wanted_pokemon)):
             await listingmsg.add_reaction(f'{i+1}\u20e3')
-            await asyncio.sleep(0.25)
 
         await listingmsg.add_reaction('\u23f9')
         del self.offers[offer_id]
 
     async def reject_offer(self, offer_id):
+        listingmsg = await self.get_listmsg()
         trader = self.guild.get_member(offer_id)
+        offered_pokemon = await self.offered_pokemon()
+        wanted_pokemon = await self.wanted_pokemon()
 
         await trader.send(
             "Meowth... {} rejected your offer for their {}.".format(
-                self.lister.display_name, self.offered_pokemon))
+                self.lister.display_name, offered_pokemon))
+
+        offer_str = "Meowth! {lister} offers a {pkmn} up for trade!".format(
+            lister=self.lister.display_name, pkmn=offered_pokemon)
+
+        instructions = "React to this message to make an offer!"
+        cancel_inst = "{lister} may cancel the trade with :stop_button:".format(
+            lister=self.lister.display_name)
+
+        await listingmsg.edit(
+            content=f"{offer_str}\n\n{instructions}\n\n{cancel_inst}",
+            )
+
+        for i in range(len(wanted_pokemon)):
+            await listingmsg.add_reaction(f'{i+1}\u20e3')
+
+        await listingmsg.add_reaction('\u23f9')
 
         del self.offers[offer_id]
 
     async def cancel_trade(self):
+        offered_pokemon = await self.offered_pokemon()
         for offerid in self.offers:
             reject = self.guild.get_member(offerid)
 
             await reject.send(
                 "Meowth... {} canceled their trade offer of {}".format(
-                    self.lister.display_name, self.offered_pokemon))
+                    self.lister.display_name, offered_pokemon))
 
-        self.close_trade()
+        await self.close_trade()
 
         # update the listing message if it still exists
         # dm those who offered saying the trade was cancelled
@@ -327,14 +361,17 @@ class Trade:
         listingmsg = await self.get_listmsg()
         await listingmsg.edit(content='Meowth! This trade has been completed!', embed=None)
         await asyncio.sleep(5)
-        self.close_trade()
+        await self.close_trade()
 
-    def close_trade(self):
+    async def close_trade(self):
+        listingmsg = await self.get_listmsg()
+        await listingmsg.delete()
         self.bot.remove_listener(self.on_raw_reaction_add)
         try:
             guild_trades = self.bot.guild_dict[self.guild_id]
             del guild_trades[self.report_channel_id][self.listing_id]
-        except KeyError:
+            await listingmsg.delete()
+        except (KeyError, discord.HTTPException):
             pass
 
 class Trading:
@@ -350,6 +387,8 @@ class Trading:
 
     async def on_message(self, message):
         ctx = await self.bot.get_context(message)
+        if not ctx.guild:
+            return
         if checks.check_tradereport(ctx) and message.author != ctx.guild.me:
             await asyncio.sleep(1)
             try:
@@ -369,20 +408,24 @@ class Trading:
         def check(m):
             return m.author == ctx.author and m.channel == ctx.channel
 
-        want_reply = await ctx.bot.wait_for('message', check=check)
+        try:
+            want_reply = await ctx.bot.wait_for('message', check=check, timeout=60)
+        except asyncio.TimeoutError:
+            await want_ask.delete()
+            return
 
         wants = want_reply.content.lower().split(',')
 
         await want_ask.delete()
         await want_reply.delete()
 
-        pkmn_convert = functools.partial(pokemon.Pokemon.convert, ctx)
+        pkmn_convert = functools.partial(pokemon.Pokemon.get_pokemon, ctx)
 
         wants = map(str.strip, wants)
-        wants = [str(await pkmn_convert(want)) for want in wants]
+        wants = map(pkmn_convert, wants)
+        wants = [str(want) for want in wants]
 
         await Trade.create_trade(ctx, wants, offer)
-        await ctx.message.delete()
 
 
 def setup(bot):

@@ -120,8 +120,14 @@ class Trade:
         trade_embed = cls.make_trade_embed(
             ctx.author, wanted_pokemon, offered_pokemon)
 
-        offer_str = ("Meowth! {lister} offers a {pkmn} up for trade!"
-                     "").format(lister=ctx.author.display_name,
+        role = offered_pokemon.role
+        if role:
+            rolestr = role.mention + " - "
+        else:
+            rolestr = ""
+
+        offer_str = ("{role}Meowth! {lister} offers a {pkmn} up for trade!"
+                     "").format(role=rolestr, lister=ctx.author.display_name,
                                 pkmn=offered_pokemon)
 
         instructions = "React to this message to make an offer!"

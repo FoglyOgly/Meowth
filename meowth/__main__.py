@@ -3303,6 +3303,8 @@ async def _configure_trade(ctx):
             return None
         elif trademsg.content.lower() == 'n':
             config_dict_temp['trade'] == {'enabled': False, 'report_channels': []}
+            await owner.send(embed=discord.Embed(colour=discord.Colour.red(), description=_('Trade disabled.')))
+            break
         else:
             trade_list = trademsg.content.lower().split(',')
             trade_list = [x.strip() for x in trade_list]

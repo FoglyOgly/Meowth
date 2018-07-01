@@ -161,7 +161,7 @@ class Trade:
 
     async def offered_pokemon(self):
         listingmsg = await self.get_listmsg()
-        ctx =  await self.bot.get_context(listingmsg)
+        ctx = await self.bot.get_context(listingmsg)
         return pokemon.Pokemon.get_pokemon(ctx, self._data['offered_pokemon'])
 
     async def wanted_pokemon(self):
@@ -172,8 +172,6 @@ class Trade:
     async def make_offer(self, trader_id, pkmn):
         offered_pokemon = await self.offered_pokemon()
         self.offers[trader_id] = str(pkmn)
-        listingmsg = await self.get_listmsg()
-        ctx = await self.bot.get_context(listingmsg)
         trader = self.guild.get_member(trader_id)
         offer_embed = self.make_offer_embed(trader, offered_pokemon, pkmn)
 
@@ -241,7 +239,7 @@ class Trade:
                 reject = self.guild.get_member(offerid)
                 try:
                     await reject.send((
-                        "Meowth... {} accepted a competing offer for their {}. "
+                        "Meowth... {} accepted a competing offer for their {}."
                         "").format(self.lister.display_name, offered_pokemon))
                 except discord.HTTPException:
                     pass
@@ -273,13 +271,17 @@ class Trade:
                 if reaction.emoji == '\u2611':
                     trader_confirms = True
                 elif reaction.emoji == '\u23f9':
+                    await tradermsg.delete()
                     return await self.withdraw_offer(trader.id)
             elif user.id == lister.id:
                 if reaction.emoji == '\u2611':
                     lister_confirms = True
                 elif reaction.emoji == '\u23f9':
+                    await listermsg.delete()
                     return await self.reject_offer(trader.id)
             if trader_confirms and lister_confirms:
+                await listermsg.delete()
+                await tradermsg.delete()
                 return await self.confirm_trade()
             else:
                 continue

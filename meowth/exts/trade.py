@@ -207,9 +207,9 @@ class Trade:
             "React with :ballot_box_with_check: when the trade has been "
             "completed! To reject or cancel this offer, react with "
             ":stop_button:").format(
-                self.lister.mention,
+                self.lister.display_name,
                 offered_pokemon,
-                trader.mention,
+                trader.display_name,
                 offer)
 
         special_check = [
@@ -404,7 +404,7 @@ class Trading:
         """Create a trade listing."""
 
         want_ask = await ctx.send(
-            f"{ctx.author.mention}, what Pokemon are you willing to accept "
+            f"{ctx.author.display_name}, what Pokemon are you willing to accept "
             f"in exchange for {str(offer)}?")
 
         def check(m):

@@ -120,7 +120,7 @@ class Trade:
         trade_embed = cls.make_trade_embed(
             ctx.author, wanted_pokemon, offered_pokemon)
 
-        role = offered_pokemon.role
+        role = offered_pokemon.role(ctx.guild)
         if role:
             rolestr = role.mention + " - "
         else:

@@ -202,7 +202,7 @@ class Pokemon():
         else:
             shiny_str = ""
         return ('https://raw.githubusercontent.com/FoglyOgly/'
-                f'Meowth/discordpy-v1/images/pkmn/{pkmn_no}{form_str}_{alolan_str}{shiny_str}?cache=3.png')
+                f'Meowth/discordpy-v1/images/pkmn/{pkmn_no}{form_str}_{alolan_str}{shiny_str}.png?cache=3')
 
     # async def colour(self):
     #     """:class:`discord.Colour` : Discord colour based on Pokemon sprite."""
@@ -333,6 +333,7 @@ class Pokemon():
         :exc:`discord.ext.commands.BadArgument`
             The argument didn't match a Pokemon ID or name.
         """
+        argument = argument.lower()
         if 'shiny' in argument.lower():
             shiny = True
             argument = argument.replace('shiny','').strip()
@@ -378,6 +379,7 @@ class Pokemon():
 
     @classmethod
     def get_pokemon(cls, ctx, argument):
+        argument = argument.lower()
         if 'shiny' in argument.lower():
             shiny = True
             argument = argument.replace('shiny', '').strip()

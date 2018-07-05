@@ -4153,7 +4153,7 @@ async def _raid(message, content):
     if str(level) in guild_dict[message.guild.id]['configure_dict']['counters']['auto_levels']:
         try:
             ctrs_dict = await _get_generic_counters(message.guild, entered_raid, weather)
-            ctrsmsg = "Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters."
+            ctrsmsg = _("Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters.")
             ctrsmessage = await raid_channel.send(content=ctrsmsg,embed=ctrs_dict[0]['embed'])
             ctrsmessage_id = ctrsmessage.id
             await ctrsmessage.pin()

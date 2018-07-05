@@ -1713,7 +1713,7 @@ msgstr "Meowth... c'est trop long. Les raids niveau {raidlevel} ne durent actuel
 #: __main__.py:4093 __main__.py:4252 __main__.py:5711 __main__.py:5725
 #: __main__.py:5748 __main__.py:5826 __main__.py:5904
 msgid "clear"
-msgstr "Clear"
+msgstr "clear"
 
 #: __main__.py:4093 __main__.py:4252 __main__.py:5711 __main__.py:5725
 #: __main__.py:5748 __main__.py:5826 __main__.py:5904
@@ -3132,6 +3132,10 @@ msgid ""
 msgstr ""
 "**Pokemon**: {pokemon}, **Location**: [{location}]({url}), **Rapporté par**: {author}\n"
 "**Location**: <{url}>"
+
+#: __main__.py:4156
+msgid "Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters."
+msgstr "Voici les meilleurs combattants pour le boss de raid suivant les conditions météo actuelles! Mettre à jour la météo avec **!weather**. Si vous connaissez le moveset du boss, vous pouvez réagir à ce message avec l’emoji correspondant et je mettrai à jour les compteurs."
 
 #: errors.py:132
 msgid "Meowth! I'm missing some details! Usage: {prefix}{command}"

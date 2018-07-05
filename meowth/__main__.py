@@ -133,7 +133,7 @@ Meowth.config = config
 Meowth.pkmn_info_path = pkmn_path
 Meowth.raid_json_path = raid_path
 
-default_exts = ['datahandler-fr', 'tutorial-fr', 'silph', 'utilities-fr', 'gymmatching']
+default_exts = ['datahandler-fr', 'tutorial', 'silph', 'utilities-fr', 'gymmatching']
 
 for ext in default_exts:
     try:
@@ -1858,6 +1858,10 @@ async def _configure(ctx, configlist):
                 return None
         if "exraid" in configreplylist:
             ctx = await _configure_exraid(ctx)
+            if not ctx:
+                return None
+        if "meetup" in configreplylist:
+            ctx = await _configure_meetup(ctx)
             if not ctx:
                 return None
         if "invite" in configreplylist:

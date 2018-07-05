@@ -1713,52 +1713,52 @@ msgstr "Meowth... c'est trop long. Les raids niveau {raidlevel} ne durent actuel
 #: __main__.py:4093 __main__.py:4252 __main__.py:5711 __main__.py:5725
 #: __main__.py:5748 __main__.py:5826 __main__.py:5904
 msgid "clear"
-msgstr "dégagé"
+msgstr "Clear"
 
 #: __main__.py:4093 __main__.py:4252 __main__.py:5711 __main__.py:5725
 #: __main__.py:5748 __main__.py:5826 __main__.py:5904
 msgid "extreme"
-msgstr "tempête"
+msgstr "extreme"
 
 #: __main__.py:4093 __main__.py:4252 __main__.py:5711 __main__.py:5725
 #: __main__.py:5748 __main__.py:5826 __main__.py:5904
 msgid "none"
-msgstr "aucun"
+msgstr "none"
 
 #: __main__.py:4093 __main__.py:4252 __main__.py:5711 __main__.py:5725
 #: __main__.py:5748 __main__.py:5826 __main__.py:5904
 msgid "rainy"
-msgstr "pluvieux"
+msgstr "rainy"
 
 #: __main__.py:4093 __main__.py:4252 __main__.py:5711 __main__.py:5725
 #: __main__.py:5748 __main__.py:5826 __main__.py:5904
 msgid "sunny"
-msgstr "ensoleillé"
+msgstr "sunny"
 
 #: __main__.py:4094 __main__.py:4253 __main__.py:5712 __main__.py:5726
 #: __main__.py:5749 __main__.py:5827 __main__.py:5905
 msgid "cloudy"
-msgstr "nuageux"
+msgstr "cloudy"
 
 #: __main__.py:4094 __main__.py:4253 __main__.py:5712 __main__.py:5726
 #: __main__.py:5749 __main__.py:5827 __main__.py:5905
 msgid "fog"
-msgstr "brouillard"
+msgstr "fog"
 
 #: __main__.py:4094 __main__.py:4253 __main__.py:5712 __main__.py:5726
 #: __main__.py:5749 __main__.py:5827 __main__.py:5905
 msgid "partlycloudy"
-msgstr "couvert"
+msgstr "partlycloudy"
 
 #: __main__.py:4094 __main__.py:4253 __main__.py:5712 __main__.py:5726
 #: __main__.py:5749 __main__.py:5827 __main__.py:5905
 msgid "snow"
-msgstr "neige"
+msgstr "snow"
 
 #: __main__.py:4094 __main__.py:4253 __main__.py:5712 __main__.py:5726
 #: __main__.py:5749 __main__.py:5827 __main__.py:5905
 msgid "windy"
-msgstr "venteux"
+msgstr "windy"
 
 #: __main__.py:4106 __main__.py:4265
 msgid "Meowth! I couldn't find a gym named '{0}'."

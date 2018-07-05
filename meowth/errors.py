@@ -101,6 +101,14 @@ class WildReportChannelCheckFail(CommandError):
     'Exception raised checks.researchreport fails'
     pass
 
+class TradeChannelCheckFail(CommandError):
+    'Exception raised checks.tradereport fails'
+    pass
+
+class TradeSetCheckFail(CommandError):
+    'Exception raised checks.tradeset fails'
+    pass
+
 async def delete_error(message, error):
     try:
         await message.delete()

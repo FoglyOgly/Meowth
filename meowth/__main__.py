@@ -4322,17 +4322,40 @@ async def _raidegg(ctx, content):
         raid_embed.add_field(name=_('**Hatches:**'), value=_('Set with **!timerset**'), inline=True)
         raid_embed.set_footer(text=_('Reported by @{author} - {timestamp}').format(author=message.author.display_name, timestamp=timestamp), icon_url=message.author.avatar_url_as(format=None, static_format='jpg', size=32))
         raid_embed.set_thumbnail(url=raid_img_url)
+        raid_report = {}
         raidreport = await message.channel.send(content=_('Meowth! Level {level} raid egg reported by {member}! Details: {location_details}. Coordinate in {raid_channel}').format(level=egg_level, member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention), embed=raid_embed)
+        raid_report[message.channel.id] = raidreport.id
+        if gyms:
+            for district in gym['districts']:
+                district_channel = discord.utils.get(message.channel.guild.text_channels, name=district)
+                if district_channel is not None:
+                    await asyncio.sleep(1)
+                    district_raidreport = await district_channel.send(content=_('Meowth! Level {level} raid egg reported by {member}! Details: {location_details}. Coordinate in {raid_channel}').format(
+                        level=egg_level, member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention), embed=raid_embed)
+                    raid_report[district_channel.id] = district_raidreport.id
+                    await message.channel.send('Channel found "{}"'.format(district_channel))
+                else:
+                    await message.channel.send('Channel not found "{}"'.format(district))
+            is_ex = gym.get('is_ex', 'No')
+            if is_ex.lower() == "yes":
+                await asyncio.sleep(1)
+                district = 'gymy-exowe'
+                district_channel = discord.utils.get(message.channel.guild.text_channels, name=district)
+                if district_channel is not None:
+                    district_raidreport = await district_channel.send(content=_('Meowth! Level {level} raid egg reported by {member}! Details: {location_details}. Coordinate in {raid_channel}').format(
+                        level=egg_level, member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention), embed=raid_embed)
+                    raid_report[district_channel.id] = district_raidreport.id
+                    await message.channel.send('Channel found "{}"'.format(district_channel))
+                else:
+                    await message.channel.send('Channel not found "{}"'.format(district))
         await asyncio.sleep(1)
         raidmsg = _("Meowth! Level {level} raid egg reported by {member} in {citychannel}! Details: {location_details}. Coordinate here!\n\nClick the question mark reaction to get help on the commands that work in here.\n\nThis channel will be deleted five minutes after the timer expires.").format(level=egg_level, member=message.author.mention, citychannel=message.channel.mention, location_details=raid_details)
         raidmessage = await raid_channel.send(content=raidmsg, embed=raid_embed)
         await raidmessage.add_reaction('\u2754')
         await raidmessage.pin()
         guild_dict[message.guild.id]['raidchannel_dict'][raid_channel.id] = {
-            'reportcity': {message.channel.id: raidreport.id},
-            'trainer_dict': {
-
-            },
+            'reportcity': raid_report,
+            'trainer_dict': {},
             'exp': time.time() + (60 * raid_info['raid_eggs'][egg_level]['hatchtime']),
             'manual_timer': False,
             'active': True,

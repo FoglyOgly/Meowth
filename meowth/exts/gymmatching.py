@@ -37,6 +37,8 @@ class GymMatching:
 
     def _create_embed_gyms(self, ctx, gym, add_emoji: bool = False, verbose: bool = True, score_limit: int = 70,
                            count_limit: int = 10):
+        if count_limit > 10:
+            count_limit = 10
         gyms = self.get_gyms(ctx.guild.id)
         if not gyms:
             return None
@@ -46,6 +48,7 @@ class GymMatching:
         embed = discord.Embed(colour=ctx.guild.me.colour,
                               description=f"Dla podanej nazwy **\"{gym}\"** znaleziono następujące gymy")
         printed = []
+        gyms_to_print = []
         for match, score in result:
             if score < score_limit:
                 continue
@@ -74,9 +77,14 @@ class GymMatching:
                         ex_status = 'nieznany'
             ex_status_str = f"\nTyp gymu: **{ex_status}**"
             emoji = "" if add_emoji is False else self.num_to_emoji[len(printed)] + " "
-            value = "" if verbose is False else f"{coords_str}{districts_str}{ex_status_str}{notes_str}"
-            embed.add_field(name=f"{emoji}{match}", value=value, inline=False)
+            if verbose:
+                value = f"{coords_str}{districts_str}{ex_status_str}{notes_str}"
+                embed.add_field(name=f"{emoji}{match}", value=value, inline=False)
+            else:
+                gyms_to_print.append(f"{emoji}{match}")
             printed.append((match, districts))
+        if not verbose:
+            embed.add_field(name="Wybierz jeden z gymów używając emoji poniżej:", value="\n".join(gyms_to_print))
         return embed, printed
 
     @commands.command(aliases=['findgym', 'znajdźgym', 'znajdzgym', 'szukajgym', 'szukajgyma', 'szukajgymu'])

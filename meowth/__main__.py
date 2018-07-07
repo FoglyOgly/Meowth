@@ -6763,7 +6763,7 @@ async def _list(ctx):
             event_list = []
             for r in rc_d:
                 for report_channel in rc_d[r]['reportcity'].keys():
-                    reportcity = Meowth.get_channel(report_channel):
+                    reportcity = Meowth.get_channel(report_channel)
                     if (reportcity.name == cty) and rc_d[r]['active'] and discord.utils.get(guild.text_channels, id=r):
                         exp = rc_d[r]['exp']
                         type = rc_d[r]['type']

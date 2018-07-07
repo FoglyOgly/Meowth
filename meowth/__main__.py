@@ -4227,16 +4227,16 @@ async def _report_to_districts(channel, gym, content, embed):
         return {}
     raid_reports = {}
     for district in gym.get('districts', []):
-        channel, report = await _send_to_district(channel, district, category, content, embed)
+        report_channel, report_message = await _send_to_district(channel, district, category, content, embed)
         await asyncio.sleep(0)
-        if channel is not None:
-            raid_reports[channel] = report
+        if report_channel is not None:
+            raid_reports[report_channel] = report_message
     is_ex = gym.get('is_ex', 'No')
     if is_ex.lower() == "yes":
-        channel, report = await _send_to_district(channel, 'gymy-exowe', category, content, embed)
+        report_channel, report_message = await _send_to_district(channel, 'gymy-exowe', category, content, embed)
         await asyncio.sleep(0)
-        if channel is not None:
-            raid_reports[channel] = report
+        if report_channel is not None:
+            raid_reports[report_channel] = report_message
     return raid_reports
 
 
@@ -6762,7 +6762,8 @@ async def _list(ctx):
             exraid_list = []
             event_list = []
             for r in rc_d:
-                for reportcity in Meowth.get_channel(rc_d[r]['reportcity'].keys()):
+                for report_channel in rc_d[r]['reportcity'].keys():
+                    reportcity = Meowth.get_channel(report_channel):
                     if (reportcity.name == cty) and rc_d[r]['active'] and discord.utils.get(guild.text_channels, id=r):
                         exp = rc_d[r]['exp']
                         type = rc_d[r]['type']

@@ -8,6 +8,7 @@ from fuzzywuzzy import process
 import discord
 from discord.ext import commands
 
+
 class GymMatching:
     def __init__(self, bot):
         self.bot = bot
@@ -34,20 +35,21 @@ class GymMatching:
         result = process.extract(gym, gyms, scorer=fuzz.token_set_ratio, limit=max_count)
         return [] if not result else result
 
-    def _create_embed_gyms(self, ctx, gym, add_emoji = False):
+    def _create_embed_gyms(self, ctx, gym, add_emoji: bool = False, verbose: bool = True, score_limit: int = 70,
+                           count_limit: int = 10):
         gyms = self.get_gyms(ctx.guild.id)
         if not gyms:
             return None
-        result = self._get_n_match(list(gyms.keys()), gym, 9)
+        result = self._get_n_match(list(gyms.keys()), gym, count_limit)
         if len(result) == 0:
             return None
         embed = discord.Embed(colour=ctx.guild.me.colour,
                               description=f"Dla podanej nazwy **\"{gym}\"** znaleziono następujące gymy")
         printed = []
         for match, score in result:
-            if score < 70:
+            if score < score_limit:
                 continue
-            if len(printed) > 9:
+            if len(printed) > count_limit-1:
                 continue
             gym_info = gyms[match]
             coords = gym_info['coordinates']
@@ -72,13 +74,13 @@ class GymMatching:
                         ex_status = 'nieznany'
             ex_status_str = f"\nTyp gymu: **{ex_status}**"
             emoji = "" if add_emoji is False else self.num_to_emoji[len(printed)] + " "
-            embed.add_field(name=f"{emoji}{match}",
-                            value=f"{coords_str}{districts_str}{ex_status_str}{notes_str}", inline=False)
+            value = "" if verbose is False else f"{coords_str}{districts_str}{ex_status_str}{notes_str}"
+            embed.add_field(name=f"{emoji}{match}", value=value, inline=False)
             printed.append((match, districts))
         return embed, printed
 
-    @commands.command(aliases=['znajdźgym', 'znajdzgym', 'szukajgym', 'szukajgyma', 'szukajgymu'])
-    async def findgym(self, ctx, *, gym):
+    @commands.command(aliases=['findgym', 'znajdźgym', 'znajdzgym', 'szukajgym', 'szukajgyma', 'szukajgymu'])
+    async def find_gym(self, ctx, *, gym):
         guild = ctx.guild
         gyms = self.get_gyms(guild.id)
         if not gyms:
@@ -90,24 +92,16 @@ class GymMatching:
         else:
             await ctx.send(f"Nie znaleziono żadnego gymu pasującego do \"{gym}\".")
 
-    @commands.command()
-    async def pickgym(self, ctx, *, gym):
-        match, districts = await self.pick_gym_prompt(ctx, gym)
-        if not match:
-            return await ctx.send(f"Nie znaleziono żadnego gymu pasującego do \"{gym}\".")
-        if match == "__TIMEOUT__":
-            return await ctx.send(f"Za wolno.. spróbuj jeszcze raz.")
-        return await ctx.send(f"Znaleziono dopasowanie: {match} w dzielnicach {districts}")
-
     async def pick_gym_prompt(self, ctx, gym):
-        embed, printed = self._create_embed_gyms(ctx, gym, add_emoji=True)
+        embed, printed = self._create_embed_gyms(ctx, gym, add_emoji=True, verbose=False)
         if embed is None or len(printed) == 0:
             return None, None
         if len(printed) == 1:
             return printed[0]
         try:
             q_msg = await ctx.send(embed=embed)
-            reaction, user = await self._ask(ctx, q_msg, [ctx.message.author.id], [self.num_to_emoji[key] for key in range(len(printed))])
+            reaction, user = await self._ask(ctx, q_msg, [ctx.message.author.id],
+                                             [self.num_to_emoji[key] for key in range(len(printed))])
         except TypeError:
             await q_msg.delete()
             return None, None
@@ -123,14 +117,15 @@ class GymMatching:
             return (user.id in user_list) and (reaction.message.id == message.id) and (reaction.emoji in react_list)
 
         for r in react_list:
-            await asyncio.sleep(0.25)
+            await asyncio.sleep(0.1)
             await message.add_reaction(r)
         try:
             reaction, user = await ctx.bot.wait_for('reaction_add', check=check, timeout=10)
             return reaction, user
         except asyncio.TimeoutError:
             await message.clear_reactions()
-            return
+            return None, None
+
 
 def setup(bot):
     bot.add_cog(GymMatching(bot))

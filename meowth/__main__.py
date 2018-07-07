@@ -4150,7 +4150,7 @@ async def _raid(ctx, content):
     raid_embed.set_thumbnail(url=raid_img_url)
     report_embed = raid_embed
     raidreport = await message.channel.send(content=_('Meowth! {pokemon} raid reported by {member}! Details: {location_details}. Coordinate in {raid_channel}').format(pokemon=entered_raid.capitalize(), member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention), embed=report_embed)
-    raid_reports{message.channel.id: raidreport.id}
+    raid_reports = {message.channel.id: raidreport.id}
     await asyncio.sleep(1)
     raidmsg = _("{roletest}Meowth! {pokemon} raid reported by {member} in {citychannel}! Details: {location_details}. Coordinate here!\n\nClick the question mark reaction to get help on the commands that work in here.\n\nThis channel will be deleted five minutes after the timer expires.").format(roletest=roletest, pokemon=entered_raid.title(), member=message.author.mention, citychannel=message.channel.mention, location_details=raid_details)
     raidmessage = await raid_channel.send(content=raidmsg, embed=raid_embed)
@@ -4160,7 +4160,9 @@ async def _raid(ctx, content):
         await asyncio.sleep(1)
         content = _('Meowth! {pokemon} raid reported by {member}! Details: {location_details}. Coordinate in {raid_channel}').format(pokemon=entered_raid.capitalize(), member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention)
         embed = report_embed
-        raid_reports.update(_report_to_districts(message.channel.guild, gym, content, embed))
+        district_reports = await _report_to_districts(message.channel, gym, content, embed)
+        if district_reports is not None:
+            raid_reports.update(district_reports)
     level = get_level(entered_raid)
     if str(level) in guild_dict[message.guild.id]['configure_dict']['counters']['auto_levels']:
         try:
@@ -4204,28 +4206,37 @@ async def _raid(ctx, content):
     return raid_channel
 
 
-async def _send_to_district(guild, district, category, content, embed):
-    district_channel = discord.utils.get(guild.text_channels, name=district, category_id=category.id)
+async def _send_to_district(channel, district, category, content, embed):
+    district_channel = discord.utils.get(channel.guild.text_channels, name=district, category_id=category.id)
     if district_channel is None:
         logger.info('Nie znalazłem kanału dla dzielnicy "{}"'.format(district))
-        return
+        return None, None
+    if channel.id == district_channel.id:
+        logger.info('Raport dla dzielnicy "{}" już istnieje'.format(district))
+        return None, None
     district_raidreport = await district_channel.send(content=content, embed=embed)
-    await asyncio.sleep(1)
-    return {district_channel.id: district_raidreport.id}
+    await asyncio.sleep(0)
+    return district_channel.id, district_raidreport.id
 
 
-async def _report_to_districts(guild, gym, content, embed):
-    raid_reports = {}
+async def _report_to_districts(channel, gym, content, embed):
     category_name = 'Dzielnice'
-    category = discord.utils.get(guild.categories, name=category_name)
+    category = discord.utils.get(channel.guild.categories, name=category_name)
     if category is None:
         logger.info('Nie znalazłem kategori {}'.format(category_name))
-        return raid_reports
-    for district in gym['districts']:
-        raid_reports.update(_send_to_district(guild, district, category, content, embed))
+        return {}
+    raid_reports = {}
+    for district in gym.get('districts', []):
+        channel, report = await _send_to_district(channel, district, category, content, embed)
+        await asyncio.sleep(0)
+        if channel is not None:
+            raid_reports[channel] = report
     is_ex = gym.get('is_ex', 'No')
     if is_ex.lower() == "yes":
-        raid_reports.update(_send_to_district(guild, 'gymy-exowe', category, content, embed))
+        channel, report = await _send_to_district(channel, 'gymy-exowe', category, content, embed)
+        await asyncio.sleep(0)
+        if channel is not None:
+            raid_reports[channel] = report
     return raid_reports
 
 
@@ -4356,7 +4367,7 @@ async def _raidegg(ctx, content):
         raid_embed.set_thumbnail(url=raid_img_url)
         raidreport = await message.channel.send(content=_('Meowth! Level {level} raid egg reported by {member}! Details: {location_details}. Coordinate in {raid_channel}').format(level=egg_level, member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention), embed=raid_embed)
         await asyncio.sleep(1)
-        raid_reports{message.channel.id: raidreport.id}
+        raid_reports = {message.channel.id: raidreport.id}
         raidmsg = _("Meowth! Level {level} raid egg reported by {member} in {citychannel}! Details: {location_details}. Coordinate here!\n\nClick the question mark reaction to get help on the commands that work in here.\n\nThis channel will be deleted five minutes after the timer expires.").format(level=egg_level, member=message.author.mention, citychannel=message.channel.mention, location_details=raid_details)
         raidmessage = await raid_channel.send(content=raidmsg, embed=raid_embed)
         await raidmessage.add_reaction('\u2754')
@@ -4365,7 +4376,9 @@ async def _raidegg(ctx, content):
             await asyncio.sleep(1)
             content = _('Meowth! Level {level} raid egg reported by {member}! Details: {location_details}. Coordinate in {raid_channel}').format(level=egg_level, member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention)
             embed = raid_embed
-            raid_reports.update(_report_to_districts(message.channel.guild, gym, content, embed))
+            district_reports = await _report_to_districts(message.channel, gym, content, embed)
+            if district_reports is not None:
+                raid_reports.update(district_reports)
         guild_dict[message.guild.id]['raidchannel_dict'][raid_channel.id] = {
             'reportcity': raid_reports,
             'trainer_dict': {},

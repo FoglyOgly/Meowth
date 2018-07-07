@@ -57,8 +57,8 @@ class GymMatching:
             coords_str = f"Współrzędne: [{coords}]({coords_link})"
             notes = gym_info.get('notes', None)
             notes_str = "" if notes is None else f"\nDodatkowe informacje: {notes}"
-            districts = gym_info.get('districts', None)
-            districts_str = '' if districts is None else f"\nDzielnice: **{districts}**"
+            districts = gym_info.get('districts', [])
+            districts_str = '' if districts is None else "\nDzielnice: **{}**".format(", ".join(districts))
             is_ex = gym_info.get('is_ex', None)
             can_be_ex = gym_info.get('can_be_ex', None)
             ex_status = ''

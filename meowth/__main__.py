@@ -92,6 +92,14 @@ script_path = os.path.dirname(os.path.realpath(__file__))
 Helper functions
 """
 
+def __load_raid_info():
+    # Check first if the server has its own configuration for raid source
+    raid_path_source = os.path.join('config', 'raid_info.json')
+    if not os.path.isfile(raid_path_source):
+        raid_path_source = os.path.join('data', 'raid_info.json')
+    with open(raid_path_source, 'r') as fd:
+        raid_info = json.load(fd)
+        return (raid_path_source, raid_info)
 
 def load_config():
     global config
@@ -107,14 +115,13 @@ def load_config():
         'meowth', localedir='locale', languages=[config['bot-language']])
     language.install()
     pokemon_language = [config['pokemon-language']]
+    # Load Pokemon list and raid info
     pokemon_path_source = os.path.join(
         'locale', '{0}', 'pkmn.json').format(config['pokemon-language'])
-    raid_path_source = os.path.join('data', 'raid_info.json')
-    # Load Pokemon list and raid info
     with open(pokemon_path_source, 'r') as fd:
         pkmn_info = json.load(fd)
-    with open(raid_path_source, 'r') as fd:
-        raid_info = json.load(fd)
+
+    raid_path_source, raid_info = __load_raid_info()
     # Load type information
     with open(os.path.join('data', 'type_chart.json'), 'r') as fd:
         type_chart = json.load(fd)
@@ -3365,8 +3372,7 @@ async def raid_json(ctx, level=None, *, newlist=None):
         if timeout or res.emoji == '❎':
             return await ctx.channel.send(_("Meowth! Configuration cancelled!"))
         elif res.emoji == '✅':
-            with open(os.path.join('config', 'raid_info.json'), 'r') as fd:
-                data = json.load(fd)
+            __unused__, data = __load_raid_info()
             tmp = data['raid_eggs'][level]['pokemon']
             data['raid_eggs'][level]['pokemon'] = intlist
             with open(os.path.join('config', 'raid_info.json'), 'w') as fd:

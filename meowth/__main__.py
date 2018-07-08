@@ -5475,7 +5475,7 @@ async def recover(ctx):
         }
         async for message in channel.history(limit=500, reverse=True):
             if message.author.id == guild.me.id:
-                c = _('Coordinate here')
+                c = 'Szczegóły: '
                 if c in message.content:
                     reportchannel = message.raw_channel_mentions[0]
                     raidmessage = message
@@ -5609,7 +5609,7 @@ async def recover(ctx):
                     else:
                         continue
         guild_dict[channel.guild.id]['raidchannel_dict'][channel.id] = {
-            'reportcity': {reportchannel.id: raidmessage.id},
+            'reportcity': {reportchannel: raidmessage.id},
             'trainer_dict': trainer_dict,
             'exp': exp,
             'manual_timer': manual_timer,

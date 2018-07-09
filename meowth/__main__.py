@@ -36,6 +36,8 @@ from meowth.bot import MeowthBot
 from meowth.config import Config
 from meowth.errors import custom_error_handling
 from meowth.logs import init_loggers
+from meowth.utils import *
+
 
 logger = init_loggers()
 
@@ -95,14 +97,6 @@ script_path = os.path.dirname(os.path.realpath(__file__))
 Helper functions
 """
 
-def __load_raid_info():
-    # Check first if the server has its own configuration for raid source
-    raid_path_source = os.path.join('config', 'raid_info.json')
-    if not os.path.isfile(raid_path_source):
-        raid_path_source = os.path.join('data', 'raid_info.json')
-    with open(raid_path_source, 'r') as fd:
-        raid_info = json.load(fd)
-        return (raid_path_source, raid_info)
 
 def load_config():
     global config
@@ -118,13 +112,14 @@ def load_config():
         'meowth', localedir='locale', languages=[config['bot-language']])
     language.install()
     pokemon_language = [config['pokemon-language']]
-    # Load Pokemon list and raid info
     pokemon_path_source = os.path.join(
         'locale', '{0}', 'pkmn.json').format(config['pokemon-language'])
+    raid_path_source = os.path.join('data', 'raid_info.json')
+    # Load Pokemon list and raid info
     with open(pokemon_path_source, 'r') as fd:
         pkmn_info = json.load(fd)
-
-    raid_path_source, raid_info = __load_raid_info()
+    with open(raid_path_source, 'r') as fd:
+        raid_info = json.load(fd)
     # Load type information
     with open(os.path.join('data', 'type_chart.json'), 'r') as fd:
         type_chart = json.load(fd)
@@ -140,9 +135,7 @@ cf = Config()
 
 
 Meowth.pkmn_info = pkmn_info
-Meowth.raid_info = raid_info
-Meowth.type_list = type_list
-Meowth.type_chart = type_chart
+Meowth.raid_info = cf.get_raid_info()
 
 Meowth.config = config
 Meowth.pkmn_info_path = pkmn_path
@@ -213,15 +206,15 @@ def get_level(pkmn):
         pkmn_number = pkmn
     else:
         pkmn_number = get_number(pkmn)
-    for level in raid_info['raid_eggs']:
-        for level, pkmn_list in raid_info['raid_eggs'].items():
+    for level in cf.get_raid_info()['raid_eggs']:
+        for level, pkmn_list in cf.get_raid_info()['raid_eggs'].items():
             if pkmn_number in pkmn_list["pokemon"]:
                 return level
 
 def get_raidlist():
     raidlist = []
-    for level in raid_info['raid_eggs']:
-        for pokemon in raid_info['raid_eggs'][level]['pokemon']:
+    for level in cf.get_raid_info()['raid_eggs']:
+        for pokemon in cf.get_raid_info()['raid_eggs'][level]['pokemon']:
             raidlist.append(pokemon)
             raidlist.append(get_name(pokemon).lower())
     return raidlist
@@ -640,7 +633,7 @@ async def expiry_check(channel):
                     end = guild_dict[guild.id]['raidchannel_dict'][channel.id]['meetup'].get('end',False)
                     if start and guild_dict[guild.id]['raidchannel_dict'][channel.id]['type'] == 'egg':
                         if start < now:
-                            pokemon = get_name(raid_info['raid_eggs']['EX']['pokemon'][0])
+                            pokemon = get_name(cf.get_raid_info()['raid_eggs']['EX']['pokemon'][0])
                             await _eggtoraid(pokemon, channel, author=None)
                     if end and end < now:
                         event_loop.create_task(expire_channel(channel))
@@ -658,9 +651,9 @@ async def expiry_check(channel):
                             if guild_dict[guild.id]['raidchannel_dict'][channel.id]['type'] == 'egg':
                                 pokemon = guild_dict[guild.id]['raidchannel_dict'][channel.id]['pokemon']
                                 egglevel = guild_dict[guild.id]['raidchannel_dict'][channel.id]['egglevel']
-                                if not pokemon and len(raid_info['raid_eggs'][egglevel]['pokemon']) == 1:
-                                    pokemon = get_name(raid_info['raid_eggs'][egglevel]['pokemon'][0])
-                                elif not pokemon and egglevel == "5" and guild_dict[channel.guild.id]['configure_dict']['settings'].get('regional',None) in raid_info['raid_eggs']["5"]['pokemon']:
+                                if not pokemon and len(cf.get_raid_info()['raid_eggs'][egglevel]['pokemon']) == 1:
+                                    pokemon = get_name(cf.get_raid_info()['raid_eggs'][egglevel]['pokemon'][0])
+                                elif not pokemon and egglevel == "5" and guild_dict[channel.guild.id]['configure_dict']['settings'].get('regional',None) in cf.get_raid_info()['raid_eggs']["5"]['pokemon']:
                                     pokemon = get_name(guild_dict[channel.guild.id]['configure_dict']['settings']['regional'])
                                 if pokemon:
                                     logger.info(
@@ -1008,7 +1001,7 @@ async def message_cleanup(loop=True):
                     report_message = await report_edit_dict[messageid]['channel'].get_message(messageid)
                     await report_message.edit(content=report_edit_dict[messageid]['action']['content'],embed=discord.Embed(description=report_edit_dict[messageid]['action']['embedcontent'], colour=report_message.embeds[0].colour.value))
                     await report_message.clear_reactions()
-                except (discord.errors.NotFound, discord.errors.Forbidden, discord.errors.HTTPException, IndexError):
+                except (discord.errors.NotFound, discord.errors.Forbidden, discord.errors.HTTPException):
                     pass
         # save server_dict changes after cleanup
         logger.info('message_cleanup - SAVING CHANGES')
@@ -1374,19 +1367,7 @@ async def save(ctx):
         await _print(Meowth.owner, err)
 
 async def _save():
-    with tempfile.NamedTemporaryFile('wb', dir=os.path.dirname(os.path.join('config', 'serverdict')), delete=False) as tf:
-        pickle.dump(guild_dict, tf, (- 1))
-        tempname = tf.name
-    try:
-        os.remove(os.path.join('config', 'serverdict_backup'))
-    except OSError as e:
-        pass
-    try:
-        os.rename(os.path.join('config', 'serverdict'), os.path.join('config', 'serverdict_backup'))
-    except OSError as e:
-        if e.errno != errno.ENOENT:
-            raise
-    os.rename(tempname, os.path.join('config', 'serverdict'))
+    Config.save_serverdict(guild_dict)
 
 @Meowth.command()
 @checks.is_owner()
@@ -3331,7 +3312,7 @@ async def reload_json(ctx):
     Usage: !reload_json
     Useful to avoid a full restart if boss list changed"""
     logger.info("reloading the jsons ...")
-    load_config()
+    cf.reload()
     await ctx.message.add_reaction('☑')
 
 @Meowth.command()
@@ -3340,29 +3321,29 @@ async def raid_json(ctx, level=None, *, newlist=None):
     'Edits or displays raid_info.json\n\n    Usage: !raid_json [level] [list]'
     msg = ''
     if (not level) and (not newlist):
-        for level in raid_info['raid_eggs']:
-            msg += _('\n**Level {level} raid list:** `{raidlist}` \n').format(level=level, raidlist=raid_info['raid_eggs'][level]['pokemon'])
-            for pkmn in raid_info['raid_eggs'][level]['pokemon']:
+        for level in cf.get_raid_info()['raid_eggs']:
+            msg += _('\n**Level {level} raid list:** `{raidlist}` \n').format(level=level, raidlist=cf.get_raid_info()['raid_eggs'][level]['pokemon'])
+            for pkmn in cf.get_raid_info()['raid_eggs'][level]['pokemon']:
                 msg += '{name} ({number})'.format(name=get_name(pkmn).title(), number=pkmn)
                 msg += ' '
             msg += '\n'
         return await ctx.channel.send(msg)
-    elif level in raid_info['raid_eggs'] and (not newlist):
-        msg += _('**Level {level} raid list:** `{raidlist}` \n').format(level=level, raidlist=raid_info['raid_eggs'][level]['pokemon'])
-        for pkmn in raid_info['raid_eggs'][level]['pokemon']:
+    elif level in cf.get_raid_info()['raid_eggs'] and (not newlist):
+        msg += _('**Level {level} raid list:** `{raidlist}` \n').format(level=level, raidlist=cf.get_raid_info()['raid_eggs'][level]['pokemon'])
+        for pkmn in cf.get_raid_info()['raid_eggs'][level]['pokemon']:
             msg += '{name} ({number})'.format(name=get_name(pkmn).title(), number=pkmn)
             msg += ' '
         msg += '\n'
         return await ctx.channel.send(msg)
-    elif level in raid_info['raid_eggs'] and newlist:
+    elif level in cf.get_raid_info()['raid_eggs'] and newlist:
         newlist = [item.strip() for item in newlist.strip('[]').split(',')]
         try:
             intlist = [int(x) for x in newlist]
         except:
             return await ctx.channel.send(_("I couldn't understand the list you supplied! Please use a comma-separated list of Pokemon species numbers."))
         msg += _('I will replace this:\n')
-        msg += _('**Level {level} raid list:** `{raidlist}` \n').format(level=level, raidlist=raid_info['raid_eggs'][level]['pokemon'])
-        for pkmn in raid_info['raid_eggs'][level]['pokemon']:
+        msg += _('**Level {level} raid list:** `{raidlist}` \n').format(level=level, raidlist=cf.get_raid_info()['raid_eggs'][level]['pokemon'])
+        for pkmn in cf.get_raid_info()['raid_eggs'][level]['pokemon']:
             msg += '{name} ({number})'.format(name=get_name(pkmn).title(), number=pkmn)
             msg += ' '
         msg += _('\n\nWith this:\n')
@@ -3380,12 +3361,7 @@ async def raid_json(ctx, level=None, *, newlist=None):
         if timeout or res.emoji == '❎':
             return await ctx.channel.send(_("Meowth! Configuration cancelled!"))
         elif res.emoji == '✅':
-            __unused__, data = __load_raid_info()
-            tmp = data['raid_eggs'][level]['pokemon']
-            data['raid_eggs'][level]['pokemon'] = intlist
-            with open(os.path.join('config', 'raid_info.json'), 'w') as fd:
-                json.dump(data, fd, indent=2, separators=(', ', ': '))
-            load_config()
+            cf.save_raidegg_info(level, intlist)
             await question.clear_reactions()
             await question.add_reaction('☑')
             return await ctx.channel.send(_("Meowth! Configuration successful!"))
@@ -3481,9 +3457,9 @@ async def changeraid(ctx, newraid):
         guild_dict[guild.id]['raidchannel_dict'][channel.id]['pokemon'] = ''
         changefrom = guild_dict[guild.id]['raidchannel_dict'][channel.id]['type']
         guild_dict[guild.id]['raidchannel_dict'][channel.id]['type'] = 'egg'
-        egg_img = raid_info['raid_eggs'][newraid]['egg_img']
+        egg_img = cf.get_raid_info()['raid_eggs'][newraid]['egg_img']
         boss_list = []
-        for p in raid_info['raid_eggs'][newraid]['pokemon']:
+        for p in cf.get_raid_info()['raid_eggs'][newraid]['pokemon']:
             p_name = get_name(p).title()
             p_type = get_type(message.guild, p)
             boss_list.append((((p_name + ' (') + str(p)) + ') ') + ''.join(p_type))
@@ -3493,7 +3469,7 @@ async def changeraid(ctx, newraid):
         report_message = await report_channel.get_message(guild_dict[guild.id]['raidchannel_dict'][channel.id]['raidreport'])
         oldembed = raid_message.embeds[0]
         raid_embed = discord.Embed(title=oldembed.title, url=oldembed.url, colour=message.guild.me.colour)
-        if len(raid_info['raid_eggs'][newraid]['pokemon']) > 1:
+        if len(cf.get_raid_info()['raid_eggs'][newraid]['pokemon']) > 1:
             raid_embed.add_field(name=_('**Possible Bosses:**'), value=_('{bosslist1}').format(bosslist1='\n'.join(boss_list[::2])), inline=True)
             raid_embed.add_field(name='\u200b', value=_('{bosslist2}').format(bosslist2='\n'.join(boss_list[1::2])), inline=True)
         else:
@@ -3525,7 +3501,7 @@ async def changeraid(ctx, newraid):
         egglevel = guild_dict[guild.id]['raidchannel_dict'][channel.id]['egglevel']
         if egglevel == "0":
             egglevel = get_level(newraid)
-        guild_dict[guild.id]['raidchannel_dict'][channel.id]['exp'] -= 60 * raid_info['raid_eggs'][egglevel]['raidtime']
+        guild_dict[guild.id]['raidchannel_dict'][channel.id]['exp'] -= 60 * cf.get_raid_info()['raid_eggs'][egglevel]['raidtime']
 
         await _eggtoraid(newraid, channel, author=message.author)
 
@@ -4201,8 +4177,8 @@ async def _raid(message, content):
         await message.channel.send(_("Meowth! The Pokemon {pokemon} only appears in EX Raids! Use **!exraid** to report one!").format(pokemon=entered_raid.capitalize()))
         return
     if raidexp is not False:
-        if _timercheck(raidexp, raid_info['raid_eggs'][get_level(entered_raid)]['raidtime']):
-            await message.channel.send(_("Meowth...that's too long. Level {raidlevel} raids currently last no more than {raidtime} minutes...").format(raidlevel=get_level(entered_raid), raidtime=raid_info['raid_eggs'][get_level(entered_raid)]['raidtime']))
+        if _timercheck(raidexp, cf.get_raid_info()['raid_eggs'][get_level(entered_raid)]['raidtime']):
+            await message.channel.send(_("Meowth...that's too long. Level {raidlevel} raids currently last no more than {raidtime} minutes...").format(raidlevel=get_level(entered_raid), raidtime=cf.get_raid_info()['raid_eggs'][get_level(entered_raid)]['raidtime']))
             return
     raid_details = ' '.join(raid_split)
     raid_details = raid_details.strip()
@@ -4267,7 +4243,7 @@ async def _raid(message, content):
     if str(level) in guild_dict[message.guild.id]['configure_dict']['counters']['auto_levels']:
         try:
             ctrs_dict = await _get_generic_counters(message.guild, entered_raid, weather)
-            ctrsmsg = _("Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters.")
+            ctrsmsg = _("""Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters.""")
             ctrsmessage = await raid_channel.send(content=ctrsmsg,embed=ctrs_dict[0]['embed'])
             ctrsmessage_id = ctrsmessage.id
             await ctrsmessage.pin()
@@ -4283,7 +4259,7 @@ async def _raid(message, content):
     guild_dict[message.guild.id]['raidchannel_dict'][raid_channel.id] = {
         'reportcity': message.channel.id,
         'trainer_dict': {},
-        'exp': time.time() + (60 * raid_info['raid_eggs'][str(level)]['raidtime']),
+        'exp': time.time() + (60 * cf.get_raid_info()['raid_eggs'][str(level)]['raidtime']),
         'manual_timer': False,
         'active': True,
         'raidmessage': raidmessage.id,
@@ -4359,8 +4335,8 @@ async def _raidegg(message, content):
             raidexp = (60 * int(h)) + int(m)
         del raidegg_split[(- 1)]
     if raidexp is not False:
-        if _timercheck(raidexp, raid_info['raid_eggs'][str(egg_level)]['hatchtime']):
-            await message.channel.send(_("Meowth...that's too long. Level {raidlevel} Raid Eggs currently last no more than {hatchtime} minutes...").format(raidlevel=egg_level, hatchtime=raid_info['raid_eggs'][str(egg_level)]['hatchtime']))
+        if _timercheck(raidexp, cf.get_raid_info()['raid_eggs'][str(egg_level)]['hatchtime']):
+            await message.channel.send(_("Meowth...that's too long. Level {raidlevel} Raid Eggs currently last no more than {hatchtime} minutes...").format(raidlevel=egg_level, hatchtime=cf.get_raid_info()['raid_eggs'][str(egg_level)]['hatchtime']))
             return
     raid_details = ' '.join(raidegg_split)
     raid_details = raid_details.strip()
@@ -4394,7 +4370,7 @@ async def _raidegg(message, content):
         return
     else:
         egg_level = str(egg_level)
-        egg_info = raid_info['raid_eggs'][egg_level]
+        egg_info = cf.get_raid_info()['raid_eggs'][egg_level]
         egg_img = egg_info['egg_img']
         boss_list = []
         for p in egg_info['pokemon']:
@@ -4437,7 +4413,7 @@ async def _raidegg(message, content):
             'trainer_dict': {
 
             },
-            'exp': time.time() + (60 * raid_info['raid_eggs'][egg_level]['hatchtime']),
+            'exp': time.time() + (60 * cf.get_raid_info()['raid_eggs'][egg_level]['hatchtime']),
             'manual_timer': False,
             'active': True,
             'raidmessage': raidmessage.id,
@@ -4453,9 +4429,9 @@ async def _raidegg(message, content):
             await _timerset(raid_channel, raidexp)
         else:
             await raid_channel.send(content=_('Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset <minutes>** so others can check it with **!timer**.').format(member=message.author.mention))
-        if len(raid_info['raid_eggs'][egg_level]['pokemon']) == 1:
-            await _eggassume('assume ' + get_name(raid_info['raid_eggs'][egg_level]['pokemon'][0]), raid_channel)
-        elif egg_level == "5" and guild_dict[raid_channel.guild.id]['configure_dict']['settings'].get('regional',None) in raid_info['raid_eggs']["5"]['pokemon']:
+        if len(cf.get_raid_info()['raid_eggs'][egg_level]['pokemon']) == 1:
+            await _eggassume('assume ' + get_name(cf.get_raid_info()['raid_eggs'][egg_level]['pokemon'][0]), raid_channel)
+        elif egg_level == "5" and guild_dict[raid_channel.guild.id]['configure_dict']['settings'].get('regional',None) in cf.get_raid_info()['raid_eggs']["5"]['pokemon']:
             await _eggassume('assume ' + get_name(guild_dict[raid_channel.guild.id]['configure_dict']['settings']['regional']), raid_channel)
         event_loop.create_task(expiry_check(raid_channel))
         egg_reports = guild_dict[message.guild.id].setdefault('trainers',{}).setdefault(message.author.id,{}).setdefault('egg_reports',0) + 1
@@ -4484,7 +4460,7 @@ async def _eggassume(args, raid_channel, author=None):
     if (not raid_match):
         await raid_channel.send(_('Meowth! The Pokemon {pokemon} does not appear in raids!').format(pokemon=entered_raid.capitalize()))
         return
-    elif get_number(entered_raid) not in raid_info['raid_eggs'][egglevel]['pokemon']:
+    elif get_number(entered_raid) not in cf.get_raid_info()['raid_eggs'][egglevel]['pokemon']:
         await raid_channel.send(_('Meowth! The Pokemon {pokemon} does not hatch from level {level} raid eggs!').format(pokemon=entered_raid.capitalize(), level=egglevel))
         return
     guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id]['pokemon'] = entered_raid
@@ -4589,11 +4565,11 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
     if (not raid_match):
         await raid_channel.send(_('Meowth! The Pokemon {pokemon} does not appear in raids!').format(pokemon=entered_raid.capitalize()))
         return
-    elif get_number(entered_raid) not in raid_info['raid_eggs'][str(egglevel)]['pokemon']:
+    elif get_number(entered_raid) not in cf.get_raid_info()['raid_eggs'][str(egglevel)]['pokemon']:
         await raid_channel.send(_('Meowth! The Pokemon {pokemon} does not hatch from level {level} raid eggs!').format(pokemon=entered_raid.capitalize(), level=egglevel))
         return
     if (egglevel.isdigit() and int(egglevel) > 0) or egglevel == 'EX':
-        raidexp = eggdetails['exp'] + 60 * raid_info['raid_eggs'][str(egglevel)]['raidtime']
+        raidexp = eggdetails['exp'] + 60 * cf.get_raid_info()['raid_eggs'][str(egglevel)]['raidtime']
     else:
         raidexp = eggdetails['exp']
     end = datetime.datetime.utcfromtimestamp(raidexp) + datetime.timedelta(hours=guild_dict[raid_channel.guild.id]['configure_dict']['settings']['offset'])
@@ -4746,7 +4722,7 @@ async def _exraid(ctx, location):
     raid_details = ' '.join(exraid_split)
     raid_details = raid_details.strip()
     raid_gmaps_link = create_gmaps_query(raid_details, message.channel, type="exraid")
-    egg_info = raid_info['raid_eggs']['EX']
+    egg_info = cf.get_raid_info()['raid_eggs']['EX']
     egg_img = egg_info['egg_img']
     boss_list = []
     for p in egg_info['pokemon']:
@@ -4816,7 +4792,7 @@ async def _exraid(ctx, location):
         'trainer_dict': {
 
         },
-        'exp': time.time() + (((60 * 60) * 24) * raid_info['raid_eggs']['EX']['hatchtime']),
+        'exp': time.time() + (((60 * 60) * 24) * cf.get_raid_info()['raid_eggs']['EX']['hatchtime']),
         'manual_timer': False,
         'active': True,
         'raidmessage': raidmessage.id,
@@ -4826,8 +4802,8 @@ async def _exraid(ctx, location):
         'pokemon': '',
         'egglevel': 'EX'
     }
-    if len(raid_info['raid_eggs']['EX']['pokemon']) == 1:
-        await _eggassume('assume ' + get_name(raid_info['raid_eggs']['EX']['pokemon'][0]), raid_channel)
+    if len(cf.get_raid_info()['raid_eggs']['EX']['pokemon']) == 1:
+        await _eggassume('assume ' + get_name(cf.get_raid_info()['raid_eggs']['EX']['pokemon'][0]), raid_channel)
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=guild_dict[raid_channel.guild.id]['configure_dict']['settings']['offset'])
     await raid_channel.send(content=_('Meowth! Hey {member}, if you can, set the time left until the egg hatches using **!timerset <date and time>** so others can check it with **!timer**. **<date and time>** can just be written exactly how it appears on your EX Raid Pass.').format(member=message.author.mention))
     ex_reports = guild_dict[message.guild.id].setdefault('trainers',{}).setdefault(message.author.id,{}).setdefault('ex_reports',0) + 1
@@ -5045,7 +5021,7 @@ async def _meetup(ctx, location):
     raid_details = ' '.join(event_split)
     raid_details = raid_details.strip()
     raid_gmaps_link = create_gmaps_query(raid_details, message.channel, type="meetup")
-    egg_info = raid_info['raid_eggs']['EX']
+    egg_info = cf.get_raid_info()['raid_eggs']['EX']
     raid_channel_name = _('meetup-')
     raid_channel_name += sanitize_channel_name(raid_details)
     raid_channel_category = get_category(message.channel,"EX", category_type="meetup")
@@ -5072,7 +5048,7 @@ async def _meetup(ctx, location):
     guild_dict[message.guild.id]['raidchannel_dict'][raid_channel.id] = {
         'reportcity': channel.id,
         'trainer_dict': {},
-        'exp': time.time() + (((60 * 60) * 24) * raid_info['raid_eggs']['EX']['hatchtime']),
+        'exp': time.time() + (((60 * 60) * 24) * cf.get_raid_info()['raid_eggs']['EX']['hatchtime']),
         'manual_timer': False,
         'active': True,
         'raidmessage': raidmessage.id,
@@ -5147,11 +5123,11 @@ async def timerset(ctx, *,timer):
         if type == 'egg':
             raidlevel = guild_dict[guild.id]['raidchannel_dict'][channel.id]['egglevel']
             raidtype = _('Raid Egg')
-            maxtime = raid_info['raid_eggs'][raidlevel]['hatchtime']
+            maxtime = cf.get_raid_info()['raid_eggs'][raidlevel]['hatchtime']
         else:
             raidlevel = get_level(guild_dict[guild.id]['raidchannel_dict'][channel.id]['pokemon'])
             raidtype = _('Raid')
-            maxtime = raid_info['raid_eggs'][raidlevel]['raidtime']
+            maxtime = cf.get_raid_info()['raid_eggs'][raidlevel]['raidtime']
         if timer.isdigit():
             raidexp = int(timer)
         elif type == 'egg' and ':' in timer:
@@ -5256,7 +5232,7 @@ async def _timerset(raidchannel, exptime):
     elif guild_dict[guild.id]['raidchannel_dict'][raidchannel.id]['type'] == 'egg':
         egglevel = guild_dict[guild.id]['raidchannel_dict'][raidchannel.id]['egglevel']
         hatch = end
-        end = hatch + datetime.timedelta(minutes=raid_info['raid_eggs'][egglevel]['raidtime'])
+        end = hatch + datetime.timedelta(minutes=cf.get_raid_info()['raid_eggs'][egglevel]['raidtime'])
         topicstr += _('Hatches on {expiry}').format(expiry=hatch.strftime(_('%B %d at %I:%M %p (%H:%M) | ')))
         topicstr += _('Ends on {end}').format(end=end.strftime(_('%B %d at %I:%M %p (%H:%M)')))
         endtime = hatch.strftime(_('%B %d at %I:%M %p (%H:%M)'))
@@ -5330,7 +5306,7 @@ async def starttime(ctx,*,start_time=""):
         if rc_d['type'] == 'egg':
             egglevel = rc_d['egglevel']
             mintime = (rc_d['exp'] - time.time()) / 60
-            maxtime = mintime + raid_info['raid_eggs'][egglevel]['raidtime']
+            maxtime = mintime + cf.get_raid_info()['raid_eggs'][egglevel]['raidtime']
         elif (rc_d['type'] == 'raid') or (rc_d['type'] == 'exraid'):
             egglevel = get_level(rc_d['pokemon'])
             mintime = 0
@@ -5540,7 +5516,7 @@ async def recover(ctx):
             raid_details = ' '.join(chsplit)
             raid_details = raid_details.strip()
             if (not topic):
-                exp = raidmessage.created_at.replace(tzinfo=datetime.timezone.utc).timestamp() + (60 * raid_info['raid_eggs'][egglevel]['hatchtime'])
+                exp = raidmessage.created_at.replace(tzinfo=datetime.timezone.utc).timestamp() + (60 * cf.get_raid_info()['raid_eggs'][egglevel]['hatchtime'])
                 manual_timer = False
             else:
                 topicsplit = topic.split('|')
@@ -5549,8 +5525,8 @@ async def recover(ctx):
                 exp = utchatch.replace(year=now.year, tzinfo=datetime.timezone.utc).timestamp()
                 manual_timer = True
             pokemon = ''
-            if len(raid_info['raid_eggs'][egglevel]['pokemon']) == 1:
-                pokemon = get_name(raid_info['raid_eggs'][egglevel]['pokemon'][0])
+            if len(cf.get_raid_info()['raid_eggs'][egglevel]['pokemon']) == 1:
+                pokemon = get_name(cf.get_raid_info()['raid_eggs'][egglevel]['pokemon'][0])
         elif name.split('-')[0] in get_raidlist():
             raidtype = 'raid'
             egglevel = '0'
@@ -5560,7 +5536,7 @@ async def recover(ctx):
             raid_details = ' '.join(chsplit)
             raid_details = raid_details.strip()
             if (not topic):
-                exp = raidmessage.created_at.replace(tzinfo=datetime.timezone.utc).timestamp() + (60 * raid_info['raid_eggs'][get_level(pokemon)]['raidtime'])
+                exp = raidmessage.created_at.replace(tzinfo=datetime.timezone.utc).timestamp() + (60 * cf.get_raid_info()['raid_eggs'][get_level(pokemon)]['raidtime'])
                 manual_timer = False
             else:
                 localend = datetime.datetime.strptime(topic[:(- 8)], _('Ends on %B %d at %I:%M %p'))
@@ -5586,8 +5562,8 @@ async def recover(ctx):
                 exp = utchatch.replace(year=now.year, tzinfo=datetime.timezone.utc).timestamp()
                 manual_timer = True
             pokemon = ''
-            if len(raid_info['raid_eggs']['EX']['pokemon']) == 1:
-                pokemon = get_name(raid_info['raid_eggs']['EX']['pokemon'][0])
+            if len(cf.get_raid_info()['raid_eggs']['EX']['pokemon']) == 1:
+                pokemon = get_name(cf.get_raid_info()['raid_eggs']['EX']['pokemon'][0])
         elif meetup:
             raidtype = 'egg'
             egglevel = 'EX'
@@ -6071,14 +6047,14 @@ async def interested(ctx, *, teamcounts: str=None):
     if teamcounts:
         if "all" in teamcounts.lower():
             # What a hack
-            teamcounts = "{teamcounts} {bosslist}".format(teamcounts=teamcounts,bosslist=" ".join([get_name(s).title() for s in raid_info['raid_eggs'][egglevel]['pokemon']]))
+            teamcounts = "{teamcounts} {bosslist}".format(teamcounts=teamcounts,bosslist=" ".join([get_name(s).title() for s in cf.get_raid_info()['raid_eggs'][egglevel]['pokemon']]))
             teamcounts = teamcounts.lower().replace("all","").strip()
         pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, '', p) in re.sub(rgx, '', teamcounts.lower())), None)
     if pkmn_match and guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['type'] == "egg":
         entered_interest = []
         for word in re.split('[ ,]', teamcounts.lower()):
             if word.lower() in pkmn_info['pokemon_list']:
-                if get_number(word.lower()) in raid_info['raid_eggs'][egglevel]['pokemon']:
+                if get_number(word.lower()) in cf.get_raid_info()['raid_eggs'][egglevel]['pokemon']:
                     if word.lower() not in entered_interest:
                         entered_interest.append(word.lower())
                 else:
@@ -6086,7 +6062,7 @@ async def interested(ctx, *, teamcounts: str=None):
                     return
                 teamcounts = teamcounts.lower().replace(word.lower(),"").replace(",","").strip()
     elif not pkmn_match and guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['type'] == 'egg':
-        entered_interest = [get_name(p) for p in raid_info['raid_eggs'][egglevel]['pokemon']]
+        entered_interest = [get_name(p) for p in cf.get_raid_info()['raid_eggs'][egglevel]['pokemon']]
     if teamcounts and teamcounts.split()[0].isdigit():
         total = int(teamcounts.split()[0])
     elif (ctx.author.id in trainer_dict) and (sum(trainer_dict[ctx.author.id]['status'].values()) > 0):
@@ -6165,7 +6141,7 @@ async def coming(ctx, *, teamcounts: str=None):
     pkmn_match = None
     if teamcounts:
         if "all" in teamcounts.lower():
-            teamcounts = "{teamcounts} {bosslist}".format(teamcounts=teamcounts,bosslist=" ".join([get_name(s).title() for s in raid_info['raid_eggs'][egglevel]['pokemon']]))
+            teamcounts = "{teamcounts} {bosslist}".format(teamcounts=teamcounts,bosslist=" ".join([get_name(s).title() for s in cf.get_raid_info()['raid_eggs'][egglevel]['pokemon']]))
             teamcounts = teamcounts.lower().replace("all","").strip()
         pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, '', p) in re.sub(rgx, '', teamcounts.lower())), None)
     if pkmn_match and guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['type'] == "egg":
@@ -6175,7 +6151,7 @@ async def coming(ctx, *, teamcounts: str=None):
             if word.lower() in pkmn_info['pokemon_list']:
                 if word.lower() not in entered_interest:
                     entered_interest.append(word.lower())
-                    if not get_number(word.lower()) in raid_info['raid_eggs'][egglevel]['pokemon']:
+                    if not get_number(word.lower()) in cf.get_raid_info()['raid_eggs'][egglevel]['pokemon']:
                         await ctx.message.channel.send(_("{word} doesn't appear in level {egglevel} raids!").format(word=word.title(),egglevel=egglevel))
                         unmatched_mons = True
                 teamcounts = teamcounts.lower().replace(word.lower(),"").replace(",","").strip()
@@ -6183,7 +6159,7 @@ async def coming(ctx, *, teamcounts: str=None):
             await ctx.message.channel.send(_("Invalid Pokemon detected. Please check the pinned message for the list of possible bosses and try again."))
             return
     elif not pkmn_match and guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['type'] == 'egg':
-        entered_interest = [get_name(p) for p in raid_info['raid_eggs'][egglevel]['pokemon']]
+        entered_interest = [get_name(p) for p in cf.get_raid_info()['raid_eggs'][egglevel]['pokemon']]
     trainer_dict = guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['trainer_dict']
     if (not teamcounts):
         if ctx.author.id in trainer_dict:
@@ -6272,14 +6248,14 @@ async def here(ctx, *, teamcounts: str=None):
     pkmn_match = None
     if teamcounts:
         if "all" in teamcounts.lower():
-            teamcounts = "{teamcounts} {bosslist}".format(teamcounts=teamcounts,bosslist=" ".join([get_name(s).title() for s in raid_info['raid_eggs'][egglevel]['pokemon']]))
+            teamcounts = "{teamcounts} {bosslist}".format(teamcounts=teamcounts,bosslist=" ".join([get_name(s).title() for s in cf.get_raid_info()['raid_eggs'][egglevel]['pokemon']]))
             teamcounts = teamcounts.lower().replace("all","").strip()
         pkmn_match = next((p for p in pkmn_info['pokemon_list'] if re.sub(rgx, '', p) in re.sub(rgx, '', teamcounts.lower())), None)
     if pkmn_match and guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['type'] == "egg":
         entered_interest = []
         for word in re.split(' |,', teamcounts.lower()):
             if word.lower() in pkmn_info['pokemon_list']:
-                if get_number(word.lower()) in raid_info['raid_eggs'][egglevel]['pokemon']:
+                if get_number(word.lower()) in cf.get_raid_info()['raid_eggs'][egglevel]['pokemon']:
                     if word.lower() not in entered_interest:
                         entered_interest.append(word.lower())
                 else:
@@ -6287,7 +6263,7 @@ async def here(ctx, *, teamcounts: str=None):
                     return
                 teamcounts = teamcounts.lower().replace(word.lower(),"").replace(",","").strip()
     elif not pkmn_match and guild_dict[ctx.guild.id]['raidchannel_dict'][ctx.channel.id]['type'] == 'egg':
-        entered_interest = [get_name(p) for p in raid_info['raid_eggs'][egglevel]['pokemon']]
+        entered_interest = [get_name(p) for p in cf.get_raid_info()['raid_eggs'][egglevel]['pokemon']]
 
     if (not teamcounts):
         if ctx.author.id in trainer_dict:
@@ -6363,6 +6339,7 @@ async def _here(channel, author, count, party, entered_interest=None):
     trainer_dict[author.id]['party'] = party
     if entered_interest:
         trainer_dict[author.id]['interest'] = entered_interest
+    logger.debug("Trainer_dict: %s" % trainer_dict[author.id])
     await _edit_party(channel, author)
     guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['trainer_dict'] = trainer_dict
 
@@ -6456,7 +6433,7 @@ async def _edit_party(channel, author=None):
         boss_dict = {}
         boss_list = []
         display_list = []
-        for p in raid_info['raid_eggs'][egglevel]['pokemon']:
+        for p in cf.get_raid_info()['raid_eggs'][egglevel]['pokemon']:
             p_name = get_name(p).title()
             boss_list.append(p_name.lower())
             p_type = get_type(channel.guild,p)
@@ -7172,7 +7149,7 @@ async def _bosslist(ctx):
     channel = ctx.channel
     egglevel = guild_dict[message.guild.id]['raidchannel_dict'][channel.id]['egglevel']
     egg_level = str(egglevel)
-    egg_info = raid_info['raid_eggs'][egg_level]
+    egg_info = cf.get_raid_info()['raid_eggs'][egg_level]
     egg_img = egg_info['egg_img']
     boss_dict = {}
     boss_list = []

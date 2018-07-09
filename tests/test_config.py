@@ -16,3 +16,6 @@ class TestConfig(TestCase):
                                for team in config.team_info.values()])
         print(team_msg)
 
+    def test_get_raid_info(self):
+        config = Config()
+        print(config.get_raid_info()['raid_eggs'])

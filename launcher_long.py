@@ -80,14 +80,13 @@ def run_meowth(autorestart):
                 wait_time = min([retries^2, 60])
                 print("")
                 print("Meowth experienced a crash.")
-                logging.error("Meowth experienced a crash.")
                 print("")
                 for i in range(wait_time, 0, -1):
                     sys.stdout.write("\r")
                     sys.stdout.write(
                         "Restarting Meowth from crash in {:0d}".format(i))
                     sys.stdout.flush()
-                    time.sleep()
+                    time.sleep(1)
 
     print("Meowth has closed. Exit code: {exit_code}".format(exit_code=code))
 

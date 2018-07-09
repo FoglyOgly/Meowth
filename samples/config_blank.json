@@ -26,7 +26,13 @@
 "//": "Define your server's emoji strings here.",
 
 "//": "Emoji for team assignments",
-"team_dict": {"mystic": ":mystic:", "valor": ":valor:", "instinct": ":instinct:", "harmony": ":harmony:"},
+
+"team_dict": {
+    "mystic":   { "emoji" : ":mystic:", "role" : "Equipe Sagesse" },
+    "valor":    { "emoji" : ":valor:", "role" : "Equipe Bravoure" },
+    "instinct": { "emoji" : ":instinct:", "role" : "Equipe Intuition"  },
+    "harmony":  { "emoji" : ":harmony:", "role" : "Equipe Harmony" }
+},
 
 "//": "Emoji for raid organization",
 "omw_id": ":omw:",

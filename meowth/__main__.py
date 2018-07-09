@@ -33,10 +33,12 @@ from meowth import checks
 from meowth import pkmn_match
 from meowth import utils
 from meowth.bot import MeowthBot
+from meowth.config import Config
 from meowth.errors import custom_error_handling
 from meowth.logs import init_loggers
 
 logger = init_loggers()
+
 
 def _get_prefix(bot, message):
     guild = message.guild
@@ -47,6 +49,7 @@ def _get_prefix(bot, message):
     if not prefix:
         prefix = bot.config['default_prefix']
     return commands.when_mentioned_or(prefix)(bot, message)
+
 
 Meowth = MeowthBot(
     command_prefix=_get_prefix, case_insensitive=True,
@@ -132,6 +135,9 @@ def load_config():
     return (pokemon_path_source, raid_path_source)
 
 pkmn_path, raid_path = load_config()
+
+cf = Config()
+
 
 Meowth.pkmn_info = pkmn_info
 Meowth.raid_info = raid_info
@@ -964,6 +970,7 @@ async def guild_cleanup(loop=True):
         await asyncio.sleep(7200)
         continue
 
+
 async def message_cleanup(loop=True):
     while (not Meowth.is_closed()):
         logger.info('message_cleanup ------ BEGIN ------')
@@ -1134,8 +1141,8 @@ async def on_guild_remove(guild):
 async def on_member_join(member):
     'Welcome message to the server and some basic instructions.'
     guild = member.guild
-    team_msg = _(' or ').join(['**!team {0}**'.format(team)
-                           for team in config['team_dict'].keys()])
+    team_msg = _(' or ').join(['**!team {0}**'.format(team['name'])
+                               for team in cf.team_info.values()])
     if not guild_dict[guild.id]['configure_dict']['welcome']['enabled']:
         return
     # Build welcome message
@@ -1956,14 +1963,15 @@ async def _configure_team(ctx):
             guild_roles = []
             lowercase_roles = []
             for role in guild.roles:
-                if role.name.lower() in config['team_dict'] and role.name not in guild_roles:
+                if role.name.lower() in cf.team_info and role.name not in guild_roles:
                     guild_roles.append(role.name)
             lowercase_roles = [element.lower() for element in guild_roles]
-            for team in config['team_dict'].keys():
-                temp_role = discord.utils.get(guild.roles, name=team)
+            for team, t_info in cf.team_info.items():
+                logger.debug("Searching for role %s=%s" % (team, t_info['role']))
+                temp_role = discord.utils.get(guild.roles, name=t_info['role'])
                 if temp_role == None:
                     try:
-                        await guild.create_role(name=team, hoist=False, mentionable=True)
+                        await guild.create_role(name=t_info['role'], hoist=False, mentionable=True)
                     except discord.errors.HTTPException:
                         pass
             await owner.send(embed=discord.Embed(colour=discord.Colour.green(), description=_('Team Assignments enabled!')))
@@ -3676,20 +3684,23 @@ async def team(ctx,*,content):
     guild = ctx.guild
     toprole = guild.me.top_role.name
     position = guild.me.top_role.position
-    team_msg = _(' or ').join(['**!team {0}**'.format(team) for team in config['team_dict'].keys()])
+    team_msg = _(' or ').join(['**!team {0}**'.format(team['name']) for team in cf.team_info.values()])
     high_roles = []
     guild_roles = []
     lowercase_roles = []
     harmony = None
     for role in guild.roles:
-        if (role.name.lower() in config['team_dict']) and (role.name not in guild_roles):
+        config_roles = [team['role'].lower() for team in cf.team_info.values()]
+        if (role.name.lower() in config_roles) and (role.name not in guild_roles):
             guild_roles.append(role.name)
     lowercase_roles = [element.lower() for element in guild_roles]
-    for team in config['team_dict'].keys():
-        if team.lower() not in lowercase_roles:
+    for team in cf.team_info.values():
+        team_lower = team['role'].lower()
+        if team_lower not in lowercase_roles:
             try:
-                temp_role = await guild.create_role(name=team.lower(), hoist=False, mentionable=True)
-                guild_roles.append(team.lower())
+                logger.info("Creating role: %s" % team['role'])
+                temp_role = await guild.create_role(name=team['role'], hoist=False, mentionable=True)
+                guild_roles.append(team_lower)
             except discord.errors.HTTPException:
                 await message.channel.send(_('Maximum guild roles reached.'))
                 return
@@ -3702,8 +3713,10 @@ async def team(ctx,*,content):
     team_split = content.lower().split()
     entered_team = team_split[0]
     entered_team = ''.join([i for i in entered_team if i.isalpha()])
-    if entered_team in lowercase_roles:
-        index = lowercase_roles.index(entered_team)
+    logger.debug("Enterred team: %s" % entered_team)
+    map_team_by_name = {t['name']: (k, t) for k, t in cf.team_info.items()}
+    if entered_team in map_team_by_name:
+        index = lowercase_roles.index(map_team_by_name[entered_team][1]['role'].lower())
         role = discord.utils.get(ctx.guild.roles, name=guild_roles[index])
     if 'harmony' in lowercase_roles:
         index = lowercase_roles.index('harmony')
@@ -3728,7 +3741,7 @@ async def team(ctx,*,content):
             await ctx.channel.send(_('Meowth! {team_role} is not configured as a role on this server. Please contact an admin for assistance.').format(team_role=team))
             return
     # Check if team is one of the three defined in the team_dict
-    if entered_team not in config['team_dict'].keys():
+    if entered_team not in [team['name'] for team in cf.team_info.values()]:
         await ctx.channel.send(_('Meowth! "{entered_team}" isn\'t a valid team! Try {available_teams}').format(entered_team=entered_team, available_teams=team_msg))
         return
     # Check if the role is configured on the server
@@ -3739,7 +3752,9 @@ async def team(ctx,*,content):
             if harmony and (harmony in ctx.author.roles):
                 await ctx.author.remove_roles(harmony)
             await ctx.author.add_roles(role)
-            await ctx.channel.send(_('Meowth! Added {member} to Team {team_name}! {team_emoji}').format(member=ctx.author.mention, team_name=role.name.capitalize(), team_emoji=parse_emoji(ctx.guild, config['team_dict'][entered_team])))
+            await ctx.channel.send(_('Meowth! Added {member} to Team {team_name}! {team_emoji}')
+                                   .format(member=ctx.author.mention, team_name=role.name.capitalize(),
+                                           team_emoji=parse_emoji(ctx.guild, cf.get_team_info(map_team_by_name[entered_team][0])['emoji'])))
         except discord.Forbidden:
             await ctx.channel.send(_("Meowth! I can't add roles!"))
 
@@ -4251,7 +4266,7 @@ async def _raid(message, content):
     if str(level) in guild_dict[message.guild.id]['configure_dict']['counters']['auto_levels']:
         try:
             ctrs_dict = await _get_generic_counters(message.guild, entered_raid, weather)
-            ctrsmsg = "Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters."
+            ctrsmsg = _("Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters.")
             ctrsmessage = await raid_channel.send(content=ctrsmsg,embed=ctrs_dict[0]['embed'])
             ctrsmessage_id = ctrsmessage.id
             await ctrsmessage.pin()
@@ -5920,7 +5935,7 @@ async def _get_generic_counters(guild, pkmn, weather=None):
     ctrs_dict = {}
     ctrs_index = 0
     ctrs_dict[ctrs_index] = {}
-    ctrs_dict[ctrs_index]['moveset'] = "Unknown Moveset"
+    ctrs_dict[ctrs_index]['moveset'] = _("Unknown Moveset")
     ctrs_dict[ctrs_index]['emoji'] = '0\u20e3'
     img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=4'.format(str(get_number(pkmn)).zfill(3))
     level = get_level(pkmn) if get_level(pkmn).isdigit() else "5"
@@ -5962,7 +5977,7 @@ async def _get_generic_counters(guild, pkmn, weather=None):
         ctr_name = clean(ctr['pokemonId'])
         moveset = ctr['byMove'][-1]
         moves = _("{move1} | {move2}").format(move1=clean(moveset['move1'])[:-5], move2=clean(moveset['move2']))
-        name = _("#{index} - {ctr_name}").format(index=ctrindex, ctr_name=ctr_name)
+        name = "#{index} - {ctr_name}".format(index=ctrindex, ctr_name=translate_pkmname(ctr_name))
         ctrs_embed.add_field(name=name,value=moves)
         ctrindex += 1
     ctrs_dict[ctrs_index]['embed'] = ctrs_embed
@@ -6111,11 +6126,11 @@ async def _maybe(channel, author, count, party, entered_interest=None):
         if team_emoji == "unknown":
             team_emoji = "❔"
         else:
-            team_emoji = parse_emoji(channel.guild, config['team_dict'][team_emoji])
+            team_emoji = parse_emoji(channel.guild, cf.get_team_info(team_emoji)['emoji'])
         await channel.send(_('Meowth! {member} is interested! {emoji}: 1').format(member=author.mention, emoji=team_emoji))
     else:
         msg = _('Meowth! {member} is interested with a total of {trainer_count} trainers!').format(member=author.mention, trainer_count=count)
-        await channel.send('{msg} {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | ❔: {unknown}'.format(msg=msg, blue_emoji=parse_emoji(channel.guild, config['team_dict']['mystic']), mystic=party['mystic'], red_emoji=parse_emoji(channel.guild, config['team_dict']['valor']), valor=party['valor'], instinct=party['instinct'], yellow_emoji=parse_emoji(channel.guild, config['team_dict']['instinct']), unknown=party['unknown']))
+        await channel.send('{msg} {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | ❔: {unknown}'.format(msg=msg, blue_emoji=parse_emoji(channel.guild, cf.get_team_info('mystic')['emoji']), mystic=party['mystic'], red_emoji=parse_emoji(channel.guild, cf.get_team_info('valor')['emoji']), valor=party['valor'], instinct=party['instinct'], yellow_emoji=parse_emoji(channel.guild, cf.get_team_info('instinct')['emoji']), unknown=party['unknown']))
     if author.id not in guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['trainer_dict']:
         trainer_dict[author.id] = {
 
@@ -6218,11 +6233,11 @@ async def _coming(channel, author, count, party, entered_interest=None):
         if team_emoji == "unknown":
             team_emoji = "❔"
         else:
-            team_emoji = parse_emoji(channel.guild, config['team_dict'][team_emoji])
+            team_emoji = parse_emoji(channel.guild, cf.get_team_info(team_emoji)['emoji'])
         await channel.send(_('Meowth! {member} is on the way! {emoji}: 1').format(member=author.mention, emoji=team_emoji))
     else:
         msg = _('Meowth! {member} is on the way with a total of {trainer_count} trainers!').format(member=author.mention, trainer_count=count)
-        await channel.send('{msg} {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | ❔: {unknown}'.format(msg=msg, blue_emoji=parse_emoji(channel.guild, config['team_dict']['mystic']), mystic=party['mystic'], red_emoji=parse_emoji(channel.guild, config['team_dict']['valor']), valor=party['valor'], instinct=party['instinct'], yellow_emoji=parse_emoji(channel.guild, config['team_dict']['instinct']), unknown=party['unknown']))
+        await channel.send('{msg} {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | ❔: {unknown}'.format(msg=msg, blue_emoji=parse_emoji(channel.guild, cf.get_team_info('mystic')['emoji']), mystic=party['mystic'], red_emoji=parse_emoji(channel.guild, cf.get_team_info('valor')['emoji']), valor=party['valor'], instinct=party['instinct'], yellow_emoji=parse_emoji(channel.guild, cf.get_team_info('instinct')['emoji']), unknown=party['unknown']))
     if author.id not in trainer_dict:
         trainer_dict[author.id] = {
 
@@ -6274,10 +6289,10 @@ async def here(ctx, *, teamcounts: str=None):
 
     if (not teamcounts):
         if ctx.author.id in trainer_dict:
-            bluecount = str(trainer_dict[ctx.author.id]['party']['mystic']) + _('m ')
-            redcount = str(trainer_dict[ctx.author.id]['party']['valor']) + _('v ')
-            yellowcount = str(trainer_dict[ctx.author.id]['party']['instinct']) + _('i ')
-            unknowncount = str(trainer_dict[ctx.author.id]['party']['unknown']) + _('u ')
+            bluecount = str(trainer_dict[ctx.author.id]['party']['mystic']) + '%s ' % cf.get_team_info('mystic')['short']
+            redcount = str(trainer_dict[ctx.author.id]['party']['valor']) + '%s ' % cf.get_team_info('valor')['short']
+            yellowcount = str(trainer_dict[ctx.author.id]['party']['instinct']) + '%s ' % cf.get_team_info('instinct')['short']
+            unknowncount = str(trainer_dict[ctx.author.id]['party']['unknown']) + 'u '
             teamcounts = ((((str(trainer_dict[ctx.author.id]['count']) + ' ') + bluecount) + redcount) + yellowcount) + unknowncount
         else:
             teamcounts = '1'
@@ -6328,12 +6343,12 @@ async def _here(channel, author, count, party, entered_interest=None):
         if team_emoji == "unknown":
             team_emoji = "❔"
         else:
-            team_emoji = parse_emoji(channel.guild, config['team_dict'][team_emoji])
+            team_emoji = parse_emoji(channel.guild, cf.get_team_info(team_emoji)['emoji'])
         msg = _('Meowth! {member} is at the {raidtype}! {emoji}: 1').format(member=author.mention, emoji=team_emoji, raidtype=raidtype)
         await channel.send(msg + lobbymsg)
     else:
         msg = _('Meowth! {member} is at the {raidtype} with a total of {trainer_count} trainers!').format(member=author.mention, trainer_count=count, raidtype=raidtype)
-        msg += ' {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | ❔: {unknown}'.format(blue_emoji=parse_emoji(channel.guild, config['team_dict']['mystic']), mystic=party['mystic'], red_emoji=parse_emoji(channel.guild, config['team_dict']['valor']), valor=party['valor'], instinct=party['instinct'], yellow_emoji=parse_emoji(channel.guild, config['team_dict']['instinct']), unknown=party['unknown'])
+        msg += ' {blue_emoji}: {mystic} | {red_emoji}: {valor} | {yellow_emoji}: {instinct} | ❔: {unknown}'.format(blue_emoji=parse_emoji(channel.guild, cf.get_team_info('mystic')['emoji']), mystic=party['mystic'], red_emoji=parse_emoji(channel.guild, cf.get_team_info('valor')['emoji']), valor=party['valor'], instinct=party['instinct'], yellow_emoji=parse_emoji(channel.guild, cf.get_team_info('instinct')['emoji']), unknown=party['unknown'])
         await channel.send(msg + lobbymsg)
     if author.id not in trainer_dict:
         trainer_dict[author.id] = {
@@ -6495,7 +6510,7 @@ async def _edit_party(channel, author=None):
             newembed.set_field_at(1, name='\u200b', value='\u200b', inline=True)
     if channel_dict["total"] > 0:
         newembed.add_field(name=_('**Status List**'), value=_('Maybe: **{channelmaybe}** | Coming: **{channelcoming}** | Here: **{channelhere}**').format(channelmaybe=channel_dict["maybe"], channelcoming=channel_dict["coming"], channelhere=channel_dict["here"]), inline=True)
-        newembed.add_field(name=_('**Team List**'), value='{blue_emoji}: **{channelblue}** | {red_emoji}: **{channelred}** | {yellow_emoji}: **{channelyellow}** | ❔: **{channelunknown}**'.format(blue_emoji=parse_emoji(channel.guild, config['team_dict']['mystic']), channelblue=channel_dict["mystic"], red_emoji=parse_emoji(channel.guild, config['team_dict']['valor']), channelred=channel_dict["valor"], yellow_emoji=parse_emoji(channel.guild, config['team_dict']['instinct']), channelyellow=channel_dict["instinct"], channelunknown=channel_dict["unknown"]), inline=True)
+        newembed.add_field(name=_('**Team List**'), value='{blue_emoji}: **{channelblue}** | {red_emoji}: **{channelred}** | {yellow_emoji}: **{channelyellow}** | ❔: **{channelunknown}**'.format(blue_emoji=parse_emoji(channel.guild, cf.get_team_info('mystic')['emoji']), channelblue=channel_dict["mystic"], red_emoji=parse_emoji(channel.guild, cf.get_team_info('valor')['emoji']), channelred=channel_dict["valor"], yellow_emoji=parse_emoji(channel.guild, cf.get_team_info('instinct')['emoji']), channelyellow=channel_dict["instinct"], channelunknown=channel_dict["unknown"]), inline=True)
     newembed.set_footer(text=reportembed.footer.text, icon_url=reportembed.footer.icon_url)
     newembed.set_thumbnail(url=reportembed.thumbnail.url)
     try:
@@ -6921,7 +6936,7 @@ async def _list(ctx):
                     team = word.lower()
                     break
             if team == "mystic" or team == "valor" or team == "instinct":
-                bulletpoint = parse_emoji(ctx.guild, config['team_dict'][team])
+                bulletpoint = parse_emoji(ctx.guild, cf.get_team_info(team)['emoji'])
             elif team == "unknown":
                 bulletpoint = '❔'
             else:
@@ -7214,7 +7229,7 @@ async def _teamlist(ctx):
                     team_dict[team][status] += int(trainer_dict[trainer]['party'][team])
     for team in team_list[:-1]:
         if team_dict[team]['total'] > 0:
-            teamliststr += _('{emoji} **{total} total,** {interested} interested, {coming} coming, {here} waiting {emoji}\n').format(emoji=parse_emoji(ctx.guild, config['team_dict'][team]), total=team_dict[team]['total'], interested=team_dict[team]['maybe'], coming=team_dict[team]['coming'], here=team_dict[team]['here'])
+            teamliststr += _('{emoji} **{total} total,** {interested} interested, {coming} coming, {here} waiting {emoji}\n').format(emoji=parse_emoji(ctx.guild, cf.get_team_info(team)['emoji']), total=team_dict[team]['total'], interested=team_dict[team]['maybe'], coming=team_dict[team]['coming'], here=team_dict[team]['here'])
     if team_dict["unknown"]['total'] > 0:
         teamliststr += '❔ '
         teamliststr += _('**{grey_number} total,** {greymaybe} interested, {greycoming} coming, {greyhere} waiting')

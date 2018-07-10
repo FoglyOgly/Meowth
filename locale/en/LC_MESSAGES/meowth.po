@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2018-06-29 22:54+CEST\n"
+"POT-Creation-Date: 2018-07-10 22:27+CEST\n"
 "PO-Revision-Date: 2017-10-21 22:32+1000\n"
 "Last-Translator: Scragly\n"
 "Language-Team: \n"
@@ -32,7 +32,7 @@ msgstr ""
 msgid "Received admin command {command} from unauthorized user, {user}!"
 msgstr "Received admin command {command} from unauthorized user, {user}!"
 
-#: meowth/__main__.py:354 meowth/__main__.py:3806
+#: meowth/__main__.py:354 meowth/__main__.py:3882
 #, fuzzy
 msgid "Meowth! **{word}** isn't a Pokemon!"
 msgstr "Meowth! \"{entered_word}\" is not a Pokemon! Check your spelling!"
@@ -45,8 +45,8 @@ msgstr ""
 msgid "Did you mean: '{0}'"
 msgstr ""
 
-#: meowth/__main__.py:506 meowth/__main__.py:3983 meowth/__main__.py:4146
-#: meowth/__main__.py:4397 meowth/__main__.py:4528 meowth/__main__.py:4896
+#: meowth/__main__.py:506 meowth/__main__.py:4059 meowth/__main__.py:4222
+#: meowth/__main__.py:4473 meowth/__main__.py:4604 meowth/__main__.py:4972
 msgid "{pokemon} - "
 msgstr ""
 
@@ -84,13 +84,13 @@ msgstr ""
 msgid "level-{level}-egg-"
 msgstr ""
 
-#: meowth/__main__.py:566 meowth/__main__.py:2043
+#: meowth/__main__.py:566 meowth/__main__.py:2042
 msgid ""
 "The following could not be found:\n"
 "{}"
 msgstr ""
 
-#: meowth/__main__.py:566 meowth/__main__.py:2043
+#: meowth/__main__.py:566 meowth/__main__.py:2042
 msgid "Warning"
 msgstr ""
 
@@ -114,7 +114,7 @@ msgstr ""
 "coordinate in!\n"
 "If this was in error, reset the raid with **!timerset**"
 
-#: meowth/__main__.py:725 meowth/__main__.py:5413
+#: meowth/__main__.py:725 meowth/__main__.py:5489
 msgid "hatched-"
 msgstr ""
 
@@ -139,7 +139,7 @@ msgstr ""
 msgid "**This level {level} raid egg has expired!**"
 msgstr ""
 
-#: meowth/__main__.py:735 meowth/__main__.py:5414
+#: meowth/__main__.py:735 meowth/__main__.py:5490
 msgid "expired-"
 msgstr ""
 
@@ -158,8 +158,8 @@ msgstr ""
 msgid " raid"
 msgstr ""
 
-#: meowth/__main__.py:741 meowth/__main__.py:5608 meowth/__main__.py:6223
-#: meowth/__main__.py:6484 meowth/__main__.py:6996
+#: meowth/__main__.py:741 meowth/__main__.py:5684 meowth/__main__.py:6300
+#: meowth/__main__.py:6568 meowth/__main__.py:7080
 msgid "event"
 msgstr ""
 
@@ -185,7 +185,7 @@ msgstr ""
 msgid "Starting up..."
 msgstr "Starting up..."
 
-#: meowth/__main__.py:1092
+#: meowth/__main__.py:1094
 msgid ""
 "Meowth! That's right!\n"
 "\n"
@@ -197,7 +197,7 @@ msgstr ""
 "{server_count} servers connected.\n"
 "{member_count} members found."
 
-#: meowth/__main__.py:1117
+#: meowth/__main__.py:1120
 msgid ""
 "Meowth! I'm Meowth, a Discord helper bot for Pokemon Go communities, and "
 "someone has invited me to your server! Type **!help** to see a list of "
@@ -209,25 +209,25 @@ msgstr ""
 "things I can do, and type **!configure** in any channel of your server to "
 "begin!"
 
-#: meowth/__main__.py:1134 meowth/__main__.py:3587
+#: meowth/__main__.py:1137 meowth/__main__.py:3663
 msgid " or "
 msgstr ""
 
-#: meowth/__main__.py:1140
+#: meowth/__main__.py:1143
 msgid " If you have any questions just ask an admin."
 msgstr " If you have any questions just ask an admin."
 
-#: meowth/__main__.py:1141
+#: meowth/__main__.py:1144
 #, fuzzy
 msgid "Meowth! Welcome to {server}, {user}! "
 msgstr "Meowth! Welcome to {server_name}, {new_member_name}! "
 
-#: meowth/__main__.py:1143
+#: meowth/__main__.py:1146
 #, fuzzy
 msgid "Set your team by typing {team_command}."
 msgstr "Set your team by typing {team_command} without quotations."
 
-#: meowth/__main__.py:1183 meowth/__main__.py:1195 meowth/__main__.py:6438
+#: meowth/__main__.py:1186 meowth/__main__.py:1198 meowth/__main__.py:6522
 msgid ""
 "Meowth! Please wait until the raid egg has hatched before announcing you're "
 "coming or present."
@@ -235,7 +235,7 @@ msgstr ""
 "Meowth! Please wait until the raid egg has hatched before announcing you're "
 "coming or present."
 
-#: meowth/__main__.py:1230 meowth/__main__.py:5382
+#: meowth/__main__.py:1233 meowth/__main__.py:5458
 msgid ""
 "Meowth! Someone has suggested a different location for the raid! Trainers "
 "{trainer_list}: make sure you are headed to the right place!"
@@ -243,42 +243,42 @@ msgstr ""
 "Meowth! Someone has suggested a different location for the raid! Trainers "
 "{trainer_list}: make sure you are headed to the right place!"
 
-#: meowth/__main__.py:1294
+#: meowth/__main__.py:1297
 msgid "has despawned"
 msgstr ""
 
-#: meowth/__main__.py:1363 meowth/__main__.py:1391 meowth/__main__.py:1407
+#: meowth/__main__.py:1366 meowth/__main__.py:1382 meowth/__main__.py:1398
 msgid "Error occured while trying to save!"
 msgstr "Error occured while trying to save!"
 
-#: meowth/__main__.py:1393
+#: meowth/__main__.py:1384
 #, fuzzy
 msgid "Restarting..."
 msgstr "Starting up..."
 
-#: meowth/__main__.py:1409
+#: meowth/__main__.py:1400
 #, fuzzy
 msgid "Shutting down..."
 msgstr "Starting up..."
 
-#: meowth/__main__.py:1430
+#: meowth/__main__.py:1421
 msgid "Are you sure you want to clear all regionals?"
 msgstr ""
 
-#: meowth/__main__.py:1451
+#: meowth/__main__.py:1442
 msgid "Meowth! Regional raid boss cleared!"
 msgstr ""
 
-#: meowth/__main__.py:1457
+#: meowth/__main__.py:1448
 msgid "Meowth! Regional raid boss set to **{boss}**!"
 msgstr ""
 
-#: meowth/__main__.py:1460
+#: meowth/__main__.py:1451
 #, fuzzy
 msgid "Meowth! That Pokemon doesn't appear in raids!"
 msgstr "Meowth! The Pokemon {pokemon} does not appear in raids!"
 
-#: meowth/__main__.py:1473 meowth/__main__.py:1476
+#: meowth/__main__.py:1464 meowth/__main__.py:1467
 #, fuzzy
 msgid ""
 "I couldn't convert your answer to an appropriate timezone! Please double "
@@ -288,166 +288,167 @@ msgstr ""
 "Please double check what you sent me and resend a number strarting from "
 "**-12** to **12**."
 
-#: meowth/__main__.py:1480
+#: meowth/__main__.py:1471
 msgid ""
 "Timezone has been set to: `UTC{offset}`\n"
 "The current time is **{now}**"
 msgstr ""
 
-#: meowth/__main__.py:1494
+#: meowth/__main__.py:1485
 msgid "Prefix has been set to: `{}`"
 msgstr ""
 
-#: meowth/__main__.py:1497
+#: meowth/__main__.py:1488
 msgid "Prefix has been reset to default: `{}`"
 msgstr ""
 
-#: meowth/__main__.py:1506
+#: meowth/__main__.py:1497
 msgid "Silph Road Travelers Card cleared!"
 msgstr ""
 
-#: meowth/__main__.py:1516
+#: meowth/__main__.py:1507
 msgid "The Silph Extension isn't accessible at the moment, sorry!"
 msgstr ""
 
-#: meowth/__main__.py:1521
+#: meowth/__main__.py:1512
 msgid "Silph Card for {silph_user} not found."
 msgstr ""
 
-#: meowth/__main__.py:1525
+#: meowth/__main__.py:1516
 msgid "No Discord account found linked to this Travelers Card!"
 msgstr ""
 
-#: meowth/__main__.py:1529
+#: meowth/__main__.py:1520
 msgid "This Travelers Card is linked to another Discord account!"
 msgstr ""
 
-#: meowth/__main__.py:1543
+#: meowth/__main__.py:1534
 msgid "This Travelers Card has been successfully linked to you!"
 msgstr ""
 
-#: meowth/__main__.py:1550
+#: meowth/__main__.py:1541
 msgid "Pokebattler ID cleared!"
 msgstr ""
 
-#: meowth/__main__.py:1561
+#: meowth/__main__.py:1552
 msgid "Pokebattler ID set to {pbid}!"
 msgstr ""
 
-#: meowth/__main__.py:1576
+#: meowth/__main__.py:1567
 msgid "Prefix for this server is: `{}`"
 msgstr ""
 
-#: meowth/__main__.py:1590
+#: meowth/__main__.py:1581
 msgid "Bot Permissions"
 msgstr ""
 
-#: meowth/__main__.py:1605
+#: meowth/__main__.py:1596
 msgid "**FAIL**"
 msgstr ""
 
-#: meowth/__main__.py:1605
+#: meowth/__main__.py:1596
 msgid "**PASS**"
 msgstr ""
 
-#: meowth/__main__.py:1613
+#: meowth/__main__.py:1604
 msgid "**MISSING**"
 msgstr ""
 
-#: meowth/__main__.py:1616
+#: meowth/__main__.py:1607
 msgid "**ENABLED**"
 msgstr ""
 
-#: meowth/__main__.py:1621
+#: meowth/__main__.py:1612
 msgid "GUILD"
 msgstr ""
 
-#: meowth/__main__.py:1626
+#: meowth/__main__.py:1617
 msgid "CATEGORY"
 msgstr ""
 
-#: meowth/__main__.py:1627
+#: meowth/__main__.py:1618
 msgid "CHANNEL"
 msgstr ""
 
-#: meowth/__main__.py:1634
+#: meowth/__main__.py:1625
 msgid "I couldn't send an embed here, so I've sent you a DM"
 msgstr ""
 
-#: meowth/__main__.py:1674
+#: meowth/__main__.py:1665
 msgid "I'll wait for your announcement!"
 msgstr ""
 
-#: meowth/__main__.py:1681 meowth/__main__.py:1737
+#: meowth/__main__.py:1672 meowth/__main__.py:1728
 msgid ""
 "Meowth! You took too long to send me your announcement! Retry when you're "
 "ready."
 msgstr ""
 
-#: meowth/__main__.py:1684
+#: meowth/__main__.py:1675
 msgid "Announcement"
 msgstr ""
 
-#: meowth/__main__.py:1694
+#: meowth/__main__.py:1685
 msgid "to send it to all servers, "
 msgstr ""
 
-#: meowth/__main__.py:1702
+#: meowth/__main__.py:1693
 msgid "That's what you sent, does it look good? React with "
 msgstr ""
 
-#: meowth/__main__.py:1704
+#: meowth/__main__.py:1695
 msgid "to send to another channel, "
 msgstr ""
 
-#: meowth/__main__.py:1706
+#: meowth/__main__.py:1697
 msgid "to send it to this channel, or "
 msgstr ""
 
-#: meowth/__main__.py:1708
+#: meowth/__main__.py:1699
 msgid "to cancel"
 msgstr ""
 
-#: meowth/__main__.py:1718
+#: meowth/__main__.py:1709
 #, fuzzy
 msgid "Announcement Cancelled."
 msgstr "Duplicate Report cancelled."
 
-#: meowth/__main__.py:1721 meowth/__main__.py:1733
+#: meowth/__main__.py:1712 meowth/__main__.py:1724
 msgid "Announcement Sent."
 msgstr ""
 
-#: meowth/__main__.py:1723
+#: meowth/__main__.py:1714
 msgid "What channel would you like me to send it to?"
 msgstr ""
 
-#: meowth/__main__.py:1735
+#: meowth/__main__.py:1726
 msgid "Meowth! That channel doesn't exist! Retry when you're ready."
 msgstr ""
 
-#: meowth/__main__.py:1748 meowth/__main__.py:3571
+#: meowth/__main__.py:1739 meowth/__main__.py:3647
 msgid "For support, contact us on our Discord server. Invite Code: hhVjAN8"
 msgstr ""
 
-#: meowth/__main__.py:1762
+#: meowth/__main__.py:1753
 msgid "Announcement sent to {} server owners: {} successful, {} failed."
 msgstr ""
 
-#: meowth/__main__.py:1767
+#: meowth/__main__.py:1758
 #, fuzzy
 msgid "Announcement Timed Out."
 msgstr "Duplicate Report Timed Out."
 
-#: meowth/__main__.py:1814
+#: meowth/__main__.py:1805
 msgid ""
 "I'm sorry, I couldn't understand some of what you entered. Let's just start "
 "here."
 msgstr ""
 
-#: meowth/__main__.py:1816 meowth/__main__.py:1927 meowth/__main__.py:1989
-#: meowth/__main__.py:2148 meowth/__main__.py:2372 meowth/__main__.py:2563
-#: meowth/__main__.py:2664 meowth/__main__.py:2764 meowth/__main__.py:2864
-#: meowth/__main__.py:3038 meowth/__main__.py:3119 meowth/__main__.py:3194
+#: meowth/__main__.py:1807 meowth/__main__.py:1926 meowth/__main__.py:1988
+#: meowth/__main__.py:2147 meowth/__main__.py:2371 meowth/__main__.py:2562
+#: meowth/__main__.py:2663 meowth/__main__.py:2763 meowth/__main__.py:2863
+#: meowth/__main__.py:3037 meowth/__main__.py:3118 meowth/__main__.py:3193
+#: meowth/__main__.py:3241
 msgid ""
 "**MULTIPLE SESSIONS!**\n"
 "\n"
@@ -458,7 +459,7 @@ msgid ""
 "Your Sessions: **{yoursessions}** | Total Sessions: **{allsessions}**"
 msgstr ""
 
-#: meowth/__main__.py:1817
+#: meowth/__main__.py:1808
 #, fuzzy
 msgid ""
 "Meowth! That's Right! Welcome to the configuration for Meowth the Pokemon Go "
@@ -483,7 +484,7 @@ msgstr ""
 "using roles. If you have a bot that handles this already, or you don't want "
 "this feature, type N, otherwise type Y to enable the feature!"
 
-#: meowth/__main__.py:1819
+#: meowth/__main__.py:1810
 msgid ""
 "\n"
 "\n"
@@ -493,7 +494,7 @@ msgid ""
 "configure those commands. Example: `want, raid, wild`"
 msgstr ""
 
-#: meowth/__main__.py:1823
+#: meowth/__main__.py:1814
 msgid ""
 "\n"
 "\n"
@@ -501,7 +502,7 @@ msgid ""
 "{enabled_commands}"
 msgstr ""
 
-#: meowth/__main__.py:1824
+#: meowth/__main__.py:1815
 msgid ""
 "\n"
 "\n"
@@ -518,10 +519,11 @@ msgid ""
 "**meetup** - for !meetup command configuration\n"
 "**want** - for want/unwant command configuration\n"
 "**archive** - For !archive configuration\n"
+"**trade** - For trade command configuration\n"
 "**timezone** - For timezone configuration"
 msgstr ""
 
-#: meowth/__main__.py:1825 meowth/__main__.py:1852
+#: meowth/__main__.py:1816 meowth/__main__.py:1843
 msgid ""
 "\n"
 "\n"
@@ -529,20 +531,20 @@ msgid ""
 "configure process."
 msgstr ""
 
-#: meowth/__main__.py:1826 meowth/__main__.py:1853
+#: meowth/__main__.py:1817 meowth/__main__.py:1844
 msgid "Meowth Configuration - {guild}"
 msgstr ""
 
-#: meowth/__main__.py:1833 meowth/__main__.py:1966 meowth/__main__.py:2033
-#: meowth/__main__.py:2084 meowth/__main__.py:2125 meowth/__main__.py:2168
-#: meowth/__main__.py:2217 meowth/__main__.py:2239 meowth/__main__.py:2258
-#: meowth/__main__.py:2308 meowth/__main__.py:2392 meowth/__main__.py:2441
-#: meowth/__main__.py:2463 meowth/__main__.py:2482 meowth/__main__.py:2540
-#: meowth/__main__.py:2586 meowth/__main__.py:2627 meowth/__main__.py:2684
-#: meowth/__main__.py:2733 meowth/__main__.py:2784 meowth/__main__.py:2833
-#: meowth/__main__.py:2884 meowth/__main__.py:2933 meowth/__main__.py:2955
-#: meowth/__main__.py:2974 meowth/__main__.py:3057 meowth/__main__.py:3135
-#: meowth/__main__.py:3168 meowth/__main__.py:3209
+#: meowth/__main__.py:1824 meowth/__main__.py:1965 meowth/__main__.py:2032
+#: meowth/__main__.py:2083 meowth/__main__.py:2124 meowth/__main__.py:2167
+#: meowth/__main__.py:2216 meowth/__main__.py:2238 meowth/__main__.py:2257
+#: meowth/__main__.py:2307 meowth/__main__.py:2391 meowth/__main__.py:2440
+#: meowth/__main__.py:2462 meowth/__main__.py:2481 meowth/__main__.py:2539
+#: meowth/__main__.py:2585 meowth/__main__.py:2626 meowth/__main__.py:2683
+#: meowth/__main__.py:2732 meowth/__main__.py:2783 meowth/__main__.py:2832
+#: meowth/__main__.py:2883 meowth/__main__.py:2932 meowth/__main__.py:2954
+#: meowth/__main__.py:2973 meowth/__main__.py:3056 meowth/__main__.py:3134
+#: meowth/__main__.py:3167 meowth/__main__.py:3208 meowth/__main__.py:3256
 #, fuzzy
 msgid ""
 "**CONFIG CANCELLED!**\n"
@@ -552,26 +554,26 @@ msgstr ""
 "**CONFIG CANCELLED!**\n"
 "No changes have been made."
 
-#: meowth/__main__.py:1847
+#: meowth/__main__.py:1838
 #, fuzzy
 msgid "I'm sorry I don't understand. Please reply with the choices above."
 msgstr ""
 "I'm sorry I don't understand. Please reply with either **N** to disable, or "
 "**Y** to enable."
 
-#: meowth/__main__.py:1904 meowth/__main__.py:1931 meowth/__main__.py:1993
-#: meowth/__main__.py:2152 meowth/__main__.py:2376 meowth/__main__.py:2567
-#: meowth/__main__.py:2611 meowth/__main__.py:2668 meowth/__main__.py:2768
-#: meowth/__main__.py:2868 meowth/__main__.py:3042 meowth/__main__.py:3123
-#: meowth/__main__.py:3198
+#: meowth/__main__.py:1903 meowth/__main__.py:1930 meowth/__main__.py:1992
+#: meowth/__main__.py:2151 meowth/__main__.py:2375 meowth/__main__.py:2566
+#: meowth/__main__.py:2610 meowth/__main__.py:2667 meowth/__main__.py:2767
+#: meowth/__main__.py:2867 meowth/__main__.py:3041 meowth/__main__.py:3122
+#: meowth/__main__.py:3197 meowth/__main__.py:3245
 msgid "Configuration Complete"
 msgstr ""
 
-#: meowth/__main__.py:1904 meowth/__main__.py:1931 meowth/__main__.py:1993
-#: meowth/__main__.py:2152 meowth/__main__.py:2376 meowth/__main__.py:2567
-#: meowth/__main__.py:2611 meowth/__main__.py:2668 meowth/__main__.py:2768
-#: meowth/__main__.py:2868 meowth/__main__.py:3042 meowth/__main__.py:3123
-#: meowth/__main__.py:3198
+#: meowth/__main__.py:1903 meowth/__main__.py:1930 meowth/__main__.py:1992
+#: meowth/__main__.py:2151 meowth/__main__.py:2375 meowth/__main__.py:2566
+#: meowth/__main__.py:2610 meowth/__main__.py:2667 meowth/__main__.py:2767
+#: meowth/__main__.py:2867 meowth/__main__.py:3041 meowth/__main__.py:3122
+#: meowth/__main__.py:3197 meowth/__main__.py:3245
 msgid ""
 "Meowth! Alright! Your settings have been saved and I'm ready to go! If you "
 "need to change any of these settings, just type **!configure** in your "
@@ -581,14 +583,14 @@ msgstr ""
 "need to change any of these settings, just type **!configure** in your "
 "server again."
 
-#: meowth/__main__.py:1939
+#: meowth/__main__.py:1938
 #, fuzzy
 msgid "Team Assignments"
 msgstr ""
 "**Team Assignments enabled!**\n"
 "---"
 
-#: meowth/__main__.py:1939
+#: meowth/__main__.py:1938
 msgid ""
 "Team assignment allows users to assign their Pokemon Go team role using the "
 "**!team** command. If you have a bot that handles this already, you may want "
@@ -601,22 +603,22 @@ msgid ""
 "Respond here with: **N** to disable, **Y** to enable:"
 msgstr ""
 
-#: meowth/__main__.py:1959
+#: meowth/__main__.py:1958
 #, fuzzy
 msgid "Team Assignments enabled!"
 msgstr ""
 "**Team Assignments enabled!**\n"
 "---"
 
-#: meowth/__main__.py:1963
+#: meowth/__main__.py:1962
 #, fuzzy
 msgid "Team Assignments disabled!"
 msgstr ""
 "**Team Assignments disabled!**\n"
 "---"
 
-#: meowth/__main__.py:1969 meowth/__main__.py:2128 meowth/__main__.py:2543
-#: meowth/__main__.py:2589
+#: meowth/__main__.py:1968 meowth/__main__.py:2127 meowth/__main__.py:2542
+#: meowth/__main__.py:2588
 msgid ""
 "I'm sorry I don't understand. Please reply with either **N** to disable, or "
 "**Y** to enable."
@@ -624,7 +626,7 @@ msgstr ""
 "I'm sorry I don't understand. Please reply with either **N** to disable, or "
 "**Y** to enable."
 
-#: meowth/__main__.py:2000
+#: meowth/__main__.py:1999
 #, fuzzy
 msgid ""
 "I can welcome new members to the server with a short message. Here is an "
@@ -636,7 +638,7 @@ msgstr ""
 " I can welcome new members to the server with a short message. Here is an "
 "example:\n"
 
-#: meowth/__main__.py:2002
+#: meowth/__main__.py:2001
 msgid ""
 "Meowth! Welcome to {server_name}, {owner_name.mention}! Set your team by "
 "typing '**!team mystic**' or '**!team valor**' or '**!team instinct**' "
@@ -645,16 +647,16 @@ msgstr ""
 "Meowth! Welcome to {server_name}, {owner_name.mention}! Set your team by "
 "typing '**!team mystic**' or '**!team valor**' or '**!team instinct**' "
 "without quotations. If you have any questions just ask an admin."
+
+#: meowth/__main__.py:2003
+msgid ""
+"Meowth! Welcome to {server_name}, {owner_name.mention}! If you have any "
+"questions just ask an admin."
+msgstr ""
+"Meowth! Welcome to {server_name}, {owner_name.mention}! If you have any "
+"questions just ask an admin."
 
 #: meowth/__main__.py:2004
-msgid ""
-"Meowth! Welcome to {server_name}, {owner_name.mention}! If you have any "
-"questions just ask an admin."
-msgstr ""
-"Meowth! Welcome to {server_name}, {owner_name.mention}! If you have any "
-"questions just ask an admin."
-
-#: meowth/__main__.py:2005
 #, fuzzy
 msgid ""
 "\n"
@@ -671,21 +673,21 @@ msgstr ""
 "\n"
 "Respond with: **N** to disable, **Y** to enable:"
 
-#: meowth/__main__.py:2006 meowth/__main__.py:2023
+#: meowth/__main__.py:2005 meowth/__main__.py:2022
 #, fuzzy
 msgid "Welcome Message"
 msgstr ""
 "**Welcome Message disabled!**\n"
 "---"
 
-#: meowth/__main__.py:2011
+#: meowth/__main__.py:2010
 #, fuzzy
 msgid "Welcome Message enabled!"
 msgstr ""
 "**Welcome Message disabled!**\n"
 "---"
 
-#: meowth/__main__.py:2014
+#: meowth/__main__.py:2013
 msgid ""
 "Would you like a custom welcome message? You can reply with **N** to use the "
 "default message above or enter your own below.\n"
@@ -703,20 +705,20 @@ msgid ""
 "within embeds may be broken on mobile, this is a Discord bug."
 msgstr ""
 
-#: meowth/__main__.py:2025
+#: meowth/__main__.py:2024
 msgid "Current Welcome Message"
 msgstr ""
 
-#: meowth/__main__.py:2030
+#: meowth/__main__.py:2029
 msgid "Default welcome message set"
 msgstr ""
 
-#: meowth/__main__.py:2036
+#: meowth/__main__.py:2035
 msgid ""
 "Please shorten your message to less than 500 characters. You entered {count}."
 msgstr ""
 
-#: meowth/__main__.py:2046
+#: meowth/__main__.py:2045
 msgid ""
 "{msg}\n"
 "\n"
@@ -724,29 +726,29 @@ msgid ""
 "The following could not be found: {errors}"
 msgstr ""
 
-#: meowth/__main__.py:2047
+#: meowth/__main__.py:2046
 msgid ""
 "Please check the data given and retry a new welcome message, or reply with "
 "**N** to use the default."
 msgstr ""
 
-#: meowth/__main__.py:2052
+#: meowth/__main__.py:2051
 msgid "Here's what you sent. Does it look ok?"
 msgstr ""
 
-#: meowth/__main__.py:2059
+#: meowth/__main__.py:2058
 msgid ""
 "Here's what you sent. Does it look ok?\n"
 "\n"
 "{welcome}"
 msgstr ""
 
-#: meowth/__main__.py:2066
+#: meowth/__main__.py:2065
 msgid ""
 "Please enter a new welcome message, or reply with **N** to use the default."
 msgstr ""
 
-#: meowth/__main__.py:2070
+#: meowth/__main__.py:2069
 #, fuzzy
 msgid ""
 "Welcome Message set to:\n"
@@ -756,14 +758,14 @@ msgstr ""
 "**Welcome Message disabled!**\n"
 "---"
 
-#: meowth/__main__.py:2073
+#: meowth/__main__.py:2072
 #, fuzzy
 msgid "Welcome Message Channel"
 msgstr ""
 "**Welcome Message disabled!**\n"
 "---"
 
-#: meowth/__main__.py:2073
+#: meowth/__main__.py:2072
 #, fuzzy
 msgid ""
 "Which channel in your server would you like me to post the Welcome Messages? "
@@ -783,11 +785,11 @@ msgstr ""
 "Respond with: **channel-name** of a channel in your server or **DM** to "
 "Direct Message:"
 
-#: meowth/__main__.py:2078
+#: meowth/__main__.py:2077
 msgid "Welcome DM set"
 msgstr ""
 
-#: meowth/__main__.py:2081
+#: meowth/__main__.py:2080
 msgid ""
 "Channel names can't contain spaces, sorry. Please double check the name and "
 "send your response again."
@@ -795,22 +797,22 @@ msgstr ""
 "Channel names can't contain spaces, sorry. Please double check the name and "
 "send your response again."
 
-#: meowth/__main__.py:2112 meowth/__main__.py:2206 meowth/__main__.py:2430
-#: meowth/__main__.py:2722 meowth/__main__.py:2822 meowth/__main__.py:2922
-#: meowth/__main__.py:3095
+#: meowth/__main__.py:2111 meowth/__main__.py:2205 meowth/__main__.py:2429
+#: meowth/__main__.py:2721 meowth/__main__.py:2821 meowth/__main__.py:2921
+#: meowth/__main__.py:3094 meowth/__main__.py:3298
 msgid ""
 "I couldn't set my own permissions in this channel. Please ensure I have the "
 "correct permissions in {channel} using **{prefix}get perms**."
 msgstr ""
 
-#: meowth/__main__.py:2113
+#: meowth/__main__.py:2112
 #, fuzzy
 msgid "Welcome Channel set to {channel}"
 msgstr ""
 "**Welcome Channel set**\n"
 "---"
 
-#: meowth/__main__.py:2116
+#: meowth/__main__.py:2115
 #, fuzzy
 msgid ""
 "The channel you provided isn't in your server. Please double check your "
@@ -819,21 +821,21 @@ msgstr ""
 "The channel you provided isn't in your server. Please double check your "
 "channel name and resend your response."
 
-#: meowth/__main__.py:2122
+#: meowth/__main__.py:2121
 #, fuzzy
 msgid "Welcome Message disabled!"
 msgstr ""
 "**Welcome Message disabled!**\n"
 "---"
 
-#: meowth/__main__.py:2159
+#: meowth/__main__.py:2158
 #, fuzzy
 msgid "Raid Reporting Channels"
 msgstr ""
 "**Reporting Channels enabled**\n"
 "---"
 
-#: meowth/__main__.py:2159
+#: meowth/__main__.py:2158
 #, fuzzy
 msgid ""
 "Raid Reporting allows users to report active raids with **!raid** or raid "
@@ -859,22 +861,23 @@ msgstr ""
 "to provide a list of channels in your server you will allow reports from in "
 "this format: `channel-name, channel-name, channel-name`"
 
-#: meowth/__main__.py:2165
+#: meowth/__main__.py:2164
 #, fuzzy
 msgid "Raid Reporting disabled"
 msgstr ""
 "**Raid Reports disabled**\n"
 "---"
 
-#: meowth/__main__.py:2197
+#: meowth/__main__.py:2196
 #, fuzzy
 msgid "Raid Reporting Channels enabled"
 msgstr ""
 "**Reporting Channels enabled**\n"
 "---"
 
-#: meowth/__main__.py:2209 meowth/__main__.py:2433 meowth/__main__.py:2725
-#: meowth/__main__.py:2825 meowth/__main__.py:2925 meowth/__main__.py:3099
+#: meowth/__main__.py:2208 meowth/__main__.py:2432 meowth/__main__.py:2724
+#: meowth/__main__.py:2824 meowth/__main__.py:2924 meowth/__main__.py:3098
+#: meowth/__main__.py:3302
 #, fuzzy
 msgid ""
 "The channel list you provided doesn't match with your servers channels.\n"
@@ -887,7 +890,7 @@ msgstr ""
 "The following aren't in your server: {invalid_channels}\n"
 "Please double check your channel list and resend your reponse."
 
-#: meowth/__main__.py:2212
+#: meowth/__main__.py:2211
 #, fuzzy
 msgid ""
 "For each report, I generate Google Maps links to give people directions to "
@@ -919,24 +922,24 @@ msgstr ""
 "Respond with: **location info, location info, location info** each matching "
 "the order of the previous channel list:"
 
-#: meowth/__main__.py:2212
+#: meowth/__main__.py:2211
 msgid "Raid Reporting Locations"
 msgstr ""
 
-#: meowth/__main__.py:2213 meowth/__main__.py:2255 meowth/__main__.py:2437
-#: meowth/__main__.py:2479 meowth/__main__.py:2729 meowth/__main__.py:2829
-#: meowth/__main__.py:2929 meowth/__main__.py:2971
+#: meowth/__main__.py:2212 meowth/__main__.py:2254 meowth/__main__.py:2436
+#: meowth/__main__.py:2478 meowth/__main__.py:2728 meowth/__main__.py:2828
+#: meowth/__main__.py:2928 meowth/__main__.py:2970
 msgid "Entered Channels"
 msgstr ""
 
-#: meowth/__main__.py:2213 meowth/__main__.py:2255 meowth/__main__.py:2437
-#: meowth/__main__.py:2479 meowth/__main__.py:2729 meowth/__main__.py:2829
-#: meowth/__main__.py:2929 meowth/__main__.py:2971
+#: meowth/__main__.py:2212 meowth/__main__.py:2254 meowth/__main__.py:2436
+#: meowth/__main__.py:2478 meowth/__main__.py:2728 meowth/__main__.py:2828
+#: meowth/__main__.py:2928 meowth/__main__.py:2970
 msgid "{citychannel_list}"
 msgstr ""
 
-#: meowth/__main__.py:2226 meowth/__main__.py:2450 meowth/__main__.py:2742
-#: meowth/__main__.py:2842 meowth/__main__.py:2942
+#: meowth/__main__.py:2225 meowth/__main__.py:2449 meowth/__main__.py:2741
+#: meowth/__main__.py:2841 meowth/__main__.py:2941
 #, fuzzy
 msgid ""
 "The number of cities doesn't match the number of channels you gave me "
@@ -958,11 +961,11 @@ msgstr ""
 "Please double check that your locations match up with your provided channels "
 "and resend your response."
 
-#: meowth/__main__.py:2229
+#: meowth/__main__.py:2228
 msgid "Raid Reporting Locations are set"
 msgstr ""
 
-#: meowth/__main__.py:2230
+#: meowth/__main__.py:2229
 msgid ""
 "How would you like me to categorize the raid channels I create? Your options "
 "are:\n"
@@ -973,11 +976,11 @@ msgid ""
 "**level** - If you want them categorized by level."
 msgstr ""
 
-#: meowth/__main__.py:2230 meowth/__main__.py:2254 meowth/__main__.py:2305
+#: meowth/__main__.py:2229 meowth/__main__.py:2253 meowth/__main__.py:2304
 msgid "Raid Reporting Categories"
 msgstr ""
 
-#: meowth/__main__.py:2254
+#: meowth/__main__.py:2253
 msgid ""
 "In the same order as they appear below, please give the names of the "
 "categories you would like raids reported in each channel to appear in. You "
@@ -990,23 +993,23 @@ msgid ""
 "You have configured the following channels as raid reporting channels."
 msgstr ""
 
-#: meowth/__main__.py:2285 meowth/__main__.py:2336 meowth/__main__.py:2509
-#: meowth/__main__.py:3001
+#: meowth/__main__.py:2284 meowth/__main__.py:2335 meowth/__main__.py:2508
+#: meowth/__main__.py:3000
 msgid ""
 "The category list you provided doesn't match with your server's categories."
 msgstr ""
 
-#: meowth/__main__.py:2287 meowth/__main__.py:2294 meowth/__main__.py:2338
-#: meowth/__main__.py:2345 meowth/__main__.py:2511 meowth/__main__.py:2518
-#: meowth/__main__.py:3003 meowth/__main__.py:3010
+#: meowth/__main__.py:2286 meowth/__main__.py:2293 meowth/__main__.py:2337
+#: meowth/__main__.py:2344 meowth/__main__.py:2510 meowth/__main__.py:2517
+#: meowth/__main__.py:3002 meowth/__main__.py:3009
 msgid ""
 "\n"
 "\n"
 "The following aren't in your server: **{invalid_categories}**"
 msgstr ""
 
-#: meowth/__main__.py:2288 meowth/__main__.py:2339 meowth/__main__.py:2512
-#: meowth/__main__.py:3004
+#: meowth/__main__.py:2287 meowth/__main__.py:2338 meowth/__main__.py:2511
+#: meowth/__main__.py:3003
 msgid ""
 "\n"
 "\n"
@@ -1014,7 +1017,7 @@ msgid ""
 "made these categories, try again."
 msgstr ""
 
-#: meowth/__main__.py:2292 meowth/__main__.py:2516 meowth/__main__.py:3008
+#: meowth/__main__.py:2291 meowth/__main__.py:2515 meowth/__main__.py:3007
 #, fuzzy
 msgid ""
 "The number of categories I found in your server doesn't match the number of "
@@ -1036,7 +1039,7 @@ msgstr ""
 "Please double check that your locations match up with your provided channels "
 "and resend your response."
 
-#: meowth/__main__.py:2305
+#: meowth/__main__.py:2304
 msgid ""
 "Pokemon Go currently has five levels of raids. Please provide the names of "
 "the categories you would like each level of raid to appear in. Use the "
@@ -1049,7 +1052,7 @@ msgid ""
 "Example: `level 1-3, level 1-3, level 1-3, level 4, 1231231241561337813`"
 msgstr ""
 
-#: meowth/__main__.py:2343
+#: meowth/__main__.py:2342
 msgid ""
 "The number of categories I found in your server doesn't match the number of "
 "raid levels! Make sure you give me exactly six categories, one for each "
@@ -1061,22 +1064,22 @@ msgid ""
 "Please double check your categories."
 msgstr ""
 
-#: meowth/__main__.py:2349 meowth/__main__.py:2523 meowth/__main__.py:3015
+#: meowth/__main__.py:2348 meowth/__main__.py:2522 meowth/__main__.py:3014
 msgid "Sorry, I didn't understand your answer! Try again."
 msgstr ""
 
-#: meowth/__main__.py:2352
+#: meowth/__main__.py:2351
 msgid "Raid Categories are set"
 msgstr ""
 
-#: meowth/__main__.py:2383
+#: meowth/__main__.py:2382
 #, fuzzy
 msgid "EX Raid Reporting Channels"
 msgstr ""
 "**Reporting Channels enabled**\n"
 "---"
 
-#: meowth/__main__.py:2383
+#: meowth/__main__.py:2382
 #, fuzzy
 msgid ""
 "EX Raid Reporting allows users to report EX raids with **!exraid**. Pokemon "
@@ -1101,25 +1104,25 @@ msgstr ""
 "to provide a list of channels in your server you will allow reports from in "
 "this format: `channel-name, channel-name, channel-name`"
 
-#: meowth/__main__.py:2389
+#: meowth/__main__.py:2388
 #, fuzzy
 msgid "EX Raid Reporting disabled"
 msgstr ""
 "**Raid Reports disabled**\n"
 "---"
 
-#: meowth/__main__.py:2421
+#: meowth/__main__.py:2420
 #, fuzzy
 msgid "EX Raid Reporting Channels enabled"
 msgstr ""
 "**Reporting Channels enabled**\n"
 "---"
 
-#: meowth/__main__.py:2436
+#: meowth/__main__.py:2435
 msgid "EX Raid Reporting Locations"
 msgstr ""
 
-#: meowth/__main__.py:2436
+#: meowth/__main__.py:2435
 #, fuzzy
 msgid ""
 "For each report, I generate Google Maps links to give people directions to "
@@ -1151,11 +1154,11 @@ msgstr ""
 "Respond with: **location info, location info, location info** each matching "
 "the order of the previous channel list:"
 
-#: meowth/__main__.py:2453
+#: meowth/__main__.py:2452
 msgid "EX Raid Reporting Locations are set"
 msgstr ""
 
-#: meowth/__main__.py:2454
+#: meowth/__main__.py:2453
 msgid ""
 "How would you like me to categorize the EX raid channels I create? Your "
 "options are:\n"
@@ -1165,11 +1168,11 @@ msgid ""
 "**other** - If you want them categorized in a provided category name or ID"
 msgstr ""
 
-#: meowth/__main__.py:2454 meowth/__main__.py:2478
+#: meowth/__main__.py:2453 meowth/__main__.py:2477
 msgid "EX Raid Reporting Categories"
 msgstr ""
 
-#: meowth/__main__.py:2478
+#: meowth/__main__.py:2477
 msgid ""
 "In the same order as they appear below, please give the names of the "
 "categories you would like raids reported in each channel to appear in. You "
@@ -1182,15 +1185,15 @@ msgid ""
 "You have configured the following channels as EX raid reporting channels."
 msgstr ""
 
-#: meowth/__main__.py:2526
+#: meowth/__main__.py:2525
 msgid "EX Raid Categories are set"
 msgstr ""
 
-#: meowth/__main__.py:2528
+#: meowth/__main__.py:2527
 msgid "EX Raid Channel Read Permissions"
 msgstr ""
 
-#: meowth/__main__.py:2528
+#: meowth/__main__.py:2527
 msgid ""
 "Who do you want to be able to **see** the EX Raid channels? Your options "
 "are:\n"
@@ -1199,15 +1202,15 @@ msgid ""
 "**same** - To only allow those with access to the reporting channel."
 msgstr ""
 
-#: meowth/__main__.py:2533
+#: meowth/__main__.py:2532
 msgid "Everyone permission enabled"
 msgstr ""
 
-#: meowth/__main__.py:2537
+#: meowth/__main__.py:2536
 msgid "Same permission enabled"
 msgstr ""
 
-#: meowth/__main__.py:2574
+#: meowth/__main__.py:2573
 msgid ""
 "Do you want access to EX raids controlled through members using the **!"
 "invite** command?\n"
@@ -1218,23 +1221,23 @@ msgid ""
 "Respond with: **N** to disable, or **Y** to enable:"
 msgstr ""
 
-#: meowth/__main__.py:2574
+#: meowth/__main__.py:2573
 msgid "Invite Configuration"
 msgstr ""
 
-#: meowth/__main__.py:2579
+#: meowth/__main__.py:2578
 msgid "Invite Command enabled"
 msgstr ""
 
-#: meowth/__main__.py:2583
+#: meowth/__main__.py:2582
 msgid "Invite Command disabled"
 msgstr ""
 
-#: meowth/__main__.py:2618
+#: meowth/__main__.py:2617
 msgid "Automatic Counters Configuration"
 msgstr ""
 
-#: meowth/__main__.py:2618
+#: meowth/__main__.py:2617
 msgid ""
 "Do you want to generate an automatic counters list in newly created raid "
 "channels using PokeBattler?\n"
@@ -1247,28 +1250,28 @@ msgid ""
 "EX`"
 msgstr ""
 
-#: meowth/__main__.py:2624
+#: meowth/__main__.py:2623
 msgid "Automatic Counters disabled"
 msgstr ""
 
-#: meowth/__main__.py:2641
+#: meowth/__main__.py:2640
 msgid "Automatic Counter Levels set to: {levels}"
 msgstr ""
 
-#: meowth/__main__.py:2644
+#: meowth/__main__.py:2643
 msgid ""
 "Please enter at least one level from 1 to EX separated by comma. Ex: `4,5,"
 "EX` or **N** to turn off automatic counters."
 msgstr ""
 
-#: meowth/__main__.py:2675
+#: meowth/__main__.py:2674
 #, fuzzy
 msgid "Wild Reporting Channels"
 msgstr ""
 "**Reporting Channels enabled**\n"
 "---"
 
-#: meowth/__main__.py:2675
+#: meowth/__main__.py:2674
 #, fuzzy
 msgid ""
 "Wild Reporting allows users to report wild spawns with **!wild**. Pokemon "
@@ -1293,21 +1296,21 @@ msgstr ""
 "to provide a list of channels in your server you will allow reports from in "
 "this format: `channel-name, channel-name, channel-name`"
 
-#: meowth/__main__.py:2681
+#: meowth/__main__.py:2680
 #, fuzzy
 msgid "Wild Reporting disabled"
 msgstr ""
 "**Wild Reports disabled**\n"
 "---"
 
-#: meowth/__main__.py:2713
+#: meowth/__main__.py:2712
 #, fuzzy
 msgid "Wild Reporting Channels enabled"
 msgstr ""
 "**Reporting Channels enabled**\n"
 "---"
 
-#: meowth/__main__.py:2728
+#: meowth/__main__.py:2727
 #, fuzzy
 msgid ""
 "For each report, I generate Google Maps links to give people directions to "
@@ -1339,19 +1342,19 @@ msgstr ""
 "Respond with: **location info, location info, location info** each matching "
 "the order of the previous channel list:"
 
-#: meowth/__main__.py:2728
+#: meowth/__main__.py:2727
 msgid "Wild Reporting Locations"
 msgstr ""
 
-#: meowth/__main__.py:2745
+#: meowth/__main__.py:2744
 msgid "Wild Reporting Locations are set"
 msgstr ""
 
-#: meowth/__main__.py:2775
+#: meowth/__main__.py:2774
 msgid "Research Reporting Channels"
 msgstr ""
 
-#: meowth/__main__.py:2775
+#: meowth/__main__.py:2774
 #, fuzzy
 msgid ""
 "Research Reporting allows users to report field research with **!research**. "
@@ -1376,21 +1379,21 @@ msgstr ""
 "to provide a list of channels in your server you will allow reports from in "
 "this format: `channel-name, channel-name, channel-name`"
 
-#: meowth/__main__.py:2781
+#: meowth/__main__.py:2780
 #, fuzzy
 msgid "Research Reporting disabled"
 msgstr ""
 "**Raid Reports disabled**\n"
 "---"
 
-#: meowth/__main__.py:2813
+#: meowth/__main__.py:2812
 #, fuzzy
 msgid "Research Reporting Channels enabled"
 msgstr ""
 "**Reporting Channels enabled**\n"
 "---"
 
-#: meowth/__main__.py:2828
+#: meowth/__main__.py:2827
 #, fuzzy
 msgid ""
 "For each report, I generate Google Maps links to give people directions to "
@@ -1422,22 +1425,22 @@ msgstr ""
 "Respond with: **location info, location info, location info** each matching "
 "the order of the previous channel list:"
 
-#: meowth/__main__.py:2828
+#: meowth/__main__.py:2827
 msgid "Research Reporting Locations"
 msgstr ""
 
-#: meowth/__main__.py:2845
+#: meowth/__main__.py:2844
 msgid "Research Reporting Locations are set"
 msgstr ""
 
-#: meowth/__main__.py:2875
+#: meowth/__main__.py:2874
 #, fuzzy
 msgid "Meetup Reporting Channels"
 msgstr ""
 "**Reporting Channels enabled**\n"
 "---"
 
-#: meowth/__main__.py:2875
+#: meowth/__main__.py:2874
 #, fuzzy
 msgid ""
 "Meetup Reporting allows users to report meetups with **!meetup** or **!"
@@ -1462,21 +1465,21 @@ msgstr ""
 "to provide a list of channels in your server you will allow reports from in "
 "this format: `channel-name, channel-name, channel-name`"
 
-#: meowth/__main__.py:2881
+#: meowth/__main__.py:2880
 #, fuzzy
 msgid "Meetup Reporting disabled"
 msgstr ""
 "**Reporting Channels disabled**\n"
 "---"
 
-#: meowth/__main__.py:2913
+#: meowth/__main__.py:2912
 #, fuzzy
 msgid "Meetup Reporting Channels enabled"
 msgstr ""
 "**Reporting Channels enabled**\n"
 "---"
 
-#: meowth/__main__.py:2928
+#: meowth/__main__.py:2927
 #, fuzzy
 msgid ""
 "For each report, I generate Google Maps links to give people directions to "
@@ -1508,15 +1511,15 @@ msgstr ""
 "Respond with: **location info, location info, location info** each matching "
 "the order of the previous channel list:"
 
-#: meowth/__main__.py:2928
+#: meowth/__main__.py:2927
 msgid "Meetup Reporting Locations"
 msgstr ""
 
-#: meowth/__main__.py:2945
+#: meowth/__main__.py:2944
 msgid "Meetup Reporting Locations are set"
 msgstr ""
 
-#: meowth/__main__.py:2946
+#: meowth/__main__.py:2945
 msgid ""
 "How would you like me to categorize the meetup channels I create? Your "
 "options are:\n"
@@ -1526,11 +1529,11 @@ msgid ""
 "**other** - If you want them categorized in a provided category name or ID"
 msgstr ""
 
-#: meowth/__main__.py:2946 meowth/__main__.py:2970
+#: meowth/__main__.py:2945 meowth/__main__.py:2969
 msgid "Meetup Reporting Categories"
 msgstr ""
 
-#: meowth/__main__.py:2970
+#: meowth/__main__.py:2969
 msgid ""
 "In the same order as they appear below, please give the names of the "
 "categories you would like raids reported in each channel to appear in. You "
@@ -1543,18 +1546,18 @@ msgid ""
 "You have configured the following channels as meetup reporting channels."
 msgstr ""
 
-#: meowth/__main__.py:3018
+#: meowth/__main__.py:3017
 msgid "Meetup Categories are set"
 msgstr ""
 
-#: meowth/__main__.py:3049
+#: meowth/__main__.py:3048
 #, fuzzy
 msgid "Pokemon Notifications"
 msgstr ""
 "**Pokemon Notifications enabled**\n"
 "---"
 
-#: meowth/__main__.py:3049
+#: meowth/__main__.py:3048
 #, fuzzy
 msgid ""
 "The **!want** and **!unwant** commands let you add or remove roles for "
@@ -1581,21 +1584,21 @@ msgstr ""
 "Repond with: **N** to disable, or the **channel-name** list to enable, each "
 "seperated by a comma and space."
 
-#: meowth/__main__.py:3054
+#: meowth/__main__.py:3053
 #, fuzzy
 msgid "Pokemon Notifications disabled"
 msgstr ""
 "**Pokemon Notifications disabled**\n"
 "---"
 
-#: meowth/__main__.py:3096
+#: meowth/__main__.py:3095
 #, fuzzy
 msgid "Pokemon Notifications enabled"
 msgstr ""
 "**Pokemon Notifications enabled**\n"
 "---"
 
-#: meowth/__main__.py:3130
+#: meowth/__main__.py:3129
 msgid ""
 "The **!archive** command marks temporary raid channels for archival rather "
 "than deletion. This can be useful for investigating potential violations of "
@@ -1607,33 +1610,33 @@ msgid ""
 "category in your server."
 msgstr ""
 
-#: meowth/__main__.py:3130 meowth/__main__.py:3162
+#: meowth/__main__.py:3129 meowth/__main__.py:3161
 msgid "Archive Configuration"
 msgstr ""
 
-#: meowth/__main__.py:3140
+#: meowth/__main__.py:3139
 msgid "Archived channels will remain in the same category."
 msgstr ""
 
-#: meowth/__main__.py:3144
+#: meowth/__main__.py:3143
 #, fuzzy
 msgid "Archived Channels disabled."
 msgstr ""
 "**Reporting Channels disabled**\n"
 "---"
 
-#: meowth/__main__.py:3155
+#: meowth/__main__.py:3154
 msgid ""
 "I couldn't find the category you replied with! Please reply with **same** to "
 "leave archived channels in the same category, or give the name or ID of an "
 "existing category."
 msgstr ""
 
-#: meowth/__main__.py:3159
+#: meowth/__main__.py:3158
 msgid "Archive category set."
 msgstr ""
 
-#: meowth/__main__.py:3162
+#: meowth/__main__.py:3161
 msgid ""
 "I can also listen in your raid channels for words or phrases that you want "
 "to trigger an automatic archival. For example, if discussion of spoofing is "
@@ -1644,15 +1647,15 @@ msgid ""
 "list of phrases you want me to listen in raid channels for."
 msgstr ""
 
-#: meowth/__main__.py:3166
+#: meowth/__main__.py:3165
 msgid "Phrase list disabled."
 msgstr ""
 
-#: meowth/__main__.py:3175
+#: meowth/__main__.py:3174
 msgid "Archive Phrase list set."
 msgstr ""
 
-#: meowth/__main__.py:3205
+#: meowth/__main__.py:3204
 msgid ""
 "There are a few settings available that are not within **!configure**. To "
 "set these, use **!set <setting>** in any channel to set that setting.\n"
@@ -1675,11 +1678,11 @@ msgid ""
 "Respond with: A number from **-12** to **12**:"
 msgstr ""
 
-#: meowth/__main__.py:3205
+#: meowth/__main__.py:3204
 msgid "Timezone Configuration and Other Settings"
 msgstr ""
 
-#: meowth/__main__.py:3215 meowth/__main__.py:3218
+#: meowth/__main__.py:3214 meowth/__main__.py:3217
 #, fuzzy
 msgid ""
 "I couldn't convert your answer to an appropriate timezone!\n"
@@ -1691,182 +1694,210 @@ msgstr ""
 "Please double check what you sent me and resend a number strarting from "
 "**-12** to **12**."
 
-#: meowth/__main__.py:3223
+#: meowth/__main__.py:3222
 #, fuzzy
 msgid "Timezone set"
 msgstr ""
 "**Timezone set**\n"
 "---"
 
-#: meowth/__main__.py:3244
+#: meowth/__main__.py:3252
+msgid ""
+"The **!trade** command allows your users to organize and coordinate trades. "
+"This command requires at least one channel specifically for trades.\n"
+"\n"
+"If you would like to disable this feature, reply with **N**. Otherwise, just "
+"send the names or IDs of the channels you want to allow the **!trade** "
+"command in, separated by commas."
+msgstr ""
+
+#: meowth/__main__.py:3252
+msgid "Trade Configuration"
+msgstr ""
+
+#: meowth/__main__.py:3260
+#, fuzzy
+msgid "Trade disabled."
+msgstr ""
+"**Raid Reports disabled**\n"
+"---"
+
+#: meowth/__main__.py:3299
+#, fuzzy
+msgid "Pokemon Trades enabled"
+msgstr ""
+"**Pokemon Notifications enabled**\n"
+"---"
+
+#: meowth/__main__.py:3325
 msgid ""
 "\n"
 "**Level {level} raid list:** `{raidlist}` \n"
 msgstr ""
 
-#: meowth/__main__.py:3251 meowth/__main__.py:3264 meowth/__main__.py:3269
+#: meowth/__main__.py:3332 meowth/__main__.py:3345 meowth/__main__.py:3350
 msgid "**Level {level} raid list:** `{raidlist}` \n"
 msgstr ""
 
-#: meowth/__main__.py:3262
+#: meowth/__main__.py:3343
 msgid ""
 "I couldn't understand the list you supplied! Please use a comma-separated "
 "list of Pokemon species numbers."
 msgstr ""
 
-#: meowth/__main__.py:3263
+#: meowth/__main__.py:3344
 msgid "I will replace this:\n"
 msgstr ""
 
-#: meowth/__main__.py:3268
+#: meowth/__main__.py:3349
 msgid ""
 "\n"
 "\n"
 "With this:\n"
 msgstr ""
 
-#: meowth/__main__.py:3273
+#: meowth/__main__.py:3354
 msgid ""
 "\n"
 "\n"
 "Continue?"
 msgstr ""
 
-#: meowth/__main__.py:3281
+#: meowth/__main__.py:3362
 msgid "Meowth! Configuration cancelled!"
 msgstr ""
 
-#: meowth/__main__.py:3292
+#: meowth/__main__.py:3367
 msgid "Meowth! Configuration successful!"
 msgstr ""
 
-#: meowth/__main__.py:3294
+#: meowth/__main__.py:3369
 msgid "Meowth! I'm not sure what went wrong, but configuration is cancelled!"
 msgstr ""
 
-#: meowth/__main__.py:3311
+#: meowth/__main__.py:3387
 msgid "every user"
 msgstr ""
 
-#: meowth/__main__.py:3333
+#: meowth/__main__.py:3409
 msgid ""
 "Are you sure you want to reset the **{type}** report stats for **{target}**?"
 msgstr ""
 
-#: meowth/__main__.py:3359
+#: meowth/__main__.py:3435
 msgid "{trainer}'s report stats have been cleared!"
 msgstr ""
 
-#: meowth/__main__.py:3375
+#: meowth/__main__.py:3451
 msgid "The channel you entered is not a raid channel."
 msgstr ""
 
-#: meowth/__main__.py:3378 meowth/__main__.py:4304
+#: meowth/__main__.py:3454 meowth/__main__.py:4380
 msgid "level-{egg_level}-egg-"
 msgstr ""
 
-#: meowth/__main__.py:3397 meowth/__main__.py:3400 meowth/__main__.py:4320
-#: meowth/__main__.py:4323 meowth/__main__.py:4693 meowth/__main__.py:4696
-#: meowth/__main__.py:6405 meowth/__main__.py:6408
+#: meowth/__main__.py:3473 meowth/__main__.py:3476 meowth/__main__.py:4396
+#: meowth/__main__.py:4399 meowth/__main__.py:4769 meowth/__main__.py:4772
+#: meowth/__main__.py:6489 meowth/__main__.py:6492
 #, fuzzy
 msgid "**Possible Bosses:**"
 msgstr "Possible Bosses: {boss_list}"
 
-#: meowth/__main__.py:3397 meowth/__main__.py:4320 meowth/__main__.py:4693
-#: meowth/__main__.py:6405
+#: meowth/__main__.py:3473 meowth/__main__.py:4396 meowth/__main__.py:4769
+#: meowth/__main__.py:6489
 msgid "{bosslist1}"
 msgstr ""
 
-#: meowth/__main__.py:3398 meowth/__main__.py:4321 meowth/__main__.py:4694
-#: meowth/__main__.py:6406
+#: meowth/__main__.py:3474 meowth/__main__.py:4397 meowth/__main__.py:4770
+#: meowth/__main__.py:6490
 msgid "{bosslist2}"
 msgstr ""
 
-#: meowth/__main__.py:3400 meowth/__main__.py:4323 meowth/__main__.py:4696
-#: meowth/__main__.py:6408
+#: meowth/__main__.py:3476 meowth/__main__.py:4399 meowth/__main__.py:4772
+#: meowth/__main__.py:6492
 msgid "{bosslist}"
 msgstr ""
 
-#: meowth/__main__.py:3407 meowth/__main__.py:4406 meowth/__main__.py:4566
-#: meowth/__main__.py:5370 meowth/__main__.py:5384 meowth/__main__.py:6399
+#: meowth/__main__.py:3483 meowth/__main__.py:4482 meowth/__main__.py:4642
+#: meowth/__main__.py:5446 meowth/__main__.py:5460 meowth/__main__.py:6483
 msgid "team"
 msgstr ""
 
-#: meowth/__main__.py:3408 meowth/__main__.py:4407 meowth/__main__.py:4567
-#: meowth/__main__.py:5371 meowth/__main__.py:5385 meowth/__main__.py:6400
+#: meowth/__main__.py:3484 meowth/__main__.py:4483 meowth/__main__.py:4643
+#: meowth/__main__.py:5447 meowth/__main__.py:5461 meowth/__main__.py:6484
 msgid "status"
 msgstr ""
 
-#: meowth/__main__.py:3412 meowth/__main__.py:3413
+#: meowth/__main__.py:3488 meowth/__main__.py:3489
 msgid "Level {}"
 msgstr ""
 
-#: meowth/__main__.py:3412 meowth/__main__.py:3413
+#: meowth/__main__.py:3488 meowth/__main__.py:3489
 msgid "level\\s\\d"
 msgstr ""
 
-#: meowth/__main__.py:3415
+#: meowth/__main__.py:3491
 #, fuzzy
 msgid "Meowth! Level {} reported"
 msgstr "Meowth! {member} is interested!"
 
-#: meowth/__main__.py:3415 meowth/__main__.py:3416
+#: meowth/__main__.py:3491 meowth/__main__.py:3492
 msgid "Meowth!\\s.*\\sraid\\sreported"
 msgstr ""
 
-#: meowth/__main__.py:3416
+#: meowth/__main__.py:3492
 msgid "Meowth! Level {}"
 msgstr ""
 
-#: meowth/__main__.py:3440
+#: meowth/__main__.py:3516
 msgid ""
 "Are you sure you want to clear all status for this raid? Everybody will have "
 "to RSVP again. If you are wanting to clear one user's status, use `!"
 "setstatus <user> cancel`"
 msgstr ""
 
-#: meowth/__main__.py:3456
+#: meowth/__main__.py:3532
 #, fuzzy
 msgid "Meowth! Raid status lists have been cleared!"
 msgstr "Meowth! **!wild** commands have been disabled."
 
-#: meowth/__main__.py:3471
+#: meowth/__main__.py:3547
 msgid "Meowth! {status} is not a valid status!"
 msgstr ""
 
-#: meowth/__main__.py:3489
+#: meowth/__main__.py:3565
 msgid "Removed {cleancount} empty roles"
 msgstr ""
 
-#: meowth/__main__.py:3519 meowth/__main__.py:3570
+#: meowth/__main__.py:3595 meowth/__main__.py:3646
 msgid "Uptime"
 msgstr ""
 
-#: meowth/__main__.py:3523 meowth/__main__.py:3575
+#: meowth/__main__.py:3599 meowth/__main__.py:3651
 msgid "I need the `Embed links` permission to send this"
 msgstr ""
 
-#: meowth/__main__.py:3532
+#: meowth/__main__.py:3608
 msgid "{yr}y {mth}m {day}d {hr}:{min}"
 msgstr ""
 
-#: meowth/__main__.py:3534
+#: meowth/__main__.py:3610
 msgid "{mth}m {day}d {hr}:{min}"
 msgstr ""
 
-#: meowth/__main__.py:3536
+#: meowth/__main__.py:3612
 msgid "{day} days {hr} hrs {min} mins"
 msgstr ""
 
-#: meowth/__main__.py:3538
+#: meowth/__main__.py:3614
 msgid "{hr} hrs {min} mins {sec} secs"
 msgstr ""
 
-#: meowth/__main__.py:3540
+#: meowth/__main__.py:3616
 msgid "{min} mins {sec} secs"
 msgstr ""
 
-#: meowth/__main__.py:3556
+#: meowth/__main__.py:3632
 msgid ""
 "I'm Meowth! A Pokemon Go helper bot for Discord!\n"
 "\n"
@@ -1877,35 +1908,35 @@ msgid ""
 "\n"
 msgstr ""
 
-#: meowth/__main__.py:3563
+#: meowth/__main__.py:3639
 msgid "About Meowth"
 msgstr ""
 
-#: meowth/__main__.py:3564
+#: meowth/__main__.py:3640
 msgid "Owner"
 msgstr ""
 
-#: meowth/__main__.py:3566
+#: meowth/__main__.py:3642
 msgid "Servers"
 msgstr ""
 
-#: meowth/__main__.py:3567
+#: meowth/__main__.py:3643
 msgid "Members"
 msgstr ""
 
-#: meowth/__main__.py:3568
+#: meowth/__main__.py:3644
 msgid "Your Server"
 msgstr ""
 
-#: meowth/__main__.py:3569
+#: meowth/__main__.py:3645
 msgid "Your Members"
 msgstr ""
 
-#: meowth/__main__.py:3605
+#: meowth/__main__.py:3681
 msgid "Maximum guild roles reached."
 msgstr ""
 
-#: meowth/__main__.py:3610
+#: meowth/__main__.py:3686
 msgid ""
 "Meowth! My roles are ranked lower than the following team roles: "
 "**{higher_roles_list}**\n"
@@ -1915,16 +1946,16 @@ msgstr ""
 "**{higher_roles_list}**\n"
 "Please get an admin to move my roles above them!"
 
-#: meowth/__main__.py:3634
+#: meowth/__main__.py:3710
 msgid "Meowth! You already have a team role!"
 msgstr "Meowth! You already have a team role!"
 
-#: meowth/__main__.py:3638
+#: meowth/__main__.py:3714
 #, fuzzy
 msgid "Meowth! You are already in Team Harmony!"
 msgstr "Meowth! You already have a team role!"
 
-#: meowth/__main__.py:3642
+#: meowth/__main__.py:3718
 msgid ""
 "Meowth! {team_role} is not configured as a role on this server. Please "
 "contact an admin for assistance."
@@ -1932,11 +1963,11 @@ msgstr ""
 "Meowth! {team_role} is not configured as a role on this server. Please "
 "contact an admin for assistance."
 
-#: meowth/__main__.py:3646
+#: meowth/__main__.py:3722
 msgid "Meowth! \"{entered_team}\" isn't a valid team! Try {available_teams}"
 msgstr "Meowth! \"{entered_team}\" isn't a valid team! Try {available_teams}"
 
-#: meowth/__main__.py:3650
+#: meowth/__main__.py:3726
 msgid ""
 "Meowth! The \"{entered_team}\" role isn't configured on this server! Contact "
 "an admin!"
@@ -1944,160 +1975,160 @@ msgstr ""
 "Meowth! The \"{entered_team}\" role isn't configured on this server! Contact "
 "an admin!"
 
-#: meowth/__main__.py:3656
+#: meowth/__main__.py:3732
 msgid "Meowth! Added {member} to Team {team_name}! {team_emoji}"
 msgstr "Meowth! Added {member} to Team {team_name}! {team_emoji}"
 
-#: meowth/__main__.py:3660
+#: meowth/__main__.py:3736
 msgid "Meowth! I can't add roles!"
 msgstr "Meowth! I can't add roles!"
 
-#: meowth/__main__.py:3671
+#: meowth/__main__.py:3747
 msgid "Traveler Card"
 msgstr ""
 
-#: meowth/__main__.py:3673
+#: meowth/__main__.py:3749
 msgid "{user}'s Trainer Profile"
 msgstr ""
 
-#: meowth/__main__.py:3675
+#: meowth/__main__.py:3751
 msgid "Silph Road"
 msgstr ""
 
-#: meowth/__main__.py:3676
+#: meowth/__main__.py:3752
 msgid "Pokebattler"
 msgstr ""
 
-#: meowth/__main__.py:3677
+#: meowth/__main__.py:3753
 #, fuzzy
 msgid "Raid Reports"
 msgstr ""
 "**Raid Reports enabled**\n"
 "---"
 
-#: meowth/__main__.py:3678
+#: meowth/__main__.py:3754
 msgid "Egg Reports"
 msgstr ""
 
-#: meowth/__main__.py:3679
+#: meowth/__main__.py:3755
 msgid "EX Raid Reports"
 msgstr ""
 
-#: meowth/__main__.py:3680
+#: meowth/__main__.py:3756
 #, fuzzy
 msgid "Wild Reports"
 msgstr ""
 "**Wild Reports enabled**\n"
 "---"
 
-#: meowth/__main__.py:3681
+#: meowth/__main__.py:3757
 msgid "Research Reports"
 msgstr ""
 
-#: meowth/__main__.py:3697
+#: meowth/__main__.py:3773
 msgid ""
 "Leaderboard type not supported. Please select from: **total, raids, eggs, "
 "exraids, wilds, research**"
 msgstr ""
 
-#: meowth/__main__.py:3712
+#: meowth/__main__.py:3788
 msgid "Reporting Leaderboard ({type})"
 msgstr ""
 
-#: meowth/__main__.py:3717
+#: meowth/__main__.py:3793
 msgid "Raids: **{raids}** | Eggs: **{eggs}** | "
 msgstr ""
 
-#: meowth/__main__.py:3719
+#: meowth/__main__.py:3795
 msgid "EX Raids: **{exraids}** | "
 msgstr ""
 
-#: meowth/__main__.py:3721
+#: meowth/__main__.py:3797
 msgid "Wilds: **{wilds}** | "
 msgstr ""
 
-#: meowth/__main__.py:3723
+#: meowth/__main__.py:3799
 msgid "Research: **{research}** | "
 msgstr ""
 
-#: meowth/__main__.py:3728
+#: meowth/__main__.py:3804
 msgid "No Reports"
 msgstr ""
 
-#: meowth/__main__.py:3728
+#: meowth/__main__.py:3804
 msgid "Nobody has made a report or this report type is disabled."
 msgstr ""
 
-#: meowth/__main__.py:3798
+#: meowth/__main__.py:3874
 msgid "Meowth! Did you mean **!list wants**?"
 msgstr ""
 
-#: meowth/__main__.py:3819
+#: meowth/__main__.py:3895
 msgid "Maximum guild roles reached. Pokemon not added."
 msgstr ""
 
-#: meowth/__main__.py:3840
+#: meowth/__main__.py:3916
 msgid "Meowth! Got it! {member} wants {pokemon}"
 msgstr "Meowth! Got it! {member} wants {pokemon}"
 
-#: meowth/__main__.py:3845
+#: meowth/__main__.py:3921
 msgid "Meowth! {member}, I already know you want {pokemon}!"
 msgstr "Meowth! {member}, I already know you want {pokemon}!"
 
-#: meowth/__main__.py:3848
+#: meowth/__main__.py:3924
 #, fuzzy
 msgid "Meowth! {member}, out of your total {count} items:"
 msgstr ""
 "Meowth! {member} is on the way with a total of {trainer_count} trainers!"
 
-#: meowth/__main__.py:3850
+#: meowth/__main__.py:3926
 msgid ""
 "\n"
 "**{added_count} Added:** \n"
 "\t{added_list}"
 msgstr ""
 
-#: meowth/__main__.py:3852
+#: meowth/__main__.py:3928
 msgid ""
 "\n"
 "**{already_want_count} Already Following:** \n"
 "\t{already_want_list}"
 msgstr ""
 
-#: meowth/__main__.py:3856
+#: meowth/__main__.py:3932
 msgid ""
 "\n"
 "\t{word}"
 msgstr ""
 
-#: meowth/__main__.py:3858
+#: meowth/__main__.py:3934
 msgid ": *({correction}?)*"
 msgstr ""
 
-#: meowth/__main__.py:3859
+#: meowth/__main__.py:3935
 msgid ""
 "\n"
 "**{count} Not Valid:**"
 msgstr ""
 
-#: meowth/__main__.py:3931
+#: meowth/__main__.py:4007
 msgid "{0}, you have no pokemon in your want list."
 msgstr "{0}, you have no pokemon in your want list."
 
-#: meowth/__main__.py:3933
+#: meowth/__main__.py:4009
 msgid "{0}, I've removed {1} pokemon from your want list."
 msgstr "{0}, I've removed {1} pokemon from your want list."
 
-#: meowth/__main__.py:3952 meowth/__main__.py:4038 meowth/__main__.py:4210
-#: meowth/__main__.py:4633 meowth/__main__.py:4817 meowth/__main__.py:4940
-#: meowth/__main__.py:5021 meowth/__main__.py:5028 meowth/__main__.py:5030
-#: meowth/__main__.py:5267 meowth/__main__.py:5287 meowth/__main__.py:5311
-#: meowth/__main__.py:6592 meowth/__main__.py:6755 meowth/__main__.py:6759
-#: meowth/__main__.py:6773 meowth/__main__.py:6855
+#: meowth/__main__.py:4028 meowth/__main__.py:4114 meowth/__main__.py:4286
+#: meowth/__main__.py:4709 meowth/__main__.py:4893 meowth/__main__.py:5016
+#: meowth/__main__.py:5097 meowth/__main__.py:5104 meowth/__main__.py:5106
+#: meowth/__main__.py:5343 meowth/__main__.py:5363 meowth/__main__.py:5387
+#: meowth/__main__.py:6676 meowth/__main__.py:6839 meowth/__main__.py:6843
+#: meowth/__main__.py:6857 meowth/__main__.py:6939
 msgid "%I:%M %p (%H:%M)"
 msgstr ""
 
-#: meowth/__main__.py:3955 meowth/__main__.py:3971
+#: meowth/__main__.py:4031 meowth/__main__.py:4047
 msgid ""
 "Meowth! Give more details when reporting! Usage: **!wild <pokemon name> "
 "<location>**"
@@ -2105,47 +2136,47 @@ msgstr ""
 "Meowth! Give more details when reporting! Usage: **!wild <pokemon name> "
 "<location>**"
 
-#: meowth/__main__.py:3986
+#: meowth/__main__.py:4062
 msgid "**This {pokemon} has despawned!**"
 msgstr ""
 
-#: meowth/__main__.py:3988
+#: meowth/__main__.py:4064
 #, fuzzy
 msgid "Meowth! Click here for my directions to the wild {pokemon}!"
 msgstr "Meowth! Click here for directions to the wild {pokemon}!"
 
-#: meowth/__main__.py:3988 meowth/__main__.py:4899
+#: meowth/__main__.py:4064 meowth/__main__.py:4975
 msgid "Ask {author} if my directions aren't perfect!"
 msgstr ""
 
-#: meowth/__main__.py:3989 meowth/__main__.py:4153 meowth/__main__.py:4401
-#: meowth/__main__.py:4532
+#: meowth/__main__.py:4065 meowth/__main__.py:4229 meowth/__main__.py:4477
+#: meowth/__main__.py:4608
 msgid "**Details:**"
 msgstr ""
 
-#: meowth/__main__.py:3989 meowth/__main__.py:4153 meowth/__main__.py:4401
-#: meowth/__main__.py:4532
+#: meowth/__main__.py:4065 meowth/__main__.py:4229 meowth/__main__.py:4477
+#: meowth/__main__.py:4608
 msgid "{pokemon} ({pokemonnumber}) {type}"
 msgstr ""
 
-#: meowth/__main__.py:3991
+#: meowth/__main__.py:4067
 msgid "**Reactions:**"
 msgstr ""
 
-#: meowth/__main__.py:3991
+#: meowth/__main__.py:4067
 msgid "{emoji}: I'm on my way!"
 msgstr ""
 
-#: meowth/__main__.py:3992
+#: meowth/__main__.py:4068
 msgid "{emoji}: The Pokemon despawned!"
 msgstr ""
 
-#: meowth/__main__.py:3993 meowth/__main__.py:4157 meowth/__main__.py:4327
-#: meowth/__main__.py:4700 meowth/__main__.py:4817 meowth/__main__.py:4965
+#: meowth/__main__.py:4069 meowth/__main__.py:4233 meowth/__main__.py:4403
+#: meowth/__main__.py:4776 meowth/__main__.py:4893 meowth/__main__.py:5041
 msgid "Reported by @{author} - {timestamp}"
 msgstr ""
 
-#: meowth/__main__.py:3994
+#: meowth/__main__.py:4070
 #, fuzzy
 msgid ""
 "{roletest}Meowth! Wild {pokemon} reported by {member}! Details: "
@@ -2153,8 +2184,8 @@ msgid ""
 msgstr ""
 "Meowth! Wild {pokemon} reported by {member}! Details: {location_details}"
 
-#: meowth/__main__.py:4041 meowth/__main__.py:4069 meowth/__main__.py:4110
-#: meowth/__main__.py:4119 meowth/__main__.py:4278
+#: meowth/__main__.py:4117 meowth/__main__.py:4145 meowth/__main__.py:4186
+#: meowth/__main__.py:4195 meowth/__main__.py:4354
 msgid ""
 "Meowth! Give more details when reporting! Usage: **!raid <pokemon name> "
 "<location>**"
@@ -2162,11 +2193,11 @@ msgstr ""
 "Meowth! Give more details when reporting! Usage: **!raid <pokemon name> "
 "<location>**"
 
-#: meowth/__main__.py:4051
+#: meowth/__main__.py:4127
 msgid "Meowth! **!raid assume** is not allowed in this level egg."
 msgstr "Meowth! **!raid assume** is not allowed in this level egg."
 
-#: meowth/__main__.py:4063
+#: meowth/__main__.py:4139
 msgid ""
 "Meowth! Please wait until the egg has hatched before changing it to an open "
 "raid!"
@@ -2174,18 +2205,18 @@ msgstr ""
 "Meowth! Please wait until the egg has hatched before changing it to an open "
 "raid!"
 
-#: meowth/__main__.py:4098 meowth/__main__.py:4385 meowth/__main__.py:4490
+#: meowth/__main__.py:4174 meowth/__main__.py:4461 meowth/__main__.py:4566
 msgid "Meowth! The Pokemon {pokemon} does not appear in raids!"
 msgstr "Meowth! The Pokemon {pokemon} does not appear in raids!"
 
-#: meowth/__main__.py:4101
+#: meowth/__main__.py:4177
 #, fuzzy
 msgid ""
 "Meowth! The Pokemon {pokemon} only appears in EX Raids! Use **!exraid** to "
 "report one!"
 msgstr "Meowth! The Pokemon {pokemon} does not appear in raids!"
 
-#: meowth/__main__.py:4105
+#: meowth/__main__.py:4181
 #, fuzzy
 msgid ""
 "Meowth...that's too long. Level {raidlevel} raids currently last no more "
@@ -2193,117 +2224,117 @@ msgid ""
 msgstr ""
 "Meowth...that's too long. {raidtype}s currently last no more than one hour..."
 
-#: meowth/__main__.py:4112 meowth/__main__.py:4271 meowth/__main__.py:5730
-#: meowth/__main__.py:5744 meowth/__main__.py:5767 meowth/__main__.py:5845
-#: meowth/__main__.py:5923
+#: meowth/__main__.py:4188 meowth/__main__.py:4347 meowth/__main__.py:5806
+#: meowth/__main__.py:5820 meowth/__main__.py:5843 meowth/__main__.py:5921
+#: meowth/__main__.py:5999
 msgid "clear"
 msgstr ""
 
-#: meowth/__main__.py:4112 meowth/__main__.py:4271 meowth/__main__.py:5730
-#: meowth/__main__.py:5744 meowth/__main__.py:5767 meowth/__main__.py:5845
-#: meowth/__main__.py:5923
+#: meowth/__main__.py:4188 meowth/__main__.py:4347 meowth/__main__.py:5806
+#: meowth/__main__.py:5820 meowth/__main__.py:5843 meowth/__main__.py:5921
+#: meowth/__main__.py:5999
 msgid "extreme"
 msgstr ""
 
-#: meowth/__main__.py:4112 meowth/__main__.py:4271 meowth/__main__.py:5730
-#: meowth/__main__.py:5744 meowth/__main__.py:5767 meowth/__main__.py:5845
-#: meowth/__main__.py:5923
+#: meowth/__main__.py:4188 meowth/__main__.py:4347 meowth/__main__.py:5806
+#: meowth/__main__.py:5820 meowth/__main__.py:5843 meowth/__main__.py:5921
+#: meowth/__main__.py:5999
 msgid "none"
 msgstr ""
 
-#: meowth/__main__.py:4112 meowth/__main__.py:4271 meowth/__main__.py:5730
-#: meowth/__main__.py:5744 meowth/__main__.py:5767 meowth/__main__.py:5845
-#: meowth/__main__.py:5923
+#: meowth/__main__.py:4188 meowth/__main__.py:4347 meowth/__main__.py:5806
+#: meowth/__main__.py:5820 meowth/__main__.py:5843 meowth/__main__.py:5921
+#: meowth/__main__.py:5999
 msgid "rainy"
 msgstr ""
 
-#: meowth/__main__.py:4112 meowth/__main__.py:4271 meowth/__main__.py:5730
-#: meowth/__main__.py:5744 meowth/__main__.py:5767 meowth/__main__.py:5845
-#: meowth/__main__.py:5923
+#: meowth/__main__.py:4188 meowth/__main__.py:4347 meowth/__main__.py:5806
+#: meowth/__main__.py:5820 meowth/__main__.py:5843 meowth/__main__.py:5921
+#: meowth/__main__.py:5999
 msgid "sunny"
 msgstr ""
 
-#: meowth/__main__.py:4113 meowth/__main__.py:4272 meowth/__main__.py:5731
-#: meowth/__main__.py:5745 meowth/__main__.py:5768 meowth/__main__.py:5846
-#: meowth/__main__.py:5924
+#: meowth/__main__.py:4189 meowth/__main__.py:4348 meowth/__main__.py:5807
+#: meowth/__main__.py:5821 meowth/__main__.py:5844 meowth/__main__.py:5922
+#: meowth/__main__.py:6000
 msgid "cloudy"
 msgstr ""
 
-#: meowth/__main__.py:4113 meowth/__main__.py:4272 meowth/__main__.py:5731
-#: meowth/__main__.py:5745 meowth/__main__.py:5768 meowth/__main__.py:5846
-#: meowth/__main__.py:5924
+#: meowth/__main__.py:4189 meowth/__main__.py:4348 meowth/__main__.py:5807
+#: meowth/__main__.py:5821 meowth/__main__.py:5844 meowth/__main__.py:5922
+#: meowth/__main__.py:6000
 msgid "fog"
 msgstr ""
 
-#: meowth/__main__.py:4113 meowth/__main__.py:4272 meowth/__main__.py:5731
-#: meowth/__main__.py:5745 meowth/__main__.py:5768 meowth/__main__.py:5846
-#: meowth/__main__.py:5924
+#: meowth/__main__.py:4189 meowth/__main__.py:4348 meowth/__main__.py:5807
+#: meowth/__main__.py:5821 meowth/__main__.py:5844 meowth/__main__.py:5922
+#: meowth/__main__.py:6000
 msgid "partlycloudy"
 msgstr ""
 
-#: meowth/__main__.py:4113 meowth/__main__.py:4272 meowth/__main__.py:5731
-#: meowth/__main__.py:5745 meowth/__main__.py:5768 meowth/__main__.py:5846
-#: meowth/__main__.py:5924
+#: meowth/__main__.py:4189 meowth/__main__.py:4348 meowth/__main__.py:5807
+#: meowth/__main__.py:5821 meowth/__main__.py:5844 meowth/__main__.py:5922
+#: meowth/__main__.py:6000
 msgid "snow"
 msgstr ""
 
-#: meowth/__main__.py:4113 meowth/__main__.py:4272 meowth/__main__.py:5731
-#: meowth/__main__.py:5745 meowth/__main__.py:5768 meowth/__main__.py:5846
-#: meowth/__main__.py:5924
+#: meowth/__main__.py:4189 meowth/__main__.py:4348 meowth/__main__.py:5807
+#: meowth/__main__.py:5821 meowth/__main__.py:5844 meowth/__main__.py:5922
+#: meowth/__main__.py:6000
 msgid "windy"
 msgstr ""
 
-#: meowth/__main__.py:4125 meowth/__main__.py:4284
+#: meowth/__main__.py:4201 meowth/__main__.py:4360
 msgid "Meowth! I couldn't find a gym named '{0}'."
 msgstr ""
 
-#: meowth/__main__.py:4129 meowth/__main__.py:4288
+#: meowth/__main__.py:4205 meowth/__main__.py:4364
 msgid "No notes for this gym."
 msgstr ""
 
-#: meowth/__main__.py:4149 meowth/__main__.py:4531
+#: meowth/__main__.py:4225 meowth/__main__.py:4607
 msgid "Meowth! Click here for directions to the raid!"
 msgstr "Meowth! Click here for directions to the raid!"
 
-#: meowth/__main__.py:4151 meowth/__main__.py:4317
+#: meowth/__main__.py:4227 meowth/__main__.py:4393
 msgid ""
 "**Name:** {0}\n"
 "**Notes:** {1}"
 msgstr ""
 
-#: meowth/__main__.py:4152 meowth/__main__.py:4318
+#: meowth/__main__.py:4228 meowth/__main__.py:4394
 msgid "**Gym:**"
 msgstr ""
 
-#: meowth/__main__.py:4154 meowth/__main__.py:4402 meowth/__main__.py:4533
+#: meowth/__main__.py:4230 meowth/__main__.py:4478 meowth/__main__.py:4609
 msgid "**Weaknesses:**"
 msgstr ""
 
-#: meowth/__main__.py:4154 meowth/__main__.py:4402 meowth/__main__.py:4533
+#: meowth/__main__.py:4230 meowth/__main__.py:4478 meowth/__main__.py:4609
 #, fuzzy
 msgid "{weakness_list}"
 msgstr "Weaknesses: {weakness_list}"
 
-#: meowth/__main__.py:4155 meowth/__main__.py:4325 meowth/__main__.py:4403
-#: meowth/__main__.py:4698
+#: meowth/__main__.py:4231 meowth/__main__.py:4401 meowth/__main__.py:4479
+#: meowth/__main__.py:4774
 msgid "**Next Group:**"
 msgstr ""
 
-#: meowth/__main__.py:4155 meowth/__main__.py:4325 meowth/__main__.py:4698
-#: meowth/__main__.py:4963 meowth/__main__.py:6604
+#: meowth/__main__.py:4231 meowth/__main__.py:4401 meowth/__main__.py:4774
+#: meowth/__main__.py:5039 meowth/__main__.py:6688
 msgid "Set with **!starttime**"
 msgstr ""
 
-#: meowth/__main__.py:4156 meowth/__main__.py:4326 meowth/__main__.py:4699
-#: meowth/__main__.py:4964
+#: meowth/__main__.py:4232 meowth/__main__.py:4402 meowth/__main__.py:4775
+#: meowth/__main__.py:5040
 msgid "Set with **!timerset**"
 msgstr ""
 
-#: meowth/__main__.py:4156 meowth/__main__.py:4538 meowth/__main__.py:4699
+#: meowth/__main__.py:4232 meowth/__main__.py:4614 meowth/__main__.py:4775
 msgid "**Expires:**"
 msgstr ""
 
-#: meowth/__main__.py:4160
+#: meowth/__main__.py:4236
 msgid ""
 "Meowth! {pokemon} raid reported by {member}! Details: {location_details}. "
 "Coordinate in {raid_channel}"
@@ -2311,7 +2342,7 @@ msgstr ""
 "Meowth! {pokemon} raid reported by {member}! Details: {location_details}. "
 "Coordinate in {raid_channel}"
 
-#: meowth/__main__.py:4162
+#: meowth/__main__.py:4238
 msgid ""
 "{roletest}Meowth! {pokemon} raid reported by {member} in {citychannel}! "
 "Details: {location_details}. Coordinate here!\n"
@@ -2322,7 +2353,7 @@ msgid ""
 "This channel will be deleted five minutes after the timer expires."
 msgstr ""
 
-#: meowth/__main__.py:4170 meowth/__main__.py:4425 meowth/__main__.py:4582
+#: meowth/__main__.py:4246 meowth/__main__.py:4501 meowth/__main__.py:4658
 msgid ""
 "Here are the best counters for the raid boss in currently known weather "
 "conditions! Update weather with **!weather**. If you know the moveset of the "
@@ -2330,7 +2361,7 @@ msgid ""
 "update the counters."
 msgstr ""
 
-#: meowth/__main__.py:4203
+#: meowth/__main__.py:4279
 msgid ""
 "Meowth! Hey {member}, if you can, set the time left on the raid using **!"
 "timerset <minutes>** so others can check it with **!timer**."
@@ -2338,7 +2369,7 @@ msgstr ""
 "Meowth! Hey {member}, if you can, set the time left on the raid using **!"
 "timerset <minutes>** so others can check it with **!timer**."
 
-#: meowth/__main__.py:4217
+#: meowth/__main__.py:4293
 msgid ""
 "Meowth! Give more details when reporting! Usage: **!raidegg <level> "
 "<location>**"
@@ -2346,7 +2377,7 @@ msgstr ""
 "Meowth! Give more details when reporting! Usage: **!raidegg <level> "
 "<location>**"
 
-#: meowth/__main__.py:4223 meowth/__main__.py:4268
+#: meowth/__main__.py:4299 meowth/__main__.py:4344
 msgid ""
 "Meowth! Give more details when reporting! Use at least: **!raidegg <level> "
 "<location>**. Type **!help** raidegg for more info."
@@ -2354,16 +2385,16 @@ msgstr ""
 "Meowth! Give more details when reporting! Use at least: **!raidegg <level> "
 "<location>**. Type **!help** raidegg for more info."
 
-#: meowth/__main__.py:4229 meowth/__main__.py:5058
+#: meowth/__main__.py:4305 meowth/__main__.py:5134
 msgid "Did you mean egg hatch time {0} or time remaining before hatch {1}?"
 msgstr ""
 
-#: meowth/__main__.py:4249 meowth/__main__.py:5077 meowth/__main__.py:5135
-#: meowth/__main__.py:5220 meowth/__main__.py:5261
+#: meowth/__main__.py:4325 meowth/__main__.py:5153 meowth/__main__.py:5211
+#: meowth/__main__.py:5296 meowth/__main__.py:5337
 msgid "Meowth! Please enter a time in the future."
 msgstr ""
 
-#: meowth/__main__.py:4263
+#: meowth/__main__.py:4339
 #, fuzzy
 msgid ""
 "Meowth...that's too long. Level {raidlevel} Raid Eggs currently last no more "
@@ -2371,19 +2402,19 @@ msgid ""
 msgstr ""
 "Meowth...that's too long. {raidtype}s currently last no more than one hour..."
 
-#: meowth/__main__.py:4293
+#: meowth/__main__.py:4369
 msgid "Meowth! Raid egg levels are only from 1-5!"
 msgstr "Meowth! Raid egg levels are only from 1-5!"
 
-#: meowth/__main__.py:4315 meowth/__main__.py:4400 meowth/__main__.py:4691
+#: meowth/__main__.py:4391 meowth/__main__.py:4476 meowth/__main__.py:4767
 msgid "Meowth! Click here for directions to the coming raid!"
 msgstr "Meowth! Click here for directions to the coming raid!"
 
-#: meowth/__main__.py:4326 meowth/__main__.py:4404
+#: meowth/__main__.py:4402 meowth/__main__.py:4480
 msgid "**Hatches:**"
 msgstr ""
 
-#: meowth/__main__.py:4329
+#: meowth/__main__.py:4405
 msgid ""
 "Meowth! Level {level} raid egg reported by {member}! Details: "
 "{location_details}. Coordinate in {raid_channel}"
@@ -2391,7 +2422,7 @@ msgstr ""
 "Meowth! Level {level} raid egg reported by {member}! Details: "
 "{location_details}. Coordinate in {raid_channel}"
 
-#: meowth/__main__.py:4331
+#: meowth/__main__.py:4407
 msgid ""
 "Meowth! Level {level} raid egg reported by {member} in {citychannel}! "
 "Details: {location_details}. Coordinate here!\n"
@@ -2402,7 +2433,7 @@ msgid ""
 "This channel will be deleted five minutes after the timer expires."
 msgstr ""
 
-#: meowth/__main__.py:4355
+#: meowth/__main__.py:4431
 msgid ""
 "Meowth! Hey {member}, if you can, set the time left until the egg hatches "
 "using **!timerset <minutes>** so others can check it with **!timer**."
@@ -2410,28 +2441,28 @@ msgstr ""
 "Meowth! Hey {member}, if you can, set the time left until the egg hatches "
 "using **!timerset <minutes>** so others can check it with **!timer**."
 
-#: meowth/__main__.py:4388 meowth/__main__.py:4493
+#: meowth/__main__.py:4464 meowth/__main__.py:4569
 msgid ""
 "Meowth! The Pokemon {pokemon} does not hatch from level {level} raid eggs!"
 msgstr ""
 "Meowth! The Pokemon {pokemon} does not hatch from level {level} raid eggs!"
 
-#: meowth/__main__.py:4422
+#: meowth/__main__.py:4498
 #, fuzzy
 msgid ""
 "{roletest}Meowth! This egg will be assumed to be {pokemon} when it hatches!"
 msgstr "Meowth! This egg will be assumed to be {pokemon} when it hatches!"
 
-#: meowth/__main__.py:4467 meowth/__main__.py:5358 meowth/__main__.py:5428
-#: meowth/__main__.py:6391
+#: meowth/__main__.py:4543 meowth/__main__.py:5434 meowth/__main__.py:5504
+#: meowth/__main__.py:6475
 msgid "Coordinate here"
 msgstr ""
 
-#: meowth/__main__.py:4505
+#: meowth/__main__.py:4581
 msgid "The event has started!"
 msgstr ""
 
-#: meowth/__main__.py:4511
+#: meowth/__main__.py:4587
 msgid ""
 "Meowth! The egg has hatched into a {pokemon} raid! Details: "
 "{location_details}. Coordinate in {raid_channel}"
@@ -2439,7 +2470,7 @@ msgstr ""
 "Meowth! The egg has hatched into a {pokemon} raid! Details: "
 "{location_details}. Coordinate in {raid_channel}"
 
-#: meowth/__main__.py:4512
+#: meowth/__main__.py:4588
 msgid ""
 "Meowth! The egg reported by {member} in {citychannel} hatched into a "
 "{pokemon} raid! Details: {location_details}. Coordinate here!\n"
@@ -2450,19 +2481,19 @@ msgid ""
 "This channel will be deleted five minutes after the timer expires."
 msgstr ""
 
-#: meowth/__main__.py:4516 meowth/__main__.py:4703
+#: meowth/__main__.py:4592 meowth/__main__.py:4779
 msgid "Use the **!invite** command to gain access and coordinate"
 msgstr ""
 
-#: meowth/__main__.py:4517 meowth/__main__.py:4704
+#: meowth/__main__.py:4593 meowth/__main__.py:4780
 msgid " after using **!invite** to gain access"
 msgstr ""
 
-#: meowth/__main__.py:4519 meowth/__main__.py:4706
+#: meowth/__main__.py:4595 meowth/__main__.py:4782
 msgid "Coordinate"
 msgstr ""
 
-#: meowth/__main__.py:4521
+#: meowth/__main__.py:4597
 #, fuzzy
 msgid ""
 "Meowth! The EX egg has hatched into a {pokemon} raid! Details: "
@@ -2471,7 +2502,7 @@ msgstr ""
 "Meowth! The egg has hatched into a {pokemon} raid! Details: "
 "{location_details}. Coordinate in {raid_channel}"
 
-#: meowth/__main__.py:4522
+#: meowth/__main__.py:4598
 msgid ""
 "Meowth! {pokemon} EX raid reported by {member} in {citychannel}! Details: "
 "{location_details}. Coordinate here{invitemsgstr2}!\n"
@@ -2482,20 +2513,20 @@ msgid ""
 "This channel will be deleted five minutes after the timer expires."
 msgstr ""
 
-#: meowth/__main__.py:4536 meowth/__main__.py:4538 meowth/__main__.py:5003
-#: meowth/__main__.py:5007 meowth/__main__.py:5010 meowth/__main__.py:5024
-#: meowth/__main__.py:5026 meowth/__main__.py:5154 meowth/__main__.py:5155
-#: meowth/__main__.py:5161 meowth/__main__.py:5162 meowth/__main__.py:5164
-#: meowth/__main__.py:5165 meowth/__main__.py:5289 meowth/__main__.py:6761
-#: meowth/__main__.py:6767 meowth/__main__.py:6769 meowth/__main__.py:6771
+#: meowth/__main__.py:4612 meowth/__main__.py:4614 meowth/__main__.py:5079
+#: meowth/__main__.py:5083 meowth/__main__.py:5086 meowth/__main__.py:5100
+#: meowth/__main__.py:5102 meowth/__main__.py:5230 meowth/__main__.py:5231
+#: meowth/__main__.py:5237 meowth/__main__.py:5238 meowth/__main__.py:5240
+#: meowth/__main__.py:5241 meowth/__main__.py:5365 meowth/__main__.py:6845
+#: meowth/__main__.py:6851 meowth/__main__.py:6853 meowth/__main__.py:6855
 msgid "%B %d at %I:%M %p (%H:%M)"
 msgstr ""
 
-#: meowth/__main__.py:4541
+#: meowth/__main__.py:4617
 msgid "Ends on %B %d at %I:%M %p (%H:%M)"
 msgstr ""
 
-#: meowth/__main__.py:4564
+#: meowth/__main__.py:4640
 #, fuzzy
 msgid ""
 "{roletest}Meowth! Trainers {trainer_list}: The raid egg has just hatched "
@@ -2508,18 +2539,18 @@ msgstr ""
 "You're now able to update your status with **!coming** or **!here**. If "
 "you've changed your plans, use **!cancel**."
 
-#: meowth/__main__.py:4637 meowth/__main__.py:4644
+#: meowth/__main__.py:4713 meowth/__main__.py:4720
 #, fuzzy
 msgid "Meowth! Give more details when reporting! Usage: **!exraid <location>**"
 msgstr ""
 "Meowth! Give more details when reporting! Usage: **!raidegg <level> "
 "<location>**"
 
-#: meowth/__main__.py:4656
+#: meowth/__main__.py:4732
 msgid "ex-raid-egg-"
 msgstr ""
 
-#: meowth/__main__.py:4708
+#: meowth/__main__.py:4784
 #, fuzzy
 msgid ""
 "Meowth! EX raid egg reported by {member}! Details: {location_details}. "
@@ -2528,7 +2559,7 @@ msgstr ""
 "Meowth! Level {level} raid egg reported by {member}! Details: "
 "{location_details}. Coordinate in {raid_channel}"
 
-#: meowth/__main__.py:4710
+#: meowth/__main__.py:4786
 msgid ""
 "Meowth! EX raid reported by {member} in {citychannel}! Details: "
 "{location_details}. Coordinate here{invitemsgstr2}!\n"
@@ -2539,7 +2570,7 @@ msgid ""
 "This channel will be deleted five minutes after the timer expires."
 msgstr ""
 
-#: meowth/__main__.py:4732
+#: meowth/__main__.py:4808
 #, fuzzy
 msgid ""
 "Meowth! Hey {member}, if you can, set the time left until the egg hatches "
@@ -2550,13 +2581,13 @@ msgstr ""
 "Meowth! Hey {member}, if you can, set the time left until the egg hatches "
 "using **!timerset <minutes>** so others can check it with **!timer**."
 
-#: meowth/__main__.py:4768
+#: meowth/__main__.py:4844
 msgid ""
 "Meowth! No EX Raids have been reported in this server! Use **!exraid** to "
 "report one!"
 msgstr ""
 
-#: meowth/__main__.py:4770
+#: meowth/__main__.py:4846
 msgid ""
 "Meowth! {0}, you've told me you have an invite to an EX Raid, and I'm just "
 "going to take your word for it! The following {1} EX Raids have been "
@@ -2567,52 +2598,52 @@ msgid ""
 "exraid**"
 msgstr ""
 
-#: meowth/__main__.py:4774
+#: meowth/__main__.py:4850
 msgid "Meowth! Be sure to report your EX Raid with **!exraid**!"
 msgstr ""
 
-#: meowth/__main__.py:4777
+#: meowth/__main__.py:4853
 msgid ""
 "Meowth! I couldn't tell which EX Raid you meant! Try the **!invite** command "
 "again, and make sure you respond with the number of the channel that matches!"
 msgstr ""
 
-#: meowth/__main__.py:4788
+#: meowth/__main__.py:4864
 msgid ""
 "Meowth! Alright {0}, you can now send messages in {1}! Make sure you let the "
 "trainers in there know if you can make it to the EX Raid!"
 msgstr ""
 
-#: meowth/__main__.py:4792
+#: meowth/__main__.py:4868
 #, fuzzy
 msgid ""
 "Meowth! I couldn't understand your reply! Try the **!invite** command again!"
 msgstr "Meowth...I couldn't understand your time format..."
 
-#: meowth/__main__.py:4822
+#: meowth/__main__.py:4898
 msgid ""
 "entered an incorrect amount of arguments.\n"
 "\n"
 "Usage: **!research** or **!research <pokestop>, <quest>, <reward>**"
 msgstr ""
 
-#: meowth/__main__.py:4827 meowth/__main__.py:4851
+#: meowth/__main__.py:4903 meowth/__main__.py:4927
 msgid "**Pokestop:**"
 msgstr ""
 
-#: meowth/__main__.py:4828 meowth/__main__.py:4869
+#: meowth/__main__.py:4904 meowth/__main__.py:4945
 msgid "**Quest:**"
 msgstr ""
 
-#: meowth/__main__.py:4829 meowth/__main__.py:4887
+#: meowth/__main__.py:4905 meowth/__main__.py:4963
 msgid "**Reward:**"
 msgstr ""
 
-#: meowth/__main__.py:4832
+#: meowth/__main__.py:4908
 msgid "**New Research Report**"
 msgstr ""
 
-#: meowth/__main__.py:4832
+#: meowth/__main__.py:4908
 msgid ""
 "Meowth! I'll help you report a research quest!\n"
 "\n"
@@ -2621,15 +2652,15 @@ msgid ""
 "stop anytime."
 msgstr ""
 
-#: meowth/__main__.py:4840 meowth/__main__.py:4860 meowth/__main__.py:4878
+#: meowth/__main__.py:4916 meowth/__main__.py:4936 meowth/__main__.py:4954
 msgid "took too long to respond"
 msgstr ""
 
-#: meowth/__main__.py:4843 meowth/__main__.py:4863 meowth/__main__.py:4881
+#: meowth/__main__.py:4919 meowth/__main__.py:4939 meowth/__main__.py:4957
 msgid "cancelled the report"
 msgstr ""
 
-#: meowth/__main__.py:4852
+#: meowth/__main__.py:4928
 msgid ""
 "Great! Now, reply with the **quest** that you received from **{location}**. "
 "You can reply with **cancel** to stop anytime.\n"
@@ -2637,7 +2668,7 @@ msgid ""
 "Here's what I have so far:"
 msgstr ""
 
-#: meowth/__main__.py:4870
+#: meowth/__main__.py:4946
 msgid ""
 "Fantastic! Now, reply with the **reward** for the **{quest}** quest that you "
 "received from **{location}**. You can reply with **cancel** to stop "
@@ -2646,57 +2677,57 @@ msgid ""
 "Here's what I have so far:"
 msgstr ""
 
-#: meowth/__main__.py:4897
+#: meowth/__main__.py:4973
 msgid "{roletest}Field Research reported by {author}"
 msgstr ""
 
-#: meowth/__main__.py:4898
+#: meowth/__main__.py:4974
 #, fuzzy
 msgid "Meowth! Click here for my directions to the research!"
 msgstr "Meowth! Click here for directions to the raid!"
 
-#: meowth/__main__.py:4919
+#: meowth/__main__.py:4995
 #, fuzzy
 msgid "**Research Report Cancelled**"
 msgstr ""
 "**Raid Reports enabled**\n"
 "---"
 
-#: meowth/__main__.py:4919
+#: meowth/__main__.py:4995
 msgid ""
 "Meowth! Your report has been cancelled because you {error}! Retry when "
 "you're ready."
 msgstr ""
 
-#: meowth/__main__.py:4943
+#: meowth/__main__.py:5019
 #, fuzzy
 msgid "Meowth! Give more details when reporting! Usage: **!meetup <location>**"
 msgstr ""
 "Meowth! Give more details when reporting! Usage: **!raidegg <level> "
 "<location>**"
 
-#: meowth/__main__.py:4949
+#: meowth/__main__.py:5025
 msgid "meetup-"
 msgstr ""
 
-#: meowth/__main__.py:4960
+#: meowth/__main__.py:5036
 #, fuzzy
 msgid "Meowth! Click here for directions to the event!"
 msgstr "Meowth! Click here for directions to the raid!"
 
-#: meowth/__main__.py:4961
+#: meowth/__main__.py:5037
 msgid "**Event Location:**"
 msgstr ""
 
-#: meowth/__main__.py:4963
+#: meowth/__main__.py:5039
 msgid "**Event Starts:**"
 msgstr ""
 
-#: meowth/__main__.py:4964
+#: meowth/__main__.py:5040
 msgid "**Event Ends:**"
 msgstr ""
 
-#: meowth/__main__.py:4967
+#: meowth/__main__.py:5043
 #, fuzzy
 msgid ""
 "Meowth! Meetup reported by {member}! Details: {location_details}. Coordinate "
@@ -2705,7 +2736,7 @@ msgstr ""
 "Meowth! {pokemon} raid reported by {member}! Details: {location_details}. "
 "Coordinate in {raid_channel}"
 
-#: meowth/__main__.py:4969
+#: meowth/__main__.py:5045
 #, fuzzy
 msgid ""
 "Meowth! Meetup reported by {member} in {citychannel}! Details: "
@@ -2757,7 +2788,7 @@ msgstr ""
 "\n"
 "This channel will be deleted five minutes after the timer expires."
 
-#: meowth/__main__.py:4987
+#: meowth/__main__.py:5063
 #, fuzzy
 msgid ""
 "Meowth! Hey {member}, if you can, set the time that the event starts with **!"
@@ -2767,57 +2798,57 @@ msgstr ""
 "Meowth! Hey {member}, if you can, set the time left until the egg hatches "
 "using **!timerset <minutes>** so others can check it with **!timer**."
 
-#: meowth/__main__.py:5003
+#: meowth/__main__.py:5079
 msgid "This event will start at {expiry_time}"
 msgstr ""
 
-#: meowth/__main__.py:5005
+#: meowth/__main__.py:5081
 msgid "Nobody has told me a start time! Set it with **!starttime**"
 msgstr ""
 
-#: meowth/__main__.py:5007
+#: meowth/__main__.py:5083
 msgid " | This event will end at {expiry_time}"
 msgstr ""
 
-#: meowth/__main__.py:5010
+#: meowth/__main__.py:5086
 msgid "This event will end at {expiry_time}"
 msgstr ""
 
-#: meowth/__main__.py:5012
+#: meowth/__main__.py:5088
 msgid "Nobody has told me a end time! Set it with **!timerset**"
 msgstr ""
 
-#: meowth/__main__.py:5015 meowth/__main__.py:5583
+#: meowth/__main__.py:5091 meowth/__main__.py:5659
 msgid "egg"
 msgstr ""
 
-#: meowth/__main__.py:5016 meowth/__main__.py:5582
+#: meowth/__main__.py:5092 meowth/__main__.py:5658
 msgid "hatch"
 msgstr ""
 
-#: meowth/__main__.py:5018 meowth/__main__.py:5586 meowth/__main__.py:5608
-#: meowth/__main__.py:6223 meowth/__main__.py:6484 meowth/__main__.py:6996
+#: meowth/__main__.py:5094 meowth/__main__.py:5662 meowth/__main__.py:5684
+#: meowth/__main__.py:6300 meowth/__main__.py:6568 meowth/__main__.py:7080
 msgid "raid"
 msgstr ""
 
-#: meowth/__main__.py:5019 meowth/__main__.py:5585
+#: meowth/__main__.py:5095 meowth/__main__.py:5661
 msgid "end"
 msgstr ""
 
-#: meowth/__main__.py:5021
+#: meowth/__main__.py:5097
 #, fuzzy
 msgid "This {raidtype}'s timer has already expired as of {expiry_time}!"
 msgstr ""
 "Meowth! This {raidtype}'s timer has already expired as of {expiry_time} "
 "({expiry_time24})!"
 
-#: meowth/__main__.py:5024
+#: meowth/__main__.py:5100
 #, fuzzy
 msgid "This {raidtype} will {raidaction} on {expiry}!"
 msgstr ""
 "Meowth! This {raidtype} will {raidaction} at {expiry_time} ({expiry_time24})!"
 
-#: meowth/__main__.py:5026
+#: meowth/__main__.py:5102
 #, fuzzy
 msgid ""
 "No one told me when the {raidtype} will {raidaction}, so I'm assuming it "
@@ -2826,13 +2857,13 @@ msgstr ""
 "Meowth! No one told me when the {raidtype} will {raidaction}, so I'm "
 "assuming it will {raidaction} at {expiry_time} ({expiry_time24})!"
 
-#: meowth/__main__.py:5028
+#: meowth/__main__.py:5104
 #, fuzzy
 msgid "This {raidtype} will {raidaction} at {expiry_time}!"
 msgstr ""
 "Meowth! This {raidtype} will {raidaction} at {expiry_time} ({expiry_time24})!"
 
-#: meowth/__main__.py:5030
+#: meowth/__main__.py:5106
 #, fuzzy
 msgid ""
 "No one told me when the {raidtype} will {raidaction}, so I'm assuming it "
@@ -2841,15 +2872,15 @@ msgstr ""
 "Meowth! No one told me when the {raidtype} will {raidaction}, so I'm "
 "assuming it will {raidaction} at {expiry_time} ({expiry_time24})!"
 
-#: meowth/__main__.py:5049
+#: meowth/__main__.py:5125
 msgid "Raid Egg"
 msgstr ""
 
-#: meowth/__main__.py:5053
+#: meowth/__main__.py:5129
 msgid "Raid"
 msgstr ""
 
-#: meowth/__main__.py:5080 meowth/__main__.py:5085 meowth/__main__.py:5096
+#: meowth/__main__.py:5156 meowth/__main__.py:5161 meowth/__main__.py:5172
 #, fuzzy
 msgid ""
 "Meowth! I couldn't understand your time format. Try again like this: **!"
@@ -2858,7 +2889,7 @@ msgstr ""
 "Meowth... I couldn't understand your time format. Try again like this: !"
 "timerset H:MM"
 
-#: meowth/__main__.py:5099
+#: meowth/__main__.py:5175
 #, fuzzy
 msgid ""
 "Meowth...that's too long. Level {raidlevel} {raidtype}s currently last no "
@@ -2866,85 +2897,85 @@ msgid ""
 msgstr ""
 "Meowth...that's too long. {raidtype}s currently last no more than one hour..."
 
-#: meowth/__main__.py:5115 meowth/__main__.py:5123
+#: meowth/__main__.py:5191 meowth/__main__.py:5199
 msgid ""
 "Meowth! Your timer wasn't formatted correctly. Change your **!timerset** to "
 "match this format: **MM/DD HH:MM AM/PM** (You can also omit AM/PM and use 24-"
 "hour time!)"
 msgstr ""
 
-#: meowth/__main__.py:5128
+#: meowth/__main__.py:5204
 msgid "Meowth! Please enter a time after your start time."
 msgstr ""
 
-#: meowth/__main__.py:5137
+#: meowth/__main__.py:5213
 msgid "Meowth! Timerset isn't supported for EX Raids after they have hatched."
 msgstr ""
 
-#: meowth/__main__.py:5148
+#: meowth/__main__.py:5224
 msgid "The channel has been reactivated."
 msgstr ""
 
-#: meowth/__main__.py:5154 meowth/__main__.py:5161 meowth/__main__.py:5164
+#: meowth/__main__.py:5230 meowth/__main__.py:5237 meowth/__main__.py:5240
 msgid "Ends on {end}"
 msgstr ""
 
-#: meowth/__main__.py:5160
+#: meowth/__main__.py:5236
 msgid "%B %d at %I:%M %p (%H:%M) | "
 msgstr ""
 
-#: meowth/__main__.py:5160
+#: meowth/__main__.py:5236
 msgid "Hatches on {expiry}"
 msgstr ""
 
-#: meowth/__main__.py:5192
+#: meowth/__main__.py:5268
 msgid "Meowth!"
 msgstr ""
 
-#: meowth/__main__.py:5223
+#: meowth/__main__.py:5299
 msgid "Meowth! Please enter a time before your end time."
 msgstr ""
 
-#: meowth/__main__.py:5244 meowth/__main__.py:5250
+#: meowth/__main__.py:5320 meowth/__main__.py:5326
 msgid ""
 "Meowth! Your start time wasn't formatted correctly. Change your **!"
 "starttime** to match this format: **HH:MM AM/PM** (You can also omit AM/PM "
 "and use 24-hour time!)"
 msgstr ""
 
-#: meowth/__main__.py:5258
+#: meowth/__main__.py:5334
 msgid "Meowth! The raid will be over before that...."
 msgstr ""
 
-#: meowth/__main__.py:5264
+#: meowth/__main__.py:5340
 msgid "Meowth! The egg will not hatch by then!"
 msgstr ""
 
-#: meowth/__main__.py:5267
+#: meowth/__main__.py:5343
 msgid ""
 "Meowth! There is already a start time of **{start}** set! Do you want to "
 "change it?"
 msgstr ""
 
-#: meowth/__main__.py:5275
+#: meowth/__main__.py:5351
 msgid "Start time change cancelled."
 msgstr ""
 
-#: meowth/__main__.py:5290
+#: meowth/__main__.py:5366
 msgid "Meowth! The current start time has been set to: **{starttime}**"
 msgstr ""
 
-#: meowth/__main__.py:5311
+#: meowth/__main__.py:5387
 msgid "Meowth! The current start time is: **{starttime}**"
 msgstr ""
 
-#: meowth/__main__.py:5313
+#: meowth/__main__.py:5389
 msgid ""
 "Meowth! No start time has been set, set one with **!starttime HH:MM AM/PM**! "
 "(You can also omit AM/PM and use 24-hour time!)"
 msgstr ""
 
-#: meowth/__main__.py:5337
+#: meowth/__main__.py:5413
 #, fuzzy
 msgid ""
 "Meowth! Here's the current location for the raid!\n"
@@ -2953,7 +2984,7 @@ msgstr ""
 "Meowth! Here's the current location for the raid!\n"
 "Details:{location}"
 
-#: meowth/__main__.py:5351
+#: meowth/__main__.py:5427
 msgid ""
 "Meowth! We're missing the new location details! Usage: **!location new <new "
 "address>**"
@@ -2961,231 +2992,231 @@ msgstr ""
 "Meowth! We're missing the new location details! Usage: **!location new <new "
 "address>**"
 
-#: meowth/__main__.py:5407
+#: meowth/__main__.py:5483
 msgid "Meowth! I can't recover this channel because I know about it already!"
 msgstr ""
 
-#: meowth/__main__.py:5418
+#: meowth/__main__.py:5494
 msgid "level-[1-5]-egg"
 msgstr ""
 
-#: meowth/__main__.py:5419
+#: meowth/__main__.py:5495
 msgid "meetup"
 msgstr ""
 
-#: meowth/__main__.py:5466
+#: meowth/__main__.py:5542
 msgid "Ends on %B %d at %I:%M %p"
 msgstr ""
 
-#: meowth/__main__.py:5509
+#: meowth/__main__.py:5585
 msgid "Meowth! I couldn't recognize this as a raid channel!"
 msgstr ""
 
-#: meowth/__main__.py:5513 meowth/__main__.py:5519
+#: meowth/__main__.py:5589 meowth/__main__.py:5595
 msgid "is interested"
 msgstr ""
 
-#: meowth/__main__.py:5513 meowth/__main__.py:5521
+#: meowth/__main__.py:5589 meowth/__main__.py:5597
 msgid "on the way"
 msgstr ""
 
-#: meowth/__main__.py:5513 meowth/__main__.py:5523
+#: meowth/__main__.py:5589 meowth/__main__.py:5599
 msgid "at the raid"
 msgstr ""
 
-#: meowth/__main__.py:5513 meowth/__main__.py:5525
+#: meowth/__main__.py:5589 meowth/__main__.py:5601
 msgid "left the raid"
 msgstr ""
 
-#: meowth/__main__.py:5513 meowth/__main__.py:5525
+#: meowth/__main__.py:5589 meowth/__main__.py:5601
 msgid "no longer"
 msgstr ""
 
-#: meowth/__main__.py:5527
+#: meowth/__main__.py:5603
 msgid "trainers"
 msgstr ""
 
-#: meowth/__main__.py:5575
+#: meowth/__main__.py:5651
 msgid ""
 "Meowth! This channel has been recovered! However, there may be some "
 "inaccuracies in what I remembered! Here's what I have:"
 msgstr ""
 
-#: meowth/__main__.py:5587
+#: meowth/__main__.py:5663
 msgid ""
 "\n"
 "I'm not sure when this {raidtype} will {action}, so please use **!timerset** "
 "if you can!"
 msgstr ""
 
-#: meowth/__main__.py:5616
+#: meowth/__main__.py:5692
 #, fuzzy
 msgid "Meowth! You've already made a duplicate report for this {raidtype}!"
 msgstr "Meowth! You've already made a duplicate report for this raid!"
 
-#: meowth/__main__.py:5637
+#: meowth/__main__.py:5713
 #, fuzzy
 msgid "Meowth! Are you sure you wish to remove this {raidtype}?"
 msgstr "Meowth! Are you sure you wish to remove this raid?"
 
-#: meowth/__main__.py:5646
+#: meowth/__main__.py:5722
 msgid "Duplicate Report cancelled."
 msgstr "Duplicate Report cancelled."
 
-#: meowth/__main__.py:5655
+#: meowth/__main__.py:5731
 #, fuzzy
 msgid "Duplicate Confirmed"
 msgstr "Duplicate Report Timed Out."
 
-#: meowth/__main__.py:5672
+#: meowth/__main__.py:5748
 msgid "Duplicate Report Timed Out."
 msgstr "Duplicate Report Timed Out."
 
-#: meowth/__main__.py:5680
+#: meowth/__main__.py:5756
 msgid "Duplicate report #{duplicate_report_count} received."
 msgstr "Duplicate report #{duplicate_report_count} received."
 
-#: meowth/__main__.py:5726 meowth/__main__.py:5753
+#: meowth/__main__.py:5802 meowth/__main__.py:5829
 msgid ""
 "Meowth! You're missing some details! Be sure to enter a pokemon that appears "
 "in raids! Usage: **!counters <pkmn> [weather] [user ID]**"
 msgstr ""
 
-#: meowth/__main__.py:5763
+#: meowth/__main__.py:5839
 msgid "user #{user}'s"
 msgstr ""
 
-#: meowth/__main__.py:5766
+#: meowth/__main__.py:5842
 msgid "Level 30"
 msgstr ""
 
-#: meowth/__main__.py:5808 meowth/__main__.py:5891
+#: meowth/__main__.py:5884 meowth/__main__.py:5967
 msgid "{pkmn} | {weather} | {movesetstr}"
 msgstr ""
 
-#: meowth/__main__.py:5809 meowth/__main__.py:5869
+#: meowth/__main__.py:5885 meowth/__main__.py:5945
 msgid "**CP:** {raid_cp}\n"
 msgstr ""
 
-#: meowth/__main__.py:5810 meowth/__main__.py:5870
+#: meowth/__main__.py:5886 meowth/__main__.py:5946
 msgid "**Weather:** {weather}\n"
 msgstr ""
 
-#: meowth/__main__.py:5811 meowth/__main__.py:5871
+#: meowth/__main__.py:5887 meowth/__main__.py:5947
 msgid "**Attacker Level:** {atk_levels}"
 msgstr ""
 
-#: meowth/__main__.py:5815 meowth/__main__.py:5875 meowth/__main__.py:5895
+#: meowth/__main__.py:5891 meowth/__main__.py:5951 meowth/__main__.py:5971
 msgid "Results courtesy of Pokebattler"
 msgstr ""
 
-#: meowth/__main__.py:5822 meowth/__main__.py:5880 meowth/__main__.py:5900
+#: meowth/__main__.py:5898 meowth/__main__.py:5956 meowth/__main__.py:5976
 msgid "{move1} | {move2}"
 msgstr ""
 
-#: meowth/__main__.py:5823 meowth/__main__.py:5901
+#: meowth/__main__.py:5899 meowth/__main__.py:5977
 msgid "#{index} - {ctr_name}"
 msgstr ""
 
-#: meowth/__main__.py:5824
+#: meowth/__main__.py:5900
 msgid "CP"
 msgstr ""
 
-#: meowth/__main__.py:5827
+#: meowth/__main__.py:5903
 msgid "Results with {userstr} attackers"
 msgstr ""
 
-#: meowth/__main__.py:5827 meowth/__main__.py:5912
+#: meowth/__main__.py:5903 meowth/__main__.py:5988
 msgid ""
 "[See your personalized results!](https://www.pokebattler.com/raids/{pkmn})"
 msgstr ""
 
-#: meowth/__main__.py:5829
+#: meowth/__main__.py:5905
 msgid "Difficulty rating: {est}"
 msgstr ""
 
-#: meowth/__main__.py:5829
+#: meowth/__main__.py:5905
 msgid "Pokebattler Estimator:"
 msgstr ""
 
-#: meowth/__main__.py:5839
+#: meowth/__main__.py:5915
 msgid "Unknown Moveset"
 msgstr ""
 
-#: meowth/__main__.py:5868
+#: meowth/__main__.py:5944
 msgid "{pkmn} | {weather} | Unknown Moveset"
 msgstr ""
 
-#: meowth/__main__.py:5910
+#: meowth/__main__.py:5986
 msgid "**Possible Movesets:**"
 msgstr ""
 
-#: meowth/__main__.py:5912
+#: meowth/__main__.py:5988
 msgid "Results with Level 30 attackers"
 msgstr ""
 
-#: meowth/__main__.py:5926
+#: meowth/__main__.py:6002
 msgid "Meowth! Enter one of the following weather conditions: {}"
 msgstr ""
 
-#: meowth/__main__.py:5941
+#: meowth/__main__.py:6017
 #, fuzzy
 msgid "Meowth! Weather set to {}!"
 msgstr "Meowth! {member} has left the raid!"
 
-#: meowth/__main__.py:5963 meowth/__main__.py:6090
+#: meowth/__main__.py:6039 meowth/__main__.py:6166
 msgid "m "
 msgstr ""
 
-#: meowth/__main__.py:5964 meowth/__main__.py:6091
+#: meowth/__main__.py:6040 meowth/__main__.py:6167
 msgid "v "
 msgstr ""
 
-#: meowth/__main__.py:5965 meowth/__main__.py:6092
+#: meowth/__main__.py:6041 meowth/__main__.py:6168
 msgid "i "
 msgstr ""
 
-#: meowth/__main__.py:5966 meowth/__main__.py:6093
+#: meowth/__main__.py:6042 meowth/__main__.py:6169
 msgid "u "
 msgstr ""
 
-#: meowth/__main__.py:5985 meowth/__main__.py:6186
+#: meowth/__main__.py:6061 meowth/__main__.py:6262
 msgid "{word} doesn't appear in level {egglevel} raids! Please try again."
 msgstr ""
 
-#: meowth/__main__.py:6032
+#: meowth/__main__.py:6108
 #, fuzzy
 msgid "Meowth! {member} is interested! {emoji}: 1"
 msgstr "Meowth! {member} is interested!"
 
-#: meowth/__main__.py:6034
+#: meowth/__main__.py:6110
 msgid ""
 "Meowth! {member} is interested with a total of {trainer_count} trainers!"
 msgstr ""
 "Meowth! {member} is interested with a total of {trainer_count} trainers!"
 
-#: meowth/__main__.py:6079
+#: meowth/__main__.py:6155
 msgid "{word} doesn't appear in level {egglevel} raids!"
 msgstr ""
 
-#: meowth/__main__.py:6083
+#: meowth/__main__.py:6159
 msgid ""
 "Invalid Pokemon detected. Please check the pinned message for the list of "
 "possible bosses and try again."
 msgstr ""
 
-#: meowth/__main__.py:6139
+#: meowth/__main__.py:6215
 #, fuzzy
 msgid "Meowth! {member} is on the way! {emoji}: 1"
 msgstr "Meowth! {member} is on the way!"
 
-#: meowth/__main__.py:6141
+#: meowth/__main__.py:6217
 msgid ""
 "Meowth! {member} is on the way with a total of {trainer_count} trainers!"
 msgstr ""
 "Meowth! {member} is on the way with a total of {trainer_count} trainers!"
 
-#: meowth/__main__.py:6226
+#: meowth/__main__.py:6303
 msgid ""
 "\n"
 "There is a group already in the lobby! Use **!lobby** to join them or **!"
@@ -3193,12 +3224,12 @@ msgid ""
 "group!"
 msgstr ""
 
-#: meowth/__main__.py:6249
+#: meowth/__main__.py:6328
 #, fuzzy
 msgid "Meowth! {member} is at the {raidtype}! {emoji}: 1"
 msgstr "Meowth! {member} is at the raid!"
 
-#: meowth/__main__.py:6252
+#: meowth/__main__.py:6332
 #, fuzzy
 msgid ""
 "Meowth! {member} is at the {raidtype} with a total of {trainer_count} "
@@ -3206,57 +3237,57 @@ msgid ""
 msgstr ""
 "Meowth! {member} is at the raid with a total of {trainer_count} trainers!"
 
-#: meowth/__main__.py:6310
+#: meowth/__main__.py:6394
 msgid "Only one non-team count can be accepted."
 msgstr ""
 
-#: meowth/__main__.py:6322
+#: meowth/__main__.py:6406
 msgid "Only one count per team accepted."
 msgstr ""
 
-#: meowth/__main__.py:6326
+#: meowth/__main__.py:6410
 msgid "Invalid format, please check and try again."
 msgstr ""
 
-#: meowth/__main__.py:6330
+#: meowth/__main__.py:6414
 msgid ""
 "Team counts are higher than the total, double check your counts and try "
 "again. You entered **"
 msgstr ""
 
-#: meowth/__main__.py:6331
+#: meowth/__main__.py:6415
 msgid "** total and **"
 msgstr ""
 
-#: meowth/__main__.py:6332
+#: meowth/__main__.py:6416
 msgid "** in your party."
 msgstr ""
 
-#: meowth/__main__.py:6337
+#: meowth/__main__.py:6421
 msgid ""
 "Meowth! Something is not adding up! Try making sure your total matches what "
 "each team adds up to!"
 msgstr ""
 
-#: meowth/__main__.py:6405 meowth/__main__.py:6408
+#: meowth/__main__.py:6489 meowth/__main__.py:6492
 msgid "**Boss Interest:**"
 msgstr ""
 
-#: meowth/__main__.py:6411
+#: meowth/__main__.py:6495
 msgid "**Status List**"
 msgstr ""
 
-#: meowth/__main__.py:6411
+#: meowth/__main__.py:6495
 msgid ""
 "Maybe: **{channelmaybe}** | Coming: **{channelcoming}** | Here: "
 "**{channelhere}**"
 msgstr ""
 
-#: meowth/__main__.py:6412
+#: meowth/__main__.py:6496
 msgid "**Team List**"
 msgstr ""
 
-#: meowth/__main__.py:6447
+#: meowth/__main__.py:6531
 msgid ""
 "Meowth! I can't understand how many are in your group. Just say **!here** if "
 "you're by yourself, or **!coming 5** for example if there are 5 in your "
@@ -3266,18 +3297,18 @@ msgstr ""
 "you're by yourself, or **!coming 5** for example if there are 5 in your "
 "group."
 
-#: meowth/__main__.py:6457
+#: meowth/__main__.py:6541
 msgid ""
 "Meowth! There is no group in the lobby for you to join! Use **!starting** if "
 "the group waiting at the raid is entering the lobby!"
 msgstr ""
 
-#: meowth/__main__.py:6461
+#: meowth/__main__.py:6545
 #, fuzzy
 msgid "Meowth! {member} is entering the lobby!"
 msgstr "Meowth! {member} is on the way!"
 
-#: meowth/__main__.py:6463
+#: meowth/__main__.py:6547
 #, fuzzy
 msgid ""
 "Meowth! {member} is entering the lobby with a total of {trainer_count} "
@@ -3285,15 +3316,15 @@ msgid ""
 msgstr ""
 "Meowth! {member} is on the way with a total of {trainer_count} trainers!"
 
-#: meowth/__main__.py:6488
+#: meowth/__main__.py:6572
 msgid "Meowth! {member} has no status to cancel!"
 msgstr "Meowth! {member} has no status to cancel!"
 
-#: meowth/__main__.py:6492
+#: meowth/__main__.py:6576
 msgid "Meowth! {member} is no longer interested!"
 msgstr "Meowth! {member} is no longer interested!"
 
-#: meowth/__main__.py:6494
+#: meowth/__main__.py:6578
 msgid ""
 "Meowth! {member} and their total of {trainer_count} trainers are no longer "
 "interested!"
@@ -3301,12 +3332,12 @@ msgstr ""
 "Meowth! {member} and their total of {trainer_count} trainers are no longer "
 "interested!"
 
-#: meowth/__main__.py:6497
+#: meowth/__main__.py:6581
 #, fuzzy
 msgid "Meowth! {member} has left the {raidtype}!"
 msgstr "Meowth! {member} has left the raid!"
 
-#: meowth/__main__.py:6499
+#: meowth/__main__.py:6583
 #, fuzzy
 msgid ""
 "Meowth! {member} and their total of {trainer_count} trainers have left the "
@@ -3315,11 +3346,11 @@ msgstr ""
 "Meowth! {member} and their total of {trainer_count} trainers have left the "
 "raid!"
 
-#: meowth/__main__.py:6502
+#: meowth/__main__.py:6586
 msgid "Meowth! {member} is no longer on their way!"
 msgstr "Meowth! {member} is no longer on their way!"
 
-#: meowth/__main__.py:6504
+#: meowth/__main__.py:6588
 msgid ""
 "Meowth! {member} and their total of {trainer_count} trainers are no longer "
 "on their way!"
@@ -3327,12 +3358,12 @@ msgstr ""
 "Meowth! {member} and their total of {trainer_count} trainers are no longer "
 "on their way!"
 
-#: meowth/__main__.py:6507
+#: meowth/__main__.py:6591
 #, fuzzy
 msgid "Meowth! {member} has backed out of the lobby!"
 msgstr "Meowth! {member} has left the raid!"
 
-#: meowth/__main__.py:6509
+#: meowth/__main__.py:6593
 #, fuzzy
 msgid ""
 "Meowth! {member} and their total of {trainer_count} trainers have backed out "
@@ -3341,33 +3372,33 @@ msgstr ""
 "Meowth! {member} and their total of {trainer_count} trainers have left the "
 "raid!"
 
-#: meowth/__main__.py:6527
+#: meowth/__main__.py:6611
 msgid ""
 "Meowth! The group of {count} in the lobby has entered the raid! Wish them "
 "luck!"
 msgstr ""
 
-#: meowth/__main__.py:6558
+#: meowth/__main__.py:6642
 #, fuzzy
 msgid "Meowth! How can you start when the egg hasn't hatched!?"
 msgstr "Meowth! How can you start when there's no one waiting at this raid!?"
 
-#: meowth/__main__.py:6562
+#: meowth/__main__.py:6646
 #, fuzzy
 msgid "Meowth! Please wait for the group in the lobby to enter the raid."
 msgstr ""
 "Meowth! Please wait until the egg has hatched before changing it to an open "
 "raid!"
 
-#: meowth/__main__.py:6586
+#: meowth/__main__.py:6670
 msgid "Meowth! How can you start when there's no one waiting at this raid!?"
 msgstr "Meowth! How can you start when there's no one waiting at this raid!?"
 
-#: meowth/__main__.py:6592
+#: meowth/__main__.py:6676
 msgid " to start at **{}** "
 msgstr ""
 
-#: meowth/__main__.py:6596
+#: meowth/__main__.py:6680
 #, fuzzy
 msgid ""
 "Starting - Meowth! The group that was waiting{timestr}is starting the raid! "
@@ -3379,16 +3410,16 @@ msgstr ""
 "{trainer_list}, please respond with {here_emoji} or **!here** if you are "
 "waiting for another group!"
 
-#: meowth/__main__.py:6604
+#: meowth/__main__.py:6688
 msgid "**Next Group**"
 msgstr ""
 
-#: meowth/__main__.py:6639
+#: meowth/__main__.py:6723
 #, fuzzy
 msgid "Meowth! There's no one else in the lobby for this raid!"
 msgstr "Meowth! Are you sure you wish to remove this raid?"
 
-#: meowth/__main__.py:6645
+#: meowth/__main__.py:6729
 msgid ""
 "Backout - Meowth! {author} has indicated that the group consisting of "
 "{lobby_list} and the people with them has backed out of the lobby! If this "
@@ -3396,55 +3427,55 @@ msgid ""
 "accurate!"
 msgstr ""
 
-#: meowth/__main__.py:6659
+#: meowth/__main__.py:6743
 #, fuzzy
 msgid "Meowth! There's no one in the lobby for this raid!"
 msgstr "Meowth! How can you start when there's no one waiting at this raid!?"
 
-#: meowth/__main__.py:6662
+#: meowth/__main__.py:6746
 msgid ""
 "Backout - Meowth! {author} has requested a backout! If one of the following "
 "trainers reacts with the check mark, I will assume the group is backing out "
 "of the raid lobby as requested! {lobby_list}"
 msgstr ""
 
-#: meowth/__main__.py:6673
+#: meowth/__main__.py:6757
 msgid "Meowth! {user} confirmed the group is backing out!"
 msgstr ""
 
-#: meowth/__main__.py:6693
+#: meowth/__main__.py:6777
 msgid "**Meowth!** "
 msgstr ""
 
-#: meowth/__main__.py:6749
+#: meowth/__main__.py:6833
 msgid " (assumed)"
 msgstr ""
 
-#: meowth/__main__.py:6755
+#: meowth/__main__.py:6839
 msgid " Next group: **{}**"
 msgstr ""
 
-#: meowth/__main__.py:6759 meowth/__main__.py:6761
+#: meowth/__main__.py:6843 meowth/__main__.py:6845
 msgid " - Hatches: {expiry}{is_assumed}"
 msgstr ""
 
-#: meowth/__main__.py:6767 meowth/__main__.py:6771
+#: meowth/__main__.py:6851 meowth/__main__.py:6855
 msgid " - Starts: {expiry}{is_assumed}"
 msgstr ""
 
-#: meowth/__main__.py:6769
+#: meowth/__main__.py:6853
 msgid " - Ends: {expiry}{is_assumed}"
 msgstr ""
 
-#: meowth/__main__.py:6773
+#: meowth/__main__.py:6857
 msgid " - Expiry: {expiry}{is_assumed}"
 msgstr ""
 
-#: meowth/__main__.py:6774
+#: meowth/__main__.py:6858
 msgid "    {raidchannel}{expiry_text}\n"
 msgstr ""
 
-#: meowth/__main__.py:6775
+#: meowth/__main__.py:6859
 #, fuzzy
 msgid ""
 "    {interestcount} interested, {comingcount} coming, {herecount} here, "
@@ -3454,86 +3485,86 @@ msgstr ""
 "{raidchannel} - {interestcount} interested, {comingcount} coming, "
 "{herecount} here. End time: {expiry}{manualtimer}"
 
-#: meowth/__main__.py:6778
+#: meowth/__main__.py:6862
 msgid ""
 "**Here's the current channels for {0}**\n"
 "\n"
 msgstr ""
 
-#: meowth/__main__.py:6780
+#: meowth/__main__.py:6864
 msgid "**Active Raids:**\n"
 msgstr ""
 
-#: meowth/__main__.py:6786
+#: meowth/__main__.py:6870
 msgid "**Active Raids:** (continued)\n"
 msgstr ""
 
-#: meowth/__main__.py:6790
+#: meowth/__main__.py:6874
 msgid "**Raid Eggs:**\n"
 msgstr ""
 
-#: meowth/__main__.py:6796
+#: meowth/__main__.py:6880
 msgid "**Raid Eggs:** (continued)\n"
 msgstr ""
 
-#: meowth/__main__.py:6800
+#: meowth/__main__.py:6884
 msgid "**EX Raids:**\n"
 msgstr ""
 
-#: meowth/__main__.py:6806
+#: meowth/__main__.py:6890
 msgid "**EX Raids:** (continued)\n"
 msgstr ""
 
-#: meowth/__main__.py:6809
+#: meowth/__main__.py:6893
 msgid "**Meetups:**\n"
 msgstr ""
 
-#: meowth/__main__.py:6815
+#: meowth/__main__.py:6899
 msgid "**Meetups:** (continued)\n"
 msgstr ""
 
-#: meowth/__main__.py:6818
+#: meowth/__main__.py:6902
 #, fuzzy
 msgid ""
 "Meowth! No active raids! Report one with **!raid <name> <location> [weather] "
 "[timer]**."
 msgstr "Meowth! No active raids! Report one with **!raid <name> <location>**."
 
-#: meowth/__main__.py:6852
+#: meowth/__main__.py:6936
 msgid " Nobody has updated their status yet!"
 msgstr ""
 
-#: meowth/__main__.py:6855
+#: meowth/__main__.py:6939
 msgid ""
 "\n"
 "The next group will be starting at **{}**"
 msgstr ""
 
-#: meowth/__main__.py:6868 meowth/__main__.py:6915 meowth/__main__.py:6962
-#: meowth/__main__.py:7012 meowth/__main__.py:7059 meowth/__main__.py:7106
-#: meowth/__main__.py:7150 meowth/__main__.py:7171 meowth/__main__.py:7207
+#: meowth/__main__.py:6952 meowth/__main__.py:6999 meowth/__main__.py:7046
+#: meowth/__main__.py:7096 meowth/__main__.py:7143 meowth/__main__.py:7190
+#: meowth/__main__.py:7234 meowth/__main__.py:7255 meowth/__main__.py:7291
 msgid "**Meowth!**"
 msgstr ""
 
-#: meowth/__main__.py:6886 meowth/__main__.py:6893 meowth/__main__.py:6933
-#: meowth/__main__.py:6940 meowth/__main__.py:6981 meowth/__main__.py:6988
-#: meowth/__main__.py:7029 meowth/__main__.py:7036
+#: meowth/__main__.py:6970 meowth/__main__.py:6977 meowth/__main__.py:7017
+#: meowth/__main__.py:7024 meowth/__main__.py:7065 meowth/__main__.py:7072
+#: meowth/__main__.py:7113 meowth/__main__.py:7120
 msgid "**{name}**"
 msgstr ""
 
-#: meowth/__main__.py:6889 meowth/__main__.py:6896 meowth/__main__.py:6936
-#: meowth/__main__.py:6943 meowth/__main__.py:6984 meowth/__main__.py:6991
-#: meowth/__main__.py:7032 meowth/__main__.py:7039
+#: meowth/__main__.py:6973 meowth/__main__.py:6980 meowth/__main__.py:7020
+#: meowth/__main__.py:7027 meowth/__main__.py:7068 meowth/__main__.py:7075
+#: meowth/__main__.py:7116 meowth/__main__.py:7123
 msgid "**{name} ({count})**"
 msgstr ""
 
-#: meowth/__main__.py:6890 meowth/__main__.py:6897 meowth/__main__.py:6937
-#: meowth/__main__.py:6944 meowth/__main__.py:6985 meowth/__main__.py:6992
-#: meowth/__main__.py:7033 meowth/__main__.py:7040
+#: meowth/__main__.py:6974 meowth/__main__.py:6981 meowth/__main__.py:7021
+#: meowth/__main__.py:7028 meowth/__main__.py:7069 meowth/__main__.py:7076
+#: meowth/__main__.py:7117 meowth/__main__.py:7124
 msgid "{name} **({count})**"
 msgstr ""
 
-#: meowth/__main__.py:6902 meowth/__main__.py:6904
+#: meowth/__main__.py:6986 meowth/__main__.py:6988
 msgid ""
 " including {trainer_list} and the people with them! Let them know if there "
 "is a group forming"
@@ -3541,12 +3572,12 @@ msgstr ""
 " including {trainer_list} and the people with them! Let them know if there "
 "is a group forming"
 
-#: meowth/__main__.py:6905
+#: meowth/__main__.py:6989
 #, fuzzy
 msgid " {trainer_count} interested{including_string}!"
 msgstr "Meowth! {trainer_count} interested{including_string}!"
 
-#: meowth/__main__.py:6949 meowth/__main__.py:6951
+#: meowth/__main__.py:7033 meowth/__main__.py:7035
 msgid ""
 " including {trainer_list} and the people with them! Be considerate and wait "
 "for them if possible"
@@ -3554,12 +3585,12 @@ msgstr ""
 " including {trainer_list} and the people with them! Be considerate and wait "
 "for them if possible"
 
-#: meowth/__main__.py:6952
+#: meowth/__main__.py:7036
 #, fuzzy
 msgid " {trainer_count} on the way{including_string}!"
 msgstr "Meowth! {trainer_count} on the way{including_string}!"
 
-#: meowth/__main__.py:6999 meowth/__main__.py:7001
+#: meowth/__main__.py:7083 meowth/__main__.py:7085
 msgid ""
 " including {trainer_list} and the people with them! Be considerate and let "
 "them know if and when you'll be there"
@@ -3567,12 +3598,12 @@ msgstr ""
 " including {trainer_list} and the people with them! Be considerate and let "
 "them know if and when you'll be there"
 
-#: meowth/__main__.py:7002
+#: meowth/__main__.py:7086
 #, fuzzy
 msgid " {trainer_count} waiting at the {raidtype}{including_string}!"
 msgstr "Meowth! {trainer_count} waiting at the raid{including_string}!"
 
-#: meowth/__main__.py:7046 meowth/__main__.py:7048
+#: meowth/__main__.py:7130 meowth/__main__.py:7132
 #, fuzzy
 msgid ""
 " including {trainer_list} and the people with them! Use **!lobby** if you "
@@ -3581,86 +3612,86 @@ msgstr ""
 " including {trainer_list} and the people with them! Let them know if there "
 "is a group forming"
 
-#: meowth/__main__.py:7049
+#: meowth/__main__.py:7133
 #, fuzzy
 msgid " {trainer_count} in the lobby{including_string}!"
 msgstr "Meowth! {trainer_count} on the way{including_string}!"
 
-#: meowth/__main__.py:7092
+#: meowth/__main__.py:7176
 msgid ""
 "{type}{name}: **{total} total,** {interested} interested, {coming} coming, "
 "{here} waiting{type}\n"
 msgstr ""
 
-#: meowth/__main__.py:7094
+#: meowth/__main__.py:7178
 msgid ""
 " Boss numbers for the raid:\n"
 "{}"
 msgstr ""
 
-#: meowth/__main__.py:7096
+#: meowth/__main__.py:7180
 msgid " Nobody has told me what boss they want!"
 msgstr ""
 
-#: meowth/__main__.py:7131
+#: meowth/__main__.py:7215
 msgid ""
 "{emoji} **{total} total,** {interested} interested, {coming} coming, {here} "
 "waiting {emoji}\n"
 msgstr ""
 
-#: meowth/__main__.py:7134
+#: meowth/__main__.py:7218
 msgid ""
 "**{grey_number} total,** {greymaybe} interested, {greycoming} coming, "
 "{greyhere} waiting"
 msgstr ""
 
-#: meowth/__main__.py:7138
+#: meowth/__main__.py:7222
 msgid ""
 " Team numbers for the raid:\n"
 "{}"
 msgstr ""
 
-#: meowth/__main__.py:7140
+#: meowth/__main__.py:7224
 msgid " Nobody has updated their status!"
 msgstr ""
 
-#: meowth/__main__.py:7160
+#: meowth/__main__.py:7244
 msgid " Your current **!want** list is: ```{wantlist}```"
 msgstr ""
 
-#: meowth/__main__.py:7162
+#: meowth/__main__.py:7246
 msgid " You don't have any wants! use **!want** to add some."
 msgstr ""
 
-#: meowth/__main__.py:7186 meowth/__main__.py:7192
+#: meowth/__main__.py:7270 meowth/__main__.py:7276
 msgid ""
 "**Reward**: {reward}, **Pokestop**: [{location}]({url}), **Quest**: {quest}, "
 "**Reported By**: {author}"
 msgstr ""
 
-#: meowth/__main__.py:7188
+#: meowth/__main__.py:7272
 msgid ""
 "Meowth! **Here's the current research reports for {channel}**\n"
 "{questmsg}"
 msgstr ""
 
-#: meowth/__main__.py:7196
+#: meowth/__main__.py:7280
 msgid ""
 " **Here's the current research reports for {channel}**\n"
 "{questmsg}"
 msgstr ""
 
-#: meowth/__main__.py:7198
+#: meowth/__main__.py:7282
 msgid " There are no reported research reports. Report one with **!research**"
 msgstr ""
 
-#: meowth/__main__.py:7222
+#: meowth/__main__.py:7306
 msgid ""
 "**Pokemon**: {pokemon}, **Location**: [{location}]({url}), **Reported By**: "
 "{author}"
 msgstr ""
 
-#: meowth/__main__.py:7224
+#: meowth/__main__.py:7308
 #, fuzzy
 msgid ""
 "Meowth! **Here's the current wild reports for {channel}**\n"
@@ -3669,200 +3700,200 @@ msgstr ""
 "Meowth! Here's the current location for the raid!\n"
 "Details:{location}"
 
-#: meowth/__main__.py:7228
+#: meowth/__main__.py:7312
 msgid ""
 "**Pokemon**: {pokemon}, **Location**: [{location}]({url}), **Reported By**: "
 "{author}\n"
 "**Location**: <{url}>"
 msgstr ""
 
-#: meowth/__main__.py:7232
+#: meowth/__main__.py:7316
 msgid ""
 " **Here's the current wild reports for {channel}**\n"
 "{wildmsg}"
 msgstr ""
 
-#: meowth/__main__.py:7234
+#: meowth/__main__.py:7318
 #, fuzzy
 msgid ""
 " There are no reported wild pokemon. Report one with **!wild <pokemon> "
 "<location>**"
 msgstr "Meowth! No active raids! Report one with **!raid <name> <location>**."
 
-#: meowth/errors.py:132
+#: meowth/errors.py:140
 msgid "Meowth! I'm missing some details! Usage: {prefix}{command}"
 msgstr ""
 
-#: meowth/errors.py:165
+#: meowth/errors.py:173
 msgid ""
 "Meowth! Team Management is not enabled on this server. **{prefix}{cmd_name}"
 "** is unable to be used."
 msgstr ""
 
-#: meowth/errors.py:170
+#: meowth/errors.py:178
 msgid ""
 "Meowth! Pokemon Notifications are not enabled on this server. **{prefix}"
 "{cmd_name}** is unable to be used."
 msgstr ""
 
-#: meowth/errors.py:175
+#: meowth/errors.py:183
 msgid ""
 "Meowth! Wild Reporting is not enabled on this server. **{prefix}{cmd_name}** "
 "is unable to be used."
 msgstr ""
 
-#: meowth/errors.py:180
+#: meowth/errors.py:188
 msgid ""
 "Meowth! Reporting is not enabled for this channel. **{prefix}{cmd_name}** is "
 "unable to be used."
 msgstr ""
 
-#: meowth/errors.py:185
+#: meowth/errors.py:193
 msgid ""
 "Meowth! Raid Management is not enabled on this server. **{prefix}{cmd_name}"
 "** is unable to be used."
 msgstr ""
 
-#: meowth/errors.py:190
+#: meowth/errors.py:198
 msgid ""
 "Meowth! EX Raid Management is not enabled on this server. **{prefix}"
 "{cmd_name}** is unable to be used."
 msgstr ""
 
-#: meowth/errors.py:195
+#: meowth/errors.py:203
 msgid ""
 "Meowth! Research Reporting is not enabled on this server. **{prefix}"
 "{cmd_name}** is unable to be used."
 msgstr ""
 
-#: meowth/errors.py:200
+#: meowth/errors.py:208
 msgid ""
 "Meowth! Meetup Reporting is not enabled on this server. **{prefix}{cmd_name}"
 "** is unable to be used."
 msgstr ""
 
-#: meowth/errors.py:205
+#: meowth/errors.py:213
 msgid ""
 "Meowth! Channel Archiving is not enabled on this server. **{prefix}{cmd_name}"
 "** is unable to be used."
 msgstr ""
 
-#: meowth/errors.py:210
+#: meowth/errors.py:218
 msgid ""
 "Meowth! EX Raid Invite is not enabled on this server. **{prefix}{cmd_name}** "
 "is unable to be used."
 msgstr ""
 
-#: meowth/errors.py:216 meowth/errors.py:411 meowth/errors.py:428
-#: meowth/errors.py:445
+#: meowth/errors.py:224 meowth/errors.py:419 meowth/errors.py:436
+#: meowth/errors.py:453
 msgid "Meowth! Please use **{prefix}{cmd_name}** in "
 msgstr ""
 
-#: meowth/errors.py:219 meowth/errors.py:346 meowth/errors.py:363
-#: meowth/errors.py:380 meowth/errors.py:397 meowth/errors.py:414
-#: meowth/errors.py:431 meowth/errors.py:448
+#: meowth/errors.py:227 meowth/errors.py:354 meowth/errors.py:371
+#: meowth/errors.py:388 meowth/errors.py:405 meowth/errors.py:422
+#: meowth/errors.py:439 meowth/errors.py:456
 msgid "a Region report channel."
 msgstr ""
 
-#: meowth/errors.py:221 meowth/errors.py:348 meowth/errors.py:365
-#: meowth/errors.py:382 meowth/errors.py:399 meowth/errors.py:416
-#: meowth/errors.py:433 meowth/errors.py:450
+#: meowth/errors.py:229 meowth/errors.py:356 meowth/errors.py:373
+#: meowth/errors.py:390 meowth/errors.py:407 meowth/errors.py:424
+#: meowth/errors.py:441 meowth/errors.py:458
 msgid "one of the following region channels:"
 msgstr ""
 
-#: meowth/errors.py:233
+#: meowth/errors.py:241
 msgid "Meowth! Please use **{prefix}{cmd_name}** in the following channel"
 msgstr ""
 
-#: meowth/errors.py:236
+#: meowth/errors.py:244
 msgid "s:\n"
 msgstr ""
 
-#: meowth/errors.py:238
+#: meowth/errors.py:246
 msgid ": "
 msgstr ""
 
-#: meowth/errors.py:254
+#: meowth/errors.py:262
 msgid ""
 "Meowth! Please use **{prefix}{cmd_name}** in a Raid channel. Use **{prefix}"
 "list** in any "
 msgstr ""
 
-#: meowth/errors.py:257 meowth/errors.py:274 meowth/errors.py:327
+#: meowth/errors.py:265 meowth/errors.py:282 meowth/errors.py:335
 msgid "Region report channel to see active raids."
 msgstr ""
 
-#: meowth/errors.py:259 meowth/errors.py:276 meowth/errors.py:329
+#: meowth/errors.py:267 meowth/errors.py:284 meowth/errors.py:337
 msgid "of the following Region channels to see active raids:"
 msgstr ""
 
-#: meowth/errors.py:271
+#: meowth/errors.py:279
 msgid ""
 "Meowth! Please use **{prefix}{cmd_name}** in an Egg channel. Use **{prefix}"
 "list** in any "
 msgstr ""
 
-#: meowth/errors.py:287
+#: meowth/errors.py:295
 msgid "Meowth! **{prefix}{cmd_name}** can't be used in a Raid channel."
 msgstr ""
 
-#: meowth/errors.py:293
+#: meowth/errors.py:301
 msgid ""
 "Meowth! Please use **{prefix}{cmd_name}** in an Active Raid channel. Use "
 "**{prefix}list** in any "
 msgstr ""
 
-#: meowth/errors.py:302
+#: meowth/errors.py:310
 msgid "Region report channel to see active channels."
 msgstr ""
 
-#: meowth/errors.py:304
+#: meowth/errors.py:312
 msgid "of the following Region channels to see active channels:"
 msgstr ""
 
-#: meowth/errors.py:312 meowth/errors.py:337
+#: meowth/errors.py:320 meowth/errors.py:345
 msgid ""
 "\n"
 "This is an egg channel. The channel needs to be activated with **{prefix}"
 "raid <pokemon>** before I accept commands!"
 msgstr ""
 
-#: meowth/errors.py:318
+#: meowth/errors.py:326
 msgid ""
 "Meowth! Please use **{prefix}{cmd_name}** in an Active channel. Use "
 "**{prefix}list** in any "
 msgstr ""
 
-#: meowth/errors.py:343
+#: meowth/errors.py:351
 msgid "Meowth! Please use **{prefix}{cmd_name}** in either a Raid channel or "
 msgstr ""
 
-#: meowth/errors.py:360
+#: meowth/errors.py:368
 msgid ""
 "Meowth! Please use **{prefix}{cmd_name}** in either a Raid Egg channel or "
 msgstr ""
 
-#: meowth/errors.py:377
+#: meowth/errors.py:385
 msgid ""
 "Meowth! Please use **{prefix}{cmd_name}** in either a EX Raid channel or one "
 "of the following region channels:"
 msgstr ""
 
-#: meowth/errors.py:394
+#: meowth/errors.py:402
 msgid ""
 "Meowth! Please use **{prefix}{cmd_name}** in a EX Raid channel. Use "
 "**{prefix}list** in any of the following region channels to see active raids:"
 msgstr ""
 
-#: meowth/utils.py:138
+#: meowth/utils.py:153
 msgid "Raid Coordination Help"
 msgstr ""
 
-#: meowth/utils.py:141
+#: meowth/utils.py:156
 msgid "<> denote required arguments, [] denote optional arguments"
 msgstr ""
 
-#: meowth/utils.py:144
+#: meowth/utils.py:159
 msgid "Raid MGMT Commands"
 msgstr ""
 

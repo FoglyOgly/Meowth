@@ -71,7 +71,14 @@ except OSError:
         with open(os.path.join('data', 'serverdict'), 'wb') as fd:
             pickle.dump(Meowth.guild_dict, fd, (- 1))
         logger.info('Serverdict Created')
-
+try:
+    with open(os.path.join('data', 'serverdict.json'), 'r') as fd:
+        test_guild_dict = json.load(fd)
+    logger.info('JSON data loaded. Comparison status: {}'.format(Meowth.guild_dict == test_guild_dict))
+    logger.info('{}'.format(Meowth.guild_dict))
+    logger.info('{}'.format(test_guild_dict))
+except:
+    pass
 
 guild_dict = Meowth.guild_dict
 
@@ -1368,6 +1375,10 @@ async def _save():
         if e.errno != errno.ENOENT:
             raise
     os.rename(tempname, os.path.join('data', 'serverdict'))
+    with tempfile.NamedTemporaryFile('w', dir=os.path.dirname(os.path.join('data', 'serverdict')), delete=False) as tf:
+        json.dump(guild_dict, tf, indent=1)
+        tempname = tf.name
+    os.rename(tempname, os.path.join('data', 'serverdict.json'))
 
 @Meowth.command()
 @checks.is_owner()

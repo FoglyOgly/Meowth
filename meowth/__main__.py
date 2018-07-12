@@ -5531,7 +5531,7 @@ async def recover(ctx):
                 manual_timer = False
             else:
                 topicsplit = topic.split('|')
-                localhatch = datetime.datetime.strptime(topicsplit[0][:(- 9)], _('Hatches on %B %d at %I:%M %p'))
+                localhatch = datetime.datetime.strptime(topicsplit[0][:(- 9)], _('Wykluwa się %d %B o %H:%M '))
                 utchatch = localhatch - datetime.timedelta(hours=guild_dict[guild.id]['configure_dict']['settings']['offset'])
                 exp = utchatch.replace(year=now.year, tzinfo=datetime.timezone.utc).timestamp()
                 manual_timer = True

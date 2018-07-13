@@ -52,6 +52,29 @@ Meowth = MeowthBot(
     command_prefix=_get_prefix, case_insensitive=True,
     activity=discord.Game(name="Pokemon Go"))
 
+def _correct_json(input_dict, output_dict):
+    for key, value in input_dict.items():
+        int_key = None
+        try:
+            int_key = int(key)
+            str_key = str(int_key)
+            if str_key != key:
+                int_key = None
+        except:
+            pass
+        if int_key is not None:
+            if isinstance(value, dict):
+                output_dict[int_key] = {}
+                _correct_json(value, output_dict[int_key])
+            else:
+                output_dict[int_key] = value
+        else:
+            if isinstance(value, dict):
+                output_dict[key] = {}
+                _correct_json(value, output_dict[key])
+            else:
+                output_dict[key] = value
+
 custom_error_handling(Meowth, logger)
 try:
     with open(os.path.join('data', 'serverdict'), 'rb') as fd:
@@ -74,7 +97,9 @@ except OSError:
 try:
     with open(os.path.join('data', 'serverdict.json'), 'r') as fd:
         test_guild_dict = json.load(fd)
-    logger.info('JSON data loaded. Comparison status: {}'.format(Meowth.guild_dict == test_guild_dict))
+    test_guild_dict_converted = {}
+    _correct_json(test_guild_dict, test_guild_dict_converted)
+    logger.info('JSON data loaded. Comparison status: {}'.format(Meowth.guild_dict == test_guild_dict_converted))
     logger.info('{}'.format(Meowth.guild_dict))
     logger.info('{}'.format(test_guild_dict))
 except:

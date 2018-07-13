@@ -96,7 +96,7 @@ class GymMatching:
                 embed.add_field(name=f"{emoji}{name}", value=value, inline=False)
             else:
                 gyms_to_print.append(f"{emoji}{name}")
-            printed.append((name, districts))
+            printed.append((match, districts))
         if not verbose:
             embed.add_field(name="Wybierz jeden z gymów używając emoji poniżej:", value="\n".join(gyms_to_print))
         return embed, printed

@@ -4150,9 +4150,8 @@ async def _raid(ctx, content):
             return await message.channel.send(f"Nie znaleziono żadnego gymu pasującego do \"{raid_details}\".")
         if match == "__TIMEOUT__":
             return await message.channel.send(f"Za wolno... spróbuj jeszcze raz.")
-        #gymy-exowe, raidy-xxxxx vs districts
         gym = gyms[match]
-        raid_details = match
+        raid_details = gym['name']
         gym_coords = gym['coordinates']
         gym_note = gym.get('notes', _('No notes for this gym.'))
         raid_gmaps_link = create_gmaps_query(gym_coords, message.channel, type="raid")
@@ -4356,9 +4355,8 @@ async def _raidegg(ctx, content):
             return await message.channel.send(f"Nie znaleziono żadnego gymu pasującego do \"{raid_details}\".")
         if match == "__TIMEOUT__":
             return await message.channel.send(f"Za wolno... spróbuj jeszcze raz.")
-        #gymy-exowe, raidy-xxxxx vs districts
         gym = gyms[match]
-        raid_details = match
+        raid_details = gym['name']
         gym_coords = gym['coordinates']
         gym_note = gym.get('notes', _('No notes for this gym.'))
         raid_gmaps_link = create_gmaps_query(gym_coords, message.channel, type="raid")

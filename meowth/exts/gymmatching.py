@@ -8,11 +8,13 @@ from fuzzywuzzy import process
 import discord
 from discord.ext import commands
 
+from unidecode import unidecode
 
 class GymMatching:
     def __init__(self, bot):
         self.bot = bot
         self.gym_data = self.init_json()
+        self.gym_data = self.prepare_gyms_data()
         self.num_to_emoji = {0: '0\u20e3', 1: '1\u20e3', 2: '2\u20e3', 3: '3\u20e3', 4: '4\u20e3', 5: '5\u20e3',
                              6: '6\u20e3', 7: '7\u20e3', 8: '8\u20e3', 9: '9\u20e3'}
         self.emoji_to_num = {v: k for k, v in self.num_to_emoji.items()}
@@ -20,6 +22,16 @@ class GymMatching:
     def init_json(self):
         with open(os.path.join('data', 'gym_data.json')) as fd:
             return json.load(fd)
+
+    def prepare_gyms_data(self):
+        updated_gyms_data = {}
+        for guild, gyms in self.gym_data.items():
+            updated_gyms_data[guild] = {}
+            for gym, data in gyms.items():
+                new_name = unidecode(gym)
+                updated_gyms_data[guild][new_name.lower()] = data
+                updated_gyms_data[guild][new_name.lower()]['name'] = gym
+        return updated_gyms_data
 
     def get_gyms(self, guild_id):
         return self.gym_data.get(str(guild_id))
@@ -42,7 +54,8 @@ class GymMatching:
         gyms = self.get_gyms(ctx.guild.id)
         if not gyms:
             return None
-        result = self._get_n_match(list(gyms.keys()), gym, count_limit)
+        normalized_gym_name = unidecode(gym).lower()
+        result = self._get_n_match(list(gyms.keys()), normalized_gym_name, count_limit)
         if len(result) == 0:
             return None
         embed = discord.Embed(colour=ctx.guild.me.colour,
@@ -55,6 +68,7 @@ class GymMatching:
             if len(printed) > count_limit-1:
                 continue
             gym_info = gyms[match]
+            name = gym_info['name']
             coords = gym_info['coordinates']
             coords_link = "https://www.google.com/maps/search/?api=1&query={0}".format('+'.join(coords.split()))
             coords_str = f"Współrzędne: [{coords}]({coords_link})"
@@ -79,10 +93,10 @@ class GymMatching:
             emoji = "" if add_emoji is False else self.num_to_emoji[len(printed)] + " "
             if verbose:
                 value = f"{coords_str}{districts_str}{ex_status_str}{notes_str}"
-                embed.add_field(name=f"{emoji}{match}", value=value, inline=False)
+                embed.add_field(name=f"{emoji}{name}", value=value, inline=False)
             else:
-                gyms_to_print.append(f"{emoji}{match}")
-            printed.append((match, districts))
+                gyms_to_print.append(f"{emoji}{name}")
+            printed.append((name, districts))
         if not verbose:
             embed.add_field(name="Wybierz jeden z gymów używając emoji poniżej:", value="\n".join(gyms_to_print))
         return embed, printed

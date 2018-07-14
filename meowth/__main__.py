@@ -38,6 +38,7 @@ from meowth.logs import init_loggers
 
 logger = init_loggers()
 
+
 def _get_prefix(bot, message):
     guild = message.guild
     try:
@@ -47,6 +48,7 @@ def _get_prefix(bot, message):
     if not prefix:
         prefix = bot.config['default_prefix']
     return commands.when_mentioned_or(prefix)(bot, message)
+
 
 Meowth = MeowthBot(
     command_prefix=_get_prefix, case_insensitive=True,
@@ -957,6 +959,7 @@ async def guild_cleanup(loop=True):
         await asyncio.sleep(7200)
         continue
 
+
 async def message_cleanup(loop=True):
     while (not Meowth.is_closed()):
         logger.info('message_cleanup ------ BEGIN ------')
@@ -1110,7 +1113,8 @@ async def on_guild_join(guild):
         'trainers':{},
         'trade_dict': {}
     }
-    await owner.send(_("Meowth! I'm Meowth, a Discord helper bot for Pokemon Go communities, and someone has invited me to your server! Type **!help** to see a list of things I can do, and type **!configure** in any channel of your server to begin!"))
+    await owner.send(_("Meowth! I'm Meowth, a Discord helper bot for Pokemon Go communities, and someone has invited me to your server! "
+                       "Type **!help** to see a list of things I can do, and type **!configure** in any channel of your server to begin!"))
 
 @Meowth.event
 async def on_guild_remove(guild):
@@ -1634,17 +1638,16 @@ async def perms(ctx, channel_id = None):
             pass
         await ctx.author.send(embed=embed)
 
-@Meowth.command()
+@Meowth.command(help=_("Test welcome on yourself or mentioned member.\n\n"
+                        "Usage: !welcome [@member]"))
 @commands.has_permissions(manage_guild=True)
 async def welcome(ctx, user: discord.Member=None):
-    """Test welcome on yourself or mentioned member.
-
-    Usage: !welcome [@member]"""
     if (not user):
         user = ctx.author
     await on_member_join(user)
 
-@Meowth.command(hidden=True)
+@Meowth.command(hidden=True,
+                help=_("Get current Meowth log.\n\nUsage: !outputlog\nOutput is a link to hastebin."))
 @commands.has_permissions(manage_guild=True)
 async def outputlog(ctx):
     """Get current Meowth log.
@@ -1974,9 +1977,9 @@ async def _configure_team(ctx):
     ctx.config_dict_temp = config_dict_temp
     return ctx
 
-@configure.command()
+
+@configure.command(help=_("""Welcome message settings"""))
 async def welcome(ctx):
-    """Welcome message settings"""
     guild = ctx.message.guild
     owner = ctx.message.author
     try:

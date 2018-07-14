@@ -1117,7 +1117,8 @@ async def on_guild_join(guild):
         'trainers':{},
         'trade_dict': {}
     }
-    await owner.send(_("Meowth! I'm Meowth, a Discord helper bot for Pokemon Go communities, and someone has invited me to your server! Type **!help** to see a list of things I can do, and type **!configure** in any channel of your server to begin!"))
+    await owner.send(_("Meowth! I'm Meowth, a Discord helper bot for Pokemon Go communities, and someone has invited me to your server! "
+                       "Type **!help** to see a list of things I can do, and type **!configure** in any channel of your server to begin!"))
 
 @Meowth.event
 async def on_guild_remove(guild):
@@ -1923,11 +1924,20 @@ async def team(ctx):
     config_sessions = guild_dict[ctx.guild.id]['configure_dict']['settings'].setdefault('config_sessions',{}).setdefault(owner.id,0) + 1
     guild_dict[ctx.guild.id]['configure_dict']['settings']['config_sessions'][owner.id] = config_sessions
     if guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id] > 1:
-        await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("**MULTIPLE SESSIONS!**\n\nIt looks like you have **{yoursessions}** active configure sessions. I recommend you send **cancel** first and then send your request again to avoid confusing me.\n\nYour Sessions: **{yoursessions}** | Total Sessions: **{allsessions}**").format(allsessions=sum(guild_dict[guild.id]['configure_dict']['settings']['config_sessions'].values()),yoursessions=guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id])))
+        await owner.send(embed=discord.Embed(colour=discord.Colour.orange(),
+                                             description=_("**MULTIPLE SESSIONS!**\n\n"
+                                                           "It looks like you have **{yoursessions}** active configure sessions. "
+                                                           "I recommend you send **cancel** first and then send your request again to avoid confusing me.\n\n"
+                                                           "Your Sessions: **{yoursessions}** | Total Sessions: **{allsessions}**")
+                                             .format(allsessions=sum(guild_dict[guild.id]['configure_dict']['settings']['config_sessions'].values()),
+                                                     yoursessions=guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id])))
     ctx = await _configure_team(ctx)
     if ctx:
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
-        await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name=_('Configuration Complete'), icon_url=Meowth.user.avatar_url))
+        await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(),
+                                             description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! "
+                                                           "If you need to change any of these settings, just type **!configure** in your server again.")
+                                             ).set_author(name=_('Configuration Complete'), icon_url=Meowth.user.avatar_url))
     del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
 
 
@@ -1935,7 +1945,13 @@ async def _configure_team(ctx):
     guild = ctx.message.guild
     owner = ctx.message.author
     config_dict_temp = getattr(ctx, 'config_dict_temp',copy.deepcopy(guild_dict[guild.id]['configure_dict']))
-    await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Team assignment allows users to assign their Pokemon Go team role using the **!team** command. If you have a bot that handles this already, you may want to disable this feature.\n\nIf you are to use this feature, ensure existing team roles are as follows: mystic, valor, instinct. These must be all lowercase letters. If they don't exist yet, I'll make some for you instead.\n\nRespond here with: **N** to disable, **Y** to enable:")).set_author(name=_('Team Assignments'), icon_url=Meowth.user.avatar_url))
+    await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(),
+                                         description=_("Team assignment allows users to assign their Pokemon Go team role using the **!team** command. " +
+                                                       "If you have a bot that handles this already, you may want to disable this feature.\n\n" +
+                                                       "If you are to use this feature, ensure existing team roles are as follows: mystic, valor, instinct. " +
+                                                       "These must be all lowercase letters. If they don't exist yet, I'll make some for you instead.\n\n" +
+                                                       "Respond here with: **N** to disable, **Y** to enable:")
+                                         ).set_author(name=_('Team Assignments'), icon_url=Meowth.user.avatar_url))
     while True:
         teamreply = await Meowth.wait_for('message', check=(lambda message: (message.guild == None) and message.author == owner))
         if teamreply.content.lower() == 'y':
@@ -1965,7 +1981,8 @@ async def _configure_team(ctx):
             await owner.send(embed=discord.Embed(colour=discord.Colour.red(), description=_('**CONFIG CANCELLED!**\n\nNo changes have been made.')))
             return None
         else:
-            await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=_("I'm sorry I don't understand. Please reply with either **N** to disable, or **Y** to enable.")))
+            await owner.send(embed=discord.Embed(colour=discord.Colour.orange(),
+                                                 description=_("I'm sorry I don't understand. Please reply with either **N** to disable, or **Y** to enable.")))
             continue
     ctx.config_dict_temp = config_dict_temp
     return ctx

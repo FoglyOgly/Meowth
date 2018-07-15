@@ -4157,6 +4157,12 @@ async def _raid(ctx, content):
         raid_gmaps_link = create_gmaps_query(gym_coords, message.channel, type="raid")
     else:
         raid_gmaps_link = create_gmaps_query(raid_details, message.channel, type="raid")
+    if not fromegg:
+        is_duplicate = _is_raid_duplicate(message.guild, raid_details, guild_dict[message.guild.id]['raidchannel_dict'])
+        if is_duplicate is not None:
+            await message.channel.send(
+                _('Meowth! To zgłoszenie wygląda na duplikat. Sprawdź czy ktoś już nie zgłosił tego rajdu tu: {}'.format(is_duplicate)))
+            return
     raid_channel_name = (entered_raid + '-') + sanitize_channel_name(raid_details)
     raid_channel_category = get_category(message.channel, get_level(entered_raid), category_type="raid")
     raid_channel = await message.guild.create_text_channel(raid_channel_name, overwrites=dict(message.channel.overwrites), category=raid_channel_category)
@@ -4275,6 +4281,18 @@ async def _report_to_districts(channel, gym, content, embed):
     return raid_reports
 
 
+def _is_raid_duplicate(guild, gym_name, gym_dict):
+    for channel_id in gym_dict:
+        channel_to_check = discord.utils.get(guild.text_channels, id=channel_id)
+        if channel_to_check is None:
+            continue
+        if gym_dict[channel_id]['type'] != 'egg' and gym_dict[channel_id]['type'] != 'raid':
+            continue
+        if gym_dict[channel_id]['address'] == gym_name:
+            return channel_to_check.mention
+    return None
+
+
 async def _raidegg(ctx, content):
     message = ctx.message
     timestamp = (message.created_at + datetime.timedelta(hours=guild_dict[message.channel.guild.id]['configure_dict']['settings']['offset'])).strftime(_('%I:%M %p (%H:%M)'))
@@ -4366,6 +4384,11 @@ async def _raidegg(ctx, content):
         await message.channel.send(_('Meowth! Raid egg levels are only from 1-5!'))
         return
     else:
+        is_duplicate = _is_raid_duplicate(message.guild, raid_details, guild_dict[message.guild.id]['raidchannel_dict'])
+        if is_duplicate is not None:
+            await message.channel.send(
+                _('Meowth! To zgłoszenie wygląda na duplikat. Sprawdź czy ktoś już nie zgłosił tego rajdu tu: {}'.format(is_duplicate)))
+            return
         egg_level = str(egg_level)
         egg_info = raid_info['raid_eggs'][egg_level]
         egg_img = egg_info['egg_img']

@@ -4278,6 +4278,13 @@ async def _report_to_districts(channel, gym, content, embed):
         await asyncio.sleep(0)
         if report_channel is not None:
             raid_reports[report_channel] = report_message
+    else:
+        can_be_ex = gym.get('can_be_ex', 'No')
+        if can_be_ex.lower() == "yes":
+            report_channel, report_message = await _send_to_district(channel, 'gymy-potencjalnie-exowe', category, content, embed)
+            await asyncio.sleep(0)
+            if report_channel is not None:
+                raid_reports[report_channel] = report_message
     return raid_reports
 
 

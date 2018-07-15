@@ -67,15 +67,24 @@ class Pokemon():
         self.guild = guild
         self.pkmn_list = bot.pkmn_info['pokemon_list']
         lgnd_list = [144, 145, 146, 150, 243, 244, 245, 377, 378, 379, 380, 381, 382, 383, 384]
-        mythical_list = [151]
-        shiny_list = [1, 2, 3, 4, 5, 6, 25, 26, 90, 91, 126, 129, 130, 138, 139,
-            140, 141, 142, 147, 148, 149, 172, 175, 176, 179, 180, 181, 198,
+        mythical_list = [151, 251]
+        shiny_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 25, 26, 90, 91, 126, 129, 130, 138, 139,
+            140, 141, 142, 144, 147, 148, 149, 172, 175, 176, 179, 180, 181, 198,
             202, 240, 246, 247, 248, 249, 250, 261, 262, 296, 297, 302, 303,
-            304, 305, 306, 307, 308, 315, 320, 321, 333, 334, 353, 354, 355,
+            304, 305, 306, 307, 308, 311, 312, 315, 320, 321, 333, 334, 353, 354, 355,
             356, 359, 360, 361, 362, 370, 382]
         alolan_list = [19, 20, 27, 28, 37, 38, 52, 53, 88, 89, 103]
-        form_dict = {201: [c for c in ascii_lowercase],
-            351: ['normal', 'rainy', 'snowy', 'sunny']}
+        form_dict = {
+			7: ['sunglasses'],
+			8: ['sunglasses'],
+			9: ['sunglasses'],
+			25:  ['ash', 'party', 'witch', 'santa', 'summer'],
+			26:  ['ash', 'party', 'witch', 'santa', 'summer'],
+			172:  ['ash', 'party', 'witch', 'santa', 'summer'],
+			201: [c for c in ascii_lowercase],
+            351: ['normal', 'rainy', 'snowy', 'sunny'],
+            386: ['defense', 'normal', 'attack', 'speed']			
+		}
         if pkmn.isdigit():
             try:
                 pkmn = self.pkmn_list[int(pkmn)-1]
@@ -344,7 +353,11 @@ class Pokemon():
             argument = argument.replace('alolan', '').strip()
         else:
             alolan = False
-        form_list = ['normal', 'sunny', 'rainy', 'snowy']
+        form_list = [
+			'normal', 'sunny', 'rainy', 'snowy', 'sunglasses',
+			'ash', 'party', 'witch', 'santa', 'summer',
+			'defense', 'normal', 'attack', 'speed'
+		]
         form_list.extend([' ' + c for c in ascii_lowercase])
         f = next((x for x in form_list if x in argument.lower()), None)
         if f:
@@ -390,7 +403,11 @@ class Pokemon():
             argument = argument.replace('alolan', '').strip()
         else:
             alolan = False
-        form_list = ['normal', 'sunny', 'rainy', 'snowy']
+        form_list = [
+			'normal', 'sunny', 'rainy', 'snowy', 'sunglasses',
+			'ash', 'party', 'witch', 'santa', 'summer',
+			'defense', 'normal', 'attack', 'speed'
+		]
         form_list.extend([' ' + c for c in ascii_lowercase])
         f = next((x for x in form_list if x in argument.lower()), None)
         if f:

@@ -3,7 +3,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.0.8\n"
+"X-Generator: Poedit 2.0.9\n"
 "Project-Id-Version: Moewth French\n"
 "Language: fr\n"
 "POT-Creation-Date: \n"
@@ -2153,18 +2153,18 @@ msgid ""
 msgstr ""
 "Meowth! Évènement (Meetup) signalé par {member} dans {citychannel}! Détails: {location_details}. Coordonnés ici!\n"
 "\n"
-"Pour mettre à jour votre statut, choisissez parmi les commandes suivantes: **!maybe**, **!coming**, **!here**, **!cancel**. Si vous amenez plus d'un entrainer / compte, ajoutez le nombre total de comptes, équipes facultatives, à votre première mise à jour.\n"
-"Exemple: `! Coming 5 2m 2v 1i`\n"
+"Pour mettre à jour votre statut, choisissez parmi les commandes suivantes: **!maybe**, **!coming**, **!here**, **!cancel**. Si vous amenez plus d'un dresseurs / compte, ajoutez le nombre total de comptes, équipes facultatives, à votre première mise à jour.\n"
+"Exemple: `!coming 5 2m 2v 1i`\n"
 "\n"
-"Pour voir la liste des formateurs ayant donné leur statut:\n"
+"Pour voir la liste des dresseurs ayant donné leur statut:\n"
 "**!list interested**, **!list coming**, **!list here** ou seulement **!list** pour voir toutes les listes. Utilisez **!list teams** pour voir la répartition de l'équipe.\n"
 "\n"
 "Parfois, je ne suis pas très bon pour les directions, mais je vais corriger mes instructions si quelqu'un m'envoie un lien de cartes ou utilise **!location new <address>**. Vous pouvez voir l'emplacement de l'événement en utilisant **!location**\n"
 "\n"
-"Vous pouvez régler l'heure de début avec **!starttime <MM / JJ HH: MM AM / PM> ** (vous pouvez également omettre AM / PM et utiliser l'heure de 24 heures) et y accéder avec **!starttime**.\n"
-"Vous pouvez régler l'heure de fin avec **!timerset <MM / DD HH: MM AM / PM> ** et y accéder avec **!timer **.\n"
+"Vous pouvez régler l'heure de début avec **!starttime <JJ/MM HH:MM AM/PM> ** (vous pouvez également omettre AM/PM et utiliser l'heure de 24 heures) et y accéder avec **!starttime**.\n"
+"Vous pouvez régler l'heure de fin avec **!timerset <JJ/MM HH:MM AM/PM> ** et y accéder avec **!timer **.\n"
 "\n"
-"Cete chaine sera supprimée cinq minutes après l'expiration du délai."
+"Cette chaine sera supprimée cinq minutes après l'expiration du délai."
 
 #: __main__.py:4968
 msgid "Meowth! Hey {member}, if you can, set the time that the event starts with **!starttime <date and time>** and also set the time that the event ends using **!timerset <date and time>**."
@@ -2196,7 +2196,7 @@ msgstr "oeuf"
 
 #: __main__.py:4997 __main__.py:5563
 msgid "hatch"
-msgstr "éclosion"
+msgstr "éclos"
 
 #: __main__.py:4999 __main__.py:5567 __main__.py:5589 __main__.py:6203
 #: __main__.py:6467 __main__.py:6979
@@ -2205,7 +2205,7 @@ msgstr "raid"
 
 #: __main__.py:5000 __main__.py:5566
 msgid "end"
-msgstr "fin"
+msgstr "fini"
 
 #: __main__.py:5002
 msgid "This {raidtype}'s timer has already expired as of {expiry_time}!"
@@ -2221,7 +2221,7 @@ msgstr "Personne ne m'a dit quand le {raidtype} sera {raidaction}, donc je suppo
 
 #: __main__.py:5009
 msgid "This {raidtype} will {raidaction} at {expiry_time}!"
-msgstr "Ce {raidtype} sera {raidaction} à {expiry_time}!"
+msgstr "Ce {raidtype} sera {raidaction} à **{expiry_time}**!"
 
 #: __main__.py:5011
 msgid "No one told me when the {raidtype} will {raidaction}, so I'm assuming it will {raidaction} at {expiry_time}!"

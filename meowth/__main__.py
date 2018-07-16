@@ -3760,7 +3760,7 @@ async def profile(ctx, user: discord.Member = None):
 
 @Meowth.command()
 async def leaderboard(ctx, type="total"):
-    """Affiche les dix premiers journalistes d'un serveur.
+    """Affiche les dix premiers annonceurs d'un serveur.
 
      Utilisation:!leaderboard [type]
      Types acceptés: raids, oeufs, exraids, wilds, recherche"""

@@ -4242,8 +4242,9 @@ async def _raid(ctx, content):
     else:
         await raid_channel.send(content=_('Meowth! Hey {member}, if you can, set the time left on the raid using **!timerset <minutes>** so others can check it with **!timer**.').format(member=message.author.mention))
     event_loop.create_task(expiry_check(raid_channel))
-    raid_reports = guild_dict[message.guild.id].setdefault('trainers',{}).setdefault(message.author.id,{}).setdefault('raid_reports',0) + 1
-    guild_dict[message.guild.id]['trainers'][message.author.id]['raid_reports'] = raid_reports
+    if not fromegg and (level == '4' or level == '5'):
+        raid_reports = guild_dict[message.guild.id].setdefault('trainers',{}).setdefault(message.author.id,{}).setdefault('raid_reports',0) + 1
+        guild_dict[message.guild.id]['trainers'][message.author.id]['raid_reports'] = raid_reports
     return raid_channel
 
 
@@ -4466,8 +4467,9 @@ async def _raidegg(ctx, content):
         elif egg_level == "5" and guild_dict[raid_channel.guild.id]['configure_dict']['settings'].get('regional',None) in raid_info['raid_eggs']["5"]['pokemon']:
             await _eggassume('assume ' + get_name(guild_dict[raid_channel.guild.id]['configure_dict']['settings']['regional']), raid_channel)
         event_loop.create_task(expiry_check(raid_channel))
-        egg_reports = guild_dict[message.guild.id].setdefault('trainers',{}).setdefault(message.author.id,{}).setdefault('egg_reports',0) + 1
-        guild_dict[message.guild.id]['trainers'][message.author.id]['egg_reports'] = egg_reports
+        if egg_level == '4' or egg_level == '5':
+            egg_reports = guild_dict[message.guild.id].setdefault('trainers',{}).setdefault(message.author.id,{}).setdefault('egg_reports',0) + 1
+            guild_dict[message.guild.id]['trainers'][message.author.id]['egg_reports'] = egg_reports
         return raid_channel
 
 async def _eggassume(args, raid_channel, author=None):
@@ -4721,8 +4723,8 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
     guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id]['duplicate'] = duplicate
     guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id]['archive'] = archive
     if author:
-        raid_reports = guild_dict[raid_channel.guild.id].setdefault('trainers',{}).setdefault(author.id,{}).setdefault('raid_reports',0) + 1
-        guild_dict[raid_channel.guild.id]['trainers'][author.id]['raid_reports'] = raid_reports
+        #raid_reports = guild_dict[raid_channel.guild.id].setdefault('trainers',{}).setdefault(author.id,{}).setdefault('raid_reports',0) + 1
+        #guild_dict[raid_channel.guild.id]['trainers'][author.id]['raid_reports'] = raid_reports
         await _edit_party(raid_channel, author)
     event_loop.create_task(expiry_check(raid_channel))
 

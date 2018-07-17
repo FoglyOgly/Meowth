@@ -73,7 +73,7 @@ class Pokemon():
             202, 240, 246, 247, 248, 249, 250, 261, 262, 296, 297, 302, 303,
             304, 305, 306, 307, 308, 311, 312, 315, 320, 321, 333, 334, 353, 354, 355,
             356, 359, 360, 361, 362, 370, 382]
-        alolan_list = [19, 20, 27, 28, 37, 38, 52, 53, 88, 89, 103]
+        alolan_list = [19, 20, 27, 28, 37, 38, 50, 51, 52, 53, 74, 75, 76, 88, 89, 103]
         form_dict = {
 			7: ['sunglasses'],
 			8: ['sunglasses'],
@@ -83,7 +83,7 @@ class Pokemon():
 			172:  ['ash', 'party', 'witch', 'santa', 'summer'],
 			201: [c for c in ascii_lowercase],
             351: ['normal', 'rainy', 'snowy', 'sunny'],
-            386: ['defense', 'normal', 'attack', 'speed']			
+            386: ['defense', 'normal', 'attack', 'speed']
 		}
         if pkmn.isdigit():
             try:

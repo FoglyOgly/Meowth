@@ -3261,7 +3261,7 @@ async def _configure_trade(ctx):
             await owner.send(embed=discord.Embed(colour=discord.Colour.red(), description=_('**CONFIG CANCELLED!**\n\nNo changes have been made.')))
             return None
         elif trademsg.content.lower() == 'n':
-            config_dict_temp['trade'] == {'enabled': False, 'report_channels': []}
+            config_dict_temp['trade'] = {'enabled': False, 'report_channels': []}
             await owner.send(embed=discord.Embed(colour=discord.Colour.red(), description=_('Trade disabled.')))
             break
         else:

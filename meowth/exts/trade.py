@@ -395,7 +395,7 @@ class Trading:
 
     async def on_message(self, message):
         ctx = await self.bot.get_context(message)
-        if not ctx.guild:
+        if not ctx.guild or not checks.check_tradeset(ctx):
             return
         if checks.check_tradereport(ctx) and message.author != ctx.guild.me:
             await asyncio.sleep(1)

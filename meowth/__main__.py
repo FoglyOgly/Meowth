@@ -1400,7 +1400,7 @@ async def exit(ctx):
     Meowth._shutdown_mode = 0
     await Meowth.logout()
 
-@Meowth.group(name='set', help=_("Changes a setting.") , case_insensitive=True)
+@Meowth.group(name=_('set'), help=_("Changes a setting.") , case_insensitive=True)
 async def _set(ctx):
     if ctx.invoked_subcommand == None:
         raise commands.BadArgument()
@@ -3530,9 +3530,7 @@ async def cleanroles(ctx):
             cleancount += 1
     await ctx.message.channel.send(_("Removed {cleancount} empty roles").format(cleancount=cleancount))
 
-@Meowth.command(name=_("archive"), help=_("""Marks a raid channel for archival.
-
-    Usage: !archive"""))
+@Meowth.command(name=_("archive"), help=_("Marks a raid channel for archival."))
 @checks.allowarchive()
 async def archive(ctx):
     message = ctx.message
@@ -4761,9 +4759,7 @@ async def _exraid(ctx, location):
     guild_dict[message.guild.id]['trainers'][message.author.id]['ex_reports'] = ex_reports
     event_loop.create_task(expiry_check(raid_channel))
 
-@Meowth.command(name=_("invite"), help=_("""Join an EX Raid.
-
-    Usage: !invite"""))
+@Meowth.command(name=_("invite"), help=_("Join an EX Raid."))
 @checks.allowinvite()
 async def invite(ctx):
     await _invite(ctx)
@@ -4822,6 +4818,7 @@ async def _invite(ctx):
     await exraidmsg.delete()
 
 @Meowth.command(name=_("research"), help=_("""Report Field research
+
     Guided report method with just !research. If you supply arguments in one
     line, avoid commas in anything but your separations between pokestop,
     quest, reward. Order matters if you supply arguments. If a pokemon name
@@ -4829,7 +4826,7 @@ async def _invite(ctx):
 
     Usage: !research [pokestop name [optional URL], quest, reward]"""), aliases=['res'])
 @checks.allowresearchreport()
-async def research(ctx, *, details = None):
+async def research(ctx, *, details=None):
     message = ctx.message
     channel = message.channel
     author = message.author
@@ -5959,7 +5956,7 @@ async def weather(ctx, *, weather):
 Status Management
 """
 
-@Meowth.command(name=_("interested"), help=_(    """Indicate you are interested in the raid.
+@Meowth.command(name=_("interested"), help=_("""Indicate you are interested in the raid.
 
     Usage: !interested [count] [party]
     Works only in raid channels. If count is omitted, assumes you are a group of 1.

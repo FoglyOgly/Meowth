@@ -1049,7 +1049,7 @@ async def _print(owner, message):
 
 async def maint_start():
     try:
-        event_loop.create_task(guild_cleanup())
+#        event_loop.create_task(guild_cleanup())
         event_loop.create_task(channel_cleanup())
         event_loop.create_task(message_cleanup())
         logger.info('Maintenance Tasks Started')

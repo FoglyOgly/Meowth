@@ -81,7 +81,7 @@ class Pokemon():
 			25:  ['ash', 'party', 'witch', 'santa', 'summer'],
 			26:  ['ash', 'party', 'witch', 'santa', 'summer'],
 			172:  ['ash', 'party', 'witch', 'santa', 'summer'],
-			201: [c for c in ascii_lowercase],
+			201: [c for c in ascii_lowercase].extend(['!', '?']),
             351: ['normal', 'rainy', 'snowy', 'sunny'],
             386: ['defense', 'normal', 'attack', 'speed']			
 		}
@@ -199,7 +199,10 @@ class Pokemon():
         """:class:`str` : Pokemon sprite image URL"""
         pkmn_no = str(self.id).zfill(3)
         if self.form:
-            form_str = self.form
+            if self.form == '?':
+                form_str = 'question'
+            else:    
+                form_str = self.form
         else:
             form_str = ""
         if self.alolan:

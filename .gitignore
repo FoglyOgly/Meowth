@@ -1,6 +1,6 @@
-
+*~
 *.bat
-config.json
+/config
 data/serverdict_backup
 data/serverdict
 
@@ -9,3 +9,5 @@ __pychache__/
 *.py[cod]
 
 data/gym_data.json
+venv/
+.idea

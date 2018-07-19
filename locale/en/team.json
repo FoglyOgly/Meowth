@@ -1,0 +1,22 @@
+{
+  "mystic" : {
+    "name" : "mystic",
+    "color" : "blue",
+    "short" : "b"
+  },
+  "instinct" : {
+    "name" : "instinct",
+    "color" : "yellow",
+    "short" : "y"
+  },
+  "valor" : {
+    "name" : "valor",
+    "color" : "red",
+    "short" : "r"
+  },
+  "harmony" : {
+    "name" : "harmony",
+    "color" : "green",
+    "short" : "h"
+  }
+}

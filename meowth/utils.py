@@ -150,13 +150,13 @@ def sanitize_channel_name(name):
 
 async def get_raid_help(prefix, avatar, user=None):
     helpembed = discord.Embed(colour=discord.Colour.lighter_grey())
-    helpembed.set_author(name="Raid Coordination Help", icon_url=avatar)
+    helpembed.set_author(name=_("Raid Coordination Help"), icon_url=avatar)
     helpembed.add_field(
         name="Key",
-        value="<> denote required arguments, [] denote optional arguments",
+        value=_("<> denote required arguments, [] denote optional arguments"),
         inline=False)
     helpembed.add_field(
-        name="Raid MGMT Commands",
+        name=_("Raid MGMT Commands"),
         value=(
             f"`{prefix}raid <species>`\n"
             f"`{prefix}weather <weather>`\n"

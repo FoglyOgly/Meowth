@@ -1,0 +1,22 @@
+{
+  "mystic" : {
+    "name" : "sagesse",
+    "color" : "bleue",
+    "short" : "b"
+  },
+  "instinct" : {
+    "name" : "intuition",
+    "color" : "jaune",
+    "short" : "j"
+  },
+  "valor" : {
+    "name" : "bravoure",
+    "color" : "rouge",
+    "short" : "r"
+  },
+  "harmony" : {
+    "name" : "harmonie",
+    "color" : "vert",
+    "short" : "v"
+  }
+}

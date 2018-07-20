@@ -1,11 +1,25 @@
-
-*.bat
-config.json
-data/serverdict_backup
-data/serverdict
-
-logs/
-__pychache__/
+# Byte-compiled / optimized / DLL files
+__pycache__/
 *.py[cod]
 
-data/gym_data.json
+# C extensions
+*.so
+
+# Distribution / packaging
+bin/
+build/
+develop-eggs/
+dist/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+.vscode/
+meowth/config.py
+docs/
+logs/

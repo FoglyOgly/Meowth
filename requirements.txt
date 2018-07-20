@@ -1,0 +1,10 @@
+aiocontextvars>=0.1.2
+asyncpg>=0.13
+colorthief
+dateparser
+discord.py
+fuzzywuzzy
+more_itertools
+psutil
+python-dateutil>=2.6
+python-Levenshtein>=0.12

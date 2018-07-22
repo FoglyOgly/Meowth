@@ -156,36 +156,31 @@ async def get_raid_help(prefix, avatar, user=None):
         value="<> indique un argument obligatoire, [] indique un argument optionel",
         inline=False)
     helpembed.add_field(
-        name="Raid MGMT Commands",
+        name="Raid MGMT Commands/Description",
         value=(
             f"`{prefix}raid <species>`\n"
+            "`Indique le PKM éclos`\n"
             f"`{prefix}weather <weather>`\n"
+            "`Indique la météo du jeu`\n"
             f"`{prefix}timerset <minutes>`\n"
+            "`Indique le temps avant éclosion/dépop (en MM)`\n"
             f"`{prefix}starttime <time>`\n"
+            "`Indique l'heure de début (HH:MM)`\n"
             "`<lien google maps>`\n"
+            "`Mets à jour l'emplacement`\n"
             "**RSVP**\n"
             f"`{prefix}(i/c/h)...\n"
-            "[total]...\n"
-            "[nombre par équipe]`\n"
+            "`interested/coming/here`\n"
+            "[nb total] de dresseurs présents\n"
+            "[nb par équipe] pour chaque équipe (ex. 3m for 3 Mystic)`\n"
             "**Lists**\n"
             f"`{prefix}list [status]`\n"
-            f"`{prefix}list [status] tags`\n"
-            f"`{prefix}list teams`\n\n"
-            f"`{prefix}starting [team]`"))
-    helpembed.add_field(
-        name="Description",
-        value=(
-            "`Indique le PKM éclos`\n"
-            "`Indique la météo du jeu`\n"
-            "`Indique le temps avant éclosion/dépop (en MM)`\n"
-            "`Indique l'heure de début (HH:MM)`\n"
-            "`Mets à jour l'emplacement`\n\n"
-            "`interested/coming/here`\n"
-            "`# de dresseurs présents`\n"
-            "`# pour chaque équipe (ex. 3m for 3 Mystic)`\n\n"
             "`Liste les dresseurs par status`\n"
+            f"`{prefix}list [status] tags`\n"
             "`@mentions les dresseurs par status`\n"
+            f"`{prefix}list teams`\n"
             "`Liste les dresseurs par équipe`\n\n"
+            f"`{prefix}starting [team]`"
             "`Déplace les dresseurs de la liste 'here' à lobby.`"))
     if not user:
         return helpembed

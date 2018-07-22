@@ -17,7 +17,7 @@ def is_lock_free():
     global lock_socket
     lock_socket = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
     try:
-        lock_id = "meowth2_0"   # this should be unique. using your username as a prefix is a convention
+        lock_id = "meowth2_0-prod"   # this should be unique. using your username as a prefix is a convention
         lock_socket.bind('\0' + lock_id)
         logging.info("Acquired lock %r" % (lock_id,))
         print("Acquired lock %r" % (lock_id,))

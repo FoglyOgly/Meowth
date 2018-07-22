@@ -105,7 +105,7 @@ class Trade:
             icon=Trade.icon_url,
             fields={
                 "Vous offrez": str(listed_pokemon),
-                "Ils offerent": str(offer)
+                "Ils offrent": str(offer)
                 },
             inline=True,
             footer=trader.display_name,
@@ -407,7 +407,10 @@ class Trading:
     @commands.command()
     @checks.allowtrade()
     async def trade(self, ctx, *, offer: pokemon.Pokemon):
-        """Créer une liste d'échanges."""
+        """Créer une liste d'échanges. 
+        Vous pouvez offrir/proposer des types rares 
+        comme les shiny ou les alolan (utiliser alolan est pas alola!).
+        """
 
         want_ask = await ctx.send(
             f"{ctx.author.display_name}, quel Pokemon êtes-vous prêt à accepter "

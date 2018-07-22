@@ -61,7 +61,7 @@ def run_meowth(autorestart):
                     sys.stdout.write(
                         "Restarting Meowth from crash in {:0d}".format(i))
                     sys.stdout.flush()
-                    time.sleep()
+                    time.sleep(1)
 
     print("Meowth has closed. Exit code: {exit_code}".format(exit_code=code))
 

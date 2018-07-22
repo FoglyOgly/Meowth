@@ -2,11 +2,11 @@
 
 import sys
 import os
-import logging
-import socket
 import subprocess
 import argparse
 import time
+import logging
+import socket
 
 
 lock_socket = None  # we want to keep the socket open until the very end of
@@ -17,7 +17,7 @@ def is_lock_free():
     global lock_socket
     lock_socket = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
     try:
-        lock_id = "hrenaud.meowth2.0"   # this should be unique. using your username as a prefix is a convention
+        lock_id = "meowth2_0"   # this should be unique. using your username as a prefix is a convention
         lock_socket.bind('\0' + lock_id)
         logging.info("Acquired lock %r" % (lock_id,))
         print("Acquired lock %r" % (lock_id,))
@@ -86,7 +86,7 @@ def run_meowth(autorestart):
                     sys.stdout.write(
                         "Restarting Meowth from crash in {:0d}".format(i))
                     sys.stdout.flush()
-                    time.sleep()
+                    time.sleep(1)
 
     print("Meowth has closed. Exit code: {exit_code}".format(exit_code=code))
 

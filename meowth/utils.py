@@ -4,6 +4,7 @@ from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 
 import discord
+import asyncio
 
 def get_match(word_list: list, word: str, score_cutoff: int = 60):
     """Uses fuzzywuzzy to see if word is close to entries in word_list
@@ -41,13 +42,15 @@ def colour(*args):
 
 def make_embed(msg_type='', title=None, icon=None, content=None,
                msg_colour=None, guild=None, title_url=None,
-               thumbnail='', image=''):
+               thumbnail='', image='', fields=None, footer=None,
+               footer_icon=None, inline=False):
     """Returns a formatted discord embed object.
 
     Define either a type or a colour.
     Types are:
     error, warning, info, success, help.
     """
+
     embed_types = {
         'error':{
             'icon':'https://i.imgur.com/juhq2uJ.png',
@@ -89,6 +92,18 @@ def make_embed(msg_type='', title=None, icon=None, content=None,
         embed.set_thumbnail(url=thumbnail)
     if image:
         embed.set_image(url=image)
+    if fields:
+        for key, value in fields.items():
+            ilf = inline
+            if not isinstance(value, str):
+                ilf = value[0]
+                value = value[1]
+            embed.add_field(name=key, value=value, inline=ilf)
+    if footer:
+        footer = {'text':footer}
+        if footer_icon:
+            footer['icon_url'] = footer_icon
+        embed.set_footer(**footer)
     return embed
 
 def bold(msg: str):
@@ -138,40 +153,86 @@ async def get_raid_help(prefix, avatar, user=None):
     helpembed.set_author(name="Raid Coordination Help", icon_url=avatar)
     helpembed.add_field(
         name="Key",
-        value="<> denote required arguments, [] denote optional arguments",
+        value="<> indique un argument obligatoire, [] indique un argument optionel",
         inline=False)
     helpembed.add_field(
-        name="Raid MGMT Commands",
+        name="Raid MGMT Commands/Description",
         value=(
             f"`{prefix}raid <species>`\n"
+            "`-> Indique le PKM éclos`\n"
             f"`{prefix}weather <weather>`\n"
+            "`-> Indique la météo du jeu`\n"
             f"`{prefix}timerset <minutes>`\n"
+            "`-> Indique le temps avant éclosion/dépop (en MM)`\n"
             f"`{prefix}starttime <time>`\n"
-            "`<google maps link>`\n"
+            "`-> Indique l'heure de début (HH:MM)`\n"
+            "`<lien google maps>`\n"
+            "`-> Mets à jour l'emplacement`\n"
             "**RSVP**\n"
-            f"`{prefix}(i/c/h)...\n"
-            "[total]...\n"
-            "[team counts]`\n"
+            f"`{prefix}(i/c/h) [nb total] [nb par équipe]`\n"
+            "`-> (i/c/h) interested/coming/here`\n"
+            "`-> [nb total] de dresseurs présents`\n"
+            "`-> [nb par équipe] pour chaque équipe (ex. 3m for 3 Mystic)`\n"
             "**Lists**\n"
             f"`{prefix}list [status]`\n"
+            "`-> Liste les dresseurs par status`\n"
             f"`{prefix}list [status] tags`\n"
-            f"`{prefix}list teams`\n\n"
-            f"`{prefix}starting [team]`"))
-    helpembed.add_field(
-        name="Description",
-        value=(
-            "`Hatches Egg channel`\n"
-            "`Sets in-game weather`\n"
-            "`Sets hatch/raid timer`\n"
-            "`Sets start time`\n"
-            "`Updates raid location`\n\n"
-            "`interested/coming/here`\n"
-            "`# of trainers`\n"
-            "`# from each team (ex. 3m for 3 Mystic)`\n\n"
-            "`Lists trainers by status`\n"
-            "`@mentions trainers by status`\n"
-            "`Lists trainers by team`\n\n"
-            "`Moves trainers on 'here' list to a lobby.`"))
+            "`-> @mentions les dresseurs par status`\n"
+            f"`{prefix}list teams`\n"
+            "`-> Liste les dresseurs par équipe`\n\n"
+            f"`{prefix}starting [team]`\n"
+            "`-> Déplace les dresseurs de la liste 'here' à lobby.`"))
     if not user:
         return helpembed
     await user.send(embed=helpembed)
+
+def get_number(bot, pkm_name):
+    try:
+        number = bot.pkmn_info['pokemon_list'].index(pkm_name) + 1
+    except ValueError:
+        number = None
+    return number
+
+def get_name(bot, pkmn_number):
+    pkmn_number = int(pkmn_number) - 1
+    try:
+        name = bot.pkmn_info['pokemon_list'][pkmn_number]
+    except IndexError:
+        name = None
+    return name
+
+def get_raidlist(bot):
+    raidlist = []
+    for level in bot.raid_info['raid_eggs']:
+        for pokemon in bot.raid_info['raid_eggs'][level]['pokemon']:
+            raidlist.append(pokemon)
+            raidlist.append(get_name(pokemon).lower())
+    return raidlist
+
+def get_level(bot, pkmn):
+    if str(pkmn).isdigit():
+        pkmn_number = pkmn
+    else:
+        pkmn_number = get_number(bot, pkmn)
+    for level in bot.raid_info['raid_eggs']:
+        for level, pkmn_list in bot.raid_info['raid_eggs'].items():
+            if pkmn_number in pkmn_list["pokemon"]:
+                return level
+
+async def ask(bot, message, user_list=None, timeout=60, *, react_list=['✅', '❎']):
+    if user_list and type(user_list) != __builtins__.list:
+        user_list = [user_list]
+    def check(reaction, user):
+        if user_list and type(user_list) is __builtins__.list:
+            return (user.id in user_list) and (reaction.message.id == message.id) and (reaction.emoji in react_list)
+        elif not user_list:
+            return (user.id != message.author.id) and (reaction.message.id == message.id) and (reaction.emoji in react_list)
+    for r in react_list:
+        await asyncio.sleep(0.25)
+        await message.add_reaction(r)
+    try:
+        reaction, user = await bot.wait_for('reaction_add', check=check, timeout=timeout)
+        return reaction, user
+    except asyncio.TimeoutError:
+        await message.clear_reactions()
+        return

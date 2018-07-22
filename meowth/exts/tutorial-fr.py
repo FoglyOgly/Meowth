@@ -64,7 +64,7 @@ class Tutorial:
         # if no response for 5 minutes, close tutorial
         except asyncio.TimeoutError:
             await ctx.tutorial_channel.send(
-                f"Vous avez pris trop de temps pour compléter la commande "
+                "Vous avez pris trop de temps pour compléter la commande "
                 f"**{ctx.prefix}want** ! Cette chaîne sera supprimée dans dix secondes.")
             await asyncio.sleep(10)
             await ctx.tutorial_channel.delete()

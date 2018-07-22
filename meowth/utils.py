@@ -159,29 +159,29 @@ async def get_raid_help(prefix, avatar, user=None):
         name="Raid MGMT Commands/Description",
         value=(
             f"`{prefix}raid <species>`\n"
-            "`Indique le PKM éclos`\n"
+            "`-> Indique le PKM éclos`\n"
             f"`{prefix}weather <weather>`\n"
-            "`Indique la météo du jeu`\n"
+            "`-> Indique la météo du jeu`\n"
             f"`{prefix}timerset <minutes>`\n"
-            "`Indique le temps avant éclosion/dépop (en MM)`\n"
+            "`-> Indique le temps avant éclosion/dépop (en MM)`\n"
             f"`{prefix}starttime <time>`\n"
-            "`Indique l'heure de début (HH:MM)`\n"
+            "`-> Indique l'heure de début (HH:MM)`\n"
             "`<lien google maps>`\n"
-            "`Mets à jour l'emplacement`\n"
+            "`-> Mets à jour l'emplacement`\n"
             "**RSVP**\n"
-            f"`{prefix}(i/c/h)...\n"
+            f"`{prefix}(i/c/h)...`\n"
             "`interested/coming/here`\n"
             "[nb total] de dresseurs présents\n"
             "[nb par équipe] pour chaque équipe (ex. 3m for 3 Mystic)`\n"
             "**Lists**\n"
             f"`{prefix}list [status]`\n"
-            "`Liste les dresseurs par status`\n"
+            "`-> Liste les dresseurs par status`\n"
             f"`{prefix}list [status] tags`\n"
-            "`@mentions les dresseurs par status`\n"
+            "`-> @mentions les dresseurs par status`\n"
             f"`{prefix}list teams`\n"
-            "`Liste les dresseurs par équipe`\n\n"
-            f"`{prefix}starting [team]`"
-            "`Déplace les dresseurs de la liste 'here' à lobby.`"))
+            "`-> Liste les dresseurs par équipe`\n\n"
+            f"`{prefix}starting [team]`\n"
+            "`-> Déplace les dresseurs de la liste 'here' à lobby.`"))
     if not user:
         return helpembed
     await user.send(embed=helpembed)

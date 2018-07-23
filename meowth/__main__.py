@@ -742,13 +742,12 @@ async def expire_channel(channel):
                 maybe_list = []
                 trainer_dict = copy.deepcopy(
                     guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['trainer_dict'])
-                for trainer in trainer_dict.keys():
-                    if trainer_dict[trainer]['status']['maybe']:
-                        user = channel.guild.get_member(trainer)
-                        maybe_list.append(user.mention)
+                max_trainer_count = _count_trainers(trainer_dict)
                 h = _('hatched-')
                 new_name = h if h not in channel.name else ''
-                new_name += channel.name
+                new_name += _('level-{egg_level}-egg-').format(egg_level=guild_dict[guild.id]['raidchannel_dict'][channel.id]['egglevel'])
+                new_name += sanitize_channel_name(guild_dict[guild.id]['raidchannel_dict'][channel.id]['address'])
+                new_name = "{max_trainer_count}👤".format(max_trainer_count=max_trainer_count) + new_name
                 await channel.edit(name=new_name)
                 await channel.send(_("**This egg has hatched!**\n\n...or the time has just expired. Trainers {trainer_list}: Update the raid to the pokemon that hatched using **!raid <pokemon>** or reset the hatch timer with **!timerset**. This channel will be deactivated until I get an update and I'll delete it in 45 minutes if I don't hear anything.").format(trainer_list=', '.join(maybe_list)))
             delete_time = (guild_dict[guild.id]['raidchannel_dict'][channel.id]['exp'] + (45 * 60)) - time.time()
@@ -758,7 +757,11 @@ async def expire_channel(channel):
             if (not alreadyexpired):
                 e = _('expired-')
                 new_name = e if e not in channel.name else ''
-                new_name += channel.name
+                if guild_dict[guild.id]['raidchannel_dict'][channel.id]['type'] == 'egg':
+                    new_name += _('level-{egg_level}-egg-').format(egg_level=guild_dict[guild.id]['raidchannel_dict'][channel.id]['egglevel'])
+                else:
+                    new_name += _('{}-').format(guild_dict[guild.id]['raidchannel_dict'][channel.id]['pokemon'])
+                new_name += sanitize_channel_name(guild_dict[guild.id]['raidchannel_dict'][channel.id]['address'])
                 await channel.edit(name=new_name)
                 await channel.send(_('This channel timer has expired! The channel has been deactivated and will be deleted in 5 minutes.\nTo reactivate the channel, use **!timerset** to set the timer again.'))
             delete_time = (guild_dict[guild.id]['raidchannel_dict'][channel.id]['exp'] + (5 * 60)) - time.time()
@@ -3403,6 +3406,9 @@ async def changeraid(ctx, newraid):
     if newraid.isdigit():
         raid_channel_name = _('level-{egg_level}-egg-').format(egg_level=newraid)
         raid_channel_name += sanitize_channel_name(guild_dict[guild.id]['raidchannel_dict'][channel.id]['address'])
+        trainer_dict = copy.deepcopy(guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['trainer_dict'])
+        max_trainer_count = _count_trainers(trainer_dict)
+        raid_channel_name = "{max_trainer_count}👤".format(max_trainer_count=max_trainer_count) + raid_channel_name
         guild_dict[guild.id]['raidchannel_dict'][channel.id]['egglevel'] = newraid
         guild_dict[guild.id]['raidchannel_dict'][channel.id]['pokemon'] = ''
         changefrom = guild_dict[guild.id]['raidchannel_dict'][channel.id]['type']
@@ -4163,7 +4169,7 @@ async def _raid(ctx, content):
             await message.channel.send(
                 _('Meowth! To zgłoszenie wygląda na duplikat. Sprawdź czy ktoś już nie zgłosił tego rajdu tu: {}'.format(is_duplicate)))
             return
-    raid_channel_name = (entered_raid + '-') + sanitize_channel_name(raid_details)
+    raid_channel_name = "0👤" + (entered_raid + '-') + sanitize_channel_name(raid_details)
     raid_channel_category = get_category(message.channel, get_level(entered_raid), category_type="raid")
     raid_channel = await message.guild.create_text_channel(raid_channel_name, overwrites=dict(message.channel.overwrites), category=raid_channel_category)
     ow = raid_channel.overwrites_for(raid_channel.guild.default_role)
@@ -4407,6 +4413,7 @@ async def _raidegg(ctx, content):
             boss_list.append((((p_name + ' (') + str(p)) + ') ') + ''.join(p_type))
         raid_channel_name = _('level-{egg_level}-egg-').format(egg_level=egg_level)
         raid_channel_name += sanitize_channel_name(raid_details)
+        raid_channel_name = "0👤" + raid_channel_name
         raid_channel_category = get_category(message.channel, egg_level, category_type="raid")
         raid_channel = await message.guild.create_text_channel(raid_channel_name, overwrites=dict(message.channel.overwrites), category=raid_channel_category)
         ow = raid_channel.overwrites_for(raid_channel.guild.default_role)
@@ -4616,6 +4623,9 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
         raidreportcontent = _('Meowth! The EX egg has hatched into a {pokemon} raid! Details: {location_details}. {invitemsgstr} coordinate in {raid_channel}').format(pokemon=entered_raid.capitalize(), location_details=egg_address, invitemsgstr=invitemsgstr,raid_channel=raid_channel.mention)
         raidmsg = _("Meowth! {pokemon} EX raid reported by {member}! Details: {location_details}. Coordinate here{invitemsgstr2}!\n\nClick the question mark reaction to get help on the commands that work in here.\n\nThis channel will be deleted five minutes after the timer expires.").format(pokemon=entered_raid.capitalize(), member=raid_messageauthor.mention, location_details=egg_address, invitemsgstr2=invitemsgstr2)
     raid_channel_name = (entered_raid + '-') + sanitize_channel_name(egg_address)
+    trainer_dict = copy.deepcopy(guild_dict[raid_channel.guild.id]['raidchannel_dict'][raid_channel.id]['trainer_dict'])
+    max_trainer_count = _count_trainers(trainer_dict, entered_raid)
+    raid_channel_name = "{max_trainer_count}👤".format(max_trainer_count=max_trainer_count) + raid_channel_name
     raid = discord.utils.get(raid_channel.guild.roles, name=entered_raid)
     if raid == None:
         roletest = ""
@@ -6460,6 +6470,49 @@ async def _party_status(ctx, total, teamcounts):
     result = [total, partylist]
     return result
 
+def _count_trainers(trainer_dict, pkmn=None):
+    #logger.info("_count_trainers: {}, {}".format(trainer_dict, pkmn))
+    trainer_count = {'anything': 0}
+    for trainer in trainer_dict.keys():
+        #logger.info(" checking trainer {}".format(trainer))
+        if not pkmn:
+            #logger.info("  pkmn is not set")
+            if 'interest' in trainer_dict[trainer] and len(trainer_dict[trainer]['interest']):
+                #logger.info("   interest defined for trainer: {}".format(trainer_dict[trainer]['interest']))
+                for interested in trainer_dict[trainer]['interest']:
+                    if interested not in trainer_count:
+                        trainer_count[interested] = 0
+                    trainer_count[interested] += trainer_dict[trainer]['status']['maybe'] + \
+                                                 trainer_dict[trainer]['status']['coming'] + \
+                                                 trainer_dict[trainer]['status']['here']
+            else:
+                trainer_count['anything'] += trainer_dict[trainer]['status']['maybe'] + \
+                                             trainer_dict[trainer]['status']['coming'] + \
+                                             trainer_dict[trainer]['status']['here']
+        else:
+            #logger.info("  pkmn is set to {}".format(pkmn))
+            if 'interest' in trainer_dict[trainer] and len(trainer_dict[trainer]['interest']):
+                #logger.info("   interest defined for trainer: {}".format(trainer_dict[trainer]['interest']))
+                if pkmn in trainer_dict[trainer]['interest']:
+                    if pkmn not in trainer_count:
+                        trainer_count[pkmn] = 0
+                    trainer_count[pkmn] += trainer_dict[trainer]['status']['maybe'] + \
+                                           trainer_dict[trainer]['status']['coming'] + \
+                                           trainer_dict[trainer]['status']['here']
+            else:
+                trainer_count['anything'] += trainer_dict[trainer]['status']['maybe'] + \
+                                             trainer_dict[trainer]['status']['coming'] + \
+                                             trainer_dict[trainer]['status']['here']
+    #logger.info(" trainer_count: {}".format(trainer_count))
+    max_trainer_count = 0
+    for interested, count in trainer_count.items():
+        if count > max_trainer_count:
+            max_trainer_count = count
+    if max_trainer_count > 9:
+        max_trainer_count = 9
+    #logger.info(" max: {}".format(max_trainer_count))
+    return max_trainer_count
+
 async def _edit_party(channel, author=None):
     egglevel = guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['egglevel']
     if egglevel != "0":
@@ -6540,6 +6593,10 @@ async def _edit_party(channel, author=None):
         await raidmsg.edit(embed=newembed)
     except:
         pass
+    pkmn = guild_dict[channel.guild.id]['raidchannel_dict'][channel.id].get('pokemon', None)
+    max_trainer_count = _count_trainers(trainer_dict, pkmn)
+    new_name = "{}".format(max_trainer_count) + channel.name[1:]
+    await channel.edit(name=new_name)
 
 @Meowth.command(aliases=['l'])
 @checks.activeraidchannel()

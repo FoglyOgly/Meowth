@@ -6037,8 +6037,8 @@ Status Management
 async def interested(ctx, *, teamcounts: str=None):
     """Indiquez que vous êtes intéressé par le raid.
 
-     Utilisation:!interest [count] [party]
-     Fonctionne uniquement dans les canaux de raid. Si count est omis, suppose que vous êtes un groupe de 1.
+     Utilisation:!interest [nb total] [nb par équipe]
+     Fonctionne uniquement dans les chaînes de raid. Si count est omis, suppose que vous êtes un groupe de 1.
      Sinon, cette commande s'attend à ce qu'au moins un mot de votre message soit un nombre,
      et supposera que vous êtes un groupe avec autant de gens.
 
@@ -6137,8 +6137,8 @@ async def _maybe(channel, author, count, party, entered_interest=None):
 async def coming(ctx, *, teamcounts: str=None):
     """Indiquez que vous êtes sur le chemin d'un raid.
 
-     Utilisation:!coming [count] [party]
-     Fonctionne uniquement dans les canaux de raid. Si count est omis, vérifie s'il y a déjà eu!
+     Utilisation:!coming [nb total] [nb par équipe]
+     Fonctionne uniquement dans les chaînes de raid. Si count est omis, vérifie s'il y a déjà eu!
      commande et prend le compte de cela. S'il n'en trouve aucun, suppose que vous êtes un groupe
      de 1.
      Sinon, cette commande s'attend à ce qu'au moins un mot de votre message soit un nombre,
@@ -6244,8 +6244,8 @@ async def _coming(channel, author, count, party, entered_interest=None):
 async def here(ctx, *, teamcounts: str=None):
     """Indiquez que vous êtes arrivé au raid.
 
-     Utilisation:!here [compte] [fête]
-     Fonctionne uniquement dans les canaux de raid. Si le message est omis, et
+     Utilisation:!here [nb total] [nb par équipe]
+     Fonctionne uniquement dans les chaînes de raid. Si le message est omis, et
      vous avez déjà émis! à venir, puis préserve le compte
      de cette commande. Sinon, suppose que vous êtes un groupe de 1.
      Sinon, cette commande s'attend à ce qu'au moins un mot de votre message soit un nombre,

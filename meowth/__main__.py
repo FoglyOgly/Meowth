@@ -3704,8 +3704,8 @@ async def profile(ctx, user: discord.Member = None):
     embed.add_field(name=_("Research Reports"), value=f"{guild_dict[ctx.guild.id]['trainers'].setdefault(user.id,{}).get('research_reports',0)}", inline=True)
     await ctx.send(embed=embed)
 
-@Meowth.command()
-async def leaderboard(ctx, type="total"):
+@Meowth.command(hidden=True)
+async def epenis(ctx, type="total"):
     """Displays the top ten reporters of a server.
 
     Usage: !leaderboard [type]

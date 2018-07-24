@@ -4722,7 +4722,18 @@ async def _exraid(ctx, location):
         return
     raid_details = ' '.join(exraid_split)
     raid_details = raid_details.strip()
-    raid_gmaps_link = create_gmaps_query(raid_details, message.channel, type="exraid")
+    gyms = get_gyms(message.guild.id)
+    if gyms:
+        match = await gym_match_prompt(message.channel, message.author.id, raid_details, gyms)
+        if not match:
+            return await message.channel.send(_("Meowth! I couldn't find a gym named '{0}'.").format(raid_details))
+        gym = gyms[match]
+        raid_details = match
+        gym_coords = gym['coordinates']
+        gym_note = gym.get('notes', _('No notes for this gym.'))
+        raid_gmaps_link = create_gmaps_query(gym_coords, message.channel, type="exraid")
+    else:
+        raid_gmaps_link = create_gmaps_query(raid_details, message.channel, type="exraid")
     egg_info = raid_info['raid_eggs']['EX']
     egg_img = egg_info['egg_img']
     boss_list = []

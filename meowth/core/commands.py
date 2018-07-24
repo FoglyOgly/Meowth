@@ -84,7 +84,7 @@ class Core:
         """Sets the bot's activity"""
         status = ctx.me.status
         game = discord.Game(name=game)
-        await ctx.bot.change_presence(status=status, game=game)
+        await ctx.bot.change_presence(status=status, activity=game)
         embed = make_embed(msg_type='success', title='Game set.')
         await ctx.send(embed=embed)
 
@@ -106,7 +106,7 @@ class Core:
             "invisible" : discord.Status.invisible
             }
 
-        game = ctx.me.game
+        game = ctx.me.activity
 
         try:
             status = statuses[status.lower()]
@@ -114,7 +114,7 @@ class Core:
             await ctx.bot.send_cmd_help(ctx)
         else:
             await ctx.bot.change_presence(status=status,
-                                          game=game)
+                                          activity=game)
             embed = make_embed(
                 msg_type='success',
                 title="Status changed to {}.".format(status))
@@ -224,7 +224,7 @@ class Core:
         about = [
             "A Bot for Pokemon Go Communities!",
             f"**[Docs & Source!]({bot_repo})** | **{invite_str}**\n\n",
-            f"Guild Prefix: `{prefix}help`\n",
+            f"Guild Prefix: `{prefix}`\n",
             f"Help: `{prefix}help`\n\n",
             f"**Owner:** {owner}",
             f"**Uptime:** {uptime_str}",

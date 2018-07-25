@@ -4779,6 +4779,7 @@ async def _exraid(ctx, location):
         boss_list.append((((p_name + ' (') + str(p)) + ') ') + ''.join(p_type))
     raid_channel_name = _('ex-raid-egg-')
     raid_channel_name += sanitize_channel_name(raid_details)
+    raid_channel_name = "0👤" + raid_channel_name
     raid_channel_overwrite_list = channel.overwrites
     if guild_dict[channel.guild.id]['configure_dict']['invite']['enabled']:
         if guild_dict[channel.guild.id]['configure_dict']['exraid']['permissions'] == "everyone":

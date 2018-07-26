@@ -95,11 +95,16 @@ class DBLogHandler(logging.Handler):
             self.submit_log(record_id, record), self.bot.loop)
 
     async def submit_log(self, log_id, record):
-        data = dict(log_id=log_id, created=record.created,
-                    logger_name=record.name, level_name=record.levelname,
-                    file_path=record.pathname, module=record.module,
-                    func_name=record.funcName, line_no=record.lineno,
-                    message=record.message, traceback=record.exc_info)
+        data = dict(log_id=log_id,
+                    created=record.created,
+                    logger_name=str(record.name),
+                    level_name=str(record.levelname),
+                    file_path=str(record.pathname),
+                    module=str(record.module),
+                    func_name=str(record.funcName),
+                    line_no=record.lineno,
+                    message=str(record.message),
+                    traceback=str(record.exc_info))
         try:
             table = self.bot.dbi.table(self.log_name)
             table.insert(**data)

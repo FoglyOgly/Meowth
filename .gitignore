@@ -20,6 +20,7 @@ var/
 .installed.cfg
 *.egg
 .vscode/
+.vs/
 meowth/config.py
 docs/
 logs/

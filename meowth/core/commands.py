@@ -626,7 +626,7 @@ class Core:
                 embed = make_embed(msg_type='error', title=f'{cog} not found.')
                 await ctx.send(embed=embed)
                 return
-        except errors.PostgresError:
+        except errors.PostgresError as e:
             msg = "{}: {}".format(type(e).__name__, e)
             embed = make_embed(
                 msg_type='error', title=f'Error enabling {cog}', content=msg)

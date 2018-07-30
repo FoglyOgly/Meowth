@@ -200,34 +200,3 @@ class ActivityLogging:
             await table.insert.commit(do_update=False)
         except asyncpg.PostgresError as e:
             self.logger.exception(type(e).__name__, exc_info=e)
-
-    async def on_member_update(self, before, after):
-        status_update = None
-        status_from = None
-        name_update = None
-
-        if before.status != after.status:
-            status_update = str(after.status)
-            status_from = str(before.status)
-
-        if before.nick != after.nick and after.nick:
-            name_update = after.nick
-
-        if not status_update and not name_update:
-            return
-
-        time_value = int(time.time())
-        guild = after.guild.id if after.guild else None
-
-        data = dict(member_id=after.id, time=time_value,
-                    status=status_update, from_status=status_from,
-                    guild_id=guild, display_name=name_update)
-
-        try:
-            table = self.bot.dbi.table('member_activity')
-            table.insert(**data)
-            table.insert.primaries('member_id', 'time')
-            # ignore conflicts
-            await table.insert.commit(do_update=False)
-        except asyncpg.PostgresError as e:
-            self.logger.exception(type(e).__name__, exc_info=e)

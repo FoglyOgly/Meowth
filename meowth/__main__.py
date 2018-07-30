@@ -1830,7 +1830,7 @@ async def _configure(ctx, configlist):
     for session in guild_dict[guild.id]['configure_dict']['settings']['config_sessions'].keys():
         if not guild.get_member(session):
             try:
-                del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+                del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][session]
             except KeyError:
                 pass
     config_dict_temp = getattr(ctx, 'config_dict_temp',copy.deepcopy(guild_dict[guild.id]['configure_dict']))

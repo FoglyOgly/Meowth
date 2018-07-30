@@ -4,6 +4,7 @@ from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 
 import discord
+import asyncio
 
 def get_match(word_list: list, word: str, score_cutoff: int = 60):
     """Uses fuzzywuzzy to see if word is close to entries in word_list
@@ -41,13 +42,15 @@ def colour(*args):
 
 def make_embed(msg_type='', title=None, icon=None, content=None,
                msg_colour=None, guild=None, title_url=None,
-               thumbnail='', image=''):
+               thumbnail='', image='', fields=None, footer=None,
+               footer_icon=None, inline=False):
     """Returns a formatted discord embed object.
 
     Define either a type or a colour.
     Types are:
     error, warning, info, success, help.
     """
+
     embed_types = {
         'error':{
             'icon':'https://i.imgur.com/juhq2uJ.png',
@@ -89,6 +92,18 @@ def make_embed(msg_type='', title=None, icon=None, content=None,
         embed.set_thumbnail(url=thumbnail)
     if image:
         embed.set_image(url=image)
+    if fields:
+        for key, value in fields.items():
+            ilf = inline
+            if not isinstance(value, str):
+                ilf = value[0]
+                value = value[1]
+            embed.add_field(name=key, value=value, inline=ilf)
+    if footer:
+        footer = {'text':footer}
+        if footer_icon:
+            footer['icon_url'] = footer_icon
+        embed.set_footer(**footer)
     return embed
 
 def bold(msg: str):
@@ -175,3 +190,54 @@ async def get_raid_help(prefix, avatar, user=None):
     if not user:
         return helpembed
     await user.send(embed=helpembed)
+
+def get_number(bot, pkm_name):
+    try:
+        number = bot.pkmn_info['pokemon_list'].index(pkm_name) + 1
+    except ValueError:
+        number = None
+    return number
+
+def get_name(bot, pkmn_number):
+    pkmn_number = int(pkmn_number) - 1
+    try:
+        name = bot.pkmn_info['pokemon_list'][pkmn_number]
+    except IndexError:
+        name = None
+    return name
+
+def get_raidlist(bot):
+    raidlist = []
+    for level in bot.raid_info['raid_eggs']:
+        for pokemon in bot.raid_info['raid_eggs'][level]['pokemon']:
+            raidlist.append(pokemon)
+            raidlist.append(get_name(pokemon).lower())
+    return raidlist
+
+def get_level(bot, pkmn):
+    if str(pkmn).isdigit():
+        pkmn_number = pkmn
+    else:
+        pkmn_number = get_number(bot, pkmn)
+    for level in bot.raid_info['raid_eggs']:
+        for level, pkmn_list in bot.raid_info['raid_eggs'].items():
+            if pkmn_number in pkmn_list["pokemon"]:
+                return level
+
+async def ask(bot, message, user_list=None, timeout=60, *, react_list=['✅', '❎']):
+    if user_list and type(user_list) != __builtins__.list:
+        user_list = [user_list]
+    def check(reaction, user):
+        if user_list and type(user_list) is __builtins__.list:
+            return (user.id in user_list) and (reaction.message.id == message.id) and (reaction.emoji in react_list)
+        elif not user_list:
+            return (user.id != message.author.id) and (reaction.message.id == message.id) and (reaction.emoji in react_list)
+    for r in react_list:
+        await asyncio.sleep(0.25)
+        await message.add_reaction(r)
+    try:
+        reaction, user = await bot.wait_for('reaction_add', check=check, timeout=timeout)
+        return reaction, user
+    except asyncio.TimeoutError:
+        await message.clear_reactions()
+        return

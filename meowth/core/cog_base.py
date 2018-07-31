@@ -20,7 +20,7 @@ class Cog:
     _is_base = True
 
     def __new__(cls, bot, *args, **kwargs):
-        instance = super().__new__(cls)
+        instance = super().__new__(cls, *args, **kwargs)
         def run_cog_init(klass):
             for base in klass.__bases__:
                 if base is object:
@@ -67,6 +67,7 @@ class Cog:
                 self.logger.info(
                     f'Cog table {table.name} for {cog_name} found.')
                 table.new_columns = []
+                table.initial_data = []
                 continue
             await table.create()
             self.logger.info(f'Cog table {table.name} for {cog_name} created.')

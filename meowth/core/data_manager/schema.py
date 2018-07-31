@@ -420,7 +420,7 @@ class Table:
     """Represents a database table."""
 
     __slots__ = ('name', 'dbi', 'columns', 'where', 'new_columns',
-                 'query', 'insert', 'update')
+                 'query', 'insert', 'update', 'initial_data')
 
     def __init__(self, name: str, dbi):
         self.name = name
@@ -428,6 +428,7 @@ class Table:
         self.where = SQLConditions(parent=self)
         self.columns = TableColumns(table=self)
         self.new_columns = []
+        self.initial_data = []
         self.query = Query(dbi, self)
         self.insert = Insert(dbi, self)
         self.update = Update(dbi, self)
@@ -479,12 +480,10 @@ class Table:
                 sql += (f", CONSTRAINT {self.name}_pkey"
                         f" PRIMARY KEY ({', '.join(primaries)})")
         sql += ")"
-        try:
-            await self.dbi.execute_transaction(sql)
-        except PostgresError:
-            raise
-        else:
-            return self
+        await self.dbi.execute_transaction(sql)
+        if self.new_columns:
+            await self.insert.rows(self.new_columns).commit(do_update=False)
+        return self
 
     async def exists(self):
         """Create table and return the object representing it."""

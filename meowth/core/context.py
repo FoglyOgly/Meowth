@@ -35,6 +35,12 @@ class Context(commands.Context):
     def get_text(self, content):
         return content
 
+    def language(self):
+        try:
+            return self.bot.guild_languages[self.guild.id]
+        except (AttributeError, KeyError):
+            return None
+
     async def codeblock(self, contents, syntax="py", send=True, title=None):
         paginator = commands.Paginator(prefix=f'```{syntax}', max_size=1900)
         for line in contents.split('\n'):

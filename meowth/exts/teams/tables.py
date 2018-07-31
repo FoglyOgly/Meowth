@@ -1,0 +1,3 @@
+teams = {}
+
+def setup(bot):

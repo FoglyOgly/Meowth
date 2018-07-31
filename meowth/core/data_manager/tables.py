@@ -41,16 +41,6 @@ def core_table_sqls():
                               "CONSTRAINT discord_messages_pkey "
                               "PRIMARY KEY (message_id, sent));"),
 
-        'member_activity'  : ("CREATE TABLE member_activity ("
-                              "member_id bigint NOT NULL, "
-                              "time bigint NOT NULL, "
-                              "status text, "
-                              "from_status text, "
-                              "guild_id bigint, "
-                              "display_name text, "
-                              "CONSTRAINT member_activity_pkey "
-                              "PRIMARY KEY (member_id, time));"),
-
         'command_log'      : ("CREATE TABLE command_log ("
                               "message_id bigint NOT NULL, "
                               "sent bigint NOT NULL, "

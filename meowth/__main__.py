@@ -1244,7 +1244,7 @@ async def on_raw_reaction_add(payload):
     channel = Meowth.get_channel(payload.channel_id)
     try:
         message = await channel.get_message(payload.message_id)
-    except (discord.errors.NotFound, AttributeError):
+    except (discord.errors.NotFound, AttributeError, discord.Forbidden):
         return
     guild = message.guild
     try:

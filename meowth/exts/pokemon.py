@@ -376,7 +376,8 @@ class Pokemon():
         form_list = [
             'normal', 'sunny', 'rainy', 'snowy', 'sunglasses',
             'ash', 'party', 'witch', 'santa', 'summer',
-            'defense', 'normal', 'attack', 'speed'
+            'defense', 'normal', 'attack', 'speed',
+            '1', '2', '3', '4', '5', '6', '7', '8'
         ]
         form_list.extend([' ' + c for c in ascii_lowercase])
         f = next((x for x in form_list if x in argument.lower()), None)
@@ -426,7 +427,8 @@ class Pokemon():
         form_list = [
             'normal', 'sunny', 'rainy', 'snowy', 'sunglasses',
             'ash', 'party', 'witch', 'santa', 'summer',
-            'defense', 'normal', 'attack', 'speed'
+            'defense', 'normal', 'attack', 'speed',
+            '1', '2', '3', '4', '5', '6', '7', '8'
         ]
         form_list.extend([' ' + c for c in ascii_lowercase])
         f = next((x for x in form_list if x in argument.lower()), None)

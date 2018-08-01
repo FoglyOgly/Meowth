@@ -95,7 +95,7 @@ class Pokemon():
             26:  ['ash', 'party', 'witch', 'santa', 'summer'],
             172:  ['ash', 'party', 'witch', 'santa', 'summer'],
             201: list(ascii_lowercase) + ['!', '?'],
-            327: ['1', '2', '3', '4', '5', '6', '7', '8']
+            327: ['1', '2', '3', '4', '5', '6', '7', '8'],
             351: ['normal', 'rainy', 'snowy', 'sunny'],
             386: ['defense', 'normal', 'attack', 'speed']
         }

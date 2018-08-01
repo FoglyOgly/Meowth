@@ -303,4 +303,8 @@ def setup(bot):
 
 
 
-    return team_table
+    return [
+        team_table,
+        team_names_table,
+        color_names_table
+    ]

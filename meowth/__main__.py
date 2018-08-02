@@ -1033,13 +1033,12 @@ async def on_ready():
         Meowth.get_all_members(), id=config['master'])
     await _print(Meowth.owner, _('Starting up...'))
     Meowth.uptime = datetime.datetime.now()
-    owners = []
     msg_success = 0
     msg_fail = 0
     guilds = len(Meowth.guilds)
     users = 0
     for guild in Meowth.guilds:
-        users += len(guild.members)
+        users += guild.member_count
         try:
             if guild.id not in guild_dict:
                 guild_dict[guild.id] = {
@@ -1083,7 +1082,6 @@ async def on_ready():
                 'raidchannel_dict':{},
                 'trainers':{}
             }
-        owners.append(guild.owner)
     await _print(Meowth.owner, _("Meowth! That's right!\n\n{server_count} servers connected.\n{member_count} members found.").format(server_count=guilds, member_count=users))
     await maint_start()
 
@@ -1246,7 +1244,7 @@ async def on_raw_reaction_add(payload):
     channel = Meowth.get_channel(payload.channel_id)
     try:
         message = await channel.get_message(payload.message_id)
-    except (discord.errors.NotFound, AttributeError):
+    except (discord.errors.NotFound, AttributeError, discord.Forbidden):
         return
     guild = message.guild
     try:
@@ -1789,7 +1787,10 @@ async def _configure(ctx, configlist):
     guild_dict[ctx.guild.id]['configure_dict']['settings']['config_sessions'][owner.id] = config_sessions
     for session in guild_dict[guild.id]['configure_dict']['settings']['config_sessions'].keys():
         if not guild.get_member(session):
-            del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][session]
+            try:
+                del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][session]
+            except KeyError:
+                pass
     config_dict_temp = getattr(ctx, 'config_dict_temp',copy.deepcopy(guild_dict[guild.id]['configure_dict']))
     firstconfig = False
     all_commands = [str(x) for x in config_dict_temp.keys()]
@@ -1827,7 +1828,10 @@ async def _configure(ctx, configlist):
             configreply.content = configreply.content.replace("timezone", "settings")
             if configreply.content.lower() == 'cancel':
                 await owner.send(embed=discord.Embed(colour=discord.Colour.red(), description=_('**CONFIG CANCELLED!**\n\nNo changes have been made.')))
-                del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+                try:
+                    del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+                except KeyError:
+                    pass
                 return None
             elif "all" in configreply.content.lower():
                 configreplylist = all_commands
@@ -1906,7 +1910,10 @@ async def _configure(ctx, configlist):
             ctx.config_dict_temp['settings']['done'] = True
             guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
             await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name=_('Configuration Complete'), icon_url=Meowth.user.avatar_url))
-        del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+        try:
+            del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+        except KeyError:
+            pass
 
 @configure.command(name='all')
 async def configure_all(ctx):
@@ -1933,8 +1940,10 @@ async def team(ctx):
     if ctx:
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name=_('Configuration Complete'), icon_url=Meowth.user.avatar_url))
-    del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
-
+    try:
+        del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+    except KeyError:
+        pass
 
 async def _configure_team(ctx):
     guild = ctx.message.guild
@@ -1994,7 +2003,10 @@ async def welcome(ctx):
     if ctx:
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name=_('Configuration Complete'), icon_url=Meowth.user.avatar_url))
-    del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+    try:
+        del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+    except KeyError:
+        pass
 
 async def _configure_welcome(ctx):
     guild = ctx.message.guild
@@ -2153,7 +2165,10 @@ async def raid(ctx):
     if ctx:
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name=_('Configuration Complete'), icon_url=Meowth.user.avatar_url))
-    del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+    try:
+        del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+    except KeyError:
+        pass
 
 async def _configure_raid(ctx):
     guild = ctx.message.guild
@@ -2343,7 +2358,7 @@ async def _configure_raid(ctx):
                             await owner.send(embed=discord.Embed(colour=discord.Colour.orange(),description=msg))
                             continue
                     else:
-                        msg = _("The number of categories I found in your server doesn't match the number of raid levels! Make sure you give me exactly six categories, one for each level of raid. You can use the same category for multiple levels if you want, but I need to see six category names.\n\n**Matched Categories:** {catlist}\n\nPlease double check your categories.").format(catlist=', '.join(levelcat_names) if len(levelcat_list)>0 else "None")
+                        msg = _("The number of categories I found in your server doesn't match the number of raid levels! Make sure you give me exactly six categories, one for each level of raid. You can use the same category for multiple levels if you want, but I need to see five category names.\n\n**Matched Categories:** {catlist}\n\nPlease double check your categories.").format(catlist=', '.join(levelcat_names) if len(levelcat_list)>0 else "None")
                         if levelcat_errors:
                             msg += _("\n\nThe following aren't in your server: **{invalid_categories}**").format(invalid_categories=', '.join(levelcat_errors))
                         await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=msg))
@@ -2377,7 +2392,10 @@ async def exraid(ctx):
     if ctx:
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name=_('Configuration Complete'), icon_url=Meowth.user.avatar_url))
-    del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+    try:
+        del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+    except KeyError:
+        pass
 
 async def _configure_exraid(ctx):
     guild = ctx.message.guild
@@ -2568,7 +2586,10 @@ async def invite(ctx):
     if ctx:
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name=_('Configuration Complete'), icon_url=Meowth.user.avatar_url))
-    del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+    try:
+        del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+    except KeyError:
+        pass
 
 async def _configure_invite(ctx):
     guild = ctx.message.guild
@@ -2612,7 +2633,10 @@ async def counters(ctx):
     if ctx:
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name=_('Configuration Complete'), icon_url=Meowth.user.avatar_url))
-    del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+    try:
+        del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+    except KeyError:
+        pass
 
 async def _configure_counters(ctx):
     guild = ctx.message.guild
@@ -2669,7 +2693,10 @@ async def wild(ctx):
     if ctx:
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name=_('Configuration Complete'), icon_url=Meowth.user.avatar_url))
-    del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+    try:
+        del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+    except KeyError:
+        pass
 
 async def _configure_wild(ctx):
     guild = ctx.message.guild
@@ -2769,7 +2796,10 @@ async def research(ctx):
     if ctx:
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name=_('Configuration Complete'), icon_url=Meowth.user.avatar_url))
-    del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+    try:
+        del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+    except KeyError:
+        pass
 
 async def _configure_research(ctx):
     guild = ctx.message.guild
@@ -2869,7 +2899,10 @@ async def meetup(ctx):
     if ctx:
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name=_('Configuration Complete'), icon_url=Meowth.user.avatar_url))
-    del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+    try:
+        del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+    except KeyError:
+        pass
 
 async def _configure_meetup(ctx):
     guild = ctx.message.guild
@@ -3044,7 +3077,10 @@ async def want(ctx):
     if ctx:
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name=_('Configuration Complete'), icon_url=Meowth.user.avatar_url))
-    del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+    try:
+        del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+    except KeyError:
+        pass
 
 async def _configure_want(ctx):
     guild = ctx.message.guild
@@ -3125,7 +3161,10 @@ async def archive(ctx):
     if ctx:
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name=_('Configuration Complete'), icon_url=Meowth.user.avatar_url))
-    del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+    try:
+        del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+    except KeyError:
+        pass
 
 async def _configure_archive(ctx):
     guild = ctx.message.guild
@@ -3200,7 +3239,10 @@ async def timezone(ctx):
     if ctx:
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name=_('Configuration Complete'), icon_url=Meowth.user.avatar_url))
-    del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+    try:
+        del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+    except KeyError:
+        pass
 
 async def _configure_settings(ctx):
     guild = ctx.message.guild
@@ -3248,7 +3290,10 @@ async def trade(ctx):
     if ctx:
         guild_dict[guild.id]['configure_dict'] = ctx.config_dict_temp
         await owner.send(embed=discord.Embed(colour=discord.Colour.lighter_grey(), description=_("Meowth! Alright! Your settings have been saved and I'm ready to go! If you need to change any of these settings, just type **!configure** in your server again.")).set_author(name=_('Configuration Complete'), icon_url=Meowth.user.avatar_url))
-    del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+    try:
+        del guild_dict[guild.id]['configure_dict']['settings']['config_sessions'][owner.id]
+    except KeyError:
+        pass
 
 async def _configure_trade(ctx):
     guild = ctx.message.guild
@@ -4722,7 +4767,18 @@ async def _exraid(ctx, location):
         return
     raid_details = ' '.join(exraid_split)
     raid_details = raid_details.strip()
-    raid_gmaps_link = create_gmaps_query(raid_details, message.channel, type="exraid")
+    gyms = get_gyms(message.guild.id)
+    if gyms:
+        match = await gym_match_prompt(message.channel, message.author.id, raid_details, gyms)
+        if not match:
+            return await message.channel.send(_("Meowth! I couldn't find a gym named '{0}'.").format(raid_details))
+        gym = gyms[match]
+        raid_details = match
+        gym_coords = gym['coordinates']
+        gym_note = gym.get('notes', _('No notes for this gym.'))
+        raid_gmaps_link = create_gmaps_query(gym_coords, message.channel, type="exraid")
+    else:
+        raid_gmaps_link = create_gmaps_query(raid_details, message.channel, type="exraid")
     egg_info = raid_info['raid_eggs']['EX']
     egg_img = egg_info['egg_img']
     boss_list = []
@@ -6026,8 +6082,8 @@ Status Management
 async def interested(ctx, *, teamcounts: str=None):
     """Indiquez que vous êtes intéressé par le raid.
 
-     Utilisation:!interest [count] [party]
-     Fonctionne uniquement dans les canaux de raid. Si count est omis, suppose que vous êtes un groupe de 1.
+     Utilisation:!interest [nb total] [nb par équipe]
+     Fonctionne uniquement dans les chaînes de raid. Si count est omis, suppose que vous êtes un groupe de 1.
      Sinon, cette commande s'attend à ce qu'au moins un mot de votre message soit un nombre,
      et supposera que vous êtes un groupe avec autant de gens.
 
@@ -6126,8 +6182,8 @@ async def _maybe(channel, author, count, party, entered_interest=None):
 async def coming(ctx, *, teamcounts: str=None):
     """Indiquez que vous êtes sur le chemin d'un raid.
 
-     Utilisation:!coming [count] [party]
-     Fonctionne uniquement dans les canaux de raid. Si count est omis, vérifie s'il y a déjà eu!
+     Utilisation:!coming [nb total] [nb par équipe]
+     Fonctionne uniquement dans les chaînes de raid. Si count est omis, vérifie s'il y a déjà eu!
      commande et prend le compte de cela. S'il n'en trouve aucun, suppose que vous êtes un groupe
      de 1.
      Sinon, cette commande s'attend à ce qu'au moins un mot de votre message soit un nombre,
@@ -6233,8 +6289,8 @@ async def _coming(channel, author, count, party, entered_interest=None):
 async def here(ctx, *, teamcounts: str=None):
     """Indiquez que vous êtes arrivé au raid.
 
-     Utilisation:!here [compte] [fête]
-     Fonctionne uniquement dans les canaux de raid. Si le message est omis, et
+     Utilisation:!here [nb total] [nb par équipe]
+     Fonctionne uniquement dans les chaînes de raid. Si le message est omis, et
      vous avez déjà émis! à venir, puis préserve le compte
      de cette commande. Sinon, suppose que vous êtes un groupe de 1.
      Sinon, cette commande s'attend à ce qu'au moins un mot de votre message soit un nombre,

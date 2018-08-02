@@ -7,6 +7,15 @@ A Discord helper bot for Pokemon Go communities.
 
 Meowth is a Discord bot written in Python 3.6.1+ built with [discord.py v1.0.0a (rewrite branch)](https://github.com/Rapptz/discord.py/tree/rewrite)
 
+## Forked Version
+Cette version est "iso" avec la version forked avec ces différences :
+* Traduction via po/mo du `bot`.
+* Traduction directement dans certains fichiers pour traduire les `!help <command>` qui sont les commentaires de class.
+* Traduction directement dans certains fichiers pour traduire les `fstrings` utilisées par les développeurs dans les dernières mises à jour.
+* Ajout d'une version `Long running tasks` pour prévenir les redémarrages régulier de certains hébergeurs.
+
+https://help.pythonanywhere.com/pages/LongRunningTasks/
+
 ## Meowth v2 Features
 
 Meowth assists with organising Pokemon Go communities with support for:

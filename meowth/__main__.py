@@ -4769,7 +4769,21 @@ async def _exraid(ctx, location):
         return
     raid_details = ' '.join(exraid_split)
     raid_details = raid_details.strip()
-    raid_gmaps_link = create_gmaps_query(raid_details, message.channel, type="exraid")
+    gyms = get_gyms(message.guild.id)
+    if gyms:
+        gym_matching_cog = Meowth.cogs.get('GymMatching')
+        match, districts = await gym_matching_cog.pick_gym_prompt(ctx, raid_details)
+        if not match:
+            return await message.channel.send(f"Nie znaleziono żadnego gymu pasującego do \"{raid_details}\".")
+        if match == "__TIMEOUT__":
+            return await message.channel.send(f"Za wolno... spróbuj jeszcze raz.")
+        gym = gyms[match]
+        raid_details = gym['name']
+        gym_coords = gym['coordinates']
+        gym_note = gym.get('notes', _('No notes for this gym.'))
+        raid_gmaps_link = create_gmaps_query(gym_coords, message.channel, type="raid")
+    else:
+        raid_gmaps_link = create_gmaps_query(raid_details, message.channel, type="exraid")
     egg_info = raid_info['raid_eggs']['EX']
     egg_img = egg_info['egg_img']
     boss_list = []
@@ -4814,6 +4828,9 @@ async def _exraid(ctx, location):
                     pass
     raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/eggs/{}?cache=0'.format(str(egg_img))
     raid_embed = discord.Embed(title=_('Meowth! Click here for directions to the coming raid!'), url=raid_gmaps_link, colour=message.guild.me.colour)
+    if gyms:
+        gym_info = _("**Name:** {0}\n**Notes:** {1}").format(raid_details, gym_note)
+        raid_embed.add_field(name=_('**Gym:**'), value=gym_info, inline=False)
     if len(egg_info['pokemon']) > 1:
         raid_embed.add_field(name=_('**Possible Bosses:**'), value=_('{bosslist1}').format(bosslist1='\n'.join(boss_list[::2])), inline=True)
         raid_embed.add_field(name='\u200b', value=_('{bosslist2}').format(bosslist2='\n'.join(boss_list[1::2])), inline=True)

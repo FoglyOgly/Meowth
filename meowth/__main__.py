@@ -4159,7 +4159,7 @@ async def _raid(ctx, content):
         gym = gyms[match]
         raid_details = gym['name']
         gym_coords = gym['coordinates']
-        gym_note = gym.get('notes', _('No notes for this gym.'))
+        gym_type = gym_matching_cog.get_gym_status(gym)
         raid_gmaps_link = create_gmaps_query(gym_coords, message.channel, type="raid")
     else:
         raid_gmaps_link = create_gmaps_query(raid_details, message.channel, type="raid")
@@ -4187,7 +4187,7 @@ async def _raid(ctx, content):
     raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=0'.format(str(raid_number).zfill(3))
     raid_embed = discord.Embed(title=_('Meowth! Click here for directions to the raid!'), url=raid_gmaps_link, colour=message.guild.me.colour)
     if gyms:
-        gym_info = _("**Name:** {0}\n**Notes:** {1}").format(raid_details, gym_note)
+        gym_info = _("**Nazwa:** {0}\n**Typ gymu:** {1}").format(raid_details, gym_type)
         raid_embed.add_field(name=_('**Gym:**'), value=gym_info, inline=False)
     raid_embed.add_field(name=_('**Details:**'), value=_('{pokemon} ({pokemonnumber}) {type}').format(pokemon=entered_raid.capitalize(), pokemonnumber=str(raid_number), type=''.join(get_type(message.guild, raid_number)), inline=True))
     raid_embed.add_field(name=_('**Weaknesses:**'), value=_('{weakness_list}').format(weakness_list=weakness_to_str(message.guild, get_weaknesses(entered_raid))), inline=True)
@@ -4390,7 +4390,7 @@ async def _raidegg(ctx, content):
         gym = gyms[match]
         raid_details = gym['name']
         gym_coords = gym['coordinates']
-        gym_note = gym.get('notes', _('No notes for this gym.'))
+        gym_type = gym_matching_cog.get_gym_status(gym)
         raid_gmaps_link = create_gmaps_query(gym_coords, message.channel, type="raid")
     else:
         raid_gmaps_link = create_gmaps_query(raid_details, message.channel, type="raid")
@@ -4425,7 +4425,7 @@ async def _raidegg(ctx, content):
         raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/eggs/{}?cache=0'.format(str(egg_img))
         raid_embed = discord.Embed(title=_('Meowth! Click here for directions to the coming raid!'), url=raid_gmaps_link, colour=message.guild.me.colour)
         if gyms:
-            gym_info = _("**Name:** {0}\n**Notes:** {1}").format(raid_details, gym_note)
+            gym_info = _("**Nazwa:** {0}\n**Typ gymu:** {1}").format(raid_details, gym_type)
             raid_embed.add_field(name=_('**Gym:**'), value=gym_info, inline=False)
         if len(egg_info['pokemon']) > 1:
             raid_embed.add_field(name=_('**Possible Bosses:**'), value=_('{bosslist1}').format(bosslist1='\n'.join(boss_list[::2])), inline=True)
@@ -4780,7 +4780,7 @@ async def _exraid(ctx, location):
         gym = gyms[match]
         raid_details = gym['name']
         gym_coords = gym['coordinates']
-        gym_note = gym.get('notes', _('No notes for this gym.'))
+        gym_type = gym_matching_cog.get_gym_status(gym)
         raid_gmaps_link = create_gmaps_query(gym_coords, message.channel, type="raid")
     else:
         raid_gmaps_link = create_gmaps_query(raid_details, message.channel, type="exraid")
@@ -4829,7 +4829,7 @@ async def _exraid(ctx, location):
     raid_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/eggs/{}?cache=0'.format(str(egg_img))
     raid_embed = discord.Embed(title=_('Meowth! Click here for directions to the coming raid!'), url=raid_gmaps_link, colour=message.guild.me.colour)
     if gyms:
-        gym_info = _("**Name:** {0}\n**Notes:** {1}").format(raid_details, gym_note)
+        gym_info = _("**Nazwa:** {0}\n**Typ gymu:** {1}").format(raid_details, gym_type)
         raid_embed.add_field(name=_('**Gym:**'), value=gym_info, inline=False)
     if len(egg_info['pokemon']) > 1:
         raid_embed.add_field(name=_('**Possible Bosses:**'), value=_('{bosslist1}').format(bosslist1='\n'.join(boss_list[::2])), inline=True)

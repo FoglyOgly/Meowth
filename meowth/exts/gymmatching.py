@@ -10,20 +10,21 @@ from discord.ext import commands
 
 from unidecode import unidecode
 
+
 class GymMatching:
     def __init__(self, bot):
         self.bot = bot
-        self.gym_data = self.init_json()
-        self.gym_data = self.prepare_gyms_data()
+        self.gym_data = self._init_json()
+        self.gym_data = self._prepare_gyms_data()
         self.num_to_emoji = {0: '0\u20e3', 1: '1\u20e3', 2: '2\u20e3', 3: '3\u20e3', 4: '4\u20e3', 5: '5\u20e3',
                              6: '6\u20e3', 7: '7\u20e3', 8: '8\u20e3', 9: '9\u20e3'}
         self.emoji_to_num = {v: k for k, v in self.num_to_emoji.items()}
 
-    def init_json(self):
+    def _init_json(self):
         with open(os.path.join('data', 'gym_data.json')) as fd:
             return json.load(fd)
 
-    def prepare_gyms_data(self):
+    def _prepare_gyms_data(self):
         updated_gyms_data = {}
         for guild, gyms in self.gym_data.items():
             updated_gyms_data[guild] = {}
@@ -46,6 +47,17 @@ class GymMatching:
         """
         result = process.extract(gym, gyms, scorer=fuzz.token_set_ratio, limit=max_count)
         return [] if not result else result
+
+    def get_gym_status(self, gym_data):
+        is_ex = gym_data.get('is_ex', None)
+        can_be_ex = gym_data.get('can_be_ex', None)
+        if is_ex == "Yes":
+            return 'ex-raidowy'
+        if can_be_ex == "Yes":
+            return 'potencjalnie ex-rajdowy'
+        if is_ex is not None and can_be_ex is not None:
+            return 'zwykły'
+        return 'nieznany'
 
     def _create_embed_gyms(self, ctx, gym, add_emoji: bool = False, verbose: bool = True, score_limit: int = 70,
                            count_limit: int = 10):
@@ -78,17 +90,7 @@ class GymMatching:
             districts_str = '' if districts is None else "\nDzielnice: **{}**".format(", ".join(districts))
             is_ex = gym_info.get('is_ex', None)
             can_be_ex = gym_info.get('can_be_ex', None)
-            ex_status = ''
-            if is_ex == "Yes":
-                ex_status = 'ex-raidowy'
-            else:
-                if can_be_ex == "Yes":
-                    ex_status = 'potencjalnie ex-rajdowy'
-                else:
-                    if is_ex is not None and can_be_ex is not None:
-                        ex_status = 'zwykły'
-                    else:
-                        ex_status = 'nieznany'
+            ex_status = self.get_gym_status(gym_info)
             ex_status_str = f"\nTyp gymu: **{ex_status}**"
             emoji = "" if add_emoji is False else self.num_to_emoji[len(printed)] + " "
             if verbose:
@@ -135,8 +137,10 @@ class GymMatching:
         return printed[self.emoji_to_num[reaction.emoji]]
 
     async def _ask(self, ctx, message, user_list: list, react_list: list):
-        def check(reaction, user):
-            return (user.id in user_list) and (reaction.message.id == message.id) and (reaction.emoji in react_list)
+        def check(reaction_to_check, user_to_check):
+            return (user_to_check.id in user_list) and \
+                   (reaction_to_check.message.id == message.id) and \
+                   (reaction_to_check.emoji in react_list)
 
         for r in react_list:
             await asyncio.sleep(0.1)

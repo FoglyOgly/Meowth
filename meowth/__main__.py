@@ -535,48 +535,48 @@ def get_raidtext(type, pkmn, level, member, channel):
         raidtext = _("Meowth! EX raid reported by {member} in {channel}! Coordinate here!\n\nFor help, react to this message with the question mark and I will DM you a list of commands you can use!").format(member=member.mention, channel=channel.mention)
     return raidtext
 
-async def create_raid_channel(type, pkmn, level, details, report_channel):
-    guild = report_channel.guild
-    if type == "exraid":
-        name = _("exraid-egg-")
-        raid_channel_overwrite_list = channel.overwrites
-        if guild_dict[guild.id]['configure_dict']['invite']['enabled']:
-            if guild_dict[guild.id]['configure_dict']['exraid']['permissions'] == "everyone":
-                everyone_overwrite = (guild.default_role, discord.PermissionOverwrite(send_messages=False))
-                raid_channel_overwrite_list.append(everyone_overwrite)
-            for overwrite in raid_channel_overwrite_list:
-                if isinstance(overwrite[0], discord.Role):
-                    if overwrite[0].permissions.manage_guild or overwrite[0].permissions.manage_channels or overwrite[0].permissions.manage_messages:
-                        continue
-                    overwrite[1].send_messages = False
-                elif isinstance(overwrite[0], discord.Member):
-                    if channel.permissions_for(overwrite[0]).manage_guild or channel.permissions_for(overwrite[0]).manage_channels or channel.permissions_for(overwrite[0]).manage_messages:
-                        continue
-                    overwrite[1].send_messages = False
-                if (overwrite[0].name not in guild.me.top_role.name) and (overwrite[0].name not in guild.me.name):
-                    overwrite[1].send_messages = False
-        else:
-            if guild_dict[guild.id]['configure_dict']['exraid']['permissions'] == "everyone":
-                everyone_overwrite = (guild.default_role, discord.PermissionOverwrite(send_messages=True))
-                raid_channel_overwrite_list.append(everyone_overwrite)
-        meowth_overwrite = (Meowth.user, discord.PermissionOverwrite(send_messages=True, read_messages=True, manage_roles=True))
-        raid_channel_overwrite_list.append(meowth_overwrite)
-        raid_channel = await guild.create_text_channel(raid_channel_name, overwrites=raid_channel_overwrites,category=raid_channel_category)
-        if guild_dict[guild.id]['configure_dict']['invite']['enabled']:
-            for role in guild.role_hierarchy:
-                if role.permissions.manage_guild or role.permissions.manage_channels or role.permissions.manage_messages:
-                    raid_channel_overwrite_list.append((role, discord.PermissionOverwrite(send_messages=True)))
-    elif type == "raid":
-        name = pkmn + "-"
-        raid_channel_overwrite_list = report_channel.overwrites
-        level = get_level(pkmn)
-    elif type == "egg":
-        name = _("level-{level}-egg-").format(level=str(level))
-        raid_channel_overwrite_list = report_channel.overwrites
-    name += sanitize_channel_name(details)
-    cat = get_category(report_channel, str(level), category_type=type)
-    ow = dict(raid_channel_overwrite_list)
-    return await guild.create_text_channel(name, overwrites=ow, category=cat)
+# async def create_raid_channel(type, pkmn, level, details, report_channel):
+#     guild = report_channel.guild
+#     if type == "exraid":
+#         name = _("exraid-egg-")
+#         raid_channel_overwrite_list = channel.overwrites
+#         if guild_dict[guild.id]['configure_dict']['invite']['enabled']:
+#             if guild_dict[guild.id]['configure_dict']['exraid']['permissions'] == "everyone":
+#                 everyone_overwrite = (guild.default_role, discord.PermissionOverwrite(send_messages=False))
+#                 raid_channel_overwrite_list.append(everyone_overwrite)
+#             for overwrite in raid_channel_overwrite_list:
+#                 if isinstance(overwrite[0], discord.Role):
+#                     if overwrite[0].permissions.manage_guild or overwrite[0].permissions.manage_channels or overwrite[0].permissions.manage_messages:
+#                         continue
+#                     overwrite[1].send_messages = False
+#                 elif isinstance(overwrite[0], discord.Member):
+#                     if channel.permissions_for(overwrite[0]).manage_guild or channel.permissions_for(overwrite[0]).manage_channels or channel.permissions_for(overwrite[0]).manage_messages:
+#                         continue
+#                     overwrite[1].send_messages = False
+#                 if (overwrite[0].name not in guild.me.top_role.name) and (overwrite[0].name not in guild.me.name):
+#                     overwrite[1].send_messages = False
+#         else:
+#             if guild_dict[guild.id]['configure_dict']['exraid']['permissions'] == "everyone":
+#                 everyone_overwrite = (guild.default_role, discord.PermissionOverwrite(send_messages=True))
+#                 raid_channel_overwrite_list.append(everyone_overwrite)
+#         meowth_overwrite = (Meowth.user, discord.PermissionOverwrite(send_messages=True, read_messages=True, manage_roles=True))
+#         raid_channel_overwrite_list.append(meowth_overwrite)
+#         raid_channel = await guild.create_text_channel(raid_channel_name, overwrites=raid_channel_overwrites,category=raid_channel_category)
+#         if guild_dict[guild.id]['configure_dict']['invite']['enabled']:
+#             for role in guild.role_hierarchy:
+#                 if role.permissions.manage_guild or role.permissions.manage_channels or role.permissions.manage_messages:
+#                     raid_channel_overwrite_list.append((role, discord.PermissionOverwrite(send_messages=True)))
+#     elif type == "raid":
+#         name = pkmn + "-"
+#         raid_channel_overwrite_list = report_channel.overwrites
+#         level = get_level(pkmn)
+#     elif type == "egg":
+#         name = _("level-{level}-egg-").format(level=str(level))
+#         raid_channel_overwrite_list = report_channel.overwrites
+#     name += sanitize_channel_name(details)
+#     cat = get_category(report_channel, str(level), category_type=type)
+#     ow = dict(raid_channel_overwrite_list)
+#     return await guild.create_text_channel(name, overwrites=ow, category=cat)
 
 @Meowth.command(hidden=True)
 async def template(ctx, *, sample_message):
@@ -743,9 +743,9 @@ async def expire_channel(channel):
                 trainer_dict = copy.deepcopy(
                     guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['trainer_dict'])
                 max_trainer_count = _count_trainers(trainer_dict)
-                h = _('hatched-')
-                new_name = h if h not in channel.name else ''
-                new_name += _('level-{egg_level}-egg-').format(egg_level=guild_dict[guild.id]['raidchannel_dict'][channel.id]['egglevel'])
+                h = _('🐣')
+                new_name = h if h not in channel.name else '🥚'
+                new_name += _('{egg_level}-').format(egg_level=guild_dict[guild.id]['raidchannel_dict'][channel.id]['egglevel'])
                 new_name += sanitize_channel_name(guild_dict[guild.id]['raidchannel_dict'][channel.id]['address'])
                 new_name = "{max_trainer_count}👤".format(max_trainer_count=max_trainer_count) + new_name
                 await channel.edit(name=new_name)
@@ -758,7 +758,7 @@ async def expire_channel(channel):
                 e = _('expired-')
                 new_name = e if e not in channel.name else ''
                 if guild_dict[guild.id]['raidchannel_dict'][channel.id]['type'] == 'egg':
-                    new_name += _('level-{egg_level}-egg-').format(egg_level=guild_dict[guild.id]['raidchannel_dict'][channel.id]['egglevel'])
+                    new_name += _('🐣{egg_level}-').format(egg_level=guild_dict[guild.id]['raidchannel_dict'][channel.id]['egglevel'])
                 else:
                     new_name += _('{}-').format(guild_dict[guild.id]['raidchannel_dict'][channel.id]['pokemon'])
                 new_name += sanitize_channel_name(guild_dict[guild.id]['raidchannel_dict'][channel.id]['address'])
@@ -3404,7 +3404,7 @@ async def changeraid(ctx, newraid):
         await channel.send(_('The channel you entered is not a raid channel.'))
         return
     if newraid.isdigit():
-        raid_channel_name = _('level-{egg_level}-egg-').format(egg_level=newraid)
+        raid_channel_name = _('🥚{egg_level}-').format(egg_level=newraid)
         raid_channel_name += sanitize_channel_name(guild_dict[guild.id]['raidchannel_dict'][channel.id]['address'])
         trainer_dict = copy.deepcopy(guild_dict[channel.guild.id]['raidchannel_dict'][channel.id]['trainer_dict'])
         max_trainer_count = _count_trainers(trainer_dict)
@@ -4411,7 +4411,7 @@ async def _raidegg(ctx, content):
             p_name = get_name(p).title()
             p_type = get_type(message.guild, p)
             boss_list.append((((p_name + ' (') + str(p)) + ') ') + ''.join(p_type))
-        raid_channel_name = _('level-{egg_level}-egg-').format(egg_level=egg_level)
+        raid_channel_name = _('🥚{egg_level}-').format(egg_level=egg_level)
         raid_channel_name += sanitize_channel_name(raid_details)
         raid_channel_name = "0👤" + raid_channel_name
         raid_channel_category = get_category(message.channel, egg_level, category_type="raid")
@@ -4791,7 +4791,7 @@ async def _exraid(ctx, location):
         p_name = get_name(p).title()
         p_type = get_type(message.guild, p)
         boss_list.append((((p_name + ' (') + str(p)) + ') ') + ''.join(p_type))
-    raid_channel_name = _('ex-raid-egg-')
+    raid_channel_name = _('🥚ex-')
     raid_channel_name += sanitize_channel_name(raid_details)
     raid_channel_name = "0👤" + raid_channel_name
     raid_channel_overwrite_list = channel.overwrites

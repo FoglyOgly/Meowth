@@ -1007,7 +1007,7 @@ async def message_cleanup(loop=True):
             for report_dict in report_dict_dict:
                 for reportid in report_dict_dict[report_dict].keys():
                     if report_dict_dict[report_dict][reportid].get('exp', 0) <= time.time():
-                        report_channel = Meowth.get_channel(report_dict_dict[report_dict][reportid].get('reportchannel')
+                        report_channel = Meowth.get_channel(report_dict_dict[report_dict][reportid].get('reportchannel'))
                         if report_channel:
                             user_report = report_dict_dict[report_dict][reportid].get('reportmessage',None)
                             if user_report:

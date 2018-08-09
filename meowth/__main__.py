@@ -972,14 +972,14 @@ async def message_cleanup(loop=True):
             report_delete_dict = {}
             for report_dict in report_dict_dict:
                 for reportid in report_dict_dict[report_dict].keys():
-                    if report_dict_dict[report_dict][reportid]['exp'] <= time.time():
-                        report_channel = Meowth.get_channel(report_dict_dict[report_dict][reportid]['reportchannel'])
+                    if report_dict_dict[report_dict][reportid].get('exp', 0) <= time.time():
+                        report_channel = Meowth.get_channel(report_dict_dict[report_dict][reportid].get('reportchannel'))
                         if report_channel:
                             user_report = report_dict_dict[report_dict][reportid].get('reportmessage',None)
                             if user_report:
                                 report_delete_dict[user_report] = {"action":"delete","channel":report_channel}
                             if report_dict_dict[report_dict][reportid]['expedit'] == "delete":
-                                report_delete_dict[reportid] = {"action":report_dict_dict[report_dict][reportid]['expedit'],"channel":report_channel}
+                                report_delete_dict[reportid] = {"action":"delete","channel":report_channel}
                             else:
                                 report_edit_dict[reportid] = {"action":report_dict_dict[report_dict][reportid]['expedit'],"channel":report_channel}
                         del guild_dict[guildid][report_dict][reportid]
@@ -992,7 +992,7 @@ async def message_cleanup(loop=True):
             for messageid in report_edit_dict.keys():
                 try:
                     report_message = await report_edit_dict[messageid]['channel'].get_message(messageid)
-                    await report_message.edit(content=report_edit_dict[messageid]['action']['content'],embed=discord.Embed(description=report_edit_dict[messageid]['action']['embedcontent'], colour=report_message.embeds[0].colour.value))
+                    await report_message.edit(content=report_edit_dict[messageid]['action']['content'],embed=discord.Embed(description=report_edit_dict[messageid]['action'].get('embedcontent'), colour=report_message.embeds[0].colour.value))
                     await report_message.clear_reactions()
                 except (discord.errors.NotFound, discord.errors.Forbidden, discord.errors.HTTPException, IndexError):
                     pass

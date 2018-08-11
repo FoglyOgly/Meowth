@@ -982,7 +982,10 @@ async def message_cleanup(loop=True):
                                 report_delete_dict[reportid] = {"action":"delete","channel":report_channel}
                             else:
                                 report_edit_dict[reportid] = {"action":report_dict_dict[report_dict][reportid]['expedit'],"channel":report_channel}
-                        del guild_dict[guildid][report_dict][reportid]
+                        try:
+                            del guild_dict[guildid][report_dict][reportid]
+                        except KeyError:
+                            pass
             for messageid in report_delete_dict.keys():
                 try:
                     report_message = await report_delete_dict[messageid]['channel'].get_message(messageid)

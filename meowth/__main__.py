@@ -978,7 +978,7 @@ async def message_cleanup(loop=True):
                             user_report = report_dict_dict[report_dict][reportid].get('reportmessage',None)
                             if user_report:
                                 report_delete_dict[user_report] = {"action":"delete","channel":report_channel}
-                            if report_dict_dict[report_dict][reportid]['expedit'] == "delete":
+                            if report_dict_dict[report_dict][reportid].get('expedit') == "delete":
                                 report_delete_dict[reportid] = {"action":"delete","channel":report_channel}
                             else:
                                 report_edit_dict[reportid] = {"action":report_dict_dict[report_dict][reportid]['expedit'],"channel":report_channel}
@@ -987,14 +987,14 @@ async def message_cleanup(loop=True):
                 try:
                     report_message = await report_delete_dict[messageid]['channel'].get_message(messageid)
                     await report_message.delete()
-                except (discord.errors.NotFound, discord.errors.Forbidden, discord.errors.HTTPException):
+                except (discord.errors.NotFound, discord.errors.Forbidden, discord.errors.HTTPException, KeyError):
                     pass
             for messageid in report_edit_dict.keys():
                 try:
                     report_message = await report_edit_dict[messageid]['channel'].get_message(messageid)
                     await report_message.edit(content=report_edit_dict[messageid]['action']['content'],embed=discord.Embed(description=report_edit_dict[messageid]['action'].get('embedcontent'), colour=report_message.embeds[0].colour.value))
                     await report_message.clear_reactions()
-                except (discord.errors.NotFound, discord.errors.Forbidden, discord.errors.HTTPException, IndexError):
+                except (discord.errors.NotFound, discord.errors.Forbidden, discord.errors.HTTPException, IndexError, KeyError):
                     pass
         # save server_dict changes after cleanup
         logger.info('message_cleanup - SAVING CHANGES')

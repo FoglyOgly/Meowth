@@ -1403,10 +1403,13 @@ async def _save():
         if e.errno != errno.ENOENT:
             raise
     os.rename(tempname, os.path.join('data', 'serverdict'))
-    with tempfile.NamedTemporaryFile('w', dir=os.path.dirname(os.path.join('data', 'serverdict')), delete=False) as tf:
-        json.dump(guild_dict, tf, indent=1)
-        tempname = tf.name
-    os.rename(tempname, os.path.join('data', 'serverdict.json'))
+    try:
+        with tempfile.NamedTemporaryFile('w', dir=os.path.dirname(os.path.join('data', 'serverdict')), delete=False) as tf:
+            json.dump(guild_dict, tf, indent=1)
+            tempname = tf.name
+        os.rename(tempname, os.path.join('data', 'serverdict.json'))
+    except:
+        pass
 
 @Meowth.command()
 @checks.is_owner()

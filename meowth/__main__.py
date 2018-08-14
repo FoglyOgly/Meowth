@@ -4936,7 +4936,7 @@ async def _invite(ctx):
     await reply.delete()
     await exraidmsg.delete()
 
-@Meowth.command(aliases=['res', 'task', 'quest'])
+@Meowth.command(aliases=['res', 'task', 'quest', 't'])
 @checks.allowresearchreport()
 async def research(ctx, *, details = None):
     """Report Field research

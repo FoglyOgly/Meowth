@@ -3714,7 +3714,7 @@ async def profile(ctx, user: discord.Member = None):
     await ctx.send(embed=embed)
 
 @Meowth.command(hidden=True)
-async def epenis(ctx, type="total"):
+async def epenis(ctx, type="total", limit=10):
     """Displays the top ten reporters of a server.
 
     Usage: !leaderboard [type]
@@ -3723,10 +3723,14 @@ async def epenis(ctx, type="total"):
     leaderboard = []
     rank = 1
     field_value = ""
-    typelist = ["total", "raids", "exraids", "wilds", "research", "eggs"]
+    typelist = ["total", "raids", "exraids", "wilds", "research", "eggs", "ranking"]
     type = type.lower()
+    if limit < 1:
+        limit = 1
+    if limit > 1000:
+        limit = 1000
     if type not in typelist:
-        await ctx.send(_("Leaderboard type not supported. Please select from: **total, raids, eggs, exraids, wilds, research**"))
+        await ctx.send(_("Leaderboard type not supported. Please select from: **total, raids, eggs, exraids, wilds, research, ranking**"))
         return
     for trainer in trainers.keys():
         user = ctx.guild.get_member(trainer)
@@ -3736,10 +3740,10 @@ async def epenis(ctx, type="total"):
         eggs = trainers[trainer].setdefault('egg_reports', 0)
         research = trainers[trainer].setdefault('research_reports', 0)
         total_reports = raids + wilds + exraids + eggs + research
-        trainer_stats = {'trainer':trainer, 'total':total_reports, 'raids':raids, 'wilds':wilds, 'research':research, 'exraids':exraids, 'eggs':eggs}
+        trainer_stats = {'trainer':trainer, 'total':total_reports, 'raids':raids, 'wilds':wilds, 'research':research, 'exraids':exraids, 'eggs':eggs, 'ranking':raids+eggs}
         if trainer_stats[type] > 0 and user:
             leaderboard.append(trainer_stats)
-    leaderboard = sorted(leaderboard,key= lambda x: x[type], reverse=True)[:10]
+    leaderboard = sorted(leaderboard,key= lambda x: x[type], reverse=True)[:limit]
     embed = discord.Embed(colour=ctx.guild.me.colour)
     embed.set_author(name=_("Reporting Leaderboard ({type})").format(type=type.title()), icon_url=Meowth.user.avatar_url)
     for trainer in leaderboard:

@@ -5,7 +5,8 @@ def setup(bot):
     team_table.new_columns = [
         schema.IDColumn('team_id', primary_key=True),
         schema.StringColumn('identifier', unique=True),
-        schema.IntColumn('color_id', unique=True)
+        schema.IntColumn('color_id', unique=True),
+        schema.StringColumn('emoji', unique=True)
     ]
 
     team_names_table = bot.dbi.table('team_names')
@@ -26,17 +27,20 @@ def setup(bot):
         {
             "team_id": 1,
             "identifier": "mystic",
-            "color_id": 1
+            "color_id": 1,
+            "emoji": ':mystic:'
         },
         {
             "team_id": 2,
             "identifier": "instinct",
-            "color_id": 2
+            "color_id": 2,
+            "emoji": ':instinct:'
         },
         {
             "team_id": 3,
             "identifier": "valor",
-            "color_id": 3
+            "color_id": 3,
+            "emoji": ':valor:'
         }
     ]
 

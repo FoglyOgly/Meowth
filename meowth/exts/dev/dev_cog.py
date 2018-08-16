@@ -86,7 +86,7 @@ class Dev:
         return content.strip('` \n')
 
     @command(name='eval')
-    @checks.is_owner()
+    @checks.is_co_owner()
     async def _eval(self, ctx, *, body: str):
         """Evaluates provided python code"""
 
@@ -135,12 +135,14 @@ class Dev:
                 await ctx.codeblock(f"{value}{ret}")
 
     @command(name='print')
+    @checks.is_co_owner()
     async def _print(self, ctx, *, body: str):
         """Prints code snippets"""
         ctx.message.content = f'!eval print({body})'
         await ctx.bot.process_commands(ctx.message)
 
     @command()
+    @checks.is_co_owner()
     async def runas(self, ctx, member: discord.Member, *, new_cmd):
         """Run a command as a different member."""
         if await ctx.bot.is_owner(member):
@@ -153,6 +155,7 @@ class Dev:
 
     @command(aliases=['src'])
     @commands.cooldown(rate=2, per=5, type=commands.BucketType.user)
+    @checks.is_co_owner()
     async def source(self, ctx, *, command: BotCommand):
         """Displays the source code for a particular command.
         There is a per-user, 2 times per 5 seconds cooldown in order to prevent spam.
@@ -165,12 +168,14 @@ class Dev:
             await ctx.send(p)
 
     @command()
+    @checks.is_owner()
     async def clear_console(self, ctx):
         """Clear the console"""
         os.system('cls')
         await ctx.ok()
 
     @command()
+    @checks.is_co_owner()
     async def guild(self, ctx, *, guild: Guild):
         """Lookup Guild info"""
         if guild:
@@ -229,11 +234,13 @@ class Dev:
         await ctx.send(embed=embed)
 
     @command(name='say')
+    @checks.is_co_owner()
     async def _say(self, ctx, *, msg):
         """Repeat the given message."""
         await ctx.send(msg)
 
     @command()
+    @checks.is_co_owner()
     async def emoji(self, ctx, emoji):
         emoji_obj = ctx.get.emoji(emoji)
         if not emoji_obj:
@@ -249,6 +256,7 @@ class Dev:
             pass
 
     @command()
+    @checks.is_co_owner()
     async def check_perms(
             self, ctx, member_or_role: Multi(discord.Member, discord.Role),
             guild_or_channel: Multi(
@@ -307,6 +315,7 @@ class Dev:
             await ctx.author.send(embed=embed)
 
     @command()
+    @checks.is_co_owner()
     async def msg(self, ctx, message_id: int, channel=None, guild=None):
         """Returns the raw content, embed and attachment data of a message."""
         if channel and channel.isdigit():

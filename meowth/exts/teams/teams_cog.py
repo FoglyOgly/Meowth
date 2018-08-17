@@ -1,4 +1,5 @@
 from meowth import Cog, command
+from meowth.utils import get_match
 
 from . import teams_checks
 
@@ -35,23 +36,15 @@ class Team:
         argument = argument.lower()
 
         team_table = ctx.bot.dbi.table('teams')
-        team_names_table = ctx.bot.dbi.table('team_names')
-        team_names_query = team_names_table.query('name')
-        team_names = await team_names_query.get_values()
-        color_names_table = ctx.bot.dbi.table('color_names')
-        color_names_query = color_names_table.query('name')
-        color_names = await color_names_query.get_values()
-        if argument in team_names:
-            query = team_names_table.query('team_id')
-            query.where(name=argument)
+        teamcolor_names_table = ctx.bot.dbi.table('teamcolor_names')
+        teamcolor_names_query = teamcolor_names_table.query.select(
+            'team_name', 'color_name')
+        teamcolor_names = await teamcolor_names_query.get_values()
+        match = get_match(teamcolor_names, argument, score_cutoff=80)[0]
+        if match:
+            query = teamcolor_names_table.query('team_id')
+            query.where((team_name=match, color_name=match))
             team_id = await query.get_value()
-        elif argument in color_names:
-            query = color_names_table.query('color_id')
-            query.where(name=argument)
-            color_id = await query.get_value()
-            team_query = team_table.query('team_id')
-            team_query.where(color_id=color_id)
-            team_id = await team_query.get_value()
         else:
             return await ctx.send("Team not found!")
         

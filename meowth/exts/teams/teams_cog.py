@@ -1,6 +1,8 @@
 from meowth import Cog, command
 from meowth.utils import get_match
 
+import discord
+
 from . import teams_checks
 
 class Team:
@@ -10,7 +12,7 @@ class Team:
         self.guild = guild_id
         self.id = team_id
         
-    def role(self):
+    async def role(self):
         settings_table = self.bot.dbi.table('TeamSettings')
         query = settings_table.query()
         if self.id = 1:
@@ -24,7 +26,7 @@ class Team:
         guild = self.bot.get_guild(self.guild)
         role = discord.utils.get(guild.roles, id=result)
     
-    def emoji(self):
+    async def emoji(self):
         team_table = self.bot.dbi.table('teams')
         query = team_table.query('emoji')
         query.where(team_id=self.id)
@@ -58,5 +60,14 @@ class Teams(Cog):
     @teams_checks.team_not_set()
     async def team(self, ctx, *, chosen_team: Team):
         """Set your Pokemon Go team."""
+
+        role = await chosen_team.role()
+        try:
+            await ctx.author.add_roles(role)
+            await ctx.send("Adding role succeeded")
+        except discord.Forbidden:
+            await ctx.send("Missing permissions")
+        except discord.HTTPException:
+            await ctx.send("Adding roles failed")
 
 

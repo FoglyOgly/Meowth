@@ -25,6 +25,7 @@ class Team:
         result = await query.get_value()
         guild = self.bot.get_guild(self.guild)
         role = discord.utils.get(guild.roles, id=result)
+        return role
     
     async def emoji(self):
         team_table = self.bot.dbi.table('teams')

@@ -5,7 +5,7 @@ import asyncpg
 
 from discord.ext.commands import when_mentioned_or
 
-from .schema import Table, Query, Insert, Update
+from .schema import Table, Query, Insert, Update, Schema
 from .tables import core_table_sqls
 from . import sqltypes
 
@@ -153,3 +153,6 @@ class DatabaseInterface:
         table.query.where(table_schema='public')
         table.query.order_by('table_name')
         return await table.query.get()
+    
+    def schema(self, name):
+        return Schema(self, name)

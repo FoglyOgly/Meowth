@@ -279,126 +279,34 @@ class IntervalColumn(Column):
     def __init__(self, name, field=False, **kwargs):
         super().__init__(name, sqltypes.IntervalSQL(field), **kwargs)
 
-class TableOld:
-    """Represents a database table."""
+class Schema:
+    """Represents a database schema."""
 
-    __slots__ = ('name', 'dbi', 'columns', 'current_filter', 'new_columns')
+    __slots__ = ('name', 'dbi')
 
-    def __init__(self, name: str, dbi):
-        self.name = name
+    def __init__(self, dbi, name: str):
         self.dbi = dbi
-        self.current_filter = {}
-        self.columns = Column(name, table=self)
-        self.new_columns = []
-
-    def __str__(self):
-        return self.name
-
-    def where(self, **filters):
-        if filters:
-            self.current_filter = filters
-            return self
-        return self.current_filter
-
-    def clear_filter(self):
-        self.current_filter = {}
-
-    async def _get_columns(self):
-        return await self.dbi.get_table_columns(self.name)
-
-    async def _get_primary(self):
-        return self.dbi.get_table_primary(self.name)
-
-    async def get(self, columns='*', **filters):
-        """Returns values from columns of filtered table."""
-        filters = dict(self.current_filter, **filters)
-        return await self.dbi.get(self.name, columns, **filters)
-
-    async def get_values(self, column='*', **filters):
-        """Returns list of values in a column from filtered table."""
-        filters = dict(self.current_filter, **filters)
-        return await self.dbi.get_values(self.name, column, **filters)
-
-    async def get_value(self, column, **filters):
-        """Returns a single value from a column from filtered table."""
-        filters = dict(self.current_filter, **filters)
-        return await self.dbi.get_value(self.name, column, **filters)
-
-    async def get_first(self, columns='*', **filters):
-        """Returns first row from filtered table."""
-        filters = dict(self.current_filter, **filters)
-        return await self.dbi.get_first(self.name, columns, **filters)
-
-    async def insert(self, **data):
-        """Add record to current table."""
-        data = dict(self.current_filter, **data)
-        return await self.dbi.insert(self.name, **data)
-
-    async def upsert(self, **data):
-        """Add record to current table."""
-        data = dict(self.current_filter, **data)
-        return await self.dbi.upsert(self.name, **data)
-
-    async def update(self, **data):
-        """Add record to current table."""
-        data = dict(self.current_filter, **data)
-        return await self.dbi.upsert(self.name, **data)
-
-    async def delete(self, **filters):
-        """Deletes records from the current table."""
-        filters = dict(self.current_filter, **filters)
-        return await self.dbi.delete(self.name, **filters)
-
-    @classmethod
-    def test_create(cls, name, *columns, primaries=None):
-        """Generate SQL for creating the table."""
-        sql = f"CREATE TABLE {name} ("
-        sql += ', '.join(col.to_sql for col in columns)
-        if primaries:
-            if isinstance(primaries, str):
-                sql += f", CONSTRAINT {name}_pkey PRIMARY KEY ({primaries})"
-            elif isinstance(primaries, (list, tuple, set)):
-                sql += (f", CONSTRAINT {name}_pkey"
-                        f" PRIMARY KEY ({', '.join(primaries)}))")
-        sql += ")"
-        return sql
-
-    async def create(self, *columns, primaries=None):
-        """Create table and return the object representing it."""
-        sql = f"CREATE TABLE {self.name} ("
-        if not columns:
-            if not self.new_columns:
-                raise SchemaError("No columns for created table.")
-            columns = self.new_columns
-        sql += ', '.join(col.to_sql for col in columns)
-        if primaries:
-            if isinstance(primaries, str):
-                sql += f", CONSTRAINT {self.name}_pkey PRIMARY KEY ({primaries})"
-            elif isinstance(primaries, (list, tuple, set)):
-                sql += (f", CONSTRAINT {self.name}_pkey"
-                        f" PRIMARY KEY ({', '.join(primaries)}))")
-        sql += ")"
-        try:
-            await self.dbi.execute_transaction(sql)
-        except PostgresError:
-            raise
-        else:
-            return self
+        self.name = name
 
     async def exists(self):
-        """Create table and return the object representing it."""
-        sql = f"SELECT to_regclass('{self.name}')"
-        try:
-            result = await self.dbi.execute_query(sql)
-        except PostgresError:
-            raise
-        else:
-            return bool(list(result[0])[0])
+        schemata_table = self.dbi.table('information_schema.schemata')
+        query = schemata_table.query('schema_name')
+        result = await query.where(schema_name=self.name).get_value()
+        return bool(result)
 
-    async def drop(self, dbi, name):
-        """Drop table from database."""
-        sql = f"DROP TABLE {name}"
-        return await dbi.execute_transaction(sql)
+    async def drop(self, cascade=False):
+        sql = "DROP SCHEMA $1"
+        if cascade:
+            sql += " CASCADE"
+        return await self.dbi.execute_transaction(sql, self.name)
+
+    async def create(self, skip_if_exists=True):
+        if skip_if_exists:
+            sql = "CREATE SCHEMA IF NOT EXISTS $1"
+        else:
+            sql = "CREATE SCHEMA $1"
+        await self.dbi.execute_transaction(sql, self.name)
+        return self
 
 class TableColumns:
     """Inteface to get and return table columns."""
@@ -434,8 +342,15 @@ class Table:
     __slots__ = ('name', 'dbi', 'columns', 'where', 'new_columns',
                  'query', 'insert', 'update', 'initial_data')
 
-    def __init__(self, name: str, dbi):
+    def __init__(self, name: str, dbi, *, schema=None):
+        if '.' in name and not schema:
+            schema, name = name.split('.', 1)
+            schema = Schema(dbi, schema)
         self.name = name
+        if schema:
+            if isinstance(schema, str):
+                schema = Schema(dbi, schema)
+        self.schema = schema
         self.dbi = dbi
         self.where = SQLConditions(parent=self)
         self.columns = TableColumns(table=self)
@@ -477,7 +392,11 @@ class Table:
 
     async def create(self, *columns, primaries=None):
         """Create table and return the object representing it."""
-        sql = f"CREATE TABLE {self.name} ("
+        if self.schema:
+            await self.schema.create()
+            sql = f"CREATE TABLE {self.schema}.{self.name} ("
+        else:
+            sql = f"CREATE TABLE {self.name} ("
         if not columns:
             if not self.new_columns:
                 raise SchemaError("No columns for created table.")

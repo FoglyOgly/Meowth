@@ -116,8 +116,14 @@ class Column:
         if sum(map(bool, [primary_key, default is not None, unique])) > 1:
             raise SchemaError('Set only one of either primary_key, default or '
                               'unique')
+        if table:
+            if not isinstance(table, Table):
+                raise SchemaError('Table must be Table object')
         self.table = table
         self.aggregate = None
+        if foreign_key:
+            if not isinstance(foreign_key, Column):
+                raise SchemaError('Foreign key must be Column object')
         self.foreign_key = foreign_key
 
     def __str__(self):

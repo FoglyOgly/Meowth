@@ -99,10 +99,11 @@ class SQLComparison:
 
 class Column:
     __slots__ = ('name', 'data_type', 'primary_key', 'required',
-                 'default', 'unique', 'table', 'aggregate')
+                 'default', 'unique', 'table', 'aggregate', 'foreign_key')
 
     def __init__(self, name, data_type=None, *, primary_key=False,
-                 required=False, default=None, unique=False, table=None):
+                 required=False, default=None, unique=False, table=None,
+                 foreign_key=None):
         self.name = name
         if data_type:
             if not isinstance(data_type, sqltypes.SQLType):
@@ -117,6 +118,7 @@ class Column:
                               'unique')
         self.table = table
         self.aggregate = None
+        self.foreign_key = foreign_key
 
     def __str__(self):
         if self.aggregate:
@@ -185,6 +187,10 @@ class Column:
         sql = []
         sql.append(self.name)
         sql.append(self.data_type.to_sql())
+        if self.foreign_key:
+            f_table = self.foreign_key.table.name
+            f_col = self.foreign_key.name
+            sql.append(f"REFERENCES {table} ({col})")
         if self.default is not None:
             if isinstance(self.default, str) and isinstance(self.data_type, str):
                 default = f"'{self.default}'"
@@ -500,7 +506,7 @@ class Table:
         sql = f"DROP TABLE $1"
         return await self.dbi.execute_transaction(sql, (self.name,))
 
-    async def get_contraints(self):
+    async def get_constraints(self):
         """Get column from table."""
         table = Table('information_schema.table_constraints', self.dbi)
         table.query('constrain_name').where(

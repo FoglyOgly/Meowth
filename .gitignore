@@ -11,3 +11,4 @@ __pychache__/
 data/gym_data.json
 venv/
 .idea
+.vscode/

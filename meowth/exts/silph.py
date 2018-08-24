@@ -84,8 +84,8 @@ class SilphCard:
         data = data.get('data', data)
         self.silph_name = silph_username
         self.game_name = data.get('in_game_username')
-        self.url = f'https://sil.ph/{silph_username}.json'
-        self.data_url = f'https://sil.ph/{silph_username}'
+        self.data_url = f'https://sil.ph/{silph_username}.json'
+        self.url = f'https://sil.ph/{silph_username}'
         self.id = data.get('card_id')
         self.home_region = data.get('home_region')
         self.team = data.get('team')

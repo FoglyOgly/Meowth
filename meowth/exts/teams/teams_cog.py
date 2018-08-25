@@ -38,15 +38,14 @@ class Team:
     async def convert(cls, ctx, argument):
         argument = argument.lower()
 
-        team_table = ctx.bot.dbi.table('teams')
-        teamcolor_names_table = ctx.bot.dbi.table('teamcolor_names')
-        teamcolor_names_query = teamcolor_names_table.query.select(
-            'team_name', 'color_name')
-        teamcolor_names = await teamcolor_names_query.get_values()
-        match = get_match(teamcolor_names, argument, score_cutoff=80)[0]
+        team_names_table = ctx.bot.dbi.table('team_names')
+        team_names_query = team_names_table.query.select(
+            'team_name')
+        team_names = await team_names_query.get_values()
+        match = get_match(team_names, argument, score_cutoff=80)[0]
         if match:
-            query = teamcolor_names_table.query('team_id')
-            query.where((team_name=match, color_name=match))
+            query = team_names_table.query('team_id')
+            query.where(team_name=match)
             team_id = await query.get_value()
         else:
             return await ctx.send("Team not found!")

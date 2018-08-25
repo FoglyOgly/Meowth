@@ -1,5 +1,6 @@
 import asyncio
 import textwrap
+import gettext
 
 from aiocontextvars import enable_inherit, ContextVar
 
@@ -31,6 +32,7 @@ class Context(commands.Context):
             self.guild_dm = self.bot.data.guild(self.guild.id)
             self.setting = self.guild_dm.settings
         self.get = GetTools(self)
+        self.language = 'en'
 
     def get_text(self, content):
         return content

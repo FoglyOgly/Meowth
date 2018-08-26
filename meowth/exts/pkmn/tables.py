@@ -28,3 +28,5 @@ def setup(bot):
         schema.StringColumn('evo_cost_item'),
         schema.StringColumn('evo_condition')
     ]
+
+    return pokemon_table

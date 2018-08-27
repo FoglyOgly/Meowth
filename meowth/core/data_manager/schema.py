@@ -126,60 +126,64 @@ class Column:
                 raise SchemaError('Foreign key must be Column object')
         self.foreign_key = foreign_key
 
+    @property
+    def full_name(self):
+        return f"{self.table}.{self.name}" if self.table else self.name
+
     def __str__(self):
         if self.aggregate:
-            return f"{self.aggregate} ({self.name})"
+            return f"{self.aggregate} ({self.full_name})"
         else:
-            return self.name
+            return self.full_name
 
     def __lt__(self, value):
         return SQLComparison(
-            SQLOperator.lt(), self.aggregate, self.name, value)
+            SQLOperator.lt(), self.aggregate, self.full_name, value)
 
     def __le__(self, value):
         return SQLComparison(
-            SQLOperator.le(), self.aggregate, self.name, value)
+            SQLOperator.le(), self.aggregate, self.full_name, value)
 
     def __eq__(self, value):
         return SQLComparison(
-            SQLOperator.eq(), self.aggregate, self.name, value)
+            SQLOperator.eq(), self.aggregate, self.full_name, value)
 
     def __ne__(self, value):
         return SQLComparison(
-            SQLOperator.ne(), self.aggregate, self.name, value)
+            SQLOperator.ne(), self.aggregate, self.full_name, value)
 
     def __gt__(self, value):
         return SQLComparison(
-            SQLOperator.gt(), self.aggregate, self.name, value)
+            SQLOperator.gt(), self.aggregate, self.full_name, value)
 
     def __ge__(self, value):
         return SQLComparison(
-            SQLOperator.ge(), self.aggregate, self.name, value)
+            SQLOperator.ge(), self.aggregate, self.full_name, value)
 
     def like(self, value):
         return SQLComparison(
-            SQLOperator.like(), self.aggregate, self.name, value)
+            SQLOperator.like(), self.aggregate, self.full_name, value)
 
     def ilike(self, value):
         return SQLComparison(
-            SQLOperator.ilike(), self.aggregate, self.name, value)
+            SQLOperator.ilike(), self.aggregate, self.full_name, value)
 
     def not_like(self, value):
         return SQLComparison(
-            SQLOperator.not_like(), self.aggregate, self.name, value)
+            SQLOperator.not_like(), self.aggregate, self.full_name, value)
 
     def not_ilike(self, value):
         return SQLComparison(
-            SQLOperator.not_ilike(), self.aggregate, self.name, value)
+            SQLOperator.not_ilike(), self.aggregate, self.full_name, value)
 
     def between(self, minvalue, maxvalue):
         return SQLComparison(
-            SQLOperator.between(), self.aggregate, self.name,
+            SQLOperator.between(), self.aggregate, self.full_name,
             minvalue=minvalue, maxvalue=maxvalue)
 
     def in_(self, value):
         return SQLComparison(
-            SQLOperator.in_(), self.aggregate, self.name, value)
+            SQLOperator.in_(), self.aggregate, self.full_name, value)
 
     @classmethod
     def from_dict(cls, data):
@@ -191,12 +195,8 @@ class Column:
     @property
     def to_sql(self):
         sql = []
-        sql.append(self.name)
+        sql.append(self.full_name)
         sql.append(self.data_type.to_sql())
-        if self.foreign_key:
-            f_table = self.foreign_key.table.name
-            f_col = self.foreign_key.name
-            sql.append(f"REFERENCES {table} ({col})")
         if self.default is not None:
             if isinstance(self.default, str) and isinstance(self.data_type, str):
                 default = f"'{self.default}'"
@@ -240,7 +240,7 @@ class Column:
         if not self.table:
             return None
         data = dict(self.table.current_filter)
-        data[self.name] = value
+        data[self.full_name] = value
         return await self.table.upsert(**data)
 
     async def get(self, **filters):
@@ -340,7 +340,7 @@ class Table:
     """Represents a database table."""
 
     __slots__ = ('name', 'dbi', 'columns', 'where', 'new_columns',
-                 'query', 'insert', 'update', 'initial_data')
+                 'query', 'insert', 'update', 'initial_data', 'schema')
 
     def __init__(self, name: str, dbi, *, schema=None):
         if '.' in name and not schema:
@@ -419,12 +419,8 @@ class Table:
     async def exists(self):
         """Create table and return the object representing it."""
         sql = f"SELECT to_regclass('{self.name}')"
-        try:
-            result = await self.dbi.execute_query(sql)
-        except PostgresError:
-            raise
-        else:
-            return bool(list(result[0])[0])
+        result = await self.dbi.execute_query(sql)
+        return bool(list(result[0])[0])
 
     async def drop(self):
         """Drop table from database."""
@@ -499,8 +495,11 @@ class SQLConditions:
                     continue
                 data = dict(column=condition.column)
                 if condition.value is not None:
-                    data.update(value=f"${self._count}")
-                    self.values.append(condition.value)
+                    if isinstance(condition.value, Column):
+                        data.update(value=str(condition.value))
+                    else:
+                        data.update(value=f"${self._count}")
+                        self.values.append(condition.value)
                 else:
                     data.update(minvalue=f"${self._count}")
                     self.values.append(condition.minvalue)
@@ -533,7 +532,7 @@ class SQLConditions:
 
 class Query:
     """Builds a database query."""
-    def __init__(self, dbi, table=None):
+    def __init__(self, dbi, *tables):
         self._dbi = dbi
         self._select = ['*']
         self._distinct = False
@@ -541,8 +540,8 @@ class Query:
         self._order_by = []
         self._sort = ''
         self._from = set()
-        if table:
-            self.table(table)
+        if tables:
+            self.table(*tables)
         self._limit = None
         self._offset = None
         self.conditions = SQLConditions(parent=self)
@@ -583,7 +582,7 @@ class Query:
     def group_by(self, *columns):
         for col in columns:
             if isinstance(col, Column):
-                self._group_by.append(col.name)
+                self._group_by.append(col.full_name)
             elif isinstance(col, str):
                 self._group_by.append(col)
         return self
@@ -597,7 +596,7 @@ class Query:
             sort = ''
         for col in columns:
             if isinstance(col, Column):
-                self._order_by.append(f"{col.name}{sort}")
+                self._order_by.append(f"{col.full_name}{sort}")
             elif isinstance(col, str):
                 self._order_by.append(f"{col}{sort}")
         return self

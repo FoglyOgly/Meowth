@@ -2,6 +2,7 @@ import asyncio
 import os
 import sys
 import json
+import traceback
 from datetime import timezone
 import logging
 from logging import handlers
@@ -103,7 +104,8 @@ class DBLogHandler(logging.Handler):
                     func_name=str(record.funcName),
                     line_no=record.lineno,
                     message=str(record.message),
-                    traceback=str(record.exc_info))
+                    traceback=''.join(
+                        traceback.format_exception(*record.exc_info)))
         try:
             table = self.bot.dbi.table(self.log_name)
             table.insert(**data)

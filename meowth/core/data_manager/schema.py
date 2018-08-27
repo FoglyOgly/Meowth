@@ -288,6 +288,9 @@ class Schema:
         self.dbi = dbi
         self.name = name
 
+    def __str__(self):
+        return self.name
+
     async def exists(self):
         schemata_table = self.dbi.table('information_schema.schemata')
         query = schemata_table.query('schema_name')
@@ -333,7 +336,9 @@ class TableColumns:
 
     async def get_primaries(self):
         kcu = Table('information_schema.key_column_usage', self._dbi)
-        query = kcu.query('column_name').where(TABLE_NAME=self._table.name)
+        query = kcu.query('column_name').where(
+            table_name=self._table.name,
+            constraint_name=f"{self._table.name}_pkey")
         return await query.get_values()
 
 class Table:
@@ -360,8 +365,12 @@ class Table:
         self.insert = Insert(dbi, self)
         self.update = Update(dbi, self)
 
+    @property
+    def full_name(self):
+        return f"{self.schema}.{self.name}" if self.schema else self.name
+
     def __str__(self):
-        return self.name
+        return self.full_name
 
     def __hash__(self):
         return hash(str(self))
@@ -394,9 +403,7 @@ class Table:
         """Create table and return the object representing it."""
         if self.schema:
             await self.schema.create()
-            sql = f"CREATE TABLE {self.schema}.{self.name} ("
-        else:
-            sql = f"CREATE TABLE {self.name} ("
+        sql = f"CREATE TABLE {self.full_name} ("
         if not columns:
             if not self.new_columns:
                 raise SchemaError("No columns for created table.")
@@ -418,14 +425,14 @@ class Table:
 
     async def exists(self):
         """Create table and return the object representing it."""
-        sql = f"SELECT to_regclass('{self.name}')"
+        sql = f"SELECT to_regclass('{self.full_name}')"
         result = await self.dbi.execute_query(sql)
         return bool(list(result[0])[0])
 
     async def drop(self):
         """Drop table from database."""
         sql = f"DROP TABLE $1"
-        return await self.dbi.execute_transaction(sql, (self.name,))
+        return await self.dbi.execute_transaction(sql, (self.full_name,))
 
     async def get_constraints(self):
         """Get column from table."""
@@ -624,7 +631,7 @@ class Query:
             else:
                 select_names = [str(c) for c in self._select]
                 sql.append(f"{select_str} {', '.join(select_names)}")
-        table_names = [t.name for t in self._from]
+        table_names = [t.full_name for t in self._from]
         sql.append(f"FROM {', '.join(table_names)}")
         if self.conditions.where_conditions:
             con_sql = self.conditions.where_conditions

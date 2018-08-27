@@ -8,13 +8,14 @@ import json
 import logging
 from datetime import datetime
 from contextlib import redirect_stdout
+from subprocess import Popen, PIPE
 
 import pathlib
 
 import discord
 from discord.ext import commands
 
-from meowth import checks, command
+from meowth import checks, command, group
 from meowth.utils import make_embed, get_match
 from meowth.utils.formatters import ilcode
 from meowth.utils.converters import BotCommand, Guild, Multi
@@ -393,3 +394,16 @@ class Dev:
         if len(results) == 1:
             results = results[0]
         await ctx.codeblock(str(results), "")
+
+    @group()
+    @checks.is_owner()
+    async def git(self, ctx):
+        ctx.git_path = os.path.dirname(ctx.bot.eevee_dir)
+        ctx.git_cmd = ['git']
+
+    @git.command()
+    async def pull(self, ctx):
+        ctx.git_cmd.append('pull')
+
+        p = Popen(ctx.git_cmd, stdout=PIPE, cwd=ctx.git_path)
+        await ctx.codeblock(p.stdout.read().decode("utf-8"), syntax="")

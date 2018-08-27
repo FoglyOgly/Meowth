@@ -412,8 +412,8 @@ class Table:
                         f" PRIMARY KEY ({', '.join(primaries)})")
         sql += ")"
         await self.dbi.execute_transaction(sql)
-        if self.new_columns:
-            await self.insert.rows(self.new_columns).commit(do_update=False)
+        if self.initial_data:
+            await self.insert.rows(self.initial_data).commit(do_update=False)
         return self
 
     async def exists(self):

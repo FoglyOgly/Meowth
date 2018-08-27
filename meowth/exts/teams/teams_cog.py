@@ -15,11 +15,11 @@ class Team:
     async def role(self):
         settings_table = self.bot.dbi.table('TeamSettings')
         query = settings_table.query()
-        if self.id = 1:
+        if self.id == 1:
             query.select('blue_role_id')
-        elif self.id = 2:
+        elif self.id == 2:
             query.select('red_role_id')
-        elif self.id = 3:
+        elif self.id == 3:
             query.select('yellow_role_id')
         query.where(guild_id=self.guild)
         result = await query.get_value()

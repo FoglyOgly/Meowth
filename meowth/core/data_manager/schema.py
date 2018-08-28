@@ -209,6 +209,10 @@ class Column:
             sql.append('UNIQUE')
         if self.required:
             sql.append('NOT NULL')
+        if self.foreign_key:
+            fk_table = self.foreign_key.table.full_name
+            fk_name = self.foreign_key.name
+            sql.append(f'REFERENCES {fk_table} ({fk_name})')
         return ' '.join(sql)
 
     @property

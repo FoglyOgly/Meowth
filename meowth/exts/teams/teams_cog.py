@@ -30,7 +30,7 @@ class Team:
     async def emoji(self):
         team_table = self.bot.dbi.table('teams')
         query = team_table.query('emoji')
-        query.where(team_id=self.id)
+        query.where(team_id==self.id)
         result = await query.get_value()
         return result
 
@@ -45,7 +45,7 @@ class Team:
         match = get_match(team_names, argument, score_cutoff=80)[0]
         if match:
             query = team_names_table.query('team_id')
-            query.where(team_name=match)
+            query.where(team_name==match)
             team_id = await query.get_value()
         else:
             return await ctx.send("Team not found!")

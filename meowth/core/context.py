@@ -39,8 +39,14 @@ class Context(commands.Context):
 
     def language(self):
         try:
-            return self.bot.guild_languages[self.guild.id]
+            return self.bot.guild_languages[self.guild.id]['bot']
         except (AttributeError, KeyError):
+            return None
+
+    def pkmn_language(self):
+        try:
+            return self.bot.guild_languages[self.guild.id]['pokemon']
+        except (AttributeError KeyError):
             return None
 
     async def codeblock(self, contents, syntax="py", send=True, title=None):

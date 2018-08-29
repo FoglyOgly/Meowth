@@ -2,11 +2,11 @@ from meowth.core.data_manager import schema
 
 def setup(bot):
     team_table = bot.dbi.table('teams')
-    # color_table = bot.dbi.table('colors')
+    color_table = bot.dbi.table('colors')
     team_table.new_columns = [
         schema.IDColumn('team_id', primary_key=True),
         schema.IDColumn('color_id', unique=True,
-            # foreign_key=colors['color_id']
+            foreign_key=colors['color_id']
             ),
         schema.StringColumn('identifier', unique=True),
         schema.StringColumn('emoji', unique=True)

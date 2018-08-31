@@ -13,15 +13,15 @@ class Team:
         self.id = team_id
         
     async def role(self):
-        settings_table = self.bot.dbi.table('TeamSettings')
+        settings_table = self.bot.dbi.table('guild_config')
         query = settings_table.query()
-        if self.id == 1:
-            query.select('blue_role_id')
-        elif self.id == 2:
-            query.select('red_role_id')
-        elif self.id == 3:
-            query.select('yellow_role_id')
         query.where(guild_id=self.guild)
+        if self.id == 1:
+            query.where(config_name='blue_role_id')
+        elif self.id == 2:
+            query.where(config_name='red_role_id')
+        elif self.id == 3:
+            query.where(config_name='yellow_role_id')
         result = await query.get_value()
         guild = self.bot.get_guild(self.guild)
         role = discord.utils.get(guild.roles, id=result)

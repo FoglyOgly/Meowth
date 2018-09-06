@@ -972,29 +972,32 @@ async def message_cleanup(loop=True):
             report_delete_dict = {}
             for report_dict in report_dict_dict:
                 for reportid in report_dict_dict[report_dict].keys():
-                    if report_dict_dict[report_dict][reportid]['exp'] <= time.time():
-                        report_channel = Meowth.get_channel(report_dict_dict[report_dict][reportid]['reportchannel'])
+                    if report_dict_dict[report_dict][reportid].get('exp', 0) <= time.time():
+                        report_channel = Meowth.get_channel(report_dict_dict[report_dict][reportid].get('reportchannel'))
                         if report_channel:
                             user_report = report_dict_dict[report_dict][reportid].get('reportmessage',None)
                             if user_report:
                                 report_delete_dict[user_report] = {"action":"delete","channel":report_channel}
-                            if report_dict_dict[report_dict][reportid]['expedit'] == "delete":
-                                report_delete_dict[reportid] = {"action":report_dict_dict[report_dict][reportid]['expedit'],"channel":report_channel}
+                            if report_dict_dict[report_dict][reportid].get('expedit') == "delete":
+                                report_delete_dict[reportid] = {"action":"delete","channel":report_channel}
                             else:
                                 report_edit_dict[reportid] = {"action":report_dict_dict[report_dict][reportid]['expedit'],"channel":report_channel}
-                        del guild_dict[guildid][report_dict][reportid]
+                        try:
+                            del guild_dict[guildid][report_dict][reportid]
+                        except KeyError:
+                            pass
             for messageid in report_delete_dict.keys():
                 try:
                     report_message = await report_delete_dict[messageid]['channel'].get_message(messageid)
                     await report_message.delete()
-                except (discord.errors.NotFound, discord.errors.Forbidden, discord.errors.HTTPException):
+                except (discord.errors.NotFound, discord.errors.Forbidden, discord.errors.HTTPException, KeyError):
                     pass
             for messageid in report_edit_dict.keys():
                 try:
                     report_message = await report_edit_dict[messageid]['channel'].get_message(messageid)
-                    await report_message.edit(content=report_edit_dict[messageid]['action']['content'],embed=discord.Embed(description=report_edit_dict[messageid]['action']['embedcontent'], colour=report_message.embeds[0].colour.value))
+                    await report_message.edit(content=report_edit_dict[messageid]['action']['content'],embed=discord.Embed(description=report_edit_dict[messageid]['action'].get('embedcontent'), colour=report_message.embeds[0].colour.value))
                     await report_message.clear_reactions()
-                except (discord.errors.NotFound, discord.errors.Forbidden, discord.errors.HTTPException, IndexError):
+                except (discord.errors.NotFound, discord.errors.Forbidden, discord.errors.HTTPException, IndexError, KeyError):
                     pass
         # save server_dict changes after cleanup
         logger.info('message_cleanup - SAVING CHANGES')
@@ -1244,7 +1247,7 @@ async def on_raw_reaction_add(payload):
     channel = Meowth.get_channel(payload.channel_id)
     try:
         message = await channel.get_message(payload.message_id)
-    except (discord.errors.NotFound, AttributeError):
+    except (discord.errors.NotFound, AttributeError, discord.Forbidden):
         return
     guild = message.guild
     try:
@@ -2358,7 +2361,7 @@ async def _configure_raid(ctx):
                             await owner.send(embed=discord.Embed(colour=discord.Colour.orange(),description=msg))
                             continue
                     else:
-                        msg = _("The number of categories I found in your server doesn't match the number of raid levels! Make sure you give me exactly six categories, one for each level of raid. You can use the same category for multiple levels if you want, but I need to see six category names.\n\n**Matched Categories:** {catlist}\n\nPlease double check your categories.").format(catlist=', '.join(levelcat_names) if len(levelcat_list)>0 else "None")
+                        msg = _("The number of categories I found in your server doesn't match the number of raid levels! Make sure you give me exactly six categories, one for each level of raid. You can use the same category for multiple levels if you want, but I need to see five category names.\n\n**Matched Categories:** {catlist}\n\nPlease double check your categories.").format(catlist=', '.join(levelcat_names) if len(levelcat_list)>0 else "None")
                         if levelcat_errors:
                             msg += _("\n\nThe following aren't in your server: **{invalid_categories}**").format(invalid_categories=', '.join(levelcat_errors))
                         await owner.send(embed=discord.Embed(colour=discord.Colour.orange(), description=msg))

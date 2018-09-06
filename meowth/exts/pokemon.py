@@ -78,14 +78,16 @@ class Pokemon():
 
         shiny_list = [
             1, 2, 3, 4, 5, 6, 7, 8, 9, 25, 26, 90, 91, 126, 129, 130,
-            138, 139, 140, 141, 142, 144, 147, 148, 149, 172, 175, 176,
-            179, 180, 181, 198, 202, 240, 246, 247, 248, 249, 250, 261,
-            262, 296, 297, 302, 303, 304, 305, 306, 307, 308, 311, 312,
-            315, 320, 321, 333, 334, 353, 354, 355, 356, 359, 360, 361,
-            362, 370, 382
+            133, 134, 135, 136, 138, 139, 140, 141, 142, 144, 145, 147, 
+            148, 149, 172, 175, 176, 177, 178, 179, 180, 181, 191, 192, 
+            196, 197, 198, 202, 204, 205, 209, 210, 228, 229, 240, 246, 
+            247, 248, 249, 250, 261, 262, 296, 297, 302, 303, 304, 305, 
+            306, 307, 308, 311, 312, 315, 320, 321, 333, 334, 353, 354, 
+            355, 356, 359, 360, 361, 362, 370, 382
         ]
 
-        alolan_list = [19, 20, 27, 28, 37, 38, 52, 53, 88, 89, 103]
+        alolan_list = [19, 20, 26, 27, 28, 37, 38, 
+            50, 51, 52, 53, 74, 75, 76, 88, 89, 103, 105]
 
         form_dict = {
             7: ['sunglasses'],
@@ -95,6 +97,7 @@ class Pokemon():
             26:  ['ash', 'party', 'witch', 'santa', 'summer'],
             172:  ['ash', 'party', 'witch', 'santa', 'summer'],
             201: list(ascii_lowercase) + ['!', '?'],
+            327: ['1', '2', '3', '4', '5', '6', '7', '8'],
             351: ['normal', 'rainy', 'snowy', 'sunny'],
             386: ['defense', 'normal', 'attack', 'speed']
         }
@@ -375,9 +378,10 @@ class Pokemon():
         form_list = [
             'normal', 'sunny', 'rainy', 'snowy', 'sunglasses',
             'ash', 'party', 'witch', 'santa', 'summer',
-            'defense', 'normal', 'attack', 'speed'
+            'defense', 'normal', 'attack', 'speed',
+            '1', '2', '3', '4', '5', '6', '7', '8', '!', '?'
         ]
-        form_list.extend([' ' + c for c in ascii_lowercase])
+        form_list.extend(' ' + c for c in ascii_lowercase)
         f = next((x for x in form_list if x in argument.lower()), None)
         if f:
             form = f.strip()
@@ -425,9 +429,10 @@ class Pokemon():
         form_list = [
             'normal', 'sunny', 'rainy', 'snowy', 'sunglasses',
             'ash', 'party', 'witch', 'santa', 'summer',
-            'defense', 'normal', 'attack', 'speed'
+            'defense', 'normal', 'attack', 'speed',
+            '1', '2', '3', '4', '5', '6', '7', '8', '!', '?'
         ]
-        form_list.extend([' ' + c for c in ascii_lowercase])
+        form_list.extend(' ' + c for c in ascii_lowercase)
         f = next((x for x in form_list if x in argument.lower()), None)
         if f:
             form = f.strip()

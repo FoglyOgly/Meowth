@@ -43,10 +43,10 @@ https://discord.gg/hhVjAN8
 
 ## Docker
 ### Build
-docker build --rm --file=Dockerfile --tag=meowth:latest . 
+`docker build --rm --file=Dockerfile --tag=meowth:latest .`
 
 ### Run
-docker run --rm --volume=$(pwd):/opt/Meowth meowth:latest
+`docker run --rm --volume=$(pwd):/opt/Meowth meowth:latest`
 
 
 ## Dependancies

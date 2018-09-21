@@ -54,7 +54,7 @@ class DataHandler:
                 for pkmnno in vals["pokemon"]:
                     leveldata.append(f"#{pkmnno} - {self.get_name(pkmnno)}")
                 leveldata = '\n'.join(leveldata)
-                data.append(f"**Raid {pkmnlvl} Pokemon**\n{leveldata}\n")
+                #data.append(f"**Raid {pkmnlvl} Pokemon**\n{leveldata}\n")
                 data.append(f"**Raid {pkmnlvl} Pokemon (hatchtime: {vals['hatchtime']}, raidtime: {vals['raidtime']})**\n{leveldata}\n")
         data_str = '\n'.join(data)
         await ctx.send(f"**{title}**\n{data_str}")

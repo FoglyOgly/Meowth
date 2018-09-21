@@ -55,6 +55,7 @@ class DataHandler:
                     leveldata.append(f"#{pkmnno} - {self.get_name(pkmnno)}")
                 leveldata = '\n'.join(leveldata)
                 data.append(f"**Raid {pkmnlvl} Pokemon**\n{leveldata}\n")
+                data.append(f"**Raid {pkmnlvl} Pokemon (hatchtime: {vals['hatchtime']}, raidtime: {vals['raidtime']})**\n{leveldata}\n")
         data_str = '\n'.join(data)
         await ctx.send(f"**{title}**\n{data_str}")
 
@@ -180,6 +181,19 @@ class DataHandler:
         with open(ctx.bot.raid_json_path, 'w') as fd:
             json.dump(self.raid_info, fd, indent=4)
         await ctx.message.add_reaction('\u2705')
+
+    @raiddata.command(name='hatchtime', aliases=['raidtime'])
+    async def change_time(self, ctx, level, duration):
+        """Mets à jour la durée des raids et hatchtime `!raiddata hatchtime 1 15` or `!raiddata raidtime 1 90`"""
+        timetype = ctx.invoked_with
+        if duration.isdigit():
+            try:
+                self.raid_info['raid_eggs'][level][timetype] = int(duration)
+                return await ctx.send(f"{timetype} of level {level} raid changed to {duration} minutes")
+            except KeyError:
+                return await ctx.send('Invalid raid level specified.')
+        else:
+            return await ctx.send(f"{duration} must be a number")
 
 def setup(bot):
     bot.add_cog(DataHandler(bot))

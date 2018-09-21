@@ -195,7 +195,7 @@ def get_number(pkm_name):
         number = None
     return number
 
-def get_level(pkmn):
+def get_level(pkmn, max_lvl=5):
     if str(pkmn).isdigit():
         pkmn_number = pkmn
     else:
@@ -203,6 +203,8 @@ def get_level(pkmn):
     for level in raid_info['raid_eggs']:
         for level, pkmn_list in raid_info['raid_eggs'].items():
             if pkmn_number in pkmn_list["pokemon"]:
+                if str(level).isdigit() and str(level) != str(min([max_lvl, int(level)])):
+                    return str(max_lvl)
                 return level
 
 def get_raidlist():
@@ -978,23 +980,26 @@ async def message_cleanup(loop=True):
                             user_report = report_dict_dict[report_dict][reportid].get('reportmessage',None)
                             if user_report:
                                 report_delete_dict[user_report] = {"action":"delete","channel":report_channel}
-                            if report_dict_dict[report_dict][reportid]['expedit'] == "delete":
+                            if report_dict_dict[report_dict][reportid].get('expedit') == "delete":
                                 report_delete_dict[reportid] = {"action":"delete","channel":report_channel}
                             else:
                                 report_edit_dict[reportid] = {"action":report_dict_dict[report_dict][reportid]['expedit'],"channel":report_channel}
-                        del guild_dict[guildid][report_dict][reportid]
+                        try:
+                            del guild_dict[guildid][report_dict][reportid]
+                        except KeyError:
+                            pass
             for messageid in report_delete_dict.keys():
                 try:
                     report_message = await report_delete_dict[messageid]['channel'].get_message(messageid)
                     await report_message.delete()
-                except (discord.errors.NotFound, discord.errors.Forbidden, discord.errors.HTTPException):
+                except (discord.errors.NotFound, discord.errors.Forbidden, discord.errors.HTTPException, KeyError):
                     pass
             for messageid in report_edit_dict.keys():
                 try:
                     report_message = await report_edit_dict[messageid]['channel'].get_message(messageid)
                     await report_message.edit(content=report_edit_dict[messageid]['action']['content'],embed=discord.Embed(description=report_edit_dict[messageid]['action'].get('embedcontent'), colour=report_message.embeds[0].colour.value))
                     await report_message.clear_reactions()
-                except (discord.errors.NotFound, discord.errors.Forbidden, discord.errors.HTTPException, IndexError):
+                except (discord.errors.NotFound, discord.errors.Forbidden, discord.errors.HTTPException, IndexError, KeyError):
                     pass
         # save server_dict changes after cleanup
         logger.info('message_cleanup - SAVING CHANGES')
@@ -4418,8 +4423,18 @@ async def _raidegg(message, content):
         egg_level = str(egg_level)
         egg_info = raid_info['raid_eggs'][egg_level]
         egg_img = egg_info['egg_img']
+
+        # account for psuedo level 6 boosted raids
+        pkmn_list = []
+        if egg_level == '5':
+            try:
+                pkmn_list.extend(raid_info['raid_eggs']['6']['pokemon'])
+            except KeyError:
+                pass
+        pkmn_list.extend(egg_info['pokemon'])
+
         boss_list = []
-        for p in egg_info['pokemon']:
+        for p in pkmn_list:
             p_name = get_name(p).title()
             p_type = get_type(message.guild, p)
             boss_list.append((((p_name + ' (') + str(p)) + ') ') + ''.join(p_type))
@@ -4438,7 +4453,7 @@ async def _raidegg(message, content):
         if gyms:
             gym_info = _("**Name:** {0}\n**Notes:** {1}").format(raid_details, gym_note)
             raid_embed.add_field(name=_('**Gym:**'), value=gym_info, inline=False)
-        if len(egg_info['pokemon']) > 1:
+        if len(pkmn_list) > 1:
             raid_embed.add_field(name=_('**Possible Bosses:**'), value=_('{bosslist1}').format(bosslist1='\n'.join(boss_list[::2])), inline=True)
             raid_embed.add_field(name='\u200b', value=_('{bosslist2}').format(bosslist2='\n'.join(boss_list[1::2])), inline=True)
         else:
@@ -5889,7 +5904,9 @@ async def counters(ctx, *, args = None):
 
 async def _counters(ctx, pkmn, user = None, weather = None, movesetstr = "Unknown Moveset"):
     img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=4'.format(str(get_number(pkmn)).zfill(3))
-    level = get_level(pkmn) if get_level(pkmn).isdigit() else "5"
+    level = get_level(pkmn, max_lvl=6)
+    if not level.isdigit():
+        level = "5"
     url = "https://fight.pokebattler.com/raids/defenders/{pkmn}/levels/RAID_LEVEL_{level}/attackers/".format(pkmn=pkmn.replace('-','_').upper(),level=level)
     if user:
         url += "users/{user}/".format(user=user)
@@ -5972,7 +5989,9 @@ async def _get_generic_counters(guild, pkmn, weather=None):
     ctrs_dict[ctrs_index]['moveset'] = "Unknown Moveset"
     ctrs_dict[ctrs_index]['emoji'] = '0\u20e3'
     img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=4'.format(str(get_number(pkmn)).zfill(3))
-    level = get_level(pkmn) if get_level(pkmn).isdigit() else "5"
+    level = get_level(pkmn, max_lvl=6)
+    if not level.isdigit():
+        level = "5"
     url = "https://fight.pokebattler.com/raids/defenders/{pkmn}/levels/RAID_LEVEL_{level}/attackers/".format(pkmn=pkmn.replace('-','_').upper(),level=level)
     url += "levels/30/"
     weather_list = [_('none'), _('extreme'), _('clear'), _('sunny'), _('rainy'),
@@ -7205,7 +7224,17 @@ async def _bosslist(ctx):
     boss_dict = {}
     boss_list = []
     boss_dict["unspecified"] = {"type": "❔", "total": 0, "maybe": 0, "coming": 0, "here": 0}
-    for p in egg_info['pokemon']:
+
+    # account for psuedo level 6 boosted raids
+    pkmn_list = []
+    if egg_level == '5':
+        try:
+            pkmn_list.extend(raid_info['raid_eggs']['6']['pokemon'])
+        except KeyError:
+            pass
+    pkmn_list.extend(egg_info['pokemon'])
+
+    for p in pkmn_list:
         p_name = get_name(p).title()
         boss_list.append(p_name.lower())
         p_type = get_type(message.guild,p)

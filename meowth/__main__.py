@@ -195,7 +195,7 @@ def get_number(pkm_name):
         number = None
     return number
 
-def get_level(pkmn):
+def get_level(pkmn, max_lvl=5):
     if str(pkmn).isdigit():
         pkmn_number = pkmn
     else:
@@ -203,6 +203,8 @@ def get_level(pkmn):
     for level in raid_info['raid_eggs']:
         for level, pkmn_list in raid_info['raid_eggs'].items():
             if pkmn_number in pkmn_list["pokemon"]:
+                if str(level).isdigit() and str(level) != str(min([max_lvl, int(level)])):
+                    return str(max_lvl)
                 return level
 
 def get_raidlist():
@@ -5881,7 +5883,9 @@ async def counters(ctx, *, args = None):
 
 async def _counters(ctx, pkmn, user = None, weather = None, movesetstr = "Unknown Moveset"):
     img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=4'.format(str(get_number(pkmn)).zfill(3))
-    level = get_level(pkmn) if get_level(pkmn).isdigit() else "5"
+    level = get_level(pkmn, max_lvl=6)
+    if not level.isdigit():
+        level = "5"
     url = "https://fight.pokebattler.com/raids/defenders/{pkmn}/levels/RAID_LEVEL_{level}/attackers/".format(pkmn=pkmn.replace('-','_').upper(),level=level)
     if user:
         url += "users/{user}/".format(user=user)
@@ -5964,7 +5968,9 @@ async def _get_generic_counters(guild, pkmn, weather=None):
     ctrs_dict[ctrs_index]['moveset'] = "Unknown Moveset"
     ctrs_dict[ctrs_index]['emoji'] = '0\u20e3'
     img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=4'.format(str(get_number(pkmn)).zfill(3))
-    level = get_level(pkmn) if get_level(pkmn).isdigit() else "5"
+    level = get_level(pkmn, max_lvl=6)
+    if not level.isdigit():
+        level = "5"
     url = "https://fight.pokebattler.com/raids/defenders/{pkmn}/levels/RAID_LEVEL_{level}/attackers/".format(pkmn=pkmn.replace('-','_').upper(),level=level)
     url += "levels/30/"
     weather_list = [_('none'), _('extreme'), _('clear'), _('sunny'), _('rainy'),

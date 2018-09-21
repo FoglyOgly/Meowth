@@ -1,69 +1,89 @@
 {
   "raid_eggs": {
     "1": {
-      "egg": "normal", 
-      "egg_img": "1.png", 
+      "egg": "normal",
+      "egg_img": "1.png",
       "pokemon": [
-        129, 
-        138, 
-        140, 
-        320
-      ], 
-      "hatchtime": 60, 
-      "raidtime": 45
-    }, 
+        1,
+        4,
+        7,
+        129,
+        138,
+        140,
+        147
+      ],
+      "hatchtime": 60,
+      "raidtime": 90
+    },
     "2": {
-      "egg": "normal", 
-      "egg_img": "2.png", 
+      "egg": "normal",
+      "egg_img": "2.png",
       "pokemon": [
-        125, 
-        185, 
-        303, 
-        310
-      ], 
-      "hatchtime": 60, 
-      "raidtime": 45
-    }, 
+        82,
+        108,
+        125,
+        126,
+        185,
+        303
+      ],
+      "hatchtime": 60,
+      "raidtime": 90
+    },
     "3": {
-      "egg": "rare", 
-      "egg_img": "3.png", 
+      "egg": "rare",
+      "egg_img": "3.png",
       "pokemon": [
-        68, 
-        95, 
-        135, 
+        65,
+        68,
+        95,
+        106,
+        107,
+        114,
+        123,
+        135,
         142
-      ], 
-      "hatchtime": 60, 
-      "raidtime": 45
-    }, 
+      ],
+      "hatchtime": 60,
+      "raidtime": 90
+    },
     "4": {
-      "egg": "rare", 
-      "egg_img": "4.png", 
+      "egg": "rare",
+      "egg_img": "4.png",
       "pokemon": [
-        76, 
-        112, 
-        248, 
+        76,
+        112,
+        131,
+        143,
+        248,
         359
-      ], 
-      "hatchtime": 60, 
-      "raidtime": 45
-    }, 
+      ],
+      "hatchtime": 60,
+      "raidtime": 90
+    },
     "5": {
-      "egg": "legendary", 
-      "egg_img": "5.png", 
-      "pokemon": [
-        378
-      ], 
-      "hatchtime": 60, 
-      "raidtime": 45
-    }, 
-    "EX": {
-      "egg": "EX", 
-      "egg_img": "EX.png", 
+      "egg": "legendary",
+      "egg_img": "5.png",
+      "pokemon": [],
+      "hatchtime": 60,
+      "raidtime": 90
+    },
+    "6": {
+      "egg": "legendary",
+      "egg_img": "5.png",
       "pokemon": [
         150
-      ], 
-      "hatchtime": 14, 
+      ],
+      "hatchtime": 60,
+      "raidtime": 90
+    },
+    "EX": {
+      "egg": "EX",
+      "egg_img": "EX.png",
+      "pokemon": [
+        150,
+        386
+      ],
+      "hatchtime": 14,
       "raidtime": 45
     }
   }

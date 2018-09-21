@@ -4423,8 +4423,18 @@ async def _raidegg(message, content):
         egg_level = str(egg_level)
         egg_info = raid_info['raid_eggs'][egg_level]
         egg_img = egg_info['egg_img']
+
+        # account for psuedo level 6 boosted raids
+        pkmn_list = []
+        if egg_level == '5':
+            try:
+                pkmn_list.extend(raid_info['raid_eggs']['6']['pokemon'])
+            except KeyError:
+                pass
+        pkmn_list.extend(egg_info['pokemon'])
+
         boss_list = []
-        for p in egg_info['pokemon']:
+        for p in pkmn_list:
             p_name = get_name(p).title()
             p_type = get_type(message.guild, p)
             boss_list.append((((p_name + ' (') + str(p)) + ') ') + ''.join(p_type))
@@ -4443,7 +4453,7 @@ async def _raidegg(message, content):
         if gyms:
             gym_info = _("**Name:** {0}\n**Notes:** {1}").format(raid_details, gym_note)
             raid_embed.add_field(name=_('**Gym:**'), value=gym_info, inline=False)
-        if len(egg_info['pokemon']) > 1:
+        if len(pkmn_list) > 1:
             raid_embed.add_field(name=_('**Possible Bosses:**'), value=_('{bosslist1}').format(bosslist1='\n'.join(boss_list[::2])), inline=True)
             raid_embed.add_field(name='\u200b', value=_('{bosslist2}').format(bosslist2='\n'.join(boss_list[1::2])), inline=True)
         else:
@@ -7203,7 +7213,17 @@ async def _bosslist(ctx):
     boss_dict = {}
     boss_list = []
     boss_dict["unspecified"] = {"type": "❔", "total": 0, "maybe": 0, "coming": 0, "here": 0}
-    for p in egg_info['pokemon']:
+
+    # account for psuedo level 6 boosted raids
+    pkmn_list = []
+    if egg_level == '5':
+        try:
+            pkmn_list.extend(raid_info['raid_eggs']['6']['pokemon'])
+        except KeyError:
+            pass
+    pkmn_list.extend(egg_info['pokemon'])
+
+    for p in pkmn_list:
         p_name = get_name(p).title()
         boss_list.append(p_name.lower())
         p_type = get_type(message.guild,p)

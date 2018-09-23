@@ -96,6 +96,7 @@ Helper functions
 def load_config():
     global config
     global pkmn_info
+    global pkmn_info_reference
     global type_chart
     global type_list
     global raid_info
@@ -111,9 +112,15 @@ def load_config():
         'locale', '{0}', 'pkmn.json').format(config['pokemon-language'])
     raid_path_source = os.path.join('data', 'raid_info.json')
     # Load Pokemon list and raid info
-    with open(pokemon_path_source, 'r') as fd:
+    with open(pokemon_path_source, 'r', encoding='utf-8') as fd:
         pkmn_info = json.load(fd)
-    with open(raid_path_source, 'r') as fd:
+    if 'en' != config['pokemon-language']:
+         pokemon_path_source_reference = os.path.join('locale', 'en', 'pkmn.json')
+         with open(pokemon_path_source_reference, 'r', encoding='utf-8') as fd:
+            pkmn_info_reference = json.load(fd)
+    else:
+         pkmn_info_reference = pkmn_info
+    with open(raid_path_source, 'r', encoding='utf-8') as fd:
         raid_info = json.load(fd)
     # Load type information
     with open(os.path.join('data', 'type_chart.json'), 'r') as fd:
@@ -5888,9 +5895,11 @@ async def counters(ctx, *, args = None):
     await _counters(ctx, pkmn, user, weather, "Unknown Moveset")
 
 async def _counters(ctx, pkmn, user = None, weather = None, movesetstr = "Unknown Moveset"):
+    pokemon_index = pkmn_info['pokemon_list'].index(pkmn)
+    pkmn_reference = pkmn_info_reference['pokemon_list'][pokemon_index]
     img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=4'.format(str(get_number(pkmn)).zfill(3))
     level = get_level(pkmn) if get_level(pkmn).isdigit() else "5"
-    url = "https://fight.pokebattler.com/raids/defenders/{pkmn}/levels/RAID_LEVEL_{level}/attackers/".format(pkmn=pkmn.replace('-','_').upper(),level=level)
+    url = "https://fight.pokebattler.com/raids/defenders/{pkmn}/levels/RAID_LEVEL_{level}/attackers/".format(pkmn=pkmn_reference.replace('-','_').upper(),level=level)
     if user:
         url += "users/{user}/".format(user=user)
         userstr = _("user #{user}'s").format(user=user)
@@ -5973,7 +5982,9 @@ async def _get_generic_counters(guild, pkmn, weather=None):
     ctrs_dict[ctrs_index]['emoji'] = '0\u20e3'
     img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=4'.format(str(get_number(pkmn)).zfill(3))
     level = get_level(pkmn) if get_level(pkmn).isdigit() else "5"
-    url = "https://fight.pokebattler.com/raids/defenders/{pkmn}/levels/RAID_LEVEL_{level}/attackers/".format(pkmn=pkmn.replace('-','_').upper(),level=level)
+    pokemon_index = pkmn_info['pokemon_list'].index(pkmn)
+    pkmn_reference = pkmn_info_reference['pokemon_list'][pokemon_index]
+    url = "https://fight.pokebattler.com/raids/defenders/{pkmn}/levels/RAID_LEVEL_{level}/attackers/".format(pkmn=pkmn_reference.replace('-','_').upper(),level=level)
     url += "levels/30/"
     weather_list = [_('none'), _('extreme'), _('clear'), _('sunny'), _('rainy'),
                     _('partlycloudy'), _('cloudy'), _('windy'), _('snow'), _('fog')]

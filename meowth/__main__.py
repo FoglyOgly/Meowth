@@ -5996,17 +5996,10 @@ async def _get_generic_counters(guild, pkmn, weather=None):
     ctrs_dict[ctrs_index]['moveset'] = "Unknown Moveset"
     ctrs_dict[ctrs_index]['emoji'] = '0\u20e3'
     img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=4'.format(str(get_number(pkmn)).zfill(3))
-<<<<<<< HEAD
     level = get_level(pkmn) if get_level(pkmn).isdigit() else "5"
     pokemon_index = pkmn_info['pokemon_list'].index(pkmn)
     pkmn_reference = pkmn_info_reference['pokemon_list'][pokemon_index]
     url = "https://fight.pokebattler.com/raids/defenders/{pkmn}/levels/RAID_LEVEL_{level}/attackers/".format(pkmn=pkmn_reference.replace('-','_').upper(),level=level)
-=======
-    level = get_level(pkmn, max_lvl=6)
-    if not level.isdigit():
-        level = "5"
-    url = "https://fight.pokebattler.com/raids/defenders/{pkmn}/levels/RAID_LEVEL_{level}/attackers/".format(pkmn=pkmn.replace('-','_').upper(),level=level)
->>>>>>> origin/discordpy-fr-beta
     url += "levels/30/"
     weather_list = [_('none'), _('extreme'), _('clear'), _('sunny'), _('rainy'),
                     _('partlycloudy'), _('cloudy'), _('windy'), _('snow'), _('fog')]

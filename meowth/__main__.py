@@ -1162,12 +1162,29 @@ async def on_member_join(member):
 @Meowth.event
 async def on_message(message):
     if message.guild != None:
+        if message.author == message.guild.me:
+            return
         raid_status = guild_dict[message.guild.id]['raidchannel_dict'].get(message.channel.id, None)
         if raid_status:
             if guild_dict[message.guild.id]['configure_dict'].get('archive', {}).get('enabled', False) and guild_dict[message.guild.id]['configure_dict'].get('archive', {}).get('list', []):
+                content_words = message.content.split(' ')
+                phrase_matches = []
                 for phrase in guild_dict[message.guild.id]['configure_dict']['archive']['list']:
-                    if phrase in message.content:
-                        await _archive(message.channel)
+                    phrase_len = len(phrase)
+                    if phrase_len == 1:
+                        if phrase in content_words:
+                            phrase_matches.append(phrase)
+                    else:
+                        try:
+                            match_idx = content_words.index(phrase.split(' ', 1)[0])
+                            if ' '.join(content_words[match_idx:phrase_len]) == phrase:
+                                phrase_matches.append(phrase)
+                        except ValueError:
+                            pass
+                if phrase_matches:
+                    logger.info(
+                        f"Archived - Guild: {message.guild}, Channel: {message.channel}, Matches: {phrase_matches}")
+                    await _archive(message.channel)
             if guild_dict[message.guild.id]['raidchannel_dict'][message.channel.id]['active']:
                 trainer_dict = guild_dict[message.guild.id]['raidchannel_dict'][message.channel.id]['trainer_dict']
                 if message.author.id in trainer_dict:

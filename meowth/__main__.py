@@ -4126,7 +4126,10 @@ async def _wild(message, content):
     else:
         roletest = _("{pokemon} - ").format(pokemon=wild.mention)
     wild_number = pkmn_info['pokemon_list'].index(entered_wild) + 1
-    wild_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=2'.format(str(wild_number).zfill(3))
+    if wild_number == 25:
+        wild_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}witch_.png?cache=2'.format(str(wild_number).zfill(3))
+    else:
+        wild_img_url = 'https://raw.githubusercontent.com/FoglyOgly/Meowth/discordpy-v1/images/pkmn/{0}_.png?cache=2'.format(str(wild_number).zfill(3))
     expiremsg = _('**This {pokemon} has despawned!**').format(pokemon=entered_wild.title())
     wild_gmaps_link = create_gmaps_query(wild_details, message.channel, type="wild")
     wild_embed = discord.Embed(title=_('Meowth! Click here for my directions to the wild {pokemon}!').format(pokemon=entered_wild.title()), description=_("Ask {author} if my directions aren't perfect!").format(author=message.author.name), url=wild_gmaps_link, colour=message.guild.me.colour)

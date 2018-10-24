@@ -5991,7 +5991,7 @@ async def _counters(ctx, pkmn, user = None, weather = None, movesetstr = "Unknow
         await ctx.channel.send(embed=ctrs_embed)
 
 async def _get_generic_counters(guild, pkmn, weather=None):
-    emoji_dict = {0: '0\u20e3', 1: '1\u20e3', 2: '2\u20e3', 3: '3\u20e3', 4: '4\u20e3', 5: '5\u20e3', 6: '6\u20e3', 7: '7\u20e3', 8: '8\u20e3', 9: '9\u20e3', 10: '10\u20e3'}
+    emoji_dict = {0: '0\u20e3', 1: '1\u20e3', 2: '2\u20e3', 3: '3\u20e3', 4: '4\u20e3', 5: '5\u20e3', 6: '6\u20e3', 7: '7\u20e3', 8: '8\u20e3', 9: '9\u20e3'}
     ctrs_dict = {}
     ctrs_index = 0
     ctrs_dict[ctrs_index] = {}
@@ -6045,6 +6045,8 @@ async def _get_generic_counters(guild, pkmn, weather=None):
     ctrs_dict[ctrs_index]['embed'] = ctrs_embed
     for moveset in data['byMove']:
         ctrs_index += 1
+        if ctrs_index == 10:
+            break
         move1 = moveset['move1'][:-5].lower().title().replace('_', ' ')
         move2 = moveset['move2'].lower().title().replace('_', ' ')
         movesetstr = f'{move1} | {move2}'

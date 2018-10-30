@@ -1,6 +1,6 @@
 """This cog contains features relating to Pokemon."""
 
-from .pkmn_cog import Pokemon
+from .pkmn_cog import Pokedex
 
 def setup(bot):
-    bot.add_cog(Pokemon(bot))
+    bot.add_cog(Pokedex(bot))

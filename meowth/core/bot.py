@@ -220,7 +220,6 @@ class Bot(commands.AutoShardedBot):
         ctx = await self.get_context(message, cls=Context)
         if not ctx.command:
             return
-        __cvar__.set(ctx)
         await self.invoke(ctx)
 
     def match(self, data_list, item):

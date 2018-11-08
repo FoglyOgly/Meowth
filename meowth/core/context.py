@@ -2,7 +2,7 @@ import asyncio
 import textwrap
 import gettext
 
-from aiocontextvars import enable_inherit, ContextVar
+from aiocontextvars import ContextVar
 
 import discord
 from discord.abc import Messageable

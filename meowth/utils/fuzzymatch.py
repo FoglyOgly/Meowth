@@ -3,7 +3,7 @@ from enum import Enum
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 
-def get_match(word_list: list, word: str, score_cutoff: int = 60):
+def get_match(word_list: list, word: str, score_cutoff: int = 80):
     """Uses fuzzywuzzy to see if word is close to entries in word_list
 
     Returns a tuple of (MATCH, SCORE)

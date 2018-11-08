@@ -73,6 +73,19 @@ type_emoji = {
     "fairy"    : "<:fairy:351758295070932992>"
 }
 
+raid_times = {
+    1: (60, 45),
+    2: (60, 45),
+    3: (60, 45),
+    4: (60, 45),
+    5: (60, 45),
+    "EX": (None, 45)
+}
+
+# weatherapikey = 
+
+max_report_distance = 20
+
 # help command categories
 command_categories = {
     "Owner" : {

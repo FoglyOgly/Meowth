@@ -1,4 +1,6 @@
 from meowth import Cog, command, bot
+from meowth.utils import formatters
+from meowth.exts.weather import Weather
 from math import log
 
 import discord
@@ -49,6 +51,27 @@ class Pokemon():
     async def _type2(self):
         data = self._data
         return await data.select('type2').get_value()
+
+    async def boost_weather(self):
+        type1 = await self._type()
+        type2 = await self._type2()
+        weather_query = self.bot.dbi.table('types').select('weather')
+        weather_query.where((typeid=type1, typeid=type2))
+        weather = weather_query.get_values()
+        return weather
+    
+    async def weather_str(self):
+        weather = await self.boost_weather()
+        weather_names = []
+        for item in weather:
+            name = await Weather(self.bot, item).name()
+            weather_names.append(name)
+        weather_str = ", ".join(weather_names)
+        return weather_str
+
+    async def is_boosted(self, weather):
+        boost_weather = await self.boost_weather()
+        return weather in boost_weather
     
     
     async def type_emoji(self):
@@ -206,6 +229,7 @@ class Pokemon():
         type2 = await self._type2()
         type2_dict = {}
         if type2:
+            type_chart_ref = self.bot.dbi.table('type_chart').query()
             type2_ref = await type_chart_ref.where(defender_type_id=type2).get()
             for typedoc in type2_ref:
                 attacker_type = typedoc['attack_type_id']
@@ -297,38 +321,44 @@ class Pokemon():
         height = await self._HeightM()
         weight = await self._WeightKg()
         weaks = await self.weaknesses_emoji()
-        print(weaks)
         resists = await self.resistances_emoji()
-        print(resists)
         name = await self.name()
         type_emoji = await self.type_emoji()
         sprite_url = await self.sprite_url()
-        embed = discord.Embed(description=f"```{description}```",
-            title=type_emoji+' '+category)
-        embed.set_author(name=f"#{num} - {name}")
-        embed.set_thumbnail(url=sprite_url)
-        embed.add_field(name='Height', value=f"{height} m")
-        embed.add_field(name='Weight', value=f"{weight} kg")
-        embed.add_field(name='Weaknesses', value=weaks)
-        embed.add_field(name='Resistances', value=resists)
         fast_moves = await self.fast_moves()
         fast_move_names = []
         for x in fast_moves:
             move = Move(self.bot, x)
             name = await move.name()
             emoji = await move.emoji()
-            fast_move_names.append(name+emoji)
+            fast_move_names.append(name+' '+emoji)
         fast_moves_str = "\n".join(fast_move_names)
-        embed.add_field(name='Fast Moves', value=fast_moves_str)
         charge_moves = await self.charge_moves()
         charge_move_names = []
         for x in charge_moves:
             move = Move(self.bot, x)
             name = await move.name()
             emoji = await move.emoji()
-            charge_move_names.append(name+emoji)
+            charge_move_names.append(name+' '+emoji)
         charge_moves_str = "\n".join(charge_move_names)
-        embed.add_field(name='Charge Moves', value=charge_moves_str)
+        embed_desc = f"```{description}```"
+        author_name = f"#{num} - {name}"
+        weather_str = await self.weather_str()
+        # author_icon = type icon
+        fields = {
+            "Height/Weight": f"{height} m/{weight} kg",
+            "Boosted in:": weather_str,
+            "Weaknesses": weaks,
+            "Resistances": resists,
+            "Fast Moves": fast_moves_str,
+            "Charge Moves": charge_moves_str
+        }
+        embed = formatters.make_embed(
+            title=f"#{num} - {name}",
+            content=embed_desc,
+            thumbnail = sprite_url,
+            fields = fields
+        )
         return embed
     
     
@@ -384,6 +414,20 @@ class Pokemon():
         return cls(ctx.bot, pokemonId, form=form, gender=gender, shiny=shiny,
             attiv=attiv, defiv=defiv, staiv=staiv, lvl=lvl, quickMoveid=quickMoveid,
             chargeMoveid=chargeMoveid, cp=cp)
+
+class RaidBoss(Pokemon):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.attiv = 15
+        self.defiv = 15
+        self.staiv = 15
+    
+    
+    async def convert(cls, ctx, arg):
+        pkmn = await super().convert(ctx, arg)
+        return cls(pkmn)
+
 
 class Move:
 

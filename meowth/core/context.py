@@ -2,7 +2,7 @@ import asyncio
 import textwrap
 import gettext
 
-from aiocontextvars import enable_inherit, ContextVar
+from aiocontextvars import ContextVar
 
 import discord
 from discord.abc import Messageable
@@ -18,7 +18,6 @@ def ctx_setup(loop):
     builtins.__dict__['_'] = use_current_gettext
     builtins.__dict__['get_ctx'] = cvar.get
     builtins.__dict__['__cvar__'] = cvar
-    enable_inherit(loop)
 
 def use_current_gettext(*args, **kwargs):
     return cvar.get().get_text(*args, **kwargs)

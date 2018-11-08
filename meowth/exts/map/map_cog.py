@@ -4,12 +4,12 @@ import pywraps2 as s2
 import aiohttp
 import asyncio
 import datetime
-from discord import Channel
+from discord import TextChannel
 from math import radians, degrees
 	
 
 
-class ReportChannel(Channel):
+class ReportChannel(TextChannel):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 

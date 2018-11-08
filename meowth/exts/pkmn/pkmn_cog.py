@@ -56,7 +56,7 @@ class Pokemon():
         type1 = await self._type()
         type2 = await self._type2()
         weather_query = self.bot.dbi.table('types').select('weather')
-        weather_query.where((typeid=type1, typeid=type2))
+        weather_query.where(typeid=type1).where(typeid=type2)
         weather = weather_query.get_values()
         return weather
     
@@ -417,13 +417,14 @@ class Pokemon():
 
 class RaidBoss(Pokemon):
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, pkmn):
+        self = pkmn
         self.attiv = 15
         self.defiv = 15
         self.staiv = 15
+
     
-    
+    @classmethod
     async def convert(cls, ctx, arg):
         pkmn = await super().convert(ctx, arg)
         return cls(pkmn)

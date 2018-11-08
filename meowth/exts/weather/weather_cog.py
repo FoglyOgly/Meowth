@@ -1,5 +1,5 @@
 from meowth import Cog, command, bot
-from meowth.exts.map_cog import S2_L10
+from meowth.exts.map import S2_L10
 import aiohttp
 import asyncio
 from datetime import datetime
@@ -38,17 +38,7 @@ class WeatherCog(Cog):
     def __init__(self, bot):
         self.bot = bot
         loop = asyncio.get_event_loop()
-        while True:
-            now = datetime.utcnow()
-            hour = now.hour
-            if hour < 12:
-                update_at = now.replace(hour=11, minute=30, second=0)
-            else:
-                update_at = now.replace(hour=23, minute=30, second=0)
-            stamp = update_at.timestamp()
-            loop.call_at(stamp, update_weather, self)
-            await asyncio.sleep(42300)
-            continue
+        loop.create_task(self.update_weather())
     
     async def update_weather(self):
         weather_query = self.bot.dbi.table('weather_forecasts').query()

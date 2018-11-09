@@ -65,7 +65,7 @@ class WeatherCog(Cog):
                         update[str(time)] = weather.value
             weather_update.where(cellid=cell)
             weather_update.values(**update)
-            print(weather_update.sql)
+            print(weather_update.sql_test)
             await weather_update.commit()
         
 

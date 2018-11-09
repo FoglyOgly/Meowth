@@ -6,6 +6,7 @@ import asyncio
 import datetime
 from discord import TextChannel
 from math import radians, degrees
+import numpy as np
 	
 
 
@@ -105,11 +106,12 @@ class S2_L10():
     
     @property
     def center_coords(self):
-        center_coords = s2.S2CellId(self.cellid).ToPoint()
+        cellid = np.uint64(self.cellid)
+        center_coords = s2.S2CellId(cellid).ToPoint()
         return center_coords
     
     async def weather_place(self):
-        coords = self.center_coords
+        center_coords = self.center_coords
         url = 'http://dataservice.accuweather.com/locations/v1/geoposition/search.json'
         params = {
             'q': f"{center_coords[0]},{center_coords[1]}",

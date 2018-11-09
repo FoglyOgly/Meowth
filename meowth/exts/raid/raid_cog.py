@@ -27,6 +27,7 @@ class Raid():
     def update_time(self, new_time: int):
         if new_time < 0:
             raise
+        level = self.level
         max_times = self.bot.raid_info.raid_times[level]
         max_hatch = max_times[0]
         max_active = max_times[1]
@@ -35,6 +36,7 @@ class Raid():
                 raise
             else:
                 self.hatch = time.time() + new_time*60
+                self.end = self.hatch + max_active*60
         else:
             self.end = time.time() + new_time*60
     
@@ -60,13 +62,13 @@ class Raid():
         gym = self.gym
         directions_url = await gym.url()
         directions_text = "Click here for directions to this raid!"
-        half_length = -len(boss_names)//2
         boss_names = []
         for x in boss_list:
             boss = RaidBoss(x)
             name = await boss.name()
             type_emoji = await boss.type_emoji()
             boss_names.append(f"{name} {type_emoji}")
+        half_length = -len(boss_names)//2
         bosses_left = boss_names[0:half_length]
         bosses_right = boss_names[half_length:]
         fields = {
@@ -110,15 +112,15 @@ class Raid():
         embed.url = directions_url
         return embed
     
-    async def hatch_egg(self):
+    # async def hatch_egg(self):
 
-    async def report_hatch(self, pkmn):
+    # async def report_hatch(self, pkmn):
 
-    async def update_weather(self, weather):
+    # async def update_weather(self, weather):
     
-    async def expire_raid(self):
+    # async def expire_raid(self):
     
-    async def update_gym(self, gym):
+    # async def update_gym(self, gym):
 
 
         

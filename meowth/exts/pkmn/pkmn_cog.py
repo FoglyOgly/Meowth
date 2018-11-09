@@ -96,7 +96,7 @@ class Pokemon():
     
     async def _gender_type(self):
         data = self._data
-        return await data.select('gender').get_value()
+        return await data.select('gender_type').get_value()
     
     
     async def _mythical(self):

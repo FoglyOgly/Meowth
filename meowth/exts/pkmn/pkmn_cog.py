@@ -324,7 +324,7 @@ class Pokemon():
         weight = await self._WeightKg()
         weaks = await self.weaknesses_emoji()
         resists = await self.resistances_emoji()
-        name = await self.name()
+        pkmn_name = await self.name()
         type_emoji = await self.type_emoji()
         sprite_url = await self.sprite_url()
         fast_moves = await self.fast_moves()
@@ -344,7 +344,6 @@ class Pokemon():
             charge_move_names.append(name+' '+emoji)
         charge_moves_str = "\n".join(charge_move_names)
         embed_desc = f"```{description}```"
-        author_name = f"#{num} - {name}"
         weather_str = await self.weather_str()
         # author_icon = type icon
         fields = {
@@ -356,7 +355,7 @@ class Pokemon():
             "Charge Moves": charge_moves_str
         }
         embed = formatters.make_embed(
-            title=f"#{num} - {name}",
+            title=f"#{num} - {pkmn_name}",
             content=embed_desc,
             thumbnail = sprite_url,
             fields = fields

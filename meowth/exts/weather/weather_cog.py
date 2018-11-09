@@ -66,6 +66,7 @@ class WeatherCog(Cog):
                         weather = await Weather.from_data(self.bot, hour)
                         time = datetime.utcfromtimestamp(hour['EpochDateTime']).hour % 12
                         update[str(time)] = weather.value
+            print(update)
             weather_update.where(cellid=cell)
             weather_update.values(**update)
             print(weather_update.sql())

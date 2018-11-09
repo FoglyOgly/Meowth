@@ -106,7 +106,8 @@ class S2_L10():
     
     @property
     def center_coords(self):
-        cellid = ctypes.c_ulonglong(self.cellid)
+        cellid = self.cellid
+        print(cellid)
         center_coords = s2.S2CellId(cellid).ToPoint()
         return center_coords
     

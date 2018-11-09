@@ -60,7 +60,7 @@ class WeatherCog(Cog):
                 async with session.get(url, params=params) as resp:
                     data = await resp.json()
                     for hour in data:
-                        weather = Weather.from_data(self.bot, hour)
+                        weather = await Weather.from_data(self.bot, hour)
                         time = datetime.utcfromtimestamp(hour['EpochDateTime']).hour % 12
                         update[time] = weather.value
             weather_update.where(cellid=cell)

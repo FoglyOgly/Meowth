@@ -104,7 +104,7 @@ class S2_L10():
     @property
     def center_coords(self):
         cellid = int(self.cellid, base=16)
-        center_coords = s2.S2CellId(cellid).ToPoint()
+        center_coords = s2.S2LatLng(s2.S2CellId(cellid).ToPoint())
         return center_coords
     
     async def weather_place(self):

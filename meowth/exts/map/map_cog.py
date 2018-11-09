@@ -116,7 +116,7 @@ class S2_L10():
             'toplevel': 'true'
         }
         async with aiohttp.ClientSession() as session:
-            async with session.get(url, params) as resp:
+            async with session.get(url, params=params) as resp:
                 data = await resp.json()
                 place_id = data[0]['Key']
                 return place_id

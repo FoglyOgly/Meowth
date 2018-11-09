@@ -5,9 +5,7 @@ import aiohttp
 import asyncio
 import datetime
 from discord import TextChannel
-from math import radians, degrees
-import ctypes
-	
+from math import radians, degrees	
 
 
 class ReportChannel(TextChannel):
@@ -82,9 +80,8 @@ class ReportChannel(TextChannel):
 
     async def get_all_gyms(self, bot):
         covering = await self.level_10_covering(bot)
-        gyms_query = bot.dbi.table('gyms').query()
-        for cell in covering:
-            gyms_query.where(l10=cell)
+        gyms = bot.dbi.table('gyms')
+        gyms_query = gyms.query().where(gyms['l10'] in covering)
         return gyms_query
 
 
@@ -106,8 +103,7 @@ class S2_L10():
     
     @property
     def center_coords(self):
-        cellid = self.cellid
-        print(cellid)
+        cellid = int(self.cellid, base=16)
         center_coords = s2.S2CellId(cellid).ToPoint()
         return center_coords
     

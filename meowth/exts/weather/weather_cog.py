@@ -45,7 +45,7 @@ class WeatherCog(Cog):
         weather_query.select('cellid')
         cells = await weather_query.get_values()
         for cell in cells:
-            print(cell)
+            cell = int(cell, base=16)
             s2cell = S2_L10(self.bot, cell)
             place_id = await s2cell.weather_place()
             update = {}

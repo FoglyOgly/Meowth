@@ -6,7 +6,7 @@ import asyncio
 import datetime
 from discord import TextChannel
 from math import radians, degrees
-import numpy as np
+import ctypes
 	
 
 
@@ -106,7 +106,7 @@ class S2_L10():
     
     @property
     def center_coords(self):
-        cellid = np.uint64(self.cellid)
+        cellid = ctypes.c_ulonglong(self.cellid)
         center_coords = s2.S2CellId(cellid).ToPoint()
         return center_coords
     

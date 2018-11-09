@@ -36,7 +36,7 @@ def colour(*args):
 def make_embed(msg_type='', title=None, icon=None, content=None,
                msg_colour=None, guild=None, title_url=None,
                thumbnail='', image='', fields=None, footer=None,
-               footer_icon=None, inline=False):
+               footer_icon=None, inline=True):
     """Returns a formatted discord embed object.
 
     Define either a type or a colour.

@@ -10,12 +10,12 @@ from math import radians, degrees
 
 
 class ReportChannel(TextChannel):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
 
     def _data(self, bot):
         channel_query = bot.dbi.table('report_channels').query()
-        channel_query.where(channelid=self.id)
+        _data = channel_query.where(channelid=self.id)
         return _data
     
     async def center_coords(self, bot):
@@ -82,7 +82,8 @@ class ReportChannel(TextChannel):
     async def get_all_gyms(self, bot):
         covering = await self.level_10_covering(bot)
         gyms_query = bot.dbi.table('gyms').query()
-        gyms_query.where(l10 in covering)
+        for cell in covering:
+            gyms_query.where(l10=cell)
         return gyms_query
 
 
@@ -104,7 +105,7 @@ class S2_L10():
     
     @property
     def center_coords(self):
-        coords = self.cellid.ToPoint()
+        center_coords = s2.S2CellId(self.cellid).ToPoint()
         return center_coords
     
     async def weather_place(self):
@@ -131,7 +132,7 @@ class S2_L10():
 
     async def get_all_gyms(self):
         gyms_query = self.bot.dbi.table('gyms').query()
-        gyms_query.select('gym_id').where(l10=self.id)
+        gyms_query.select('gym_id').where(l10=self.cellid)
         gyms = await gyms_query.get_values()
         return gyms
 
@@ -163,7 +164,7 @@ class POI():
         prefix = "https://www.google.com/maps/dir/?api=1&"
         prefix += f"destination={lat},{lon}"
         prefix += "&dir_action=navigate"
-        return url
+        return prefix
     
     async def weather(self):
         L10id = await self._L10()
@@ -176,7 +177,7 @@ class Gym(POI):
 
     @property 
     def _data(self):
-        data = bot.dbi.table('gyms').query()
+        data = self.bot.dbi.table('gyms').query()
         data = data.where(gym_id=self.id)
         return data
     
@@ -187,7 +188,7 @@ class Gym(POI):
 
     @classmethod
     async def convert(cls, ctx, arg):
-        report_channel = ReportChannel(ctx.channel)
+        report_channel = ctx.channel.ReportChannel()
         gyms_query = await report_channel.get_all_gyms(ctx.bot)
         gyms_query.select('gym_id', 'name')
         data = await gyms_query.get()
@@ -204,7 +205,7 @@ class Pokestop(POI):
 
     @property
     def _data(self):
-        data = bot.dbi.table('stops').query()
+        data = self.bot.dbi.table('stops').query()
         data = data.where(stop_id=self.id)
         return data
 

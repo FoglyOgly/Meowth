@@ -21,7 +21,7 @@ class Weather():
         phrase = data['IconPhrase'].lower()
         accuweather = bot.dbi.table('accuweather')
         phrase_query = accuweather.query()
-        phrase_query.where(accuweather['phrase'].lower()==phrase)
+        phrase_query.where(phrase=phrase)
         wind_speed = data['Wind']['Speed']['Value']
         if wind_speed > 24:
             phrase_query.select('precipitation')

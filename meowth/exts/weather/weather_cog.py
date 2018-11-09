@@ -18,9 +18,10 @@ class Weather():
     
     @classmethod
     async def from_data(cls, bot, data):
-        phrase = data['IconPhrase']
-        phrase_query = bot.dbi.table('accuweather').query()
-        phrase_query.where(phrase=phrase)
+        phrase = data['IconPhrase'].lower()
+        accuweather = bot.dbi.table('accuweather')
+        phrase_query = accuweather.query()
+        phrase_query.where(accuweather['phrase'].lower()==phrase)
         wind_speed = data['Wind']['Speed']['Value']
         if wind_speed > 24:
             phrase_query.select('precipitation')
@@ -45,7 +46,6 @@ class WeatherCog(Cog):
         weather_query.select('cellid')
         cells = await weather_query.get_values()
         for cell in cells:
-            cell = int(cell, base=16)
             s2cell = S2_L10(self.bot, cell)
             place_id = await s2cell.weather_place()
             update = {}

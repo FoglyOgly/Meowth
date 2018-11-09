@@ -57,7 +57,7 @@ class WeatherCog(Cog):
                     'details': 'true',
                     'metric': 'true'
                 }
-                async with session.get(url, params) as resp:
+                async with session.get(url, params=params) as resp:
                     data = await resp.json()
                     for hour in data:
                         weather = Weather.from_data(self.bot, hour)

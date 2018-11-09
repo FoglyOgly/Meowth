@@ -55,8 +55,8 @@ class Pokemon():
     async def boost_weather(self):
         type1 = await self._type()
         type2 = await self._type2()
-        weather_query = self.bot.dbi.table('types').select('weather')
-        weather_query.where(typeid=type1).where(typeid=type2)
+        weather_query = self.bot.dbi.table('types').query().select('weather')
+        weather_query.where(typeid=(type1, type2))
         weather = weather_query.get_values()
         return weather
     

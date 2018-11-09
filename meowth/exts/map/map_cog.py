@@ -111,7 +111,7 @@ class S2_L10():
         center_coords = self.center_coords
         url = 'http://dataservice.accuweather.com/locations/v1/geoposition/search.json'
         params = {
-            'q': f"{center_coords[0]},{center_coords[1]}",
+            'q': f"{center_coords.lat()},{center_coords.lng()}",
             'apikey': self.bot.config.weatherapikey,
             'toplevel': 'true'
         }

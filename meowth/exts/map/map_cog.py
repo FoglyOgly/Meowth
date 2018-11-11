@@ -180,7 +180,7 @@ class Gym(POI):
     @property 
     def _data(self):
         data = self.bot.dbi.table('gyms').query()
-        data = data.where(gym_id=self.id)
+        data = data.where(id=self.id)
         return data
     
     async def _exraid(self):

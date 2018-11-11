@@ -20,7 +20,7 @@ class ReportChannel():
     
     async def center_coords(self):
         data = self._data
-        record = await data.get()
+        record = await data.get()[0]
         return (record['lat'], record['lon'])
     
     async def radius(self):
@@ -147,7 +147,7 @@ class POI():
     
     async def _coords(self):
         data = self._data
-        record = await data.get()
+        record = await data.get()[0]
         return (record['lat'], record['lon'])
 
     async def _L10(self):

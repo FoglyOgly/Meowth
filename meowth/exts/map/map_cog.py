@@ -198,7 +198,7 @@ class Gym(POI):
         gymname_list = data_dict.keys()
         match = get_match(gymname_list, arg)
         if match:
-            return cls(ctx.bot, data_dict[match])
+            return cls(ctx.bot, data_dict[match[0]])
 
     
 

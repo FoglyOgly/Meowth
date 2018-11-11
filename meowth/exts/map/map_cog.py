@@ -15,7 +15,7 @@ class ReportChannel():
     @property
     def _data(self):
         channel_query = self.bot.dbi.table('report_channels').query()
-        _data = channel_query.where(channelid=self.id)
+        _data = channel_query.where(channelid=self.channel.id)
         return _data
     
     async def center_coords(self):

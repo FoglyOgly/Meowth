@@ -4,83 +4,84 @@ import pywraps2 as s2
 import aiohttp
 import asyncio
 import datetime
-from discord import TextChannel
 from math import radians, degrees	
 
 
-class ReportChannel(TextChannel):
-    def __init__(self):
-        super().__init__()
+class ReportChannel():
+    def __init__(self, bot, channel):
+        self.bot = bot
+        self.channel = channel
 
-    def _data(self, bot):
-        channel_query = bot.dbi.table('report_channels').query()
+    @property
+    def _data(self):
+        channel_query = self.bot.dbi.table('report_channels').query()
         _data = channel_query.where(channelid=self.id)
         return _data
     
-    async def center_coords(self, bot):
-        data = self._data(bot)
+    async def center_coords(self):
+        data = self._data
         record = await data.get()
         return (record['lat'], record['lon'])
     
-    async def radius(self, bot):
-        data = self._data(bot)
+    async def radius(self):
+        data = self._data
         radius = await data.select('radius').get_value()
         return radius
     
-    async def raid_report(self, bot):
-        data = self._data(bot)
+    async def raid_report(self):
+        data = self._data
         raid = await data.select('raid').get_value()
         return raid
     
-    async def wild_report(self, bot):
-        data = self._data(bot)
+    async def wild_report(self):
+        data = self._data
         wild = await data.select('wild').get_value()
         return wild
     
-    async def research_report(self, bot):
-        data = self._data(bot)
+    async def research_report(self):
+        data = self._data
         research = await data.select('research').get_value()
         return research
     
-    async def raidparty_report(self, bot):
-        data = self._data(bot)
+    async def raidparty_report(self):
+        data = self._data
         raidparty = await data.select('raidparty').get_value()
         return raidparty
     
-    async def user_report(self, bot):
-        data = self._data(bot)
+    async def user_report(self):
+        data = self._data
         user = await data.select('user').get_value()
         return user
     
-    async def clean_mode(self, bot):
-        data = self._data(bot)
+    async def clean_mode(self):
+        data = self._data
         clean = await data.select('clean').get_value()
         return clean
     
-    async def s2_cap(self, bot):
-        coords = await self.center_coords(bot)
+    async def s2_cap(self):
+        coords = await self.center_coords()
         point = s2.S2LatLng.FromDegrees(*coords).ToPoint()
-        radius = await self.radius(bot)
+        radius = await self.radius()
         angle = radius/6371.0
         cap = s2.S2Cap(point, s2.S1Angle.Radians(angle))
         return cap
 
-    async def point_in_channel(self, bot, coords):
-        cell = S2_L10.from_coords(bot, coords)
-        covering = await self.level_10_covering(bot)
+    async def point_in_channel(self, coords):
+        cell = S2_L10.from_coords(self.bot, coords)
+        covering = await self.level_10_covering()
         return cell.cellid in covering
 
     
-    async def level_10_covering(self, bot):
-        cap = await self.s2_cap(bot)
+    async def level_10_covering(self):
+        cap = await self.s2_cap()
         coverer = s2.S2RegionCoverer()
         coverer.set_fixed_level(10)
         covering = coverer.GetCovering(cap)
         return covering
 
-    async def get_all_gyms(self, bot):
-        covering = await self.level_10_covering(bot)
-        gyms = bot.dbi.table('gyms')
+    async def get_all_gyms(self):
+        covering = await self.level_10_covering()
+        gyms = self.bot.dbi.table('gyms')
         gyms_query = gyms.query().where(gyms['l10'] in covering)
         return gyms_query
 
@@ -188,8 +189,8 @@ class Gym(POI):
 
     @classmethod
     async def convert(cls, ctx, arg):
-        report_channel = ctx.channel.ReportChannel()
-        gyms_query = await report_channel.get_all_gyms(ctx.bot)
+        report_channel = ReportChannel(ctx.bot, ctx.channel)
+        gyms_query = await report_channel.get_all_gyms()
         gyms_query.select('gym_id', 'name')
         data = await gyms_query.get()
         data_dict = {x['name'] : x['gym_id'] for x in data}

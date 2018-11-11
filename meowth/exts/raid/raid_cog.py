@@ -23,6 +23,7 @@ class Raid():
             self.end = hatch + active_time*60
         elif end:
             self.end = end
+            self.hatch = hatch
     
     def update_time(self, new_time: int):
         if new_time < 0:

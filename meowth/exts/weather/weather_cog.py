@@ -65,9 +65,10 @@ class WeatherCog(Cog):
                     for hour in data:
                         weather = await Weather.from_data(self.bot, hour)
                         time = datetime.utcfromtimestamp(hour['EpochDateTime']).hour % 12
-                        insert[str(time)] = weather.value
+                        col = f"forecast_{time}"
+                        insert[col] = weather.value
             forecast_table.insert(**insert)
-            await forecast_table.insert.commit()
+            await forecast_table.insert.commit(do_update=True)
         
 
                         

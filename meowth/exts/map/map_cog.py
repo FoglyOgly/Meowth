@@ -125,7 +125,8 @@ class S2_L10():
     async def weather(self):
         weather_query = self.bot.dbi.table('weather_forecasts')
         current_hour = datetime.datetime.utcnow().hour % 12
-        weather_query.select(str(current_hour)).where(cellid=self.cellid)
+        col = f"forecast_{current_hour}"
+        weather_query.select(col).where(cellid=self.cellid)
         weather = await weather_query.get_value()
         return weather
 

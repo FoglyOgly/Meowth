@@ -94,7 +94,7 @@ class Raid():
         weather = await self.gym.weather()
         is_boosted = await boss.is_boosted(weather)
         end = self.end
-        enddt = datetime.fromtimestamp(end, tzinfo=timezone.utc)
+        enddt = datetime.fromtimestamp(end)
         title = f"{boss_name} {boss_type} Raid (Level {level})"
         img_url = await boss.sprite_url()
         gym = self.gym

@@ -200,6 +200,7 @@ class Pokemon():
     
     @property
     def _dex_data(self):
+        print(self.id)
         dex_ref = self.bot.dbi.table('pokedex').query().where(pokemonid=self.id)
         data = dex_ref.where(language_id=9)
         return data

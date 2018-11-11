@@ -133,16 +133,16 @@ class RaidCog(Cog):
         self.bot = bot
     
     @command()
-    async def raid(self, ctx, level_or_boss, gym: Gym, time: int):
+    async def raid(self, ctx, level_or_boss, gym: Gym, endtime: int):
         if level_or_boss.isdigit():
             level = level_or_boss
             boss = None
-            hatch = time.time() + 60*time
+            hatch = time.time() + 60*endtime
             end = None
         else:
             boss = await Pokemon.convert(ctx, level_or_boss)
             # level = boss.raid_level
-            end = time.time() + 60*time
+            end = time.time() + 60*endtime
             hatch = None
         new_raid = Raid(ctx.bot, gym, pkmn = boss, hatch=hatch, end=end)
         if new_raid.hatch:

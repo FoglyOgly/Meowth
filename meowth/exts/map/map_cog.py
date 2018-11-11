@@ -82,7 +82,7 @@ class ReportChannel():
     async def get_all_gyms(self):
         covering = await self.level_10_covering()
         gyms = self.bot.dbi.table('gyms')
-        gyms_query = gyms.query().where(gyms['l10'] in covering)
+        gyms_query = gyms.query().where(gyms['l10'].in_(covering))
         return gyms_query
 
 

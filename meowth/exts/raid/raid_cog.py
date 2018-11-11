@@ -145,6 +145,7 @@ class RaidCog(Cog):
             # level = boss.raid_level
             end = time.time() + 60*endtime
             hatch = None
+        print(boss)
         new_raid = Raid(ctx.bot, gym, pkmn = boss, hatch=hatch, end=end)
         if new_raid.hatch:
             embed = await new_raid.egg_embed()

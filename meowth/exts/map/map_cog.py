@@ -191,9 +191,9 @@ class Gym(POI):
     async def convert(cls, ctx, arg):
         report_channel = ReportChannel(ctx.bot, ctx.channel)
         gyms_query = await report_channel.get_all_gyms()
-        gyms_query.select('gym_id', 'name')
+        gyms_query.select('id', 'name')
         data = await gyms_query.get()
-        data_dict = {x['name'] : x['gym_id'] for x in data}
+        data_dict = {x['name'] : x['id'] for x in data}
         gymname_list = data_dict.keys()
         match = get_match(gymname_list, arg)
         if match:

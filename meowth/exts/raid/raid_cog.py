@@ -11,7 +11,7 @@ from datetime import timezone, datetime
 class Raid():
 
     def __init__(self, bot, gym: Gym, level=None, #fix level
-        pkmn: RaidBoss=None, hatch: float=None, end: float=None):
+        pkmn: Pokemon=None, hatch: float=None, end: float=None):
 
         self.bot = bot
         self.gym = gym

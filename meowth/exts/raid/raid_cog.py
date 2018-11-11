@@ -10,7 +10,7 @@ from datetime import timezone, datetime
 
 class Raid():
 
-    def __init__(self, bot, gym: Gym, level,
+    def __init__(self, bot, gym: Gym, level=None, #fix level
         pkmn: RaidBoss=None, hatch: float=None, end: float=None):
 
         self.bot = bot
@@ -141,10 +141,10 @@ class RaidCog(Cog):
             end = None
         else:
             boss = await Pokemon.convert(ctx, level_or_boss)
-            level = boss.raid_level
+            # level = boss.raid_level
             end = time.time() + 60*time
             hatch = None
-        new_raid = Raid(ctx.bot, gym, level, pkmn = boss, hatch=hatch, end=end)
+        new_raid = Raid(ctx.bot, gym, pkmn = boss, hatch=hatch, end=end)
         if new_raid.hatch:
             embed = await new_raid.egg_embed()
         else:

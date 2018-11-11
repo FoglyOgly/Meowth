@@ -140,7 +140,7 @@ class RaidCog(Cog):
             hatch = time.time() + 60*time
             end = None
         else:
-            boss = await RaidBoss.convert(ctx, level_or_boss)
+            boss = await Pokemon.convert(ctx, level_or_boss)
             level = boss.raid_level
             end = time.time() + 60*time
             hatch = None

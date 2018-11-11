@@ -51,8 +51,8 @@ class WeatherCog(Cog):
         for cell in cells:
             s2cell = S2_L10(self.bot, cell)
             place_id = await s2cell.weather_place()
-            update = {}
-            weather_update = self.bot.dbi.table('weather_forecasts').update()
+            insert = {'cellid': cell}
+            forecast_table = self.bot.dbi.table('weather_forecasts')
             async with aiohttp.ClientSession() as session:
                 url = f"http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/{place_id}"
                 params = {
@@ -65,12 +65,9 @@ class WeatherCog(Cog):
                     for hour in data:
                         weather = await Weather.from_data(self.bot, hour)
                         time = datetime.utcfromtimestamp(hour['EpochDateTime']).hour % 12
-                        update[str(time)] = weather.value
-            print(update)
-            weather_update.where(cellid=cell)
-            weather_update.values(**update)
-            print(weather_update.sql())
-            await weather_update.commit()
+                        insert[str(time)] = weather.value
+            forecast_table.insert(**insert)
+            await forecast_table.insert.commit()
         
 
                         

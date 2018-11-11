@@ -77,7 +77,8 @@ class ReportChannel():
         coverer = s2.S2RegionCoverer()
         coverer.set_fixed_level(10)
         covering = coverer.GetCovering(cap)
-        return covering
+        id_list = [hex(x.id()) for x in covering]
+        return id_list
 
     async def get_all_gyms(self):
         covering = await self.level_10_covering()

@@ -92,67 +92,67 @@ class ErrorHandler:
                            "Try again in {:.2f}s"
                            "".format(error.retry_after))
 
-        elif isinstance(error, TeamSetCheckFail):
+        elif isinstance(error, errors.TeamSetCheckFail):
             msg = _('Meowth! Team Management is not enabled on this server. **{prefix}{cmd_name}** is unable to be used.').format(cmd_name=ctx.invoked_with, prefix=prefix)
             error = await ctx.channel.send(msg)
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)
 
-        elif isinstance(error, WantSetCheckFail):
+        elif isinstance(error, errors.WantSetCheckFail):
             msg = _('Meowth! Pokemon Notifications are not enabled on this server. **{prefix}{cmd_name}** is unable to be used.').format(cmd_name=ctx.invoked_with, prefix=prefix)
             error = await ctx.channel.send(msg)
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)
 
-        elif isinstance(error, WildSetCheckFail):
+        elif isinstance(error, errors.WildSetCheckFail):
             msg = _('Meowth! Wild Reporting is not enabled on this server. **{prefix}{cmd_name}** is unable to be used.').format(cmd_name=ctx.invoked_with, prefix=prefix)
             error = await ctx.channel.send(msg)
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)
 
-        elif isinstance(error, ReportCheckFail):
+        elif isinstance(error, errors.ReportCheckFail):
             msg = _('Meowth! Reporting is not enabled for this channel. **{prefix}{cmd_name}** is unable to be used.').format(cmd_name=ctx.invoked_with, prefix=prefix)
             error = await ctx.channel.send(msg)
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)
 
-        elif isinstance(error, RaidSetCheckFail):
+        elif isinstance(error, errors.RaidSetCheckFail):
             msg = _('Meowth! Raid Management is not enabled on this server. **{prefix}{cmd_name}** is unable to be used.').format(cmd_name=ctx.invoked_with, prefix=prefix)
             error = await ctx.channel.send(msg)
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)
 
-        elif isinstance(error, EXRaidSetCheckFail):
+        elif isinstance(error, errors.EXRaidSetCheckFail):
             msg = _('Meowth! EX Raid Management is not enabled on this server. **{prefix}{cmd_name}** is unable to be used.').format(cmd_name=ctx.invoked_with, prefix=prefix)
             error = await ctx.channel.send(msg)
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)
 
-        elif isinstance(error, ResearchSetCheckFail):
+        elif isinstance(error, errors.ResearchSetCheckFail):
             msg = _('Meowth! Research Reporting is not enabled on this server. **{prefix}{cmd_name}** is unable to be used.').format(cmd_name=ctx.invoked_with, prefix=prefix)
             error = await ctx.channel.send(msg)
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)
 
-        elif isinstance(error, MeetupSetCheckFail):
+        elif isinstance(error, errors.MeetupSetCheckFail):
             msg = _('Meowth! Meetup Reporting is not enabled on this server. **{prefix}{cmd_name}** is unable to be used.').format(cmd_name=ctx.invoked_with, prefix=prefix)
             error = await ctx.channel.send(msg)
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)
 
-        elif isinstance(error, ArchiveSetCheckFail):
+        elif isinstance(error, errors.ArchiveSetCheckFail):
             msg = _('Meowth! Channel Archiving is not enabled on this server. **{prefix}{cmd_name}** is unable to be used.').format(cmd_name=ctx.invoked_with, prefix=prefix)
             error = await ctx.channel.send(msg)
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)
 
-        elif isinstance(error, InviteSetCheckFail):
+        elif isinstance(error, errors.InviteSetCheckFail):
             msg = _('Meowth! EX Raid Invite is not enabled on this server. **{prefix}{cmd_name}** is unable to be used.').format(cmd_name=ctx.invoked_with, prefix=prefix)
             error = await ctx.channel.send(msg)
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)
 
-        elif isinstance(error, CityChannelCheckFail):
+        elif isinstance(error, errors.CityChannelCheckFail):
             guild = ctx.guild
             msg = _('Meowth! Please use **{prefix}{cmd_name}** in ').format(cmd_name=ctx.invoked_with, prefix=prefix)
             city_channels = bot.guild_dict[guild.id]['configure_dict']['raid']['report_channels']
@@ -170,7 +170,7 @@ class ErrorHandler:
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)
 
-        elif isinstance(error, WantChannelCheckFail):
+        elif isinstance(error, errors.WantChannelCheckFail):
             guild = ctx.guild
             msg = _('Meowth! Please use **{prefix}{cmd_name}** in the following channel').format(cmd_name=ctx.invoked_with, prefix=prefix)
             want_channels = bot.guild_dict[guild.id]['configure_dict']['want']['report_channels']
@@ -192,7 +192,7 @@ class ErrorHandler:
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)
 
-        elif isinstance(error, RaidChannelCheckFail):
+        elif isinstance(error, errors.RaidChannelCheckFail):
             guild = ctx.guild
             msg = _('Meowth! Please use **{prefix}{cmd_name}** in a Raid channel. Use **{prefix}list** in any ').format(cmd_name=ctx.invoked_with, prefix=prefix)
             city_channels = bot.guild_dict[guild.id]['configure_dict']['raid']['report_channels']
@@ -210,7 +210,7 @@ class ErrorHandler:
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)
 
-        elif isinstance(error, EggChannelCheckFail):
+        elif isinstance(error, errors.EggChannelCheckFail):
             guild = ctx.guild
             msg = _('Meowth! Please use **{prefix}{cmd_name}** in an Egg channel. Use **{prefix}list** in any ').format(cmd_name=ctx.invoked_with, prefix=prefix)
             city_channels = bot.guild_dict[guild.id]['configure_dict']['raid']['report_channels']
@@ -227,13 +227,13 @@ class ErrorHandler:
             error = await ctx.channel.send(msg)
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)
-        elif isinstance(error, NonRaidChannelCheckFail):
+        elif isinstance(error, errors.NonRaidChannelCheckFail):
             msg = _("Meowth! **{prefix}{cmd_name}** can't be used in a Raid channel.").format(cmd_name=ctx.invoked_with, prefix=prefix)
             error = await ctx.channel.send(msg)
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)
 
-        elif isinstance(error, ActiveRaidChannelCheckFail):
+        elif isinstance(error, errors.ActiveRaidChannelCheckFail):
             guild = ctx.guild
             msg = _('Meowth! Please use **{prefix}{cmd_name}** in an Active Raid channel. Use **{prefix}list** in any ').format(cmd_name=ctx.invoked_with, prefix=prefix)
             city_channels = bot.guild_dict[guild.id]['configure_dict']['raid']['report_channels']
@@ -259,7 +259,7 @@ class ErrorHandler:
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)
 
-        elif isinstance(error, ActiveChannelCheckFail):
+        elif isinstance(error, errors.ActiveChannelCheckFail):
             guild = ctx.guild
             msg = _('Meowth! Please use **{prefix}{cmd_name}** in an Active channel. Use **{prefix}list** in any ').format(cmd_name=ctx.invoked_with, prefix=prefix)
             city_channels = bot.guild_dict[guild.id]['configure_dict']['raid']['report_channels']
@@ -285,7 +285,7 @@ class ErrorHandler:
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)
 
-        elif isinstance(error, CityRaidChannelCheckFail):
+        elif isinstance(error, errors.CityRaidChannelCheckFail):
             guild = ctx.guild
             msg = _('Meowth! Please use **{prefix}{cmd_name}** in either a Raid channel or ').format(cmd_name=ctx.invoked_with, prefix=prefix)
             city_channels = bot.guild_dict[guild.id]['configure_dict']['raid']['report_channels']
@@ -303,7 +303,7 @@ class ErrorHandler:
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)
 
-        elif isinstance(error, RegionEggChannelCheckFail):
+        elif isinstance(error, errors.RegionEggChannelCheckFail):
             guild = ctx.guild
             msg = _('Meowth! Please use **{prefix}{cmd_name}** in either a Raid Egg channel or ').format(cmd_name=ctx.invoked_with, prefix=prefix)
             city_channels = bot.guild_dict[guild.id]['configure_dict']['raid']['report_channels']
@@ -321,7 +321,7 @@ class ErrorHandler:
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)
 
-        elif isinstance(error, RegionExRaidChannelCheckFail):
+        elif isinstance(error, errors.RegionExRaidChannelCheckFail):
             guild = ctx.guild
             msg = _('Meowth! Please use **{prefix}{cmd_name}** in either a EX Raid channel or one of the following region channels:').format(cmd_name=ctx.invoked_with, prefix=prefix)
             city_channels = bot.guild_dict[guild.id]['configure_dict']['exraid']['report_channels']
@@ -339,7 +339,7 @@ class ErrorHandler:
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)
 
-        elif isinstance(error, ExRaidChannelCheckFail):
+        elif isinstance(error, errors.ExRaidChannelCheckFail):
             guild = ctx.guild
             msg = _('Meowth! Please use **{prefix}{cmd_name}** in a EX Raid channel. Use **{prefix}list** in any of the following region channels to see active raids:').format(cmd_name=ctx.invoked_with, prefix=prefix)
             city_channels = bot.guild_dict[guild.id]['configure_dict']['exraid']['report_channels']
@@ -357,7 +357,7 @@ class ErrorHandler:
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)
 
-        elif isinstance(error, ResearchReportChannelCheckFail):
+        elif isinstance(error, errors.ResearchReportChannelCheckFail):
             guild = ctx.guild
             msg = _('Meowth! Please use **{prefix}{cmd_name}** in ').format(cmd_name=ctx.invoked_with, prefix=prefix)
             city_channels = bot.guild_dict[guild.id]['configure_dict']['research']['report_channels']
@@ -375,7 +375,7 @@ class ErrorHandler:
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)
 
-        elif isinstance(error, MeetupReportChannelCheckFail):
+        elif isinstance(error, errors.MeetupReportChannelCheckFail):
             guild = ctx.guild
             msg = _('Meowth! Please use **{prefix}{cmd_name}** in ').format(cmd_name=ctx.invoked_with, prefix=prefix)
             city_channels = bot.guild_dict[guild.id]['configure_dict']['meetup']['report_channels']
@@ -393,7 +393,7 @@ class ErrorHandler:
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)
 
-        elif isinstance(error,WildReportChannelCheckFail):
+        elif isinstance(error, errors.WildReportChannelCheckFail):
             guild = ctx.guild
             msg = _('Meowth! Please use **{prefix}{cmd_name}** in ').format(cmd_name=ctx.invoked_with, prefix=prefix)
             city_channels = bot.guild_dict[guild.id]['configure_dict']['wild']['report_channels']

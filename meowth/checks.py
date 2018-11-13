@@ -7,7 +7,8 @@ def is_owner_check(ctx):
     author = ctx.author.id
     owner = ctx.bot.config['master']
     subowner = ctx.bot.config['submaster']
-    return author == owner or author in subowner
+    //return author == owner or author in subowner
+    return author == owner
 
 def is_owner():
     return commands.check(is_owner_check)

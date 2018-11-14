@@ -174,6 +174,7 @@ class POI():
         L10id = await self._L10()
         L10 = S2_L10(self.bot, L10id)
         weather = await L10.weather()
+        return weather
     
 
 

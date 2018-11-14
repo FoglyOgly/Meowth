@@ -1,7 +1,7 @@
 from meowth import Cog, command, bot
 from meowth.utils import formatters, fuzzymatch
 from meowth.exts.weather import Weather
-from math import log
+from math import log, floor
 
 import discord
 

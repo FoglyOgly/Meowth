@@ -139,7 +139,7 @@ class Raid():
             fast_move=fast_move_id, charge_move=charge_move_id)
         query_dict = (await query.get())[0]
         ctrs_list = []
-        for x in range(1,6):
+        for x in range(1,7):
             ctrid = query_dict[f'counter_{x}_id']
             ctrfast = query_dict[f'counter_{x}_fast']
             ctrcharge = query_dict[f'counter_{x}_charge']

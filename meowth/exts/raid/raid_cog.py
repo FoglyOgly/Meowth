@@ -234,8 +234,11 @@ class RaidCog(Cog):
                     )
                     async with aiohttp.ClientSession() as session:
                         async with session.get(data_url) as resp:
-                            data = await resp.json()
-                            data = data['attackers'][0]
+                            try:
+                                data = await resp.json()
+                                data = data['attackers'][0]
+                            except KeyError:
+                                print(data_url)
                     random_move_ctrs = data['randomMove']['defenders'][-6:]
                     estimator = data['randomMove']['total']['estimator']
                     random_move_dict = {

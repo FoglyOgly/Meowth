@@ -78,7 +78,7 @@ class Raid():
         json_url = 'https://fight.pokebattler.com/raids/defenders/'
         json_url += f"{pkmnid}/levels/RAID_LEVEL_{level}/attackers/levels/"
         json_url += "30/strategies/CINEMATIC_ATTACK_WHEN_POSSIBLE/"
-        json_url += f"DEFENSE_RANDOM_MC/"
+        json_url += f"DEFENSE_RANDOM_MC"
         json_url += f"?sort=OVERALL&weatherCondition={weather}"
         json_url += "&dodgeStrategy=DODGE_REACTION_TIME"
         json_url += "&aggregation=AVERAGE&randomAssistants=-1"

@@ -206,8 +206,9 @@ class Raid():
         weather = await self.weather()
         print(weather)
         weather = Weather(self.bot, weather)
+        print(weather.value)
         weather_name = await weather.name()
-        is_boosted = await boss.is_boosted(weather)
+        is_boosted = await boss.is_boosted(weather.value)
         cp_range = await self.cp_range()
         end = self.end
         enddt = datetime.fromtimestamp(end)

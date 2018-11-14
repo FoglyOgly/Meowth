@@ -12,6 +12,7 @@ class Weather():
 
     async def name(self):
         weather_names_query = self.bot.dbi.table('weather_names').query().select('name')
+        print(self.value)
         weather_names_query.where(weather=self.value).where(language_id=9)
         name = await weather_names_query.get_value()
         return name
@@ -19,7 +20,6 @@ class Weather():
     @classmethod
     async def from_data(cls, bot, data):
         phrase = data['IconPhrase'].lower()
-        print(phrase)
         accuweather = bot.dbi.table('accuweather')
         phrase_query = accuweather.query()
         phrase_query.where(phrase=phrase)
@@ -27,12 +27,10 @@ class Weather():
         if wind_speed > 24:
             phrase_query.select('precipitation')
             precip = await phrase_query.get_value()
-            print(precip)
             if not precip:
                 return cls(bot, 'WINDY')
         phrase_query.select('weather')
         weather = await phrase_query.get_value()
-        print(weather)
         return cls(bot, weather)
 
 

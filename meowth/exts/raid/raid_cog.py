@@ -13,7 +13,11 @@ from datetime import timezone, datetime
 class RaidBoss(Pokemon):
 
     def __init__(self, pkmn):
-        self = pkmn
+        self.bot = pkmn.bot
+        self.id = pkmn.pokemonId
+        self.form = pkmn.form
+        self.quickMoveid = pkmn.quickMoveid
+        self.chargeMoveid = pkmn.chargeMoveid
 
     
 

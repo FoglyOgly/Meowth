@@ -207,8 +207,6 @@ class Raid():
             charge_emoji = ""
         moveset = f"{quick_name} {quick_emoji} | {charge_name} {charge_emoji}"
         weather = await self.weather()
-        print(weather)
-        print(2)
         weather = Weather(self.bot, weather)
         weather_name = await weather.name()
         is_boosted = await boss.is_boosted(weather.value)
@@ -230,7 +228,7 @@ class Raid():
         weaks = await boss.weaknesses_emoji()
         ctrs_list = await self.generic_counters_data()
         fields = {
-            "Gym": f"[{directions_text}]({directions_url})",
+            "Boss": f"{boss_name}",
             "Weather": weather_name,
             "Weaknesses": weaks,
             "Resistances": resists,
@@ -251,8 +249,8 @@ class Raid():
             ctrs_str.append(ctr_str)
             i += 1
         fields['Counters'] = "\n".join(ctrs_str)
-        embed = formatters.make_embed(icon=raid_icon, title=title,
-            thumbnail=img_url, fields=fields, footer="Ends at")
+        embed = formatters.make_embed(icon=raid_icon, title=directions_text,
+            title_url=directions_url, thumbnail=img_url, fields=fields, footer="Ends at")
         embed.timestamp = enddt
         return embed
     

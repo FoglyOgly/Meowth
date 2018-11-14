@@ -224,7 +224,7 @@ class RaidCog(Cog):
     async def countersupdate(self, ctx):
         data_table = ctx.bot.dbi.table('counters_data')
         raid_lists = ctx.bot.raid_info.raid_lists
-        weather_list = ['CLEAR', 'PARTLY_CLOUDY', 'CLOUDY', 'RAINY', 'SNOW', 'FOG', 'WINDY']
+        weather_list = ['CLEAR', 'PARTLY_CLOUDY', 'OVERCAST', 'RAINY', 'SNOW', 'FOG', 'WINDY']
         ctrs_data_list = []
         for level in raid_lists:
             for pkmnid in raid_lists[level]:

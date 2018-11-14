@@ -1,6 +1,7 @@
-from meowth import Cog, command, bot
+from meowth import Cog, command, bot, checks
 from meowth.exts.map import Gym, ReportChannel
 from meowth.exts.pkmn import Pokemon, Move
+from meowth.exts.weather import Weather
 from meowth.utils import formatters
 from . import raid_info
 
@@ -112,7 +113,32 @@ class Raid():
         high_cp = await self.pkmn.calculate_cp()
         return [low_cp, high_cp]
     
-    # async def generic_counters_data(self):
+    async def generic_counters_data(self):
+        data_table = self.bot.dbi.table('counters_data')
+        weather = await self.weather()
+        boss = self.pkmn
+        boss_id = boss.id
+        level = self.level
+        fast_move_id = boss.quickMoveId
+        fast_move = Move(self.bot, fast_move_id)
+        fast_move_name = await fast_move.name()
+        fast_move_emoji = await fast_move.emoji()
+        charge_move_id = boss.chargeMoveId
+        charge_move = Move(self.bot, charge_move_id)
+        charge_move_name = await charge_move.name()
+        charge_move_emoji = await charge_move.emoji()
+        query = data_table.query().select().where(
+            boss_id=boss_id, weather=weather, level=level,
+            fast_move=fast_move_id, charge_move=charge_move_id)
+        query_dict = await query.get()
+        ctrs_list = []
+        for x in range(1,6):
+            ctrid = query_dict[f'counter_{x}_id']
+            ctrfast = query_dict[f'counter_{x}_fast']
+            ctrcharge = query_dict[f'counter_{x}_charge']
+            ctr = Pokemon(self.bot, quickMoveId=ctrfast, chargeMoveId=ctrcharge)
+            ctrs_list.append(ctr)
+        return ctrs_list
         
 
 
@@ -158,30 +184,66 @@ class Raid():
             display_level = level
         boss_name = await boss.name()
         boss_type = await boss.type_emoji()
+        quick_move = Move(self.bot, boss.quickMoveId) if boss.quickMoveId else None
+        charge_move = Move(self.bot, boss.chargeMoveId) if boss.chargeMoveId else None
+        if quick_move:
+            quick_name = await quick_move.name()
+            quick_emoji = await quick_move.emoji()
+        else:
+            quick_name = "Unknown"
+            quick_emoji = ""
+        if charge_move:
+            charge_name = await charge_move.name()
+            charge_emoji = await charge_move.emoji()
+        else:
+            charge_name = "Unknown"
+            charge_emoji = ""
+        moveset = f"{quick_name} {quick_emoji} | {charge_name} {charge_emoji}"
         weather = await self.weather()
+        weather = Weather(self.bot, weather)
+        weather_name = await weather.name()
         is_boosted = await boss.is_boosted(weather)
+        cp_range = await self.cp_range()
         end = self.end
         enddt = datetime.fromtimestamp(end)
         title = f"{boss_name} Raid (Level {display_level})"
+        if is_boosted:
+            title += " BOOSTED"
         img_url = await boss.sprite_url()
         gym = self.gym
         directions_url = await gym.url()
         gym_name = await gym._name()
         exraid = await gym._exraid()
-        directions_text = f"{gym_name}"
+        directions_text = gym_name
         if exraid:
             directions_text += " (EX RAID GYM)"
         resists = await boss.resistances_emoji()
         weaks = await boss.weaknesses_emoji()
+        ctrs_list = await self.generic_counters_data()
         fields = {
+            "Gym": f"[{directions_text}]({directions_url})",
+            "Weather": weather_name,
             "Weaknesses": weaks,
-            "Resistances": resists
+            "Resistances": resists,
+            "CP Range": f"{cp_range[0]}-{cp_range[1]}",
+            "Moveset": moveset,
+            "Counters": (False, "")
         }
+        i = 1
+        for ctr in ctrs_list:
+            name = await ctr.name()
+            fast = Move(self.bot, ctr.quickMoveId)
+            fast_name = await fast.name()
+            fast_emoji = await fast.emoji()
+            charge = Move(self.bot, ctr.chargeMoveId)
+            charge_name = await charge.name()
+            charge_emoji = await charge.emoji()
+            moveset = f"{fast_name} {fast_emoji} | {charge_name} {charge_emoji}"
+            fields[f"#{i} - {name}"] = moveset
+            i += 1
         embed = formatters.make_embed(icon=raid_icon, title=title,
             thumbnail=img_url, fields=fields, footer="Ends at")
         embed.timestamp = enddt
-        embed.title = directions_text
-        embed.url = directions_url
         return embed
     
     # async def hatch_egg(self):
@@ -213,7 +275,7 @@ class RaidCog(Cog):
             level = boss.raid_level
             end = time.time() + 60*endtime
             hatch = None
-        new_raid = Raid(ctx.bot, gym, level=level, pkmn = boss, hatch=hatch, end=end)
+        new_raid = Raid(ctx.bot, gym, level=level, pkmn=boss, hatch=hatch, end=end)
         if new_raid.hatch:
             embed = await new_raid.egg_embed()
         else:
@@ -221,10 +283,11 @@ class RaidCog(Cog):
         await ctx.send(embed=embed)
     
     @command()
+    @checks.is_co_owner()
     async def countersupdate(self, ctx):
         data_table = ctx.bot.dbi.table('counters_data')
         raid_lists = ctx.bot.raid_info.raid_lists
-        weather_list = ['CLEAR', 'PARTLY_CLOUDY', 'OVERCAST', 'RAINY', 'SNOW', 'FOG', 'WINDY']
+        weather_list = ['CLEAR', 'PARTLY_CLOUDY', 'OVERCAST', 'RAINY', 'SNOW', 'FOG', 'WINDY', 'NO_WEATHER']
         ctrs_data_list = []
         for level in raid_lists:
             for pkmnid in raid_lists[level]:
@@ -290,7 +353,7 @@ class RaidCog(Cog):
                         ctrs_data_list.append(moveset_dict)
         
         insert = data_table.insert().rows(ctrs_data_list)
-        return await insert.commit()
+        return await insert.commit(do_update=True)
 
 
 

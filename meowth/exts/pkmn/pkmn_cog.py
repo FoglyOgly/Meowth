@@ -196,7 +196,7 @@ class Pokemon():
             url += 'SHINY'
         if await self._gender_type() == 'DIMORPH' and self.gender:
             url += self.gender
-        url += '?cache=1'
+        url += '.png?cache=1'
         return url
     
     @property

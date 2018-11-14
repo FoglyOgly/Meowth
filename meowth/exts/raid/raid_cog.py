@@ -133,17 +133,11 @@ class Raid():
         if boss.chargeMoveid:
             charge_move_id = boss.chargeMoveid
         else:
-            charge_move_id = 'unknown'
-        print(boss_id)
-        print(weather)
-        print(level)
-        print(fast_move_id)
-        print(charge_move_id)
+            charge_move_id = 'random'
         query = data_table.query().select().where(
             boss_id=boss_id, weather=weather, level=level,
             fast_move=fast_move_id, charge_move=charge_move_id)
-        query_dict = await query.get()
-        print(query_dict)
+        query_dict = await query.get()[0]
         ctrs_list = []
         for x in range(1,6):
             ctrid = query_dict[f'counter_{x}_id']

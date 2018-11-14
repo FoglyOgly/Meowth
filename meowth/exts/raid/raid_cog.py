@@ -123,11 +123,11 @@ class Raid():
         boss = self.pkmn
         boss_id = boss.id
         level = self.level
-        fast_move_id = boss.quickMoveId
+        fast_move_id = boss.quickMoveid
         fast_move = Move(self.bot, fast_move_id)
         fast_move_name = await fast_move.name()
         fast_move_emoji = await fast_move.emoji()
-        charge_move_id = boss.chargeMoveId
+        charge_move_id = boss.chargeMoveid
         charge_move = Move(self.bot, charge_move_id)
         charge_move_name = await charge_move.name()
         charge_move_emoji = await charge_move.emoji()
@@ -140,7 +140,7 @@ class Raid():
             ctrid = query_dict[f'counter_{x}_id']
             ctrfast = query_dict[f'counter_{x}_fast']
             ctrcharge = query_dict[f'counter_{x}_charge']
-            ctr = Pokemon(self.bot, quickMoveId=ctrfast, chargeMoveId=ctrcharge)
+            ctr = Pokemon(self.bot, quickMoveid=ctrfast, chargeMoveid=ctrcharge)
             ctrs_list.append(ctr)
         return ctrs_list
         
@@ -188,8 +188,8 @@ class Raid():
             display_level = level
         boss_name = await boss.name()
         boss_type = await boss.type_emoji()
-        quick_move = Move(self.bot, boss.quickMoveId) if boss.quickMoveId else None
-        charge_move = Move(self.bot, boss.chargeMoveId) if boss.chargeMoveId else None
+        quick_move = Move(self.bot, boss.quickMoveid) if boss.quickMoveid else None
+        charge_move = Move(self.bot, boss.chargeMoveid) if boss.chargeMoveid else None
         if quick_move:
             quick_name = await quick_move.name()
             quick_emoji = await quick_move.emoji()
@@ -236,10 +236,10 @@ class Raid():
         i = 1
         for ctr in ctrs_list:
             name = await ctr.name()
-            fast = Move(self.bot, ctr.quickMoveId)
+            fast = Move(self.bot, ctr.quickMoveid)
             fast_name = await fast.name()
             fast_emoji = await fast.emoji()
-            charge = Move(self.bot, ctr.chargeMoveId)
+            charge = Move(self.bot, ctr.chargeMoveid)
             charge_name = await charge.name()
             charge_emoji = await charge.emoji()
             moveset = f"{fast_name} {fast_emoji} | {charge_name} {charge_emoji}"

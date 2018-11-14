@@ -131,6 +131,7 @@ class S2_L10():
         weather_query.select(col).where(cellid=self.cellid)
         weather = await weather_query.get_value()
         print(weather)
+        print(1)
         return weather
 
     async def get_all_gyms(self):

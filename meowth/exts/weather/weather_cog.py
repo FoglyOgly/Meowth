@@ -13,6 +13,7 @@ class Weather():
     async def name(self):
         weather_names_query = self.bot.dbi.table('weather_names').query().select('name')
         print(self.value)
+        print(3)
         weather_names_query.where(weather=self.value).where(language_id=9)
         name = await weather_names_query.get_value()
         return name

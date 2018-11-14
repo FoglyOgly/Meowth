@@ -205,8 +205,8 @@ class Raid():
         moveset = f"{quick_name} {quick_emoji} | {charge_name} {charge_emoji}"
         weather = await self.weather()
         print(weather)
+        print(2)
         weather = Weather(self.bot, weather)
-        print(weather.value)
         weather_name = await weather.name()
         is_boosted = await boss.is_boosted(weather.value)
         cp_range = await self.cp_range()

@@ -6,6 +6,7 @@ from meowth.utils import formatters
 from . import raid_info
 
 import discord
+import asyncio
 import aiohttp
 import time
 from datetime import timezone, datetime

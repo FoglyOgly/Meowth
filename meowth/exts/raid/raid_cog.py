@@ -17,6 +17,8 @@ class RaidBoss(Pokemon):
         self.bot = pkmn.bot
         self.id = pkmn.id
         self.form = pkmn.form
+        self.shiny = False
+        self.gender = None
         self.quickMoveid = pkmn.quickMoveid
         self.chargeMoveid = pkmn.chargeMoveid
 

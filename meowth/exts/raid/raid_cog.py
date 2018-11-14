@@ -235,10 +235,10 @@ class Raid():
             "Weaknesses": weaks,
             "Resistances": resists,
             "CP Range": f"{cp_range[0]}-{cp_range[1]}",
-            "Moveset": moveset,
-            "Counters": (False, "\u200b")
+            "Moveset": moveset
         }
         i = 1
+        ctrs_str = []
         for ctr in ctrs_list:
             name = await ctr.name()
             fast = Move(self.bot, ctr.quickMoveid)
@@ -247,9 +247,10 @@ class Raid():
             charge = Move(self.bot, ctr.chargeMoveid)
             charge_name = await charge.name()
             charge_emoji = await charge.emoji()
-            moveset = f"{fast_name} {fast_emoji} | {charge_name} {charge_emoji}"
-            fields[f"#{i} - {name}"] = moveset
+            ctr_str = f"**{name}**: {fast_name} {fast_emoji} | {charge_name} {charge_emoji}"
+            ctrs_str.append(ctr_str)
             i += 1
+        fields['Counters'] = "\n".join(ctrs_str)
         embed = formatters.make_embed(icon=raid_icon, title=title,
             thumbnail=img_url, fields=fields, footer="Ends at")
         embed.timestamp = enddt

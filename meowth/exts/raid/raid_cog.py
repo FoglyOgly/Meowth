@@ -143,7 +143,7 @@ class Raid():
             ctrid = query_dict[f'counter_{x}_id']
             ctrfast = query_dict[f'counter_{x}_fast']
             ctrcharge = query_dict[f'counter_{x}_charge']
-            ctr = Pokemon(self.bot, quickMoveid=ctrfast, chargeMoveid=ctrcharge)
+            ctr = Pokemon(self.bot, ctrid, quickMoveid=ctrfast, chargeMoveid=ctrcharge)
             ctrs_list.append(ctr)
         return ctrs_list
         

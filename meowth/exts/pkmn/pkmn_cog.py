@@ -1,5 +1,5 @@
 from meowth import Cog, command, bot
-from meowth.utils import formatters
+from meowth.utils import formatters, fuzzymatch
 from meowth.exts.weather import Weather
 from math import log
 
@@ -200,7 +200,6 @@ class Pokemon():
     
     @property
     def _dex_data(self):
-        print(self.id)
         dex_ref = self.bot.dbi.table('pokedex').query().where(pokemonid=self.id)
         data = dex_ref.where(language_id=9)
         return data
@@ -382,12 +381,20 @@ class Pokemon():
             att = (await self._baseAttack() + self.attiv)*cpm
             defense = (await self._baseDefense() + self.defiv)*cpm
             sta = (await self._baseStamina() + self.staiv)*cpm
-            cp = (att*defense^0.5*sta^0.5*cpm^2)/10
+            cp = (att*defense^0.5*sta^0.5)/10
             return cp
 
     @classmethod    
     async def convert(cls, ctx, arg):
-        args = arg.split()
+        pokemon = ctx.bot.dbi.table('pokemon')
+        pokedex = ctx.bot.dbi.table('pokedex')
+        form_names = ctx.bot.dbi.table('form_names')
+        forms_table = ctx.bot.dbi.table('forms')
+        movesets = ctx.bot.dbi.table('movesets')
+        id_list = await pokemon.query('pokemonid').get_values()
+        name_list = await pokedex.query('name').get_values()
+        form_list = await form_names.query('name').get_values()
+        args = arg.lower().split()
         shiny = False
         form = None
         gender = None
@@ -401,35 +408,49 @@ class Pokemon():
         alolan = False
         for arg in args:
             if arg.startswith('cp'):
-                cp = arg[2:]
+                cp = int(arg[2:])
+            elif arg.startswith('@'):
+                arg = arg[1:]
+                move = await Move.convert(ctx, arg)
+                if move:
+                    if await move._fast():
+                        quickMoveid = move.id
+                    else:
+                        chargeMoveid = move.id
+                else:
+                    pass
             elif arg == 'shiny':
                 shiny = True
-            elif arg == 'alolan':
-                alolan = True
-            elif arg.startswith('@'):
-                pass
+            elif arg == 'male':
+                gender = 'male'
+            elif arg == 'female':
+                gender = 'female'
+            elif arg.startswith('att'):
+                attiv = int(arg[3:])
+            elif arg.startswith('def'):
+                defiv = int(arg[3:])
+            elif arg.startswith('sta'):
+                staiv = int(arg[3:])
+            elif arg.startswith('lvl'):
+                lvl = int(arg[3:])
             else:
-                ref = ctx.bot.dbi.table('pokedex').query().select(
-                    'pokemonid').where(name=arg).where(language_id=9)
-                pokemonId = await ref.get_value()
-                print(pokemonId)
-        return cls(ctx.bot, pokemonId, form=form, gender=gender, shiny=shiny,
+                form_name = fuzzymatch.get_match(form_list, arg)
+                if form_name:
+                    forms = form_names.query('formid').where(name=form_name)
+                    form = await forms.get_first()
+                    id_list = forms_table.query('pokemonid').where(formid=form)
+                else:
+                    name = fuzzymatch.get_match(name_list, arg)
+                    if name:
+                        ref = pokedex.query('pokemonid').where(
+                            name=name)
+                        ids = await ref.get_values()
+                        pokemonid = set(ids) & set(id_list)
+        return cls(ctx.bot, pokemonid, form=form, gender=gender, shiny=shiny,
             attiv=attiv, defiv=defiv, staiv=staiv, lvl=lvl, quickMoveid=quickMoveid,
             chargeMoveid=chargeMoveid, cp=cp)
 
-class RaidBoss(Pokemon):
 
-    def __init__(self, pkmn):
-        self = pkmn
-        self.attiv = 15
-        self.defiv = 15
-        self.staiv = 15
-
-    
-    @classmethod
-    async def convert(cls, ctx, arg):
-        pkmn = await super().convert(ctx, arg)
-        return cls(pkmn)
 
 
 class Move:
@@ -537,6 +558,16 @@ class Move:
             language_id=9)
         name = await names_ref.select('name').get_value()
         return name
+    
+    @classmethod
+    async def convert(cls, ctx, arg):
+        names = ctx.bot.dbi.table('move_names')
+        name_list = await names.query('name').get_values()
+        match = fuzzymatch.get_match(name_list, arg)
+        if match:
+            match_id = await moves.query('moveid').where(name=match).get_first()
+            return cls(bot, match_id)
+            
             
 
 class Pokedex(Cog):

@@ -1,17 +1,18 @@
 from meowth import Cog, command, bot
 from meowth.exts.map import Gym, ReportChannel
-from meowth.exts.pkmn import Pokemon, Move, RaidBoss
+from meowth.exts.pkmn import Pokemon, Move
 from meowth.utils import formatters
 from . import raid_info
 
 import discord
+import aiohttp
 import time
 from datetime import timezone, datetime
 
 class Raid():
 
-    def __init__(self, bot, gym: Gym, level=None, #fix level
-        pkmn: Pokemon=None, hatch: float=None, end: float=None):
+    def __init__(self, bot, gym: Gym=None, level=None,
+        pkmn: RaidBoss=None, hatch: float=None, end: float=None):
 
         self.bot = bot
         self.gym = gym
@@ -47,10 +48,54 @@ class Raid():
         boss_list = self.bot.raid_info.raid_lists[level]
         return boss_list
     
+    @property
+    def pokebattler_url(self):
+        pkmnid = self.pkmn.id
+        url = f"https://www.pokebattler.com/raids/{pkmnid}"
+        return url
+    
+    @staticmethod
+    def pokebattler_data_url(pkmnid, level, weather):
+        json_url = 'https://fight.pokebattler.com/raids/defenders/'
+        json_url += f"{pkmnid}/levels/RAID_LEVEL_{level}/attackers/levels/"
+        json_url += "30/strategies/CINEMATIC_ATTACK_WHEN_POSSIBLE/"
+        json_url += f"DEFENSE_RANDOM_MC/"
+        json_url += f"?sort=OVERALL&weatherCondition={weather}"
+        json_url += "&dodgeStrategy=DODGE_REACTION_TIME"
+        json_url += "&aggregation=AVERAGE&randomAssistants=-1"
+        return json_url
+    
+
+    
     async def weather(self):
         gym = self.gym
         weather = await gym.weather()
         return weather
+    
+    async def is_boosted(self):
+        weather = await self.weather()
+        pkmn = self.pkmn
+        return await pkmn.is_boosted(weather)
+    
+    async def cp_range(self):
+        boost = await self.is_boosted()
+        if boost:
+            self.pkmn.lvl = 25
+        else:
+            self.pkmn.lvl = 20
+        self.pkmn.attiv = 10
+        self.pkmn.defiv = 10
+        self.pkmn.staiv = 10
+        low_cp = await self.pkmn.calculate_cp()
+        self.pkmn.attiv = 15
+        self.pkmn.defiv = 15
+        self.pkmn.staiv = 15
+        high_cp = await self.pkmn.calculate_cp()
+        return [low_cp, high_cp]
+    
+    async def generic_counters_data(self):
+        
+
 
     async def egg_embed(self):
         raid_icon = '' #TODO
@@ -86,20 +131,27 @@ class Raid():
 
     async def raid_embed(self):
         raid_icon = '' #TODO
-        level = self.level
         boss = self.pkmn
+        level = boss.raid_level
+        if level == 6:
+            display_level = 5
+        else:
+            display_level = level
         boss_name = await boss.name()
         boss_type = await boss.type_emoji()
-        title = f"{boss_name} Raid"
-        weather = await self.gym.weather()
+        weather = await self.weather()
         is_boosted = await boss.is_boosted(weather)
         end = self.end
         enddt = datetime.fromtimestamp(end)
-        title = f"{boss_name} {boss_type} Raid (Level {level})"
+        title = f"{boss_name} Raid (Level {display_level})"
         img_url = await boss.sprite_url()
         gym = self.gym
         directions_url = await gym.url()
-        directions_text = "Click here for directions to this raid!"
+        gym_name = await gym._name()
+        exraid = await gym._exraid()
+        directions_text = f"{gym_name}"
+        if exraid:
+            directions_text += " (EX RAID GYM)"
         resists = await boss.resistances_emoji()
         weaks = await boss.weaknesses_emoji()
         fields = {
@@ -124,7 +176,24 @@ class Raid():
     # async def update_gym(self, gym):
 
 
+class RaidBoss(Pokemon):
+
+    def __init__(self, pkmn):
+        self = pkmn
+
+    
+
+    @property
+    def raid_level(self):
+        for level in self.bot.raid_info.raid_lists:
+            if self.id in self.bot.raid_info.raid_lists[level]:
+                return level
         
+    
+    @classmethod
+    async def convert(cls, ctx, arg):
+        pkmn = await super().convert(ctx, arg)
+        return cls(pkmn)        
         
 
 class RaidCog(Cog):
@@ -141,15 +210,81 @@ class RaidCog(Cog):
             hatch = time.time() + 60*endtime
             end = None
         else:
-            boss = await Pokemon.convert(ctx, level_or_boss)
-            level = None
-            # level = boss.raid_level
+            boss = await RaidBoss.convert(ctx, level_or_boss)
+            level = boss.raid_level
             end = time.time() + 60*endtime
             hatch = None
-        print(boss)
         new_raid = Raid(ctx.bot, gym, level=level, pkmn = boss, hatch=hatch, end=end)
         if new_raid.hatch:
             embed = await new_raid.egg_embed()
         else:
             embed = await new_raid.raid_embed()
         await ctx.send(embed=embed)
+    
+    @command()
+    async def countersupdate(self, ctx):
+        data_table = ctx.bot.dbi.table('counters_data')
+        raid_lists = ctx.bot.raid_info.raid_lists
+        weather_list = ['CLEAR', 'PARTLY_CLOUDY', 'CLOUDY', 'RAINY', 'SNOW', 'FOG', 'WINDY']
+        ctrs_data_list = []
+        for level in raid_lists:
+            for pkmnid in raid_lists[level]:
+                for weather in weather_list:
+                    data_url = Raid.pokebattler_data_url(
+                        pkmnid, level, weather
+                    )
+                    async with aiohttp.ClientSession() as session:
+                        async with session.get(data_url) as resp:
+                            data = await resp.json()
+                            data = data['attackers'][0]
+                    random_move_ctrs = data['randomMove']['defenders'][-6:]
+                    estimator = data['randomMove']['total']['estimator']
+                    random_move_dict = {
+                        'boss_id': pkmnid,
+                        'level': level,
+                        'weather': weather,
+                        'fast_move': 'random',
+                        'charge_move': 'random',
+                        'estimator': estimator
+                    }
+                    ctr_index = 1
+                    for ctr in reversed(random_move_ctrs):
+                        ctrid = ctr['pokemonId']
+                        moveset = ctr['byMove'][-1]
+                        fast_move = moveset['move1']
+                        charge_move = moveset['move2']
+                        random_move_dict[f'counter_{ctr_index}_id'] = ctrid
+                        random_move_dict[f'counter_{ctr_index}_fast'] = fast_move
+                        random_move_dict[f'counter_{ctr_index}_charge'] = charge_move
+                        ctr_index += 1
+                    ctrs_data_list.append(random_move_dict)
+                    for moveset in data['byMove']:
+                        ctrs = moveset['defenders'][-6:]
+                        boss_fast = moveset['move1']
+                        boss_charge = moveset['move2']
+                        estimator = moveset['total']['estimator']
+                        moveset_dict = {
+                            'boss_id': pkmnid,
+                            'level': level,
+                            'weather': weather,
+                            'fast_move': boss_fast,
+                            'charge_move': boss_charge,
+                            'estimator': estimator
+                        }
+                        ctr_index = 1
+                        for ctr in reversed(ctrs):
+                            ctrid = ctr['pokemonId']
+                            moveset = ctr['byMove'][-1]
+                            fast_move = moveset['move1']
+                            charge_move = moveset['move2']
+                            moveset_dict[f'counter_{ctr_index}_id'] = ctrid
+                            moveset_dict[f'counter_{ctr_index}_fast'] = fast_move
+                            moveset_dict[f'counter_{ctr_index}_charge'] = charge_move
+                            ctr_index += 1
+                        ctrs_data_list.append(moveset_dict)
+        
+        insert = data_table.insert().rows(ctrs_data_list)
+        return await insert.commit()
+
+
+

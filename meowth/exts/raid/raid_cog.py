@@ -26,7 +26,7 @@ class RaidBoss(Pokemon):
     
     @classmethod
     async def convert(cls, ctx, arg):
-        pkmn = await super().convert(ctx, arg)
+        pkmn = await Pokemon.convert(ctx, arg)
         return cls(pkmn)   
 
 class Raid():

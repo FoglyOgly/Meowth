@@ -205,7 +205,6 @@ class Raid():
             charge_emoji = ""
         moveset = f"{quick_name} {quick_emoji} | {charge_name} {charge_emoji}"
         weather = await self.weather()
-        await asyncio.sleep(0.5)
         print(weather)
         print(2)
         weather = Weather(self.bot, weather)

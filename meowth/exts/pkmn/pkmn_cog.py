@@ -374,7 +374,7 @@ class Pokemon():
     
     
     async def calculate_cp(self):
-        if not all(self.lvl, self.attiv, self.defiv, self.staiv):
+        if not all([self.lvl, self.attiv, self.defiv, self.staiv]):
             return None
         else:
             cpm = await self.cpm()

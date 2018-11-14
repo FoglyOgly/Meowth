@@ -130,6 +130,7 @@ class S2_L10():
         col = f"forecast_{current_hour}"
         weather_query.select(col).where(cellid=self.cellid)
         weather = await weather_query.get_value()
+        print(weather)
         return weather
 
     async def get_all_gyms(self):

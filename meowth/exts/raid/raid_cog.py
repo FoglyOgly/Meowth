@@ -236,7 +236,7 @@ class Raid():
             "Resistances": resists,
             "CP Range": f"{cp_range[0]}-{cp_range[1]}",
             "Moveset": moveset,
-            "Counters": (False, "")
+            "Counters": (False, "\u200b")
         }
         i = 1
         for ctr in ctrs_list:

@@ -9,6 +9,25 @@ import aiohttp
 import time
 from datetime import timezone, datetime
 
+class RaidBoss(Pokemon):
+
+    def __init__(self, pkmn):
+        self = pkmn
+
+    
+
+    @property
+    def raid_level(self):
+        for level in self.bot.raid_info.raid_lists:
+            if self.id in self.bot.raid_info.raid_lists[level]:
+                return level
+        
+    
+    @classmethod
+    async def convert(cls, ctx, arg):
+        pkmn = await super().convert(ctx, arg)
+        return cls(pkmn)   
+
 class Raid():
 
     def __init__(self, bot, gym: Gym=None, level=None,
@@ -173,27 +192,7 @@ class Raid():
     
     # async def expire_raid(self):
     
-    # async def update_gym(self, gym):
-
-
-class RaidBoss(Pokemon):
-
-    def __init__(self, pkmn):
-        self = pkmn
-
-    
-
-    @property
-    def raid_level(self):
-        for level in self.bot.raid_info.raid_lists:
-            if self.id in self.bot.raid_info.raid_lists[level]:
-                return level
-        
-    
-    @classmethod
-    async def convert(cls, ctx, arg):
-        pkmn = await super().convert(ctx, arg)
-        return cls(pkmn)        
+    # async def update_gym(self, gym):     
         
 
 class RaidCog(Cog):

@@ -126,14 +126,14 @@ class Raid():
         boss = self.pkmn
         boss_id = boss.id
         level = self.level
-        fast_move_id = boss.quickMoveid
-        fast_move = Move(self.bot, fast_move_id)
-        fast_move_name = await fast_move.name()
-        fast_move_emoji = await fast_move.emoji()
-        charge_move_id = boss.chargeMoveid
-        charge_move = Move(self.bot, charge_move_id)
-        charge_move_name = await charge_move.name()
-        charge_move_emoji = await charge_move.emoji()
+        if boss.quickMoveid:
+            fast_move_id = boss.quickMoveid
+        else:
+            fast_move_id = 'random'
+        if boss.chargeMoveid:
+            charge_move_id = boss.chargeMoveid
+        else:
+            charge_move_id = 'unknown'
         query = data_table.query().select().where(
             boss_id=boss_id, weather=weather, level=level,
             fast_move=fast_move_id, charge_move=charge_move_id)

@@ -137,7 +137,7 @@ class Raid():
         query = data_table.query().select().where(
             boss_id=boss_id, weather=weather, level=level,
             fast_move=fast_move_id, charge_move=charge_move_id)
-        query_dict = await query.get()
+        query_dict = (await query.get())[0]
         ctrs_list = []
         for x in range(1,6):
             ctrid = query_dict[f'counter_{x}_id']

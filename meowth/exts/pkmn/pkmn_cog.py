@@ -435,7 +435,7 @@ class Pokemon():
                 lvl = int(arg[3:])
             else:
                 form_name = fuzzymatch.get_match(form_list, arg)
-                if form_name:
+                if form_name[0]:
                     forms = form_names.query('formid').where(name=form_name)
                     form = await forms.get_first()
                     id_list = forms_table.query('pokemonid').where(formid=form)
@@ -443,7 +443,7 @@ class Pokemon():
                     name = fuzzymatch.get_match(name_list, arg)
                     if name:
                         ref = pokedex.query('pokemonid').where(
-                            name=name)
+                            name=name[0])
                         ids = await ref.get_values()
                         pokemonid = set(ids) & set(id_list)
         return cls(ctx.bot, pokemonid, form=form, gender=gender, shiny=shiny,
@@ -564,8 +564,8 @@ class Move:
         names = ctx.bot.dbi.table('move_names')
         name_list = await names.query('name').get_values()
         match = fuzzymatch.get_match(name_list, arg)
-        if match:
-            match_id = await moves.query('moveid').where(name=match).get_first()
+        if match[0]:
+            match_id = await moves.query('moveid').where(name=match[0]).get_first()
             return cls(bot, match_id)
             
             

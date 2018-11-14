@@ -93,7 +93,7 @@ class Raid():
         high_cp = await self.pkmn.calculate_cp()
         return [low_cp, high_cp]
     
-    async def generic_counters_data(self):
+    # async def generic_counters_data(self):
         
 
 

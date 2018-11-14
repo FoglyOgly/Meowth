@@ -204,6 +204,7 @@ class Raid():
             charge_emoji = ""
         moveset = f"{quick_name} {quick_emoji} | {charge_name} {charge_emoji}"
         weather = await self.weather()
+        print(weather)
         weather = Weather(self.bot, weather)
         weather_name = await weather.name()
         is_boosted = await boss.is_boosted(weather)

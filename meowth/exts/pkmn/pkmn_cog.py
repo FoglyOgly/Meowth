@@ -381,7 +381,7 @@ class Pokemon():
             att = (await self._baseAttack() + self.attiv)*cpm
             defense = (await self._baseDefense() + self.defiv)*cpm
             sta = (await self._baseStamina() + self.staiv)*cpm
-            cp = (att*defense**0.5*sta**0.5)/10
+            cp = floor((att*defense**0.5*sta**0.5)/10)
             return cp
 
     @classmethod    

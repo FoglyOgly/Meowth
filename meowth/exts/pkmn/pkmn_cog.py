@@ -367,8 +367,8 @@ class Pokemon():
         if not self.lvl:
             return None
         else:
-            cpm_ref = self.bot.dbi.table('cpm_table').where(
-                level=self.lvl).query()
+            cpm_ref = self.bot.dbi.table('cpm_table').query().where(
+                level=self.lvl)
             cpm = await cpm_ref.select('cpm').get_value()
             return cpm
     

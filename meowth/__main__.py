@@ -50,7 +50,7 @@ def _get_prefix(bot, message):
 
 Meowth = MeowthBot(
     command_prefix=_get_prefix, case_insensitive=True,
-    activity=discord.Game(name="Pokemon Go beta 20181107"))
+    activity=discord.Game(name="Pokemon Go beta 20181114"))
 
 custom_error_handling(Meowth, logger)
 try:

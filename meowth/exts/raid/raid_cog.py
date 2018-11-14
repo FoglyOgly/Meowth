@@ -228,9 +228,13 @@ class RaidCog(Cog):
         ctrs_data_list = []
         for level in raid_lists:
             for pkmnid in raid_lists[level]:
+                if level == 'EX':
+                    url_level = 5
+                else:
+                    url_level = level
                 for weather in weather_list:
                     data_url = Raid.pokebattler_data_url(
-                        pkmnid, level, weather
+                        pkmnid, url_level, weather
                     )
                     async with aiohttp.ClientSession() as session:
                         async with session.get(data_url) as resp:

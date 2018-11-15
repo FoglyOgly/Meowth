@@ -253,6 +253,7 @@ class Raid():
             ctr_str = f"**{name}**: {fast_name} {fast_emoji} | {charge_name} {charge_emoji}"
             ctrs_str.append(ctr_str)
             i += 1
+        ctrs_str.append(f'[Results courtesy of Pokebattler](https://www.pokebattler.com/raids/{boss.id})')
         fields['<:pkbtlr:512707623812857871> Counters'] = "\n".join(ctrs_str)
         embed = formatters.make_embed(icon=raid_icon, title=directions_text,
             title_url=directions_url, thumbnail=img_url, fields=fields, footer="Ending",

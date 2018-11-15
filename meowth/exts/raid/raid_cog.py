@@ -28,7 +28,7 @@ class RaidBoss(Pokemon):
     def raid_level(self):
         for level in self.bot.raid_info.raid_lists:
             if self.id in self.bot.raid_info.raid_lists[level]:
-                return int(level)
+                return level
         
     
     @classmethod
@@ -152,14 +152,16 @@ class Raid():
     async def egg_embed(self):
         raid_icon = '' #TODO
         level = self.level
-        title = f"Level {level} Raid Egg"
         egg_img_url = self.bot.raid_info.egg_images[level]
         boss_list = self.boss_list
         hatch = self.hatch
         hatchdt = datetime.fromtimestamp(hatch, tzinfo=timezone.utc)
         gym = self.gym
         directions_url = await gym.url()
-        directions_text = "Click here for directions to this raid!"
+        directions_text = await gym._name()
+        exraid = await gym._exraid()
+        if exraid:
+            directions_text += " (EX Raid Gym)"
         boss_names = []
         for x in boss_list:
             boss = RaidBoss(x)
@@ -173,12 +175,11 @@ class Raid():
             "Possible Bosses:": "\n".join(bosses_left),
             "\u200b": "\n".join(bosses_right)
         }
-        footer_text = "Hatches at"
-        embed = formatters.make_embed(icon=raid_icon, title=title, thumbnail=egg_img_url,
+        footer_text = "Hatching"
+        embed = formatters.make_embed(icon=raid_icon, title=directions_text,
+            thumbnail=egg_img_url, title_url = directions_url,
             fields=fields, footer=footer_text)
         embed.timestamp = hatchdt
-        embed.title = directions_text
-        embed.url = directions_url
         return embed
 
     async def raid_embed(self):

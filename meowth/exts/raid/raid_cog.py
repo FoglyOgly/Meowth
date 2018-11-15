@@ -28,7 +28,7 @@ class RaidBoss(Pokemon):
     def raid_level(self):
         for level in self.bot.raid_info.raid_lists:
             if self.id in self.bot.raid_info.raid_lists[level]:
-                return level
+                return int(level)
         
     
     @classmethod
@@ -190,6 +190,9 @@ class Raid():
         else:
             display_level = level
         boss_name = await boss.name()
+        shiny_available = await boss._shiny_available()
+        if shiny_available:
+            boss_name += '\u272b'
         boss_type = await boss.type_emoji()
         quick_move = Move(self.bot, boss.quickMoveid) if boss.quickMoveid else None
         charge_move = Move(self.bot, boss.chargeMoveid) if boss.chargeMoveid else None
@@ -211,11 +214,11 @@ class Raid():
         weather_name = await weather.name()
         is_boosted = await boss.is_boosted(weather.value)
         cp_range = await self.cp_range()
+        cp_str = f"{cp_range[0]}-{cp_range[1]}"
         end = self.end
         enddt = datetime.fromtimestamp(end)
-        title = f"{boss_name} Raid (Level {display_level})"
         if is_boosted:
-            title += " BOOSTED"
+            cp_str += " (Boosted)"
         img_url = await boss.sprite_url()
         gym = self.gym
         directions_url = await gym.url()
@@ -223,7 +226,7 @@ class Raid():
         exraid = await gym._exraid()
         directions_text = gym_name
         if exraid:
-            directions_text += " (EX RAID GYM)"
+            directions_text += " (EX Raid Gym)"
         resists = await boss.resistances_emoji()
         weaks = await boss.weaknesses_emoji()
         ctrs_list = await self.generic_counters_data()
@@ -250,7 +253,7 @@ class Raid():
             i += 1
         fields['Counters'] = "\n".join(ctrs_str)
         embed = formatters.make_embed(icon=raid_icon, title=directions_text,
-            title_url=directions_url, thumbnail=img_url, fields=fields, footer="Ends at")
+            title_url=directions_url, thumbnail=img_url, fields=fields, footer="Ending")
         embed.timestamp = enddt
         return embed
     

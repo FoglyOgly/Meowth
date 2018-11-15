@@ -183,7 +183,7 @@ class Raid():
         return embed
 
     async def raid_embed(self):
-        raid_icon = '' #TODO
+        raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png' #TODO
         boss = self.pkmn
         level = boss.raid_level
         if level == 6:

@@ -184,6 +184,7 @@ class Raid():
 
     async def raid_embed(self):
         raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png' #TODO
+        footer_icon = 'https://media.discordapp.net/attachments/346766728132427777/512699022822080512/imageedit_10_6071805149.png'
         boss = self.pkmn
         level = boss.raid_level
         if level == 6:
@@ -254,7 +255,8 @@ class Raid():
             i += 1
         fields['Counters'] = "\n".join(ctrs_str)
         embed = formatters.make_embed(icon=raid_icon, title=directions_text,
-            title_url=directions_url, thumbnail=img_url, fields=fields, footer="Ending")
+            title_url=directions_url, thumbnail=img_url, fields=fields, footer="Ending",
+            footer_icon=footer_icon)
         embed.timestamp = enddt
         return embed
     

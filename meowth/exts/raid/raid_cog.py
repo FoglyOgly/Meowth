@@ -193,7 +193,7 @@ class Raid():
         boss_name = await boss.name()
         shiny_available = await boss._shiny_available()
         if shiny_available:
-            boss_name += '\u272b'
+            boss_name += ':sparkles:'
         boss_type = await boss.type_emoji()
         quick_move = Move(self.bot, boss.quickMoveid) if boss.quickMoveid else None
         charge_move = Move(self.bot, boss.chargeMoveid) if boss.chargeMoveid else None

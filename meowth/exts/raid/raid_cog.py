@@ -47,7 +47,7 @@ class Raid():
         self.pkmn = pkmn
         if hatch:
             self.hatch = hatch
-            active_time = bot.config.raid_times[level[1]]
+            active_time = bot.raid_info.raid_times[level[1]]
             self.end = hatch + active_time*60
         elif end:
             self.end = end

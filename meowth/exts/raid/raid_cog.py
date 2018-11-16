@@ -179,7 +179,7 @@ class Raid():
         bosses_left = boss_names[0:half_length]
         bosses_right = boss_names[half_length:]
         fields = {
-            "Weather": (False, weather_name)
+            "Weather": (False, weather_name),
             "Possible Bosses:": "\n".join(bosses_left),
             "\u200b": "\n".join(bosses_right)
         }

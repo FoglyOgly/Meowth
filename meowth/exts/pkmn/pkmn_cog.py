@@ -434,7 +434,7 @@ class Pokemon():
             else:
                 form_name = fuzzymatch.get_match(form_list, arg)
                 if form_name[0]:
-                    forms = form_names.query('formid').where(name=form_name)
+                    forms = form_names.query('formid').where(name=form_name[0])
                     form = await forms.get_first()
                     id_list = forms_table.query('pokemonid').where(formid=form)
                 else:

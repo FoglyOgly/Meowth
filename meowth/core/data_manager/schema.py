@@ -184,6 +184,10 @@ class Column:
     def in_(self, value):
         return SQLComparison(
             SQLOperator.in_(), self.aggregate, self.full_name, value)
+    
+    def is_(self, value):
+        return SQLComparison(
+            SQLOperator.is_(), self.aggregate, self.full_name, value)
 
     @classmethod
     def from_dict(cls, data):

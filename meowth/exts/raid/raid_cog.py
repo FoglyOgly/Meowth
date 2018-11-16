@@ -150,7 +150,8 @@ class Raid():
 
 
     async def egg_embed(self):
-        raid_icon = '' #TODO
+        raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png'
+        footer_icon = 'https://media.discordapp.net/attachments/346766728132427777/512699022822080512/imageedit_10_6071805149.png'
         level = self.level
         egg_img_url = self.bot.raid_info.egg_images[level]
         boss_list = self.boss_list
@@ -162,23 +163,30 @@ class Raid():
         exraid = await gym._exraid()
         if exraid:
             directions_text += " (EX Raid Gym)"
+        weather = await self.weather()
+        weather = Weather(self.bot, weather)
+        weather_name = await weather.name()
         boss_names = []
         for x in boss_list:
             boss = RaidBoss(Pokemon(self.bot, x))
             name = await boss.name()
             type_emoji = await boss.type_emoji()
+            shiny_available = await boss._shiny_available()
+            if shiny_available:
+                name += '<:shiny3:512736786863095818>'
             boss_names.append(f"{name} {type_emoji}")
         half_length = -len(boss_names)//2
         bosses_left = boss_names[0:half_length]
         bosses_right = boss_names[half_length:]
         fields = {
+            "Weather": (False, weather_name)
             "Possible Bosses:": "\n".join(bosses_left),
             "\u200b": "\n".join(bosses_right)
         }
         footer_text = "Hatching"
         embed = formatters.make_embed(icon=raid_icon, title=directions_text,
             thumbnail=egg_img_url, title_url = directions_url,
-            fields=fields, footer=footer_text)
+            fields=fields, footer=footer_text, footer_icon=footer_icon)
         embed.timestamp = hatchdt
         return embed
 

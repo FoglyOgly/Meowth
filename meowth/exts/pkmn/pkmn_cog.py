@@ -55,10 +55,9 @@ class Pokemon():
     async def boost_weather(self):
         type1 = await self._type()
         type2 = await self._type2()
-        weather_query = self.bot.dbi.table('types').query().select('weather')
-        weather_query.where(typeid=type1)
-        if type2:
-            weather_query.where(typeid=type2)
+        types_table = self.bot.dbi.table('types')
+        weather_query = types_table.query('weather')
+        weather_query.where((types_table['typeid']==type1, types_table['typeid']==type2))
         weather = await weather_query.get_values()
         return weather
     
@@ -257,7 +256,6 @@ class Pokemon():
         types_sorted = sorted(type_chart.items(), key=(lambda x: x[1]), reverse=True)
         emoji_string = ''
         for type_tuple in types_sorted:
-            print(emoji_string)
             type_ref = self.bot.dbi.table('types').query()
             emoji = await type_ref.select('emoji').where(typeid=type_tuple[0]).get_value()
             if type_tuple[1] == 2:
@@ -275,7 +273,6 @@ class Pokemon():
         types_sorted = sorted(type_chart.items(), key=(lambda x: x[1]))
         emoji_string = ''
         for type_tuple in types_sorted:
-            print(emoji_string)
             type_ref = self.bot.dbi.table('types').query()
             emoji = await type_ref.select('emoji').where(typeid=type_tuple[0]).get_value()
             if type_tuple[1] == -2:

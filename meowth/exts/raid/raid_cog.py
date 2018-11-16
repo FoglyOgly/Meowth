@@ -166,6 +166,7 @@ class Raid():
         weather = await self.weather()
         weather = Weather(self.bot, weather)
         weather_name = await weather.name()
+        weather_emoji = await weather.boosted_emoji_str()
         boss_names = []
         for x in boss_list:
             boss = RaidBoss(Pokemon(self.bot, x))
@@ -173,13 +174,13 @@ class Raid():
             type_emoji = await boss.type_emoji()
             shiny_available = await boss._shiny_available()
             if shiny_available:
-                name += '<:shiny3:512736786863095818>'
+                name += ':sparkles:'
             boss_names.append(f"{name} {type_emoji}")
         half_length = -len(boss_names)//2
         bosses_left = boss_names[0:half_length]
         bosses_right = boss_names[half_length:]
         fields = {
-            "Weather": (False, weather_name),
+            "Weather": (False, f"{weather_name} {weather_emoji}"),
             "Possible Bosses:": "\n".join(bosses_left),
             "\u200b": "\n".join(bosses_right)
         }
@@ -200,9 +201,10 @@ class Raid():
         else:
             display_level = level
         boss_name = await boss.name()
+        type_emoji = await boss.type_emoji()
         shiny_available = await boss._shiny_available()
         if shiny_available:
-            boss_name += '<:shiny3:512736786863095818>'
+            boss_name += ':sparkles:'
         boss_type = await boss.type_emoji()
         quick_move = Move(self.bot, boss.quickMoveid) if boss.quickMoveid else None
         charge_move = Move(self.bot, boss.chargeMoveid) if boss.chargeMoveid else None
@@ -222,6 +224,7 @@ class Raid():
         weather = await self.weather()
         weather = Weather(self.bot, weather)
         weather_name = await weather.name()
+        weather_emoji = await weather.boosted_emoji_str()
         is_boosted = await boss.is_boosted(weather.value)
         cp_range = await self.cp_range()
         cp_str = f"{cp_range[0]}-{cp_range[1]}"
@@ -241,8 +244,8 @@ class Raid():
         weaks = await boss.weaknesses_emoji()
         ctrs_list = await self.generic_counters_data()
         fields = {
-            "Boss": f"{boss_name}",
-            "Weather": weather_name,
+            "Boss": f"{boss_name} {type_emoji}",
+            "Weather": f"{weather_name} {weather_emoji}",
             "Weaknesses": weaks,
             "Resistances": resists,
             "CP Range": f"{cp_range[0]}-{cp_range[1]}",

@@ -12,12 +12,23 @@ class Weather():
 
     async def name(self):
         weather_names_query = self.bot.dbi.table('weather_names').query().select('name')
-        print(self.value)
-        print(3)
         weather_names_query.where(weather=self.value).where(language_id=9)
         name = await weather_names_query.get_value()
         return name
     
+    async def types_boosted(self):
+        types_table = self.bot.dbi.table('types')
+        query = types_table.select('typeid').where(weather=self.value)
+        type_list = await query.get_values()
+        return type_list
+    
+    async def boosted_emoji_str(self):
+        types_table = self.bot.dbi.table('types')
+        query = types_table.select('emoji').where(weather=self.value)
+        emoji_list = await query.get_values()
+        return "".join(emoji_list)
+
+
     @classmethod
     async def from_data(cls, bot, data):
         phrase = data['IconPhrase'].lower()

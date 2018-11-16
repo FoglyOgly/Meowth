@@ -155,7 +155,7 @@ class Raid():
         egg_img_url = self.bot.raid_info.egg_images[level]
         boss_list = self.boss_list
         hatch = self.hatch
-        hatchdt = datetime.fromtimestamp(hatch, tzinfo=timezone.utc)
+        hatchdt = datetime.fromtimestamp(hatch)
         gym = self.gym
         directions_url = await gym.url()
         directions_text = await gym._name()

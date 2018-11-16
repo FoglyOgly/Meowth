@@ -164,7 +164,7 @@ class Raid():
             directions_text += " (EX Raid Gym)"
         boss_names = []
         for x in boss_list:
-            boss = RaidBoss(x)
+            boss = RaidBoss(Pokemon(self.bot, x))
             name = await boss.name()
             type_emoji = await boss.type_emoji()
             boss_names.append(f"{name} {type_emoji}")

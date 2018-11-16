@@ -190,7 +190,7 @@ class Pokemon():
             "FoglyOgly/Meowth/discordpy-v1/images/pkmn/")
         url += self.id
         if self.form:
-            url += self.form
+            url += str(self.form)
         if self.shiny:
             url += 'SHINY'
         if await self._gender_type() == 'DIMORPH' and self.gender:

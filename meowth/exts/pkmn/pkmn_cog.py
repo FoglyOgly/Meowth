@@ -389,7 +389,7 @@ class Pokemon():
         form_names = ctx.bot.dbi.table('form_names')
         forms_table = ctx.bot.dbi.table('forms')
         movesets = ctx.bot.dbi.table('movesets')
-        id_list = await pokemon.query('pokemonid').get_values()
+        id_list = await pokemon.query('pokemonid').where(formid=None).get_values()
         name_list = await pokedex.query('name').get_values()
         form_list = await form_names.query('name').get_values()
         args = arg.lower().split()
@@ -438,12 +438,13 @@ class Pokemon():
                     form = await forms.get_value()
                     id_list = await forms_table.query('pokemonid').where(formid=form).get_values()
                 else:
-                    name = fuzzymatch.get_match(name_list, arg)
-                    if name:
+                    names = fuzzymatch.get_matches(name_list, arg)
+                    if names:
+                        names = [x[0] for x in names]
                         ref = pokedex.query('pokemonid').where(
-                            name=name[0])
+                            pokedex['name'].in_(names))
                         ids = await ref.get_values()
-                        pokemonid = (set(ids) & set(id_list)).pop()
+            pokemonid = (set(ids) & set(id_list)).pop()
         return cls(ctx.bot, pokemonid, form=form, gender=gender, shiny=shiny,
             attiv=attiv, defiv=defiv, staiv=staiv, lvl=lvl, quickMoveid=quickMoveid,
             chargeMoveid=chargeMoveid, cp=cp)

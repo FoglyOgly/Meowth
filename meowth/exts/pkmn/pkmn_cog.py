@@ -444,7 +444,7 @@ class Pokemon():
                         ref = pokedex.query('pokemonid').where(
                             pokedex['name'].in_(names))
                         ids = await ref.get_values()
-            pokemonid = (set(ids) & set(id_list)).pop()
+        pokemonid = (set(ids) & set(id_list)).pop()
         return cls(ctx.bot, pokemonid, form=form, gender=gender, shiny=shiny,
             attiv=attiv, defiv=defiv, staiv=staiv, lvl=lvl, quickMoveid=quickMoveid,
             chargeMoveid=chargeMoveid, cp=cp)

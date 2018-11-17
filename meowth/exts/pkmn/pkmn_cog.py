@@ -389,7 +389,7 @@ class Pokemon():
         form_names = ctx.bot.dbi.table('form_names')
         forms_table = ctx.bot.dbi.table('forms')
         movesets = ctx.bot.dbi.table('movesets')
-        id_list = await pokemon.query('pokemonid').where(pokemon['formid'].is_('NULL')).get_values()
+        id_list = await pokemon.query('pokemonid').where(formid=0).get_values()
         name_list = await pokedex.query('name').get_values()
         form_list = await form_names.query('name').get_values()
         args = arg.lower().split()

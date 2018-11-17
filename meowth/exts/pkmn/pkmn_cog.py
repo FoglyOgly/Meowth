@@ -210,7 +210,15 @@ class Pokemon():
     
     async def name(self):
         dex_data = self._dex_data
-        return await dex_data.select('name').get_value()
+        name = await dex_data.select('name').get_value()
+        if self.form:
+            name += " "
+            form_names_table = self.bot.dbi.table('form_names')
+            form_name_query = form_names_table.query('name')
+            form_name_query.where(formid=self.form, language_id=9)
+            form_name = await form_name_query.get_value()
+            name += form_name
+        return name
     
     
     async def description(self):

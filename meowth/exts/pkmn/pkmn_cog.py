@@ -57,7 +57,10 @@ class Pokemon():
         type2 = await self._type2()
         types_table = self.bot.dbi.table('types')
         weather_query = types_table.query('weather')
-        weather_query.where((types_table['typeid']==type1, types_table['typeid']==type2))
+        if not type2:
+            weather_query.where(typeid=type1)
+        else:
+            weather_query.where((types_table['typeid']==type1, types_table['typeid']==type2))
         weather = await weather_query.get_values()
         return weather
     

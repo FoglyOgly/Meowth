@@ -426,14 +426,14 @@ class Pokemon():
                 gender = 'male'
             elif arg == 'female':
                 gender = 'female'
-            elif arg.startswith('att'):
-                attiv = int(arg[3:])
-            elif arg.startswith('def'):
-                defiv = int(arg[3:])
-            elif arg.startswith('sta'):
-                staiv = int(arg[3:])
-            elif arg.startswith('lvl'):
-                lvl = int(arg[3:])
+            elif arg.startswith('$att'):
+                attiv = int(arg[4:])
+            elif arg.startswith('$def'):
+                defiv = int(arg[4:])
+            elif arg.startswith('$sta'):
+                staiv = int(arg[4:])
+            elif arg.startswith('$lvl'):
+                lvl = int(arg[4:])
             else:
                 form_name = fuzzymatch.get_match(form_list, arg)
                 if form_name[0]:

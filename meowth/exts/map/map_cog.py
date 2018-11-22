@@ -256,7 +256,8 @@ class Mapper(Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    async def gyms_from_csv(bot, guildid, file):
+    async def gyms_from_csv(self, guildid, file):
+        bot = self.bot
         gyms_table = bot.dbi.table('gyms')
         insert = gyms_table.insert()
         reader = csv.DictReader(codecs.iterdecode(file.readlines()), 'utf-8')
@@ -298,7 +299,7 @@ class Mapper(Cog):
         bot = ctx.bot
         f = io.BytesIO()
         await attachment.save(f)
-        await self.gyms_from_csv(bot, guildid, f)
+        await self.gyms_from_csv(guildid, f)
 
     
     

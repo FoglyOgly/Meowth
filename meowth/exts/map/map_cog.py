@@ -6,6 +6,7 @@ import aiohttp
 import asyncio
 import datetime
 import io
+import codecs
 from math import radians, degrees
 import csv
 
@@ -258,7 +259,7 @@ class Mapper(Cog):
     async def gyms_from_csv(bot, guildid, file):
         gyms_table = bot.dbi.table('gyms')
         insert = gyms_table.insert()
-        reader = csv.DictReader(file)
+        reader = csv.DictReader(codecs.iterdecode(file.readlines()), 'utf-8')
         rows = []
         for row in reader:
             valid_data = {}

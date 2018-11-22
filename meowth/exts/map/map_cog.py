@@ -214,7 +214,12 @@ class Gym(POI):
         gyms_query = await report_channel.get_all_gyms()
         gyms_query.select('id', 'name', 'nickname')
         data = await gyms_query.get()
-        nick_dict = {x['nickname']: x['id'] for x in data if x.get('nickname') else pass}
+        nick_dict = {}
+        for x in data:
+            if x.get('nickname'):
+                nick_dict[x['nickname']] = x['id']
+            else:
+                continue
         name_dict = {x['name'] : x['id'] for x in data}
         match = get_match(nick_dict.keys(), arg)
         if match:

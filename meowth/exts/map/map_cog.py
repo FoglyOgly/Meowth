@@ -260,7 +260,7 @@ class Mapper(Cog):
         bot = self.bot
         gyms_table = bot.dbi.table('gyms')
         insert = gyms_table.insert()
-        reader = csv.DictReader(codecs.iterdecode(file.readlines()), 'utf-8')
+        reader = csv.DictReader(codecs.iterdecode(file.readlines(), 'utf-8'))
         rows = []
         for row in reader:
             valid_data = {}

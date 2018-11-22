@@ -1,10 +1,13 @@
 from meowth import Cog, command, bot
+from discord.ext import commands
 from meowth.utils.fuzzymatch import get_match
 import pywraps2 as s2
 import aiohttp
 import asyncio
 import datetime
-from math import radians, degrees	
+import io
+from math import radians, degrees
+import csv
 
 
 class ReportChannel():
@@ -84,6 +87,7 @@ class ReportChannel():
         covering = await self.level_10_covering()
         gyms = self.bot.dbi.table('gyms')
         gyms_query = gyms.query().where(gyms['l10'].in_(covering))
+        gyms_query.where(guild=self.channel.guild.id)
         return gyms_query
 
 
@@ -130,13 +134,11 @@ class S2_L10():
         col = f"forecast_{current_hour}"
         weather_query.select(col).where(cellid=self.cellid)
         weather = await weather_query.get_value()
-        print(weather)
-        print(1)
         return weather
 
     async def get_all_gyms(self):
-        gyms_query = self.bot.dbi.table('gyms').query()
-        gyms_query.select('gym_id').where(l10=self.cellid)
+        gyms_table = self.bot.dbi.table('gyms')
+        gyms_query.select('id').where(l10=self.cellid)
         gyms = await gyms_query.get_values()
         return gyms
 
@@ -162,6 +164,21 @@ class POI():
         data = self._data
         name = await data.select('name').get_value()
         return name
+    
+    async def _nick(self):
+        data = self._data
+        nick = await data.select('nickname').get_value()
+        return nick
+    
+    async def _guildid(self):
+        data = self._data
+        guildid = await data.select('guild').get_value()
+        return guildid
+    
+    async def guild(self):
+        guildid = await self._guildid()
+        guild = bot.get_guild(guildid)
+        return guild
     
     async def url(self):
         lat, lon = await self._coords()
@@ -195,13 +212,27 @@ class Gym(POI):
     async def convert(cls, ctx, arg):
         report_channel = ReportChannel(ctx.bot, ctx.channel)
         gyms_query = await report_channel.get_all_gyms()
-        gyms_query.select('id', 'name')
+        gyms_query.select('id', 'name', 'nickname')
         data = await gyms_query.get()
-        data_dict = {x['name'] : x['id'] for x in data}
-        gymname_list = data_dict.keys()
-        match = get_match(gymname_list, arg)
+        nick_dict = {x['nickname']: x['id'] for x in data if x.get('nickname') else pass}
+        name_dict = {x['name'] : x['id'] for x in data}
+        match = get_match(nick_dict.keys(), arg)
+        if match:
+            return cls(ctx.bot, nick_dict[match[0]])
+        match = get_match(name_dict.keys(), arg)
         if match:
             return cls(ctx.bot, data_dict[match[0]])
+    
+    @classmethod
+    async def insert_from_data(cls, bot, guildid, data):
+        gyms_table = bot.dbi.table('gyms')
+        insert = gyms_table.insert()
+        data['guild'] = guildid
+        insert.row(**data)
+        rcrdlist = await insert.commit(do_update=True)
+        rcrd = rcrdlist[0]
+        return cls(bot, rcrd['id'])
+
 
     
 
@@ -218,5 +249,52 @@ class Mapper(Cog):
 
     def __init__(self, bot):
         self.bot = bot
+    
+    async def gyms_from_csv(bot, guildid, file):
+        gyms_table = bot.dbi.table('gyms')
+        insert = gyms_table.insert()
+        reader = csv.DictReader(file)
+        rows = []
+        for row in reader:
+            valid_data = {}
+            valid_data['guild'] = guildid
+            if isinstance(row.get('name'), str):
+                valid_data['name'] = row['name']
+            else:
+                continue
+            if isinstance(row.get('nickname'), str):
+                valid_data['nickname'] = row.get('nickname')
+            else:
+                pass
+            if isinstance(row.get('lat'), float):
+                lat = row['lat']
+            else:
+                continue
+            if isinstance(row.get('lon'), float):
+                lon = row['lon']
+            else:
+                continue
+            l10 = S2_L10.from_coords(bot, (lat, lon))
+            valid_data['lat'] = lat
+            valid_data['lon'] = lon
+            valid_data['l10'] = hex(l10.id)
+            if isinstance(row.get('exraid'), bool):
+                valid_data['exraid'] = row.get('exraid', False)
+            rows.append(valid_data)
+        insert.rows(rows)
+        await insert.commit(do_update=True)
+    
+    @command()
+    @commands.has_permissions(manage_guild=True)
+    async def importgyms(self, ctx):
+        attachment = ctx.message.attachments[0]
+        guildid = ctx.guild.id
+        bot = ctx.bot
+        f = io.StringIO()
+        await attachment.save(f)
+        await gyms_from_csv(bot, guildid, f)
+
+    
+    
 
     

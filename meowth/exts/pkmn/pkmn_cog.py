@@ -4,6 +4,11 @@ from meowth.exts.weather import Weather
 from math import log, floor
 
 import discord
+from discord.ext.commands import CommandError
+
+class PokemonNotFound(CommandError):
+    'Exception raised, Pokemon not found'
+    pass
 
 class Pokemon():
 
@@ -201,6 +206,11 @@ class Pokemon():
         url += '.png?cache=1'
         return url
     
+    async def color(self):
+        url = await self.sprite_url()
+        color = await formatters.url_color(url)
+        return color
+
     @property
     def _dex_data(self):
         dex_ref = self.bot.dbi.table('pokedex').query().where(pokemonid=self.id)
@@ -211,6 +221,7 @@ class Pokemon():
     async def name(self):
         dex_data = self._dex_data
         name = await dex_data.select('name').get_value()
+        name = name.strip()
         if self.form:
             name += " "
             form_names_table = self.bot.dbi.table('form_names')
@@ -336,6 +347,7 @@ class Pokemon():
         pkmn_name = await self.name()
         type_emoji = await self.type_emoji()
         sprite_url = await self.sprite_url()
+        color = await self.color()
         fast_moves = await self.fast_moves()
         fast_move_names = []
         for x in fast_moves:
@@ -354,7 +366,7 @@ class Pokemon():
         charge_moves_str = "\n".join(charge_move_names)
         embed_desc = f"```{description}```"
         weather_str = await self.weather_str()
-        # author_icon = type icon
+        # author_icon = type icon TODO
         fields = {
             "Height/Weight": f"{height} m/{weight} kg",
             "Boosted in:": weather_str,
@@ -364,8 +376,10 @@ class Pokemon():
             "Charge Moves": charge_moves_str
         }
         embed = formatters.make_embed(
-            title=f"#{num} - {pkmn_name}",
+            # icon = author_icon,
+            title=f"#{num} {pkmn_name} - {category}",
             content=embed_desc,
+            msg_colour = color,
             thumbnail = sprite_url,
             fields = fields
         )
@@ -455,7 +469,14 @@ class Pokemon():
                         ref = pokedex.query('pokemonid').where(
                             pokedex['name'].in_(names))
                         ids = await ref.get_values()
-        pokemonid = (set(ids) & set(id_list)).pop()
+        possible_ids = set(ids) & set(id_list)
+        if len(possible_ids) == 1:
+            pokemonid = possible_ids.pop()
+        elif len(possible_ids) == 0:
+            raise PokemonNotFound
+        else:
+            multi = await ctx.send('Multiple possible Pokemon found! Please select from the following list.')
+            # port utils.ask from v2
         return cls(ctx.bot, pokemonid, form=form, gender=gender, shiny=shiny,
             attiv=attiv, defiv=defiv, staiv=staiv, lvl=lvl, quickMoveid=quickMoveid,
             chargeMoveid=chargeMoveid, cp=cp)
@@ -581,6 +602,13 @@ class Move:
             
 
 class Pokedex(Cog):
+
+    def __init__(self, bot):
+        self.bot = bot
+    
+    async def on_command_error(self, ctx, error):
+        if isinstance(error, PokemonNotFound):
+            await ctx.send('Pokemon not ')
 
     @command()
     async def pokedex(self, ctx, *, pokemon: Pokemon):

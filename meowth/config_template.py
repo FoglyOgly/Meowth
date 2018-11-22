@@ -20,6 +20,12 @@ db_details = {
     'password' : 'password'
 }
 
+emoji = {
+    'coming': '\u1f697',
+    'here': '<:here:350686955316445185>',
+    'maybe': '\u1f914'
+}
+
 # default language
 lang_bot = 'en'
 lang_pkmn = 'en'

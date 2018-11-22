@@ -2,8 +2,10 @@ from meowth import Cog, command, bot, checks
 from meowth.exts.map import Gym, ReportChannel
 from meowth.exts.pkmn import Pokemon, Move
 from meowth.exts.weather import Weather
+from meowth.exts.want import Want
 from meowth.utils import formatters
 from . import raid_info
+from . import raid_checks
 
 import discord
 import asyncio
@@ -92,6 +94,19 @@ class Raid():
         json_url += "&aggregation=AVERAGE&randomAssistants=-1"
         return json_url
     
+    
+    async def channel_name(self):
+        gym_name = await self.gym._name()
+        if self.pkmn:
+            boss_name = await self.pkmn.name()
+            return f"{boss_name}-{gym_name}"
+        else:
+            return f"{self.level}-{gym_name}"
+    
+    async def on_raw_reaction_add(self, payload):
+        if payload.message_id not in self.message_ids:
+            return
+        
 
     
     async def weather(self):
@@ -168,9 +183,11 @@ class Raid():
         weather_name = await weather.name()
         weather_emoji = await weather.boosted_emoji_str()
         boss_names = []
-        for x in boss_list:
+        for i in range(len(boss_list)):
+            x = boss_list[i]
             boss = RaidBoss(Pokemon(self.bot, x))
-            name = await boss.name()
+            name = f'{i+1}\u20e3'
+            name += await boss.name()
             type_emoji = await boss.type_emoji()
             shiny_available = await boss._shiny_available()
             if shiny_available:
@@ -233,6 +250,7 @@ class Raid():
         if is_boosted:
             cp_str += " (Boosted)"
         img_url = await boss.sprite_url()
+        color = await boss.color()
         gym = self.gym
         directions_url = await gym.url()
         gym_name = await gym._name()
@@ -266,15 +284,20 @@ class Raid():
             i += 1
         ctrs_str.append(f'[Results courtesy of Pokebattler](https://www.pokebattler.com/raids/{boss.id})')
         fields['<:pkbtlr:512707623812857871> Counters'] = "\n".join(ctrs_str)
-        embed = formatters.make_embed(icon=raid_icon, title=directions_text,
+        embed = formatters.make_embed(icon=raid_icon, title=directions_text, msg_colour=color,
             title_url=directions_url, thumbnail=img_url, fields=fields, footer="Ending",
             footer_icon=footer_icon)
         embed.timestamp = enddt
         return embed
     
-    # async def hatch_egg(self):
+    async def hatch_egg(self, message):
+        boss_list = self.boss_list
+        for i in range(len(boss_list)):
+            await message.add_reaction(f'{i+1}\u20e3')
 
-    # async def report_hatch(self, pkmn):
+    async def report_hatch(self, pkmn):
+        self.pkmn = pkmn
+        return await self.raid_embed()
 
     # async def update_weather(self, weather):
     
@@ -288,25 +311,80 @@ class RaidCog(Cog):
     def __init__(self, bot):
         bot.raid_info = raid_info
         self.bot = bot
+
     
     @command()
+    @raid_checks.raid_enabled()
     async def raid(self, ctx, level_or_boss, gym: Gym, endtime: int):
+        raid_table = ctx.bot.dbi.table('raids')
+        query = raid_table.query()
+        query.where(gym=gym.id, guild=ctx.guild.id)
+        old_raid = await query.get()
+        if old_raid:
+            #handle duplicate?
         if level_or_boss.isdigit():
             level = level_or_boss
+            want = Want(ctx.bot, level, ctx.guild.id)
+            role = await want.role()
             boss = None
             hatch = time.time() + 60*endtime
             end = None
         else:
             boss = await RaidBoss.convert(ctx, level_or_boss)
+            want = Want(ctx.bot, boss.id, ctx.guild.id)
+            role = await want.role()
             level = boss.raid_level
             end = time.time() + 60*endtime
             hatch = None
         new_raid = Raid(ctx.bot, gym, level=level, pkmn=boss, hatch=hatch, end=end)
+        new_raid.channel_ids = []
+        new_raid.message_ids = []
         if new_raid.hatch:
             embed = await new_raid.egg_embed()
         else:
             embed = await new_raid.raid_embed()
-        await ctx.send(embed=embed)
+        if role:
+            reportcontent = role.mention + " - "
+        else:
+            reportcontent = ""
+        raid_mode = await raid_checks.raid_category(ctx, level)
+        if raid_mode == 'message':
+            reportcontent += "Coordinate this raid here using the reactions below!"
+            if not role:
+                dm_content = f"Coordinate this raid in {ctx.channel.name}!"
+                dms = await want.notify_users(dm_content, embed)
+                new_raid.message_ids.extend(dms)
+            reportmsg = await ctx.send(reportcontent, embed=embed)
+            new_raid.message_ids.append(reportmsg.id)
+        elif raid_mode.isdigit():
+            catid = int(raid_mode)
+            category = ctx.guild.get_channel(catid)
+            raid_channel_name = await new_raid.channel_name()
+            raid_channel = await ctx.guild.create_text_channel(raid_channel_name,
+                category=category)
+            new_raid.channel_ids.append(raid_channel.id)
+            reportcontent += f"Coordinate this raid in {raid_channel.mention}!"
+            if not role:
+                dm_content = f"Coordinate this raid in {raid_channel.name}!"
+                dms = await want.notify_users(dm_content, embed)
+                new_raid.message_ids.extend(dms)
+            reportmsg = await ctx.send(reportcontent, embed=embed)
+            new_raid.message_ids.extend(reportmsg.id)
+        insert = raid_table.insert()
+        data = {
+            'gym': gym.id,
+            'guild': ctx.guild.id,
+            'level': level,
+            'pkmn': boss.id,
+            'hatch': hatch,
+            'end': end
+        }
+        insert.row(**data)
+        await insert.commit()
+        
+        
+        
+        
     
     @command()
     @checks.is_co_owner()

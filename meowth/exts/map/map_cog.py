@@ -296,7 +296,7 @@ class Mapper(Cog):
         attachment = ctx.message.attachments[0]
         guildid = ctx.guild.id
         bot = ctx.bot
-        f = io.StringIO()
+        f = io.BytesIO()
         await attachment.save(f)
         await gyms_from_csv(bot, guildid, f)
 

@@ -103,9 +103,9 @@ class S2_L10():
         
     @classmethod
     def from_coords(cls, bot, coords):
-        cellid = s2.S2CellId(
+        cellid = hex(s2.S2CellId(
             s2.S2LatLng.FromDegrees(*coords)
-        ).parent(10).id()
+        ).parent(10).id())
         return cls(bot, cellid)
     
     @property

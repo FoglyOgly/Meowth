@@ -105,7 +105,7 @@ class S2_L10():
     def from_coords(cls, bot, coords):
         cellid = s2.S2CellId(
             s2.S2LatLng.FromDegrees(*coords)
-        ).parent(10)
+        ).parent(10).id()
         return cls(bot, cellid)
     
     @property

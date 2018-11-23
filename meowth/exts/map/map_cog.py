@@ -281,7 +281,7 @@ class Mapper(Cog):
             l10 = S2_L10.from_coords(bot, (lat, lon))
             valid_data['lat'] = lat
             valid_data['lon'] = lon
-            valid_data['l10'] = hex(l10.cellid)
+            valid_data['l10'] = l10.cellid
             if isinstance(row.get('exraid'), str):
                 if row['exraid'].lower() == 'false':
                     valid_data['exraid'] = False

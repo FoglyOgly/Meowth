@@ -260,7 +260,7 @@ class Mapper(Cog):
         bot = self.bot
         gyms_table = bot.dbi.table('gyms')
         insert = gyms_table.insert()
-        reader = csv.DictReader(codecs.iterdecode(file.readlines(), 'utf-8'))
+        reader = csv.DictReader(codecs.iterdecode(file.readlines(), 'utf-8'), quoting=csv.QUOTE_NONNUMERIC)
         rows = []
         for row in reader:
             valid_data = {}
@@ -285,8 +285,11 @@ class Mapper(Cog):
             valid_data['lat'] = lat
             valid_data['lon'] = lon
             valid_data['l10'] = hex(l10.id)
-            if isinstance(row.get('exraid'), bool):
-                valid_data['exraid'] = row.get('exraid', False)
+            if isinstance(row.get('exraid'), str):
+                if row['exraid'].lower() == 'false':
+                    valid_data['exraid'] = False
+                elif row['exraid'].lower() == 'true':
+                    valid_data['exraid'] = True
             rows.append(valid_data)
         insert.rows(rows)
         await insert.commit(do_update=True)

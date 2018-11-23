@@ -106,5 +106,5 @@ class WantCog(Cog):
     @command()
     async def want(self, ctx, *wants):
         for want in wants:
-            pkmn = await Pokemon.convert(want)
+            pkmn = await Pokemon.convert(ctx, want)
 

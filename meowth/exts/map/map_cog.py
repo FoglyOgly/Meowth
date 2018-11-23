@@ -260,7 +260,7 @@ class Mapper(Cog):
         bot = self.bot
         gyms_table = bot.dbi.table('gyms')
         insert = gyms_table.insert()
-        reader = csv.DictReader(codecs.iterdecode(file.readlines(), 'utf-8'), quoting=csv.QUOTE_NONNUMERIC)
+        reader = csv.DictReader(codecs.iterdecode(file.readlines(), 'utf-8'))
         rows = []
         for row in reader:
             valid_data = {}
@@ -273,13 +273,10 @@ class Mapper(Cog):
                 valid_data['nickname'] = row.get('nickname')
             else:
                 pass
-            if isinstance(row.get('lat'), float):
-                lat = row['lat']
-            else:
-                continue
-            if isinstance(row.get('lon'), float):
-                lon = row['lon']
-            else:
+            try:
+                lat = float(row.get('lat'))
+                lon = float(row.get('lon'))
+            except:
                 continue
             l10 = S2_L10.from_coords(bot, (lat, lon))
             valid_data['lat'] = lat

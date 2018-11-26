@@ -641,7 +641,8 @@ class Pokedex(Cog):
             async with session.get(url) as resp:
                 cols = await resp.content.readline()
                 cols = cols.decode('utf-8')
-                insert.set_columns(cols.split(','))
+                cols = cols.split(',')
+                insert.set_columns(*cols)
                 while True:
                     row = await resp.content.readline()
                     if row:

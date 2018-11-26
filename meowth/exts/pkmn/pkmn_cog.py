@@ -640,6 +640,7 @@ class Pokedex(Cog):
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
                 cols = await resp.content.readline()
+                cols = cols.decode('utf-8')
                 insert.set_columns(cols.split(','))
                 while True:
                     row = await resp.content.readline()

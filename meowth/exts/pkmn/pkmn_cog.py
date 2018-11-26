@@ -1,7 +1,8 @@
-from meowth import Cog, command, bot
+from meowth import Cog, command, bot, checks
 from meowth.utils import formatters, fuzzymatch
 from meowth.exts.weather import Weather
 from math import log, floor
+import aiohttp
 
 import discord
 from discord.ext.commands import CommandError
@@ -30,6 +31,22 @@ class Pokemon():
         self.quickMoveid = quickMoveid
         self.chargeMoveid = chargeMoveid
 
+    @property
+    def to_dict(self):
+        d = {
+            'id': self.id,
+            'form': self.form,
+            'gender': self.gender,
+            'shiny': self.shiny,
+            'attiv': self.attiv,
+            'defiv': self.defiv,
+            'staiv': self.staiv,
+            'lvl': self.lvl,
+            'cp': self.cp,
+            'quickMoveid': self.quickMoveid,
+            'chargeMoveid': self.chargeMoveid
+        }
+        return d
     
     @property
     def _data(self):
@@ -613,3 +630,21 @@ class Pokedex(Cog):
     @command()
     async def pokedex(self, ctx, *, pokemon: Pokemon):
         return await ctx.send(embed=await pokemon.dex_embed())
+    
+    @command()
+    @checks.is_co_owner()
+    async def pokemonupdate(self, ctx):
+        data_table = ctx.bot.dbi.table('pokemon')
+        insert = data_table.insert()
+        url = 'https://docs.google.com/spreadsheets/d/1l0qVUL43fjY1Yo2bC6RtI1Tvha5XmkK76whjKzIQrK8/export?format=csv&id=1l0qVUL43fjY1Yo2bC6RtI1Tvha5XmkK76whjKzIQrK8&gid=847346559'
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                cols = await resp.content.readline()
+                insert.set_columns(cols.split(','))
+                while True:
+                    row = await resp.content.readline()
+                    if row:
+                        insert.row(row)
+                    else:
+                        break
+        await insert.commit(do_update=True)

@@ -41,7 +41,7 @@ class Want():
         members = [guild.get_member(x) for x in users]
         for member in members:
             msg = await member.send(content, embed=embed)
-            msgs.append(msg.id)
+            msgs.append(f"{msg.channel.id}/{msg.id}")
         return msgs
 
     async def is_role(self):

@@ -4,6 +4,7 @@ from meowth.exts.pkmn import Pokemon, Move
 from meowth.exts.weather import Weather
 from meowth.exts.want import Want
 from meowth.utils import formatters
+from meowth.utils.converters import Message
 from . import raid_info
 from . import raid_checks
 
@@ -41,8 +42,8 @@ class RaidBoss(Pokemon):
 class Raid():
 
     def __init__(self, bot, gym: Gym=None, level=None,
-        pkmn: RaidBoss=None, hatch: float=None, end: float=None):
-
+        pkmn: RaidBoss=None, hatch: float=None, end: float=None,
+        trainer_dict: dict={}):
         self.bot = bot
         self.gym = gym
         self.level = level
@@ -54,6 +55,8 @@ class Raid():
         elif end:
             self.end = end
             self.hatch = hatch
+        self.trainer_dict = trainer_dict
+        
     
     def update_time(self, new_time: int):
         if new_time < 0:
@@ -82,7 +85,7 @@ class Raid():
         pkmnid = self.pkmn.id
         url = f"https://www.pokebattler.com/raids/{pkmnid}"
         return url
-    
+        
     @staticmethod
     def pokebattler_data_url(pkmnid, level, weather):
         json_url = 'https://fight.pokebattler.com/raids/defenders/'
@@ -104,7 +107,8 @@ class Raid():
             return f"{self.level}-{gym_name}"
     
     async def on_raw_reaction_add(self, payload):
-        if payload.message_id not in self.message_ids:
+        id_string = f"{payload.channel_id}/{payload.message_id}"
+        if id_string not in self.message_ids:
             return
         
 
@@ -161,14 +165,13 @@ class Raid():
             ctr = Pokemon(self.bot, ctrid, quickMoveid=ctrfast, chargeMoveid=ctrcharge)
             ctrs_list.append(ctr)
         return ctrs_list
-        
-
 
     async def egg_embed(self):
         raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png'
         footer_icon = 'https://media.discordapp.net/attachments/346766728132427777/512699022822080512/imageedit_10_6071805149.png'
         level = self.level
         egg_img_url = self.bot.raid_info.egg_images[level]
+        color = await formatters.url_color(egg_img_url)
         boss_list = self.boss_list
         hatch = self.hatch
         hatchdt = datetime.fromtimestamp(hatch)
@@ -203,7 +206,7 @@ class Raid():
         }
         footer_text = "Hatching"
         embed = formatters.make_embed(icon=raid_icon, title=directions_text,
-            thumbnail=egg_img_url, title_url = directions_url,
+            thumbnail=egg_img_url, title_url=directions_url, msg_colour=color,
             fields=fields, footer=footer_text, footer_icon=footer_icon)
         embed.timestamp = hatchdt
         return embed
@@ -290,7 +293,19 @@ class Raid():
         embed.timestamp = enddt
         return embed
     
+    async def update_messages(self):
+        if self.hatch:
+            embed = await self.egg_embed()
+        else:
+            embed = await self.raid_embed()
+        message_ids = self.message_ids
+        for messageid in message_ids:
+            msg = Message.from_id_string(self.bot, messageid)
+            await msg.edit(embed=embed)
+
+    
     async def hatch_egg(self, message):
+        self.hatch = None
         boss_list = self.boss_list
         for i in range(len(boss_list)):
             await message.add_reaction(f'{i+1}\u20e3')
@@ -303,7 +318,145 @@ class Raid():
     
     # async def expire_raid(self):
     
-    # async def update_gym(self, gym):     
+    # async def update_gym(self, gym):
+
+    async def rsvp(self, user, status, bosses: list=None, total: int=1,
+        bluecount: int=0, yellowcount: int=0, redcount: int=0):
+        if any((bluecount, yellowcount, redcount)):
+            calctotal = sum(bluecount, yellowcount, redcount)
+            if not total or total < calctotal:
+                total = calctotal
+                unknowncount = 0
+            elif total >= calctotal:
+                unknowncount = total - calctotal
+        d = {
+            'status': status,
+            'bosses': bosses,
+            'total': total,
+            'bluecount': bluecount,
+            'yellowcount': yellowcount,
+            'redcount': redcount,
+            'unknowncount': unknowncount
+        }
+        self.trainer_dict[user] = d
+
+    @property
+    def boss_interest_dict(self):
+        boss_list = self.boss_list
+        d = {x: 0 for x in boss_list}
+        trainer_dict = self.trainer_dict
+        for trainer in trainer_dict:
+            total = trainer_dict[trainer]['total']
+            bosses = trainer_dict[trainer]['bosses']
+            for boss in bosses:
+                d[boss] += total
+        return d
+
+    @property
+    def status_dict(self):
+        d = {
+            'interested': 0,
+            'coming': 0,
+            'here': 0,
+            'lobby': 0
+        }
+        trainer_dict = self.trainer_dict
+        for trainer in trainer_dict:
+            total = trainer_dict[trainer]['total']
+            status = trainer_dict[trainer]['status']
+            d[status] += total
+        return d
+    
+    @property
+    def team_dict(self):
+        d = {
+            'mystic': 0,
+            'instinct': 0,
+            'valor': 0,
+            'unknown': 0
+        }
+        trainer_dict = self.trainer_dict
+        for trainer in trainer_dict:
+            bluecount = trainer_dict[trainer]['bluecount']
+            yellowcount = trainer_dict[trainer]['yellowcount']
+            redcount = trainer_dict[trainer]['redcount']
+            unknowncount = trainer_dict[trainer]['unknowncount']
+            d['mystic'] += bluecount
+            d['instinct'] += yellowcount
+            d['valor'] += redcount
+            d['unknown'] += unknowncount
+        return d
+
+    async def get_trainer_dict(self):
+        def data(rcrd):
+            trainer = rcrd['id']
+            bosses = rcrd.get('bosses')
+            total = rcrd['total']
+            bluecount = rcrd.get('bluecount')
+            yellowcount = rcrd.get('yellowcount')
+            redcount = rcrd.get('redcount')
+            unknowncount = rcrd.get('unknowncount')
+            rcrd_dict = {
+                'bosses': bosses,
+                'total': total,
+                'bluecount': bluecount,
+                'yellowcount': yellowcount,
+                'redcount': redcount,
+                'unknowncount': unknowncount
+            }
+            return trainer, rcrd_dict
+        trainer_dict = {}
+        user_table = self.bot.dbi.table('users')
+        int_query = user_table.query()
+        int_query.where(self.id.in_(user_table['interested_list']))
+        int_data = await int_query.get()
+        for rcrd in int_data:
+            trainer, rcrd_dict = data(rcrd)
+            rcrd_dict['status'] = 'interested'
+            trainer_dict[trainer] = rcrd_dict
+        com_query = user_table.query()
+        com_query.where(coming=self.id)
+        com_data = await com_query.get()
+        for rcrd in com_data:
+            trainer, rcrd_dict = data(rcrd)
+            rcrd_dict['status'] = 'coming'
+            trainer_dict[trainer] = rcrd_dict
+        here_query = user_table.query()
+        here_query.where(here=self.id)
+        here_data = await here_query.get()
+        for rcrd in here_data:
+            trainer, rcrd_dict = data(rcrd)
+            rcrd_dict['status'] = 'here'
+            trainer_dict[trainer] = rcrd_dict
+        lob_query = user_table.query()
+        lob_query.where(lobby=self.id)
+        lob_data = await lob_query.data()
+        for rcrd in lob_data:
+            trainer, rcrd_dict = data(rcrd)
+            rcrd_dict['status'] = 'lobby'
+            trainer_dict[trainer] = rcrd_dict
+        self.trainer_dict = trainer_dict
+        return trainer_dict
+
+
+    @classmethod
+    async def from_data(cls, bot, data):
+        gym = Gym(bot, data['gym'])
+        level = data['level']
+        pkmnid, quick, charge = data.get('pkmn', [None, None, None])
+        if pkmnid:
+            pkmn = Pokemon(bot, pkmnid, quickMoveid=quick, chargeMoveid=charge)
+            boss = RaidBoss(pkmn)
+        else:
+            boss = None
+        hatch = data.get('hatch')
+        end = data['end']
+        raid = cls(bot, gym, level=level, pkmn=boss, hatch=hatch, end=end)
+        raid.channel_ids = data.get('channels')
+        raid.message_ids = data.get('messages')
+        raid.id = data['id']
+        bot.add_listener(raid.on_raw_reaction_add)
+        return raid  
         
 
 class RaidCog(Cog):
@@ -321,7 +474,25 @@ class RaidCog(Cog):
         query.where(gym=gym.id, guild=ctx.guild.id)
         old_raid = await query.get()
         if old_raid:
-            #handle duplicate?
+            old_raid = old_raid[0]
+            old_raid = Raid.from_data(ctx.bot, old_raid)
+            if old_raid.hatch:
+                embed = await old_raid.egg_embed()
+            else:
+                embed = await old_raid.raid_embed()
+            if old_raid.channel_ids:
+                mentions = []
+                for channelid in old_raid.channel_ids:
+                    channel = ctx.guild.get_channel(channelid)
+                    mention = channel.mention
+                    mentions.append(mention)
+                return await ctx.send(f"""There is already a raid reported at this gym!
+                    Coordinate here: {", ".join(mentions)}""", embed=embed)
+            else:
+                msg = await ctx.send(f"""There is already a raid reported at this gym!
+                    Coordinate here!""", embed=embed)
+                old_raid.message_ids.append(f"{msg.channel.id}/{msg.id}")
+                return msg
         if level_or_boss.isdigit():
             level = level_or_boss
             want = Want(ctx.bot, level, ctx.guild.id)
@@ -355,7 +526,7 @@ class RaidCog(Cog):
                 dms = await want.notify_users(dm_content, embed)
                 new_raid.message_ids.extend(dms)
             reportmsg = await ctx.send(reportcontent, embed=embed)
-            new_raid.message_ids.append(reportmsg.id)
+            new_raid.message_ids.append(f"{reportmsg.channel.id}/{reportmsg.id}")
         elif raid_mode.isdigit():
             catid = int(raid_mode)
             category = ctx.guild.get_channel(catid)
@@ -369,18 +540,22 @@ class RaidCog(Cog):
                 dms = await want.notify_users(dm_content, embed)
                 new_raid.message_ids.extend(dms)
             reportmsg = await ctx.send(reportcontent, embed=embed)
-            new_raid.message_ids.extend(reportmsg.id)
+            new_raid.message_ids.extend(f"{reportmsg.channel.id}/{reportmsg.id}")
         insert = raid_table.insert()
         data = {
             'gym': gym.id,
             'guild': ctx.guild.id,
             'level': level,
-            'pkmn': boss.id,
+            'pkmn': [boss.id or None, boss.quickMoveid or None, boss.chargeMoveid or None],
             'hatch': hatch,
-            'end': end
+            'end': end,
+            'messages': new_raid.message_ids,
+            'channels': new_raid.channel_ids
         }
         insert.row(**data)
-        await insert.commit()
+        rcrd = await insert.commit()
+        self.id = rcrd['id']
+        ctx.bot.add_listener(new_raid.on_raw_reaction_add)
         
         
         

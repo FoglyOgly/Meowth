@@ -426,7 +426,6 @@ class Dev:
         def row_from_rowbytes(rowstr):
             rowstr = rowstr.decode('utf-8')
             row = rowstr.split(',')
-            print(row)
             for i in range(len(row)):
                 row[i] = row[i][1:-1]
                 try:
@@ -443,6 +442,7 @@ class Dev:
                         row[i] = None
                     else:
                         pass
+            print(row)
             return row
         
         insert = update_table.insert()

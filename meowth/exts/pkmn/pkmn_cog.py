@@ -646,6 +646,7 @@ class Pokedex(Cog):
                 while True:
                     row = await resp.content.readline()
                     if row:
+                        print(row)
                         insert.row(*row)
                     else:
                         break

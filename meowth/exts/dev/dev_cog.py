@@ -424,7 +424,6 @@ class Dev:
         update_table = ctx.bot.dbi.table(table)
 
         def row_from_rowbytes(rowbytes):
-            rowstr = rowbytes.decode('utf-8')
             row = rowstr.split(',')
             for i in range(len(row)):
                 try:

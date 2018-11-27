@@ -424,9 +424,7 @@ class Dev:
         update_table = ctx.bot.dbi.table(table)
 
         def row_from_rowbytes(rowstr):
-            print(rowstr)
             rowstr = rowstr.decode('utf-8')
-            print(rowstr)
             row = rowstr.split(',')
             for i in range(len(row)):
                 try:
@@ -448,7 +446,6 @@ class Dev:
         
         insert = update_table.insert()
         url = f'https://docs.google.com/spreadsheets/d/{ctx.bot.config.dbdocid}/gviz/tq?tq=select *&sheet={table}&tqx=out:csv'
-        print(url)
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
                 cols = await resp.content.readline()
@@ -459,6 +456,8 @@ class Dev:
                     if row:
                         row = row_from_rowbytes(row)
                         insert.row(*row)
+                    else:
+                        break
         await insert.commit(do_update=True)
         await ctx.send('Table update successful.')
 

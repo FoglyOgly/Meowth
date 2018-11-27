@@ -222,9 +222,10 @@ class Gym(POI):
             else:
                 continue
         name_dict = {x['name'] : x['id'] for x in data}
-        match = get_match(nick_dict.keys(), arg)
-        if match:
-            return cls(ctx.bot, nick_dict[match[0]])
+        if nick_dict:
+            match = get_match(nick_dict.keys(), arg)
+            if match:
+                return cls(ctx.bot, nick_dict[match[0]])
         match = get_match(name_dict.keys(), arg)
         if match:
             return cls(ctx.bot, data_dict[match[0]])

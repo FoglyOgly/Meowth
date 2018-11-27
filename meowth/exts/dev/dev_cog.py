@@ -423,7 +423,7 @@ class Dev:
             return await ctx.send("Table not valid for update.")
         update_table = ctx.bot.dbi.table(table)
 
-        def row_from_rowbytes(rowbytes):
+        def row_from_rowbytes(rowstr):
             row = rowstr.split(',')
             for i in range(len(row)):
                 try:

@@ -20,6 +20,8 @@ db_details = {
     'password' : 'password'
 }
 
+dbdocid = 'google_sheet_id_here'
+
 emoji = {
     'coming': '\u1f697',
     'here': '<:here:350686955316445185>',

@@ -6,6 +6,7 @@ import traceback
 import unicodedata
 import json
 import logging
+import aiohttp
 from datetime import datetime
 from contextlib import redirect_stdout
 from subprocess import Popen, PIPE
@@ -398,7 +399,7 @@ class Dev:
     @group()
     @checks.is_owner()
     async def git(self, ctx):
-        ctx.git_path = os.path.dirname(ctx.bot.eevee_dir)
+        ctx.git_path = os.path.dirname(ctx.bot.bot_dir)
         ctx.git_cmd = ['git']
 
     @git.command()
@@ -407,3 +408,52 @@ class Dev:
 
         p = Popen(ctx.git_cmd, stdout=PIPE, cwd=ctx.git_path)
         await ctx.codeblock(p.stdout.read().decode("utf-8"), syntax="")
+    
+    @command()
+    @checks.is_co_owner()
+    async def update(self, ctx, table):
+        """Update database tables from Google Sheets."""
+        tables = await ctx.bot.dbi.tables()
+        valid_tables = ['pokemon', 'pokedex', 'moves', 'movesets', 'move_names',
+            'form_names', 'item_names']
+        if table not in tables:
+            return await ctx.send("Table does not exist.")
+        elif table not in valid_tables:
+            return await ctx.send("Table not valid for update.")
+        update_table = ctx.bot.dbi.table(table)
+
+        def row_from_rowbytes(rowbytes):
+            rowstr = rowbytes.decode('utf-8')
+            row = rowstr.split(',')
+            for i in range(len(row)):
+                try:
+                    value = float(row[i])
+                    if value.is_integer():
+                        value = int(value)
+                    row[i] = value
+                except ValueError:
+                    if row[i] == 'TRUE':
+                        row[i] = True
+                    elif row[i] == 'FALSE':
+                        row[i] = False
+                    elif row[i] == '':
+                        row[i] = None
+                    else:
+                        pass
+            return row
+        
+        insert = update_table.insert()
+        url = f'https://docs.google.com/d/{ctx.bot.config.dbdocid}/gviz/tq?tq=select *&sheet={table}&tqx=out:csv'
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                cols = await resp.content.readline()
+                cols = row_from_rowbytes(cols)
+                insert.set_columns(*cols)
+                while True:
+                    row = await resp.content.readline()
+                    if row:
+                        row = row_from_rowbytes(row)
+                        insert.row(*row)
+        await insert.commit(do_update=True)
+
+

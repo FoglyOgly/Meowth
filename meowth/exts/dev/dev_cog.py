@@ -426,6 +426,7 @@ class Dev:
         def row_from_rowbytes(rowstr):
             rowstr = rowstr.decode('utf-8')
             row = rowstr.split(',')
+            print(row)
             for i in range(len(row)):
                 try:
                     row[i] = row[i][1:-1]

@@ -646,7 +646,8 @@ class Pokedex(Cog):
                 while True:
                     row = await resp.content.readline()
                     if row:
-                        print(row)
+                        row = row.decode('utf-8')
+                        row = row.split(',')
                         insert.row(*row)
                     else:
                         break

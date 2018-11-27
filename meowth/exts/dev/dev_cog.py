@@ -445,6 +445,7 @@ class Dev:
         
         insert = update_table.insert()
         url = f'https://docs.google.com/spreadsheets/d/{ctx.bot.config.dbdocid}/gviz/tq?tq=select *&sheet={table}&tqx=out:csv'
+        print(url)
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
                 cols = await resp.content.readline()

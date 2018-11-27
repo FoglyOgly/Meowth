@@ -171,7 +171,7 @@ class Raid():
         footer_icon = 'https://media.discordapp.net/attachments/346766728132427777/512699022822080512/imageedit_10_6071805149.png'
         level = self.level
         egg_img_url = self.bot.raid_info.egg_images[level]
-        color = await formatters.url_color(egg_img_url)
+        # color = await formatters.url_color(egg_img_url)
         boss_list = self.boss_list
         hatch = self.hatch
         hatchdt = datetime.fromtimestamp(hatch)
@@ -253,7 +253,7 @@ class Raid():
         if is_boosted:
             cp_str += " (Boosted)"
         img_url = await boss.sprite_url()
-        color = await boss.color()
+        # color = await boss.color()
         gym = self.gym
         directions_url = await gym.url()
         gym_name = await gym._name()

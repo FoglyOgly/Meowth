@@ -364,7 +364,7 @@ class Pokemon():
         pkmn_name = await self.name()
         type_emoji = await self.type_emoji()
         sprite_url = await self.sprite_url()
-        color = await self.color()
+        # color = await self.color()
         fast_moves = await self.fast_moves()
         fast_move_names = []
         for x in fast_moves:
@@ -631,39 +631,3 @@ class Pokedex(Cog):
     async def pokedex(self, ctx, *, pokemon: Pokemon):
         return await ctx.send(embed=await pokemon.dex_embed())
     
-    @command()
-    @checks.is_co_owner()
-    async def pokemonupdate(self, ctx):
-        data_table = ctx.bot.dbi.table('pokemon')
-        insert = data_table.insert()
-        url = 'https://docs.google.com/spreadsheets/d/1l0qVUL43fjY1Yo2bC6RtI1Tvha5XmkK76whjKzIQrK8/export?format=csv&id=1l0qVUL43fjY1Yo2bC6RtI1Tvha5XmkK76whjKzIQrK8&gid=847346559'
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as resp:
-                cols = await resp.content.readline()
-                cols = cols.decode('utf-8')
-                cols = cols.split(',')
-                insert.set_columns(*cols)
-                while True:
-                    row = await resp.content.readline()
-                    if row:
-                        row = row.decode('utf-8')
-                        row = row.split(',')
-                        int_indices = [1, 2, 5, 11, 12, 13, 19, 21]
-                        for i in int_indices:
-                            if row[i]:
-                                row[i] = int(row[i])
-                            else:
-                                row[i] = None
-                        bool_indices = [7, 8, 9, 10]
-                        for i in bool_indices:
-                            if row[i] == 'TRUE':
-                                row[i] = True
-                            else:
-                                row[i] = False
-                        float_indices = [14, 15, 16, 17]
-                        for i in float_indices:
-                            row[i] = float(row[i])
-                        insert.row(*row)
-                    else:
-                        break
-        await insert.commit(do_update=True)

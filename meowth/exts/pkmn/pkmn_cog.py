@@ -652,6 +652,8 @@ class Pokedex(Cog):
                         for i in int_indices:
                             if row[i]:
                                 row[i] = int(row[i])
+                            else:
+                                row[i] = None
                         bool_indices = [7, 8, 9, 10]
                         for i in bool_indices:
                             if row[i] == 'TRUE':

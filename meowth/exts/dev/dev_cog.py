@@ -414,6 +414,7 @@ class Dev:
     async def update(self, ctx, table):
         """Update database tables from Google Sheets."""
         tables = await ctx.bot.dbi.tables()
+        tables = [x['table_name'] for x in tables]
         valid_tables = ['pokemon', 'pokedex', 'moves', 'movesets', 'move_names',
             'form_names', 'item_names']
         if table not in tables:

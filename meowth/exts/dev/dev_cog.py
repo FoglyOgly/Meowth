@@ -456,5 +456,6 @@ class Dev:
                         row = row_from_rowbytes(row)
                         insert.row(*row)
         await insert.commit(do_update=True)
+        await ctx.send('Table update successful.')
 
 

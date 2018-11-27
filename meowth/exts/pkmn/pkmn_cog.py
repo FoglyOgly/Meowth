@@ -648,6 +648,19 @@ class Pokedex(Cog):
                     if row:
                         row = row.decode('utf-8')
                         row = row.split(',')
+                        int_indices = [1, 2, 5, 11, 12, 13, 19, 21]
+                        for i in int_indices:
+                            if row[i]:
+                                row[i] = int(row[i])
+                        bool_indices = [7, 8, 9, 10]
+                        for i in bool_indices:
+                            if row[i] == 'TRUE':
+                                row[i] = True
+                            else:
+                                row[i] = False
+                        float_indices = [14, 15, 16, 17]
+                        for i in float_indices:
+                            row[i] = float(row[i])
                         insert.row(*row)
                     else:
                         break

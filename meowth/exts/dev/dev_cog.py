@@ -427,7 +427,7 @@ class Dev:
             rowstr = rowstr.decode('utf-8')
             row = rowstr.split(',')
             for i in range(len(row)):
-                row[i] = row[i][1:-1]
+                row[i] = row[i].replace('"', '')
                 try:
                     value = float(row[i])
                     if value.is_integer():

@@ -428,6 +428,7 @@ class Dev:
             row = rowstr.split(',')
             for i in range(len(row)):
                 row[i] = row[i].replace('"', '')
+                row[i] = row[i].replace('\n', '')
                 try:
                     value = float(row[i])
                     if value.is_integer():
@@ -442,7 +443,6 @@ class Dev:
                         row[i] = None
                     else:
                         pass
-            print(row)
             return row
         
         insert = update_table.insert()

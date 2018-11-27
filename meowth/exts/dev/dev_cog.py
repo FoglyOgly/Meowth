@@ -428,8 +428,8 @@ class Dev:
             row = rowstr.split(',')
             print(row)
             for i in range(len(row)):
+                row[i] = row[i][1:-1]
                 try:
-                    row[i] = row[i][1:-1]
                     value = float(row[i])
                     if value.is_integer():
                         value = int(value)

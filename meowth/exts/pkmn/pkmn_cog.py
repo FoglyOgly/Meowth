@@ -396,7 +396,7 @@ class Pokemon():
             # icon = author_icon,
             title=f"#{num} {pkmn_name} - {category}",
             content=embed_desc,
-            msg_colour = color,
+            # msg_colour = color,
             thumbnail = sprite_url,
             fields = fields
         )

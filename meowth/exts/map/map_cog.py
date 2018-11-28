@@ -88,7 +88,7 @@ class ReportChannel():
         covering = await self.level_10_covering()
         gyms = self.bot.dbi.table('gyms')
         gyms_query = gyms.query().where(gyms['l10'].in_(covering))
-        gyms_query.where(guild=self.channel.guild.id)
+        # gyms_query.where(guild=self.channel.guild.id)
         return gyms_query
 
 

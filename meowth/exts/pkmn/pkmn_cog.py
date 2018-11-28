@@ -504,6 +504,7 @@ class Pokemon():
             react, author = await formatters.ask(ctx.bot, multi, user_list=[ctx.author.id],
                 react_list=react_list)
             choice = choice_dict[react]
+            return choice
         return cls(ctx.bot, pokemonid, form=form, gender=gender, shiny=shiny,
             attiv=attiv, defiv=defiv, staiv=staiv, lvl=lvl, quickMoveid=quickMoveid,
             chargeMoveid=chargeMoveid, cp=cp)

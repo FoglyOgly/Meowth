@@ -228,7 +228,7 @@ class Gym(POI):
                 return cls(ctx.bot, nick_dict[match[0]])
         match = get_match(name_dict.keys(), arg)
         if match:
-            return cls(ctx.bot, data_dict[match[0]])
+            return cls(ctx.bot, name_dict[match[0]])
     
     @classmethod
     async def insert_from_data(cls, bot, guildid, data):

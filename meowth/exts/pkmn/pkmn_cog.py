@@ -487,13 +487,23 @@ class Pokemon():
                             pokedex['name'].in_(names))
                         ids = await ref.get_values()
         possible_ids = set(ids) & set(id_list)
-        if len(possible_ids) == 1:
+        length = len(possible_ids)
+        if length == 1:
             pokemonid = possible_ids.pop()
-        elif len(possible_ids) == 0:
+        elif length == 0:
             raise PokemonNotFound
         else:
-            multi = await ctx.send('Multiple possible Pokemon found! Please select from the following list.')
-            # port utils.ask from v2
+            possible_mons = [(await cls(ctx.bot, x)) for x in possible_ids]
+            possible_names = [(await mon.name()) for mon in possible_mons]
+            react_list = formatters.mc_emoji(length)
+            choice_dict = dict(zip(possible_mons, react_list))
+            display_dict = dict(zip(possible_names, react_list))
+            embed = formatters.mc_embed(display_dict)
+            multi = await ctx.send('Multiple possible Pokemon found! Please select from the following list.',
+                embed=embed)
+            react, author = await formatters.ask(ctx.bot, multi, user_list=[ctx.author.id],
+                react_list=react_list)
+            choice = choice_dict[react]
         return cls(ctx.bot, pokemonid, form=form, gender=gender, shiny=shiny,
             attiv=attiv, defiv=defiv, staiv=staiv, lvl=lvl, quickMoveid=quickMoveid,
             chargeMoveid=chargeMoveid, cp=cp)

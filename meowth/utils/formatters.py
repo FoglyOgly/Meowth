@@ -148,3 +148,35 @@ def convert_to_bool(argument):
         return False
     else:
         return None
+
+async def ask(bot, message, user_list=None, timeout=60, *, react_list=['✅', '❎']):
+    if user_list and type(user_list) != __builtins__.list:
+        user_list = [user_list]
+    def check(reaction, user):
+        if user_list and type(user_list) is __builtins__.list:
+            return (user.id in user_list) and (reaction.message.id == message.id) and (reaction.emoji in react_list)
+        elif not user_list:
+            return (user.id != message.author.id) and (reaction.message.id == message.id) and (reaction.emoji in react_list)
+    for r in react_list:
+        await asyncio.sleep(0.25)
+        await message.add_reaction(r)
+    try:
+        reaction, user = await bot.wait_for('reaction_add', check=check, timeout=timeout)
+        return reaction, user
+    except asyncio.TimeoutError:
+        await message.clear_reactions()
+        return
+
+def mc_emoji(length: int):
+    if length > 10:
+        return None
+    elif length < 10:
+        return [f'{i}\u20e3' for i in range(1, length)]
+    else:
+        return [f'{i}\u20e3' for i in range(length)]
+
+def mc_embed(choice_dict: dict):
+    embed = discord.Embed()
+    items = [f'{k}: {v}' for k,v in choice_dict.items()] 
+    embed.add_field(name='Choices', value='\n'.join(items))
+    return embed

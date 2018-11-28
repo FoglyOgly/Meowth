@@ -486,6 +486,10 @@ class Pokemon():
                         ref = pokedex.query('pokemonid').where(
                             pokedex['name'].in_(names))
                         ids = await ref.get_values()
+                    else:
+                        raise PokemonNotFound
+        print(ids)
+        print(id_list)
         possible_ids = set(ids) & set(id_list)
         length = len(possible_ids)
         if length == 1:

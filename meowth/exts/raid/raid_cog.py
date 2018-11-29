@@ -486,7 +486,7 @@ class RaidCog(Cog):
         old_raid = await query.get()
         if old_raid:
             old_raid = old_raid[0]
-            old_raid = Raid.from_data(ctx.bot, old_raid)
+            old_raid = await Raid.from_data(ctx.bot, old_raid)
             if old_raid.hatch:
                 embed = await old_raid.egg_embed()
             else:

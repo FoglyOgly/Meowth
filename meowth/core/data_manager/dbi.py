@@ -125,6 +125,7 @@ class DatabaseInterface:
                 else:
                     async with conn.transaction():
                         async for rcrd in stmt.cursor(*query_args):
+                            print(rcrd)
                             result.append(rcrd)
                 return result
         except asyncpg.exceptions.InterfaceError:

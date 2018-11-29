@@ -454,7 +454,7 @@ class Raid():
     async def from_data(cls, bot, data):
         gym = Gym(bot, data['gym'])
         level = data['level']
-        pkmnid, quick, charge = data.get('pkmn', [None, None, None])
+        pkmnid, quick, charge = data.get('pkmn', (None, None, None))
         if pkmnid:
             pkmn = Pokemon(bot, pkmnid, quickMoveid=quick, chargeMoveid=charge)
             boss = RaidBoss(pkmn)
@@ -555,7 +555,7 @@ class RaidCog(Cog):
             'gym': gym.id,
             'guild': ctx.guild.id,
             'level': level,
-            'pkmn': [boss.id or None, boss.quickMoveid or None, boss.chargeMoveid or None],
+            'pkmn': (boss.id or None, boss.quickMoveid or None, boss.chargeMoveid or None),
             'hatch': hatch,
             'endtime': end,
             'messages': new_raid.message_ids,

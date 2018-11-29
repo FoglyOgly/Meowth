@@ -24,7 +24,7 @@ class Weather():
     
     async def boosted_emoji_str(self):
         types_table = self.bot.dbi.table('types')
-        query = types_table.select('emoji').where(weather=self.value)
+        query = types_table.query('emoji').where(weather=self.value)
         emoji_list = await query.get_values()
         return "".join(emoji_list)
 

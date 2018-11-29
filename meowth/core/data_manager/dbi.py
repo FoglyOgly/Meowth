@@ -119,15 +119,17 @@ class DatabaseInterface:
                 if any(isinstance(x, (set, tuple)) for x in query_args):
                     async with conn.transaction():
                         for query_arg in query_args:
-                            async for rcrd in stmt.cursor(*query_arg):
-                                print(rcrd)
-                                result.append(rcrd)
+                            rcrd = await stmt.fetch(*query_arg)
+                            result.append(rcrd)
+                            # async for rcrd in stmt.cursor(*query_arg):
+                            #     result.append(rcrd)
+                        return result
                 else:
                     async with conn.transaction():
-                        async for rcrd in stmt.cursor(*query_args):
-                            print(rcrd)
-                            result.append(rcrd)
-                return result
+                        return await stmt.fetch(*query_args)
+                #         async for rcrd in stmt.cursor(*query_args):
+                #             result.append(rcrd)
+                # return result
         except asyncpg.exceptions.InterfaceError as e:
             logger.error(f'Exception {type(e)}: {e}')
             await self.recreate_pool()

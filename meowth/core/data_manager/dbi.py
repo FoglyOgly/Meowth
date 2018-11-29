@@ -128,7 +128,7 @@ class DatabaseInterface:
                 return result
         except asyncpg.exceptions.InterfaceError:
             await self.recreate_pool()
-            return await self.execute_query(query, *query_args)
+            return await self.execute_transaction(query, *query_args)
 
     async def create_table(self, name, columns: list, *, primaries=None):
         """Create table."""

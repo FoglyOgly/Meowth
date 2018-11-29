@@ -128,7 +128,8 @@ class DatabaseInterface:
                             print(rcrd)
                             result.append(rcrd)
                 return result
-        except asyncpg.exceptions.InterfaceError:
+        except asyncpg.exceptions.InterfaceError as e:
+            logger.error(f'Exception {type(e)}: {e}')
             await self.recreate_pool()
             return await self.execute_transaction(query, *query_args)
 

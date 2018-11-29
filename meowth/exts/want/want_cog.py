@@ -32,6 +32,8 @@ class Want():
         _data = self._data
         _data.select('users')
         users = await _data.get_value()
+        if not users:
+            users = []
         return users
     
     async def notify_users(self, content, embed):

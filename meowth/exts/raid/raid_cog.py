@@ -56,7 +56,18 @@ class Raid():
             self.end = end
             self.hatch = hatch
         self.trainer_dict = trainer_dict
-        
+
+    @property
+    def max_hatch(self):
+        level = self.level
+        max_times = self.bot.raid_info.raid_times[level]
+        return max_times[0]
+    
+    @property
+    def max_active(self):
+        level = self.level
+        max_times = self.bot.raid_info.raid_times[level]
+        return max_times[1]
     
     def update_time(self, new_time: int):
         if new_time < 0:
@@ -450,7 +461,7 @@ class Raid():
         else:
             boss = None
         hatch = data.get('hatch')
-        end = data['end']
+        end = data['endtime']
         raid = cls(bot, gym, level=level, pkmn=boss, hatch=hatch, end=end)
         raid.channel_ids = data.get('channels')
         raid.message_ids = data.get('messages')
@@ -499,7 +510,7 @@ class RaidCog(Cog):
             role = await want.role()
             boss = None
             hatch = time.time() + 60*endtime
-            end = None
+            end = hatch + 60*ctx.bot.raid_info.raid_times[level][1]
         else:
             boss = await RaidBoss.convert(ctx, level_or_boss)
             want = Want(ctx.bot, boss.id, ctx.guild.id)
@@ -548,7 +559,7 @@ class RaidCog(Cog):
             'level': level,
             'pkmn': [boss.id or None, boss.quickMoveid or None, boss.chargeMoveid or None],
             'hatch': hatch,
-            'end': end,
+            'endtime': end,
             'messages': new_raid.message_ids,
             'channels': new_raid.channel_ids
         }

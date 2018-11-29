@@ -564,6 +564,7 @@ class RaidCog(Cog):
         insert.row(**data)
         insert.returning()
         rcrd = await insert.commit()
+        print(rcrd)
         self.id = rcrd[0]['id']
         ctx.bot.add_listener(new_raid.on_raw_reaction_add)
         

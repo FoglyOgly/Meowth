@@ -48,6 +48,8 @@ class Want():
 
     async def is_role(self):
         users = await self._users()
+        if not users:
+            return False
         if len(users) > 10:
             return True
         else:

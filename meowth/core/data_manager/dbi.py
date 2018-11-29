@@ -120,6 +120,7 @@ class DatabaseInterface:
                     async with conn.transaction():
                         for query_arg in query_args:
                             async for rcrd in stmt.cursor(*query_arg):
+                                print(rcrd)
                                 result.append(rcrd)
                 else:
                     async with conn.transaction():

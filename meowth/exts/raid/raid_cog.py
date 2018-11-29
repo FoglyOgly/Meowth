@@ -562,7 +562,7 @@ class RaidCog(Cog):
             'channels': new_raid.channel_ids
         }
         insert.row(**data)
-        insert.returning()
+        insert.returning('id')
         rcrd = await insert.commit()
         print(rcrd)
         self.id = rcrd[0]['id']

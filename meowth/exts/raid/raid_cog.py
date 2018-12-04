@@ -395,7 +395,7 @@ class Raid():
         else:
             embed = await self.raid_embed()
         for messageid in message_ids:
-            msg = Message.from_id_string(self.bot, messageid)
+            msg = await Message.from_id_string(self.bot, messageid)
             await msg.edit(content=content, embed=embed)
             msg_list.append(msg)
         if self.channel_ids:

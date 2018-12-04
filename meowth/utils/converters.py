@@ -63,7 +63,7 @@ class Message:
     """
     @classmethod
     async def from_id_string(cls, bot, arg: str):
-        ids = arg.strip('/')
+        ids = arg.split('/')
         channelid = int(ids[0])
         messageid = int(ids[1])
         channel = bot.get_channel(channelid)

@@ -488,8 +488,6 @@ class Pokemon():
                         ids = await ref.get_values()
                     else:
                         raise PokemonNotFound
-        print(ids)
-        print(id_list)
         possible_ids = set(ids) & set(id_list)
         length = len(possible_ids)
         if length == 1:
@@ -500,8 +498,8 @@ class Pokemon():
             possible_mons = [(await cls(ctx.bot, x)) for x in possible_ids]
             possible_names = [(await mon.name()) for mon in possible_mons]
             react_list = formatters.mc_emoji(length)
-            choice_dict = dict(zip(possible_mons, react_list))
-            display_dict = dict(zip(possible_names, react_list))
+            choice_dict = dict(zip(react_list, possible_mons))
+            display_dict = dict(zip(react_list, possible_names))
             embed = formatters.mc_embed(display_dict)
             multi = await ctx.send('Multiple possible Pokemon found! Please select from the following list.',
                 embed=embed)

@@ -43,7 +43,8 @@ team_colours = {
 team_emoji = {
     "mystic"   : "<:mystic:351758303912656896>",
     "valor"    : "<:valor:351758298975830016>",
-    "instinct" : "<:instinct:351758298627702786>"
+    "instinct" : "<:instinct:351758298627702786>",
+    "unknown" : "\u2754"
 }
 
 # raid settings

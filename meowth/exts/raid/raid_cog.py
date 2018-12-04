@@ -121,6 +121,28 @@ class Raid():
         id_string = f"{payload.channel_id}/{payload.message_id}"
         if id_string not in self.message_ids:
             return
+    
+    async def monitor_status(self):
+        while True:
+            hatch = self.hatch
+            end = self.end
+            if hatch:
+                sleeptime = time.time() - hatch
+                await asyncio.sleep(sleeptime)
+                hatch = self.hatch
+                if hatch <= time.time():
+                    await self.hatch_egg()
+                    continue
+                else:
+                    continue
+            else:
+                sleeptime = time.time() - end
+                await asyncio.sleep(sleeptime)
+                end = self.end
+                if end <= time.time():
+                    await self.expire_raid()
+                else:
+                    continue
         
 
     
@@ -221,6 +243,44 @@ class Raid():
             fields=fields, footer=footer_text, footer_icon=footer_icon)
         embed.timestamp = hatchdt
         return embed
+    
+    async def hatched_embed(self):
+        raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png'
+        footer_icon = 'https://media.discordapp.net/attachments/346766728132427777/512699022822080512/imageedit_10_6071805149.png'
+        level = self.level
+        egg_img_url = self.bot.raid_info.egg_images[level]
+        # color = await formatters.url_color(egg_img_url)
+        boss_list = self.boss_list
+        end = self.end
+        enddt = datetime.fromtimestamp(end)
+        gym = self.gym
+        directions_url = await gym.url()
+        directions_text = await gym._name()
+        exraid = await gym._exraid()
+        if exraid:
+            directions_text += " (EX Raid Gym)"
+        weather = await self.weather()
+        weather = Weather(self.bot, weather)
+        weather_name = await weather.name()
+        weather_emoji = await weather.boosted_emoji_str()
+        boss_names = [await x.name() for x in boss_list]
+        length = len(boss_list)
+        react_list = formatters.mc_emoji(length)
+        choice_list = [react_list[i] + boss_names[i] for i in range(len(react_list))]
+        half_length = -len(boss_names)//2
+        bosses_left = choice_list[0:half_length]
+        bosses_right = choice_list[half_length:]
+        fields = {
+            "Weather": (False, f"{weather_name} {weather_emoji}"),
+            "Possible Bosses:": "\n".join(bosses_left),
+            "\u200b": "\n".join(bosses_right)
+        }
+        footer_text = "Ending"
+        embed = formatters.make_embed(icon=raid_icon, title=directions_text,
+            thumbnail=egg_img_url, title_url=directions_url, # msg_colour=color,
+            fields=fields, footer=footer_text, footer_icon=footer_icon)
+        embed.timestamp = enddt
+        return embed
 
     async def raid_embed(self):
         raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png' #TODO
@@ -275,13 +335,25 @@ class Raid():
         resists = await boss.resistances_emoji()
         weaks = await boss.weaknesses_emoji()
         ctrs_list = await self.generic_counters_data()
+        await self.get_trainer_dict()
+        status_dict = self.status_dict
+        status_str = f"{self.bot.config.emoji['maybe']}: {status_dict['maybe']} | "
+        status_str += f"{self.bot.config.emoji['coming']}: {status_dict['coming']} | "
+        status_str += f"{self.bot.config.emoji['here']}: {status_dict['here']}"
+        team_dict = self.team_dict
+        team_str = f"{self.bot.config.team_emoji['mystic']}: {team_dict['mystic']} | "
+        team_str += f"{self.bot.config.team_emoji['instinct']}: {team_dict['instinct']} | "
+        team_str += f"{self.bot.config.team_emoji['valor']}: {team_dict['valor']} | "
+        team_str += f"{self.bot.config.team_emoji['unknown']}: {team_dict['unknown']}"
         fields = {
             "Boss": f"{boss_name} {type_emoji}",
             "Weather": f"{weather_name} {weather_emoji}",
             "Weaknesses": weaks,
             "Resistances": resists,
             "CP Range": f"{cp_range[0]}-{cp_range[1]}",
-            "Moveset": moveset
+            "Moveset": moveset,
+            "Status List": status_str,
+            "Team List": team_str
         }
         i = 1
         ctrs_str = []
@@ -304,26 +376,47 @@ class Raid():
         embed.timestamp = enddt
         return embed
     
-    async def update_messages(self):
+    async def update_messages(self, content=''):
+        msg_list = []
+        message_ids = self.message_ids
         if self.hatch:
             embed = await self.egg_embed()
+        elif not self.pkmn:
+            embed = await self.hatched_embed()
         else:
             embed = await self.raid_embed()
-        message_ids = self.message_ids
         for messageid in message_ids:
             msg = Message.from_id_string(self.bot, messageid)
-            await msg.edit(embed=embed)
+            await msg.edit(content=content, embed=embed)
+            msg_list.append(msg)
+        if self.channel_ids:
+            for chanid in self.channel_ids:
+                channel = self.bot.get_channel(chanid)
+                msg = await channel.send(content, embed=embed)
+                msg_list.append(msg)
+        return msg_list
+
 
     
-    async def hatch_egg(self, message):
+    async def hatch_egg(self):
+        content = "This raid egg has hatched! React below to report the boss!"
         self.hatch = None
         boss_list = self.boss_list
-        for i in range(len(boss_list)):
-            await message.add_reaction(f'{i+1}\u20e3')
+        length = len(boss_list)
+        react_list = formatters.mc_emoji(length)
+        boss_dict = dict(zip(react_list, boss_list))
+        msg_list = await self.update_messages(content=content)
+        response = await formatters.ask(self.bot, msg_list, timeout=(time.time()-self.end),
+            react_list=react_list)
+        if response:
+            emoji = response.emoji
+            pkmn = boss_dict[emoji]
+            return await self.report_hatch(pkmn)
+        
 
     async def report_hatch(self, pkmn):
         self.pkmn = pkmn
-        return await self.raid_embed()
+        return await self.update_messages()
 
     # async def update_weather(self, weather):
     
@@ -350,6 +443,7 @@ class Raid():
             'unknowncount': unknowncount
         }
         self.trainer_dict[user] = d
+        await self.update_messages()
 
     @property
     def boss_interest_dict(self):
@@ -466,6 +560,7 @@ class Raid():
         raid.channel_ids = data.get('channels')
         raid.message_ids = data.get('messages')
         raid.id = data['id']
+        await raid.get_trainer_dict()
         bot.add_listener(raid.on_raw_reaction_add)
         return raid  
         
@@ -538,7 +633,10 @@ class RaidCog(Cog):
             new_raid.message_ids.append(f"{reportmsg.channel.id}/{reportmsg.id}")
         elif raid_mode.isdigit():
             catid = int(raid_mode)
-            category = ctx.guild.get_channel(catid)
+            if catid:
+                category = ctx.guild.get_channel(catid)
+            else:
+                category = None
             raid_channel_name = await new_raid.channel_name()
             raid_channel = await ctx.guild.create_text_channel(raid_channel_name,
                 category=category)
@@ -564,9 +662,9 @@ class RaidCog(Cog):
         insert.row(**data)
         insert.returning('id')
         rcrd = await insert.commit()
-        print(rcrd)
-        self.id = rcrd[0][0]
+        new_raid.id = rcrd[0][0]
         ctx.bot.add_listener(new_raid.on_raw_reaction_add)
+        await new_raid.monitor_status()
         
         
         

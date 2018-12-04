@@ -149,22 +149,28 @@ def convert_to_bool(argument):
     else:
         return None
 
-async def ask(bot, message, user_list=None, timeout=60, *, react_list=['✅', '❎']):
+async def ask(bot, message_list, user_list=None, timeout=60, *, react_list=['✅', '❎']):
     if user_list and type(user_list) != __builtins__.list:
         user_list = [user_list]
-    def check(reaction, user):
+    message_id_list = [x.id for x in message_list]
+    
+    def check(payload):
+        user_id = payload.user_id
+        message_id = payload.message_id
+        emoji = payload.emoji
         if user_list and type(user_list) is __builtins__.list:
-            return (user.id in user_list) and (reaction.message.id == message.id) and (reaction.emoji in react_list)
+            return (user_id in user_list) and (message_id in message_id_list) and (emoji in react_list)
         elif not user_list:
-            return (user.id != message.author.id) and (reaction.message.id == message.id) and (reaction.emoji in react_list)
+            return (user_id != bot.id) and (message_id in message_id_list) and (emoji in react_list)
     for r in react_list:
-        await asyncio.sleep(0.25)
-        await message.add_reaction(r)
+        for message in message_list:
+            await message.add_reaction(r)
     try:
-        reaction, user = await bot.wait_for('reaction_add', check=check, timeout=timeout)
-        return reaction, user
+        payload = await bot.wait_for('raw_reaction_add', check=check, timeout=timeout)
+        return payload
     except asyncio.TimeoutError:
-        await message.clear_reactions()
+        for message in message_list:
+            await message.clear_reactions()
         return
 
 def mc_emoji(length: int):

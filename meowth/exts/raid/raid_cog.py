@@ -653,7 +653,7 @@ class RaidCog(Cog):
             'gym': gym.id,
             'guild': ctx.guild.id,
             'level': level,
-            'pkmn': (boss.id or None, boss.quickMoveid or None, boss.chargeMoveid or None),
+            'pkmn': (boss.id, boss.quickMoveid or None, boss.chargeMoveid or None) if boss else (None, None, None),
             'hatch': hatch,
             'endtime': end,
             'messages': new_raid.message_ids,

@@ -69,7 +69,7 @@ class SQLOperator:
         return cls('=', 'in', '{column} {operator} any({value})')
     
     @classmethod
-    def _contains(cls):
+    def contains_(cls):
         return cls('=', 'in', '{value} {operator} any({column})')
 
     @classmethod

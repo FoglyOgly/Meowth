@@ -263,7 +263,16 @@ class Raid():
         weather = Weather(self.bot, weather)
         weather_name = await weather.name()
         weather_emoji = await weather.boosted_emoji_str()
-        boss_names = [await x.name() for x in boss_list]
+        boss_names = []
+        for i in range(len(boss_list)):
+            x = boss_list[i]
+            boss = RaidBoss(Pokemon(self.bot, x))
+            name = await boss.name()
+            type_emoji = await boss.type_emoji()
+            shiny_available = await boss._shiny_available()
+            if shiny_available:
+                name += ':sparkles:'
+            boss_names.append(f"{name} {type_emoji}")
         length = len(boss_list)
         react_list = formatters.mc_emoji(length)
         choice_list = [react_list[i] + boss_names[i] for i in range(len(react_list))]

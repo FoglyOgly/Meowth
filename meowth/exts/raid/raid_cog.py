@@ -535,7 +535,7 @@ class Raid():
             trainer_dict[trainer] = rcrd_dict
         lob_query = user_table.query()
         lob_query.where(lobby=self.id)
-        lob_data = await lob_query.data()
+        lob_data = await lob_query.get()
         for rcrd in lob_data:
             trainer, rcrd_dict = data(rcrd)
             rcrd_dict['status'] = 'lobby'

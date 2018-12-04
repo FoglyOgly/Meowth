@@ -513,7 +513,7 @@ class Raid():
         trainer_dict = {}
         user_table = self.bot.dbi.table('users')
         int_query = user_table.query()
-        int_query.where(self.id.in_(user_table['interested_list']))
+        int_query.where(user_table['interested_list'].contains_(self.id))
         int_data = await int_query.get()
         for rcrd in int_data:
             trainer, rcrd_dict = data(rcrd)

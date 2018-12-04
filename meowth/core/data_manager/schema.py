@@ -67,6 +67,10 @@ class SQLOperator:
     @classmethod
     def in_(cls):
         return cls('=', 'in', '{column} {operator} any({value})')
+    
+    @classmethod
+    def _contains(cls):
+        return cls('=', 'in', '{value} {operator} any({column})')
 
     @classmethod
     def is_(cls):
@@ -184,6 +188,10 @@ class Column:
     def in_(self, value):
         return SQLComparison(
             SQLOperator.in_(), self.aggregate, self.full_name, value)
+    
+    def contains_(self, value):
+        return SQLComparison(
+            SQLOperator.contains_(), self.aggregate, self.full_name, value)
     
     def is_(self, value):
         return SQLComparison(
@@ -329,7 +337,6 @@ class TableColumns:
         metatable.query.where(TABLE_NAME=self._table.name)
         if names:
             metatable.query.where(metatable['COLUMN_NAME'].in_(names))
-        print(metatable.query.sql())
         return await metatable.query.get()
 
     async def get_names(self):

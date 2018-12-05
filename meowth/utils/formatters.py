@@ -161,7 +161,7 @@ async def ask(bot, message_list, user_list=None, timeout=60, *, react_list=['✅
         if user_list and type(user_list) is __builtins__.list:
             return (user_id in user_list) and (message_id in message_id_list) and (emoji in react_list)
         elif not user_list:
-            return (user_id != bot.id) and (message_id in message_id_list) and (emoji in react_list)
+            return (user_id != bot.user.id) and (message_id in message_id_list) and (emoji in react_list)
     for r in react_list:
         for message in message_list:
             await message.add_reaction(r)

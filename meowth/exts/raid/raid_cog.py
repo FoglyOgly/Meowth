@@ -422,7 +422,7 @@ class Raid():
         response = await formatters.ask(self.bot, msg_list, timeout=(self.end-time.time()),
             react_list=react_list)
         if response:
-            emoji = response.emoji
+            emoji = str(response.emoji)
             pkmn = boss_dict[emoji]
             return await self.report_hatch(pkmn)
         

@@ -158,12 +158,6 @@ async def ask(bot, message_list, user_list=None, timeout=60, *, react_list=['✅
         user_id = payload.user_id
         message_id = payload.message_id
         emoji = payload.emoji
-        print(user_list)
-        print(user_id)
-        print(message_id)
-        print(emoji)
-        print(message_id_list)
-        print(react_list)
         if user_list and type(user_list) is __builtins__.list:
             return (user_id in user_list) and (message_id in message_id_list) and (str(emoji) in react_list)
         elif not user_list:

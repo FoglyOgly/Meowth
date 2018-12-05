@@ -419,7 +419,7 @@ class Raid():
         react_list = formatters.mc_emoji(length)
         boss_dict = dict(zip(react_list, boss_list))
         msg_list = await self.update_messages(content=content)
-        response = await formatters.ask(self.bot, msg_list, timeout=(time.time()-self.end),
+        response = await formatters.ask(self.bot, msg_list, timeout=(self.end-time.time()),
             react_list=react_list)
         if response:
             emoji = response.emoji

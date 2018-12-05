@@ -277,9 +277,12 @@ class Raid():
         length = len(boss_list)
         react_list = formatters.mc_emoji(length)
         choice_list = [react_list[i] + ' ' + boss_names[i] for i in range(len(react_list))]
+        print(choice_list)
         half_length = ceil(len(boss_names)//2)
         bosses_left = choice_list[0:(half_length-1)]
+        print(bosses_left)
         bosses_right = choice_list[(half_length-1):]
+        print(bosses_right)
         fields = {
             "Weather": (False, f"{weather_name} {weather_emoji}"),
             "Possible Bosses:": "\n".join(bosses_left),

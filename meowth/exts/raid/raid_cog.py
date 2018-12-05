@@ -394,7 +394,7 @@ class Raid():
         message_ids = self.message_ids
         if self.hatch:
             embed = await self.egg_embed()
-        elif not self.pkmn:
+        elif self.pkmn is None:
             embed = await self.hatched_embed()
         else:
             embed = await self.raid_embed()

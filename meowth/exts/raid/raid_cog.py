@@ -428,7 +428,7 @@ class Raid():
         
 
     async def report_hatch(self, pkmn):
-        self.pkmn = pkmn
+        self.pkmn = RaidBoss(Pokemon(self.bot, pkmn))
         return await self.update_messages()
 
     # async def update_weather(self, weather):

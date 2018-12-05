@@ -8,7 +8,7 @@ from meowth.utils.converters import Message
 from . import raid_info
 from . import raid_checks
 
-from math import ceiling
+from math import ceil
 import discord
 import asyncio
 import aiohttp
@@ -230,7 +230,7 @@ class Raid():
             if shiny_available:
                 name += ':sparkles:'
             boss_names.append(f"{name} {type_emoji}")
-        half_length = ceiling(len(boss_names)/2)
+        half_length = ceil(len(boss_names)/2)
         bosses_left = boss_names[0:(half_length-1)]
         bosses_right = boss_names[(half_length-1):]
         fields = {
@@ -277,7 +277,7 @@ class Raid():
         length = len(boss_list)
         react_list = formatters.mc_emoji(length)
         choice_list = [react_list[i] + ' ' + boss_names[i] for i in range(len(react_list))]
-        half_length = ceiling(len(boss_names)//2)
+        half_length = ceil(len(boss_names)//2)
         bosses_left = choice_list[0:(half_length-1)]
         bosses_right = choice_list[(half_length-1):]
         fields = {

@@ -42,7 +42,7 @@ class RaidBoss(Pokemon):
 
 class Raid():
 
-    def __init__(self, bot, gym: Gym=None, level=None,
+    def __init__(self, bot, gym=None, level=None,
         pkmn: RaidBoss=None, hatch: float=None, end: float=None,
         trainer_dict: dict={}):
         self.bot = bot
@@ -57,6 +57,34 @@ class Raid():
             self.end = end
             self.hatch = hatch
         self.trainer_dict = trainer_dict
+    
+    @property
+    def status(self):
+        if self.hatch:
+            return "egg"
+        elif not self.pkmn:
+            return "hatched"
+        elif time.time() < self.end:
+            return "active"
+        else:
+            return "expired"
+    
+    @property
+    def react_list(self):
+        boss_reacts = formatters.mc_emoji(len(self.boss_list))
+        status_reacts = self.bot.config.emoji.values()
+        if self.status == 'egg':
+            if len(self.boss_list) == 1:
+                react_list = status_reacts
+            else:
+                react_list = boss_reacts
+        elif self.status == 'hatched':
+            react_list = []
+        elif self.status == 'active':
+            react_list = status_reacts
+        else:
+            return None
+        return react_list
 
     @property
     def max_hatch(self):
@@ -119,9 +147,45 @@ class Raid():
             return f"{self.level}-{gym_name}"
     
     async def on_raw_reaction_add(self, payload):
+        user_table = self.bot.dbi.table('users')
         id_string = f"{payload.channel_id}/{payload.message_id}"
         if id_string not in self.message_ids:
             return
+        trainer_data = self.trainer_dict.get(payload.user_id, {})
+        total = trainer_data.get('total', 1)
+        bosses = trainer_data.get('bosses', [])
+        bluecount = trainer_data.get('bluecount', 0)
+        yellowcount = trainer_data.get('yellowcount', 0)
+        redcount = trainer_data.get('redcount', 0)
+        unknowncount = trainer_data.get('unknowncount', 0)
+        if not any(bluecount, yellowcount, redcount):
+            team_query = user_table.query('team').where(id=payload.user_id)
+            team = await team_query.get_value()
+            if team == 'mystic':
+                bluecount = total
+            elif team == 'instinct':
+                yellowcount = total
+            elif team == 'valor':
+                redcount = total
+            else:
+                unknowncount = total
+        emoji = str(payload.emoji)
+        if emoji not in self.react_list:
+            return
+        if self.status == 'egg':
+            status = 'maybe'
+            i = self.react_list.index(emoji)
+            bossid = self.boss_list[i]
+            bosses.append(bossid) if bossid not in bosses else pass
+        elif self.status == 'active':
+            for k, v in self.bot.config.emoji.items():
+                if v == emoji:
+                    status = k
+        else:
+            return
+        await self.rsvp(payload.user_id, status, bosses=bosses, total=total)
+
+        
     
     async def monitor_status(self):
         while True:
@@ -210,9 +274,14 @@ class Raid():
         hatch = self.hatch
         hatchdt = datetime.fromtimestamp(hatch)
         gym = self.gym
-        directions_url = await gym.url()
-        directions_text = await gym._name()
-        exraid = await gym._exraid()
+        if isinstance(gym, Gym):
+            directions_url = await gym.url()
+            directions_text = await gym._name()
+            exraid = await gym._exraid()
+        else:
+            directions_url = gym.url
+            directions_text = gym.name + "(Unknown Gym)"
+            exraid = False
         if exraid:
             directions_text += " (EX Raid Gym)"
         weather = await self.weather()
@@ -255,9 +324,14 @@ class Raid():
         end = self.end
         enddt = datetime.fromtimestamp(end)
         gym = self.gym
-        directions_url = await gym.url()
-        directions_text = await gym._name()
-        exraid = await gym._exraid()
+        if isinstance(gym, Gym):
+            directions_url = await gym.url()
+            directions_text = await gym._name()
+            exraid = await gym._exraid()
+        else:
+            directions_url = gym.url
+            directions_text = gym.name + "(Unknown Gym)"
+            exraid = False
         if exraid:
             directions_text += " (EX Raid Gym)"
         weather = await self.weather()
@@ -277,12 +351,9 @@ class Raid():
         length = len(boss_list)
         react_list = formatters.mc_emoji(length)
         choice_list = [react_list[i] + ' ' + boss_names[i] for i in range(len(react_list))]
-        print(choice_list)
         half_length = ceil(len(boss_names)/2)
         bosses_left = choice_list[:(half_length)]
-        print(bosses_left)
         bosses_right = choice_list[(half_length):]
-        print(bosses_right)
         fields = {
             "Weather": (False, f"{weather_name} {weather_emoji}"),
             "Possible Bosses:": "\n".join(bosses_left),
@@ -339,10 +410,14 @@ class Raid():
         img_url = await boss.sprite_url()
         # color = await boss.color()
         gym = self.gym
-        directions_url = await gym.url()
-        gym_name = await gym._name()
-        exraid = await gym._exraid()
-        directions_text = gym_name
+        if isinstance(gym, Gym):
+            directions_url = await gym.url()
+            directions_text = await gym._name()
+            exraid = await gym._exraid()
+        else:
+            directions_url = gym.url
+            directions_text = gym.name + "(Unknown Gym)"
+            exraid = False
         if exraid:
             directions_text += " (EX Raid Gym)"
         resists = await boss.resistances_emoji()
@@ -389,18 +464,29 @@ class Raid():
             footer_icon=footer_icon)
         embed.timestamp = enddt
         return embed
+
+    def expired_embed(self):
+        embed = formatters.make_embed(content="This raid has expired!", footer="Expired")
+        embed.timestamp = datetime.fromtimestamp(self.end)
+        return embed
+
     
     async def update_messages(self, content=''):
         msg_list = []
+        react_list = self.react_list
         message_ids = self.message_ids
         if self.hatch:
             embed = await self.egg_embed()
         elif self.pkmn is None:
             embed = await self.hatched_embed()
-        else:
+        elif self.end > time.time():
             embed = await self.raid_embed()
+        else:
+            embed = self.expired_embed()
         for messageid in message_ids:
             msg = await Message.from_id_string(self.bot, messageid)
+            if not content:
+                content = msg.content
             await msg.edit(content=content, embed=embed)
             msg_list.append(msg)
         if self.channel_ids:
@@ -408,6 +494,12 @@ class Raid():
                 channel = self.bot.get_channel(chanid)
                 msg = await channel.send(content, embed=embed)
                 msg_list.append(msg)
+                self.message_ids.append(msg.id)
+        if react_list:
+            for msg in msg_list:
+                await msg.clear_reactions()
+                for react in react_list:
+                    await msg.add_reaction(react)
         return msg_list
 
 
@@ -434,7 +526,15 @@ class Raid():
 
     # async def update_weather(self, weather):
     
-    # async def expire_raid(self):
+    async def expire_raid(self):
+        await self.update_messages()
+        if self.channel_ids:
+            for chanid in self.channel_ids:
+                channel = self.bot.get_channel(chanid)
+                await channel.delete()
+        raid_table = self.bot.dbi.table('raids')
+        query = raid_table.query().where(id=self.id)
+        await query.delete()
     
     # async def update_gym(self, gym):
 
@@ -590,27 +690,28 @@ class RaidCog(Cog):
     @raid_checks.raid_enabled()
     async def raid(self, ctx, level_or_boss, gym: Gym, endtime: int):
         raid_table = ctx.bot.dbi.table('raids')
-        query = raid_table.query()
-        query.where(gym=gym.id, guild=ctx.guild.id)
-        old_raid = await query.get()
-        if old_raid:
-            old_raid = old_raid[0]
-            old_raid = await Raid.from_data(ctx.bot, old_raid)
-            if old_raid.hatch:
-                embed = await old_raid.egg_embed()
-            else:
-                embed = await old_raid.raid_embed()
-            if old_raid.channel_ids:
-                mentions = []
-                for channelid in old_raid.channel_ids:
-                    channel = ctx.guild.get_channel(channelid)
-                    mention = channel.mention
-                    mentions.append(mention)
-                return await ctx.send(f"""There is already a raid reported at this gym! Coordinate here: {", ".join(mentions)}""", embed=embed)
-            else:
-                msg = await ctx.send(f"""There is already a raid reported at this gym! Coordinate here!""", embed=embed)
-                old_raid.message_ids.append(f"{msg.channel.id}/{msg.id}")
-                return msg
+        if isinstance(gym, Gym)
+            query = raid_table.query()
+            query.where(gym=gym.id, guild=ctx.guild.id)
+            old_raid = await query.get()
+            if old_raid:
+                old_raid = old_raid[0]
+                old_raid = await Raid.from_data(ctx.bot, old_raid)
+                if old_raid.hatch:
+                    embed = await old_raid.egg_embed()
+                else:
+                    embed = await old_raid.raid_embed()
+                if old_raid.channel_ids:
+                    mentions = []
+                    for channelid in old_raid.channel_ids:
+                        channel = ctx.guild.get_channel(channelid)
+                        mention = channel.mention
+                        mentions.append(mention)
+                    return await ctx.send(f"""There is already a raid reported at this gym! Coordinate here: {", ".join(mentions)}""", embed=embed)
+                else:
+                    msg = await ctx.send(f"""There is already a raid reported at this gym! Coordinate here!""", embed=embed)
+                    old_raid.message_ids.append(f"{msg.channel.id}/{msg.id}")
+                    return msg
         if level_or_boss.isdigit():
             level = level_or_boss
             want = Want(ctx.bot, level, ctx.guild.id)
@@ -664,7 +765,7 @@ class RaidCog(Cog):
             new_raid.message_ids.extend(f"{reportmsg.channel.id}/{reportmsg.id}")
         insert = raid_table.insert()
         data = {
-            'gym': gym.id,
+            'gym': getattr(gym, 'id', gym),
             'guild': ctx.guild.id,
             'level': level,
             'pkmn': (boss.id, boss.quickMoveid or None, boss.chargeMoveid or None) if boss else (None, None, None),

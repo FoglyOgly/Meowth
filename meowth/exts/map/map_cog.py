@@ -9,7 +9,7 @@ import io
 import codecs
 from math import radians, degrees
 import csv
-
+from urllib.parse import quote_plus
 
 class ReportChannel():
     def __init__(self, bot, channel):
@@ -31,6 +31,11 @@ class ReportChannel():
         data = self._data
         radius = await data.select('radius').get_value()
         return radius
+    
+    async def city(self):
+        data = self._data
+        city = await data.select('city').get_value()
+        return city
     
     async def raid_report(self):
         data = self._data
@@ -229,6 +234,9 @@ class Gym(POI):
         match = get_match(name_dict.keys(), arg)
         if match:
             return cls(ctx.bot, name_dict[match[0]])
+        else:
+            city = await report_channel.city()
+            return PartialGym(city, arg)
     
     @classmethod
     async def insert_from_data(cls, bot, guildid, data):
@@ -241,7 +249,24 @@ class Gym(POI):
         return cls(bot, rcrd['id'])
 
 
+class PartialGym():
+
+    def __init__(self, city, arg):
+        self.city = city
+        self.arg = arg
+
+    @property
+    def name(self):
+        return arg.title()
     
+    @property
+    def url(self):
+        urlbase = 'https://www.google.com/maps/search/?api=1&query='
+        urlbase += arg
+        urlbase += city
+        url = quote_plus(urlbase)
+        return url
+
 
 
 class Pokestop(POI):

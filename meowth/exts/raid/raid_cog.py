@@ -147,6 +147,7 @@ class Raid():
             return f"{self.level}-{gym_name}"
     
     async def on_raw_reaction_add(self, payload):
+        id_string = f"{payload.channel_id}/{payload.message_id}"
         if id_string not in self.message_ids or payload.user_id == self.bot.user.id:
             return
         user_table = self.bot.dbi.table('users')
@@ -156,7 +157,6 @@ class Raid():
         if payload.guild_id:
             guild = self.bot.get_guild(payload.guild_id)
             user = guild.get_member(user.id)
-        id_string = f"{payload.channel_id}/{payload.message_id}"
         trainer_data = self.trainer_dict.get(payload.user_id, {})
         total = trainer_data.get('total', 1)
         bosses = trainer_data.get('bosses', [])

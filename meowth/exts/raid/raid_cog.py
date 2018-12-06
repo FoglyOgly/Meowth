@@ -176,7 +176,10 @@ class Raid():
             status = 'maybe'
             i = self.react_list.index(emoji)
             bossid = self.boss_list[i]
-            bosses.append(bossid) if bossid not in bosses else pass
+            if bossid not in bosses:
+                bosses.append(bossid)
+            else:
+                pass
         elif self.status == 'active':
             for k, v in self.bot.config.emoji.items():
                 if v == emoji:

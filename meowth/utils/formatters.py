@@ -157,12 +157,17 @@ async def ask(bot, message_list, user_list=None, timeout=60, *, react_list=['✅
     def check(payload):
         user_id = payload.user_id
         message_id = payload.message_id
-        emoji = payload.emoji
+        if payload.emoji.is_custom_emoji():
+            emoji = payload.emoji.id
+        else:
+            emoji = str(payload.emoji)
         if user_list and type(user_list) is __builtins__.list:
-            return (user_id in user_list) and (message_id in message_id_list) and (str(emoji) in react_list)
+            return (user_id in user_list) and (message_id in message_id_list) and (emoji in react_list)
         elif not user_list:
-            return (user_id != bot.user.id) and (message_id in message_id_list) and (str(emoji) in react_list)
+            return (user_id != bot.user.id) and (message_id in message_id_list) and (emoji in react_list)
     for r in react_list:
+        if isinstance(r, int):
+            r = bot.get_emoji(r)
         for message in message_list:
             await message.add_reaction(r)
     try:

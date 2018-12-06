@@ -169,7 +169,10 @@ class Raid():
                 redcount = total
             else:
                 unknowncount = total
-        emoji = str(payload.emoji)
+        if payload.emoji.is_custom_emoji():
+            emoji = payload.emoji.id
+        else:
+            emoji = str(payload.emoji)
         if emoji not in self.react_list:
             return
         if self.status == 'egg':
@@ -502,7 +505,9 @@ class Raid():
             for msg in msg_list:
                 await msg.clear_reactions()
                 for react in react_list:
-                    await msg.add_reaction(react)
+                    if isinstance(react, int):
+                        react = self.bot.get_emoji(react)
+                    await msg.(react)
         return msg_list
 
 
@@ -732,6 +737,7 @@ class RaidCog(Cog):
         new_raid = Raid(ctx.bot, gym, level=level, pkmn=boss, hatch=hatch, end=end)
         new_raid.channel_ids = []
         new_raid.message_ids = []
+        react_list = new_raid.react_list
         if new_raid.hatch:
             embed = await new_raid.egg_embed()
         else:
@@ -748,6 +754,10 @@ class RaidCog(Cog):
                 dms = await want.notify_users(dm_content, embed)
                 new_raid.message_ids.extend(dms)
             reportmsg = await ctx.send(reportcontent, embed=embed)
+            for react in react_list:
+                if isinstance(react, int):
+                    react = self.bot.get_emoji(react)
+                await reportmsg.add_reaction(react)
             new_raid.message_ids.append(f"{reportmsg.channel.id}/{reportmsg.id}")
         elif raid_mode.isdigit():
             catid = int(raid_mode)

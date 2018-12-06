@@ -149,7 +149,7 @@ class Raid():
     async def on_raw_reaction_add(self, payload):
         user_table = self.bot.dbi.table('users')
         id_string = f"{payload.channel_id}/{payload.message_id}"
-        if id_string not in self.message_ids:
+        if id_string not in self.message_ids or payload.user_id == self.bot.user.id:
             return
         trainer_data = self.trainer_dict.get(payload.user_id, {})
         total = trainer_data.get('total', 1)
@@ -555,6 +555,8 @@ class Raid():
                 unknowncount = 0
             elif total >= calctotal:
                 unknowncount = total - calctotal
+        else:
+            unknowncount = total
         d = {
             'status': status,
             'bosses': bosses,

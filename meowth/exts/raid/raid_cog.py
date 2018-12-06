@@ -158,7 +158,7 @@ class Raid():
         yellowcount = trainer_data.get('yellowcount', 0)
         redcount = trainer_data.get('redcount', 0)
         unknowncount = trainer_data.get('unknowncount', 0)
-        if not any(bluecount, yellowcount, redcount):
+        if not any((bluecount, yellowcount, redcount)):
             team_query = user_table.query('team').where(id=payload.user_id)
             team = await team_query.get_value()
             if team == 'mystic':

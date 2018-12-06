@@ -147,10 +147,16 @@ class Raid():
             return f"{self.level}-{gym_name}"
     
     async def on_raw_reaction_add(self, payload):
-        user_table = self.bot.dbi.table('users')
-        id_string = f"{payload.channel_id}/{payload.message_id}"
         if id_string not in self.message_ids or payload.user_id == self.bot.user.id:
             return
+        user_table = self.bot.dbi.table('users')
+        user = self.bot.get_user(payload.user_id)
+        channel = self.bot.get_channel(payload.channel_id)
+        message = await channel.get_message(payload.message_id)
+        if payload.guild_id:
+            guild = self.bot.get_guild(payload.guild_id)
+            user = guild.get_member(user.id)
+        id_string = f"{payload.channel_id}/{payload.message_id}"
         trainer_data = self.trainer_dict.get(payload.user_id, {})
         total = trainer_data.get('total', 1)
         bosses = trainer_data.get('bosses', [])
@@ -189,6 +195,7 @@ class Raid():
                     status = k
         else:
             return
+        await message.remove_reaction(emoji, user)
         await self.rsvp(payload.user_id, status, bosses=bosses, total=total)
 
         
@@ -503,7 +510,6 @@ class Raid():
                 self.message_ids.append(msg.id)
         if react_list:
             for msg in msg_list:
-                await msg.clear_reactions()
                 for react in react_list:
                     if isinstance(react, int):
                         react = self.bot.get_emoji(react)
@@ -567,6 +573,11 @@ class Raid():
             'unknowncount': unknowncount
         }
         self.trainer_dict[user] = d
+        user_table = self.bot.dbi.table('users')
+        insert = user_table.insert()
+        insert.where(id=user)
+        insert.row(**d)
+        await insert.commit(do_update=True)
         await self.update_messages()
 
     @property

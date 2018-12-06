@@ -575,7 +575,7 @@ class Raid():
         self.trainer_dict[user] = d
         user_table = self.bot.dbi.table('users')
         insert = user_table.insert()
-        insert.where(id=user)
+        d['id'] = user
         insert.row(**d)
         await insert.commit(do_update=True)
         await self.update_messages()

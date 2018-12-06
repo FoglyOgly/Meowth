@@ -507,7 +507,7 @@ class Raid():
                 for react in react_list:
                     if isinstance(react, int):
                         react = self.bot.get_emoji(react)
-                    await msg.(react)
+                    await msg.add_reaction(react)
         return msg_list
 
 

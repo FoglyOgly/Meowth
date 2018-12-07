@@ -565,18 +565,20 @@ class Raid():
 
     async def rsvp(self, user, status, bosses: list=None, total: int=1,
         bluecount: int=0, yellowcount: int=0, redcount: int=0):
-        r = None
+        d = {}
         user_table = self.bot.dbi.table('users')
         user_query = user_table.query().where(id=user)
         data = await user_query.get()
         if data:
-            upsert = user_table.update().where(id=user).values(r)
+            action = 'update'
+            upsert = user_table.update().where(id=user)
             data = data[0]
             interested_list = data['interested_list']
             coming_list = data['coming_list']
             here = data['here']
         else:
-            upsert = user_table.insert().row(r)
+            action = 'insert'
+            upsert = user_table.insert()
             interested_list = []
             coming_list = []
             here = None
@@ -631,7 +633,10 @@ class Raid():
         d['interested_list'] = interested_list
         d['coming_list'] = coming_list
         d['here'] = here
-        r = **d
+        if action == 'update':
+            upsert.values(**d)  
+        else:
+            upsert.row(**d)
         await upsert.commit()
         await self.update_messages()
 

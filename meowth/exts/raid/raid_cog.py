@@ -554,6 +554,24 @@ class Raid():
 
     async def rsvp(self, user, status, bosses: list=None, total: int=1,
         bluecount: int=0, yellowcount: int=0, redcount: int=0):
+        user_table = self.bot.dbi.table('users')
+        user_query = user_table.query().where(id=user)
+        data = (await user_query.get())[0]
+        interested_list = data['interested_list']
+        coming_list = data['coming_list']
+        here = data['here']
+        old_status = self.trainer_dict.get(user, {}).get('status')
+        if old_status == status:
+            return
+        elif old_status:
+            if status == 'cancel':
+                del self.trainer_dict[user]
+            if self.id in interested_list:
+                interested_list.remove(self.id)
+            if self.id in coming_list:
+                coming_list.remove(self.id)
+            if self.id == here:
+                here = None
         if any((bluecount, yellowcount, redcount)):
             calctotal = sum(bluecount, yellowcount, redcount)
             if not total or total < calctotal:
@@ -573,9 +591,26 @@ class Raid():
             'unknowncount': unknowncount
         }
         self.trainer_dict[user] = d
-        user_table = self.bot.dbi.table('users')
+        del d['status']
         insert = user_table.insert()
         d['id'] = user
+        if status == 'maybe':
+            interested_list.append(self.id)
+            d['interested_list'] = interested_list
+        elif status == 'coming':
+            coming_list.append(self.id)
+            d['coming_list'] = coming_list
+        elif status == 'here':
+            if here and here != self.id:
+                raid_table = self.bot.dbi.table('raids')
+                raid_query = raid_table.query()
+                raid_query.where(id=self.id)
+                data = (await raid_query.get())[0]
+                old_rsvp = Raid.from_data(self.bot, data)
+            here = self.id
+        d['interested_list'] = interested_list
+        d['coming_list'] = coming_list
+        d['here'] = here
         insert.row(**d)
         await insert.commit(do_update=True)
         await self.update_messages()

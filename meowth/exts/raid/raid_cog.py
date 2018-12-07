@@ -14,6 +14,7 @@ import asyncio
 import aiohttp
 import time
 from datetime import timezone, datetime
+from copy import deepcopy
 
 class RaidBoss(Pokemon):
 
@@ -539,13 +540,13 @@ class Raid():
     async def report_hatch(self, pkmn):
         self.pkmn = RaidBoss(Pokemon(self.bot, pkmn))
         raid_table = self.bot.dbi.table('raids')
-        insert = raid_table.insert()
+        update = raid_table.update()
+        update.where(id=self.id)
         d = {
-            'id': self.id,
             'pkmn': (self.pkmn.id, None, None)
         }
-        insert.row(**d)
-        await insert.commit(do_update=True)
+        update.values(**d)
+        await update.commit(do_update=True)
         return await self.update_messages()
 
     # async def update_weather(self, weather):
@@ -564,15 +565,18 @@ class Raid():
 
     async def rsvp(self, user, status, bosses: list=None, total: int=1,
         bluecount: int=0, yellowcount: int=0, redcount: int=0):
+        d = {}
         user_table = self.bot.dbi.table('users')
         user_query = user_table.query().where(id=user)
         data = await user_query.get()
         if data:
+            upsert = user_table.update().where(id=user).values(**d)
             data = data[0]
             interested_list = data['interested_list']
             coming_list = data['coming_list']
             here = data['here']
         else:
+            upsert = user_table.insert().row(**d)
             interested_list = []
             coming_list = []
             here = None
@@ -606,9 +610,8 @@ class Raid():
             'redcount': redcount,
             'unknowncount': unknowncount
         }
-        self.trainer_dict[user] = d
+        self.trainer_dict[user] = deepcopy(d)
         del d['status']
-        insert = user_table.insert()
         d['id'] = user
         if status == 'maybe':
             interested_list.append(self.id)
@@ -623,12 +626,12 @@ class Raid():
                 raid_query.where(id=self.id)
                 data = (await raid_query.get())[0]
                 old_rsvp = Raid.from_data(self.bot, data)
+                await old_rsvp.rsvp(user, "cancel")
             here = self.id
         d['interested_list'] = interested_list
         d['coming_list'] = coming_list
         d['here'] = here
-        insert.row(**d)
-        await insert.commit(do_update=True)
+        await upsert.commit()
         await self.update_messages()
 
     @property

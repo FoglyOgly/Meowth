@@ -538,6 +538,14 @@ class Raid():
 
     async def report_hatch(self, pkmn):
         self.pkmn = RaidBoss(Pokemon(self.bot, pkmn))
+        raid_table = self.bot.dbi.table('raids')
+        insert = raid_table.insert()
+        insert.where(id=self.id)
+        d = {
+            (self.pkmn.id, None, None)
+        }
+        insert.row(**d)
+        await insert.commit(do_update=True)
         return await self.update_messages()
 
     # async def update_weather(self, weather):

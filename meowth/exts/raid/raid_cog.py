@@ -195,6 +195,8 @@ class Raid():
                     status = k
         else:
             return
+        if isinstance(emoji, int):
+            emoji = self.bot.get_emoji(emoji)
         await message.remove_reaction(emoji, user)
         await self.rsvp(payload.user_id, status, bosses=bosses, total=total)
 

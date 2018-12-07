@@ -546,7 +546,7 @@ class Raid():
             'pkmn': (self.pkmn.id, None, None)
         }
         update.values(**d)
-        await update.commit(do_update=True)
+        await update.commit()
         return await self.update_messages()
 
     # async def update_weather(self, weather):

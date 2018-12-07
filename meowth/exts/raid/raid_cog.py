@@ -439,8 +439,6 @@ class Raid():
         resists = await boss.resistances_emoji()
         weaks = await boss.weaknesses_emoji()
         ctrs_list = await self.generic_counters_data()
-        if hasattr(self, 'id'):
-            await self.get_trainer_dict()
         status_dict = self.status_dict
         status_str = f"{self.bot.config.emoji['maybe']}: {status_dict['maybe']} | "
         status_str += f"{self.bot.config.emoji['coming']}: {status_dict['coming']} | "

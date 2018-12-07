@@ -613,8 +613,8 @@ class Raid():
             'unknowncount': unknowncount
         }
         self.trainer_dict[user] = deepcopy(d)
+        print(self.trainer_dict)
         del d['status']
-        d['id'] = user
         if status == 'maybe':
             interested_list.append(self.id)
             d['interested_list'] = interested_list
@@ -636,7 +636,9 @@ class Raid():
         if action == 'update':
             upsert.values(**d)  
         else:
+            d['id'] = user
             upsert.row(**d)
+        print(d)
         await upsert.commit()
         await self.update_messages()
 

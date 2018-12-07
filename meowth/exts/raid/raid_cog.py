@@ -696,7 +696,7 @@ class Raid():
             rcrd_dict['status'] = 'interested'
             trainer_dict[trainer] = rcrd_dict
         com_query = user_table.query()
-        com_query.where(coming=self.id)
+        com_query.where(user_table['coming_list'].contains_(self.id))
         com_data = await com_query.get()
         for rcrd in com_data:
             trainer, rcrd_dict = data(rcrd)

@@ -540,9 +540,9 @@ class Raid():
         self.pkmn = RaidBoss(Pokemon(self.bot, pkmn))
         raid_table = self.bot.dbi.table('raids')
         insert = raid_table.insert()
-        insert.where(id=self.id)
         d = {
-            (self.pkmn.id, None, None)
+            'id': self.id
+            'pkmn': (self.pkmn.id, None, None)
         }
         insert.row(**d)
         await insert.commit(do_update=True)

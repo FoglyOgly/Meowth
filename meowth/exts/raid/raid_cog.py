@@ -556,10 +556,16 @@ class Raid():
         bluecount: int=0, yellowcount: int=0, redcount: int=0):
         user_table = self.bot.dbi.table('users')
         user_query = user_table.query().where(id=user)
-        data = (await user_query.get())[0]
-        interested_list = data['interested_list']
-        coming_list = data['coming_list']
-        here = data['here']
+        data = await user_query.get()
+        if data:
+            data = data[0]
+            interested_list = data['interested_list']
+            coming_list = data['coming_list']
+            here = data['here']
+        else:
+            interested_list = []
+            coming_list = []
+            here = None
         old_status = self.trainer_dict.get(user, {}).get('status')
         if old_status == status:
             return

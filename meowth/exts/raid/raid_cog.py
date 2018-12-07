@@ -541,7 +541,7 @@ class Raid():
         raid_table = self.bot.dbi.table('raids')
         insert = raid_table.insert()
         d = {
-            'id': self.id
+            'id': self.id,
             'pkmn': (self.pkmn.id, None, None)
         }
         insert.row(**d)

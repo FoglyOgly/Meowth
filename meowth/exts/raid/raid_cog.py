@@ -693,7 +693,7 @@ class Raid():
         int_data = await int_query.get()
         for rcrd in int_data:
             trainer, rcrd_dict = data(rcrd)
-            rcrd_dict['status'] = 'interested'
+            rcrd_dict['status'] = 'maybe'
             trainer_dict[trainer] = rcrd_dict
         com_query = user_table.query()
         com_query.where(user_table['coming_list'].contains_(self.id))

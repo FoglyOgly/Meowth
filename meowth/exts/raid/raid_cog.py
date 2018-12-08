@@ -625,6 +625,7 @@ class Raid():
                 raid_query.where(id=self.id)
                 data = (await raid_query.get())[0]
                 old_rsvp = await Raid.from_data(self.bot, data)
+                print(1)
                 await old_rsvp.rsvp(user, "cancel")
             here = self.id
         d['interested_list'] = interested_list
@@ -636,6 +637,7 @@ class Raid():
             d['id'] = user
             upsert.row(**d)
         await upsert.commit()
+        print(self.trainer_dict)
         await self.update_messages()
 
     @property

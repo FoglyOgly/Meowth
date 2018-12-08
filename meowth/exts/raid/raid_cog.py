@@ -610,7 +610,6 @@ class Raid():
             'unknowncount': unknowncount
         }
         self.trainer_dict[user] = deepcopy(d)
-        print(self.trainer_dict)
         del d['status']
         if status == 'maybe':
             interested_list.append(self.id)
@@ -624,7 +623,7 @@ class Raid():
                 raid_query = raid_table.query()
                 raid_query.where(id=self.id)
                 data = (await raid_query.get())[0]
-                old_rsvp = Raid.from_data(self.bot, data)
+                old_rsvp = await Raid.from_data(self.bot, data)
                 await old_rsvp.rsvp(user, "cancel")
             here = self.id
         d['interested_list'] = interested_list
@@ -635,7 +634,6 @@ class Raid():
         else:
             d['id'] = user
             upsert.row(**d)
-        print(d)
         await upsert.commit()
         await self.update_messages()
 
@@ -807,7 +805,6 @@ class RaidCog(Cog):
             end = time.time() + 60*endtime
             hatch = None
         new_raid = Raid(ctx.bot, gym, level=level, pkmn=boss, hatch=hatch, end=end)
-        print(new_raid.trainer_dict)
         new_raid.channel_ids = []
         new_raid.message_ids = []
         react_list = new_raid.react_list

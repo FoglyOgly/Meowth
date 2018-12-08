@@ -56,7 +56,6 @@ class Raid():
         elif end:
             self.end = end
             self.hatch = hatch
-        self.trainer_dict = {}
     
     @property
     def status(self):
@@ -563,7 +562,7 @@ class Raid():
     async def rsvp(self, user, status, bosses: list=None, total: int=1,
         bluecount: int=0, yellowcount: int=0, redcount: int=0):
         trainer_dict = await self.get_trainer_dict()
-        print(self.trainer_dict)
+        print(trainer_dict)
         d = {}
         user_table = self.bot.dbi.table('users')
         user_query = user_table.query().where(id=user)

@@ -562,6 +562,7 @@ class Raid():
 
     async def rsvp(self, user, status, bosses: list=None, total: int=1,
         bluecount: int=0, yellowcount: int=0, redcount: int=0):
+        await self.get_trainer_dict()
         print(self.trainer_dict)
         d = {}
         user_table = self.bot.dbi.table('users')
@@ -613,6 +614,8 @@ class Raid():
             'unknowncount': unknowncount
         }
         if status != "cancel":
+            print(3)
+            print(d)
             self.trainer_dict[user] = deepcopy(d)
         del d['status']
         if status == 'maybe':

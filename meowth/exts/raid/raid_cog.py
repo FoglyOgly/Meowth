@@ -156,7 +156,8 @@ class Raid():
         if payload.guild_id:
             guild = self.bot.get_guild(payload.guild_id)
             user = guild.get_member(user.id)
-        trainer_data = self.trainer_dict.get(payload.user_id, {})
+        trainer_dict = await self.get_trainer_dict()
+        trainer_data = trainer_dict.get(payload.user_id, {})
         total = trainer_data.get('total', 1)
         bosses = trainer_data.get('bosses', [])
         bluecount = trainer_data.get('bluecount', 0)

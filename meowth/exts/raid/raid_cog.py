@@ -635,6 +635,7 @@ class Raid():
             d['id'] = user
             upsert.row(**d)
         await upsert.commit()
+        await asyncio.sleep(1)
         await self.update_messages()
 
     async def boss_interest_dict(self):

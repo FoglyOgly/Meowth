@@ -609,7 +609,8 @@ class Raid():
             'redcount': redcount,
             'unknowncount': unknowncount
         }
-        self.trainer_dict[user] = deepcopy(d)
+        if status != "cancel":
+            self.trainer_dict[user] = deepcopy(d)
         del d['status']
         if status == 'maybe':
             interested_list.append(self.id)

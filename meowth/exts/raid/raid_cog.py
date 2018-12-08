@@ -44,8 +44,7 @@ class RaidBoss(Pokemon):
 class Raid():
 
     def __init__(self, bot, gym=None, level=None,
-        pkmn: RaidBoss=None, hatch: float=None, end: float=None,
-        trainer_dict: dict={}):
+        pkmn: RaidBoss=None, hatch: float=None, end: float=None):
         self.bot = bot
         self.gym = gym
         self.level = level
@@ -57,7 +56,7 @@ class Raid():
         elif end:
             self.end = end
             self.hatch = hatch
-        self.trainer_dict = trainer_dict
+        self.trainer_dict = {}
     
     @property
     def status(self):

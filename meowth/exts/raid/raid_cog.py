@@ -438,11 +438,11 @@ class Raid():
         resists = await boss.resistances_emoji()
         weaks = await boss.weaknesses_emoji()
         ctrs_list = await self.generic_counters_data()
-        status_dict = self.status_dict
+        status_dict = await self.status_dict()
         status_str = f"{self.bot.config.emoji['maybe']}: {status_dict['maybe']} | "
         status_str += f"{self.bot.config.emoji['coming']}: {status_dict['coming']} | "
         status_str += f"{self.bot.config.emoji['here']}: {status_dict['here']}"
-        team_dict = self.team_dict
+        team_dict = await self.team_dict()
         team_str = f"{self.bot.config.team_emoji['mystic']}: {team_dict['mystic']} | "
         team_str += f"{self.bot.config.team_emoji['instinct']}: {team_dict['instinct']} | "
         team_str += f"{self.bot.config.team_emoji['valor']}: {team_dict['valor']} | "
@@ -562,7 +562,7 @@ class Raid():
 
     async def rsvp(self, user, status, bosses: list=None, total: int=1,
         bluecount: int=0, yellowcount: int=0, redcount: int=0):
-        await self.get_trainer_dict()
+        trainer_dict = await self.get_trainer_dict()
         print(self.trainer_dict)
         d = {}
         user_table = self.bot.dbi.table('users')
@@ -581,14 +581,13 @@ class Raid():
             interested_list = []
             coming_list = []
             here = None
-        old_status = self.trainer_dict.get(user, {}).get('status')
+        old_status = trainer_dict.get(user, {}).get('status')
         print(old_status)
         if old_status == status:
             return
         elif old_status:
             if status == 'cancel':
                 print(2)
-                del self.trainer_dict[user]
             if self.id in interested_list:
                 interested_list.remove(self.id)
             if self.id in coming_list:
@@ -605,7 +604,6 @@ class Raid():
         else:
             unknowncount = total
         d = {
-            'status': status,
             'bosses': bosses,
             'total': total,
             'bluecount': bluecount,
@@ -613,11 +611,6 @@ class Raid():
             'redcount': redcount,
             'unknowncount': unknowncount
         }
-        if status != "cancel":
-            print(3)
-            print(d)
-            self.trainer_dict[user] = deepcopy(d)
-        del d['status']
         if status == 'maybe':
             interested_list.append(self.id)
             d['interested_list'] = interested_list
@@ -631,7 +624,6 @@ class Raid():
                 raid_query.where(id=self.id)
                 data = (await raid_query.get())[0]
                 old_rsvp = await Raid.from_data(self.bot, data)
-                print(old_rsvp.trainer_dict)
                 await old_rsvp.rsvp(user, "cancel")
             here = self.id
         d['interested_list'] = interested_list
@@ -643,14 +635,12 @@ class Raid():
             d['id'] = user
             upsert.row(**d)
         await upsert.commit()
-        print(self.trainer_dict)
         await self.update_messages()
 
-    @property
-    def boss_interest_dict(self):
+    async def boss_interest_dict(self):
         boss_list = self.boss_list
         d = {x: 0 for x in boss_list}
-        trainer_dict = self.trainer_dict
+        trainer_dict = await self.get_trainer_dict()
         for trainer in trainer_dict:
             total = trainer_dict[trainer]['total']
             bosses = trainer_dict[trainer]['bosses']
@@ -658,30 +648,28 @@ class Raid():
                 d[boss] += total
         return d
 
-    @property
-    def status_dict(self):
+    async def status_dict(self):
         d = {
             'maybe': 0,
             'coming': 0,
             'here': 0,
             'lobby': 0
         }
-        trainer_dict = self.trainer_dict
+        trainer_dict = await self.get_trainer_dict()
         for trainer in trainer_dict:
             total = trainer_dict[trainer]['total']
             status = trainer_dict[trainer]['status']
             d[status] += total
         return d
     
-    @property
-    def team_dict(self):
+    async def team_dict(self):
         d = {
             'mystic': 0,
             'instinct': 0,
             'valor': 0,
             'unknown': 0
         }
-        trainer_dict = self.trainer_dict
+        trainer_dict = await self.get_trainer_dict()
         for trainer in trainer_dict:
             bluecount = trainer_dict[trainer]['bluecount']
             yellowcount = trainer_dict[trainer]['yellowcount']
@@ -741,7 +729,6 @@ class Raid():
             trainer, rcrd_dict = data(rcrd)
             rcrd_dict['status'] = 'lobby'
             trainer_dict[trainer] = rcrd_dict
-        self.trainer_dict = trainer_dict
         return trainer_dict
 
 

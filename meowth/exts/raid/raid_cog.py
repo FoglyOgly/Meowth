@@ -808,6 +808,7 @@ class RaidCog(Cog):
             end = time.time() + 60*endtime
             hatch = None
         new_raid = Raid(ctx.bot, gym, level=level, pkmn=boss, hatch=hatch, end=end)
+        print(new_raid.trainer_dict)
         new_raid.channel_ids = []
         new_raid.message_ids = []
         react_list = new_raid.react_list

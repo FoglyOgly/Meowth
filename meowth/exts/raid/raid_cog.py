@@ -580,10 +580,12 @@ class Raid():
             coming_list = []
             here = None
         old_status = self.trainer_dict.get(user, {}).get('status')
+        print(old_status)
         if old_status == status:
             return
         elif old_status:
             if status == 'cancel':
+                print(2)
                 del self.trainer_dict[user]
             if self.id in interested_list:
                 interested_list.remove(self.id)
@@ -625,7 +627,7 @@ class Raid():
                 raid_query.where(id=self.id)
                 data = (await raid_query.get())[0]
                 old_rsvp = await Raid.from_data(self.bot, data)
-                print(1)
+                print(old_rsvp.trainer_dict)
                 await old_rsvp.rsvp(user, "cancel")
             here = self.id
         d['interested_list'] = interested_list

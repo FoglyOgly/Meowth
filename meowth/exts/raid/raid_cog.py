@@ -488,7 +488,7 @@ class Raid():
         msg_list = []
         react_list = self.react_list
         message_ids = self.message_ids
-        if self.hatch:
+        if self.hatch and self.hatch > time.time():
             embed = await self.egg_embed()
         elif self.pkmn is None:
             embed = await self.hatched_embed()

@@ -527,9 +527,10 @@ class Raid():
         for messageid in message_ids:
             msg = await Message.from_id_string(self.bot, messageid)
             if not has_embed:
-                embed = RaidEmbed(msg.embeds[0])
-                embed.status_str = self.status_str
-                embed.team_str = self.team_str
+                raid_embed = RaidEmbed(msg.embeds[0])
+                raid_embed.status_str = self.status_str
+                raid_embed.team_str = self.team_str
+                embed = raid_embed.embed
                 has_embed = True
             await msg.edit(embed=embed)
             msg_list.append(msg)

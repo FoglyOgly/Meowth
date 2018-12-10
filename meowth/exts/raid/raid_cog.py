@@ -986,7 +986,7 @@ class RaidEmbed(Embed):
         team_str += f"{bot.config.team_emoji['valor']}: {team_dict['valor']} | "
         team_str += f"{bot.config.team_emoji['unknown']}: {team_dict['unknown']}"
         fields = {
-            "Boss": f"{boss_name} {type_emoji}",
+            "Boss": f"{name} {type_emoji}",
             "Weather": f"{weather_name} {weather_emoji}",
             "Weaknesses": weaks,
             "Resistances": resists,

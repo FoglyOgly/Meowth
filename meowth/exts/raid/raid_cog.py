@@ -976,11 +976,11 @@ class RaidEmbed(Embed):
         resists = await boss.resistances_emoji()
         weaks = await boss.weaknesses_emoji()
         ctrs_list = await raid.generic_counters_data()
-        status_dict = await raid.status_dict()
+        status_dict = raid.status_dict
         status_str = f"{bot.config.emoji['maybe']}: {status_dict['maybe']} | "
         status_str += f"{bot.config.emoji['coming']}: {status_dict['coming']} | "
         status_str += f"{bot.config.emoji['here']}: {status_dict['here']}"
-        team_dict = await raid.team_dict()
+        team_dict = raid.team_dict
         team_str = f"{bot.config.team_emoji['mystic']}: {team_dict['mystic']} | "
         team_str += f"{bot.config.team_emoji['instinct']}: {team_dict['instinct']} | "
         team_str += f"{bot.config.team_emoji['valor']}: {team_dict['valor']} | "

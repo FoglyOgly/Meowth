@@ -7,6 +7,7 @@ from meowth.utils import formatters
 from meowth.utils.converters import Message
 from . import raid_info
 from . import raid_checks
+from .objects import RaidEmbed
 
 from math import ceil
 import discord
@@ -156,7 +157,7 @@ class Raid():
         if payload.guild_id:
             guild = self.bot.get_guild(payload.guild_id)
             user = guild.get_member(user.id)
-        trainer_dict = await self.get_trainer_dict()
+        trainer_dict = self.trainer_dict
         trainer_data = trainer_dict.get(payload.user_id, {})
         total = trainer_data.get('total', 1)
         bosses = trainer_data.get('bosses', [])
@@ -382,106 +383,13 @@ class Raid():
         return embed
 
     async def raid_embed(self):
-        raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png' #TODO
-        footer_icon = 'https://media.discordapp.net/attachments/346766728132427777/512699022822080512/imageedit_10_6071805149.png'
-        boss = self.pkmn
-        level = boss.raid_level
-        if level == 6:
-            display_level = 5
-        else:
-            display_level = level
-        boss_name = await boss.name()
-        type_emoji = await boss.type_emoji()
-        shiny_available = await boss._shiny_available()
-        if shiny_available:
-            boss_name += ':sparkles:'
-        boss_type = await boss.type_emoji()
-        quick_move = Move(self.bot, boss.quickMoveid) if boss.quickMoveid else None
-        charge_move = Move(self.bot, boss.chargeMoveid) if boss.chargeMoveid else None
-        if quick_move:
-            quick_name = await quick_move.name()
-            quick_emoji = await quick_move.emoji()
-        else:
-            quick_name = "Unknown"
-            quick_emoji = ""
-        if charge_move:
-            charge_name = await charge_move.name()
-            charge_emoji = await charge_move.emoji()
-        else:
-            charge_name = "Unknown"
-            charge_emoji = ""
-        moveset = f"{quick_name} {quick_emoji} | {charge_name} {charge_emoji}"
-        weather = await self.weather()
-        weather = Weather(self.bot, weather)
-        weather_name = await weather.name()
-        weather_emoji = await weather.boosted_emoji_str()
-        is_boosted = await boss.is_boosted(weather.value)
-        cp_range = await self.cp_range()
-        cp_str = f"{cp_range[0]}-{cp_range[1]}"
-        end = self.end
-        enddt = datetime.fromtimestamp(end)
-        if is_boosted:
-            cp_str += " (Boosted)"
-        img_url = await boss.sprite_url()
-        # color = await boss.color()
-        gym = self.gym
-        if isinstance(gym, Gym):
-            directions_url = await gym.url()
-            directions_text = await gym._name()
-            exraid = await gym._exraid()
-        else:
-            directions_url = gym.url
-            directions_text = gym.name + "(Unknown Gym)"
-            exraid = False
-        if exraid:
-            directions_text += " (EX Raid Gym)"
-        resists = await boss.resistances_emoji()
-        weaks = await boss.weaknesses_emoji()
-        ctrs_list = await self.generic_counters_data()
-        status_dict = await self.status_dict()
-        status_str = f"{self.bot.config.emoji['maybe']}: {status_dict['maybe']} | "
-        status_str += f"{self.bot.config.emoji['coming']}: {status_dict['coming']} | "
-        status_str += f"{self.bot.config.emoji['here']}: {status_dict['here']}"
-        team_dict = await self.team_dict()
-        team_str = f"{self.bot.config.team_emoji['mystic']}: {team_dict['mystic']} | "
-        team_str += f"{self.bot.config.team_emoji['instinct']}: {team_dict['instinct']} | "
-        team_str += f"{self.bot.config.team_emoji['valor']}: {team_dict['valor']} | "
-        team_str += f"{self.bot.config.team_emoji['unknown']}: {team_dict['unknown']}"
-        fields = {
-            "Boss": f"{boss_name} {type_emoji}",
-            "Weather": f"{weather_name} {weather_emoji}",
-            "Weaknesses": weaks,
-            "Resistances": resists,
-            "CP Range": f"{cp_range[0]}-{cp_range[1]}",
-            "Moveset": moveset,
-            "Status List": status_str,
-            "Team List": team_str
-        }
-        i = 1
-        ctrs_str = []
-        for ctr in ctrs_list:
-            name = await ctr.name()
-            fast = Move(self.bot, ctr.quickMoveid)
-            fast_name = await fast.name()
-            fast_emoji = await fast.emoji()
-            charge = Move(self.bot, ctr.chargeMoveid)
-            charge_name = await charge.name()
-            charge_emoji = await charge.emoji()
-            ctr_str = f"**{name}**: {fast_name} {fast_emoji} | {charge_name} {charge_emoji}"
-            ctrs_str.append(ctr_str)
-            i += 1
-        ctrs_str.append(f'[Results courtesy of Pokebattler](https://www.pokebattler.com/raids/{boss.id})')
-        fields['<:pkbtlr:512707623812857871> Counters'] = "\n".join(ctrs_str)
-        embed = formatters.make_embed(icon=raid_icon, title=directions_text, # msg_colour=color,
-            title_url=directions_url, thumbnail=img_url, fields=fields, footer="Ending",
-            footer_icon=footer_icon)
-        embed.timestamp = enddt
-        return embed
+        return await RaidEmbed.from_raid(self)
 
     def expired_embed(self):
         embed = formatters.make_embed(content="This raid has expired!", footer="Expired")
         embed.timestamp = datetime.fromtimestamp(self.end)
         return embed
+    
 
     
     async def update_messages(self, content=''):
@@ -516,7 +424,7 @@ class Raid():
                     await msg.add_reaction(react)
         return msg_list
 
-
+    
     
     async def hatch_egg(self):
         content = "This raid egg has hatched! React below to report the boss!"
@@ -562,8 +470,7 @@ class Raid():
 
     async def rsvp(self, user, status, bosses: list=None, total: int=1,
         bluecount: int=0, yellowcount: int=0, redcount: int=0):
-        trainer_dict = await self.get_trainer_dict()
-        print(trainer_dict)
+        trainer_dict = self.trainer_dict
         d = {}
         user_table = self.bot.dbi.table('users')
         user_query = user_table.query().where(id=user)
@@ -582,7 +489,6 @@ class Raid():
             coming_list = []
             here = None
         old_status = trainer_dict.get(user, {}).get('status')
-        print(old_status)
         if old_status == status:
             return
         elif old_status:
@@ -635,13 +541,12 @@ class Raid():
             d['id'] = user
             upsert.row(**d)
         await upsert.commit()
-        await asyncio.sleep(1)
         await self.update_messages()
 
     async def boss_interest_dict(self):
         boss_list = self.boss_list
         d = {x: 0 for x in boss_list}
-        trainer_dict = await self.get_trainer_dict()
+        trainer_dict = self.trainer_dict
         for trainer in trainer_dict:
             total = trainer_dict[trainer]['total']
             bosses = trainer_dict[trainer]['bosses']
@@ -649,28 +554,38 @@ class Raid():
                 d[boss] += total
         return d
 
-    async def status_dict(self):
+    @property
+    def status_dict(self):
         d = {
             'maybe': 0,
             'coming': 0,
             'here': 0,
             'lobby': 0
         }
-        trainer_dict = await self.get_trainer_dict()
+        trainer_dict = self.trainer_dict
         for trainer in trainer_dict:
             total = trainer_dict[trainer]['total']
             status = trainer_dict[trainer]['status']
             d[status] += total
         return d
     
-    async def team_dict(self):
+    @property
+    def status_str(self):
+        status_dict = self.status_dict
+        status_str = f"{self.bot.config.emoji['maybe']}: {status_dict['maybe']} | "
+        status_str += f"{self.bot.config.emoji['coming']}: {status_dict['coming']} | "
+        status_str += f"{self.bot.config.emoji['here']}: {status_dict['here']}"
+        return status_str
+    
+    @property
+    def team_dict(self):
         d = {
             'mystic': 0,
             'instinct': 0,
             'valor': 0,
             'unknown': 0
         }
-        trainer_dict = await self.get_trainer_dict()
+        trainer_dict = self.trainer_dict
         for trainer in trainer_dict:
             bluecount = trainer_dict[trainer]['bluecount']
             yellowcount = trainer_dict[trainer]['yellowcount']
@@ -681,6 +596,15 @@ class Raid():
             d['valor'] += redcount
             d['unknown'] += unknowncount
         return d
+
+    @property
+    def team_str(self):
+        team_dict = self.team_dict
+        team_str = f"{self.bot.config.team_emoji['mystic']}: {team_dict['mystic']} | "
+        team_str += f"{self.bot.config.team_emoji['instinct']}: {team_dict['instinct']} | "
+        team_str += f"{self.bot.config.team_emoji['valor']}: {team_dict['valor']} | "
+        team_str += f"{self.bot.config.team_emoji['unknown']}: {team_dict['unknown']}"
+        return team_str
 
     async def get_trainer_dict(self):
         def data(rcrd):
@@ -751,7 +675,7 @@ class Raid():
         raid.id = data['id']
         await raid.get_trainer_dict()
         bot.add_listener(raid.on_raw_reaction_add)
-        return raid  
+        return raid
         
 
 class RaidCog(Cog):

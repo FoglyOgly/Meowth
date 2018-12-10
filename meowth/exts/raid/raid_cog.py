@@ -512,6 +512,7 @@ class Raid():
         else:
             unknowncount = total
         d = {
+            'status': status,
             'bosses': bosses,
             'total': total,
             'bluecount': bluecount,
@@ -519,6 +520,30 @@ class Raid():
             'redcount': redcount,
             'unknowncount': unknowncount
         }
+        self.trainer_dict[user] = d
+        message_ids = self.message_ids
+        has_embed = False
+        msg_list = []
+        for messageid in message_ids:
+            msg = await Message.from_id_string(self.bot, messageid)
+            if not has_embed:
+                embed = RaidEmbed(msg.embeds[0])
+                embed.status_str = self.status_str
+                embed.team_str = self.team_str
+                has_embed = True
+            await msg.edit(content=content, embed=embed)
+            msg_list.append(msg)
+        if self.channel_ids:
+            for chanid in self.channel_ids:
+                channel = self.bot.get_channel(chanid)
+                msg = await channel.send(content, embed=embed)
+                msg_list.append(msg)
+                self.message_ids.append(msg.id)
+        for msg in msg_list:
+            for react in self.react_list:
+                if isinstance(react, int):
+                    react = self.bot.get_emoji(react)
+                await msg.add_reaction(react)
         if status == 'maybe':
             interested_list.append(self.id)
             d['interested_list'] = interested_list
@@ -543,7 +568,6 @@ class Raid():
             d['id'] = user
             upsert.row(**d)
         await upsert.commit()
-        await self.update_messages()
 
     async def boss_interest_dict(self):
         boss_list = self.boss_list
@@ -867,6 +891,9 @@ class RaidCog(Cog):
 
 class RaidEmbed(Embed):
 
+    def __init__(self, embed):
+        self = embed
+
     raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png' #TODO
     footer_icon = 'https://media.discordapp.net/attachments/346766728132427777/512699022822080512/imageedit_10_6071805149.png'
 
@@ -889,39 +916,39 @@ class RaidEmbed(Embed):
         ctrs_str = boss_dict['ctrs_str']
         moveset_str = "Unknown | Unknown"
 
-        self.set_field_at(boss_index, name="Boss", value=name)
-        self.set_field_at(weak_index, name="Weaknesses", value=weaks)
-        self.set_field_at(resist_index, name="Resistances", value=resists)
-        self.set_field_at(cp_index, name="CP Range", value=cp_str)
-        self.set_field_at(ctrs_index, name="<:pkbtlr:512707623812857871> Counters", value=ctrs_str)
-        self.set_field_at(moveset_index, name="Moveset", value=moveset_str)
+        self.set_field_at(RaidEmbed.boss_index, name="Boss", value=name)
+        self.set_field_at(RaidEmbed.weak_index, name="Weaknesses", value=weaks)
+        self.set_field_at(RaidEmbed.resist_index, name="Resistances", value=resists)
+        self.set_field_at(RaidEmbed.cp_index, name="CP Range", value=cp_str)
+        self.set_field_at(RaidEmbed.ctrs_index, name="<:pkbtlr:512707623812857871> Counters", value=ctrs_str)
+        self.set_field_at(RaidEmbed.moveset_index, name="Moveset", value=moveset_str)
         return self
     
     def set_weather(self, weather_str, cp_str, ctrs_str):
-        self.set_field_at(weather_index, name="Weather", value=weather_str)
-        self.set_field_at(cp_index, name="CP Range", value=cp_str)
-        self.set_field_at(ctrs_index, name='<:pkbtlr:512707623812857871> Counters', value=ctrs_str)
+        self.set_field_at(RaidEmbed.weather_index, name="Weather", value=weather_str)
+        self.set_field_at(RaidEmbed.cp_index, name="CP Range", value=cp_str)
+        self.set_field_at(RaidEmbed.ctrs_index, name='<:pkbtlr:512707623812857871> Counters', value=ctrs_str)
         return self
     
     def set_moveset(self, moveset_str):
-        self.set_field_at(moveset_index, name="Moveset", value=moveset_str)
+        self.set_field_at(RaidEmbed.moveset_index, name="Moveset", value=moveset_str)
         return self
     
     @property
     def status_str(self):
-        return self.fields[status_index].value
+        return self.fields[RaidEmbed.status_index].value
     
     @status_str.setter
     def status_str(self, status_str):
-        self.set_field_at(status_index, name="Status List", value=status_str)
+        self.set_field_at(RaidEmbed.status_index, name="Status List", value=status_str)
     
     @property
     def team_str(self):
-        return self.fields[team_index].value
+        return self.fields[RaidEmbed.team_index].value
     
     @team_str.setter
     def team_str(self, team_str):
-        self.set_field_at(team_index, name="Team List", value=team_str)
+        self.set_field_at(RaidEmbed.team_index, name="Team List", value=team_str)
 
 
 

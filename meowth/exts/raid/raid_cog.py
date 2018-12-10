@@ -1010,8 +1010,8 @@ class RaidEmbed(Embed):
             i += 1
         ctrs_str.append(f'[Results courtesy of Pokebattler](https://www.pokebattler.com/raids/{boss.id})')
         fields['<:pkbtlr:512707623812857871> Counters'] = "\n".join(ctrs_str)
-        embed = formatters.make_embed(icon=raid_icon, title=directions_text, # msg_colour=color,
+        embed = formatters.make_embed(icon=RaidEmbed.raid_icon, title=directions_text, # msg_colour=color,
             title_url=directions_url, thumbnail=img_url, fields=fields, footer="Ending",
-            footer_icon=footer_icon)
+            footer_icon=RaidEmbed.footer_icon)
         embed.timestamp = enddt
         return embed

@@ -385,7 +385,7 @@ class Raid():
         return embed
 
     async def raid_embed(self):
-        return await RaidEmbed.from_raid(self)
+        return (await RaidEmbed.from_raid(self)).embed
 
     def expired_embed(self):
         embed = formatters.make_embed(content="This raid has expired!", footer="Expired")
@@ -889,10 +889,10 @@ class RaidCog(Cog):
         return await insert.commit(do_update=True)
 
 
-class RaidEmbed(Embed):
+class RaidEmbed():
 
     def __init__(self, embed):
-        self = embed
+        self.embed = embed
         print(len(self.fields))
 
     raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png' #TODO
@@ -917,39 +917,39 @@ class RaidEmbed(Embed):
         ctrs_str = boss_dict['ctrs_str']
         moveset_str = "Unknown | Unknown"
 
-        self.set_field_at(RaidEmbed.boss_index, name="Boss", value=name)
-        self.set_field_at(RaidEmbed.weak_index, name="Weaknesses", value=weaks)
-        self.set_field_at(RaidEmbed.resist_index, name="Resistances", value=resists)
-        self.set_field_at(RaidEmbed.cp_index, name="CP Range", value=cp_str)
-        self.set_field_at(RaidEmbed.ctrs_index, name="<:pkbtlr:512707623812857871> Counters", value=ctrs_str)
-        self.set_field_at(RaidEmbed.moveset_index, name="Moveset", value=moveset_str)
+        self.embed.set_field_at(RaidEmbed.boss_index, name="Boss", value=name)
+        self.embed.set_field_at(RaidEmbed.weak_index, name="Weaknesses", value=weaks)
+        self.embed.set_field_at(RaidEmbed.resist_index, name="Resistances", value=resists)
+        self.embed.set_field_at(RaidEmbed.cp_index, name="CP Range", value=cp_str)
+        self.embed.set_field_at(RaidEmbed.ctrs_index, name="<:pkbtlr:512707623812857871> Counters", value=ctrs_str)
+        self.embed.set_field_at(RaidEmbed.moveset_index, name="Moveset", value=moveset_str)
         return self
     
     def set_weather(self, weather_str, cp_str, ctrs_str):
-        self.set_field_at(RaidEmbed.weather_index, name="Weather", value=weather_str)
-        self.set_field_at(RaidEmbed.cp_index, name="CP Range", value=cp_str)
-        self.set_field_at(RaidEmbed.ctrs_index, name='<:pkbtlr:512707623812857871> Counters', value=ctrs_str)
+        self.embed.set_field_at(RaidEmbed.weather_index, name="Weather", value=weather_str)
+        self.embed.set_field_at(RaidEmbed.cp_index, name="CP Range", value=cp_str)
+        self.embed.set_field_at(RaidEmbed.ctrs_index, name='<:pkbtlr:512707623812857871> Counters', value=ctrs_str)
         return self
     
     def set_moveset(self, moveset_str):
-        self.set_field_at(RaidEmbed.moveset_index, name="Moveset", value=moveset_str)
+        self.embed.set_field_at(RaidEmbed.moveset_index, name="Moveset", value=moveset_str)
         return self
     
     @property
     def status_str(self):
-        return self.fields[RaidEmbed.status_index].value
+        return self.embed.fields[RaidEmbed.status_index].value
     
     @status_str.setter
     def status_str(self, status_str):
-        self.set_field_at(RaidEmbed.status_index, name="Status List", value=status_str)
+        self.embed.set_field_at(RaidEmbed.status_index, name="Status List", value=status_str)
     
     @property
     def team_str(self):
-        return self.fields[RaidEmbed.team_index].value
+        return self.embed.fields[RaidEmbed.team_index].value
     
     @team_str.setter
     def team_str(self, team_str):
-        self.set_field_at(RaidEmbed.team_index, name="Team List", value=team_str)
+        self.embed.set_field_at(RaidEmbed.team_index, name="Team List", value=team_str)
 
 
 
@@ -1042,4 +1042,4 @@ class RaidEmbed(Embed):
             title_url=directions_url, thumbnail=img_url, fields=fields, footer="Ending",
             footer_icon=RaidEmbed.footer_icon)
         embed.timestamp = enddt
-        return embed
+        return cls(embed)

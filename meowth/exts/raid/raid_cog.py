@@ -495,7 +495,7 @@ class Raid():
             return
         elif old_status:
             if status == 'cancel':
-                print(2)
+                del self.trainer_dict[user]
             if self.id in interested_list:
                 interested_list.remove(self.id)
             if self.id in coming_list:
@@ -520,7 +520,8 @@ class Raid():
             'redcount': redcount,
             'unknowncount': unknowncount
         }
-        self.trainer_dict[user] = d
+        if status != 'cancel':
+            self.trainer_dict[user] = deepcopy(d)
         message_ids = self.message_ids
         has_embed = False
         msg_list = []
@@ -563,6 +564,7 @@ class Raid():
         d['interested_list'] = interested_list
         d['coming_list'] = coming_list
         d['here'] = here
+        del d['status']
         if action == 'update':
             upsert.values(**d)  
         else:

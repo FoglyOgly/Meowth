@@ -531,12 +531,12 @@ class Raid():
                 embed.status_str = self.status_str
                 embed.team_str = self.team_str
                 has_embed = True
-            await msg.edit(content=content, embed=embed)
+            await msg.edit(embed=embed)
             msg_list.append(msg)
         if self.channel_ids:
             for chanid in self.channel_ids:
                 channel = self.bot.get_channel(chanid)
-                msg = await channel.send(content, embed=embed)
+                msg = await channel.send(embed=embed)
                 msg_list.append(msg)
                 self.message_ids.append(msg.id)
         for msg in msg_list:

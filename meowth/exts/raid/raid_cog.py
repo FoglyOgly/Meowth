@@ -926,7 +926,7 @@ class RaidEmbed(Embed):
 
 
     @classmethod
-    async def from_raid(raid: Raid):
+    async def from_raid(cls, raid: Raid):
         boss = raid.pkmn
         bot = raid.bot
         name = await boss.name()

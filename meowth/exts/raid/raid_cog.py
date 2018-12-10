@@ -58,6 +58,7 @@ class Raid():
         elif end:
             self.end = end
             self.hatch = hatch
+        self.trainer_dict = {}
     
     @property
     def status(self):

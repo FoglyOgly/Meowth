@@ -893,7 +893,6 @@ class RaidEmbed():
 
     def __init__(self, embed):
         self.embed = embed
-        print(len(self.fields))
 
     raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png' #TODO
     footer_icon = 'https://media.discordapp.net/attachments/346766728132427777/512699022822080512/imageedit_10_6071805149.png'

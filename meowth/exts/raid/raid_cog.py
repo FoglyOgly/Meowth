@@ -805,6 +805,8 @@ class RaidCog(Cog):
             raid_channel = await ctx.guild.create_text_channel(raid_channel_name,
                 category=category)
             new_raid.channel_ids.append(str(raid_channel.id))
+            raidmsg = await raid_channel.send(reportcontent, embed=embed)
+            new_raid.message_ids.append(f"{raidmsg.channel.id}/{raidmsg.id}")
             reportcontent += f"Coordinate this raid in {raid_channel.mention}!"
             if not role:
                 dm_content = f"Coordinate this raid in {raid_channel.name}!"

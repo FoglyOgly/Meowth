@@ -827,6 +827,7 @@ class RaidCog(Cog):
         insert.returning('id')
         rcrd = await insert.commit()
         new_raid.id = rcrd[0][0]
+        print(new_raid.id)
         await ctx.bot.dbi.add_listener(f'unhere_{new_raid.id}', new_raid.cancel_here)
         ctx.bot.add_listener(new_raid.on_raw_reaction_add)
         await new_raid.monitor_status()

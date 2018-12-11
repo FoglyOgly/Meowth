@@ -433,7 +433,7 @@ class Raid():
                 channel = self.bot.get_channel(int(chanid))
                 msg = await channel.send(content, embed=embed)
                 msg_list.append(msg)
-                self.message_ids.append(msg.id)
+                self.message_ids.append(f'{chanid}/{msg.id}')
         if react_list:
             for msg in msg_list:
                 for react in react_list:

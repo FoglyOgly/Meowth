@@ -498,13 +498,13 @@ class Raid():
             upsert = user_table.update().where(id=user)
             data = data[0]
             interested_list = data['interested_list']
-            coming_list = data['coming_list']
+            coming = data['coming']
             here = data['here']
         else:
             action = 'insert'
             upsert = user_table.insert()
             interested_list = []
-            coming_list = []
+            coming = None
             here = None
         old_status = trainer_dict.get(user, {}).get('status')
         if old_status == status:
@@ -553,10 +553,10 @@ class Raid():
             msg_list.append(msg)
         if self.channel_ids:
             for chanid in self.channel_ids:
-                channel = self.bot.get_channel(chanid)
+                channel = self.bot.get_channel(int(chanid))
                 msg = await channel.send(embed=embed)
                 msg_list.append(msg)
-                self.message_ids.append(msg.id)
+                self.message_ids.append(f'{chanid}/{msg.id}')
         for msg in msg_list:
             for react in self.react_list:
                 if isinstance(react, int):
@@ -564,21 +564,24 @@ class Raid():
                 await msg.add_reaction(react)
         if status == 'maybe':
             interested_list.append(self.id)
-            d['interested_list'] = interested_list
-        elif status == 'coming':
-            coming_list.append(self.id)
-            d['coming_list'] = coming_list
-        elif status == 'here':
-            if here and here != self.id:
+        elif status == 'coming' or status == 'here':
+            if coming or here:
+                if coming != self.id:
+                    old_id = coming
+                else:
+                    old_id = here
                 raid_table = self.bot.dbi.table('raids')
                 raid_query = raid_table.query()
-                raid_query.where(id=here)
+                raid_query.where(id=old_id)
                 data = (await raid_query.get())[0]
                 old_rsvp = await Raid.from_data(self.bot, data)
                 await old_rsvp.rsvp(user, "cancel")
-            here = self.id
+            if status == 'coming':
+                coming = self.id
+            else:
+                here = self.id
         d['interested_list'] = interested_list
-        d['coming_list'] = coming_list
+        d['coming'] = coming
         d['here'] = here
         del d['status']
         if action == 'update':

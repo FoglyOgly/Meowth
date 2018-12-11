@@ -827,8 +827,6 @@ class RaidCog(Cog):
         insert.returning('id')
         rcrd = await insert.commit()
         new_raid.id = rcrd[0][0]
-        print(new_raid.id)
-        await ctx.bot.dbi.add_listener(f'unhere_{new_raid.id}', new_raid.cancel_here)
         ctx.bot.add_listener(new_raid.on_raw_reaction_add)
         await new_raid.monitor_status()
         
@@ -1027,7 +1025,7 @@ class RaidEmbed():
         status_dict = raid.status_dict
         status_str = f"{bot.config.emoji['maybe']}: {status_dict['maybe']} | "
         status_str += f"{bot.config.emoji['coming']}: {status_dict['coming']} | "
-        status_str += f"{bot.config.emoji['here']}: {status_dict['here']}"
+        status_str += f"{bot.get_emoji(bot.config.emoji['here'])}: {status_dict['here']}"
         team_dict = raid.team_dict
         team_str = f"{bot.config.team_emoji['mystic']}: {team_dict['mystic']} | "
         team_str += f"{bot.config.team_emoji['instinct']}: {team_dict['instinct']} | "

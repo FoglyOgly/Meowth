@@ -514,8 +514,8 @@ class Raid():
                 del self.trainer_dict[user]
             if self.id in interested_list:
                 interested_list.remove(self.id)
-            if self.id in coming_list:
-                coming_list.remove(self.id)
+            if self.id == coming:
+                coming = None
             if self.id == here:
                 here = None
         if any((bluecount, yellowcount, redcount)):
@@ -682,7 +682,7 @@ class Raid():
             rcrd_dict['status'] = 'maybe'
             trainer_dict[trainer] = rcrd_dict
         com_query = user_table.query()
-        com_query.where(user_table['coming_list'].contains_(self.id))
+        com_query.where(coming=self.id)
         com_data = await com_query.get()
         for rcrd in com_data:
             trainer, rcrd_dict = data(rcrd)

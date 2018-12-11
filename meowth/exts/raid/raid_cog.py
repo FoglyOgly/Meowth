@@ -572,7 +572,7 @@ class Raid():
             if here and here != self.id:
                 raid_table = self.bot.dbi.table('raids')
                 raid_query = raid_table.query()
-                raid_query.where(id=self.id)
+                raid_query.where(id=here)
                 data = (await raid_query.get())[0]
                 old_rsvp = await Raid.from_data(self.bot, data)
                 await old_rsvp.rsvp(user, "cancel")

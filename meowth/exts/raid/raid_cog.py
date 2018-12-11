@@ -478,7 +478,7 @@ class Raid():
         await self.update_messages()
         if self.channel_ids:
             for chanid in self.channel_ids:
-                channel = self.bot.get_channel(chanid)
+                channel = self.bot.get_channel(int(chanid))
                 await channel.delete()
         raid_table = self.bot.dbi.table('raids')
         query = raid_table.query().where(id=self.id)
@@ -751,7 +751,7 @@ class RaidCog(Cog):
                 if old_raid.channel_ids:
                     mentions = []
                     for channelid in old_raid.channel_ids:
-                        channel = ctx.guild.get_channel(channelid)
+                        channel = ctx.guild.get_channel(int(channelid))
                         mention = channel.mention
                         mentions.append(mention)
                     return await ctx.send(f"""There is already a raid reported at this gym! Coordinate here: {", ".join(mentions)}""", embed=embed)

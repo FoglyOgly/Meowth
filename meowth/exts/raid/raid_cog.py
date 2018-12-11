@@ -619,7 +619,7 @@ class Raid():
         status_dict = self.status_dict
         status_str = f"{self.bot.config.emoji['maybe']}: {status_dict['maybe']} | "
         status_str += f"{self.bot.config.emoji['coming']}: {status_dict['coming']} | "
-        status_str += f"{self.bot.config.emoji['here']}: {status_dict['here']}"
+        status_str += f"{self.bot.get_emoji(self.bot.config.emoji['here'])}: {status_dict['here']}"
         return status_str
     
     @property

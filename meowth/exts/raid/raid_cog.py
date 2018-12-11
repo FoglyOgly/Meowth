@@ -430,7 +430,7 @@ class Raid():
             msg_list.append(msg)
         if self.channel_ids:
             for chanid in self.channel_ids:
-                channel = self.bot.get_channel(chanid)
+                channel = self.bot.get_channel(int(chanid))
                 msg = await channel.send(content, embed=embed)
                 msg_list.append(msg)
                 self.message_ids.append(msg.id)
@@ -811,7 +811,7 @@ class RaidCog(Cog):
                 dms = await want.notify_users(dm_content, embed)
                 new_raid.message_ids.extend(dms)
             reportmsg = await ctx.send(reportcontent, embed=embed)
-            new_raid.message_ids.extend(f"{reportmsg.channel.id}/{reportmsg.id}")
+            new_raid.message_ids.append(f"{reportmsg.channel.id}/{reportmsg.id}")
         insert = raid_table.insert()
         data = {
             'gym': getattr(gym, 'id', gym),

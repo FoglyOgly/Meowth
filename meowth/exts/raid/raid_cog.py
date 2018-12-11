@@ -203,6 +203,22 @@ class Raid():
         await message.remove_reaction(emoji, user)
         await self.rsvp(payload.user_id, status, bosses=bosses, total=total)
 
+    @staticmethod
+    def cancel_here(connection, pid, channel, payload):
+        if channel != f'unhere_{self.id}':
+            return
+        event_loop = asyncio.get_event_loop()
+        event_loop.create_task(self.unhere(payload))
+    
+    async def unhere(self, payload):
+        await self.get_trainer_dict()
+        msg = await Message.from_id_string(self.bot, payload)
+        raid_embed = RaidEmbed(msg.embeds[0])
+        raid_embed.status_str = self.status_str
+        raid_embed.team_str = self.team_str
+        embed = raid_embed.embed
+        await msg.edit(embed=embed)
+
         
     
     async def monitor_status(self):
@@ -811,6 +827,7 @@ class RaidCog(Cog):
         insert.returning('id')
         rcrd = await insert.commit()
         new_raid.id = rcrd[0][0]
+        await ctx.bot.dbi.add_listener(f'unhere_{new_raid.id}', new_raid.cancel_here)
         ctx.bot.add_listener(new_raid.on_raw_reaction_add)
         await new_raid.monitor_status()
         

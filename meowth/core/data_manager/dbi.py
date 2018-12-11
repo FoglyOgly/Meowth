@@ -131,6 +131,10 @@ class DatabaseInterface:
             await self.recreate_pool()
             return await self.execute_transaction(query, *query_args)
 
+    async def add_listener(channel, callback):
+        async with self.pool.acquire() as conn:
+            return await conn.add_listener(channel, callback)
+
     async def create_table(self, name, columns: list, *, primaries=None):
         """Create table."""
         return await Table(self, name).create(columns, primaries=primaries)

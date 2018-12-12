@@ -1119,6 +1119,7 @@ class RSVPEmbed():
     
     @classmethod
     def from_raid(cls, raid: Raid):
+        bot = raid.bot
 
         end = raid.end
         enddt = datetime.fromtimestamp(end)

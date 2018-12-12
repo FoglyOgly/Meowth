@@ -570,7 +570,7 @@ class Raid():
                 elif status == 'cancel':
                     display_status = 'has canceled'
                 content = f"{member.display_name} {display_status}!"
-                newmsg = await chn.send(content, embed=embed)
+                newmsg = await chn.send(content, embed=rsvpembed)
         for msg in msg_list:
             for react in self.react_list:
                 if isinstance(react, int):

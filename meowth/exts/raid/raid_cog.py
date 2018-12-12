@@ -1166,7 +1166,9 @@ class EggEmbed():
         weather_name = await weather.name()
         weather_emoji = await weather.boosted_emoji_str()
         team_str = raid.team_str
+        print(team_str)
         boss_str = await raid.boss_list_str()
+        print(boss_str)
         fields = {
             "Weather": f"{weather_name} {weather_emoji}",
             "Team List": team_str,

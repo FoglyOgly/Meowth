@@ -129,7 +129,7 @@ class Raid():
         weather = Weather(bot, weather)
         for i in range(len(boss_list)):
             x = boss_list[i]
-            boss = RaidBoss(Pokemon(raid.bot, x))
+            boss = RaidBoss(Pokemon(self.bot, x))
             name = f'{i+1}\u20e3 '
             name += await boss.name()
             is_boosted = await boss.is_boosted(weather.value)

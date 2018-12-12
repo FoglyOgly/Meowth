@@ -843,7 +843,7 @@ class RaidCog(Cog):
         insert = raid_table.insert()
         data = {
             'gym': getattr(gym, 'id', gym),
-            'guild': str(ctx.guild.id),
+            'guild': ctx.guild.id,
             'level': level,
             'pkmn': (boss.id, boss.quickMoveid or None, boss.chargeMoveid or None) if boss else (None, None, None),
             'hatch': hatch,

@@ -141,7 +141,8 @@ class Raid():
             if shiny_available:
                 name += ' :sparkles:'
             boss_names.append(f"{name} {type_emoji}")
-            boss_list_str = "\n".join(boss_names)
+        boss_list_str = "\n".join(boss_names)
+        return boss_list_str
     
     @property
     def pokebattler_url(self):

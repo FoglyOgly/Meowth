@@ -127,7 +127,7 @@ class Raid():
         boss_names = []
         boss_list = self.boss_list
         weather = await self.weather()
-        weather = Weather(bot, weather)
+        weather = Weather(self.bot, weather)
         for i in range(len(boss_list)):
             x = boss_list[i]
             boss = RaidBoss(Pokemon(self.bot, x))

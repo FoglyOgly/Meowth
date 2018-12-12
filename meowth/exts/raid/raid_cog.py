@@ -1168,7 +1168,7 @@ class EggEmbed():
         boss_str = await raid.boss_list_str()
         fields = {
             "Weather": f"{weather_name} {weather_emoji}",
-            "Team List": team_str
+            "Team List": team_str,
             "Boss Interest:": boss_str
         }
         footer_text = "Hatching"

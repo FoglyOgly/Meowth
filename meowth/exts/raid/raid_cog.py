@@ -723,7 +723,7 @@ class Raid():
     async def from_data(cls, bot, data):
         gym = Gym(bot, data['gym'])
         level = data['level']
-        guild_id = data['guild_id']
+        guild_id = data['guild']
         pkmnid, quick, charge = data.get('pkmn', (None, None, None))
         if pkmnid:
             pkmn = Pokemon(bot, pkmnid, quickMoveid=quick, chargeMoveid=charge)

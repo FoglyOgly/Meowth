@@ -430,9 +430,7 @@ class Raid():
             if not content:
                 content = msg.content
             await msg.delete()
-            self.message_ids.remove(messageid)
             newmsg = await chn.send(content, embed=embed)
-            self.message_ids.append(f'{chn.id}/{newmsg.id}')
             msg_list.append(newmsg)
         if self.channel_ids:
             for chanid in self.channel_ids:
@@ -448,6 +446,7 @@ class Raid():
                     await msg.add_reaction(react)
         raid_table = self.bot.dbi.table('raids')
         id_list = [f'{x.channel.id}/{x.id}' for x in msg_list]
+        self.message_ids = id_list
         update = raid_table.update().where(id=self.id)
         d = {
             'messages': id_list

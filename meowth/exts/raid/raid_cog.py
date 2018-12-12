@@ -465,7 +465,6 @@ class Raid():
         react_list = formatters.mc_emoji(length)
         boss_dict = dict(zip(react_list, boss_list))
         msg_list = await self.update_messages(content=content)
-        await asyncio.sleep(1)
         response = await formatters.ask(self.bot, msg_list, timeout=(self.end-time.time()),
             react_list=react_list)
         if response:
@@ -563,14 +562,9 @@ class Raid():
                 raid_embed.team_str = self.team_str
                 embed = raid_embed.embed
                 has_embed = True
-            await msg.edit(embed=embed)
+            await msg.delete()
+            newmsg = await chn.send(embed=embed)
             msg_list.append(msg)
-        if self.channel_ids:
-            for chanid in self.channel_ids:
-                channel = self.bot.get_channel(int(chanid))
-                msg = await channel.send(embed=embed)
-                msg_list.append(msg)
-                self.message_ids.append(f'{chanid}/{msg.id}')
         for msg in msg_list:
             for react in self.react_list:
                 if isinstance(react, int):

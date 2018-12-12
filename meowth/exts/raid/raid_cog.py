@@ -146,7 +146,7 @@ class Raid():
             boss_name = await self.pkmn.name()
             return f"{boss_name}-{gym_name}"
         else:
-            if self.hatch < time.time():
+            if not self.hatch or self.hatch < time.time():
                 return f"hatched-{self.level}-{self.gym_name}"
             else:
                 return f"{self.level}-{gym_name}"
@@ -823,6 +823,10 @@ class RaidCog(Cog):
                 category=category)
             new_raid.channel_ids.append(str(raid_channel.id))
             raidmsg = await raid_channel.send(reportcontent, embed=embed)
+            for react in react_list:
+                if isinstance(react, int):
+                    react = self.bot.get_emoji(react)
+                await raidmsg.add_reaction(react)
             new_raid.message_ids.append(f"{raidmsg.channel.id}/{raidmsg.id}")
             reportcontent += f"Coordinate this raid in {raid_channel.mention}!"
             if not role:
@@ -830,6 +834,10 @@ class RaidCog(Cog):
                 dms = await want.notify_users(dm_content, embed)
                 new_raid.message_ids.extend(dms)
             reportmsg = await ctx.send(reportcontent, embed=embed)
+            for react in react_list:
+                if isinstance(react, int):
+                    react = self.bot.get_emoji(react)
+                await reportmsg.add_reaction(react)
             new_raid.message_ids.append(f"{reportmsg.channel.id}/{reportmsg.id}")
         insert = raid_table.insert()
         data = {

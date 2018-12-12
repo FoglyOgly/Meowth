@@ -124,6 +124,7 @@ class Raid():
         return boss_list
     
     async def boss_list_str(self):
+        boss_names = []
         boss_list = self.boss_list
         weather = await self.weather()
         weather = Weather(bot, weather)

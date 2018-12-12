@@ -123,6 +123,25 @@ class Raid():
         boss_list = self.bot.raid_info.raid_lists[level]
         return boss_list
     
+    async def boss_list_str(self):
+        boss_list = self.boss_list
+        weather = await self.weather()
+        weather = Weather(bot, weather)
+        for i in range(len(boss_list)):
+            x = boss_list[i]
+            boss = RaidBoss(Pokemon(raid.bot, x))
+            name = f'{i+1}\u20e3 '
+            name += await boss.name()
+            is_boosted = await boss.is_boosted(weather.value)
+            if is_boosted:
+                name += ' (Boosted)'
+            type_emoji = await boss.type_emoji()
+            shiny_available = await boss._shiny_available()
+            if shiny_available:
+                name += ' :sparkles:'
+            boss_names.append(f"{name} {type_emoji}")
+            boss_list_str = "\n".join(boss_names)
+    
     @property
     def pokebattler_url(self):
         pkmnid = self.pkmn.id
@@ -303,54 +322,7 @@ class Raid():
         return ctrs_list
 
     async def egg_embed(self):
-        raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png'
-        footer_icon = 'https://media.discordapp.net/attachments/346766728132427777/512699022822080512/imageedit_10_6071805149.png'
-        level = self.level
-        egg_img_url = self.bot.raid_info.egg_images[level]
-        # color = await formatters.url_color(egg_img_url)
-        boss_list = self.boss_list
-        hatch = self.hatch
-        hatchdt = datetime.fromtimestamp(hatch)
-        gym = self.gym
-        if isinstance(gym, Gym):
-            directions_url = await gym.url()
-            directions_text = await gym._name()
-            exraid = await gym._exraid()
-        else:
-            directions_url = gym.url
-            directions_text = gym.name + "(Unknown Gym)"
-            exraid = False
-        if exraid:
-            directions_text += " (EX Raid Gym)"
-        weather = await self.weather()
-        weather = Weather(self.bot, weather)
-        weather_name = await weather.name()
-        weather_emoji = await weather.boosted_emoji_str()
-        boss_names = []
-        for i in range(len(boss_list)):
-            x = boss_list[i]
-            boss = RaidBoss(Pokemon(self.bot, x))
-            name = f'{i+1}\u20e3'
-            name += await boss.name()
-            type_emoji = await boss.type_emoji()
-            shiny_available = await boss._shiny_available()
-            if shiny_available:
-                name += ':sparkles:'
-            boss_names.append(f"{name} {type_emoji}")
-        half_length = ceil(len(boss_names)/2)
-        bosses_left = boss_names[:(half_length)]
-        bosses_right = boss_names[(half_length):]
-        fields = {
-            "Weather": (False, f"{weather_name} {weather_emoji}"),
-            "Possible Bosses:": "\n".join(bosses_left),
-            "\u200b": "\n".join(bosses_right)
-        }
-        footer_text = "Hatching"
-        embed = formatters.make_embed(icon=raid_icon, title=directions_text,
-            thumbnail=egg_img_url, title_url=directions_url, # msg_colour=color,
-            fields=fields, footer=footer_text, footer_icon=footer_icon)
-        embed.timestamp = hatchdt
-        return embed
+        return (await EggEmbed.from_raid(self)).embed
     
     async def hatched_embed(self):
         raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png'
@@ -548,11 +520,18 @@ class Raid():
         for messageid in message_ids:
             chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
             if not has_embed:
-                raid_embed = RaidEmbed(msg.embeds[0])
-                raid_embed.status_str = self.status_str
-                raid_embed.team_str = self.team_str
-                embed = raid_embed.embed
-                has_embed = True
+                if self.status == 'active':
+                    raid_embed = RaidEmbed(msg.embeds[0])
+                    raid_embed.status_str = self.status_str
+                    raid_embed.team_str = self.team_str
+                    embed = raid_embed.embed
+                    has_embed = True
+                elif self.status == 'egg':
+                    egg_embed = EggEmbed(msg.embeds[0])
+                    egg_embed.team_str = self.team_str
+                    egg_embed.boss_str = await self.boss_list_str()
+                    embed = egg_embed.embed
+                    has_embed = True
             await msg.edit(embed=embed)
             msg_list.append(msg)
         if self.channel_ids:
@@ -580,10 +559,7 @@ class Raid():
             interested_list.append(self.id)
         elif status == 'coming' or status == 'here':
             if coming or here:
-                if coming != self.id:
-                    old_id = coming
-                else:
-                    old_id = here
+                old_id = coming or here
                 raid_table = self.bot.dbi.table('raids')
                 raid_query = raid_table.query()
                 raid_query.where(id=old_id)
@@ -1007,7 +983,7 @@ class RaidEmbed():
         type_emoji = await boss.type_emoji()
         shiny_available = await boss._shiny_available()
         if shiny_available:
-            name += ':sparkles:'
+            name += ' :sparkles:'
         quick_move = Move(bot, boss.quickMoveid) if boss.quickMoveid else None
         charge_move = Move(bot, boss.chargeMoveid) if boss.chargeMoveid else None
         if quick_move:
@@ -1050,15 +1026,8 @@ class RaidEmbed():
         resists = await boss.resistances_emoji()
         weaks = await boss.weaknesses_emoji()
         ctrs_list = await raid.generic_counters_data()
-        status_dict = raid.status_dict
-        status_str = f"{bot.config.emoji['maybe']}: {status_dict['maybe']} | "
-        status_str += f"{bot.config.emoji['coming']}: {status_dict['coming']} | "
-        status_str += f"{bot.get_emoji(bot.config.emoji['here'])}: {status_dict['here']}"
-        team_dict = raid.team_dict
-        team_str = f"{bot.config.team_emoji['mystic']}: {team_dict['mystic']} | "
-        team_str += f"{bot.config.team_emoji['instinct']}: {team_dict['instinct']} | "
-        team_str += f"{bot.config.team_emoji['valor']}: {team_dict['valor']} | "
-        team_str += f"{bot.config.team_emoji['unknown']}: {team_dict['unknown']}"
+        status_str = raid.status_str
+        team_str = raid.team_str
         fields = {
             "Boss": f"{name} {type_emoji}",
             "Weather": f"{weather_name} {weather_emoji}",
@@ -1124,15 +1093,8 @@ class RSVPEmbed():
         end = raid.end
         enddt = datetime.fromtimestamp(end)
 
-        status_dict = raid.status_dict
-        status_str = f"{bot.config.emoji['maybe']}: {status_dict['maybe']} | "
-        status_str += f"{bot.config.emoji['coming']}: {status_dict['coming']} | "
-        status_str += f"{bot.get_emoji(bot.config.emoji['here'])}: {status_dict['here']}"
-        team_dict = raid.team_dict
-        team_str = f"{bot.config.team_emoji['mystic']}: {team_dict['mystic']} | "
-        team_str += f"{bot.config.team_emoji['instinct']}: {team_dict['instinct']} | "
-        team_str += f"{bot.config.team_emoji['valor']}: {team_dict['valor']} | "
-        team_str += f"{bot.config.team_emoji['unknown']}: {team_dict['unknown']}"
+        status_str = raid.status_str
+        team_str = raid.team_str
 
         fields = {
             "Status List": status_str,
@@ -1142,4 +1104,76 @@ class RSVPEmbed():
         embed = formatters.make_embed(icon=RSVPEmbed.raid_icon, title="Current RSVP Totals",
             fields=fields, footer="Ending", footer_icon=RSVPEmbed.footer_icon)
         embed.timestamp = enddt
+        return cls(embed)
+    
+class EggEmbed():
+
+    def __init__(self, embed):
+        self.embed = embed
+    
+    raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png'
+    footer_icon = 'https://media.discordapp.net/attachments/346766728132427777/512699022822080512/imageedit_10_6071805149.png'
+            
+    weather_index = 0
+    team_index = 1
+    boss_list_index = 2
+
+    def set_weather(self, weather_str, boss_list_str):
+        self.embed.set_field_at(EggEmbed.weather_index, name="Weather", value=weather_str)
+        self.boss_str = boss_list_str
+        return self
+    
+    @property
+    def team_str(self):
+        return self.embed.fields[EggEmbed.team_index].value
+    
+    @team_str.setter
+    def team_str(self, team_str):
+        self.embed.set_field_at(EggEmbed.team_index, name="Team List", value=team_str)
+    
+    @property
+    def boss_str(self):
+        return self.embed.fields[EggEmbed.boss_list_index].value
+    
+    @boss_str.setter
+    def boss_str(self, boss_str):
+        self.embed.set_field_at(EggEmbed.boss_list_index, name="Boss Interest", value=boss_str)
+
+    
+
+    
+    @classmethod
+    async def from_raid(cls, raid: Raid):
+        level = raid.level
+        egg_img_url = raid.bot.raid_info.egg_images[level]
+        # color = await formatters.url_color(egg_img_url)
+        hatch = raid.hatch
+        hatchdt = datetime.fromtimestamp(hatch)
+        gym = raid.gym
+        if isinstance(gym, Gym):
+            directions_url = await gym.url()
+            directions_text = await gym._name()
+            exraid = await gym._exraid()
+        else:
+            directions_url = gym.url
+            directions_text = gym.name + "(Unknown Gym)"
+            exraid = False
+        if exraid:
+            directions_text += " (EX Raid Gym)"
+        weather = await raid.weather()
+        weather = Weather(raid.bot, weather)
+        weather_name = await weather.name()
+        weather_emoji = await weather.boosted_emoji_str()
+        team_str = raid.team_str
+        boss_str = await raid.boss_list_str()
+        fields = {
+            "Weather": f"{weather_name} {weather_emoji}",
+            "Team List": team_str
+            "Boss Interest:": boss_str
+        }
+        footer_text = "Hatching"
+        embed = formatters.make_embed(icon=EggEmbed.raid_icon, title=directions_text,
+            thumbnail=egg_img_url, title_url=directions_url, # msg_colour=color,
+            fields=fields, footer=footer_text, footer_icon=EggEmbed.footer_icon)
+        embed.timestamp = hatchdt
         return cls(embed)

@@ -45,9 +45,10 @@ class RaidBoss(Pokemon):
 
 class Raid():
 
-    def __init__(self, bot, gym=None, level=None,
+    def __init__(self, bot, guild_id, gym=None, level=None,
         pkmn: RaidBoss=None, hatch: float=None, end: float=None):
         self.bot = bot
+        self.guild_id = guild_id
         self.gym = gym
         self.level = level
         self.pkmn = pkmn
@@ -429,9 +430,8 @@ class Raid():
             chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
             if not content:
                 content = msg.content
-            await msg.delete()
-            newmsg = await chn.send(content, embed=embed)
-            msg_list.append(newmsg)
+            await msg.edit(content=content, embed=embed)
+            msg_list.append(msg)
         if self.channel_ids:
             for chanid in self.channel_ids:
                 channel = self.bot.get_channel(int(chanid))
@@ -444,15 +444,6 @@ class Raid():
                     if isinstance(react, int):
                         react = self.bot.get_emoji(react)
                     await msg.add_reaction(react)
-        raid_table = self.bot.dbi.table('raids')
-        id_list = [f'{x.channel.id}/{x.id}' for x in msg_list]
-        self.message_ids = id_list
-        update = raid_table.update().where(id=self.id)
-        d = {
-            'messages': id_list
-        }
-        update.values(**d)
-        await update.commit()
         return msg_list
 
     
@@ -562,9 +553,24 @@ class Raid():
                 raid_embed.team_str = self.team_str
                 embed = raid_embed.embed
                 has_embed = True
-            await msg.delete()
-            newmsg = await chn.send(embed=embed)
+            await msg.edit(embed=embed)
             msg_list.append(msg)
+        if self.channel_ids:
+            for chnid in self.channel_ids:
+                rsvpembed = RSVPEmbed.from_raid(self)
+                guild = self.bot.get_guild(self.guild_id)
+                member = guild.get_member(user)
+                chn = self.bot.get_channel(int(chnid))
+                if status == 'maybe':
+                    display_status = 'is interested'
+                elif status == 'coming':
+                    display_status = 'is on the way'
+                elif status == 'here':
+                    display_status = 'is at the raid'
+                elif status == 'cancel':
+                    display_status = 'has canceled'
+                content = f"{member.display_name} {display_status}!"
+                newmsg = await chn.send(content, embed=embed)
         for msg in msg_list:
             for react in self.react_list:
                 if isinstance(react, int):
@@ -717,6 +723,7 @@ class Raid():
     async def from_data(cls, bot, data):
         gym = Gym(bot, data['gym'])
         level = data['level']
+        guild_id = data['guild_id']
         pkmnid, quick, charge = data.get('pkmn', (None, None, None))
         if pkmnid:
             pkmn = Pokemon(bot, pkmnid, quickMoveid=quick, chargeMoveid=charge)
@@ -725,7 +732,7 @@ class Raid():
             boss = None
         hatch = data.get('hatch')
         end = data['endtime']
-        raid = cls(bot, gym, level=level, pkmn=boss, hatch=hatch, end=end)
+        raid = cls(bot, guild_id, gym, level=level, pkmn=boss, hatch=hatch, end=end)
         raid.channel_ids = data.get('channels')
         raid.message_ids = data.get('messages')
         raid.id = data['id']
@@ -781,7 +788,7 @@ class RaidCog(Cog):
             level = boss.raid_level
             end = time.time() + 60*endtime
             hatch = None
-        new_raid = Raid(ctx.bot, gym, level=level, pkmn=boss, hatch=hatch, end=end)
+        new_raid = Raid(ctx.bot, ctx.guild.id, gym, level=level, pkmn=boss, hatch=hatch, end=end)
         new_raid.channel_ids = []
         new_raid.message_ids = []
         react_list = new_raid.react_list
@@ -836,7 +843,7 @@ class RaidCog(Cog):
         insert = raid_table.insert()
         data = {
             'gym': getattr(gym, 'id', gym),
-            'guild': ctx.guild.id,
+            'guild': str(ctx.guild.id),
             'level': level,
             'pkmn': (boss.id, boss.quickMoveid or None, boss.chargeMoveid or None) if boss else (None, None, None),
             'hatch': hatch,
@@ -1080,5 +1087,58 @@ class RaidEmbed():
         embed = formatters.make_embed(icon=RaidEmbed.raid_icon, title=directions_text, # msg_colour=color,
             title_url=directions_url, thumbnail=img_url, fields=fields, footer="Ending",
             footer_icon=RaidEmbed.footer_icon)
+        embed.timestamp = enddt
+        return cls(embed)
+
+class RSVPEmbed():
+
+    def __init__(self, embed):
+        self.embed = embed
+
+    raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png' #TODO
+    footer_icon = 'https://media.discordapp.net/attachments/346766728132427777/512699022822080512/imageedit_10_6071805149.png'
+
+    status_index = 0
+    team_index = 1
+
+    @property
+    def status_str(self):
+        return self.embed.fields[RSVPEmbed.status_index].value
+    
+    @status_str.setter
+    def status_str(self, status_str):
+        self.embed.set_field_at(RSVPEmbed.status_index, name="Status List", value=status_str)
+    
+    @property
+    def team_str(self):
+        return self.embed.fields[RaidEmbed.team_index].value
+    
+    @team_str.setter
+    def team_str(self, team_str):
+        self.embed.set_field_at(RaidEmbed.team_index, name="Team List", value=team_str)
+    
+    @classmethod
+    def from_raid(cls, raid: Raid):
+
+        end = raid.end
+        enddt = datetime.fromtimestamp(end)
+
+        status_dict = raid.status_dict
+        status_str = f"{bot.config.emoji['maybe']}: {status_dict['maybe']} | "
+        status_str += f"{bot.config.emoji['coming']}: {status_dict['coming']} | "
+        status_str += f"{bot.get_emoji(bot.config.emoji['here'])}: {status_dict['here']}"
+        team_dict = raid.team_dict
+        team_str = f"{bot.config.team_emoji['mystic']}: {team_dict['mystic']} | "
+        team_str += f"{bot.config.team_emoji['instinct']}: {team_dict['instinct']} | "
+        team_str += f"{bot.config.team_emoji['valor']}: {team_dict['valor']} | "
+        team_str += f"{bot.config.team_emoji['unknown']}: {team_dict['unknown']}"
+
+        fields = {
+            "Status List": status_str,
+            "Team List": team_str
+        }
+
+        embed = formatters.make_embed(icon=RSVPEmbed.raid_icon, title="Current RSVP Totals",
+            fields=fields, footer="Ending", footer_icon=RSVPEmbed.footer_icon)
         embed.timestamp = enddt
         return cls(embed)

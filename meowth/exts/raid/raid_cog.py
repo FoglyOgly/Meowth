@@ -557,7 +557,7 @@ class Raid():
             msg_list.append(msg)
         if self.channel_ids:
             for chnid in self.channel_ids:
-                rsvpembed = RSVPEmbed.from_raid(self)
+                rsvpembed = RSVPEmbed.from_raid(self).embed
                 guild = self.bot.get_guild(self.guild_id)
                 member = guild.get_member(user)
                 chn = self.bot.get_channel(int(chnid))

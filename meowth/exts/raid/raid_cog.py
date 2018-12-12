@@ -4,7 +4,7 @@ from meowth.exts.pkmn import Pokemon, Move
 from meowth.exts.weather import Weather
 from meowth.exts.want import Want
 from meowth.utils import formatters
-from meowth.utils.converters import Message
+from meowth.utils.converters import ChannelMessage
 from . import raid_info
 from . import raid_checks
 
@@ -146,7 +146,10 @@ class Raid():
             boss_name = await self.pkmn.name()
             return f"{boss_name}-{gym_name}"
         else:
-            return f"{self.level}-{gym_name}"
+            if self.hatch < time.time():
+                return f"hatched-{self.level}-{self.gym_name}"
+            else:
+                return f"{self.level}-{gym_name}"
     
     async def on_raw_reaction_add(self, payload):
         id_string = f"{payload.channel_id}/{payload.message_id}"
@@ -212,7 +215,7 @@ class Raid():
     
     async def unhere(self, payload):
         await self.get_trainer_dict()
-        msg = await Message.from_id_string(self.bot, payload)
+        chn, msg = await ChannelMessage.from_id_string(self.bot, payload)
         raid_embed = RaidEmbed(msg.embeds[0])
         raid_embed.status_str = self.status_str
         raid_embed.team_str = self.team_str
@@ -423,23 +426,34 @@ class Raid():
         else:
             embed = self.expired_embed()
         for messageid in message_ids:
-            msg = await Message.from_id_string(self.bot, messageid)
+            chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
             if not content:
                 content = msg.content
-            await msg.edit(content=content, embed=embed)
-            msg_list.append(msg)
+            await msg.delete()
+            self.message_ids.remove(messageid)
+            newmsg = await chn.send(content, embed=embed)
+            self.message_ids.append(f'{chn.id}/{newmsg.id}')
+            msg_list.append(newmsg)
         if self.channel_ids:
             for chanid in self.channel_ids:
                 channel = self.bot.get_channel(int(chanid))
-                msg = await channel.send(content, embed=embed)
-                msg_list.append(msg)
-                self.message_ids.append(f'{chanid}/{msg.id}')
+                new_name = await self.channel_name()
+                if new_name != channel.name:
+                    await channel.edit(name=new_name)
         if react_list:
             for msg in msg_list:
                 for react in react_list:
                     if isinstance(react, int):
                         react = self.bot.get_emoji(react)
                     await msg.add_reaction(react)
+        raid_table = self.bot.dbi.table('raids')
+        id_list = [f'{x.channel.id}/{x.id}' for x in msg_list]
+        update = raid_table.update().where(id=self.id)
+        d = {
+            'messages': id_list
+        }
+        update.values(**d)
+        await update.commit()
         return msg_list
 
     
@@ -542,7 +556,7 @@ class Raid():
         has_embed = False
         msg_list = []
         for messageid in message_ids:
-            msg = await Message.from_id_string(self.bot, messageid)
+            chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
             if not has_embed:
                 raid_embed = RaidEmbed(msg.embeds[0])
                 raid_embed.status_str = self.status_str

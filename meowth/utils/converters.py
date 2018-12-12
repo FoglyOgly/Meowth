@@ -54,12 +54,13 @@ class Guild:
             guild = ctx.bot.find_guild(arg)
         return guild
 
-class Message:
-    """Get Message object from string of format '{channelid}/{messageid}'.
+
+class ChannelMessage:
+    """Get tuple of Channel and Message objects from string of format '{channelid}/{messageid}'.
 
     Returns
     --------
-    :class:`discord.Message`
+    :class:`tuple(discord.Channel, discord.Message)`
     """
     @classmethod
     async def from_id_string(cls, bot, arg: str):
@@ -68,4 +69,4 @@ class Message:
         messageid = int(ids[1])
         channel = bot.get_channel(channelid)
         message = await channel.get_message(messageid)
-        return message
+        return (channel, message)

@@ -126,10 +126,12 @@ class Raid():
     async def boss_list_str(self):
         boss_names = []
         boss_list = self.boss_list
+        boss_interest_dict = await self.boss_interest_dict()
         weather = await self.weather()
         weather = Weather(self.bot, weather)
         for i in range(len(boss_list)):
             x = boss_list[i]
+            interest = boss_interest_dict[x]
             boss = RaidBoss(Pokemon(self.bot, x))
             name = f'{i+1}\u20e3 '
             name += await boss.name()
@@ -140,7 +142,7 @@ class Raid():
             shiny_available = await boss._shiny_available()
             if shiny_available:
                 name += ' :sparkles:'
-            boss_names.append(f"{name} {type_emoji}")
+            boss_names.append(f"{name} {type_emoji}: **{interest}**")
         boss_list_str = "\n".join(boss_names)
         return boss_list_str
     
@@ -1167,9 +1169,7 @@ class EggEmbed():
         weather_name = await weather.name()
         weather_emoji = await weather.boosted_emoji_str()
         team_str = raid.team_str
-        print(team_str)
         boss_str = await raid.boss_list_str()
-        print(boss_str)
         fields = {
             "Weather": f"{weather_name} {weather_emoji}",
             "Team List": team_str,

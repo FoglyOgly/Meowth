@@ -147,7 +147,7 @@ class Raid():
             return f"{boss_name}-{gym_name}"
         else:
             if not self.hatch or self.hatch < time.time():
-                return f"hatched-{self.level}-{self.gym_name}"
+                return f"hatched-{self.level}-{gym_name}"
             else:
                 return f"{self.level}-{gym_name}"
     

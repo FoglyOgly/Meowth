@@ -505,6 +505,9 @@ class Raid():
             'unknowncount': unknowncount
         }
         old_d = trainer_dict.get(user, {})
+        print(d)
+        print(old_d)
+        print(d==old_d)
         if old_d == d:
             return
         old_status = old_d.get('status')

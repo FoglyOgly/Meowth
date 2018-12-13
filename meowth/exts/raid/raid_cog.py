@@ -230,7 +230,7 @@ class Raid():
         if isinstance(emoji, int):
             emoji = self.bot.get_emoji(emoji)
         await message.remove_reaction(emoji, user)
-        if trainer_data != old_d:
+        if trainer_data != old_d or not old_d:
             await self.rsvp(payload.user_id, status, bosses=bosses, total=total)
 
     @staticmethod

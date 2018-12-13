@@ -189,13 +189,13 @@ class Raid():
         trainer_dict = self.trainer_dict
         trainer_data = trainer_dict.get(payload.user_id, {})
         old_d = deepcopy(trainer_data)
-        total = trainer_data.setdefault('total', 1)
-        bosses = trainer_data.setdefault('bosses', [])
-        bluecount = trainer_data.setdefault('bluecount', 0)
-        yellowcount = trainer_data.setdefault('yellowcount', 0)
-        redcount = trainer_data.setdefault('redcount', 0)
-        unknowncount = trainer_data.setdefault('unknowncount', 0)
-        status = trainer_data.setdefault('status', None)
+        total = trainer_data.get('total', 1)
+        bosses = trainer_data.get('bosses', [])
+        bluecount = trainer_data.get('bluecount', 0)
+        yellowcount = trainer_data.get('yellowcount', 0)
+        redcount = trainer_data.get('redcount', 0)
+        unknowncount = trainer_data.get('unknowncount', 0)
+        status = trainer_data.get('status')
         if not any((bluecount, yellowcount, redcount)):
             team_query = user_table.query('team').where(id=payload.user_id)
             team = await team_query.get_value()
@@ -508,6 +508,8 @@ class Raid():
             'unknowncount': unknowncount
         }
         old_d = trainer_dict.get(user, {})
+        if old_d == d:
+            return
         old_status = old_d.get('status')
         if old_status:
             if status == 'cancel':

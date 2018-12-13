@@ -508,8 +508,6 @@ class Raid():
             'unknowncount': unknowncount
         }
         old_d = trainer_dict.get(user, {})
-        if old_d == d:
-            return
         old_status = old_d.get('status')
         if old_status:
             if status == 'cancel':

@@ -188,7 +188,7 @@ class Raid():
             user = guild.get_member(user.id)
         trainer_dict = self.trainer_dict
         trainer_data = trainer_dict.get(payload.user_id, {})
-        print(trainer_data)
+        old_d = deepcopy(trainer_data)
         total = trainer_data.get('total', 1)
         bosses = trainer_data.get('bosses', [])
         bluecount = trainer_data.get('bluecount', 0)
@@ -229,8 +229,8 @@ class Raid():
         if isinstance(emoji, int):
             emoji = self.bot.get_emoji(emoji)
         await message.remove_reaction(emoji, user)
-        print(trainer_data)
-        await self.rsvp(payload.user_id, status, bosses=bosses, total=total)
+        if trainer_data != old_d:
+            await self.rsvp(payload.user_id, status, bosses=bosses, total=total)
 
     @staticmethod
     def cancel_here(connection, pid, channel, payload):
@@ -507,11 +507,6 @@ class Raid():
             'unknowncount': unknowncount
         }
         old_d = trainer_dict.get(user, {})
-        print(d)
-        print(old_d)
-        print(d==old_d)
-        if old_d == d:
-            return
         old_status = old_d.get('status')
         if old_status:
             if status == 'cancel':

@@ -486,18 +486,6 @@ class Raid():
             interested_list = []
             coming = None
             here = None
-        old_status = trainer_dict.get(user, {}).get('status')
-        if old_status == status:
-            return
-        elif old_status:
-            if status == 'cancel':
-                del self.trainer_dict[user]
-            if self.id in interested_list:
-                interested_list.remove(self.id)
-            if self.id == coming:
-                coming = None
-            if self.id == here:
-                here = None
         if any((bluecount, yellowcount, redcount)):
             calctotal = sum(bluecount, yellowcount, redcount)
             if not total or total < calctotal:
@@ -516,6 +504,19 @@ class Raid():
             'redcount': redcount,
             'unknowncount': unknowncount
         }
+        old_d = trainer_dict.get(user, {})
+        if old_d == d:
+            return
+        old_status = old_d.get('status')
+        if old_status:
+            if status == 'cancel':
+                del self.trainer_dict[user]
+            if self.id in interested_list:
+                interested_list.remove(self.id)
+            if self.id == coming:
+                coming = None
+            if self.id == here:
+                here = None
         if status != 'cancel':
             self.trainer_dict[user] = deepcopy(d)
         message_ids = self.message_ids

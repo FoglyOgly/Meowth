@@ -581,8 +581,10 @@ class Raid():
         d['here'] = here
         del d['status']
         if action == 'update':
+            print(1)
             upsert.values(**d)  
         else:
+            print(0)
             d['id'] = user
             upsert.row(**d)
         await upsert.commit()

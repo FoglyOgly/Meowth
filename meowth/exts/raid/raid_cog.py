@@ -188,6 +188,7 @@ class Raid():
             user = guild.get_member(user.id)
         trainer_dict = self.trainer_dict
         trainer_data = trainer_dict.get(payload.user_id, {})
+        print(trainer_data)
         total = trainer_data.get('total', 1)
         bosses = trainer_data.get('bosses', [])
         bluecount = trainer_data.get('bluecount', 0)
@@ -228,6 +229,7 @@ class Raid():
         if isinstance(emoji, int):
             emoji = self.bot.get_emoji(emoji)
         await message.remove_reaction(emoji, user)
+        print(trainer_data)
         await self.rsvp(payload.user_id, status, bosses=bosses, total=total)
 
     @staticmethod

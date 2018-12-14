@@ -230,7 +230,7 @@ class Raid():
             emoji = self.bot.get_emoji(emoji)
         await message.remove_reaction(emoji, user)
         if new_bosses != old_bosses or new_status != old_status:
-            await self.rsvp(payload.user_id, status, bosses=bosses, total=total, 
+            await self.rsvp(payload.user_id, new_status, bosses=new_bosses, total=total, 
                 bluecount=bluecount, yellowcount=yellowcount, 
                 redcount=redcount, unknowncount=unknowncount)
 

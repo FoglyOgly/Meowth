@@ -278,6 +278,7 @@ class Raid():
     async def weather(self):
         gym = self.gym
         weather = await gym.weather()
+        print(weather)
         return weather
     
     async def is_boosted(self):

@@ -222,6 +222,7 @@ class Raid():
             for k, v in self.bot.config.emoji.items():
                 if v == emoji:
                     new_status = k
+            new_bosses = []
         else:
             return
         if isinstance(emoji, int):
@@ -539,7 +540,7 @@ class Raid():
                     has_embed = True
             await msg.edit(embed=embed)
             msg_list.append(msg)
-        if self.channel_ids:
+        if self.channel_ids and self.status != 'egg':
             for chnid in self.channel_ids:
                 rsvpembed = RSVPEmbed.from_raid(self).embed
                 guild = self.bot.get_guild(self.guild_id)

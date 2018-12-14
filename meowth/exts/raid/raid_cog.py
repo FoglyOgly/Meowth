@@ -204,8 +204,6 @@ class Raid():
                 yellowcount = total
             elif team == 'valor':
                 redcount = total
-            else:
-                unknowncount = total
         if payload.emoji.is_custom_emoji():
             emoji = payload.emoji.id
         else:
@@ -232,7 +230,7 @@ class Raid():
         if new_bosses != old_bosses or new_status != old_status:
             await self.rsvp(payload.user_id, new_status, bosses=new_bosses, total=total, 
                 bluecount=bluecount, yellowcount=yellowcount, 
-                redcount=redcount, unknowncount=unknowncount)
+                redcount=redcount)
 
     @staticmethod
     def cancel_here(connection, pid, channel, payload):

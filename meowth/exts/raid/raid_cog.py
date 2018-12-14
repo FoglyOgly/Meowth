@@ -326,7 +326,6 @@ class Raid():
             ctrcharge = query_dict[f'counter_{x}_charge']
             ctr = Pokemon(self.bot, ctrid, quickMoveid=ctrfast, chargeMoveid=ctrcharge)
             ctrs_list.append(ctr)
-        print(ctrs_list)
         return ctrs_list
 
     async def egg_embed(self):
@@ -1049,6 +1048,7 @@ class RaidEmbed():
         i = 1
         ctrs_str = []
         for ctr in ctrs_list:
+            print(ctr.id)
             name = await ctr.name()
             fast = Move(bot, ctr.quickMoveid)
             fast_name = await fast.name()

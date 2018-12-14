@@ -263,8 +263,8 @@ class PartialGym():
     @property
     def url(self):
         urlbase = 'https://www.google.com/maps/search/?api=1&query='
-        urlbase += arg
-        urlbase += city
+        urlbase += self.arg
+        urlbase += self.city
         url = quote_plus(urlbase)
         return url
 

@@ -1,4 +1,5 @@
 from meowth import Cog, command, bot
+from meowth.exts.weather import Weather
 from discord.ext import commands
 from meowth.utils.fuzzymatch import get_match
 import pywraps2 as s2

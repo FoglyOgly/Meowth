@@ -570,7 +570,7 @@ class Raid():
                 raid_query = raid_table.query()
                 raid_query.where(id=old_id)
                 data = (await raid_query.get())[0]
-                old_rsvp = await Raid.from_data(self.bot, data)
+                old_rsvp = await Raid.from_data(self.bot, data, listen=False)
                 await old_rsvp.rsvp(user, "cancel")
             if status == 'coming':
                 coming = self.id
@@ -702,7 +702,7 @@ class Raid():
 
 
     @classmethod
-    async def from_data(cls, bot, data):
+    async def from_data(cls, bot, data, listen: bool=False):
         gym = Gym(bot, data['gym'])
         level = data['level']
         guild_id = data['guild']
@@ -719,7 +719,8 @@ class Raid():
         raid.message_ids = data.get('messages')
         raid.id = data['id']
         await raid.get_trainer_dict()
-        bot.add_listener(raid.on_raw_reaction_add)
+        if listen:
+            bot.add_listener(raid.on_raw_reaction_add)
         return raid
         
 

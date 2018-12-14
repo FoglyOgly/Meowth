@@ -258,7 +258,7 @@ class PartialGym():
 
     @property
     def name(self):
-        return arg.title()
+        return self.arg.title()
     
     @property
     def url(self):

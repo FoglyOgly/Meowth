@@ -216,7 +216,7 @@ class Raid():
             new_status = 'maybe'
             i = self.react_list.index(emoji)
             bossid = self.boss_list[i]
-            if bossid not in bosses:
+            if bossid not in old_bosses:
                 new_bosses = old_bosses + [bossid]
             else:
                 new_bosses = old_bosses

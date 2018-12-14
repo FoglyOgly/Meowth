@@ -188,14 +188,13 @@ class Raid():
             user = guild.get_member(user.id)
         trainer_dict = self.trainer_dict
         trainer_data = trainer_dict.get(payload.user_id, {})
-        old_d = deepcopy(trainer_data)
         total = trainer_data.get('total', 1)
-        bosses = trainer_data.get('bosses', [])
+        old_bosses = trainer_data.get('bosses', [])
         bluecount = trainer_data.get('bluecount', 0)
         yellowcount = trainer_data.get('yellowcount', 0)
         redcount = trainer_data.get('redcount', 0)
         unknowncount = trainer_data.get('unknowncount', 0)
-        status = trainer_data.get('status')
+        old_status = trainer_data.get('status')
         if not any((bluecount, yellowcount, redcount)):
             team_query = user_table.query('team').where(id=payload.user_id)
             team = await team_query.get_value()
@@ -214,24 +213,26 @@ class Raid():
         if emoji not in self.react_list:
             return
         if self.status == 'egg':
-            status = 'maybe'
+            new_status = 'maybe'
             i = self.react_list.index(emoji)
             bossid = self.boss_list[i]
             if bossid not in bosses:
-                bosses.append(bossid)
+                new_bosses = old_bosses + [bossid]
             else:
-                pass
+                new_bosses = old_bosses
         elif self.status == 'active':
             for k, v in self.bot.config.emoji.items():
                 if v == emoji:
-                    status = k
+                    new_status = k
         else:
             return
         if isinstance(emoji, int):
             emoji = self.bot.get_emoji(emoji)
         await message.remove_reaction(emoji, user)
-        if trainer_data != old_d or not old_d:
-            await self.rsvp(payload.user_id, status, bosses=bosses, total=total)
+        if new_bosses != old_bosses or new_status != old_status:
+            await self.rsvp(payload.user_id, status, bosses=bosses, total=total, 
+                bluecount=bluecount, yellowcount=yellowcount, 
+                redcount=redcount, unknowncount=unknowncount)
 
     @staticmethod
     def cancel_here(connection, pid, channel, payload):
@@ -581,10 +582,8 @@ class Raid():
         d['here'] = here
         del d['status']
         if action == 'update':
-            print(1)
             upsert.values(**d)  
         else:
-            print(0)
             d['id'] = user
             upsert.row(**d)
         await upsert.commit()

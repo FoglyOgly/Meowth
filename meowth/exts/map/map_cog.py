@@ -236,7 +236,7 @@ class Gym(POI):
             return cls(ctx.bot, name_dict[match[0]])
         else:
             city = await report_channel.city()
-            return PartialGym(city, arg)
+            return PartialGym(ctx.bot, city, arg)
     
     @classmethod
     async def insert_from_data(cls, bot, guildid, data):
@@ -251,7 +251,8 @@ class Gym(POI):
 
 class PartialGym():
 
-    def __init__(self, city, arg):
+    def __init__(self, bot, city, arg):
+        self.bot = bot
         self.city = city
         self.arg = arg
 
@@ -266,6 +267,9 @@ class PartialGym():
         urlbase += city
         url = quote_plus(urlbase)
         return url
+
+    async def weather(self):
+        return Weather(self.bot, "NO_WEATHER")
 
 
 

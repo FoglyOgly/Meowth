@@ -229,10 +229,10 @@ class Gym(POI):
         name_dict = {x['name'] : x['id'] for x in data}
         if nick_dict:
             match = get_match(nick_dict.keys(), arg)
-            if match:
+            if match[0]:
                 return cls(ctx.bot, nick_dict[match[0]])
         match = get_match(name_dict.keys(), arg)
-        if match:
+        if match[0]:
             return cls(ctx.bot, name_dict[match[0]])
         else:
             city = await report_channel.city()

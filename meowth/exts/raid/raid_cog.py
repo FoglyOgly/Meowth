@@ -278,7 +278,6 @@ class Raid():
     async def weather(self):
         gym = self.gym
         weather = await gym.weather()
-        print(weather)
         return weather
     
     async def is_boosted(self):
@@ -327,6 +326,7 @@ class Raid():
             ctrcharge = query_dict[f'counter_{x}_charge']
             ctr = Pokemon(self.bot, ctrid, quickMoveid=ctrfast, chargeMoveid=ctrcharge)
             ctrs_list.append(ctr)
+        print(ctrs_list)
         return ctrs_list
 
     async def egg_embed(self):

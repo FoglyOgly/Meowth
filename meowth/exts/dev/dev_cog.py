@@ -422,10 +422,12 @@ class Dev:
         elif table not in valid_tables:
             return await ctx.send("Table not valid for update.")
         update_table = ctx.bot.dbi.table(table)
+        columns = await update_table.columns.info()
+        length = len(columns)
 
-        def row_from_rowbytes(rowstr):
+        def row_from_rowbytes(rowstr, length):
             rowstr = rowstr.decode('utf-8')
-            row = rowstr.split(',')
+            row = rowstr.split(',', length-1)
             for i in range(len(row)):
                 row[i] = row[i].replace('"', '')
                 row[i] = row[i].replace('\n', '')
@@ -450,7 +452,7 @@ class Dev:
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
                 cols = await resp.content.readline()
-                cols = row_from_rowbytes(cols)
+                cols = row_from_rowbytes(cols, length)
                 insert.set_columns(*cols)
                 while True:
                     row = await resp.content.readline()

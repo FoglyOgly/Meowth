@@ -457,7 +457,7 @@ class Dev:
                 while True:
                     row = await resp.content.readline()
                     if row:
-                        row = row_from_rowbytes(row)
+                        row = row_from_rowbytes(row, length)
                         insert.row(*row)
                     else:
                         break

@@ -36,6 +36,9 @@ from meowth.bot import MeowthBot
 from meowth.errors import custom_error_handling
 from meowth.logs import init_loggers
 
+# to read __init__.py values
+from meowth import __version__
+
 logger = init_loggers()
 
 def _get_prefix(bot, message):
@@ -3721,6 +3724,7 @@ async def about(ctx):
     embed = discord.Embed(colour=embed_colour, icon_url=Meowth.user.avatar_url)
     embed.add_field(name=_('About Meowth'), value=about, inline=False)
     embed.add_field(name=_('Owner'), value=owner)
+    embed.add_field(name=_('Version'), value=__version__)
     if guild_count > 1:
         embed.add_field(name=_('Servers'), value=guild_count)
         embed.add_field(name=_('Members'), value=member_count)

@@ -37,7 +37,7 @@ from meowth.errors import custom_error_handling
 from meowth.logs import init_loggers
 
 # to read __init__.py values
-from meowth import __version__
+from meowth import __custversion__
 
 logger = init_loggers()
 
@@ -53,7 +53,7 @@ def _get_prefix(bot, message):
 
 Meowth = MeowthBot(
     command_prefix=_get_prefix, case_insensitive=True,
-    activity=discord.Game(name="Pokemon Go beta 20181114"))
+    activity=discord.Game(name="Pokemon Go "+__custversion__))
 
 custom_error_handling(Meowth, logger)
 try:
@@ -3723,8 +3723,8 @@ async def about(ctx):
         member_count += len(guild.members)
     embed = discord.Embed(colour=embed_colour, icon_url=Meowth.user.avatar_url)
     embed.add_field(name=_('About Meowth'), value=about, inline=False)
+    embed.add_field(name=_('Version'), value=__custversion__)
     embed.add_field(name=_('Owner'), value=owner)
-    embed.add_field(name=_('Version'), value=__version__)
     if guild_count > 1:
         embed.add_field(name=_('Servers'), value=guild_count)
         embed.add_field(name=_('Members'), value=member_count)

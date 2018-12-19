@@ -88,24 +88,32 @@ class MeowthUser:
         data = self._data
         data.select('bluecount')
         bluecount = await data.get_value()
+        if bluecount is None:
+            return 0
         return bluecount
     
     async def yellowcount(self):
         data = self._data
         data.select('yellowcount')
         yellowcount = await data.get_value()
+        if yellowcount is None:
+            return 0
         return yellowcount
 
     async def redcount(self):
         data = self._data
         data.select('redcount')
         redcount = await data.get_value()
+        if redcount is None:
+            return 0
         return redcount
     
     async def unknowncount(self):
         data = self._data
         data.select('unknowncount')
         unknowncount = await data.get_value()
+        if unknowncount is None:
+            return 0
         return unknowncount
     
     async def set_team(self, team_id):

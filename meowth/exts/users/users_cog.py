@@ -235,7 +235,7 @@ class Team:
 
         
 
-class Teams(Cog):
+class Users(Cog):
 
     @command()
     @users_checks.team_not_set()

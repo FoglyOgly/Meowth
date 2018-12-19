@@ -181,10 +181,14 @@ class MeowthUser:
             'redcount': redcount,
             'unknowncount': unknowncount
         }
-        if status == 'maybe':
+        intlist = await self.interested_list()
+        if status == 'cancel':
+            if raid_id in intlist:
+                intlist.remove(raid_id)
+                d['interested_list'] = intlist
+        elif status == 'maybe':
             if bosses:
                 d['bosses'] = bosses
-            intlist = await self.interested_list()
             if raid_id not in intlist:
                 intlist.append(raid_id)
             d['interested_list'] = intlist

@@ -222,26 +222,29 @@ class Raid():
             emoji = self.bot.get_emoji(emoji)
         await message.remove_reaction(emoji, user)
         if new_bosses != old_bosses or new_status != old_status:
-            await self.rsvp(payload.user_id, new_status, bosses=new_bosses, total=total, 
+            await self.rsvp(meowthuser, new_status, bosses=new_bosses, total=total, 
                 bluecount=bluecount, yellowcount=yellowcount, 
-                redcount=redcount)
+                redcount=redcount, unknowncount=unknowncount)
 
     def cancel_rsvp(self, connection, pid, channel, payload):
         if channel != f'cancel_{self.id}':
             return
-        print(f'listener {channel} notified')
         event_loop = asyncio.get_event_loop()
-        event_loop.create_task(self.cancel(payload))
+        event_loop.create_task(self.update_rsvp(payload))
     
-    async def cancel(self, payload):
-        print(f'cancel task for {self.id} started')
-        print(payload)
+    async def update_rsvp(self, idstring):
         await self.get_trainer_dict()
-        chn, msg = await ChannelMessage.from_id_string(self.bot, payload)
-        raid_embed = RaidEmbed(msg.embeds[0])
-        raid_embed.status_str = self.status_str
-        raid_embed.team_str = self.team_str
-        embed = raid_embed.embed
+        chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+        if self.status == 'active':
+            raid_embed = RaidEmbed(msg.embeds[0])
+            raid_embed.status_str = self.status_str
+            raid_embed.team_str = self.team_str
+            embed = raid_embed.embed
+        elif self.status == 'egg':
+            egg_embed = EggEmbed(msg.embeds[0])
+            egg_embed.team_str = self.team_str
+            egg_embed.boss_str = await self.boss_list_str()
+            embed = egg_embed.embed
         await msg.edit(embed=embed)
 
         
@@ -464,35 +467,8 @@ class Raid():
     
     # async def update_gym(self, gym):
 
-    async def rsvp(self, user, status, bosses: list=None, total: int=1,
-        bluecount: int=0, yellowcount: int=0, redcount: int=0):
-        trainer_dict = self.trainer_dict
-        d = {}
-        user_table = self.bot.dbi.table('users')
-        user_query = user_table.query().where(id=user)
-        data = await user_query.get()
-        if data:
-            action = 'update'
-            upsert = user_table.update().where(id=user)
-            data = data[0]
-            interested_list = data['interested_list']
-            coming = data['coming']
-            here = data['here']
-        else:
-            action = 'insert'
-            upsert = user_table.insert()
-            interested_list = []
-            coming = None
-            here = None
-        if any((bluecount, yellowcount, redcount)):
-            calctotal = sum(bluecount, yellowcount, redcount)
-            if not total or total < calctotal:
-                total = calctotal
-                unknowncount = 0
-            elif total >= calctotal:
-                unknowncount = total - calctotal
-        else:
-            unknowncount = total
+    async def rsvp(self, user: MeowthUser, status, bosses: list=None, total: int=1,
+        bluecount: int=0, yellowcount: int=0, redcount: int=0, unknowncount: int=0):
         d = {
             'status': status,
             'bosses': bosses,
@@ -503,43 +479,26 @@ class Raid():
             'unknowncount': unknowncount
         }
         old_d = trainer_dict.get(user, {})
+        if d == old_d:
+            return
         old_status = old_d.get('status')
-        if old_status:
-            if status == 'cancel':
-                del self.trainer_dict[user]
-            if self.id in interested_list:
-                interested_list.remove(self.id)
-            if self.id == coming:
-                coming = None
-            if self.id == here:
-                here = None
+        if old_status and status == 'cancel':
+            del self.trainer_dict[user]
         if status != 'cancel':
-            self.trainer_dict[user] = deepcopy(d)
+            self.trainer_dict[user] = d
+        await user.rsvp(self.id, status, bosses=bosses, total=total,
+            bluecount=bluecount, yellowcount=yellowcount, 
+            redcount=redcount, unknowncount=unknowncount)
         message_ids = self.message_ids
         has_embed = False
         msg_list = []
         for messageid in message_ids:
-            chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
-            if not has_embed:
-                if self.status == 'active':
-                    raid_embed = RaidEmbed(msg.embeds[0])
-                    raid_embed.status_str = self.status_str
-                    raid_embed.team_str = self.team_str
-                    embed = raid_embed.embed
-                    has_embed = True
-                elif self.status == 'egg':
-                    egg_embed = EggEmbed(msg.embeds[0])
-                    egg_embed.team_str = self.team_str
-                    egg_embed.boss_str = await self.boss_list_str()
-                    embed = egg_embed.embed
-                    has_embed = True
-            await msg.edit(embed=embed)
-            msg_list.append(msg)
+            await self.update_rsvp(messageid)
         if self.channel_ids and self.status != 'egg':
             for chnid in self.channel_ids:
                 rsvpembed = RSVPEmbed.from_raid(self).embed
                 guild = self.bot.get_guild(self.guild_id)
-                member = guild.get_member(user)
+                member = guild.get_member(user.user.id)
                 chn = self.bot.get_channel(int(chnid))
                 if status == 'maybe':
                     display_status = 'is interested'
@@ -551,27 +510,6 @@ class Raid():
                     display_status = 'has canceled'
                 content = f"{member.display_name} {display_status}!"
                 newmsg = await chn.send(content, embed=rsvpembed)
-        for msg in msg_list:
-            for react in self.react_list:
-                if isinstance(react, int):
-                    react = self.bot.get_emoji(react)
-                await msg.add_reaction(react)
-        if status == 'maybe':
-            interested_list.append(self.id)
-        elif status == 'coming':
-            coming = self.id
-        elif status == 'here':
-            here = self.id
-        d['interested_list'] = interested_list
-        d['coming'] = coming
-        d['here'] = here
-        del d['status']
-        if action == 'update':
-            upsert.values(**d)  
-        else:
-            d['id'] = user
-            upsert.row(**d)
-        await upsert.commit()
 
     async def boss_interest_dict(self):
         boss_list = self.boss_list

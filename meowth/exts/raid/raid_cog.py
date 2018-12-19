@@ -234,6 +234,8 @@ class Raid():
         event_loop.create_task(self.cancel(payload))
     
     async def cancel(self, payload):
+        print(f'cancel task for {self.id} started')
+        print(payload)
         await self.get_trainer_dict()
         chn, msg = await ChannelMessage.from_id_string(self.bot, payload)
         raid_embed = RaidEmbed(msg.embeds[0])

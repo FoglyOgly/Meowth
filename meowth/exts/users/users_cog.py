@@ -137,7 +137,7 @@ class MeowthUser:
                 yellowcount = 1
             elif team == 3:
                 redcount = 1
-            unknowncount = total - sum(bluecount, yellowcount, redcount)
+            unknowncount = total - sum((bluecount, yellowcount, redcount))
         d = {
             'total': total,
             'bluecount': bluecount,
@@ -149,7 +149,7 @@ class MeowthUser:
     
     async def set_party(self, total, bluecount=0, yellowcount=0, redcount=0):
         update = self._update
-        unknowncount = total - sum(bluecount, yellowcount, redcount)
+        unknowncount = total - sum((bluecount, yellowcount, redcount))
         d = {
             'total': total,
             'bluecount': bluecount,

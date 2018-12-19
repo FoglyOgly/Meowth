@@ -54,7 +54,7 @@ class MeowthUser:
         silphid = await data.get_value()
         return silphid
     
-    async def interested_list(self)
+    async def interested_list(self):
         data = self._data
         data.select('interested_list')
         intlist = await data.get_value()

@@ -823,7 +823,8 @@ class RaidCog(Cog):
         rcrd = await insert.commit()
         new_raid.id = rcrd[0][0]
         ctx.bot.add_listener(new_raid.on_raw_reaction_add)
-        await new_raid.monitor_status()
+        loop = asyncio.get_event_loop()
+        loop.create_task(new_raid.monitor_status())
         await ctx.bot.dbi.add_listener(f'cancel_{new_raid.id}', self.cancel_rsvp)
     
     # @command()

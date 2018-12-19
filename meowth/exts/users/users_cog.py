@@ -194,10 +194,19 @@ class MeowthUser:
             d['interested_list'] = intlist
         elif status == 'coming':
             d['coming'] = raid_id
+            d['here'] = None
         elif status == 'here': 
             d['here'] = raid_id
+            d['coming'] = None
         update.values(**d)
-        await update.commit()
+        try:
+            await update.commit()
+        except:
+            insert = self._insert
+            d['id'] = self.user.id
+            insert.row(**d)
+            await insert.commit()
+
 
 class Team:
 

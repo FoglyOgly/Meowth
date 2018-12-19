@@ -129,7 +129,7 @@ class MeowthUser:
         yellowcount = await self.yellowcount()
         redcount = await self.redcount()
         unknowncount = await self.unknowncount()
-        if not any(bluecount, yellowcount, redcount):
+        if not any((bluecount, yellowcount, redcount)):
             team = await self.team()
             if team == 1:
                 bluecount = 1

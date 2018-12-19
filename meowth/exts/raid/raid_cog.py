@@ -555,19 +555,10 @@ class Raid():
                 await msg.add_reaction(react)
         if status == 'maybe':
             interested_list.append(self.id)
-        elif status == 'coming' or status == 'here':
-            if coming or here:
-                old_id = coming or here
-                raid_table = self.bot.dbi.table('raids')
-                raid_query = raid_table.query()
-                raid_query.where(id=old_id)
-                data = (await raid_query.get())[0]
-                old_rsvp = await Raid.from_data(self.bot, data, listen=False)
-                await old_rsvp.rsvp(user, "cancel")
-            if status == 'coming':
-                coming = self.id
-            else:
-                here = self.id
+        elif status == 'coming':
+            coming = self.id
+        elif status == 'here':
+            here = self.id
         d['interested_list'] = interested_list
         d['coming'] = coming
         d['here'] = here

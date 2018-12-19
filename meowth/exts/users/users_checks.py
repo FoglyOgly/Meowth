@@ -4,7 +4,11 @@ from discord.ext import commands
 # simple predicates
 
 async def is_team_set(ctx):
-    if ctx.team:
+    users_table = ctx.bot.dbi.table('users')
+    query = users_table.query('team')
+    query.where(id=ctx.author.id)
+    team = await query.get_value()
+    if team:
         return True
     return False
 

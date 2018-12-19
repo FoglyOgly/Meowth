@@ -130,6 +130,10 @@ class DatabaseInterface:
             logger.error(f'Exception {type(e)}: {e}')
             await self.recreate_pool()
             return await self.execute_transaction(query, *query_args)
+        
+    async def add_listener(self, channel, callback):
+        con = await self.pool.acquire()
+        await con.add_listener(channel, callback)
 
     async def create_table(self, name, columns: list, *, primaries=None):
         """Create table."""

@@ -3,6 +3,7 @@ from meowth.exts.map import Gym, ReportChannel
 from meowth.exts.pkmn import Pokemon, Move
 from meowth.exts.weather import Weather
 from meowth.exts.want import Want
+from meowth.exts.users import MeowthUser
 from meowth.utils import formatters
 from meowth.utils.converters import ChannelMessage
 from . import raid_info
@@ -179,31 +180,22 @@ class Raid():
         id_string = f"{payload.channel_id}/{payload.message_id}"
         if id_string not in self.message_ids or payload.user_id == self.bot.user.id:
             return
-        user_table = self.bot.dbi.table('users')
         user = self.bot.get_user(payload.user_id)
         channel = self.bot.get_channel(payload.channel_id)
         message = await channel.get_message(payload.message_id)
+        meowthuser = MeowthUser(self.bot, user)
         if payload.guild_id:
             guild = self.bot.get_guild(payload.guild_id)
             user = guild.get_member(user.id)
         trainer_dict = self.trainer_dict
         trainer_data = trainer_dict.get(payload.user_id, {})
-        total = trainer_data.get('total', 1)
         old_bosses = trainer_data.get('bosses', [])
-        bluecount = trainer_data.get('bluecount', 0)
-        yellowcount = trainer_data.get('yellowcount', 0)
-        redcount = trainer_data.get('redcount', 0)
-        unknowncount = trainer_data.get('unknowncount', 0)
         old_status = trainer_data.get('status')
-        if not any((bluecount, yellowcount, redcount)):
-            team_query = user_table.query('team').where(id=payload.user_id)
-            team = await team_query.get_value()
-            if team == 'mystic':
-                bluecount = total
-            elif team == 'instinct':
-                yellowcount = total
-            elif team == 'valor':
-                redcount = total
+        party = await meowthuser.party()
+        bluecount = party['bluecount']
+        yellowcount = party['yellowcount']
+        redcount = party['redcount']
+        unknowncount = party['unknowncount']
         if payload.emoji.is_custom_emoji():
             emoji = payload.emoji.id
         else:
@@ -234,13 +226,13 @@ class Raid():
                 redcount=redcount)
 
     @staticmethod
-    def cancel_here(connection, pid, channel, payload):
-        if channel != f'unhere_{self.id}':
+    def cancel_rsvp(connection, pid, channel, payload):
+        if channel != f'cancel_{self.id}':
             return
         event_loop = asyncio.get_event_loop()
-        event_loop.create_task(self.unhere(payload))
+        event_loop.create_task(self.cancel(payload))
     
-    async def unhere(self, payload):
+    async def cancel(self, payload):
         await self.get_trainer_dict()
         chn, msg = await ChannelMessage.from_id_string(self.bot, payload)
         raid_embed = RaidEmbed(msg.embeds[0])
@@ -840,6 +832,15 @@ class RaidCog(Cog):
         new_raid.id = rcrd[0][0]
         ctx.bot.add_listener(new_raid.on_raw_reaction_add)
         await new_raid.monitor_status()
+        await ctx.bot.dbi.add_listener(f'cancel_{new_raid.id}', self.cancel_rsvp)
+    
+    # @command()
+    # @raid_checks.raid_channel()
+    # async def interested(self, ctx, total: int=1, *teamcounts):
+    #     if not teamcounts:
+            
+    #     for count in teamcounts:
+
         
         
         

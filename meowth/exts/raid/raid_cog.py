@@ -478,7 +478,7 @@ class Raid():
             'redcount': redcount,
             'unknowncount': unknowncount
         }
-        old_d = trainer_dict.get(user, {})
+        old_d = self.trainer_dict.get(user, {})
         if d == old_d:
             return
         old_status = old_d.get('status')

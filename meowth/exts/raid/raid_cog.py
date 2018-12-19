@@ -192,6 +192,7 @@ class Raid():
         old_bosses = trainer_data.get('bosses', [])
         old_status = trainer_data.get('status')
         party = await meowthuser.party()
+        total = party['total']
         bluecount = party['bluecount']
         yellowcount = party['yellowcount']
         redcount = party['redcount']

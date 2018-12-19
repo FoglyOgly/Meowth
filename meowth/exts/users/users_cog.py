@@ -197,7 +197,13 @@ class MeowthUser:
         elif status == 'here': 
             d['here'] = raid_id
         update.values(**d)
-        await update.commit()
+        try:
+            await update.commit()
+        except:
+            insert = self._insert
+            d['id'] = self.user.id
+            insert.row(**d)
+            await insert.commit()
 
 
 class Team:

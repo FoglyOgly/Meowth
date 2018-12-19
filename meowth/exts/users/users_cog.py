@@ -82,6 +82,8 @@ class MeowthUser:
         data = self._data
         data.select('total')
         total = await data.get_value()
+        if total is None:
+            return 1
         return total
     
     async def bluecount(self):

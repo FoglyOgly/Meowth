@@ -190,24 +190,37 @@ class MeowthUser:
             'unknowncount': unknowncount
         }
         intlist = await self.interested_list()
+        oldcoming = await self.coming()
+        oldhere = await self.here()
         if status == 'cancel':
             if raid_id in intlist:
                 intlist.remove(raid_id)
-                d['interested_list'] = intlist
-                d['coming'] = None
-                d['here'] = None
+            elif raid_id == oldcoming:
+                newcoming = None
+            elif raid_id == oldhere:
+                newhere = None
         elif status == 'maybe':
             if bosses:
                 d['bosses'] = bosses
             if raid_id not in intlist:
                 intlist.append(raid_id)
-            d['interested_list'] = intlist
+            if raid_id == oldcoming:
+                newcoming = None
+            elif raid_id == oldhere:
+                newhere = None
         elif status == 'coming':
-            d['coming'] = raid_id
-            d['here'] = None
-        elif status == 'here': 
-            d['here'] = raid_id
-            d['coming'] = None
+            if raid_id in intlist:
+                intlist.remove(raid_id)
+            newcoming = raid_id
+            newhere = None
+        elif status == 'here':
+            if raid_id in intlist:
+                intlist.remove(raid_id)
+            newhere = raid_id
+            newcoming = None
+        d['interested_list'] = intlist
+        d['coming'] = newcoming
+        d['here'] = newhere
         if action == "insert":
             d['id'] = self.user.id
             upsert.row(**d)

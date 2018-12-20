@@ -180,6 +180,7 @@ class MeowthUser:
         if not data:
             upsert = self._insert
             action = "insert"
+            data = {}
         else:
             data = data[0]
             upsert = self._update

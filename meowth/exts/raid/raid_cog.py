@@ -232,9 +232,9 @@ class Raid():
         payload = int(payload)
         del self.trainer_dict[payload]
         event_loop = asyncio.get_event_loop()
-        event_loop.create_task(self.update_rsvp())
+        event_loop.create_task(self.update_rsvp(payload, "cancel"))
     
-    async def update_rsvp(self):
+    async def update_rsvp(self, user_id, status):
         has_embed = False
         for idstring in self.message_ids:
             chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
@@ -252,6 +252,22 @@ class Raid():
                     embed = egg_embed.embed
                     has_embed = True
             await msg.edit(embed=embed)
+            if self.channel_ids and self.status != 'egg':
+                for chnid in self.channel_ids:
+                    rsvpembed = RSVPEmbed.from_raid(self).embed
+                    guild = self.bot.get_guild(self.guild_id)
+                    member = guild.get_member(user_id)
+                    chn = self.bot.get_channel(int(chnid))
+                    if status == 'maybe':
+                        display_status = 'is interested'
+                    elif status == 'coming':
+                        display_status = 'is on the way'
+                    elif status == 'here':
+                        display_status = 'is at the raid'
+                    elif status == 'cancel':
+                        display_status = 'has canceled'
+                    content = f"{member.display_name} {display_status}!"
+                    newmsg = await chn.send(content, embed=rsvpembed)
 
         
     
@@ -495,25 +511,7 @@ class Raid():
         await user.rsvp(self.id, status, bosses=bosses, total=total,
             bluecount=bluecount, yellowcount=yellowcount, 
             redcount=redcount, unknowncount=unknowncount)
-        message_ids = self.message_ids
-        for messageid in message_ids:
-            await self.update_rsvp()
-        if self.channel_ids and self.status != 'egg':
-            for chnid in self.channel_ids:
-                rsvpembed = RSVPEmbed.from_raid(self).embed
-                guild = self.bot.get_guild(self.guild_id)
-                member = guild.get_member(user.user.id)
-                chn = self.bot.get_channel(int(chnid))
-                if status == 'maybe':
-                    display_status = 'is interested'
-                elif status == 'coming':
-                    display_status = 'is on the way'
-                elif status == 'here':
-                    display_status = 'is at the raid'
-                elif status == 'cancel':
-                    display_status = 'has canceled'
-                content = f"{member.display_name} {display_status}!"
-                newmsg = await chn.send(content, embed=rsvpembed)
+        await self.update_rsvp(user.user.id, status)
 
     async def boss_interest_dict(self):
         boss_list = self.boss_list

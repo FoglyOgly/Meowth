@@ -58,6 +58,8 @@ class MeowthUser:
         data = self._data
         data.select('interested_list')
         intlist = await data.get_value()
+        if not intlist:
+            return []
         return intlist
     
     async def coming(self):
@@ -183,7 +185,7 @@ class MeowthUser:
         }
         intlist = await self.interested_list()
         if status == 'cancel':
-            if intlist and raid_id in intlist:
+            if raid_id in intlist:
                 intlist.remove(raid_id)
                 d['interested_list'] = intlist
                 d['coming'] = None
@@ -191,7 +193,7 @@ class MeowthUser:
         elif status == 'maybe':
             if bosses:
                 d['bosses'] = bosses
-            if intlist and raid_id not in intlist:
+            if raid_id not in intlist:
                 intlist.append(raid_id)
             d['interested_list'] = intlist
         elif status == 'coming':

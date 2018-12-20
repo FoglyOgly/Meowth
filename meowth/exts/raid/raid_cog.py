@@ -252,22 +252,22 @@ class Raid():
                     embed = egg_embed.embed
                     has_embed = True
             await msg.edit(embed=embed)
-            if self.channel_ids and self.status != 'egg':
-                for chnid in self.channel_ids:
-                    rsvpembed = RSVPEmbed.from_raid(self).embed
-                    guild = self.bot.get_guild(self.guild_id)
-                    member = guild.get_member(user_id)
-                    chn = self.bot.get_channel(int(chnid))
-                    if status == 'maybe':
-                        display_status = 'is interested'
-                    elif status == 'coming':
-                        display_status = 'is on the way'
-                    elif status == 'here':
-                        display_status = 'is at the raid'
-                    elif status == 'cancel':
-                        display_status = 'has canceled'
-                    content = f"{member.display_name} {display_status}!"
-                    newmsg = await chn.send(content, embed=rsvpembed)
+        if self.channel_ids and self.status != 'egg':
+            for chnid in self.channel_ids:
+                rsvpembed = RSVPEmbed.from_raid(self).embed
+                guild = self.bot.get_guild(self.guild_id)
+                member = guild.get_member(user_id)
+                chn = self.bot.get_channel(int(chnid))
+                if status == 'maybe':
+                    display_status = 'is interested'
+                elif status == 'coming':
+                    display_status = 'is on the way'
+                elif status == 'here':
+                    display_status = 'is at the raid'
+                elif status == 'cancel':
+                    display_status = 'has canceled'
+                content = f"{member.display_name} {display_status}!"
+                newmsg = await chn.send(content, embed=rsvpembed)
 
         
     
@@ -985,7 +985,6 @@ class RaidEmbed():
         i = 1
         ctrs_str = []
         for ctr in ctrs_list:
-            print(ctr.id)
             name = await ctr.name()
             fast = Move(bot, ctr.quickMoveid)
             fast_name = await fast.name()

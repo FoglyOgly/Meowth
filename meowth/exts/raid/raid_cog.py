@@ -229,22 +229,28 @@ class Raid():
     def cancel_rsvp(self, connection, pid, channel, payload):
         if channel != f'cancel_{self.id}':
             return
+        del self.trainer_dict[payload]
         event_loop = asyncio.get_event_loop()
-        event_loop.create_task(self.update_rsvp(payload))
+        event_loop.create_task(self.update_rsvp())
     
-    async def update_rsvp(self, idstring):
-        chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
-        if self.status == 'active':
-            raid_embed = RaidEmbed(msg.embeds[0])
-            raid_embed.status_str = self.status_str
-            raid_embed.team_str = self.team_str
-            embed = raid_embed.embed
-        elif self.status == 'egg':
-            egg_embed = EggEmbed(msg.embeds[0])
-            egg_embed.team_str = self.team_str
-            egg_embed.boss_str = await self.boss_list_str()
-            embed = egg_embed.embed
-        await msg.edit(embed=embed)
+    async def update_rsvp(self):
+        has_embed = False
+        for idstring in self.message_ids:
+            chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+            if not has_embed:
+                if self.status == 'active':
+                    raid_embed = RaidEmbed(msg.embeds[0])
+                    raid_embed.status_str = self.status_str
+                    raid_embed.team_str = self.team_str
+                    embed = raid_embed.embed
+                    has_embed = True
+                elif self.status == 'egg':
+                    egg_embed = EggEmbed(msg.embeds[0])
+                    egg_embed.team_str = self.team_str
+                    egg_embed.boss_str = await self.boss_list_str()
+                    embed = egg_embed.embed
+                    has_embed = True
+            await msg.edit(embed=embed)
 
         
     
@@ -489,7 +495,6 @@ class Raid():
             bluecount=bluecount, yellowcount=yellowcount, 
             redcount=redcount, unknowncount=unknowncount)
         message_ids = self.message_ids
-        await self.get_trainer_dict()
         for messageid in message_ids:
             await self.update_rsvp(messageid)
         if self.channel_ids and self.status != 'egg':

@@ -229,6 +229,7 @@ class Raid():
     def cancel_rsvp(self, connection, pid, channel, payload):
         if channel != f'cancel_{self.id}':
             return
+        payload = int(payload)
         del self.trainer_dict[payload]
         event_loop = asyncio.get_event_loop()
         event_loop.create_task(self.update_rsvp())

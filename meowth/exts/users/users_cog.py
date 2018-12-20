@@ -175,7 +175,13 @@ class MeowthUser:
 
     async def rsvp(self, raid_id, status, bosses: list=None, total: int=1,
         bluecount: int=0, yellowcount: int=0, redcount: int=0, unknowncount: int=0):
-        update = self._update
+        data = await self._data.get()
+        if not data:
+            upsert = self._insert
+            action = "insert"
+        else:
+            upsert = self._update
+            action = "update"
         d = {
             'total': total,
             'bluecount': bluecount,
@@ -202,14 +208,13 @@ class MeowthUser:
         elif status == 'here': 
             d['here'] = raid_id
             d['coming'] = None
-        update.values(**d)
-        try:
-            await update.commit()
-        except:
-            insert = self._insert
+        if action == "insert":
             d['id'] = self.user.id
-            insert.row(**d)
-            await insert.commit()
+            upsert.row(**d)
+        elif action == "update":
+            upsert.values(**d)
+        await upsert.commit()
+        
 
 
 class Team:

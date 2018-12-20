@@ -176,10 +176,12 @@ class MeowthUser:
     async def rsvp(self, raid_id, status, bosses: list=None, total: int=1,
         bluecount: int=0, yellowcount: int=0, redcount: int=0, unknowncount: int=0):
         data = await self._data.get()
+        print(data)
         if not data:
             upsert = self._insert
             action = "insert"
         else:
+            data = data[0]
             upsert = self._update
             action = "update"
         d = {
@@ -189,16 +191,20 @@ class MeowthUser:
             'redcount': redcount,
             'unknowncount': unknowncount
         }
-        intlist = await self.interested_list()
-        oldcoming = await self.coming()
-        oldhere = await self.here()
+        intlist = data.get('interested_list', [])
+        oldcoming = data.get('coming')
+        oldhere = data.get('here')
         if status == 'cancel':
             if raid_id in intlist:
                 intlist.remove(raid_id)
+                newcoming = oldcoming
+                newhere = oldhere
             elif raid_id == oldcoming:
                 newcoming = None
+                newhere = oldhere
             elif raid_id == oldhere:
                 newhere = None
+                newcoming = oldcoming
         elif status == 'maybe':
             if bosses:
                 d['bosses'] = bosses
@@ -206,8 +212,10 @@ class MeowthUser:
                 intlist.append(raid_id)
             if raid_id == oldcoming:
                 newcoming = None
+                newhere = oldhere
             elif raid_id == oldhere:
                 newhere = None
+                newcoming = oldcoming
             else:
                 newcoming = oldcoming
                 newhere = oldhere

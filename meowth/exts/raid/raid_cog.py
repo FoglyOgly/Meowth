@@ -483,14 +483,14 @@ class Raid():
             'redcount': redcount,
             'unknowncount': unknowncount
         }
-        old_d = self.trainer_dict.get(user, {})
+        old_d = self.trainer_dict.get(user.user.id, {})
         if d == old_d:
             return
         old_status = old_d.get('status')
         if old_status and status == 'cancel':
-            del self.trainer_dict[user]
+            del self.trainer_dict[user.user.id]
         if status != 'cancel':
-            self.trainer_dict[user] = d
+            self.trainer_dict[user.user.id] = d
         await user.rsvp(self.id, status, bosses=bosses, total=total,
             bluecount=bluecount, yellowcount=yellowcount, 
             redcount=redcount, unknowncount=unknowncount)
@@ -626,7 +626,6 @@ class Raid():
             rcrd_dict['status'] = 'lobby'
             trainer_dict[trainer] = rcrd_dict
         self.trainer_dict = trainer_dict
-        print(trainer_dict)
         return trainer_dict
 
 

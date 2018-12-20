@@ -208,6 +208,9 @@ class MeowthUser:
                 newcoming = None
             elif raid_id == oldhere:
                 newhere = None
+            else:
+                newcoming = oldcoming
+                newhere = oldhere
         elif status == 'coming':
             if raid_id in intlist:
                 intlist.remove(raid_id)

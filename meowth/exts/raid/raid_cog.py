@@ -623,6 +623,7 @@ class Raid():
             rcrd_dict['status'] = 'lobby'
             trainer_dict[trainer] = rcrd_dict
         self.trainer_dict = trainer_dict
+        print(trainer_dict)
         return trainer_dict
 
 

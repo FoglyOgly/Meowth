@@ -496,7 +496,7 @@ class Raid():
             redcount=redcount, unknowncount=unknowncount)
         message_ids = self.message_ids
         for messageid in message_ids:
-            await self.update_rsvp(messageid)
+            await self.update_rsvp()
         if self.channel_ids and self.status != 'egg':
             for chnid in self.channel_ids:
                 rsvpembed = RSVPEmbed.from_raid(self).embed

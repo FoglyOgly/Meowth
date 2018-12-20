@@ -233,7 +233,6 @@ class Raid():
         event_loop.create_task(self.update_rsvp(payload))
     
     async def update_rsvp(self, idstring):
-        await self.get_trainer_dict()
         chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
         if self.status == 'active':
             raid_embed = RaidEmbed(msg.embeds[0])
@@ -490,8 +489,7 @@ class Raid():
             bluecount=bluecount, yellowcount=yellowcount, 
             redcount=redcount, unknowncount=unknowncount)
         message_ids = self.message_ids
-        has_embed = False
-        msg_list = []
+        await self.get_trainer_dict()
         for messageid in message_ids:
             await self.update_rsvp(messageid)
         if self.channel_ids and self.status != 'egg':

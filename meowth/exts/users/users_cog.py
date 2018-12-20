@@ -183,13 +183,15 @@ class MeowthUser:
         }
         intlist = await self.interested_list()
         if status == 'cancel':
-            if raid_id in intlist:
+            if intlist and raid_id in intlist:
                 intlist.remove(raid_id)
                 d['interested_list'] = intlist
+                d['coming'] = None
+                d['here'] = None
         elif status == 'maybe':
             if bosses:
                 d['bosses'] = bosses
-            if raid_id not in intlist:
+            if intlist and raid_id not in intlist:
                 intlist.append(raid_id)
             d['interested_list'] = intlist
         elif status == 'coming':

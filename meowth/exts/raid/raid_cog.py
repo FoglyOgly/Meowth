@@ -770,6 +770,7 @@ class RaidCog(Cog):
                     bluecount = yellowcount = unknowncount = 0
         else:
             party = self.party_list(*teamcounts)
+            print(party)
             bluecount, yellowcount, redcount, unknowncount = party
             if not total or total < sum(party):
                 total = sum(party)
@@ -780,7 +781,6 @@ class RaidCog(Cog):
     
     @staticmethod
     def party_list(*teamcounts):
-        print(teamcounts)
         mystic = 0
         instinct = 0
         valor = 0
@@ -806,7 +806,6 @@ class RaidCog(Cog):
         }
         regx = re.compile('([a-zA-Z]+)([0-9]+)|([0-9]+)([a-zA-Z]+)')
         for count in teamcounts:
-            print(count)
             match = regx.match(count)
             if match:
                 match = regx.match(count).groups()

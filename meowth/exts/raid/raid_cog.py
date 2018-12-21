@@ -757,12 +757,16 @@ class RaidCog(Cog):
                 team = await meowthuser.team()
                 if not team:
                     unknowncount = total
+                    bluecount = yellowcount = redcount = 0
                 elif team == 1:
                     bluecount = total
+                    yellowcount = redcount = unknowncount = 0
                 elif team == 2:
                     yellowcount = total
+                    bluecount = redcount = unknowncount = 0
                 elif team == 3:
                     redcount = total
+                    bluecount = yellowcount = unknowncount = 0
         else:
             party = self.party_list(*teamcounts)
             bluecount, yellowcount, redcount, unknowncount = party

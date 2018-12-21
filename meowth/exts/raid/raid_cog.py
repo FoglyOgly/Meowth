@@ -785,25 +785,10 @@ class RaidCog(Cog):
         instinct = 0
         valor = 0
         unknown = 0
-        team_aliases = {
-            'mystic': mystic,
-            'blue': mystic,
-            'm': mystic,
-            'b': mystic,
-            'instinct': instinct,
-            'yellow': instinct,
-            'i': instinct,
-            'y': instinct,
-            'valor': valor,
-            'red': valor,
-            'v': valor,
-            'r': valor,
-            'unknown': unknown,
-            'grey': unknown,
-            'gray': unknown,
-            'u': unknown,
-            'g': unknown,
-        }
+        mystic_aliases = ['mystic', 'blue', 'm', 'b']
+        instinct_aliases = ['instinct', 'yellow', 'i', 'y']
+        valor_aliases = ['valor', 'red', 'v', 'r']
+        unknown_aliases = ['unknown', 'grey', 'gray', 'u', 'g']
         regx = re.compile('([a-zA-Z]+)([0-9]+)|([0-9]+)([a-zA-Z]+)')
         for count in teamcounts:
             match = regx.match(count)
@@ -813,9 +798,14 @@ class RaidCog(Cog):
                 int_match = match[1] or match[2]
                 print(str_match)
                 print(int_match)
-                if str_match in team_aliases.keys():
-                    if int_match:
-                        team_aliases[str_match] += int(int_match)
+                if str_match in mystic_aliases:
+                    mystic += int(int_match)
+                elif str_match in instinct_aliases:
+                    instinct += int(int_match)
+                elif str_match in valor_aliases:
+                    valor += int(int_match)
+                elif str_match in unknown_aliases:
+                    unknown += int(int_match)
         return [mystic, instinct, valor, unknown]
 
         

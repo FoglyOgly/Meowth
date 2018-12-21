@@ -588,8 +588,8 @@ class Raid():
             user_table['interested_list'].contains_(self.id),
             user_table['coming'] == self.id,
             user_table['here'] == self.id))
-        data = await query.get()
-        for rcrd in data:
+        rsvp_data = await query.get()
+        for rcrd in rsvp_data:
             trainer, rcrd_dict = data(rcrd)
             trainer_dict[trainer] = rcrd_dict
         print(trainer_dict)

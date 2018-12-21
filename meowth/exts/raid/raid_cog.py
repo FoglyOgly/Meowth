@@ -745,7 +745,7 @@ class RaidCog(Cog):
         ctx.bot.add_listener(new_raid.on_raw_reaction_add)
         loop = asyncio.get_event_loop()
         loop.create_task(new_raid.monitor_status())
-        await ctx.bot.dbi.add_listener(f'cancel_{new_raid.id}', new_raid.cancel_rsvp)
+        await ctx.bot.dbi.add_listener(f'rsvp_{new_raid.id}', new_raid._rsvp)
     
     # @command()
     # @raid_checks.raid_channel()

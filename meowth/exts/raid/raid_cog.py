@@ -235,7 +235,7 @@ class Raid():
         event_loop.create_task(self.update_rsvp(user_id, status))
     
     async def update_rsvp(self, user_id, status):
-        await self.get_trainer_dict()
+        self.trainer_dict = await self.get_trainer_dict()
         has_embed = False
         for idstring in self.message_ids:
             chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
@@ -601,7 +601,6 @@ class Raid():
             trainer, rcrd_dict = data(rcrd)
             rcrd_dict['status'] = 'lobby'
             trainer_dict[trainer] = rcrd_dict
-        self.trainer_dict = trainer_dict
         return trainer_dict
 
 

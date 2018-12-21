@@ -816,7 +816,6 @@ class RaidCog(Cog):
                 if str_match in team_aliases.keys():
                     if int_match:
                         team_aliases[str_match] += int(int_match)
-                        continue
         return [mystic, instinct, valor, unknown]
 
         

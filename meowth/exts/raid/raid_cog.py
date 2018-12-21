@@ -570,36 +570,27 @@ class Raid():
                 'redcount': redcount,
                 'unknowncount': unknowncount
             }
+            interested_list = rcrd.get('interested_list')
+            coming = rcrd.get('coming')
+            here = rcrd.get('here')
+            if self.id in interested_list:
+                status = 'maybe'
+            elif self.id == coming:
+                status = 'coming'
+            elif self.id == here:
+                status = 'here'
+            rcrd_dict['status'] = status
             return trainer, rcrd_dict
         trainer_dict = {}
         user_table = self.bot.dbi.table('users')
-        int_query = user_table.query()
-        int_query.where(user_table['interested_list'].contains_(self.id))
-        int_data = await int_query.get()
-        for rcrd in int_data:
+        query = user_table.query()
+        query.where((
+            user_table['interested_list'].contains_(self.id),
+            user_table['coming'] = self.id,
+            user_table['here'] = self.id))
+        data = await query.get()
+        for rcrd in data:
             trainer, rcrd_dict = data(rcrd)
-            rcrd_dict['status'] = 'maybe'
-            trainer_dict[trainer] = rcrd_dict
-        com_query = user_table.query()
-        com_query.where(coming=self.id)
-        com_data = await com_query.get()
-        for rcrd in com_data:
-            trainer, rcrd_dict = data(rcrd)
-            rcrd_dict['status'] = 'coming'
-            trainer_dict[trainer] = rcrd_dict
-        here_query = user_table.query()
-        here_query.where(here=self.id)
-        here_data = await here_query.get()
-        for rcrd in here_data:
-            trainer, rcrd_dict = data(rcrd)
-            rcrd_dict['status'] = 'here'
-            trainer_dict[trainer] = rcrd_dict
-        lob_query = user_table.query()
-        lob_query.where(lobby=self.id)
-        lob_data = await lob_query.get()
-        for rcrd in lob_data:
-            trainer, rcrd_dict = data(rcrd)
-            rcrd_dict['status'] = 'lobby'
             trainer_dict[trainer] = rcrd_dict
         print(trainer_dict)
         return trainer_dict

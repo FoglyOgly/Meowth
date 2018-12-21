@@ -601,6 +601,7 @@ class Raid():
             trainer, rcrd_dict = data(rcrd)
             rcrd_dict['status'] = 'lobby'
             trainer_dict[trainer] = rcrd_dict
+        print(trainer_dict)
         return trainer_dict
 
 

@@ -738,79 +738,40 @@ class RaidCog(Cog):
         loop.create_task(new_raid.monitor_status())
         await ctx.bot.dbi.add_listener(f'rsvp_{new_raid.id}', new_raid._rsvp)
     
-    @command()
-    @raid_checks.raid_channel()
-    async def interested(self, ctx, total: int=0, *teamcounts):
+    @staticmethod
+    async def get_raidid(ctx):
         raid_table = ctx.bot.dbi.table('raids')
         id_query = raid_table.query('id')
         id_query.where(raid_table['channels'].contains_(str(ctx.channel.id)))
         raid_id = await id_query.get_value()
+        return raid_id
+    
+    async def rsvp(self, ctx, status, total: int=0, *teamcounts):
+        raid_id = await self.get_raidid(ctx)
         meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
-        if not teamcounts:
-            if not total:
-                party = await meowthuser.party()
-                total = party['total']
-                bluecount = party['bluecount']
-                yellowcount = party['yellowcount']
-                redcount = party['redcount']
-                unknowncount = party['unknowncount']
-            else:
-                team = await meowthuser.team()
-                if not team:
-                    unknowncount = total
-                    bluecount = yellowcount = redcount = 0
-                elif team == 1:
-                    bluecount = total
-                    yellowcount = redcount = unknowncount = 0
-                elif team == 2:
-                    yellowcount = total
-                    bluecount = redcount = unknowncount = 0
-                elif team == 3:
-                    redcount = total
-                    bluecount = yellowcount = unknowncount = 0
-        else:
-            party = self.party_list(*teamcounts)
-            print(party)
-            bluecount, yellowcount, redcount, unknowncount = party
-            if not total or total < sum(party):
-                total = sum(party)
-            elif total > sum(party):
-                unknowncount = total - sum(party[:-1])
-        await meowthuser.rsvp(raid_id, 'maybe', total=total, bluecount=bluecount,
+        party = await meowthuser.party_list(total=total, *teamcounts)
+        bluecount, yellowcount, redcount, unknowncount = party
+        if not total or total < sum(party):
+            total = sum(party)
+        elif total > sum(party):
+            unknowncount = total - sum(party[:-1])
+        await meowthuser.rsvp(raid_id, status, total=total, bluecount=bluecount,
             yellowcount=yellowcount, redcount=redcount, unknowncount=unknowncount)
     
-    @staticmethod
-    def party_list(*teamcounts):
-        mystic = 0
-        instinct = 0
-        valor = 0
-        unknown = 0
-        mystic_aliases = ['mystic', 'blue', 'm', 'b']
-        instinct_aliases = ['instinct', 'yellow', 'i', 'y']
-        valor_aliases = ['valor', 'red', 'v', 'r']
-        unknown_aliases = ['unknown', 'grey', 'gray', 'u', 'g']
-        regx = re.compile('([a-zA-Z]+)([0-9]+)|([0-9]+)([a-zA-Z]+)')
-        for count in teamcounts:
-            match = regx.match(count)
-            if match:
-                match = regx.match(count).groups()
-                str_match = match[0] or match[3]
-                int_match = match[1] or match[2]
-                print(str_match)
-                print(int_match)
-                if str_match in mystic_aliases:
-                    mystic += int(int_match)
-                elif str_match in instinct_aliases:
-                    instinct += int(int_match)
-                elif str_match in valor_aliases:
-                    valor += int(int_match)
-                elif str_match in unknown_aliases:
-                    unknown += int(int_match)
-        return [mystic, instinct, valor, unknown]
-
+    @command()
+    @raid_checks.raid_channel()
+    async def interested(self, ctx, total: int=0, *teamcounts):
+        await self.rsvp(ctx, "maybe", total=total, *teamcounts)
         
-        
-        
+    @command()
+    @raid_checks.raid_channel()
+    async def coming(self, ctx, total: int=0, *teamcounts):
+        await self.rsvp(ctx, "coming", total=total, *teamcounts)
+    
+    @command()
+    @raid_checks.raid_channel()
+    async def here(self, ctx, total: int=0, *teamcounts):
+        await self.rsvp(ctx, "here", total=total, *teamcounts)
         
     
     @command()

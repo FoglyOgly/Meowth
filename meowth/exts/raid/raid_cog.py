@@ -17,6 +17,7 @@ import aiohttp
 import time
 from datetime import timezone, datetime
 from copy import deepcopy
+import re
 
 
 class RaidBoss(Pokemon):

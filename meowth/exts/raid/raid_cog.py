@@ -592,7 +592,6 @@ class Raid():
         for rcrd in rsvp_data:
             trainer, rcrd_dict = data(rcrd)
             trainer_dict[trainer] = rcrd_dict
-        print(trainer_dict)
         return trainer_dict
 
 

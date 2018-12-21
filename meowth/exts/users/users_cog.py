@@ -176,7 +176,6 @@ class MeowthUser:
     async def rsvp(self, raid_id, status, bosses: list=None, total: int=1,
         bluecount: int=0, yellowcount: int=0, redcount: int=0, unknowncount: int=0):
         data = await self._data.get()
-        print(data)
         if not data:
             upsert = self._insert
             action = "insert"

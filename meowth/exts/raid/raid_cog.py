@@ -811,6 +811,8 @@ class RaidCog(Cog):
                 match = regx.match(count).groups()
                 str_match = match[0] or match[3]
                 int_match = match[1] or match[2]
+                print(str_match)
+                print(int_match)
                 if str_match in team_aliases.keys():
                     if int_match:
                         team_aliases[str_match] += int(int_match)

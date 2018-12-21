@@ -172,7 +172,7 @@ class MeowthUser:
         update.values(**d)
         await update.commit()
     
-    async def party_list(total=0, *teamcounts):
+    async def party_list(self, total=0, *teamcounts):
         if not teamcounts:
             if not total:
                 party = await self.party()

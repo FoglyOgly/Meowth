@@ -586,8 +586,8 @@ class Raid():
         query = user_table.query()
         query.where((
             user_table['interested_list'].contains_(self.id),
-            user_table['coming'] = self.id,
-            user_table['here'] = self.id))
+            user_table['coming'] == self.id,
+            user_table['here'] == self.id))
         data = await query.get()
         for rcrd in data:
             trainer, rcrd_dict = data(rcrd)

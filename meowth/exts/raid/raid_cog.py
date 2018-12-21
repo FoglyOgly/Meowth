@@ -612,7 +612,7 @@ class Raid():
         raid.channel_ids = data.get('channels')
         raid.message_ids = data.get('messages')
         raid.id = data['id']
-        await raid.get_trainer_dict()
+        raid.trainer_dict = await raid.get_trainer_dict()
         if listen:
             bot.add_listener(raid.on_raw_reaction_add)
         return raid
@@ -737,14 +737,78 @@ class RaidCog(Cog):
         loop.create_task(new_raid.monitor_status())
         await ctx.bot.dbi.add_listener(f'rsvp_{new_raid.id}', new_raid._rsvp)
     
-    # @command()
-    # @raid_checks.raid_channel()
-    # async def interested(self, ctx, total: int=1, *teamcounts):
-    #     raid_table = ctx.bot.dbi.table('raids')
-    #     id_query = raid_table.query('id')
-    #     if not teamcounts:
-            
-    #     for count in teamcounts:
+    @command()
+    @raid_checks.raid_channel()
+    async def interested(self, ctx, total: int=0, *teamcounts):
+        raid_table = ctx.bot.dbi.table('raids')
+        id_query = raid_table.query('id')
+        id_query.where(raid_table['channels'].contains_(str(ctx.channel.id)))
+        raid_id = await id_query.get_value()
+        meowthuser = MeowthUser.from_id(ctx.author.id)
+        if not teamcounts:
+            if not total:
+                party = await meowthuser.party()
+                total = party['total']
+                bluecount = party['bluecount']
+                yellowcount = party['yellowcount']
+                redcount = party['redcount']
+                unknowncount = party['unknowncount']
+            else:
+                team = await meowthuser.team()
+                if not team:
+                    unknowncount = total
+                elif team == 1:
+                    bluecount = total
+                elif team == 2:
+                    yellowcount = total
+                elif team == 3:
+                    redcount = total
+        else:
+            party = self.party_list(*teamcounts)
+            bluecount, yellowcount, redcount, unknowncount = party
+            if not total or total < sum(party):
+                total = sum(party)
+            elif total > sum(party):
+                unknowncount = total - sum(party[:-1])
+        await meowthuser.rsvp(raid_id, 'maybe', total=total, bluecount=bluecount,
+            yellowcount=yellowcount, redcount=redcount, unknowncount=unknowncount)
+    
+    def party_list(*teamcounts):
+        mystic = 0
+        instinct = 0
+        valor = 0
+        unknown = 0
+        team_aliases = {
+            'mystic': mystic,
+            'blue': mystic,
+            'm': mystic,
+            'b': mystic,
+            'instinct': instinct,
+            'yellow': instinct,
+            'i': instinct,
+            'y': instinct,
+            'valor': valor,
+            'red': valor,
+            'v': valor,
+            'r': valor,
+            'unknown': unknown,
+            'grey': unknown,
+            'gray': unknown,
+            'u': unknown,
+            'g': unknown,
+        }
+        regx = re.compile('([a-zA-Z]+)([0-9]+)|([0-9]+)([a-zA-Z]+)')
+        for count in teamcounts:
+            match = regx.match(count)
+            if match:
+                match = regx.match(count).groups()
+                str_match = match[0] or match[3]
+                int_match = match[1] or match[2]
+                if str_match in team_aliases.keys():
+                    if int_match:
+                        team_aliases[str_match] += int(int_match)
+                        continue
+        return [mystic, instinct, valor, unknown]
 
         
         

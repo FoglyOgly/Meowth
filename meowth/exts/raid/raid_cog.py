@@ -744,7 +744,7 @@ class RaidCog(Cog):
         id_query = raid_table.query('id')
         id_query.where(raid_table['channels'].contains_(str(ctx.channel.id)))
         raid_id = await id_query.get_value()
-        meowthuser = MeowthUser.from_id(ctx.author.id)
+        meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
         if not teamcounts:
             if not total:
                 party = await meowthuser.party()

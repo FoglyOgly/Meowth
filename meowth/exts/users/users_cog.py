@@ -144,12 +144,12 @@ class MeowthUser:
         if not any((bluecount, yellowcount, redcount)):
             team = await self.team()
             if team == 1:
-                bluecount = 1
+                bluecount = total
             elif team == 2:
-                yellowcount = 1
+                yellowcount = total
             elif team == 3:
-                redcount = 1
-            unknowncount = total - sum((bluecount, yellowcount, redcount))
+                redcount = total
+        unknowncount = total - sum((bluecount, yellowcount, redcount))
         d = {
             'total': total,
             'bluecount': bluecount,
@@ -171,6 +171,56 @@ class MeowthUser:
         }
         update.values(**d)
         await update.commit()
+    
+    async def party_list(total=0, *teamcounts):
+        if not teamcounts:
+            if not total:
+                party = await self.party()
+                total = party['total']
+                bluecount = party['bluecount']
+                yellowcount = party['yellowcount']
+                redcount = party['redcount']
+                unknowncount = party['unknowncount']
+            else:
+                team = await self.team()
+                if not team:
+                    unknowncount = total
+                    bluecount = yellowcount = redcount = 0
+                elif team == 1:
+                    bluecount = total
+                    yellowcount = redcount = unknowncount = 0
+                elif team == 2:
+                    yellowcount = total
+                    bluecount = redcount = unknowncount = 0
+                elif team == 3:
+                    redcount = total
+                    bluecount = yellowcount = unknowncount = 0
+            return [bluecount, yellowcount, redcount, unknowncount]
+        else:
+            mystic = 0
+            instinct = 0
+            valor = 0
+            unknown = 0
+            mystic_aliases = ['mystic', 'blue', 'm', 'b']
+            instinct_aliases = ['instinct', 'yellow', 'i', 'y']
+            valor_aliases = ['valor', 'red', 'v', 'r']
+            unknown_aliases = ['unknown', 'grey', 'gray', 'u', 'g']
+            regx = re.compile('([a-zA-Z]+)([0-9]+)|([0-9]+)([a-zA-Z]+)')
+            for count in teamcounts:
+                match = regx.match(count)
+                if match:
+                    match = regx.match(count).groups()
+                    str_match = match[0] or match[3]
+                    int_match = match[1] or match[2]
+                    if str_match in mystic_aliases:
+                        mystic += int(int_match)
+                    elif str_match in instinct_aliases:
+                        instinct += int(int_match)
+                    elif str_match in valor_aliases:
+                        valor += int(int_match)
+                    elif str_match in unknown_aliases:
+                        unknown += int(int_match)
+        return [mystic, instinct, valor, unknown]
 
 
     async def rsvp(self, raid_id, status, bosses: list=None, total: int=1,

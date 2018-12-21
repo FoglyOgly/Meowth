@@ -222,19 +222,20 @@ class Raid():
             emoji = self.bot.get_emoji(emoji)
         await message.remove_reaction(emoji, user)
         if new_bosses != old_bosses or new_status != old_status:
-            await self.rsvp(meowthuser, new_status, bosses=new_bosses, total=total, 
+            await meowthuser.rsvp(self.id, new_status, bosses=new_bosses, total=total, 
                 bluecount=bluecount, yellowcount=yellowcount, 
                 redcount=redcount, unknowncount=unknowncount)
 
-    def cancel_rsvp(self, connection, pid, channel, payload):
-        if channel != f'cancel_{self.id}':
+    def _rsvp(self, connection, pid, channel, payload):
+        if channel != f'rsvp_{self.id}':
             return
-        payload = int(payload)
-        del self.trainer_dict[payload]
+        userid, status = payload.split('/')
+        user_id = int(userid)
         event_loop = asyncio.get_event_loop()
-        event_loop.create_task(self.update_rsvp(payload, "cancel"))
+        event_loop.create_task(self.update_rsvp(user_id, status))
     
     async def update_rsvp(self, user_id, status):
+        await self.get_trainer_dict()
         has_embed = False
         for idstring in self.message_ids:
             chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
@@ -488,30 +489,6 @@ class Raid():
         await query.delete()
     
     # async def update_gym(self, gym):
-
-    async def rsvp(self, user: MeowthUser, status, bosses: list=None, total: int=1,
-        bluecount: int=0, yellowcount: int=0, redcount: int=0, unknowncount: int=0):
-        d = {
-            'status': status,
-            'bosses': bosses,
-            'total': total,
-            'bluecount': bluecount,
-            'yellowcount': yellowcount,
-            'redcount': redcount,
-            'unknowncount': unknowncount
-        }
-        old_d = self.trainer_dict.get(user.user.id, {})
-        if d == old_d:
-            return
-        old_status = old_d.get('status')
-        if old_status and status == 'cancel':
-            del self.trainer_dict[user.user.id]
-        if status != 'cancel':
-            self.trainer_dict[user.user.id] = d
-        await user.rsvp(self.id, status, bosses=bosses, total=total,
-            bluecount=bluecount, yellowcount=yellowcount, 
-            redcount=redcount, unknowncount=unknowncount)
-        await self.update_rsvp(user.user.id, status)
 
     async def boss_interest_dict(self):
         boss_list = self.boss_list
@@ -770,12 +747,14 @@ class RaidCog(Cog):
         loop.create_task(new_raid.monitor_status())
         await ctx.bot.dbi.add_listener(f'cancel_{new_raid.id}', new_raid.cancel_rsvp)
     
-    # @command()
-    # @raid_checks.raid_channel()
-    # async def interested(self, ctx, total: int=1, *teamcounts):
-    #     if not teamcounts:
+    @command()
+    @raid_checks.raid_channel()
+    async def interested(self, ctx, total: int=1, *teamcounts):
+        raid_table = ctx.bot.dbi.table('raids')
+        id_query = raid_table.query('id')
+        if not teamcounts:
             
-    #     for count in teamcounts:
+        for count in teamcounts:
 
         
         

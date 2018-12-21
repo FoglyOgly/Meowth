@@ -747,14 +747,14 @@ class RaidCog(Cog):
         loop.create_task(new_raid.monitor_status())
         await ctx.bot.dbi.add_listener(f'cancel_{new_raid.id}', new_raid.cancel_rsvp)
     
-    @command()
-    @raid_checks.raid_channel()
-    async def interested(self, ctx, total: int=1, *teamcounts):
-        raid_table = ctx.bot.dbi.table('raids')
-        id_query = raid_table.query('id')
-        if not teamcounts:
+    # @command()
+    # @raid_checks.raid_channel()
+    # async def interested(self, ctx, total: int=1, *teamcounts):
+    #     raid_table = ctx.bot.dbi.table('raids')
+    #     id_query = raid_table.query('id')
+    #     if not teamcounts:
             
-        for count in teamcounts:
+    #     for count in teamcounts:
 
         
         

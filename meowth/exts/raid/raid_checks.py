@@ -23,7 +23,7 @@ def raid_enabled():
 async def is_raid_channel(ctx):
     raid_table = ctx.bot.dbi.table('raids')
     query = raid_table.query('channels')
-    query.where(guildid=ctx.guild.id)
+    query.where(guild=ctx.guild.id)
     query.where(raid_table['channels'].contains_(str(ctx.channel.id)))
     data = await query.get()
     if data:

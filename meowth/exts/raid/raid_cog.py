@@ -778,6 +778,7 @@ class RaidCog(Cog):
         await meowthuser.rsvp(raid_id, 'maybe', total=total, bluecount=bluecount,
             yellowcount=yellowcount, redcount=redcount, unknowncount=unknowncount)
     
+    @staticmethod
     def party_list(*teamcounts):
         print(teamcounts)
         mystic = 0

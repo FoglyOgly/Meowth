@@ -19,6 +19,8 @@
 "//": "Define Meowth's master id (that's you).",
 "//": "Meowth will only take admin commands from the user with this id",
 "master": 000000000000000000,
+"//": "Meowth will allso take admin commands from the users in this list, like master",
+"submaster": [000000000000000000,000000000000000000],
 
 "//": "Limit egg assumed hatches to certain egg levels.",
 "allow_assume": {"EX": "False", "5": "False", "4": "False", "3": "False", "2": "False", "1": "False"},

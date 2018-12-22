@@ -14,6 +14,7 @@ Cette version est "iso" avec la version forked avec ces différences :
 * Traduction directement dans certains fichiers pour traduire les `fstrings` utilisées par les développeurs dans les dernières mises à jour.
 * Ajout d'une version `Long running tasks` pour prévenir les redémarrages régulier de certains hébergeurs.
 * Ajout d'une nouvelle commande afin de mettre à jour la durée des raids et hatchtime `!raiddata hatchtime 1 15` or `!raiddata raidtime 1 90`
+* Ajout de la possibilité dans le fichier `config.json`de `submaster` afin de déléguer l'utilisation des command d'admin à plusisieurs personnes.
 
 https://help.pythonanywhere.com/pages/LongRunningTasks/
 

@@ -1296,8 +1296,8 @@ class CountersEmbed():
             i += 1
         ctrs_str.append(f'[Results courtesy of Pokebattler](https://www.pokebattler.com/raids/{boss.id})')
         fields['<:pkbtlr:512707623812857871> Counters'] = "\n".join(ctrs_str)
-        footer_text = "Hatching"
+        footer_text = "Ending"
         embed = formatters.make_embed(icon=CountersEmbed.raid_icon, thumbnail=img_url, # msg_colour=color,
             fields=fields, footer=footer_text, footer_icon=CountersEmbed.footer_icon)
-        embed.timestamp = hatchdt
+        embed.timestamp = enddt
         return cls(embed)

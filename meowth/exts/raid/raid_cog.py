@@ -1276,7 +1276,7 @@ class CountersEmbed():
         ctrs_str = []
         for ctr in ctrs_list:
             name = await ctr.name()
-            if ctr.nick:
+            if getattr(ctr, 'nick', None):
                 name = ctr.nick + f" ({name})"
             fast = Move(bot, ctr.quickMoveid)
             fast_name = await fast.name()

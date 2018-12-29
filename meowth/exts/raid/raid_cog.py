@@ -237,6 +237,15 @@ class Raid():
             await meowthuser.rsvp(self.id, new_status, bosses=new_bosses, total=total, 
                 bluecount=bluecount, yellowcount=yellowcount, 
                 redcount=redcount, unknowncount=unknowncount)
+    
+    async def on_command(self, ctx):
+        if ctx.command.name != 'counters':
+            return
+        if str(ctx.channel.id) not in self.channel_ids:
+            return
+        meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
+        embed = await self.counters_embed(meowthuser)
+        return await ctx.author.send(embed=embed)
 
     def _rsvp(self, connection, pid, channel, payload):
         if channel != f'rsvp_{self.id}':
@@ -710,13 +719,6 @@ class Raid():
             bot.add_listener(raid.on_raw_reaction_add)
         return raid
     
-    @command()
-    async def counters(self, ctx):
-        if str(ctx.channel.id) not in self.channel_ids:
-            return
-        meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
-        embed = await self.counters_embed(meowthuser)
-        return await ctx.author.send(embed=embed)
 
 
         
@@ -875,6 +877,11 @@ class RaidCog(Cog):
     @raid_checks.raid_channel()
     async def here(self, ctx, total: int=0, *teamcounts):
         await self.rsvp(ctx, "here", total=total, *teamcounts)
+
+    @command()
+    @raid_checks.raid_channel()
+    async def counters(self, ctx):
+        pass
         
     
     @command()

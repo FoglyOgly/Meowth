@@ -708,6 +708,7 @@ class Raid():
             bot.add_listener(raid.on_raw_reaction_add)
         return raid
     
+    @command()
     async def counters(self, ctx):
         if ctx.channel.id not in self.channel_ids:
             return

@@ -708,7 +708,6 @@ class Raid():
             bot.add_listener(raid.on_raw_reaction_add)
         return raid
     
-    @command()
     async def counters(self, ctx):
         if ctx.channel.id not in self.channel_ids:
             return
@@ -834,6 +833,7 @@ class RaidCog(Cog):
         rcrd = await insert.commit()
         new_raid.id = rcrd[0][0]
         ctx.bot.add_listener(new_raid.on_raw_reaction_add)
+        ctx.bot.add_command(new_raid.counters)
         loop = asyncio.get_event_loop()
         loop.create_task(new_raid.monitor_status())
         await ctx.bot.dbi.add_listener(f'rsvp_{new_raid.id}', new_raid._rsvp)

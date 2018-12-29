@@ -710,7 +710,7 @@ class Raid():
     
     @command()
     async def counters(self, ctx):
-        if ctx.channel.id not in self.channel_ids:
+        if str(ctx.channel.id) not in self.channel_ids:
             return
         meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
         embed = await self.counters_embed(meowthuser)

@@ -30,6 +30,7 @@ class RaidBoss(Pokemon):
         self.gender = None
         self.quickMoveid = pkmn.quickMoveid
         self.chargeMoveid = pkmn.chargeMoveid
+        self.chargeMove2id = None
 
     
 
@@ -158,13 +159,23 @@ class Raid():
     def pokebattler_data_url(pkmnid, level, weather):
         json_url = 'https://fight.pokebattler.com/raids/defenders/'
         json_url += f"{pkmnid}/levels/RAID_LEVEL_{level}/attackers/levels/"
-        json_url += "30/strategies/CINEMATIC_ATTACK_WHEN_POSSIBLE/"
+        json_url += "20/strategies/CINEMATIC_ATTACK_WHEN_POSSIBLE/"
         json_url += f"DEFENSE_RANDOM_MC"
-        json_url += f"?sort=OVERALL&weatherCondition={weather}"
+        json_url += f"?sort=ESTIMATOR&weatherCondition={weather}"
         json_url += "&dodgeStrategy=DODGE_REACTION_TIME"
         json_url += "&aggregation=AVERAGE&randomAssistants=-1"
         return json_url
     
+    @staticmethod
+    def user_pokebattler_data_url(pkmnid, level, pb_id, weather):
+        json_url = 'https://fight.pokebattler.com/raids/defenders/'
+        json_url += f"{pkmnid}/levels/RAID_LEVEL_{level}/attackers/users/"
+        json_url += f"{pb_id}/strategies/CINEMATIC_ATTACK_WHEN_POSSIBLE/"
+        json_url += "DEFENSE_RANDOM_MC"
+        json_url += f"?sort=ESTIMATOR&weatherCondition={weather}"
+        json_url += "&dodgeStrategy=DODGE_REACTION_TIME"
+        json_url += "&aggregation=AVERAGE&randomAssistants=-1"
+        return json_url
     
     async def channel_name(self):
         gym_name = await self.gym._name()
@@ -349,9 +360,88 @@ class Raid():
             ctr = Pokemon(self.bot, ctrid, quickMoveid=ctrfast, chargeMoveid=ctrcharge)
             ctrs_list.append(ctr)
         return ctrs_list
+    
+    async def rec_group_size(self):
+        data_table = self.bot.dbi.table('counters_data')
+        weather = await self.weather()
+        boss = self.pkmn
+        boss_id = boss.id
+        level = self.level
+        if boss.quickMoveid:
+            fast_move_id = boss.quickMoveid
+        else:
+            fast_move_id = 'random'
+        if boss.chargeMoveid:
+            charge_move_id = boss.chargeMoveid
+        else:
+            charge_move_id  = 'random'
+        query = data_table.query().select().where(
+            boss_id=boss_id, weather=weather, level=level,
+            fast_move=fast_move_id, charge_move=charge_move_id
+        )
+        query_dict = (await query.get())[0]
+        estimator = query_dict['estimator']
+        return ceil(estimator)
+    
+    async def user_counters_data(self, user: MeowthUser):
+        pkmnid = self.pkmn.id
+        level = self.level
+        if level == 'EX':
+            url_level = 5
+        else:
+            url_level = level
+        pb_id = await user.pokebattler()
+        if not pb_id:
+            return await self.generic_counters_data()
+        weather = await self.weather()
+        data_url = self.user_pokebattler_data_url(
+            pkmnid, url_level, pb_id, weather
+        )
+        async with aiohttp.ClientSession() as session:
+            async with session.get(data_url) as resp:
+                try:
+                    data = await resp.json()
+                    data = data['attackers'][0]
+                except KeyError:
+                    print(data_url)
+        boss_fast = self.pkmn.quickMoveid
+        boss_charge = self.pkmn.chargeMoveid
+        if not (boss_fast and boss_charge):
+            ctrs = data['randomMove']['defenders'][-6:]
+        elif (boss_fast and boss_charge):
+            for moveset in data['byMove']:
+                if moveset['move1'] == boss_fast and moveset['move2'] == boss_charge:
+                    ctrs = moveset['defenders'][-6:]
+                else:
+                    continue
+        else:
+            for moveset in data['byMove']:
+                if moveset['move2'] == boss_charge or moveset['move1'] == boss_fast:
+                    ctrs = moveset['defenders'][-6:]
+                else:
+                    continue
+        ctrs_list = []
+        for ctr in reversed(ctrs):
+            ctrid = ctr['pokemonId']
+            ctr_nick = ctr.get('name')
+            moveset = ctr['byMove'][-1]
+            fast_move = moveset['move1']
+            charge_move = moveset['move2']
+            charge_move_2 = moveset.get('move3')
+            cp = ctr['cp']
+            counter = Pokemon(self.bot, ctrid, cp=cp, quickMoveid=fast_move,
+                chargeMoveid=charge_move, chargeMove2id=charge_move_2)
+            if ctr_nick:
+                counter.nick = ctr_nick
+            ctrs_list.append(counter)
+        return ctrs_list
+
 
     async def egg_embed(self):
         return (await EggEmbed.from_raid(self)).embed
+    
+    async def counters_embed(self, user):
+        return (await CountersEmbed.from_raid(self, user)).embed
     
     async def hatched_embed(self):
         raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png'
@@ -617,6 +707,16 @@ class Raid():
         if listen:
             bot.add_listener(raid.on_raw_reaction_add)
         return raid
+    
+    @command()
+    async def counters(self, ctx):
+        if ctx.channel.id not in self.channel_ids:
+            return
+        meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
+        embed = await self.counters_embed(meowthuser)
+        return await ctx.author.send(embed=embed)
+
+
         
 
 class RaidCog(Cog):
@@ -1111,5 +1211,90 @@ class EggEmbed():
         embed = formatters.make_embed(icon=EggEmbed.raid_icon, title=directions_text,
             thumbnail=egg_img_url, title_url=directions_url, # msg_colour=color,
             fields=fields, footer=footer_text, footer_icon=EggEmbed.footer_icon)
+        embed.timestamp = hatchdt
+        return cls(embed)
+
+class CountersEmbed():
+
+    def __init__(self, embed):
+        self.embed = embed
+    
+    raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png' #TODO
+    footer_icon = 'https://media.discordapp.net/attachments/346766728132427777/512699022822080512/imageedit_10_6071805149.png'
+
+    boss_index = 0
+    weather_index = 1
+    cp_index = 2
+    moveset_index = 3
+    ctrs_index = 4
+
+    @classmethod
+    async def from_raid(cls, user: MeowthUser, raid: Raid):
+        boss = raid.pkmn
+        bot = raid.bot
+        name = await boss.name()
+        type_emoji = await boss.type_emoji()
+        shiny_available = await boss._shiny_available()
+        if shiny_available:
+            name += ' :sparkles:'
+        quick_move = Move(bot, boss.quickMoveid) if boss.quickMoveid else None
+        charge_move = Move(bot, boss.chargeMoveid) if boss.chargeMoveid else None
+        if quick_move:
+            quick_name = await quick_move.name()
+            quick_emoji = await quick_move.emoji()
+        else:
+            quick_name = "Unknown"
+            quick_emoji = ""
+        if charge_move:
+            charge_name = await charge_move.name()
+            charge_emoji = await charge_move.emoji()
+        else:
+            charge_name = "Unknown"
+            charge_emoji = ""
+        moveset = f"{quick_name} {quick_emoji}| {charge_name} {charge_emoji}"
+        weather = await raid.weather()
+        weather = Weather(bot, weather)
+        weather_name = await weather.name()
+        weather_emoji = await weather.boosted_emoji_str()
+        is_boosted = await boss.is_boosted(weather.value)
+        cp_range = await raid.cp_range()
+        cp_str = f"{cp_range[0]}-{cp_range[1]}"
+        end = raid.end
+        enddt = datetime.fromtimestamp(end)
+        if is_boosted:
+            cp_str += " (Boosted)"
+        img_url = await boss.sprite_url()
+        ctrs_list = await raid.user_counters_data(user)
+        fields = {
+            "Boss": f"{name} {type_emoji}",
+            "Weather": f"{weather_name} {weather_emoji}",
+            "CP Range": cp_str,
+            "Moveset": moveset,
+        }
+        i = 1
+        ctrs_str = []
+        for ctr in ctrs_list:
+            name = await ctr.name()
+            if ctr.nick:
+                name = ctr.nick + f" ({name})"
+            fast = Move(bot, ctr.quickMoveid)
+            fast_name = await fast.name()
+            fast_emoji = await fast.emoji()
+            charge = Move(bot, ctr.chargeMoveid)
+            charge_name = await charge.name()
+            charge_emoji = await charge.emoji()
+            ctr_str = f"**{name}**: {fast_name} {fast_emoji} | {charge_name} {charge_emoji}"
+            if ctr.chargeMove2id:
+                charge_2 = Move(bot, ctr.chargeMove2id)
+                charge_2_name = await charge_2.name()
+                charge_2_emoji = await charge_2.emoji()
+                ctr_str += f" | {charge_2_name} {charge_2_emoji}"
+            ctrs_str.append(ctr_str)
+            i += 1
+        ctrs_str.append(f'[Results courtesy of Pokebattler](https://www.pokebattler.com/raids/{boss.id})')
+        fields['<:pkbtlr:512707623812857871> Counters'] = "\n".join(ctrs_str)
+        footer_text = "Hatching"
+        embed = formatters.make_embed(icon=CountersEmbed.raid_icon, thumbnail=img_url, # msg_colour=color,
+            fields=fields, footer=footer_text, footer_icon=CountersEmbed.footer_icon)
         embed.timestamp = hatchdt
         return cls(embed)

@@ -16,7 +16,7 @@ class Pokemon():
     def __init__(
         self, bot, pokemonId, form=None, gender=None, shiny=False,
         attiv=None, defiv=None, staiv=None, lvl=None,
-        cp=None, quickMoveid=None, chargeMoveid=None
+        cp=None, quickMoveid=None, chargeMoveid=None, chargeMove2id=None
     ):
         self.bot = bot
         self.id = pokemonId
@@ -30,6 +30,7 @@ class Pokemon():
         self.cp = cp
         self.quickMoveid = quickMoveid
         self.chargeMoveid = chargeMoveid
+        self.chargeMove2id = chargeMove2id
 
     @property
     def to_dict(self):
@@ -44,7 +45,8 @@ class Pokemon():
             'lvl': self.lvl,
             'cp': self.cp,
             'quickMoveid': self.quickMoveid,
-            'chargeMoveid': self.chargeMoveid
+            'chargeMoveid': self.chargeMoveid,
+            'chargeMove2id': self.chargeMove2id
         }
         return d
     
@@ -444,6 +446,7 @@ class Pokemon():
         lvl = None
         quickMoveid = None
         chargeMoveid = None
+        chargeMove2id = None
         cp = None
         alolan = False
         for arg in args:
@@ -456,7 +459,10 @@ class Pokemon():
                     if await move._fast():
                         quickMoveid = move.id
                     else:
-                        chargeMoveid = move.id
+                        if not chargeMoveid:
+                            chargeMoveid = move.id
+                        else:
+                            chargeMove2id = move.id
                 else:
                     pass
             elif arg == 'shiny':

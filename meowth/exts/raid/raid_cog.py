@@ -1286,6 +1286,7 @@ class CountersEmbed():
             charge_emoji = await charge.emoji()
             ctr_str = f"**{name}**: {fast_name} {fast_emoji} | {charge_name} {charge_emoji}"
             if ctr.chargeMove2id:
+                print(ctr.chargeMove2id)
                 charge_2 = Move(bot, ctr.chargeMove2id)
                 charge_2_name = await charge_2.name()
                 charge_2_emoji = await charge_2.emoji()

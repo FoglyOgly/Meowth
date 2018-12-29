@@ -428,6 +428,8 @@ class Raid():
             fast_move = moveset['move1']
             charge_move = moveset['move2']
             charge_move_2 = moveset.get('move3')
+            if charge_move_2 == 'MOVE_NONE':
+                charge_move_2 = None
             cp = ctr['cp']
             counter = Pokemon(self.bot, ctrid, cp=cp, quickMoveid=fast_move,
                 chargeMoveid=charge_move, chargeMove2id=charge_move_2)
@@ -1286,7 +1288,6 @@ class CountersEmbed():
             charge_emoji = await charge.emoji()
             ctr_str = f"**{name}**: {fast_name} {fast_emoji} | {charge_name} {charge_emoji}"
             if ctr.chargeMove2id:
-                print(ctr.chargeMove2id)
                 charge_2 = Move(bot, ctr.chargeMove2id)
                 charge_2_name = await charge_2.name()
                 charge_2_emoji = await charge_2.emoji()

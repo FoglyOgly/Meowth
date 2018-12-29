@@ -441,7 +441,7 @@ class Raid():
         return (await EggEmbed.from_raid(self)).embed
     
     async def counters_embed(self, user):
-        return (await CountersEmbed.from_raid(self, user)).embed
+        return (await CountersEmbed.from_raid(user, self)).embed
     
     async def hatched_embed(self):
         raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png'

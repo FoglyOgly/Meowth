@@ -156,10 +156,10 @@ class Raid():
         return url
         
     @staticmethod
-    def pokebattler_data_url(pkmnid, level, weather):
+    def pokebattler_data_url(pkmnid, level, att_level, weather):
         json_url = 'https://fight.pokebattler.com/raids/defenders/'
         json_url += f"{pkmnid}/levels/RAID_LEVEL_{level}/attackers/levels/"
-        json_url += "20/strategies/CINEMATIC_ATTACK_WHEN_POSSIBLE/"
+        json_url += f"{att_level}/strategies/CINEMATIC_ATTACK_WHEN_POSSIBLE/"
         json_url += f"DEFENSE_RANDOM_MC"
         json_url += f"?sort=ESTIMATOR&weatherCondition={weather}"
         json_url += "&dodgeStrategy=DODGE_REACTION_TIME"
@@ -370,7 +370,7 @@ class Raid():
             ctrs_list.append(ctr)
         return ctrs_list
     
-    async def rec_group_size(self):
+    async def estimator_20(self):
         data_table = self.bot.dbi.table('counters_data')
         weather = await self.weather()
         boss = self.pkmn
@@ -389,7 +389,37 @@ class Raid():
             fast_move=fast_move_id, charge_move=charge_move_id
         )
         query_dict = (await query.get())[0]
-        estimator = query_dict['estimator']
+        estimator = query_dict['estimator_20']
+        return estimator
+    
+    async def estimator_min(self):
+        data_table = self.bot.dbi.table('counters_data')
+        weather = await self.weather()
+        boss = self.pkmn
+        boss_id = boss.id
+        level = self.level
+        if boss.quickMoveid:
+            fast_move_id = boss.quickMoveid
+        else:
+            fast_move_id = 'random'
+        if boss.chargeMoveid:
+            charge_move_id = boss.chargeMoveid
+        else:
+            charge_move_id  = 'random'
+        query = data_table.query().select().where(
+            boss_id=boss_id, weather=weather, level=level,
+            fast_move=fast_move_id, charge_move=charge_move_id
+        )
+        query_dict = (await query.get())[0]
+        estimator = query_dict['estimator_min']
+        return estimator
+    
+    async def rec_group_size(self):
+        estimator = await self.estimator_20()
+        return ceil(estimator)
+    
+    async def min_group_size(self):
+        estimator = await self.estimator_min()
         return ceil(estimator)
     
     async def user_counters_data(self, user: MeowthUser):
@@ -899,24 +929,36 @@ class RaidCog(Cog):
                     url_level = level
                 for weather in weather_list:
                     data_url = Raid.pokebattler_data_url(
-                        pkmnid, url_level, weather
+                        pkmnid, "20", url_level, weather
+                    )
+                    data_url_min = Raid.pokebattler_data_url(
+                        pkmnid, "40", url_level, weather
                     )
                     async with aiohttp.ClientSession() as session:
                         async with session.get(data_url) as resp:
                             try:
                                 data = await resp.json()
-                                data = data['attackers'][0]
+                                data_20 = data['attackers'][0]
                             except KeyError:
                                 print(data_url)
-                    random_move_ctrs = data['randomMove']['defenders'][-6:]
-                    estimator = data['randomMove']['total']['estimator']
+                    async with aiohttp.ClientSession() as session:
+                        async with session.get(data_url_min) as resp:
+                            try:
+                                data = await resp.json()
+                                data_min = data['attackers'][0]
+                            except KeyError:
+                                print(data_url_min)
+                    random_move_ctrs = data_20['randomMove']['defenders'][-6:]
+                    estimator_20 = data_20['randomMove']['total']['estimator']
+                    estimator_min = data_min['randomMove']['defenders'][-1]['total']['estimator']
                     random_move_dict = {
                         'boss_id': pkmnid,
                         'level': level,
                         'weather': weather,
                         'fast_move': 'random',
                         'charge_move': 'random',
-                        'estimator': estimator
+                        'estimator_20': estimator_20,
+                        'estimator_min': estimator_min
                     }
                     ctr_index = 1
                     for ctr in reversed(random_move_ctrs):
@@ -929,18 +971,25 @@ class RaidCog(Cog):
                         random_move_dict[f'counter_{ctr_index}_charge'] = charge_move
                         ctr_index += 1
                     ctrs_data_list.append(random_move_dict)
-                    for moveset in data['byMove']:
+                    for moveset in data_20['byMove']:
                         ctrs = moveset['defenders'][-6:]
                         boss_fast = moveset['move1']
                         boss_charge = moveset['move2']
-                        estimator = moveset['total']['estimator']
+                        estimator_20 = moveset['total']['estimator']
+                        for moveset_min in data_min['byMove']:
+                            if moveset_min['move1'] == boss_fast and moveset_min['move2'] == boss_charge:
+                                estimator_min = moveset_min['defenders'][-1]['total']['estimator']
+                                break
+                            else:
+                                continue
                         moveset_dict = {
                             'boss_id': pkmnid,
                             'level': level,
                             'weather': weather,
                             'fast_move': boss_fast,
                             'charge_move': boss_charge,
-                            'estimator': estimator
+                            'estimator_20': estimator,
+                            'estimator_min': estimator_min
                         }
                         ctr_index = 1
                         for ctr in reversed(ctrs):

@@ -937,15 +937,15 @@ class RaidCog(Cog):
                     async with aiohttp.ClientSession() as session:
                         async with session.get(data_url) as resp:
                             try:
-                                data = await resp.json()
-                                data_20 = data['attackers'][0]
+                                data_20 = await resp.json()
+                                data_20 = data_20['attackers'][0]
                             except KeyError:
                                 print(data_url)
                     async with aiohttp.ClientSession() as session:
                         async with session.get(data_url_min) as resp:
                             try:
-                                data = await resp.json()
-                                data_min = data['attackers'][0]
+                                data_min = await resp.json()
+                                data_min = data_min['attackers'][0]
                             except KeyError:
                                 print(data_url_min)
                     random_move_ctrs = data_20['randomMove']['defenders'][-6:]

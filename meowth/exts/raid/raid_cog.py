@@ -929,10 +929,10 @@ class RaidCog(Cog):
                     url_level = level
                 for weather in weather_list:
                     data_url = Raid.pokebattler_data_url(
-                        pkmnid, "20", url_level, weather
+                        pkmnid, url_level, "20", weather
                     )
                     data_url_min = Raid.pokebattler_data_url(
-                        pkmnid, "40", url_level, weather
+                        pkmnid, url_level, "40", weather
                     )
                     async with aiohttp.ClientSession() as session:
                         async with session.get(data_url) as resp:

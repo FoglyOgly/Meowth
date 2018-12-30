@@ -988,7 +988,7 @@ class RaidCog(Cog):
                             'weather': weather,
                             'fast_move': boss_fast,
                             'charge_move': boss_charge,
-                            'estimator_20': estimator,
+                            'estimator_20': estimator_20,
                             'estimator_min': estimator_min
                         }
                         ctr_index = 1

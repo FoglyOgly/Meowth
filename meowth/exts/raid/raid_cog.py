@@ -1004,7 +1004,8 @@ class RaidCog(Cog):
                         ctrs_data_list.append(moveset_dict)
         
         insert = data_table.insert().rows(ctrs_data_list)
-        return await insert.commit(do_update=True)
+        await insert.commit(do_update=True)
+        return await ctx.send("Counters update successful")
 
 
 class RaidEmbed():

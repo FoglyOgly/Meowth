@@ -1380,6 +1380,8 @@ class RaidEmbed():
         grps_str = raid.grps_str
         if grps_str:
             fields['Groups'] = grps_str
+        else:
+            fields['Groups'] = ""
         embed = formatters.make_embed(icon=RaidEmbed.raid_icon, title=directions_text, # msg_colour=color,
             title_url=directions_url, thumbnail=img_url, fields=fields, footer="Ending",
             footer_icon=RaidEmbed.footer_icon)

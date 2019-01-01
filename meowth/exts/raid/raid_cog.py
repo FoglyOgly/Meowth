@@ -1380,7 +1380,8 @@ class RaidEmbed():
         rec = await raid.rec_group_size()
         fields['Recommended Group Size'] = str(rec)
         grps_str = raid.grps_str
-        fields['Groups'] = grps_str
+        if grps_str:
+            fields['Groups'] = grps_str
         embed = formatters.make_embed(icon=RaidEmbed.raid_icon, title=directions_text, # msg_colour=color,
             title_url=directions_url, thumbnail=img_url, fields=fields, footer="Ending",
             footer_icon=RaidEmbed.footer_icon)

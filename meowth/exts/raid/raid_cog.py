@@ -156,7 +156,7 @@ class Raid():
     @property
     def grps_str(self):
         grps_str = []
-        groups = raid.group_list
+        groups = self.group_list
         if groups:
             for group in groups:
                 emoji = group['emoji']

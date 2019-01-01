@@ -74,6 +74,21 @@ class MeowthUser:
         here = await data.get_value()
         return here
     
+    async def has_rsvp(self, raid_id):
+        intlist = await self.interested_list()
+        if raid_id in intlist:
+            return True
+        coming = await self.coming()
+        if raid_id == coming:
+            return True
+        here = await self.here()
+        if raid_id == here:
+            return True
+        lobby = await self.lobby()
+        if raid_id == lobby:
+            return True
+        return False
+    
     async def lobby(self):
         data = self._data
         data.select('lobby')

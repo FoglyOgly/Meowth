@@ -18,6 +18,7 @@ import time
 from datetime import timezone, datetime
 from copy import deepcopy
 import re
+from string import ascii_lowercase
 
 
 class RaidBoss(Pokemon):
@@ -63,6 +64,7 @@ class Raid():
             self.end = end
             self.hatch = hatch
         self.trainer_dict = {}
+        self.group_list = []
     
     @property
     def status(self):
@@ -79,6 +81,7 @@ class Raid():
     def react_list(self):
         boss_reacts = formatters.mc_emoji(len(self.boss_list))
         status_reacts = self.bot.config.emoji.values()
+        grp_reacts = [x['emoji'] for x in self.group_list]
         if self.status == 'egg':
             if len(self.boss_list) == 1:
                 react_list = status_reacts
@@ -90,6 +93,7 @@ class Raid():
             react_list = status_reacts
         else:
             return None
+        react_list = react_list + grp_reacts
         return react_list
 
     @property
@@ -148,6 +152,20 @@ class Raid():
             boss_names.append(f"{name} {type_emoji}: **{interest}**")
         boss_list_str = "\n".join(boss_names)
         return boss_list_str
+    
+    @property
+    def grps_str(self):
+        grps_str = []
+            groups = raid.group_list
+            if groups:
+                for group in groups:
+                    emoji = group['emoji']
+                    time = str(group['starttime'])
+                    est = self.grp_est_power(group)
+                    grp_str = f"{emoji}: {time}"
+                    grp_str += f"Estimated Power: {est}"
+                    grps_str.append(grp_str)
+                return "\n".join(grps_str)
     
     @property
     def pokebattler_url(self):
@@ -215,6 +233,11 @@ class Raid():
             emoji = str(payload.emoji)
         if emoji not in self.react_list:
             return
+        if isinstance(emoji, str):
+            if emoji.startswith(':regional_indicator'):
+                for group in self.group_list:
+                    if emoji == group['emoji']:
+                        return await self.join_grp(user, group)
         if self.status == 'egg':
             new_status = 'maybe'
             i = self.react_list.index(emoji)
@@ -238,14 +261,57 @@ class Raid():
                 bluecount=bluecount, yellowcount=yellowcount, 
                 redcount=redcount, unknowncount=unknowncount)
     
-    async def on_command(self, ctx):
-        if ctx.command.name != 'counters':
+    async def on_command_completion(self, ctx):
+        if ctx.command.name not in ('counters', 'starttime'):
             return
         if str(ctx.channel.id) not in self.channel_ids:
             return
-        meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
-        embed = await self.counters_embed(meowthuser)
-        return await ctx.author.send(embed=embed)
+        if ctx.command.name == 'counters':
+            meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
+            embed = await self.counters_embed(meowthuser)
+            if not embed:
+                return await ctx.author.send("You likely have better counters than the ones in your Pokebattler Pokebox! Please update your Pokebox!")
+            await ctx.author.send(embed=embed)
+        elif ctx.command.name == 'group':
+            group_table = ctx.bot.dbi.table('raid_groups')
+            insert = group_table.insert()
+            num_current_groups = len(self.group_list)
+            letter = ascii_lowercase[num_current_groups]
+            emoji = f':regional_indicator_{letter}:'
+            time = ctx.args[0]
+            if time.isdigit():
+                stamp = time.time() + int(time)*60
+                if stamp > self.end:
+                    raise
+                elif self.hatch and stamp < self.hatch:
+                    raise
+                d = {
+                    'raid_id': self.id,
+                    'emoji': emoji,
+                    'starttime': stamp,
+                }
+                insert.row(**d)
+                await insert.commit()
+                d['users'] = {}
+                d['est_power'] = 0
+                self.group_list.append(d)
+                for idstring in self.message_ids:
+                    chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+                    has_embed = False
+                    if not has_embed:
+                        if self.status == 'active':
+                            raid_embed = RaidEmbed(msg.embeds[0])
+                            raid_embed.grps_str = self.grps_str
+                            embed = raid_embed.embed
+                            has_embed = True
+                        elif self.status == 'egg':
+                            egg_embed = EggEmbed(msg.embeds[0])
+                            egg_embed.grps_str = self.grps_str
+                            embed = egg_embed.embed
+                            has_embed = True
+                    await msg.edit(embed=embed)
+                    await msg.add_reaction(emoji)
+                
 
     def _rsvp(self, connection, pid, channel, payload):
         if channel != f'rsvp_{self.id}':
@@ -255,8 +321,50 @@ class Raid():
         event_loop = asyncio.get_event_loop()
         event_loop.create_task(self.update_rsvp(user_id, status))
     
+    async def join_grp(self, user_id, group):
+        group_table = self.bot.dbi.table('raid_groups')
+        insert = group_table.insert()
+        old_query = group_table.query()
+        old_query.where(raid_id=self.id)
+        old_query.where(group_table['users'].contains_(user_id))
+        old_grp = await old_query.get()
+        if old_grp:
+            old_grp['users'].remove(user_id)
+            insert.row(old_grp)
+        group['users'].append(user_id)
+        insert.row(group)
+        await insert.commit(do_update=True)
+    
+    async def update_grps(self, user_id, group):
+        self.group_list = await self.get_grp_list()
+        has_embed = False
+        for idstring in self.message_ids:
+            chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+            if not has_embed:
+                if self.status == 'active':
+                    raid_embed = RaidEmbed(msg.embeds[0])
+                    raid_embed.grps_str = self.grps_str
+                    embed = raid_embed.embed
+                    has_embed = True
+                elif self.status == 'egg':
+                    egg_embed = EggEmbed(msg.embeds[0])
+                    egg_embed.grps_str = self.grps_str
+                    embed = egg_embed.embed
+                    has_embed = True
+            await msg.edit(embed=embed)
+        if self.channel_ids and self.status != 'egg':
+            for chnid in self.channel_ids:
+                rsvpembed = RSVPEmbed.from_raidgroup(self, group).embed
+                guild = self.bot.get_guild(self.guild_id)
+                member = guild.get_member(user_id)
+                chn = self.bot.get_channel(int(chnid))
+                content = f"{member.display_name} has joined Group {group['emoji']}!"
+                newmsg = await chn.send(content, embed=rsvpembed)
+
     async def update_rsvp(self, user_id, status):
         self.trainer_dict = await self.get_trainer_dict()
+        estimator_20 = await self.estimator_20()
+        self.trainer_dict[user_id]['est_power'] = self.trainer_dict[user_id]['total'] / estimator_20
         has_embed = False
         for idstring in self.message_ids:
             chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
@@ -422,6 +530,22 @@ class Raid():
         estimator = await self.estimator_min()
         return ceil(estimator)
     
+    def user_est_power(self, user_id):
+        trainer_dict = self.trainer_dict.get(user_id)
+        if trainer_dict:
+            est_power = trainer_dict.get('est_power')
+            return est_power
+        else:
+            return 0
+    
+    def grp_est_power(self, group):
+        est = 0
+        users = group['users']
+        for user in users:
+            est_power = self.user_est_power(user)
+            est += est_power
+        return est
+
     async def user_counters_data(self, user: MeowthUser):
         pkmnid = self.pkmn.id
         level = self.level
@@ -447,19 +571,25 @@ class Raid():
         boss_charge = self.pkmn.chargeMoveid
         if not (boss_fast and boss_charge):
             ctrs = data['randomMove']['defenders'][-6:]
+            estimator = data['randomMove']['total']['estimator']
         elif (boss_fast and boss_charge):
             for moveset in data['byMove']:
                 if moveset['move1'] == boss_fast and moveset['move2'] == boss_charge:
                     ctrs = moveset['defenders'][-6:]
+                    estimator = moveset['total']['estimator']
                 else:
                     continue
         else:
             for moveset in data['byMove']:
                 if moveset['move2'] == boss_charge or moveset['move1'] == boss_fast:
                     ctrs = moveset['defenders'][-6:]
+                    estimator = moveset['total']['estimator']
                 else:
                     continue
         ctrs_list = []
+        est_20 = await self.estimator_20()
+        if estimator > est_20:
+            return []
         for ctr in reversed(ctrs):
             ctrid = ctr['pokemonId']
             ctr_nick = ctr.get('name')
@@ -475,6 +605,13 @@ class Raid():
             if ctr_nick:
                 counter.nick = ctr_nick
             ctrs_list.append(counter)
+        has_rsvp = await user.has_rsvp(self.id)
+        if has_rsvp:
+            total = self.trainer_dict[user.user.id]['total']
+            user_power = 1 / estimator
+            extra_power = (total - 1) / est_20
+            calc_power = user_power + extra_power
+            self.trainer_dict[user.user.id]['est_power'] = calc_power
         return ctrs_list
 
 
@@ -482,7 +619,10 @@ class Raid():
         return (await EggEmbed.from_raid(self)).embed
     
     async def counters_embed(self, user):
-        return (await CountersEmbed.from_raid(user, self)).embed
+        countersembed = await CountersEmbed.from_raid(user, self)
+        if not countersembed:
+            return None
+        return countersembed.embed
     
     async def hatched_embed(self):
         raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png'
@@ -684,6 +824,71 @@ class Raid():
         team_str += f"{self.bot.config.team_emoji['valor']}: {team_dict['valor']} | "
         team_str += f"{self.bot.config.team_emoji['unknown']}: {team_dict['unknown']}"
         return team_str
+    
+    def grp_status_dict(self, group):
+        d = {
+            'maybe': 0,
+            'coming': 0,
+            'here': 0,
+            'lobby': 0
+        }
+        trainer_dict = self.trainer_dict
+        for trainer in group['users']:
+            total = trainer_dict[trainer]['total']
+            status = trainer_dict[trainer]['status']
+            d[status] += total
+        return d
+    
+    def grp_status_str(self, group):
+        status_dict = self.grp_status_dict(group)
+        status_str = f"{self.bot.config.emoji['maybe']}: {status_dict['maybe']} | "
+        status_str += f"{self.bot.config.emoji['coming']}: {status_dict['coming']} | "
+        status_str += f"{self.bot.get_emoji(self.bot.config.emoji['here'])}: {status_dict['here']}"
+        return status_str
+    
+    def grp_team_dict(self, group):
+        d = {
+            'mystic': 0,
+            'instinct': 0,
+            'valor': 0,
+            'unknown': 0
+        }
+        trainer_dict = self.trainer_dict
+        for trainer in group['users']:
+            bluecount = trainer_dict[trainer]['bluecount']
+            yellowcount = trainer_dict[trainer]['yellowcount']
+            redcount = trainer_dict[trainer]['redcount']
+            unknowncount = trainer_dict[trainer]['unknowncount']
+            d['mystic'] += bluecount
+            d['instinct'] += yellowcount
+            d['valor'] += redcount
+            d['unknown'] += unknowncount
+        return d
+    
+    def grp_team_str(self, group):
+        team_dict = self.grp_team_dict(group)
+        team_str = f"{self.bot.config.team_emoji['mystic']}: {team_dict['mystic']} | "
+        team_str += f"{self.bot.config.team_emoji['instinct']}: {team_dict['instinct']} | "
+        team_str += f"{self.bot.config.team_emoji['valor']}: {team_dict['valor']} | "
+        team_str += f"{self.bot.config.team_emoji['unknown']}: {team_dict['unknown']}"
+        return team_str
+
+    async def get_grp_list(self):
+        group_list = []
+        group_table = self.bot.dbi.table('raid_groups')
+        query = group_table.query()
+        query.where(raid_id=self.id)
+        grp_data = await query.get()
+        for rcrd in grp_data:
+            grp = {
+                'emoji': rcrd['emoji'],
+                'starttime': rcrd.get('starttime'),
+                'users': rcrd.get('users', []),
+                'est_power': rcrd['est_power']
+            }
+            group_list.append(grp)
+        return group_list
+
 
     async def get_trainer_dict(self):
         def data(rcrd):
@@ -745,6 +950,7 @@ class Raid():
         raid.message_ids = data.get('messages')
         raid.id = data['id']
         raid.trainer_dict = await raid.get_trainer_dict()
+        raid.group_list = await raid.get_grp_list()
         if listen:
             bot.add_listener(raid.on_raw_reaction_add)
         return raid
@@ -913,6 +1119,10 @@ class RaidCog(Cog):
     async def counters(self, ctx):
         pass
         
+    @command()
+    @raid_checks.raid_channel()
+    async def group(self, ctx, time):
+        pass
     
     @command()
     @checks.is_co_owner()
@@ -1025,6 +1235,8 @@ class RaidEmbed():
     status_index = 6
     team_index = 7
     ctrs_index = 8
+    rec_index = 9
+    group_index = 10
 
     def set_boss(self, boss_dict):
         name = boss_dict['name']
@@ -1068,6 +1280,22 @@ class RaidEmbed():
     @team_str.setter
     def team_str(self, team_str):
         self.embed.set_field_at(RaidEmbed.team_index, name="Team List", value=team_str)
+
+    @property
+    def rec_str(self):
+        return self.embed.fields[RaidEmbed.rec_index].value
+    
+    @rec_str.setter
+    def rec_str(self, rec_str):
+        self.embed.set_field_at(RaidEmbed.rec_index, name="Recommended Group Size", value=rec_str)
+    
+    @property
+    def grps_str(self):
+        return self.embed.fields[RaidEmbed.group_index].value
+    
+    @grps_str.setter
+    def grps_str(self, grps_str):
+        self.embed.set_field_at(RaidEmbed.group_index, name="Groups", value=grps_str)
 
 
 
@@ -1149,6 +1377,10 @@ class RaidEmbed():
             i += 1
         ctrs_str.append(f'[Results courtesy of Pokebattler](https://www.pokebattler.com/raids/{boss.id})')
         fields['<:pkbtlr:512707623812857871> Counters'] = "\n".join(ctrs_str)
+        rec = await raid.rec_group_size()
+        fields['Recommended Group Size'] = str(rec)
+        grps_str = raid.grps_str
+        fields['Groups'] = grps_str
         embed = formatters.make_embed(icon=RaidEmbed.raid_icon, title=directions_text, # msg_colour=color,
             title_url=directions_url, thumbnail=img_url, fields=fields, footer="Ending",
             footer_icon=RaidEmbed.footer_icon)
@@ -1176,11 +1408,11 @@ class RSVPEmbed():
     
     @property
     def team_str(self):
-        return self.embed.fields[RaidEmbed.team_index].value
+        return self.embed.fields[RSVPEmbed.team_index].value
     
     @team_str.setter
     def team_str(self, team_str):
-        self.embed.set_field_at(RaidEmbed.team_index, name="Team List", value=team_str)
+        self.embed.set_field_at(RSVPEmbed.team_index, name="Team List", value=team_str)
     
     @classmethod
     def from_raid(cls, raid: Raid):
@@ -1198,6 +1430,27 @@ class RSVPEmbed():
         }
 
         embed = formatters.make_embed(icon=RSVPEmbed.raid_icon, title="Current RSVP Totals",
+            fields=fields, footer="Ending", footer_icon=RSVPEmbed.footer_icon)
+        embed.timestamp = enddt
+        return cls(embed)
+    
+    @classmethod
+    def from_raidgroup(cls, raid: Raid, group):
+        bot = raid.bot
+        end = raid.end
+        enddt = datetime.fromtimestamp(end)
+
+        status_str = raid.grp_status_str(group)
+        team_str = raid.grp_team_str(group)
+        est = raid.grp_est_power(group)
+
+        fields = {
+            "Status List": status_str,
+            "Team List": team_str,
+            "Estimated Power": str(est)
+        }
+        
+        embed = formatters.make_embed(icon=RSVPEmbed.raid_icon, title="Current Group RSVP Totals",
             fields=fields, footer="Ending", footer_icon=RSVPEmbed.footer_icon)
         embed.timestamp = enddt
         return cls(embed)
@@ -1325,6 +1578,8 @@ class CountersEmbed():
             cp_str += " (Boosted)"
         img_url = await boss.sprite_url()
         ctrs_list = await raid.user_counters_data(user)
+        if not ctrs_list:
+            return None
         fields = {
             "Boss": f"{name} {type_emoji}",
             "Weather": f"{weather_name} {weather_emoji}",

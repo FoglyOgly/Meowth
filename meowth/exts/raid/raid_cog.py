@@ -156,16 +156,16 @@ class Raid():
     @property
     def grps_str(self):
         grps_str = []
-            groups = raid.group_list
-            if groups:
-                for group in groups:
-                    emoji = group['emoji']
-                    time = str(group['starttime'])
-                    est = self.grp_est_power(group)
-                    grp_str = f"{emoji}: {time}"
-                    grp_str += f"Estimated Power: {est}"
-                    grps_str.append(grp_str)
-                return "\n".join(grps_str)
+        groups = raid.group_list
+        if groups:
+            for group in groups:
+                emoji = group['emoji']
+                time = str(group['starttime'])
+                est = self.grp_est_power(group)
+                grp_str = f"{emoji}: {time}"
+                grp_str += f"Estimated Power: {est}"
+                grps_str.append(grp_str)
+            return "\n".join(grps_str)
     
     @property
     def pokebattler_url(self):

@@ -80,7 +80,7 @@ class Raid():
     @property
     def react_list(self):
         boss_reacts = formatters.mc_emoji(len(self.boss_list))
-        status_reacts = self.bot.config.emoji.values()
+        status_reacts = list(self.bot.config.emoji.values())
         grp_reacts = [x['emoji'] for x in self.group_list]
         if self.status == 'egg':
             if len(self.boss_list) == 1:

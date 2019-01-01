@@ -262,7 +262,7 @@ class Raid():
                 redcount=redcount, unknowncount=unknowncount)
     
     async def on_command_completion(self, ctx):
-        if ctx.command.name not in ('counters', 'starttime'):
+        if ctx.command.name not in ('counters', 'group'):
             return
         if str(ctx.channel.id) not in self.channel_ids:
             return
@@ -588,8 +588,6 @@ class Raid():
                     continue
         ctrs_list = []
         est_20 = await self.estimator_20()
-        if estimator > est_20:
-            return []
         for ctr in reversed(ctrs):
             ctrid = ctr['pokemonId']
             ctr_nick = ctr.get('name')

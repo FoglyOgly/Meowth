@@ -278,9 +278,9 @@ class Raid():
             num_current_groups = len(self.group_list)
             letter = ascii_lowercase[num_current_groups]
             emoji = f':regional_indicator_{letter}:'
-            time = ctx.args[2]
-            if time.isdigit():
-                stamp = time.time() + int(time)*60
+            grptime = ctx.args[2]
+            if grptime.isdigit():
+                stamp = time.time() + int(grptime)*60
                 if stamp > self.end:
                     raise
                 elif self.hatch and stamp < self.hatch:

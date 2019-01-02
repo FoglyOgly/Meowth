@@ -273,11 +273,13 @@ class Raid():
                 return await ctx.author.send("You likely have better counters than the ones in your Pokebattler Pokebox! Please update your Pokebox!")
             await ctx.author.send(embed=embed)
         elif ctx.command.name == 'group':
+            emoji_list = ['🇦','🇧','🇨','🇩','🇪','🇫','🇬','🇭','🇮','🇯','🇰','🇱',
+              	'🇲','🇳','🇴','🇵','🇶','🇷','🇸','🇹','🇺','🇻','🇼','🇽','🇾','🇿'
+            ]
             group_table = ctx.bot.dbi.table('raid_groups')
             insert = group_table.insert()
             num_current_groups = len(self.group_list)
-            letter = ascii_lowercase[num_current_groups]
-            emoji = f':regional_indicator_{letter}:'
+            emoji = emoji_list[num_current_groups]
             grptime = ctx.args[2]
             if grptime.isdigit():
                 stamp = time.time() + int(grptime)*60

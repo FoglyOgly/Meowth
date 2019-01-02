@@ -333,9 +333,9 @@ class Raid():
         old_grp = await old_query.get()
         if old_grp:
             old_grp['users'].remove(user_id)
-            insert.row(old_grp)
+            insert.row(**old_grp)
         group['users'].append(user_id)
-        insert.row(group)
+        insert.row(**group)
         await insert.commit(do_update=True)
     
     async def update_grps(self, user_id, group):

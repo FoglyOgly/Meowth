@@ -330,8 +330,9 @@ class Raid():
         old_query = group_table.query()
         old_query.where(raid_id=self.id)
         old_query.where(group_table['users'].contains_(user_id))
-        old_grp = (await old_query.get())[0]
+        old_grp = await old_query.get()
         if old_grp:
+            old_grp = old_grp[0]
             old_grp['users'].remove(user_id)
             insert.row(**old_grp)
         group['users'].append(user_id)

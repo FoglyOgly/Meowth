@@ -333,11 +333,14 @@ class Raid():
         old_grp = await old_query.get()
         if old_grp:
             old_grp = old_grp[0]
+            if old_grp['emoji'] == group['emoji']:
+                return
             old_grp['users'].remove(user_id)
             insert.row(**old_grp)
         group['users'].append(user_id)
         insert.row(**group)
         await insert.commit(do_update=True)
+        await self.update_grps(user_id, group)
     
     async def update_grps(self, user_id, group):
         self.group_list = await self.get_grp_list()

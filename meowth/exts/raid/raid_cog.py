@@ -295,7 +295,7 @@ class Raid():
                 }
                 insert.row(**d)
                 await insert.commit()
-                d['users'] = {}
+                d['users'] = []
                 d['est_power'] = 0
                 self.group_list.append(d)
                 for idstring in self.message_ids:

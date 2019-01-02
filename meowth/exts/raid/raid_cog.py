@@ -240,8 +240,8 @@ class Raid():
             if emoji in emoji_letters:
                 for group in self.group_list:
                     if emoji == group['emoji']:
-                        await message.remove_reaction(emoji, payload.user_id)
-                        return await self.join_grp(user, group)
+                        await message.remove_reaction(emoji, user)
+                        return await self.join_grp(payload.user_id, group)
         if self.status == 'egg':
             new_status = 'maybe'
             i = self.react_list.index(emoji)

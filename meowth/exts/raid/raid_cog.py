@@ -20,6 +20,9 @@ from copy import deepcopy
 import re
 from string import ascii_lowercase
 
+emoji_letters = ['🇦','🇧','🇨','🇩','🇪','🇫','🇬','🇭','🇮','🇯','🇰','🇱',
+    '🇲','🇳','🇴','🇵','🇶','🇷','🇸','🇹','🇺','🇻','🇼','🇽','🇾','🇿'
+]
 
 class RaidBoss(Pokemon):
 
@@ -234,7 +237,7 @@ class Raid():
         if emoji not in self.react_list:
             return
         if isinstance(emoji, str):
-            if emoji.startswith(':regional_indicator'):
+            if emoji in emoji_letters:
                 for group in self.group_list:
                     if emoji == group['emoji']:
                         return await self.join_grp(user, group)
@@ -273,13 +276,10 @@ class Raid():
                 return await ctx.author.send("You likely have better counters than the ones in your Pokebattler Pokebox! Please update your Pokebox!")
             await ctx.author.send(embed=embed)
         elif ctx.command.name == 'group':
-            emoji_list = ['🇦','🇧','🇨','🇩','🇪','🇫','🇬','🇭','🇮','🇯','🇰','🇱',
-              	'🇲','🇳','🇴','🇵','🇶','🇷','🇸','🇹','🇺','🇻','🇼','🇽','🇾','🇿'
-            ]
             group_table = ctx.bot.dbi.table('raid_groups')
             insert = group_table.insert()
             num_current_groups = len(self.group_list)
-            emoji = emoji_list[num_current_groups]
+            emoji = emoji_letters[num_current_groups]
             grptime = ctx.args[2]
             if grptime.isdigit():
                 stamp = time.time() + int(grptime)*60

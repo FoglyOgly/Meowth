@@ -158,7 +158,9 @@ class Raid():
     
     @property
     def grps_str(self):
-        grps_str = []
+        ungrp = self.ungrp
+        ungrp_est = self.grp_est_power(ungrp)
+        grps_str = [f"Ungrouped Trainers Estimated Power: {ungrp_est}"]
         groups = self.group_list
         if groups:
             for group in groups:
@@ -169,6 +171,15 @@ class Raid():
                 grp_str += f"Estimated Power: {est}"
                 grps_str.append(grp_str)
             return "\n".join(grps_str)
+    
+    @property
+    def grpd_users(self):
+        return [x for x in y['users'] for y in self.group_list]
+    
+    @property
+    def ungrp(self):
+        d = {'users': [x for x in self.trainer_dict if x not in self.grpd_users]}
+        return d
     
     @property
     def pokebattler_url(self):
@@ -276,6 +287,7 @@ class Raid():
             if not embed:
                 return await ctx.author.send("You likely have better counters than the ones in your Pokebattler Pokebox! Please update your Pokebox!")
             await ctx.author.send(embed=embed)
+            await self.update_grps()
         elif ctx.command.name == 'group':
             group_table = ctx.bot.dbi.table('raid_groups')
             insert = group_table.insert()
@@ -340,9 +352,9 @@ class Raid():
         group['users'].append(user_id)
         insert.row(**group)
         await insert.commit(do_update=True)
-        await self.update_grps(user_id, group)
+        await self.update_grps(user_id=user_id, group=group)
     
-    async def update_grps(self, user_id, group):
+    async def update_grps(self, user_id=None, group=None):
         self.group_list = await self.get_grp_list()
         has_embed = False
         for idstring in self.message_ids:
@@ -359,19 +371,19 @@ class Raid():
                     embed = egg_embed.embed
                     has_embed = True
             await msg.edit(embed=embed)
-        if self.channel_ids and self.status != 'egg':
-            for chnid in self.channel_ids:
-                rsvpembed = RSVPEmbed.from_raidgroup(self, group).embed
-                guild = self.bot.get_guild(self.guild_id)
-                member = guild.get_member(user_id)
-                chn = self.bot.get_channel(int(chnid))
-                content = f"{member.display_name} has joined Group {group['emoji']}!"
-                newmsg = await chn.send(content, embed=rsvpembed)
+        if user_id and group:
+            if self.channel_ids and self.status != 'egg':
+                for chnid in self.channel_ids:
+                    rsvpembed = RSVPEmbed.from_raidgroup(self, group).embed
+                    guild = self.bot.get_guild(self.guild_id)
+                    member = guild.get_member(user_id)
+                    chn = self.bot.get_channel(int(chnid))
+                    content = f"{member.display_name} has joined Group {group['emoji']}!"
+                    newmsg = await chn.send(content, embed=rsvpembed)
 
     async def update_rsvp(self, user_id, status):
         self.trainer_dict = await self.get_trainer_dict()
         estimator_20 = await self.estimator_20()
-        self.trainer_dict[user_id]['est_power'] = self.trainer_dict[user_id]['total'] / estimator_20
         has_embed = False
         for idstring in self.message_ids:
             chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
@@ -923,6 +935,8 @@ class Raid():
                 status = 'here'
             rcrd_dict['status'] = status
             return trainer, rcrd_dict
+        old_dict = self.trainer_dict
+        est_20 = await self.estimator_20()
         trainer_dict = {}
         user_table = self.bot.dbi.table('users')
         query = user_table.query()
@@ -933,6 +947,13 @@ class Raid():
         rsvp_data = await query.get()
         for rcrd in rsvp_data:
             trainer, rcrd_dict = data(rcrd)
+            old_data = old_dict.get(trainer, {})
+            old_total = old_data.get('total', 0)
+            old_est = old_data.get('est_power', 0)
+            if old_total == rcrd_dict['total'] and old_est:
+                rcrd_dict['est_power'] = old_est
+            else:
+                rcrd_dict['est_power'] = rcrd_dict['total'] / est_20
             trainer_dict[trainer] = rcrd_dict
         return trainer_dict
 

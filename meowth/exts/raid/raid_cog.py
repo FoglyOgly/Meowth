@@ -174,7 +174,7 @@ class Raid():
     
     @property
     def grpd_users(self):
-        return [x for x in y['users'] for y in self.group_list]
+        return [x for y in self.group_list for x in y['users']]
     
     @property
     def ungrp(self):

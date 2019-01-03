@@ -166,7 +166,7 @@ class Raid():
             for group in groups:
                 emoji = group['emoji']
                 time = str(group['starttime'])
-                est = self.grp_est_power(group)
+                est = str(group['est_power'])
                 grp_str = f"{emoji}: {time}"
                 grp_str += f"Estimated Power: {est}"
                 grps_str.append(grp_str)
@@ -304,11 +304,11 @@ class Raid():
                     'raid_id': self.id,
                     'emoji': emoji,
                     'starttime': stamp,
+                    'users': [],
+                    'est_power': 0
                 }
                 insert.row(**d)
                 await insert.commit()
-                d['users'] = []
-                d['est_power'] = 0
                 self.group_list.append(d)
                 for idstring in self.message_ids:
                     chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
@@ -337,6 +337,7 @@ class Raid():
         event_loop.create_task(self.update_rsvp(user_id, status))
     
     async def join_grp(self, user_id, group):
+        user_est = self.user_est_power(user_id)
         group_table = self.bot.dbi.table('raid_groups')
         insert = group_table.insert()
         old_query = group_table.query()
@@ -348,8 +349,10 @@ class Raid():
             if old_grp['emoji'] == group['emoji']:
                 return
             old_grp['users'].remove(user_id)
+            old_grp['est_power'] -= user_est
             insert.row(**old_grp)
         group['users'].append(user_id)
+        group['est_power'] += user_est
         insert.row(**group)
         await insert.commit(do_update=True)
         await self.update_grps(user_id=user_id, group=group)
@@ -1471,7 +1474,7 @@ class RSVPEmbed():
 
         status_str = raid.grp_status_str(group)
         team_str = raid.grp_team_str(group)
-        est = raid.grp_est_power(group)
+        est = group['est_power']
 
         fields = {
             "Status List": status_str,

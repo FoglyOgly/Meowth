@@ -901,7 +901,7 @@ class Raid():
         grp_data = await query.get()
         for rcrd in grp_data:
             grp = {
-                'raid_id': self.id
+                'raid_id': self.id,
                 'emoji': rcrd['emoji'],
                 'starttime': rcrd.get('starttime'),
                 'users': rcrd.get('users', []),

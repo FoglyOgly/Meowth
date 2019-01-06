@@ -84,6 +84,7 @@ class Raid():
     def react_list(self):
         boss_reacts = formatters.mc_emoji(len(self.boss_list))
         status_reacts = list(self.bot.config.emoji.values())
+        status_reacts.append('\u25b6')
         grp_reacts = [x['emoji'] for x in self.group_list]
         if self.status == 'egg':
             if len(self.boss_list) == 1:
@@ -302,6 +303,17 @@ class Raid():
             else:
                 new_bosses = old_bosses
         elif self.status == 'active':
+            if emoji == '\u25b6':
+                if self.trainer_dict[user_id]['status'] == 'here':
+                    grp = self.user_grp(user_id)
+                    if not grp:
+                        grp = self.here_grp
+                    if self.channel_ids:
+                        return await self.start_grp(grp, user, channel=channel)
+                    else:
+                        return await self.start_grp(grp, user)
+                else:
+                    return await message.remove_reaction(emoji, user)
             for k, v in self.bot.config.emoji.items():
                 if v == emoji:
                     new_status = k
@@ -325,37 +337,7 @@ class Raid():
             grp = self.user_grp(ctx.author.id)
             if not grp:
                 grp = self.here_grp
-            if grp:
-                if not self.grp_is_here(grp):
-                    return await ctx.send('Please wait until your whole group is here!')
-                else:
-                    grp_est = self.grp_est_power(grp)
-                    if grp_est < 1:
-                        msg = await ctx.send('Your current group may not be able to win the raid on your own! If you want to go ahead anyway, react to this message with the check mark!')
-                        payload = await formatters.ask(self.bot, [msg], user_list = ctx.author.id)
-                        if not payload or payload.emoji == '❎':
-                            rec_size = await self.rec_group_size()
-                            return await ctx.send(f'The recommended group size for this raid is {rec_size}!')
-                    elif grp_est > 2:
-                        msg = await ctx.send('Your current group could possibly split into smaller groups and still win the raid! If you want to go ahead anyway, react to this message with the check mark!')
-                        payload = await formatters.ask(self.bot, [msg], user_list = ctx.author.id)
-                        if not payload or payload.emoji == '❎':
-                            rec_size = await self.rec_group_size()
-                            return await ctx.send(f'The recommended group size for this raid is {rec_size}!')
-                    grp_others = self.grp_others(grp)
-                    others_est = self.grp_est_power(grp_others)
-                    if others_est < 1:
-                        msg = await ctx.send("The trainers not in this group may not be able to win the raid on their own! Please consider including them. If you want to go ahead anyway, react to this message with the check mark.")
-                        payload = await formatters.ask(self.bot, [msg], user_list = ctx.author.id)
-                        if not payload or payload.emoji == '❎':
-                            return await ctx.send('Thank you for waiting!')
-                    for user in grp['users']:
-                        meowthuser = MeowthUser.from_id(self.bot, user)
-                        name = meowthuser.user.display_name
-                        await meowthuser.rsvp(self.id, "lobby")
-                    await ctx.send(f"Group {grp['emoji']} has entered the lobby!")
-                    await asyncio.sleep(120)
-                    return await ctx.send(f"Group {grp['emoji']} has entered the raid!")
+            return await self.start_grp(grp, ctx.author, channel=ctx.channel)
         elif ctx.command.name == 'counters':
             meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
             embed = await self.counters_embed(meowthuser)
@@ -401,7 +383,62 @@ class Raid():
                             has_embed = True
                     await msg.edit(embed=embed)
                     await msg.add_reaction(emoji)
-                
+    
+    async def start_grp(self, grp, author, channel=None):
+        if not self.grp_is_here(grp):
+            if channel:
+                return await channel.send('Please wait until your whole group is here!')
+        else:
+            if not channel:
+                for user in grp['users']:
+                    meowthuser = MeowthUser.from_id(self.bot, user)
+                    await meowthuser.rsvp(self.id, "lobby")
+                await self.update_rsvp()
+                await asyncio.sleep(120)
+                user_table = self.bot.dbi.table('users')
+                update = user_table.update().where(user_table['id'].in_(grp['users']))
+                update.values({'lobby': None})
+                await update.commit()
+                self.group_list.remove(grp)
+                return await self.update_grps()
+            grp_est = self.grp_est_power(grp)
+            if grp_est < 1:
+                msg = await channel.send('Your current group may not be able to win the raid on your own! If you want to go ahead anyway, react to this message with the check mark!')
+                payload = await formatters.ask(self.bot, [msg], user_list = author.id)
+                if not payload or payload.emoji == '❎':
+                    rec_size = await self.rec_group_size()
+                    return await channel.send(f'The recommended group size for this raid is {rec_size}!')
+            elif grp_est > 2:
+                msg = await channel.send('Your current group could possibly split into smaller groups and still win the raid! If you want to go ahead anyway, react to this message with the check mark!')
+                payload = await formatters.ask(self.bot, [msg], user_list = author.id)
+                if not payload or payload.emoji == '❎':
+                    rec_size = await self.rec_group_size()
+                    return await channel.send(f'The recommended group size for this raid is {rec_size}!')
+            grp_others = self.grp_others(grp)
+            others_est = self.grp_est_power(grp_others)
+            if others_est < 1:
+                msg = await channel.send("The trainers not in this group may not be able to win the raid on their own! Please consider including them. If you want to go ahead anyway, react to this message with the check mark.")
+                payload = await formatters.ask(self.bot, [msg], user_list = author.id)
+                if not payload or payload.emoji == '❎':
+                    return await channel.send('Thank you for waiting!')
+            for user in grp['users']:
+                meowthuser = MeowthUser.from_id(self.bot, user)
+                await meowthuser.rsvp(self.id, "lobby")
+            await self.update_rsvp()
+            for chn in self.channel_ids:
+                chan = self.bot.get_channel(int(chn))
+                await chan.send(f"Group {grp['emoji']} has entered the lobby!")
+            await asyncio.sleep(120)
+            for chn in self.channel_ids:
+                chan = self.bot.get_channel(int(chn))
+                await chan.send(f"Group {grp['emoji']} has entered the raid!")
+            user_table = self.bot.dbi.table('users')
+            update = user_table.update().where(user_table['id'].in_(grp['users']))
+            update.values({'lobby': None})
+            await update.commit()
+            self.group_list.remove(grp)
+            await self.update_grps()
+            return                
 
     def _rsvp(self, connection, pid, channel, payload):
         if channel != f'rsvp_{self.id}':
@@ -409,7 +446,7 @@ class Raid():
         userid, status = payload.split('/')
         user_id = int(userid)
         event_loop = asyncio.get_event_loop()
-        event_loop.create_task(self.update_rsvp(user_id, status))
+        event_loop.create_task(self.update_rsvp(user_id=user_id, status=status))
         event_loop.create_task(self.update_grps())
     
     async def join_grp(self, user_id, group):
@@ -425,10 +462,10 @@ class Raid():
             if old_grp['emoji'] == group['emoji']:
                 return
             old_grp['users'].remove(user_id)
-            old_grp['est_power'] -= user_est
+            old_grp['est_power'] = self.grp_est_power(old_grp)
             insert.row(**old_grp)
         group['users'].append(user_id)
-        group['est_power'] += user_est
+        group['est_power'] = self.grp_est_power(group)
         insert.row(**group)
         await insert.commit(do_update=True)
         await self.update_grps(user_id=user_id, group=group)
@@ -460,7 +497,7 @@ class Raid():
                     content = f"{member.display_name} has joined Group {group['emoji']}!"
                     newmsg = await chn.send(content, embed=rsvpembed)
 
-    async def update_rsvp(self, user_id, status):
+    async def update_rsvp(self, user_id=None, status=None):
         self.trainer_dict = await self.get_trainer_dict()
         estimator_20 = await self.estimator_20()
         has_embed = False
@@ -480,22 +517,23 @@ class Raid():
                     embed = egg_embed.embed
                     has_embed = True
             await msg.edit(embed=embed)
-        if self.channel_ids and self.status != 'egg':
-            for chnid in self.channel_ids:
-                rsvpembed = RSVPEmbed.from_raid(self).embed
-                guild = self.bot.get_guild(self.guild_id)
-                member = guild.get_member(user_id)
-                chn = self.bot.get_channel(int(chnid))
-                if status == 'maybe':
-                    display_status = 'is interested'
-                elif status == 'coming':
-                    display_status = 'is on the way'
-                elif status == 'here':
-                    display_status = 'is at the raid'
-                elif status == 'cancel':
-                    display_status = 'has canceled'
-                content = f"{member.display_name} {display_status}!"
-                newmsg = await chn.send(content, embed=rsvpembed)
+        if user_id and status:
+            if self.channel_ids and self.status != 'egg':
+                for chnid in self.channel_ids:
+                    rsvpembed = RSVPEmbed.from_raid(self).embed
+                    guild = self.bot.get_guild(self.guild_id)
+                    member = guild.get_member(user_id)
+                    chn = self.bot.get_channel(int(chnid))
+                    if status == 'maybe':
+                        display_status = 'is interested'
+                    elif status == 'coming':
+                        display_status = 'is on the way'
+                    elif status == 'here':
+                        display_status = 'is at the raid'
+                    elif status == 'cancel':
+                        display_status = 'has canceled'
+                    content = f"{member.display_name} {display_status}!"
+                    newmsg = await chn.send(content, embed=rsvpembed)
 
         
     

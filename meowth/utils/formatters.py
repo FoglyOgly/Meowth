@@ -150,7 +150,7 @@ def convert_to_bool(argument):
         return None
 
 async def ask(bot, message_list, user_list=None, timeout=60, *, react_list=['✅', '❎']):
-    if user_list and type(user_list) != __builtins__.list:
+    if user_list and type(user_list) != list:
         user_list = [user_list]
     message_id_list = [x.id for x in message_list]
     

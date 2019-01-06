@@ -259,16 +259,24 @@ class MeowthUser:
         intlist = data.get('interested_list', [])
         oldcoming = data.get('coming')
         oldhere = data.get('here')
+        oldlobby = data.get('lobby')
         if status == 'cancel':
             if raid_id in intlist:
                 intlist.remove(raid_id)
                 newcoming = oldcoming
                 newhere = oldhere
+                newlobby = oldlobby
             elif raid_id == oldcoming:
                 newcoming = None
                 newhere = oldhere
+                newlobby = oldlobby
             elif raid_id == oldhere:
                 newhere = None
+                newcoming = oldcoming
+                newlobby = oldlobby
+            elif raid_id == oldlobby:
+                newlobby = None
+                newhere = oldhere
                 newcoming = oldcoming
         elif status == 'maybe':
             if bosses:
@@ -278,25 +286,41 @@ class MeowthUser:
             if raid_id == oldcoming:
                 newcoming = None
                 newhere = oldhere
+                newlobby = oldlobby
             elif raid_id == oldhere:
                 newhere = None
                 newcoming = oldcoming
+                newlobby = oldlobby
+            elif raid_id == oldlobby:
+                newlobby = None
+                newcoming = oldcoming
+                newhere = oldhere
             else:
                 newcoming = oldcoming
                 newhere = oldhere
+                newlobby = oldlobby
         elif status == 'coming':
             if raid_id in intlist:
                 intlist.remove(raid_id)
             newcoming = raid_id
             newhere = None
+            newlobby = None
         elif status == 'here':
             if raid_id in intlist:
                 intlist.remove(raid_id)
             newhere = raid_id
             newcoming = None
+            newlobby = None
+        elif status == 'lobby':
+            if raid_id in intlist:
+                intlist.remove(raid_id)
+            newhere = None
+            newcoming = None
+            newlobby = raid_id
         d['interested_list'] = intlist
         d['coming'] = newcoming
         d['here'] = newhere
+        d['lobby'] = newlobby
         if action == "insert":
             d['id'] = self.user.id
             upsert.row(**d)

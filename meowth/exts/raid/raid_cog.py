@@ -421,7 +421,7 @@ class Raid():
         old_query.where(group_table['users'].contains_(user_id))
         old_grp = await old_query.get()
         if old_grp:
-            old_grp = old_grp[0]
+            old_grp = dict(old_grp[0])
             if old_grp['emoji'] == group['emoji']:
                 return
             old_grp['users'].remove(user_id)

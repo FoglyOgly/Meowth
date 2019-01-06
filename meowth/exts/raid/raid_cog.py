@@ -353,9 +353,9 @@ class Raid():
                         meowthuser = MeowthUser.from_id(self.bot, user)
                         name = meowthuser.user.display_name
                         await meowthuser.rsvp(self.id, "lobby")
-                    await ctx.send(f'Group {grp['emoji']} has entered the lobby!')
+                    await ctx.send(f"Group {grp['emoji']} has entered the lobby!")
                     await asyncio.sleep(120)
-                    return await ctx.send(f'Group {grp['emoji']} has entered the raid!')
+                    return await ctx.send(f"Group {grp['emoji']} has entered the raid!")
         elif ctx.command.name == 'counters':
             meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
             embed = await self.counters_embed(meowthuser)

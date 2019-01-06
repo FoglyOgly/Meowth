@@ -159,7 +159,7 @@ class Raid():
     @property
     def grps_str(self):
         ungrp = self.ungrp
-        ungrp_est = self.grp_est_power(ungrp)
+        ungrp_est = str(ungrp['est_power'])
         grps_str = [f"Ungrouped Trainers Estimated Power: {ungrp_est}"]
         groups = self.group_list
         if groups:
@@ -170,15 +170,55 @@ class Raid():
                 grp_str = f"{emoji}: {time}"
                 grp_str += f"Estimated Power: {est}"
                 grps_str.append(grp_str)
-            return "\n".join(grps_str)
+        return "\n".join(grps_str)
     
     @property
     def grpd_users(self):
         return [x for y in self.group_list for x in y['users']]
     
+    def user_grp(self, user):
+        for grp in self.group_list:
+            if user in grp['users']:
+                return grp
+        return None
+    
+    def grp_is_here(self, grp):
+        for user in grp['users']:
+            status = self.trainer_dict.get(user, {}).get('status')
+            if status != 'here':
+                return False
+        return True
+
     @property
     def ungrp(self):
-        d = {'users': [x for x in self.trainer_dict if x not in self.grpd_users]}
+        d = {'users': []}
+        for x in self.trainer_dict:
+            if x not in self.grpd_users:
+                if self.trainer_dict[x]['status'] in ['coming', 'here']:
+                    d['users'].append(x)
+        d['est_power'] = self.grp_est_power(d)
+        return d
+    
+    def grp_others(self, grp):
+        d = {'users': []}
+        for x in self.trainer_dict:
+            if x not in grp['users']:
+                if self.trainer_dict[x]['status'] in ['coming', 'here']:
+                    d['users'].append(x)
+        d['est_power'] = self.grp_est_power(d)
+        return d
+    
+    @property
+    def coming_grp(self):
+        d = {'users': [x for x in self.trainer_dict if self.trainer_dict[x]['status'] == 'coming']}
+        d['est_power'] = self.grp_est_power(d)
+        return d
+
+    @property
+    def here_grp(self):
+        d = {'users': [x for x in self.trainer_dict if self.trainer_dict[x]['status'] == 'here']}
+        d['est_power'] = self.grp_est_power(d)
+        d['emoji'] = self.bot.config.emoji['here']
         return d
     
     @property
@@ -277,11 +317,46 @@ class Raid():
                 redcount=redcount, unknowncount=unknowncount)
     
     async def on_command_completion(self, ctx):
-        if ctx.command.name not in ('counters', 'group'):
+        if ctx.command.name not in ('counters', 'group', 'starting'):
             return
         if str(ctx.channel.id) not in self.channel_ids:
             return
-        if ctx.command.name == 'counters':
+        if ctx.command.name == 'starting':
+            grp = self.user_grp(ctx.author.id)
+            if not grp:
+                grp = self.here_grp
+            if grp:
+                if not self.grp_is_here(grp):
+                    return await ctx.send('Please wait until your whole group is here!')
+                else:
+                    grp_est = self.grp_est_power(grp)
+                    if grp_est < 1:
+                        msg = await ctx.send('Your current group may not be able to win the raid on your own! If you want to go ahead anyway, react to this message with the check mark!')
+                        payload = await formatters.ask(self.bot, [msg], user_list = ctx.author.id)
+                        if not payload or payload.emoji == '❎':
+                            rec_size = await self.rec_group_size()
+                            return await ctx.send(f'The recommended group size for this raid is {rec_size}!')
+                    elif grp_est > 2:
+                        msg = await ctx.send('Your current group could possibly split into smaller groups and still win the raid! If you want to go ahead anyway, react to this message with the check mark!')
+                        payload = await formatters.ask(self.bot, [msg], user_list = ctx.author.id)
+                        if not payload or payload.emoji == '❎':
+                            rec_size = await self.rec_group_size()
+                            return await ctx.send(f'The recommended group size for this raid is {rec_size}!')
+                    grp_others = self.grp_others(grp)
+                    others_est = self.grp_est_power(grp_others)
+                    if others_est < 1:
+                        msg = await ctx.send("The trainers not in this group may not be able to win the raid on their own! Please consider including them. If you want to go ahead anyway, react to this message with the check mark.")
+                        payload = await formatters.ask(self.bot, [msg], user_list = ctx.author.id)
+                        if not payload or payload.emoji == '❎':
+                            return await ctx.send('Thank you for waiting!')
+                    for user in grp['users']:
+                        meowthuser = MeowthUser.from_id(self.bot, user)
+                        name = meowthuser.user.display_name
+                        await meowthuser.rsvp(self.id, "lobby")
+                    await ctx.send(f'Group {grp['emoji']} has entered the lobby!')
+                    await asyncio.sleep(120)
+                    return await ctx.send(f'Group {grp['emoji']} has entered the raid!')
+        elif ctx.command.name == 'counters':
             meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
             embed = await self.counters_embed(meowthuser)
             if not embed:
@@ -335,6 +410,7 @@ class Raid():
         user_id = int(userid)
         event_loop = asyncio.get_event_loop()
         event_loop.create_task(self.update_rsvp(user_id, status))
+        event_loop.create_task(self.update_grps())
     
     async def join_grp(self, user_id, group):
         user_est = self.user_est_power(user_id)
@@ -1152,6 +1228,11 @@ class RaidCog(Cog):
     @command()
     @raid_checks.raid_channel()
     async def group(self, ctx, time):
+        pass
+    
+    @command()
+    @raid_checks.raid_channel()
+    async def starting(self, ctx):
         pass
     
     @command()

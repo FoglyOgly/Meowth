@@ -304,8 +304,8 @@ class Raid():
                 new_bosses = old_bosses
         elif self.status == 'active':
             if emoji == '\u25b6':
-                if self.trainer_dict[user_id]['status'] == 'here':
-                    grp = self.user_grp(user_id)
+                if self.trainer_dict[payload.user_id]['status'] == 'here':
+                    grp = self.user_grp(payload.user_id)
                     if not grp:
                         grp = self.here_grp
                     if self.channel_ids:

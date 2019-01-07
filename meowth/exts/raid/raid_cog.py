@@ -424,24 +424,24 @@ class Raid():
                     payload = await formatters.ask(self.bot, [msg], user_list = author.id)
                     if not payload or str(payload.emoji) == '❎':
                         return await channel.send('Thank you for waiting!')
-                for user in grp['users']:
-                    meowthuser = MeowthUser.from_id(self.bot, user)
-                    await meowthuser.rsvp(self.id, "lobby")
-                await self.update_rsvp()
-                for chn in self.channel_ids:
-                    chan = self.bot.get_channel(int(chn))
-                    await chan.send(f"Group {grp['emoji']} has entered the lobby!")
-                await asyncio.sleep(120)
-                for chn in self.channel_ids:
-                    chan = self.bot.get_channel(int(chn))
-                    await chan.send(f"Group {grp['emoji']} has entered the raid!")
-                user_table = self.bot.dbi.table('users')
-                update = user_table.update().where(user_table['id'].in_(grp['users']))
-                update.values(lobby=None)
-                await update.commit()
-                self.group_list.remove(grp)
-                await self.update_grps()
-                return                
+            for user in grp['users']:
+                meowthuser = MeowthUser.from_id(self.bot, user)
+                await meowthuser.rsvp(self.id, "lobby")
+            await self.update_rsvp()
+            for chn in self.channel_ids:
+                chan = self.bot.get_channel(int(chn))
+                await chan.send(f"Group {grp['emoji']} has entered the lobby!")
+            await asyncio.sleep(120)
+            for chn in self.channel_ids:
+                chan = self.bot.get_channel(int(chn))
+                await chan.send(f"Group {grp['emoji']} has entered the raid!")
+            user_table = self.bot.dbi.table('users')
+            update = user_table.update().where(user_table['id'].in_(grp['users']))
+            update.values(lobby=None)
+            await update.commit()
+            self.group_list.remove(grp)
+            await self.update_grps()
+            return                
 
     def _rsvp(self, connection, pid, channel, payload):
         if channel != f'rsvp_{self.id}':

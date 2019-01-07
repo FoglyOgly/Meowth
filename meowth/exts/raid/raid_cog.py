@@ -459,7 +459,7 @@ class Raid():
                     backoutload = await formatters.ask(self.bot, [backoutmsg], timeout=starttime-time.time())
                     if backoutload and str(backoutload.emoji) == '✅':
                         for user in grp['users']:
-                            meowthuser = MeowthUser.from_id(self.bot, user_id)
+                            meowthuser = MeowthUser.from_id(self.bot, user)
                             await meowthuser.rsvp(self.id, "here")
                         for chn in self.channel_ids:
                             chan = self.bot.get_channel(int(chn))

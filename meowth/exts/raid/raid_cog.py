@@ -437,7 +437,7 @@ class Raid():
                     await chan.send(f"Group {grp['emoji']} has entered the raid!")
                 user_table = self.bot.dbi.table('users')
                 update = user_table.update().where(user_table['id'].in_(grp['users']))
-                update.values({'lobby': None})
+                update.values(lobby=None)
                 await update.commit()
                 self.group_list.remove(grp)
                 await self.update_grps()

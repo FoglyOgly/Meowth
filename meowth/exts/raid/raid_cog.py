@@ -428,19 +428,53 @@ class Raid():
                 meowthuser = MeowthUser.from_id(self.bot, user)
                 await meowthuser.rsvp(self.id, "lobby")
             await self.update_rsvp()
+            await self.update_grps()
+            msg_list = []
             for chn in self.channel_ids:
                 chan = self.bot.get_channel(int(chn))
-                await chan.send(f"Group {grp['emoji']} has entered the lobby!")
-            await asyncio.sleep(120)
-            for chn in self.channel_ids:
-                chan = self.bot.get_channel(int(chn))
-                await chan.send(f"Group {grp['emoji']} has entered the raid!")
+                lobbymsg = await chan.send(f"Group {grp['emoji']} has entered the lobby! You can join them by reacting with ▶, or ask them to backout with ⏸!")
+                msg_list.append(lobbymsg)
+            starttime = time.time() + 120
+            while time.time() < starttime:
+                payload = await formatters.ask(self.bot, msg_list, timeout=starttime-time.time(), react_list=['▶','⏸'])
+                if payload and str(payload.emoji) == '▶':
+                    user_id = payload.user_id
+                    react_channel = self.bot.get_channel(payload.channel_id)
+                    if self.trainer_dict[user_id]['status'] != 'here':
+                        await react_channel.send('You must be at the raid to join the lobby!')
+                        continue
+                    grp['users'].append(user_id)
+                    meowthuser = MeowthUser.from_id(self.bot, user_id)
+                    await meowthuser.rsvp(self.id, "lobby")
+                    await self.update_rsvp()
+                    await self.update_grps()
+                    continue
+                elif payload and str(payload.emoji) == '⏸':
+                    mention_str = ""
+                    for user in grp['users']:
+                        meowthuser = MeowthUser.from_id(user)
+                        mention = meowthuser.user.mention + " "
+                        mention_str += mention
+                    backoutmsg = await channel.send(f'{mention_str}A backout has been requested! Please confirm by reacting with ✅')
+                    backoutload = await formatters.ask(self.bot, [backoutmsg], timeout=starttime-time.time())
+                    if backoutload and str(backoutload.emoji) == '✅':
+                        for user in grp['users']:
+                            meowthuser = MeowthUser.from_id(self.bot, user_id)
+                            await meowthuser.rsvp(self.id, "here")
+                        for chn in self.channel_ids:
+                            chan = self.bot.get_channel(int(chn))
+                            return await chan.send(f"Group {grp['emoji']} has backed out! Be sure to thank them!")
+                    else:
+                        continue
+                else:
+                    await lobbymsg.edit(content=f"Group {grp['emoji']} has entered the raid!")
             user_table = self.bot.dbi.table('users')
             update = user_table.update().where(user_table['id'].in_(grp['users']))
             update.values(lobby=None)
             await update.commit()
             self.group_list.remove(grp)
             await self.update_grps()
+            await self.update_rsvp()
             return                
 
     def _rsvp(self, connection, pid, channel, payload):

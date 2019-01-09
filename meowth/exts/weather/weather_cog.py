@@ -52,7 +52,7 @@ class Weather():
         names = await weather_names.query('name').get_values()
         match = fuzzymatch.get_match(names, arg)
         if match[0]:
-            match_query = weather_names.query('weather').where(weather_name=match[0])
+            match_query = weather_names.query('weather').where(name=match[0])
             matched_weather = await match_query.get_value()
             return cls(ctx.bot, matched_weather)
         else:

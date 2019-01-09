@@ -520,6 +520,7 @@ class Raid():
             rec_str = await self.rec_group_size(weather=weather.value)
         elif self.status == 'egg':
             boss_str = await self.boss_list_str(weather=weather.value)
+        has_embed = False
         for idstring in self.message_ids:
             chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
             if not has_embed:

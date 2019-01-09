@@ -337,12 +337,10 @@ class Raid():
         if str(ctx.channel.id) not in self.channel_ids:
             return
         if ctx.command.name == 'moveset':
-            print(ctx.args)
-            print(ctx.kwargs)
             if self.status != 'active':
                 raise
             move1 = ctx.args[2]
-            move2 = ctx.kwargs['move2']
+            move2 = ctx.args[3]
             return await self.set_moveset(move1, move2=move2)
         if ctx.command.name == 'weather':
             weather = ctx.kwargs['weather']

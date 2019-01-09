@@ -507,7 +507,7 @@ class Raid():
             ctrs_str = []
             for ctr in ctrs_list:
                 name = await ctr.name()
-                fast = Move(bot, ctr.quickMoveid)
+                fast = Move(self.bot, ctr.quickMoveid)
                 fast_name = await fast.name()
                 fast_emoji = await fast.emoji()
                 charge = Move(bot, ctr.chargeMoveid)

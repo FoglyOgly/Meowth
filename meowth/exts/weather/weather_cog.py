@@ -48,8 +48,8 @@ class Weather():
     
     @classmethod
     async def convert(cls, ctx, arg):
-        weather_names = ctx.bot.dbi.table('weather_names').query('name')
-        names = await weather_names.get_values()
+        weather_names = ctx.bot.dbi.table('weather_names')
+        names = await weather_names.query('name').get_values()
         match = fuzzymatch.get_match(names, arg)
         if match[0]:
             match_query = weather_names.query('weather').where(weather_name=match[0])

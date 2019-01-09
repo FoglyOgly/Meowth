@@ -832,8 +832,8 @@ class Raid():
                 fast = move2.id
             else:
                 charge = move2.id
-        quick_move = Move(bot, fast) if fast else None
-        charge_move = Move(bot, charge) if charge else None
+        quick_move = Move(self.bot, fast) if fast else None
+        charge_move = Move(self.bot, charge) if charge else None
         self.pkmn.quickMoveid = quick_move.id
         self.pkmn.chargeMoveid = charge_move.id
         if quick_move:
@@ -853,10 +853,10 @@ class Raid():
         ctrs_str = []
         for ctr in ctrs_list:
             name = await ctr.name()
-            fast = Move(bot, ctr.quickMoveid)
+            fast = Move(self.bot, ctr.quickMoveid)
             fast_name = await fast.name()
             fast_emoji = await fast.emoji()
-            charge = Move(bot, ctr.chargeMoveid)
+            charge = Move(self.bot, ctr.chargeMoveid)
             charge_name = await charge.name()
             charge_emoji = await charge.emoji()
             ctr_str = f"**{name}**: {fast_name} {fast_emoji} | {charge_name} {charge_emoji}"

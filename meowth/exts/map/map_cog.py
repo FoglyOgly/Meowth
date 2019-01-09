@@ -148,7 +148,7 @@ class S2_L10():
         update.where(cellid=self.cellid)
         current_hour = datetime.datetime.utcnow().hour % 12
         col = "current_weather"
-        update.values(weather_table[col]=weather)
+        update.values(weather_table[col]==weather)
         await update.commit()
 
     async def get_all_gyms(self):

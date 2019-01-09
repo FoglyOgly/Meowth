@@ -337,6 +337,8 @@ class Raid():
         if str(ctx.channel.id) not in self.channel_ids:
             return
         if ctx.command.name == 'moveset':
+            print(ctx.args)
+            print(ctx.kwargs)
             if self.status != 'active':
                 raise
             move1 = ctx.args[2]

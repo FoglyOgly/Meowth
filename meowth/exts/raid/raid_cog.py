@@ -510,7 +510,7 @@ class Raid():
                 fast = Move(self.bot, ctr.quickMoveid)
                 fast_name = await fast.name()
                 fast_emoji = await fast.emoji()
-                charge = Move(bot, ctr.chargeMoveid)
+                charge = Move(self.bot, ctr.chargeMoveid)
                 charge_name = await charge.name()
                 charge_emoji = await charge.emoji()
                 ctr_str = f"**{name}**: {fast_name} {fast_emoji} | {charge_name} {charge_emoji}"

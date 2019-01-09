@@ -337,6 +337,8 @@ class Raid():
         if str(ctx.channel.id) not in self.channel_ids:
             return
         if ctx.command.name == 'weather':
+            print(ctx.args)
+            print(ctx.kwargs)
             weather = ctx.args[2]
             return await self.correct_weather(weather)
         if ctx.command.name == 'starting':

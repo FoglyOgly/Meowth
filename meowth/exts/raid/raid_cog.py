@@ -134,11 +134,12 @@ class Raid():
         boss_list = self.bot.raid_info.raid_lists[level]
         return boss_list
     
-    async def boss_list_str(self):
+    async def boss_list_str(self, weather=None):
         boss_names = []
         boss_list = self.boss_list
         boss_interest_dict = await self.boss_interest_dict()
-        weather = await self.weather()
+        if not weather:
+            weather = await self.weather()
         weather = Weather(self.bot, weather)
         for i in range(len(boss_list)):
             x = boss_list[i]
@@ -331,10 +332,12 @@ class Raid():
                 redcount=redcount, unknowncount=unknowncount)
     
     async def on_command_completion(self, ctx):
-        if ctx.command.name not in ('counters', 'group', 'starting'):
+        if ctx.command.name not in ('counters', 'group', 'starting', 'weather'):
             return
         if str(ctx.channel.id) not in self.channel_ids:
             return
+        if ctx.command.name == 'weather':
+
         if ctx.command.name == 'starting':
             grp = self.user_grp(ctx.author.id)
             if not grp:
@@ -399,10 +402,10 @@ class Raid():
                 await asyncio.sleep(120)
                 user_table = self.bot.dbi.table('users')
                 update = user_table.update().where(user_table['id'].in_(grp['users']))
-                update.values({'lobby': None})
+                update.values(lobby=None)
                 await update.commit()
                 self.group_list.remove(grp)
-                return await self.update_grps()
+                return await self.update_rsvp()
             grp_est = self.grp_est_power(grp)
             if grp_est < 1:
                 msg = await channel.send('Your current group may not be able to win the raid on your own! If you want to go ahead anyway, react to this message with the check mark!')
@@ -428,7 +431,6 @@ class Raid():
                 meowthuser = MeowthUser.from_id(self.bot, user)
                 await meowthuser.rsvp(self.id, "lobby")
             await self.update_rsvp()
-            await self.update_grps()
             msg_list = []
             for chn in self.channel_ids:
                 chan = self.bot.get_channel(int(chn))
@@ -447,7 +449,6 @@ class Raid():
                     meowthuser = MeowthUser.from_id(self.bot, user_id)
                     await meowthuser.rsvp(self.id, "lobby")
                     await self.update_rsvp()
-                    await self.update_grps()
                     continue
                 elif payload and str(payload.emoji) == '⏸':
                     mention_str = ""
@@ -463,7 +464,9 @@ class Raid():
                             await meowthuser.rsvp(self.id, "here")
                         for chn in self.channel_ids:
                             chan = self.bot.get_channel(int(chn))
-                            return await chan.send(f"Group {grp['emoji']} has backed out! Be sure to thank them!")
+                            await chan.send(f"Group {grp['emoji']} has backed out! Be sure to thank them!")
+                        await self.update_rsvp()
+                        return
                     else:
                         continue
                 else:
@@ -473,7 +476,6 @@ class Raid():
             update.values(lobby=None)
             await update.commit()
             self.group_list.remove(grp)
-            await self.update_grps()
             await self.update_rsvp()
             return                
 
@@ -484,7 +486,54 @@ class Raid():
         user_id = int(userid)
         event_loop = asyncio.get_event_loop()
         event_loop.create_task(self.update_rsvp(user_id=user_id, status=status))
-        event_loop.create_task(self.update_grps())
+    
+    def _weather(self, connection, pid, channel, payload):
+        if not isinstance(self.gym, Gym):
+            return
+        event_loop = asyncio.get_event_loop()
+        event_loop.create_task(self.change_weather(channel, payload))
+    
+    async def change_weather(self, payload):
+        weather = Weather(self.bot, payload)
+        weather_name = await weather.name()
+        emoji = await weather.boosted_emoji_str()
+        weather_str = weather_name + " " + emoji
+        if self.status == 'active':
+            is_boosted = await self.pkmn.is_boosted(weather.value)
+            cp_range = await self.cp_range(weather=weather.value)
+            cp_str = f"{cp_range[0]}-{cp_range[1]}"
+            ctrs_list = await self.generic_counters_data(weather=weather.value)
+            ctrs_str = []
+            for ctr in ctrs_list:
+                name = await ctr.name()
+                fast = Move(bot, ctr.quickMoveid)
+                fast_name = await fast.name()
+                fast_emoji = await fast.emoji()
+                charge = Move(bot, ctr.chargeMoveid)
+                charge_name = await charge.name()
+                charge_emoji = await charge.emoji()
+                ctr_str = f"**{name}**: {fast_name} {fast_emoji} | {charge_name} {charge_emoji}"
+                ctrs_str.append(ctr_str)
+                i += 1
+            ctrs_str.append(f'[Results courtesy of Pokebattler](https://www.pokebattler.com/raids/{boss.id})')
+            ctrs_str = "\n".join(ctrs_str)
+            rec_str = await self.rec_group_size(weather=weather.value)
+        elif self.status == 'egg':
+            boss_str = await self.boss_list_str(weather=weather.value)
+        for idstring in self.message_ids:
+            chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+            if not has_embed:
+                if self.status == 'active':
+                    raid_embed = RaidEmbed(msg.embeds[0])
+                    raid_embed.set_weather(weather_str, cp_str, ctrs_str, rec_str)
+                    embed = raid_embed.embed
+                    has_embed = True
+                elif self.status == 'egg':
+                    egg_embed = EggEmbed(msg.embeds[0])
+                    egg_embed.set_weather(weather_str, boss_list_str)
+                    embed = egg_embed.embed
+                    has_embed = True
+            await msg.edit(embed=embed)
     
     async def join_grp(self, user_id, group):
         user_est = self.user_est_power(user_id)
@@ -571,6 +620,7 @@ class Raid():
                         display_status = 'has canceled'
                     content = f"{member.display_name} {display_status}!"
                     newmsg = await chn.send(content, embed=rsvpembed)
+        await self.update_grps()
 
         
     
@@ -603,13 +653,14 @@ class Raid():
         weather = await gym.weather()
         return weather
     
-    async def is_boosted(self):
-        weather = await self.weather()
+    async def is_boosted(self, weather=None):
+        if not weather:
+            weather = await self.weather()
         pkmn = self.pkmn
         return await pkmn.is_boosted(weather)
     
-    async def cp_range(self):
-        boost = await self.is_boosted()
+    async def cp_range(self, weather=None):
+        boost = await self.is_boosted(weather=weather)
         if boost:
             self.pkmn.lvl = 25
         else:
@@ -624,9 +675,10 @@ class Raid():
         high_cp = await self.pkmn.calculate_cp()
         return [low_cp, high_cp]
     
-    async def generic_counters_data(self):
+    async def generic_counters_data(self, weather=None):
         data_table = self.bot.dbi.table('counters_data')
-        weather = await self.weather()
+        if not weather:
+            weather = await self.weather()
         boss = self.pkmn
         boss_id = boss.id
         level = self.level
@@ -651,9 +703,10 @@ class Raid():
             ctrs_list.append(ctr)
         return ctrs_list
     
-    async def estimator_20(self):
+    async def estimator_20(self, weather=None):
         data_table = self.bot.dbi.table('counters_data')
-        weather = await self.weather()
+        if not weather:
+            weather = await self.weather()
         boss = self.pkmn
         boss_id = boss.id
         level = self.level
@@ -673,9 +726,10 @@ class Raid():
         estimator = query_dict['estimator_20']
         return estimator
     
-    async def estimator_min(self):
+    async def estimator_min(self, weather=None):
         data_table = self.bot.dbi.table('counters_data')
-        weather = await self.weather()
+        if not weather:
+            weather = await self.weather()
         boss = self.pkmn
         boss_id = boss.id
         level = self.level
@@ -695,8 +749,8 @@ class Raid():
         estimator = query_dict['estimator_min']
         return estimator
     
-    async def rec_group_size(self):
-        estimator = await self.estimator_20()
+    async def rec_group_size(self, weather=None):
+        estimator = await self.estimator_20(weather=weather)
         return ceil(estimator)
     
     async def min_group_size(self):
@@ -919,7 +973,14 @@ class Raid():
         await update.commit()
         return await self.update_messages()
 
-    # async def update_weather(self, weather):
+    async def correct_weather(self, weather):
+        if isinstance(self.gym, Gym):
+            await self.gym.correct_weather(weather.value)
+        else:
+            await self.change_weather(weather.value)
+        
+
+        
     
     async def expire_raid(self):
         await self.update_messages()
@@ -1259,6 +1320,9 @@ class RaidCog(Cog):
         loop = asyncio.get_event_loop()
         loop.create_task(new_raid.monitor_status())
         await ctx.bot.dbi.add_listener(f'rsvp_{new_raid.id}', new_raid._rsvp)
+        if isinstance(gym, Gym):
+            cellid = await gym._L10()
+            await ctx.bot.dbi.add_listener(f'weather_{cellid}', new_raid._weather)
     
     @staticmethod
     async def get_raidid(ctx):
@@ -1308,6 +1372,16 @@ class RaidCog(Cog):
     @command()
     @raid_checks.raid_channel()
     async def starting(self, ctx):
+        pass
+    
+    @command()
+    @raid_checks.raid_channel()
+    async def weather(self, ctx, *, weather: Weather):
+        pass
+    
+    @command()
+    @raid_checks.raid_channel()
+    async def moveset(self, ctx):
         pass
     
     @command()
@@ -1441,14 +1515,17 @@ class RaidEmbed():
         self.embed.set_field_at(RaidEmbed.moveset_index, name="Moveset", value=moveset_str)
         return self
     
-    def set_weather(self, weather_str, cp_str, ctrs_str):
+    def set_weather(self, weather_str, cp_str, ctrs_str, rec_str):
         self.embed.set_field_at(RaidEmbed.weather_index, name="Weather", value=weather_str)
         self.embed.set_field_at(RaidEmbed.cp_index, name="CP Range", value=cp_str)
         self.embed.set_field_at(RaidEmbed.ctrs_index, name='<:pkbtlr:512707623812857871> Counters', value=ctrs_str)
+        self.embed.set_field_at(RaidEmbed.rec_index, name="Recommended Group Size", value=rec_str)
         return self
     
-    def set_moveset(self, moveset_str):
+    def set_moveset(self, moveset_str, ctrs_str, rec_str):
         self.embed.set_field_at(RaidEmbed.moveset_index, name="Moveset", value=moveset_str)
+        self.embed.set_field_at(RaidEmbed.ctrs_index, name='<:pkbtlr:512707623812857871> Counters', value=ctrs_str)
+        self.embed.set_field_at(RaidEmbed.rec_index, name="Recommended Group Size", value=rec_str)
         return self
     
     @property

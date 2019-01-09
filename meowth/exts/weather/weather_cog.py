@@ -1,5 +1,6 @@
 from meowth import Cog, command, bot
 from meowth.exts.map import S2_L10
+from meowth.utils import fuzzymatch
 import aiohttp
 import asyncio
 from datetime import datetime
@@ -44,6 +45,18 @@ class Weather():
         phrase_query.select('weather')
         weather = await phrase_query.get_value()
         return cls(bot, weather)
+    
+    @classmethod
+    async def convert(cls, ctx, arg):
+        weather_names = ctx.bot.dbi.table('weather_names').query('name')
+        names = await weather_names.get_values()
+        match = fuzzymatch.get_match(names, arg)
+        if match[0]:
+            match_query = weather_names.query('weather').where(weather_name=match[0])
+            matched_weather = await match_query.get_value()
+            return cls(ctx.bot, matched_weather)
+        else:
+            raise
 
 
 

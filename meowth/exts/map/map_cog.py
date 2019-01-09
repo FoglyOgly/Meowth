@@ -137,10 +137,19 @@ class S2_L10():
     async def weather(self):
         weather_query = self.bot.dbi.table('weather_forecasts').query()
         current_hour = datetime.datetime.utcnow().hour % 12
-        col = f"forecast_{current_hour}"
+        col = "current_weather"
         weather_query.select(col).where(cellid=self.cellid)
         weather = await weather_query.get_value()
         return weather
+    
+    async def correct_weather(self, weather):
+        weather_table = self.bot.dbi.table('weather_forecasts')
+        update = weather_table.update()
+        update.where(cellid=self.cellid)
+        current_hour = datetime.datetime.utcnow().hour % 12
+        col = "current_weather"
+        update.values(weather_table[col]=weather)
+        await update.commit()
 
     async def get_all_gyms(self):
         gyms_table = self.bot.dbi.table('gyms')
@@ -198,6 +207,12 @@ class POI():
         L10 = S2_L10(self.bot, L10id)
         weather = await L10.weather()
         return weather
+    
+    async def correct_weather(self, weather):
+        L10id = await self._L10()
+        L10 = S2_L10(self.bot, L10id)
+        await L10.correct_weather(weather)
+
     
 
 

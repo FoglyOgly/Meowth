@@ -632,6 +632,7 @@ class Move:
         name_list = await names.query('name').get_values()
         match = fuzzymatch.get_match(name_list, arg)
         if match[0]:
+            moves = ctx.bot.dbi.table('moves')
             match_id = await moves.query('moveid').where(name=match[0]).get_first()
             return cls(bot, match_id)
             

@@ -633,7 +633,7 @@ class Move:
         match = fuzzymatch.get_match(name_list, arg)
         if match[0]:
             match_id = await names.query('moveid').where(name=match[0]).get_first()
-            return cls(bot, match_id)
+            return cls(ctx.bot, match_id)
             
             
 

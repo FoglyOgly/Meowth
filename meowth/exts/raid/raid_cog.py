@@ -861,7 +861,7 @@ class Raid():
             charge_emoji = await charge.emoji()
             ctr_str = f"**{name}**: {fast_name} {fast_emoji} | {charge_name} {charge_emoji}"
             ctrs_str.append(ctr_str)
-        ctrs_str.append(f'[Results courtesy of Pokebattler](https://www.pokebattler.com/raids/{boss.id})')
+        ctrs_str.append(f'[Results courtesy of Pokebattler](https://www.pokebattler.com/raids/{self.pkmn.id})')
         ctrs_str = "\n".join(ctrs_str)
         rec = await self.rec_group_size()
         rec_str = str(rec)

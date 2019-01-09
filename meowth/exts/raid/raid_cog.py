@@ -332,19 +332,29 @@ class Raid():
                 redcount=redcount, unknowncount=unknowncount)
     
     async def on_command_completion(self, ctx):
-        if ctx.command.name not in ('counters', 'group', 'starting', 'weather'):
+        if ctx.command.name not in ('counters', 'group', 'starting', 'weather', 'moveset'):
             return
         if str(ctx.channel.id) not in self.channel_ids:
             return
+        if ctx.command.name == 'moveset':
+            if self.status != 'active':
+                raise
+            move1 = ctx.args[2]
+            move2 = ctx.kwargs['move2']
+            return await self.set_moveset(move1, move2=move2)
         if ctx.command.name == 'weather':
             weather = ctx.kwargs['weather']
             return await self.correct_weather(weather)
         if ctx.command.name == 'starting':
+            if self.status != 'active':
+                raise
             grp = self.user_grp(ctx.author.id)
             if not grp:
                 grp = self.here_grp
             return await self.start_grp(grp, ctx.author, channel=ctx.channel)
         elif ctx.command.name == 'counters':
+            if self.status != 'active':
+                raise
             meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
             embed = await self.counters_embed(meowthuser)
             if not embed:
@@ -676,77 +686,47 @@ class Raid():
         high_cp = await self.pkmn.calculate_cp()
         return [low_cp, high_cp]
     
-    async def generic_counters_data(self, weather=None):
+    async def pb_data(self, weather=None):
         data_table = self.bot.dbi.table('counters_data')
         if not weather:
             weather = await self.weather()
         boss = self.pkmn
         boss_id = boss.id
         level = self.level
+        query = data_table.query().select().where(
+            boss_id=boss_id, weather=weather, level=level)
         if boss.quickMoveid:
             fast_move_id = boss.quickMoveid
+            query.where(fast_move=boss.quickMoveid)
         else:
             fast_move_id = 'random'
         if boss.chargeMoveid:
             charge_move_id = boss.chargeMoveid
+            query.where(charge_move=boss.chargeMoveid)
         else:
             charge_move_id = 'random'
-        query = data_table.query().select().where(
-            boss_id=boss_id, weather=weather, level=level,
-            fast_move=fast_move_id, charge_move=charge_move_id)
-        query_dict = (await query.get())[0]
+        if fast_move_id == 'random' and charge_move_id == 'random':
+            query.where(fast_move='random', charge_move='random')
+        return (await query.get())[0]
+    
+    async def generic_counters_data(self, weather=None):
+        data = await self.pb_data(weather=weather)
         ctrs_list = []
         for x in range(1,7):
-            ctrid = query_dict[f'counter_{x}_id']
-            ctrfast = query_dict[f'counter_{x}_fast']
-            ctrcharge = query_dict[f'counter_{x}_charge']
+            ctrid = data[f'counter_{x}_id']
+            ctrfast = data[f'counter_{x}_fast']
+            ctrcharge = data[f'counter_{x}_charge']
             ctr = Pokemon(self.bot, ctrid, quickMoveid=ctrfast, chargeMoveid=ctrcharge)
             ctrs_list.append(ctr)
         return ctrs_list
     
     async def estimator_20(self, weather=None):
-        data_table = self.bot.dbi.table('counters_data')
-        if not weather:
-            weather = await self.weather()
-        boss = self.pkmn
-        boss_id = boss.id
-        level = self.level
-        if boss.quickMoveid:
-            fast_move_id = boss.quickMoveid
-        else:
-            fast_move_id = 'random'
-        if boss.chargeMoveid:
-            charge_move_id = boss.chargeMoveid
-        else:
-            charge_move_id  = 'random'
-        query = data_table.query().select().where(
-            boss_id=boss_id, weather=weather, level=level,
-            fast_move=fast_move_id, charge_move=charge_move_id
-        )
-        query_dict = (await query.get())[0]
-        estimator = query_dict['estimator_20']
+        data = await self.pb_data(weather=weather)
+        estimator = data['estimator_20']
         return estimator
     
     async def estimator_min(self, weather=None):
-        data_table = self.bot.dbi.table('counters_data')
-        if not weather:
-            weather = await self.weather()
-        boss = self.pkmn
-        boss_id = boss.id
-        level = self.level
-        if boss.quickMoveid:
-            fast_move_id = boss.quickMoveid
-        else:
-            fast_move_id = 'random'
-        if boss.chargeMoveid:
-            charge_move_id = boss.chargeMoveid
-        else:
-            charge_move_id  = 'random'
-        query = data_table.query().select().where(
-            boss_id=boss_id, weather=weather, level=level,
-            fast_move=fast_move_id, charge_move=charge_move_id
-        )
-        query_dict = (await query.get())[0]
+        data = await self.pb_data(weather=weather)
         estimator = query_dict['estimator_min']
         return estimator
     
@@ -840,6 +820,61 @@ class Raid():
             self.trainer_dict[user.user.id]['est_power'] = calc_power
         return ctrs_list
 
+    async def set_moveset(self, move1, move2=None):
+        fast = self.pkmn.quickMoveid or None
+        charge = self.pkmn.chargeMoveid or None
+        if await move1._fast():
+            fast = move1.id
+        else:
+            charge = move1.id
+        if move2:
+            if await move2._fast():
+                fast = move2.id
+            else:
+                charge = move2.id
+        quick_move = Move(bot, fast) if fast else None
+        charge_move = Move(bot, charge) if charge else None
+        self.pkmn.quickMoveid = quick_move.id
+        self.pkmn.chargeMoveid = charge_move.id
+        if quick_move:
+            quick_name = await quick_move.name()
+            quick_emoji = await quick_move.emoji()
+        else:
+            quick_name = "Unknown"
+            quick_emoji = ""
+        if charge_move:
+            charge_name = await charge_move.name()
+            charge_emoji = await charge_move.emoji()
+        else:
+            charge_name = "Unknown"
+            charge_emoji = ""
+        moveset_str = f"{quick_name} {quick_emoji}| {charge_name} {charge_emoji}"
+        ctrs_list = await self.generic_counters_data()
+        ctrs_str = []
+        for ctr in ctrs_list:
+            name = await ctr.name()
+            fast = Move(bot, ctr.quickMoveid)
+            fast_name = await fast.name()
+            fast_emoji = await fast.emoji()
+            charge = Move(bot, ctr.chargeMoveid)
+            charge_name = await charge.name()
+            charge_emoji = await charge.emoji()
+            ctr_str = f"**{name}**: {fast_name} {fast_emoji} | {charge_name} {charge_emoji}"
+            ctrs_str.append(ctr_str)
+            i += 1
+        ctrs_str.append(f'[Results courtesy of Pokebattler](https://www.pokebattler.com/raids/{boss.id})')
+        ctrs_str = "\n".join(ctrs_str)
+        rec = await self.rec_group_size()
+        rec_str = str(rec)
+        has_embed = False
+        for idstring in self.message_ids:
+            chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+            if not has_embed:
+                raid_embed = RaidEmbed(msg.embeds[0])
+                raid_embed.set_moveset(moveset_str, ctrs_str, rec_str)
+                embed = raid_embed.embed
+                has_embed = True
+            await msg.edit(embed=embed)
 
     async def egg_embed(self):
         return (await EggEmbed.from_raid(self)).embed
@@ -1382,7 +1417,7 @@ class RaidCog(Cog):
     
     @command()
     @raid_checks.raid_channel()
-    async def moveset(self, ctx):
+    async def moveset(self, ctx, move1: Move, move2: Move=None):
         pass
     
     @command()
@@ -1613,7 +1648,6 @@ class RaidEmbed():
             directions_text += " (EX Raid Gym)"
         resists = await boss.resistances_emoji()
         weaks = await boss.weaknesses_emoji()
-        ctrs_list = await raid.generic_counters_data()
         status_str = raid.status_str
         team_str = raid.team_str
         fields = {
@@ -1627,6 +1661,7 @@ class RaidEmbed():
             "Team List": team_str
         }
         i = 1
+        ctrs_list = await raid.generic_counters_data()
         ctrs_str = []
         for ctr in ctrs_list:
             name = await ctr.name()

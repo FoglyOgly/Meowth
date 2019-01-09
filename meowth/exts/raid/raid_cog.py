@@ -492,7 +492,7 @@ class Raid():
         if not isinstance(self.gym, Gym):
             return
         event_loop = asyncio.get_event_loop()
-        event_loop.create_task(self.change_weather(channel, payload))
+        event_loop.create_task(self.change_weather(payload))
     
     async def change_weather(self, payload):
         weather = Weather(self.bot, payload)

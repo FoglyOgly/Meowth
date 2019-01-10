@@ -273,8 +273,7 @@ class Raid():
         localzone = timezone(zone)
         return datetime.now(tz=localzone)
     
-    @staticmethod
-    def local_datetime(stamp):
+    def local_datetime(self, stamp):
         zone = self.tz
         localzone = timezone(zone)
         return datetime.fromtimestamp(stamp, tz=localzone)

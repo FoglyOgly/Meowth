@@ -163,16 +163,16 @@ class Raid():
     @property
     def grps_str(self):
         ungrp = self.ungrp
-        ungrp_est = str(ungrp['est_power']*100)
+        ungrp_est = str(round(ungrp['est_power']*100)
         grps_str = []
         groups = self.group_list
         if groups:
             for group in groups:
                 emoji = group['emoji']
                 dt = self.local_datetime(group['starttime'])
-                time = dt.strftime('%I:%M %p (%H:%M)')
-                est = str(group['est_power']*100)
-                grp_str = f"{emoji}: {time} ({est}%)"
+                time = dt.strftime('%I:%M %p')
+                est = str(round(group['est_power']*100))
+                grp_str = f"{emoji}: Starting {time} ({est}%)"
                 grps_str.append(grp_str)
         grps_str.append(f"Ungrouped: ({ungrp_est}%)")
         return "\n".join(grps_str)
@@ -1763,7 +1763,7 @@ class RSVPEmbed():
         fields = {
             "Status List": status_str,
             "Team List": team_str,
-            "Estimated Power": str(est)
+            "Boss Damage Estimate": str(round(est*100)) + "%"
         }
         
         embed = formatters.make_embed(icon=RSVPEmbed.raid_icon, title="Current Group RSVP Totals",

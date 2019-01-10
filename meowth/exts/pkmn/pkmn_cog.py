@@ -298,7 +298,7 @@ class Pokemon():
         emoji_string = ''
         i = 0
         for type_tuple in types_sorted:
-            if i == 6:
+            if i == 5:
                 emoji_string += '\n'
             type_ref = self.bot.dbi.table('types').query()
             emoji = await type_ref.select('emoji').where(typeid=type_tuple[0]).get_value()
@@ -319,7 +319,7 @@ class Pokemon():
         emoji_string = ''
         i = 0
         for type_tuple in types_sorted:
-            if i == 6:
+            if i == 5:
                 emoji_string += '\n'
             type_ref = self.bot.dbi.table('types').query()
             emoji = await type_ref.select('emoji').where(typeid=type_tuple[0]).get_value()

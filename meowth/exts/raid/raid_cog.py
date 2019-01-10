@@ -15,7 +15,8 @@ from discord import Embed
 import asyncio
 import aiohttp
 import time
-from datetime import timezone, datetime
+from pytz import timezone
+from datetime import datetime
 from copy import deepcopy
 import re
 from string import ascii_lowercase
@@ -53,7 +54,7 @@ class RaidBoss(Pokemon):
 class Raid():
 
     def __init__(self, bot, guild_id, gym=None, level=None,
-        pkmn: RaidBoss=None, hatch: float=None, end: float=None):
+        pkmn: RaidBoss=None, hatch: float=None, end: float=None, tz: str=None):
         self.bot = bot
         self.guild_id = guild_id
         self.gym = gym
@@ -68,6 +69,7 @@ class Raid():
             self.hatch = hatch
         self.trainer_dict = {}
         self.group_list = []
+        self.tz = tz
     
     @property
     def status(self):
@@ -161,17 +163,18 @@ class Raid():
     @property
     def grps_str(self):
         ungrp = self.ungrp
-        ungrp_est = str(ungrp['est_power'])
-        grps_str = [f"Ungrouped Trainers Estimated Power: {ungrp_est}"]
+        ungrp_est = str(ungrp['est_power']*100)
+        grps_str = []
         groups = self.group_list
         if groups:
             for group in groups:
                 emoji = group['emoji']
-                time = str(group['starttime'])
-                est = str(group['est_power'])
-                grp_str = f"{emoji}: {time}"
-                grp_str += f"Estimated Power: {est}"
+                dt = self.local_datetime(str(group['starttime']))
+                time = dt.strftime('%I:%M %p (%H:%M)')
+                est = str(group['est_power']*100)
+                grp_str = f"{emoji}: {time} ({est}%)"
                 grps_str.append(grp_str)
+        grps_str.append(f"Ungrouped: ({ungrp_est}%)")
         return "\n".join(grps_str)
     
     @property
@@ -263,6 +266,18 @@ class Raid():
                 return f"hatched-{self.level}-{gym_name}"
             else:
                 return f"{self.level}-{gym_name}"
+    
+    @property
+    def current_local_datetime(self):
+        zone = self.tz
+        localzone = timezone(zone)
+        return datetime.now(tz=localzone)
+    
+    @staticmethod
+    def local_datetime(stamp):
+        zone = self.tz
+        localzone = timezone(zone)
+        return datetime.fromtimestamp(stamp, tz=localzone)
     
     async def on_raw_reaction_add(self, payload):
         id_string = f"{payload.channel_id}/{payload.message_id}"
@@ -1283,7 +1298,8 @@ class RaidCog(Cog):
             level = boss.raid_level
             end = time.time() + 60*endtime
             hatch = None
-        new_raid = Raid(ctx.bot, ctx.guild.id, gym, level=level, pkmn=boss, hatch=hatch, end=end)
+        zone = await ctx.tz()
+        new_raid = Raid(ctx.bot, ctx.guild.id, gym, level=level, pkmn=boss, hatch=hatch, end=end, tz=zone)
         new_raid.channel_ids = []
         new_raid.message_ids = []
         react_list = new_raid.react_list
@@ -1593,7 +1609,7 @@ class RaidEmbed():
     
     @grps_str.setter
     def grps_str(self, grps_str):
-        self.embed.set_field_at(RaidEmbed.group_index, name="Groups", value=grps_str)
+        self.embed.set_field_at(RaidEmbed.group_index, name="Groups (Boss Damage Estimate)", value=grps_str)
 
 
 
@@ -1679,9 +1695,9 @@ class RaidEmbed():
         fields['Recommended Group Size'] = str(rec)
         grps_str = raid.grps_str
         if grps_str:
-            fields['Groups'] = grps_str
+            fields['Groups (Boss Damage Estimate)'] = grps_str
         else:
-            fields['Groups'] = "\u200b"
+            fields['Groups (Boss Damage Estimate)'] = "\u200b"
         embed = formatters.make_embed(icon=RaidEmbed.raid_icon, title=directions_text, # msg_colour=color,
             title_url=directions_url, thumbnail=img_url, fields=fields, footer="Ending",
             footer_icon=RaidEmbed.footer_icon)

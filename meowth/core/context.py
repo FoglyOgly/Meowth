@@ -283,6 +283,13 @@ class Context(commands.Context):
         finally:
             if autodelete:
                 await msg.delete()
+    
+    async def tz(ctx):
+        report_table = ctx.bot.dbi.table('report_channels')
+        query = report_table.query('timezone')
+        query.where(channelid=ctx.channel.id)
+        zone = await query.get_value()
+        return zone
 
 class GetTools:
     """Tools to easily get discord objects via Context."""

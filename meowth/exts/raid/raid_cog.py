@@ -169,7 +169,7 @@ class Raid():
         if groups:
             for group in groups:
                 emoji = group['emoji']
-                dt = self.local_datetime(str(group['starttime']))
+                dt = self.local_datetime(group['starttime'])
                 time = dt.strftime('%I:%M %p (%H:%M)')
                 est = str(group['est_power']*100)
                 grp_str = f"{emoji}: {time} ({est}%)"

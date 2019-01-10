@@ -163,7 +163,7 @@ class Raid():
     @property
     def grps_str(self):
         ungrp = self.ungrp
-        ungrp_est = str(round(ungrp['est_power']*100)
+        ungrp_est = str(round(ungrp['est_power']*100))
         grps_str = []
         groups = self.group_list
         if groups:

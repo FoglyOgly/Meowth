@@ -1763,7 +1763,7 @@ class RSVPEmbed():
         fields = {
             "Status List": status_str,
             "Team List": team_str,
-            "Boss Damage Estimate": str(round(est*100)) + "%"
+            "Boss Damage Estimate": (False, str(round(est*100)) + "%")
         }
         
         embed = formatters.make_embed(icon=RSVPEmbed.raid_icon, title="Current Group RSVP Totals",

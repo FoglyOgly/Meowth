@@ -296,7 +296,10 @@ class Pokemon():
         type_chart = await self.type_chart()
         types_sorted = sorted(type_chart.items(), key=(lambda x: x[1]), reverse=True)
         emoji_string = ''
+        i = 0
         for type_tuple in types_sorted:
+            if i == 6:
+                emoji_string += '\n'
             type_ref = self.bot.dbi.table('types').query()
             emoji = await type_ref.select('emoji').where(typeid=type_tuple[0]).get_value()
             if type_tuple[1] == 2:
@@ -306,6 +309,7 @@ class Pokemon():
                 emoji_string += emoji
             else:
                 break
+            i += 1
         return emoji_string
 
     
@@ -313,7 +317,10 @@ class Pokemon():
         type_chart = await self.type_chart()
         types_sorted = sorted(type_chart.items(), key=(lambda x: x[1]))
         emoji_string = ''
+        i = 0
         for type_tuple in types_sorted:
+            if i == 6:
+                emoji_string += '\n'
             type_ref = self.bot.dbi.table('types').query()
             emoji = await type_ref.select('emoji').where(typeid=type_tuple[0]).get_value()
             if type_tuple[1] == -2:
@@ -323,6 +330,7 @@ class Pokemon():
                 emoji_string += emoji
             else:
                 break
+            i += 1
         return emoji_string
     
     

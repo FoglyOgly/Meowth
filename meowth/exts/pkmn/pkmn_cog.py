@@ -689,6 +689,7 @@ class Pokedex(Cog):
         movesets_table = ctx.bot.dbi.table('movesets')
         insert = movesets_table.insert()
         insert.rows(move_list)
+        print(insert.sql(do_update=True))
         await insert.commit(do_update=True)
         return await ctx.send('Movesets table updated')
         

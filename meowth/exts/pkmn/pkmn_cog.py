@@ -662,8 +662,8 @@ class Pokedex(Cog):
     @checks.is_co_owner()
     async def movesupdate(self, ctx):
         async with aiohttp.ClientSession() as sess:
-        async with sess.get('https://fight.pokebattler.com/pokemon') as resp:
-            data = await resp.json()
+            async with sess.get('https://fight.pokebattler.com/pokemon') as resp:
+                data = await resp.json()
 
         pokemon_dicts = data['pokemon']
         move_list = []

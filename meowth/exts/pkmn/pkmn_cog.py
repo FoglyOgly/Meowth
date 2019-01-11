@@ -677,12 +677,12 @@ class Pokedex(Cog):
                 else:
                     legacy = False
                 for move in move_list:
-                    if move['pokemonId'] == pokemonId and move['moveId'] == quickmove:
+                    if move['pokemonid'] == pokemonId and move['moveid'] == quickmove:
                         break
                 else:
                     move_list.append({'pokemonid': pokemonId, 'moveid': quickmove, 'legacy': legacy})
                 for move in move_list:
-                    if move['pokemonId'] == pokemonId and move['moveId'] == chargemove:
+                    if move['pokemonid'] == pokemonId and move['moveid'] == chargemove:
                         break
                 else:
                     move_list.append({'pokemonid': pokemonId, 'moveid': chargemove, 'legacy': legacy})

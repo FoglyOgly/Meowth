@@ -680,12 +680,12 @@ class Pokedex(Cog):
                     if move['pokemonId'] == pokemonId and move['moveId'] == quickmove:
                         break
                 else:
-                    move_list.append({'pokemonId': pokemonId, 'moveId': quickmove})
+                    move_list.append({'pokemonid': pokemonId, 'moveid': quickmove, 'legacy': legacy})
                 for move in move_list:
                     if move['pokemonId'] == pokemonId and move['moveId'] == chargemove:
                         break
                 else:
-                    move_list.append({'pokemonId': pokemonId, 'moveId': chargemove, 'legacy': legacy})
+                    move_list.append({'pokemonid': pokemonId, 'moveid': chargemove, 'legacy': legacy})
         movesets_table = ctx.bot.dbi.table('movesets')
         insert = movesets_table.insert()
         insert.rows(move_list)

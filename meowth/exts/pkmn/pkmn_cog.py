@@ -658,3 +658,37 @@ class Pokedex(Cog):
     async def pokedex(self, ctx, *, pokemon: Pokemon):
         return await ctx.send(embed=await pokemon.dex_embed())
     
+    @command()
+    @checks.is_co_owner()
+    async def movesupdate(self, ctx):
+        async with aiohttp.ClientSession() as sess:
+        async with sess.get('https://fight.pokebattler.com/pokemon') as resp:
+            data = await resp.json()
+
+        pokemon_dicts = data['pokemon']
+        move_list = []
+        for pokemon in pokemon_dicts:
+            pokemonId = pokemon['pokemonId']
+            for moveset in pokemon['movesets']:
+                quickmove = moveset['quickMove']
+                chargemove = moveset['cinematicMove']
+                if moveset.get('legacyDate'):
+                    legacy = True
+                else:
+                    legacy = False
+                for move in move_list:
+                    if move['pokemonId'] == pokemonId and move['moveId'] == quickmove:
+                        break
+                else:
+                    move_list.append({'pokemonId': pokemonId, 'moveId': quickmove})
+                for move in move_list:
+                    if move['pokemonId'] == pokemonId and move['moveId'] == chargemove:
+                        break
+                else:
+                    move_list.append({'pokemonId': pokemonId, 'moveId': chargemove, 'legacy': legacy})
+        movesets_table = ctx.bot.dbi.table('movesets')
+        insert = movesets_table.insert()
+        insert.rows(move_list)
+        await insert.commit(do_update=True)
+        return await ctx.send('Movesets table updated')
+        

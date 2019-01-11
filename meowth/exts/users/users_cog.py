@@ -394,5 +394,24 @@ class Users(Cog):
             await ctx.send("Missing permissions")
         except discord.HTTPException:
             await ctx.send("Adding roles failed")
+    
+    @command()
+    async def pokebattler(self, ctx, pb_id: int):
+        """Set your Pokebattler ID."""
+
+        user_table = ctx.bot.dbi.table('users')
+        meowthuser = MeowthUser(ctx.bot, ctx.author)
+        data = await meowthuser._data()
+        if len(data) == 0:
+            insert = meowthuser._insert
+            d = {'id': ctx.author.id, 'pokebattler': pb_id}
+            insert.row(**d)
+            await insert.commit()
+        else:
+            update = meowthuser._update
+            update.values(pokebattler=pb_id)
+            await update.commit()
+        return await ctx.send(f'Pokebattler ID set to {pb_id}')
+
 
 

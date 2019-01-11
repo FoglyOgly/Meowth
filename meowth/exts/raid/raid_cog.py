@@ -17,6 +17,7 @@ import aiohttp
 import time
 from pytz import timezone
 from datetime import datetime
+from dateparser import parse
 from copy import deepcopy
 import re
 from string import ascii_lowercase
@@ -54,7 +55,7 @@ class RaidBoss(Pokemon):
 class Raid():
 
     def __init__(self, bot, guild_id, gym=None, level=None,
-        pkmn: RaidBoss=None, hatch: float=None, end: float=None, tz: str=None):
+        pkmn: RaidBoss=None, hatch: float=None, end: float=None, tz: str=None, created: float=time.time()):
         self.bot = bot
         self.guild_id = guild_id
         self.gym = gym
@@ -70,6 +71,7 @@ class Raid():
         self.trainer_dict = {}
         self.group_list = []
         self.tz = tz
+        self.created = created
     
     @property
     def status(self):
@@ -114,21 +116,30 @@ class Raid():
         max_times = self.bot.raid_info.raid_times[level]
         return max_times[1]
     
-    def update_time(self, new_time: int):
+    def update_time(self, new_time: float):
         if new_time < 0:
             raise
         level = self.level
         max_times = self.bot.raid_info.raid_times[level]
         max_hatch = max_times[0]
         max_active = max_times[1]
-        if self.hatch >= time.time():
-            if new_time > max_hatch:
-                raise
+        created = self.created
+        if self.status == 'egg':
+            if max_hatch:
+                max_stamp = created + max_hatch*60
             else:
-                self.hatch = time.time() + new_time*60
-                self.end = self.hatch + max_active*60
+                max_stamp = None
+            if (max_stamp and new_time < max_stamp) or not max_stamp:
+                self.hatch = new_time
+                self.end = new_time + max_active*60
+            else:
+                raise
         else:
-            self.end = time.time() + new_time*60
+            if not max_hatch:
+                max_hatch = 0
+            max_stamp = created + max_active*60 + max_hatch*60
+            if new_time < max_stamp:
+                self.end = new_time
     
     @property
     def boss_list(self):
@@ -262,7 +273,7 @@ class Raid():
             boss_name = await self.pkmn.name()
             return f"{boss_name}-{gym_name}"
         else:
-            if not self.hatch or self.hatch < time.time():
+            if self.status == 'hatched':
                 return f"hatched-{self.level}-{gym_name}"
             else:
                 return f"{self.level}-{gym_name}"
@@ -346,9 +357,28 @@ class Raid():
                 redcount=redcount, unknowncount=unknowncount)
     
     async def on_command_completion(self, ctx):
-        if ctx.command.name not in ('counters', 'group', 'starting', 'weather', 'moveset'):
+        if ctx.command.name not in ('counters', 'group', 'starting', 'weather', 'moveset', 'timer'):
             return
         if str(ctx.channel.id) not in self.channel_ids:
+            return
+        if ctx.command.name == 'timer':
+            newtime = ctx.args[2]
+            if newtime.isdigit():
+                stamp = time.time() + 60*newtime
+            else:
+                try:
+                    zone = self.tz
+                    newdt = parse(newtime, settings: {'TIMEZONE': zone})
+                    stamp = newdt.timestamp()
+                except:
+                    raise
+            self.update_time(stamp)
+            for idstring in self.message_ids:
+                chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+                embed = msg.embeds[0]
+                embed.timestamp = stamp
+                has_embed = False
+                await msg.edit(embed=embed)
             return
         if ctx.command.name == 'moveset':
             if self.status != 'active':
@@ -438,7 +468,7 @@ class Raid():
                 if not payload or str(payload.emoji) == '❎':
                     rec_size = await self.rec_group_size()
                     return await channel.send(f'The recommended group size for this raid is {rec_size}!')
-            elif grp_est > 2:
+            elif grp_est > 3:
                 msg = await channel.send('Your current group could possibly split into smaller groups and still win the raid! If you want to go ahead anyway, react to this message with the check mark!')
                 payload = await formatters.ask(self.bot, [msg], user_list = author.id)
                 if not payload or str(payload.emoji) == '❎':
@@ -996,7 +1026,6 @@ class Raid():
     
     async def hatch_egg(self):
         content = "This raid egg has hatched! React below to report the boss!"
-        self.hatch = None
         boss_list = self.boss_list
         length = len(boss_list)
         react_list = formatters.mc_emoji(length)
@@ -1435,6 +1464,11 @@ class RaidCog(Cog):
         pass
     
     @command()
+    @raid_checks.raid_channel()
+    async def timer(self, ctx, time):
+        pass
+    
+    @command()
     @checks.is_co_owner()
     async def countersupdate(self, ctx):
         data_table = ctx.bot.dbi.table('counters_data')
@@ -1545,8 +1579,8 @@ class RaidEmbed():
     status_index = 6
     team_index = 7
     ctrs_index = 8
-    rec_index = 9
-    group_index = 10
+    rec_index = 10
+    group_index = 9
 
     def set_boss(self, boss_dict):
         name = boss_dict['name']
@@ -1690,13 +1724,13 @@ class RaidEmbed():
             i += 1
         ctrs_str.append(f'[Results courtesy of Pokebattler](https://www.pokebattler.com/raids/{boss.id})')
         fields['<:pkbtlr:512707623812857871> Counters'] = "\n".join(ctrs_str)
-        rec = await raid.rec_group_size()
-        fields['Recommended Group Size'] = str(rec)
         grps_str = raid.grps_str
         if grps_str:
             fields['Groups (Boss Damage Estimate)'] = grps_str
         else:
             fields['Groups (Boss Damage Estimate)'] = "\u200b"
+        rec = await raid.rec_group_size()
+        fields['Recommended Group Size'] = str(rec)
         embed = formatters.make_embed(icon=RaidEmbed.raid_icon, title=directions_text, # msg_colour=color,
             title_url=directions_url, thumbnail=img_url, fields=fields, footer="Ending",
             footer_icon=RaidEmbed.footer_icon)

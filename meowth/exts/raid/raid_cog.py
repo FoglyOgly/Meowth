@@ -1693,7 +1693,7 @@ class RaidEmbed():
             exraid = await gym._exraid()
         else:
             directions_url = gym.url
-            directions_text = gym.name + "(Unknown Gym)"
+            directions_text = gym._name + "(Unknown Gym)"
             exraid = False
         if exraid:
             directions_text += " (EX Raid Gym)"
@@ -1858,7 +1858,7 @@ class EggEmbed():
             exraid = await gym._exraid()
         else:
             directions_url = gym.url
-            directions_text = gym.name + "(Unknown Gym)"
+            directions_text = gym._name + "(Unknown Gym)"
             exraid = False
         if exraid:
             directions_text += " (EX Raid Gym)"

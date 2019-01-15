@@ -947,7 +947,7 @@ class Raid():
             exraid = await gym._exraid()
         else:
             directions_url = gym.url
-            directions_text = gym.name + "(Unknown Gym)"
+            directions_text = gym.name + " (Unknown Gym)"
             exraid = False
         if exraid:
             directions_text += " (EX Raid Gym)"
@@ -1386,7 +1386,7 @@ class RaidCog(Cog):
             new_raid.message_ids.append(f"{reportmsg.channel.id}/{reportmsg.id}")
         insert = raid_table.insert()
         data = {
-            'gym': getattr(gym, 'id', gym),
+            'gym': getattr(gym, 'id', 0),
             'guild': ctx.guild.id,
             'level': level,
             'pkmn': (boss.id, boss.quickMoveid or None, boss.chargeMoveid or None) if boss else (None, None, None),
@@ -1696,7 +1696,7 @@ class RaidEmbed():
             exraid = await gym._exraid()
         else:
             directions_url = gym.url
-            directions_text = gym._name + "(Unknown Gym)"
+            directions_text = gym._name + " (Unknown Gym)"
             exraid = False
         if exraid:
             directions_text += " (EX Raid Gym)"
@@ -1861,7 +1861,7 @@ class EggEmbed():
             exraid = await gym._exraid()
         else:
             directions_url = gym.url
-            directions_text = gym._name + "(Unknown Gym)"
+            directions_text = gym._name + " (Unknown Gym)"
             exraid = False
         if exraid:
             directions_text += " (EX Raid Gym)"

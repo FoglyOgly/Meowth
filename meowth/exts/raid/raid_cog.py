@@ -1233,7 +1233,10 @@ class Raid():
             rcrd_dict['status'] = status
             return trainer, rcrd_dict
         old_dict = self.trainer_dict
-        est_20 = await self.estimator_20()
+        if self.status == 'active':
+            est_20 = await self.estimator_20()
+        else:
+            est_20 = 0
         trainer_dict = {}
         user_table = self.bot.dbi.table('users')
         query = user_table.query()
@@ -1246,11 +1249,12 @@ class Raid():
             trainer, rcrd_dict = data(rcrd)
             old_data = old_dict.get(trainer, {})
             old_total = old_data.get('total', 0)
-            old_est = old_data.get('est_power', 0)
-            if old_total == rcrd_dict['total'] and old_est:
-                rcrd_dict['est_power'] = old_est
-            else:
-                rcrd_dict['est_power'] = rcrd_dict['total'] / est_20
+            if self.status == 'active':
+                old_est = old_data.get('est_power', 0)
+                if old_total == rcrd_dict['total'] and old_est:
+                    rcrd_dict['est_power'] = old_est
+                else:
+                    rcrd_dict['est_power'] = rcrd_dict['total'] / est_20
             trainer_dict[trainer] = rcrd_dict
         return trainer_dict
 

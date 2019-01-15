@@ -217,10 +217,13 @@ class Pokemon():
             "FoglyOgly/Meowth/new-core/meowth/images/pkmn/")
         url += self.id
         if self.form:
+            url += '_'
             url += str(self.form)
         if self.shiny:
+            url += '_'
             url += 'SHINY'
         if await self._gender_type() == 'DIMORPH' and self.gender:
+            url += '_'
             url += self.gender
         url += '.png?cache=2'
         return url

@@ -274,7 +274,7 @@ class PartialGym():
         self.arg = arg
 
     @property
-    def name(self):
+    def _name(self):
         return self.arg.title()
     
     @property

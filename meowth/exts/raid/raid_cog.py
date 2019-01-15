@@ -268,7 +268,10 @@ class Raid():
         return json_url
     
     async def channel_name(self):
-        gym_name = await self.gym._name()
+        if isinstance(self.gym, Gym):
+            gym_name = await self.gym._name()
+        else:
+            gym_name = self.gym._name
         if self.pkmn:
             boss_name = await self.pkmn.name()
             return f"{boss_name}-{gym_name}"

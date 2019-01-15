@@ -1296,7 +1296,15 @@ class RaidCog(Cog):
     
     @command()
     @raid_checks.raid_enabled()
-    async def raid(self, ctx, level_or_boss, gym: Gym, endtime: int):
+    async def raid(self, ctx, level_or_boss, *, gym_and_time):
+        gym_split = gym_and_time.split()
+        if gym_split[-1].isdigit():
+            endtime = int(gym_split.pop(-1))
+            gymstr = " ".join(gym_split)
+        else:
+            gymstr = " ".join(gym_split)
+            endtime = None
+        gym = await Gym.convert(ctx, gymstr)
         raid_table = ctx.bot.dbi.table('raids')
         if isinstance(gym, Gym):
             debugurl = await gym.url()
@@ -1327,14 +1335,20 @@ class RaidCog(Cog):
             want = Want(ctx.bot, level, ctx.guild.id)
             role = await want.role()
             boss = None
-            hatch = time.time() + 60*endtime
+            if not endtime:
+                hatch = time.time() + 60*ctx.bot.raid_info.raid_times[level][0]
+            else:
+                hatch = time.time() + 60*endtime
             end = hatch + 60*ctx.bot.raid_info.raid_times[level][1]
         else:
             boss = await RaidBoss.convert(ctx, level_or_boss)
             want = Want(ctx.bot, boss.id, ctx.guild.id)
             role = await want.role()
             level = boss.raid_level
-            end = time.time() + 60*endtime
+            if not endtime:
+                end = time.time() + 60*ctx.bot.raid_info.raid_times[level][1]
+            else:
+                end = time.time() + 60*endtime
             hatch = None
         zone = await ctx.tz()
         new_raid = Raid(ctx.bot, ctx.guild.id, gym, level=level, pkmn=boss, hatch=hatch, end=end, tz=zone)

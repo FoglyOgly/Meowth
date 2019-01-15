@@ -401,7 +401,7 @@ class Users(Cog):
 
         user_table = ctx.bot.dbi.table('users')
         meowthuser = MeowthUser(ctx.bot, ctx.author)
-        data = await meowthuser._data()
+        data = await meowthuser._data.get()
         if len(data) == 0:
             insert = meowthuser._insert
             d = {'id': ctx.author.id, 'pokebattler': pb_id}

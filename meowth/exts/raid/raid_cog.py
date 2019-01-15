@@ -1686,6 +1686,7 @@ class RaidEmbed():
         gym = raid.gym
         if isinstance(gym, Gym):
             directions_url = await gym.url()
+            print(directions_url)
             directions_text = await gym._name()
             exraid = await gym._exraid()
         else:

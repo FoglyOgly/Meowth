@@ -643,7 +643,8 @@ class Raid():
 
     async def update_rsvp(self, user_id=None, status=None):
         self.trainer_dict = await self.get_trainer_dict()
-        estimator_20 = await self.estimator_20()
+        if self.status == 'active':
+            estimator_20 = await self.estimator_20()
         has_embed = False
         for idstring in self.message_ids:
             chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)

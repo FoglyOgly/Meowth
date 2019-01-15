@@ -1291,6 +1291,8 @@ class RaidCog(Cog):
     async def raid(self, ctx, level_or_boss, gym: Gym, endtime: int):
         raid_table = ctx.bot.dbi.table('raids')
         if isinstance(gym, Gym):
+            debugurl = await gym.url()
+            print(debugurl)
             query = raid_table.query()
             query.where(gym=gym.id, guild=ctx.guild.id)
             old_raid = await query.get()

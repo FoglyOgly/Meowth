@@ -368,7 +368,7 @@ class Raid():
             else:
                 try:
                     zone = self.tz
-                    newdt = parse(newtime, settings: {'TIMEZONE': zone})
+                    newdt = parse(newtime, settings={'TIMEZONE': zone})
                     stamp = newdt.timestamp()
                 except:
                     raise

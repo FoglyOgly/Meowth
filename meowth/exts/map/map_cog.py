@@ -283,6 +283,7 @@ class PartialGym():
         urlbase += self.arg
         urlbase += self.city
         url = quote_plus(urlbase)
+        print(url)
         return url
 
     async def weather(self):

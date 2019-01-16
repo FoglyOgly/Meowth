@@ -1743,10 +1743,16 @@ class RaidEmbed():
             name = await ctr.name()
             fast = Move(bot, ctr.quickMoveid)
             fast_name = await fast.name()
-            fast_emoji = await fast.emoji()
+            try:
+                fast_emoji = await fast.emoji()
+            except:
+                print(fast.id)
             charge = Move(bot, ctr.chargeMoveid)
             charge_name = await charge.name()
-            charge_emoji = await charge.emoji()
+            try:
+                charge_emoji = await charge.emoji()
+            except:
+                print(charge.id)
             ctr_str = f"**{name}**: {fast_name} {fast_emoji} | {charge_name} {charge_emoji}"
             ctrs_str.append(ctr_str)
             i += 1

@@ -1819,7 +1819,7 @@ class RSVPEmbed():
         status_str = raid.grp_status_str(group)
         team_str = raid.grp_team_str(group)
         est = group['est_power']
-        start = raid.localdatetime(group['starttime'])
+        start = raid.local_datetime(group['starttime'])
 
         fields = {
             "Status List": status_str,

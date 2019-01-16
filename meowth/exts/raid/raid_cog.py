@@ -1294,7 +1294,7 @@ class RaidCog(Cog):
         bot.raid_info = raid_info
         self.bot = bot
 
-    
+
     @command()
     @raid_checks.raid_enabled()
     async def raid(self, ctx, level_or_boss, *, gym_and_time):
@@ -1510,9 +1510,11 @@ class RaidCog(Cog):
                     data_url = Raid.pokebattler_data_url(
                         pkmnid, url_level, "20", weather
                     )
+                    print(data_url)
                     data_url_min = Raid.pokebattler_data_url(
                         pkmnid, url_level, "40", weather
                     )
+                    print(data_url_min)
                     async with aiohttp.ClientSession() as session:
                         async with session.get(data_url) as resp:
                             try:

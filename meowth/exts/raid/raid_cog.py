@@ -1820,11 +1820,12 @@ class RSVPEmbed():
         team_str = raid.grp_team_str(group)
         est = group['est_power']
         start = raid.local_datetime(group['starttime'])
+        time = start.strftime('%I:%M %p')
 
         fields = {
             "Status List": status_str,
             "Team List": team_str,
-            "Starting": start,
+            "Starting": time,
             "Boss Damage Estimate": str(round(est*100)) + "%"
         }
         

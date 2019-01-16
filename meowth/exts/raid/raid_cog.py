@@ -823,7 +823,7 @@ class Raid():
                     data = await resp.json()
                     data = data['attackers'][0]
                 except KeyError:
-                    print(data_url)
+                    pass
         boss_fast = self.pkmn.quickMoveid
         boss_charge = self.pkmn.chargeMoveid
         if not (boss_fast and boss_charge):
@@ -1308,8 +1308,6 @@ class RaidCog(Cog):
         gym = await Gym.convert(ctx, gymstr)
         raid_table = ctx.bot.dbi.table('raids')
         if isinstance(gym, Gym):
-            debugurl = await gym.url()
-            print(debugurl)
             query = raid_table.query()
             query.where(gym=gym.id, guild=ctx.guild.id)
             old_raid = await query.get()
@@ -1510,25 +1508,23 @@ class RaidCog(Cog):
                     data_url = Raid.pokebattler_data_url(
                         pkmnid, url_level, "20", weather
                     )
-                    print(data_url)
                     data_url_min = Raid.pokebattler_data_url(
                         pkmnid, url_level, "40", weather
                     )
-                    print(data_url_min)
                     async with aiohttp.ClientSession() as session:
                         async with session.get(data_url) as resp:
                             try:
                                 data_20 = await resp.json()
                                 data_20 = data_20['attackers'][0]
                             except KeyError:
-                                print(data_url)
+                                pass
                     async with aiohttp.ClientSession() as session:
                         async with session.get(data_url_min) as resp:
                             try:
                                 data_min = await resp.json()
                                 data_min = data_min['attackers'][0]
                             except KeyError:
-                                print(data_url_min)
+                                pass
                     random_move_ctrs = data_20['randomMove']['defenders'][-6:]
                     estimator_20 = data_20['randomMove']['total']['estimator']
                     estimator_min = data_min['randomMove']['defenders'][-1]['total']['estimator']
@@ -1713,7 +1709,6 @@ class RaidEmbed():
         gym = raid.gym
         if isinstance(gym, Gym):
             directions_url = await gym.url()
-            print(directions_url)
             directions_text = await gym._name()
             exraid = await gym._exraid()
         else:
@@ -1746,13 +1741,13 @@ class RaidEmbed():
             try:
                 fast_emoji = await fast.emoji()
             except:
-                print(fast.id)
+                pass
             charge = Move(bot, ctr.chargeMoveid)
             charge_name = await charge.name()
             try:
                 charge_emoji = await charge.emoji()
             except:
-                print(charge.id)
+                pass
             ctr_str = f"**{name}**: {fast_name} {fast_emoji} | {charge_name} {charge_emoji}"
             ctrs_str.append(ctr_str)
             i += 1

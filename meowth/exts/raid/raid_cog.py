@@ -446,6 +446,7 @@ class Raid():
                             has_embed = True
                     await msg.edit(embed=embed)
                     await msg.add_reaction(emoji)
+                return await self.join_grp(ctx.author.id, d)
     
     async def start_grp(self, grp, author, channel=None):
         if not self.grp_is_here(grp):
@@ -1818,11 +1819,13 @@ class RSVPEmbed():
         status_str = raid.grp_status_str(group)
         team_str = raid.grp_team_str(group)
         est = group['est_power']
+        start = raid.localdatetime(group['starttime'])
 
         fields = {
             "Status List": status_str,
             "Team List": team_str,
-            "Boss Damage Estimate": (False, str(round(est*100)) + "%")
+            "Starting": start,
+            "Boss Damage Estimate": str(round(est*100)) + "%"
         }
         
         embed = formatters.make_embed(icon=RSVPEmbed.raid_icon, title="Current Group RSVP Totals",

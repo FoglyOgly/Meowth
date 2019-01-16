@@ -364,7 +364,7 @@ class Raid():
             return
         if str(ctx.channel.id) not in self.channel_ids:
             return
-        if ctx.command.name == 'timer':
+        if ctx.command.name == 'timerset':
             newtime = ctx.args[2]
             if newtime.isdigit():
                 stamp = time.time() + 60*newtime
@@ -1490,7 +1490,7 @@ class RaidCog(Cog):
     
     @command()
     @raid_checks.raid_channel()
-    async def timer(self, ctx, time):
+    async def timerset(self, ctx, time: int):
         pass
     
     @command()

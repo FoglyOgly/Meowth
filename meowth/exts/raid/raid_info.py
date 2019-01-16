@@ -19,11 +19,11 @@ egg_images = {
 }
 
 raid_lists = {
-    '1': ["SHELLDER", "MAGIKARP", "SNORUNT", "SHINX", "BUIZEL"],
-    '2': ["DEWGONG", "EXEGGUTOR_ALOLA_FORM", "SNEASEL", "MAWILE"],
-    '3': ["RAICHU_ALOLA_FORM","MACHAMP", "JYNX", "PILOSWINE"],
-    '4': ["MAROWAK_ALOLA_FORM", "LAPRAS", "TYRANITAR", "WALREIN"],
-    '5': ["HEATRAN"],
+    '1': ["WINGULL", "PLUSLE", "MINUN", "SHUPPET", "DUSKULL"],
+    '2': ["GROVYLE", "COMBUSKEN", "MARSHTOMP", "KIRLIA", "SABLEYE", "MAWILE"],
+    '3': ["LUNATONE","SOLROCK", "CRAWDAUNT", "CLAYDOL"],
+    '4': ["SHIFTRY", "AGGRON", "ABSOL", "METAGROSS"],
+    '5': ["KYOGRE", "GROUDON"],
     '6': [],
     "EX": ["DEOXYS_ATTACK_FORM"]
 }

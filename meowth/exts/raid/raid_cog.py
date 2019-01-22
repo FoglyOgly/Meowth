@@ -538,6 +538,9 @@ class Raid():
         if payload == 'power':
             event_loop.create_task(self.update_grps())
             return
+        elif payload == 'bosses':
+            event_loop.create_task(self.update_rsvp())
+            return
         userid, status = payload.split('/')
         user_id = int(userid)
         event_loop.create_task(self.update_rsvp(user_id=user_id, status=status))

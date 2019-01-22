@@ -1077,7 +1077,7 @@ class Raid():
         d = {x: 0 for x in boss_list}
         trainer_dict = self.trainer_dict
         for trainer in trainer_dict:
-            total = trainer_dict[trainer]['total']
+            total = sum(trainer_dict[trainer]['party'])
             bosses = trainer_dict[trainer]['bosses']
             for boss in bosses:
                 d[boss] += total
@@ -1093,7 +1093,7 @@ class Raid():
         }
         trainer_dict = self.trainer_dict
         for trainer in trainer_dict:
-            total = trainer_dict[trainer]['total']
+            total = sum(trainer_dict[trainer]['party'])
             status = trainer_dict[trainer]['status']
             d[status] += total
         return d
@@ -1144,7 +1144,7 @@ class Raid():
         }
         trainer_dict = self.trainer_dict
         for trainer in group['users']:
-            total = trainer_dict[trainer]['total']
+            total = sum(trainer_dict[trainer]['party'])
             status = trainer_dict[trainer]['status']
             d[status] += total
         return d

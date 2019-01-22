@@ -1220,16 +1220,20 @@ class Raid():
         query = user_table.query()
         query.where(raid_id=self.id)
         rsvp_data = await query.get()
-        est_20 = await self.estimator_20()
+        if self.status == 'active':
+            est_20 = await self.estimator_20()
+        else:
+            est_20 = None
         for rcrd in rsvp_data:
             trainer, rcrd_dict = data(rcrd)
             total = sum(rcrd_dict['party'])
-            estimator = rcrd_dict.get('estimator')
-            if estimator:
-                est_power = 1/estimator + (total-1)/est_20
-            else:
-                est_power = total/est_20
-            rcrd_dict['est_power'] = est_power
+            if est_20:
+                estimator = rcrd_dict.get('estimator')
+                if estimator:
+                    est_power = 1/estimator + (total-1)/est_20
+                else:
+                    est_power = total/est_20
+                rcrd_dict['est_power'] = est_power
             trainer_dict[trainer] = rcrd_dict
         return trainer_dict
 

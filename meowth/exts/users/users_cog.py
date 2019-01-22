@@ -54,8 +54,6 @@ class MeowthUser:
         silphid = await data.get_value()
         return silphid
     
-    
-    
     async def set_team(self, team_id):
         update = self._update
         update.values(team=team_id)
@@ -154,18 +152,25 @@ class MeowthUser:
         query.where(user_id=self.user.id, raid_id=raid_id)
         return await query.get_value()
     
-    async def set_estimator(self, raid_id, estimator):
+    async def set_estimator(self, raid_id, estimator, est_20):
         rsvp_table = self.bot.dbi.table('raid_rsvp')
         current_rsvp = rsvp_table.query().where(user_id=self.user.id, raid_id=raid_id)
         current_rsvp = await current_rsvp.get()
         if current_rsvp:
             d = dict(current_rsvp[0])
             d['estimator'] = estimator
+            total = sum(d['party'])
+            d['est_power'] = 1/estimator + (total-1)/est_20
         else:
+            party = await self.party()
+            total = sum(party)
+            est_power = 1/estimator + (total-1)/est_20
             d = {
                 'user_id': self.user.id,
                 'raid_id': raid_id,
-                'estimator': estimator
+                'estimator': estimator,
+                'party': party,
+                'est_power': est_power
             }
         insert = rsvp_table.insert()
         insert.row(**d)

@@ -534,9 +534,12 @@ class Raid():
     def _rsvp(self, connection, pid, channel, payload):
         if channel != f'rsvp_{self.id}':
             return
+        event_loop = asyncio.get_event_loop()
+        if payload == 'power':
+            event_loop.create_task(self.update_grps())
+            return
         userid, status = payload.split('/')
         user_id = int(userid)
-        event_loop = asyncio.get_event_loop()
         event_loop.create_task(self.update_rsvp(user_id=user_id, status=status))
     
     def _weather(self, connection, pid, channel, payload):
@@ -854,7 +857,8 @@ class Raid():
                 counter.nick = ctr_nick
             ctrs_list.append(counter)
         if estimator < est_20:
-            await user.set_estimator(self.id, estimator)
+            await user.set_estimator(self.id, estimator, est_20)
+            self.trainer_dict = await self.get_trainer_dict()
         return ctrs_list
 
     async def set_moveset(self, move1, move2=None):
@@ -1188,8 +1192,8 @@ class Raid():
                 'emoji': rcrd['emoji'],
                 'starttime': rcrd.get('starttime'),
                 'users': rcrd.get('users', []),
-                'est_power': rcrd['est_power']
             }
+            grp['est_power'] = self.grp_est_power(grp)
             group_list.append(grp)
         return group_list
 

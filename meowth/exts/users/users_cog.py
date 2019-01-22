@@ -72,7 +72,10 @@ class MeowthUser:
     async def party(self):
         data = self._data
         data.select('party')
-        return await data.get_value()
+        party = await data.get_value()
+        if not party:
+            party = [0,0,0,1]
+        return party
     
     async def set_party(self, party: list = [0,0,0,1]):
         update = self._update

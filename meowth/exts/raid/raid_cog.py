@@ -308,11 +308,6 @@ class Raid():
         old_bosses = trainer_data.get('bosses', [])
         old_status = trainer_data.get('status')
         party = await meowthuser.party()
-        total = party['total']
-        bluecount = party['bluecount']
-        yellowcount = party['yellowcount']
-        redcount = party['redcount']
-        unknowncount = party['unknowncount']
         if payload.emoji.is_custom_emoji():
             emoji = payload.emoji.id
         else:
@@ -355,9 +350,7 @@ class Raid():
             emoji = self.bot.get_emoji(emoji)
         await message.remove_reaction(emoji, user)
         if new_bosses != old_bosses or new_status != old_status:
-            await meowthuser.rsvp(self.id, new_status, bosses=new_bosses, total=total, 
-                bluecount=bluecount, yellowcount=yellowcount, 
-                redcount=redcount, unknowncount=unknowncount)
+            await meowthuser.rsvp(self.id, new_status, bosses=new_bosses, party=party)
     
     async def on_command_completion(self, ctx):
         if ctx.command.name not in ('counters', 'group', 'starting', 'weather', 'moveset', 'timer'):
@@ -860,13 +853,8 @@ class Raid():
             if ctr_nick:
                 counter.nick = ctr_nick
             ctrs_list.append(counter)
-        has_rsvp = await user.has_rsvp(self.id)
-        if has_rsvp:
-            total = self.trainer_dict[user.user.id]['total']
-            user_power = 1 / estimator
-            extra_power = (total - 1) / est_20
-            calc_power = user_power + extra_power
-            self.trainer_dict[user.user.id]['est_power'] = calc_power
+        if estimator < est_20:
+            await user.set_estimator(self.id, estimator)
         return ctrs_list
 
     async def set_moveset(self, move1, move2=None):
@@ -1121,10 +1109,10 @@ class Raid():
         }
         trainer_dict = self.trainer_dict
         for trainer in trainer_dict:
-            bluecount = trainer_dict[trainer]['bluecount']
-            yellowcount = trainer_dict[trainer]['yellowcount']
-            redcount = trainer_dict[trainer]['redcount']
-            unknowncount = trainer_dict[trainer]['unknowncount']
+            bluecount = trainer_dict[trainer]['party'][0]
+            yellowcount = trainer_dict[trainer]['party'][1]
+            redcount = trainer_dict[trainer]['party'][2]
+            unknowncount = trainer_dict[trainer]['party'][3]
             d['mystic'] += bluecount
             d['instinct'] += yellowcount
             d['valor'] += redcount
@@ -1170,10 +1158,10 @@ class Raid():
         }
         trainer_dict = self.trainer_dict
         for trainer in group['users']:
-            bluecount = trainer_dict[trainer]['bluecount']
-            yellowcount = trainer_dict[trainer]['yellowcount']
-            redcount = trainer_dict[trainer]['redcount']
-            unknowncount = trainer_dict[trainer]['unknowncount']
+            bluecount = trainer_dict[trainer]['party'][0]
+            yellowcount = trainer_dict[trainer]['party'][1]
+            redcount = trainer_dict[trainer]['party'][2]
+            unknowncount = trainer_dict[trainer]['party'][3]
             d['mystic'] += bluecount
             d['instinct'] += yellowcount
             d['valor'] += redcount
@@ -1208,55 +1196,33 @@ class Raid():
 
     async def get_trainer_dict(self):
         def data(rcrd):
-            trainer = rcrd['id']
+            trainer = rcrd['user_id']
+            status = rcrd.get('status')
             bosses = rcrd.get('bosses')
-            total = rcrd['total']
-            bluecount = rcrd.get('bluecount')
-            yellowcount = rcrd.get('yellowcount')
-            redcount = rcrd.get('redcount')
-            unknowncount = rcrd.get('unknowncount')
+            party = rcrd.get('party', [0,0,0,1])
+            estimator = rcrd.get('estimator')
             rcrd_dict = {
                 'bosses': bosses,
-                'total': total,
-                'bluecount': bluecount,
-                'yellowcount': yellowcount,
-                'redcount': redcount,
-                'unknowncount': unknowncount
+                'status': status,
+                'party': party,
+                'estimator': estimator
             }
-            interested_list = rcrd.get('interested_list')
-            coming = rcrd.get('coming')
-            here = rcrd.get('here')
-            if self.id in interested_list:
-                status = 'maybe'
-            elif self.id == coming:
-                status = 'coming'
-            elif self.id == here:
-                status = 'here'
-            rcrd_dict['status'] = status
             return trainer, rcrd_dict
-        old_dict = self.trainer_dict
-        if self.status == 'active':
-            est_20 = await self.estimator_20()
-        else:
-            est_20 = 0
         trainer_dict = {}
-        user_table = self.bot.dbi.table('users')
+        user_table = self.bot.dbi.table('raid_rsvp')
         query = user_table.query()
-        query.where((
-            user_table['interested_list'].contains_(self.id),
-            user_table['coming'] == self.id,
-            user_table['here'] == self.id))
+        query.where(raid_id=self.id)
         rsvp_data = await query.get()
+        est_20 = await self.estimator_20()
         for rcrd in rsvp_data:
             trainer, rcrd_dict = data(rcrd)
-            old_data = old_dict.get(trainer, {})
-            old_total = old_data.get('total', 0)
-            if self.status == 'active':
-                old_est = old_data.get('est_power', 0)
-                if old_total == rcrd_dict['total'] and old_est:
-                    rcrd_dict['est_power'] = old_est
-                else:
-                    rcrd_dict['est_power'] = rcrd_dict['total'] / est_20
+            total = sum(rcrd_dict['party'])
+            estimator = rcrd_dict.get('estimator')
+            if estimator:
+                est_power = 1/estimator + (total-1)/est_20
+            else:
+                est_power = total/est_20
+            rcrd_dict['est_power'] = est_power
             trainer_dict[trainer] = rcrd_dict
         return trainer_dict
 
@@ -1438,13 +1404,7 @@ class RaidCog(Cog):
         raid_id = await self.get_raidid(ctx)
         meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
         party = await meowthuser.party_list(total=total, *teamcounts)
-        bluecount, yellowcount, redcount, unknowncount = party
-        if not total or total < sum(party):
-            total = sum(party)
-        elif total > sum(party):
-            unknowncount = total - sum(party[:-1])
-        await meowthuser.rsvp(raid_id, status, total=total, bluecount=bluecount,
-            yellowcount=yellowcount, redcount=redcount, unknowncount=unknowncount)
+        await meowthuser.rsvp(raid_id, status, party=party)
     
     @command()
     @raid_checks.raid_channel()

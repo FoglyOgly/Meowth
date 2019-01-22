@@ -54,86 +54,7 @@ class MeowthUser:
         silphid = await data.get_value()
         return silphid
     
-    async def interested_list(self):
-        data = self._data
-        data.select('interested_list')
-        intlist = await data.get_value()
-        if not intlist:
-            return []
-        return intlist
     
-    async def coming(self):
-        data = self._data
-        data.select('coming')
-        coming = await data.get_value()
-        return coming
-    
-    async def here(self):
-        data = self._data
-        data.select('here')
-        here = await data.get_value()
-        return here
-    
-    async def has_rsvp(self, raid_id):
-        intlist = await self.interested_list()
-        if raid_id in intlist:
-            return True
-        coming = await self.coming()
-        if raid_id == coming:
-            return True
-        here = await self.here()
-        if raid_id == here:
-            return True
-        lobby = await self.lobby()
-        if raid_id == lobby:
-            return True
-        return False
-    
-    async def lobby(self):
-        data = self._data
-        data.select('lobby')
-        lobby = await data.get_value()
-        return lobby
-    
-    async def total(self):
-        data = self._data
-        data.select('total')
-        total = await data.get_value()
-        if total is None:
-            return 1
-        return total
-    
-    async def bluecount(self):
-        data = self._data
-        data.select('bluecount')
-        bluecount = await data.get_value()
-        if bluecount is None:
-            return 0
-        return bluecount
-    
-    async def yellowcount(self):
-        data = self._data
-        data.select('yellowcount')
-        yellowcount = await data.get_value()
-        if yellowcount is None:
-            return 0
-        return yellowcount
-
-    async def redcount(self):
-        data = self._data
-        data.select('redcount')
-        redcount = await data.get_value()
-        if redcount is None:
-            return 0
-        return redcount
-    
-    async def unknowncount(self):
-        data = self._data
-        data.select('unknowncount')
-        unknowncount = await data.get_value()
-        if unknowncount is None:
-            return 0
-        return unknowncount
     
     async def set_team(self, team_id):
         update = self._update
@@ -151,51 +72,19 @@ class MeowthUser:
         await update.commit()
     
     async def party(self):
-        total = await self.total()
-        bluecount = await self.bluecount()
-        yellowcount = await self.yellowcount()
-        redcount = await self.redcount()
-        unknowncount = await self.unknowncount()
-        if not any((bluecount, yellowcount, redcount)):
-            team = await self.team()
-            if team == 1:
-                bluecount = total
-            elif team == 2:
-                yellowcount = total
-            elif team == 3:
-                redcount = total
-        unknowncount = total - sum((bluecount, yellowcount, redcount))
-        d = {
-            'total': total,
-            'bluecount': bluecount,
-            'yellowcount': yellowcount,
-            'redcount': redcount,
-            'unknowncount': unknowncount
-        }
-        return d
+        data = self._data
+        data.select('party')
+        return await data.get_value()
     
-    async def set_party(self, total, bluecount=0, yellowcount=0, redcount=0):
+    async def set_party(self, party: list = [0,0,0,1]):
         update = self._update
-        unknowncount = total - sum((bluecount, yellowcount, redcount))
-        d = {
-            'total': total,
-            'bluecount': bluecount,
-            'yellowcount': yellowcount,
-            'redcount': redcount,
-            'unknowncount': unknowncount
-        }
-        update.values(**d)
+        update.values(party=party)
         await update.commit()
     
     async def party_list(self, total=0, *teamcounts):
         if not teamcounts:
             if not total:
-                party = await self.party()
-                total = party['total']
-                bluecount = party['bluecount']
-                yellowcount = party['yellowcount']
-                redcount = party['redcount']
-                unknowncount = party['unknowncount']
+                return await self.party()
             else:
                 team = await self.team()
                 if not team:
@@ -238,95 +127,51 @@ class MeowthUser:
         return [mystic, instinct, valor, unknown]
 
 
-    async def rsvp(self, raid_id, status, bosses: list=None, total: int=1,
-        bluecount: int=0, yellowcount: int=0, redcount: int=0, unknowncount: int=0):
-        data = await self._data.get()
-        if not data:
-            upsert = self._insert
-            action = "insert"
-            data = {}
-        else:
-            data = data[0]
-            upsert = self._update
-            action = "update"
+    async def rsvp(self, raid_id, status, bosses: list=[], party=[0,0,0,1]):
+        estimator = await self.raid_estimator(raid_id)
         d = {
-            'total': total,
-            'bluecount': bluecount,
-            'yellowcount': yellowcount,
-            'redcount': redcount,
-            'unknowncount': unknowncount
+            'user_id': self.user.id,
+            'raid_id': raid_id,
+            'status': status,
+            'estimator': estimator,
+            'bosses': bosses,
+            'party': party
         }
-        intlist = data.get('interested_list', [])
-        oldcoming = data.get('coming')
-        oldhere = data.get('here')
-        oldlobby = data.get('lobby')
-        if status == 'cancel':
-            if raid_id in intlist:
-                intlist.remove(raid_id)
-                newcoming = oldcoming
-                newhere = oldhere
-                newlobby = oldlobby
-            elif raid_id == oldcoming:
-                newcoming = None
-                newhere = oldhere
-                newlobby = oldlobby
-            elif raid_id == oldhere:
-                newhere = None
-                newcoming = oldcoming
-                newlobby = oldlobby
-            elif raid_id == oldlobby:
-                newlobby = None
-                newhere = oldhere
-                newcoming = oldcoming
-        elif status == 'maybe':
-            if bosses:
-                d['bosses'] = bosses
-            if raid_id not in intlist:
-                intlist.append(raid_id)
-            if raid_id == oldcoming:
-                newcoming = None
-                newhere = oldhere
-                newlobby = oldlobby
-            elif raid_id == oldhere:
-                newhere = None
-                newcoming = oldcoming
-                newlobby = oldlobby
-            elif raid_id == oldlobby:
-                newlobby = None
-                newcoming = oldcoming
-                newhere = oldhere
-            else:
-                newcoming = oldcoming
-                newhere = oldhere
-                newlobby = oldlobby
-        elif status == 'coming':
-            if raid_id in intlist:
-                intlist.remove(raid_id)
-            newcoming = raid_id
-            newhere = None
-            newlobby = None
-        elif status == 'here':
-            if raid_id in intlist:
-                intlist.remove(raid_id)
-            newhere = raid_id
-            newcoming = None
-            newlobby = None
-        elif status == 'lobby':
-            if raid_id in intlist:
-                intlist.remove(raid_id)
-            newhere = None
-            newcoming = None
-            newlobby = raid_id
-        d['interested_list'] = intlist
-        d['coming'] = newcoming
-        d['here'] = newhere
-        d['lobby'] = newlobby
-        if action == "insert":
-            d['id'] = self.user.id
-            upsert.row(**d)
-        elif action == "update":
-            upsert.values(**d)
-        await upsert.commit()
+        rsvp_table = self.bot.dbi.table('raid_rsvp')
+        current_rsvp = rsvp_table.query().where(user_id=self.user.id, raid_id=raid_id)
+        current_rsvp = await current_rsvp.get()
+        if current_rsvp:
+            old_d = dict(current_rsvp[0])
+            if old_d == d:
+                return
+        insert = rsvp_table.insert()
+        insert.row(**d)
+        await insert.commit(do_update=True)
+    
+    async def raid_estimator(self, raid_id):
+        rsvp_table = self.bot.dbi.table('raid_rsvp')
+        query = rsvp_table.query('estimator')
+        query.where(user_id=self.user.id, raid_id=raid_id)
+        return await query.get_value()
+    
+    async def set_estimator(self, raid_id, estimator):
+        rsvp_table = self.bot.dbi.table('raid_rsvp')
+        current_rsvp = rsvp_table.query().where(user_id=self.user.id, raid_id=raid_id)
+        current_rsvp = await current_rsvp.get()
+        if current_rsvp:
+            d = dict(current_rsvp[0])
+            d['estimator'] = estimator
+        else:
+            d = {
+                'user_id': self.user.id,
+                'raid_id': raid_id,
+                'estimator': estimator
+            }
+        insert = rsvp_table.insert()
+        insert.row(**d)
+        return await insert.commit(do_update=True)
+        
+
         
 
 

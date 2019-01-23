@@ -1255,9 +1255,6 @@ class RaidCog(Cog):
 
     @command()
     @raid_checks.raid_enabled()
-
-    @command()
-    @raid_checks.raid_enabled()
     async def raid(self, ctx, level_or_boss, *, gym_and_time):
         gym_split = gym_and_time.split()
         if gym_split[-1].isdigit():

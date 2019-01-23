@@ -360,7 +360,7 @@ class Raid():
         if ctx.command.name == 'timerset':
             newtime = ctx.args[2]
             if newtime.isdigit():
-                stamp = time.time() + 60*newtime
+                stamp = time.time() + 60*int(newtime)
             else:
                 try:
                     zone = self.tz
@@ -1043,6 +1043,7 @@ class Raid():
     
     async def expire_raid(self):
         await self.update_messages()
+        await asyncio.sleep(60)
         if self.channel_ids:
             for chanid in self.channel_ids:
                 channel = self.bot.get_channel(int(chanid))
@@ -1252,6 +1253,8 @@ class RaidCog(Cog):
         bot.raid_info = raid_info
         self.bot = bot
 
+    @command()
+    @raid_checks.raid_enabled()
 
     @command()
     @raid_checks.raid_enabled()
@@ -1440,7 +1443,7 @@ class RaidCog(Cog):
     
     @command()
     @raid_checks.raid_channel()
-    async def timerset(self, ctx, time: int):
+    async def timerset(self, ctx, *, time):
         pass
     
     @command()

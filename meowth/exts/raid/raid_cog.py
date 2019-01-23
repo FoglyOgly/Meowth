@@ -400,7 +400,7 @@ class Raid():
             if not embed:
                 return await ctx.author.send("You likely have better counters than the ones in your Pokebattler Pokebox! Please update your Pokebox!")
             await ctx.author.send(embed=embed)
-            await self.update_grps()
+            await self.update_rsvp()
         elif ctx.command.name == 'group':
             group_table = ctx.bot.dbi.table('raid_groups')
             insert = group_table.insert()
@@ -535,10 +535,7 @@ class Raid():
         if channel != f'rsvp_{self.id}':
             return
         event_loop = asyncio.get_event_loop()
-        if payload == 'power':
-            event_loop.create_task(self.update_grps())
-            return
-        elif payload == 'bosses':
+        if payload == 'power' or payload == 'bosses':
             event_loop.create_task(self.update_rsvp())
             return
         userid, status = payload.split('/')
@@ -612,37 +609,12 @@ class Raid():
         group['est_power'] = self.grp_est_power(group)
         insert.row(**group)
         await insert.commit(do_update=True)
-        await self.update_grps(user_id=user_id, group=group)
+        await self.update_rsvp(user_id=user_id, group=group)
     
-    async def update_grps(self, user_id=None, group=None):
-        self.group_list = await self.get_grp_list()
-        has_embed = False
-        for idstring in self.message_ids:
-            chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
-            if not has_embed:
-                if self.status == 'active':
-                    raid_embed = RaidEmbed(msg.embeds[0])
-                    raid_embed.grps_str = self.grps_str
-                    embed = raid_embed.embed
-                    has_embed = True
-                elif self.status == 'egg':
-                    egg_embed = EggEmbed(msg.embeds[0])
-                    egg_embed.grps_str = self.grps_str
-                    embed = egg_embed.embed
-                    has_embed = True
-            await msg.edit(embed=embed)
-        if user_id and group:
-            if self.channel_ids and self.status != 'egg':
-                for chnid in self.channel_ids:
-                    rsvpembed = RSVPEmbed.from_raidgroup(self, group).embed
-                    guild = self.bot.get_guild(self.guild_id)
-                    member = guild.get_member(user_id)
-                    chn = self.bot.get_channel(int(chnid))
-                    content = f"{member.display_name} has joined Group {group['emoji']}!"
-                    newmsg = await chn.send(content, embed=rsvpembed)
 
-    async def update_rsvp(self, user_id=None, status=None):
+    async def update_rsvp(self, user_id=None, status=None, group=None):
         self.trainer_dict = await self.get_trainer_dict()
+        self.group_list = await self.get_grp_list()
         if self.status == 'active':
             estimator_20 = await self.estimator_20()
         has_embed = False
@@ -653,12 +625,14 @@ class Raid():
                     raid_embed = RaidEmbed(msg.embeds[0])
                     raid_embed.status_str = self.status_str
                     raid_embed.team_str = self.team_str
+                    raid_embed.grps_str = self.grps_str
                     embed = raid_embed.embed
                     has_embed = True
                 elif self.status == 'egg':
                     egg_embed = EggEmbed(msg.embeds[0])
                     egg_embed.team_str = self.team_str
                     egg_embed.boss_str = await self.boss_list_str()
+                    egg_embed.grps_str = self.grps_str
                     embed = egg_embed.embed
                     has_embed = True
             await msg.edit(embed=embed)
@@ -679,8 +653,15 @@ class Raid():
                         display_status = 'has canceled'
                     content = f"{member.display_name} {display_status}!"
                     newmsg = await chn.send(content, embed=rsvpembed)
-        await self.update_grps()
-
+        elif user_id and group:
+            if self.channel_ids and self.status != 'egg':
+                for chnid in self.channel_ids:
+                    rsvpembed = RSVPEmbed.from_raidgroup(self, group).embed
+                    guild = self.bot.get_guild(self.guild_id)
+                    member = guild.get_member(user_id)
+                    chn = self.bot.get_channel(int(chnid))
+                    content = f"{member.display_name} has joined Group {group['emoji']}!"
+                    newmsg = await chn.send(content, embed=rsvpembed)
         
     
     async def monitor_status(self):

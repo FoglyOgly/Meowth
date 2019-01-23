@@ -353,7 +353,7 @@ class Raid():
             await meowthuser.rsvp(self.id, new_status, bosses=new_bosses, party=party)
     
     async def on_command_completion(self, ctx):
-        if ctx.command.name not in ('counters', 'group', 'starting', 'weather', 'moveset', 'timer'):
+        if ctx.command.name not in ('counters', 'group', 'starting', 'weather', 'moveset', 'timerset'):
             return
         if str(ctx.channel.id) not in self.channel_ids:
             return

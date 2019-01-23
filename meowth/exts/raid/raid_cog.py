@@ -365,6 +365,7 @@ class Raid():
                 try:
                     zone = self.tz
                     newdt = parse(newtime, settings={'TIMEZONE': zone, 'RETURN_AS_TIMEZONE_AWARE': True, 'PREFER_DATES_FROM': 'future'})
+                    print(newdt)
                     stamp = newdt.timestamp()
                 except:
                     raise

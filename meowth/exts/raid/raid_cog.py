@@ -358,7 +358,7 @@ class Raid():
         if str(ctx.channel.id) not in self.channel_ids:
             return
         if ctx.command.name == 'timerset':
-            newtime = ctx.args[2]
+            newtime = ctx.kwargs['time']
             if newtime.isdigit():
                 stamp = time.time() + 60*int(newtime)
             else:

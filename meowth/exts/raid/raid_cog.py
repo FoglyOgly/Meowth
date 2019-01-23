@@ -369,11 +369,13 @@ class Raid():
                 except:
                     raise
             self.update_time(stamp)
+            has_embed = False
             for idstring in self.message_ids:
                 chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
-                embed = msg.embeds[0]
-                embed.timestamp = stamp
-                has_embed = False
+                if not has_embed:
+                    embed = msg.embeds[0]
+                    embed.timestamp = datetime.fromtimestamp(stamp)
+                    has_embed = True
                 await msg.edit(embed=embed)
             return
         if ctx.command.name == 'moveset':

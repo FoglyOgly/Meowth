@@ -1,5 +1,5 @@
 from meowth import Cog, command, bot, checks
-from meowth.exts.map import Gym, ReportChannel
+from meowth.exts.map import Gym, ReportChannel, PartialGym
 from meowth.exts.pkmn import Pokemon, Move
 from meowth.exts.weather import Weather
 from meowth.exts.want import Want
@@ -1237,8 +1237,12 @@ class Raid():
 
 
     @classmethod
-    async def from_data(cls, bot, data, listen: bool=False):
-        gym = Gym(bot, data['gym'])
+    async def from_data(cls, bot, data):
+        if data['gym'].isdigit():
+            gym = Gym(bot, int(data['gym']))
+        else:
+            city, arg = data['gym'].split('/')
+            gym = PartialGym(bot, city, arg)
         level = data['level']
         guild_id = data['guild']
         pkmnid, quick, charge = data.get('pkmn', (None, None, None))
@@ -1255,8 +1259,13 @@ class Raid():
         raid.id = data['id']
         raid.trainer_dict = await raid.get_trainer_dict()
         raid.group_list = await raid.get_grp_list()
-        if listen:
-            bot.add_listener(raid.on_raw_reaction_add)
+        bot.add_listener(raid.on_raw_reaction_add)
+        bot.add_listener(raid.on_command_completion)
+        await raid.monitor_status()
+        await bot.dbi.add_listener(f'rsvp_{raid.id}', raid._rsvp)
+        if isinstance(gym, Gym):
+            cellid = await gym._L10()
+            await bot.dbi.add_listener(f'weather_{cellid}', raid._weather)
         return raid
     
 
@@ -1268,6 +1277,9 @@ class RaidCog(Cog):
     def __init__(self, bot):
         bot.raid_info = raid_info
         self.bot = bot
+    
+    async def pickup_raiddata(self):
+        raid_table = self.bot.dbi.table('raids')
 
     @command(aliases=['r'])
     @raid_checks.raid_enabled()
@@ -1283,7 +1295,7 @@ class RaidCog(Cog):
         raid_table = ctx.bot.dbi.table('raids')
         if isinstance(gym, Gym):
             query = raid_table.query()
-            query.where(gym=gym.id, guild=ctx.guild.id)
+            query.where(gym=str(gym.id), guild=ctx.guild.id)
             old_raid = await query.get()
             if old_raid:
                 old_raid = old_raid[0]
@@ -1377,8 +1389,12 @@ class RaidCog(Cog):
                 await reportmsg.add_reaction(react)
             new_raid.message_ids.append(f"{reportmsg.channel.id}/{reportmsg.id}")
         insert = raid_table.insert()
+        if isinstance(gym, Gym):
+            gymid = str(gym.id)
+        else:
+            gymid = f'{gym.city}/{gym.arg}'
         data = {
-            'gym': getattr(gym, 'id', 0),
+            'gym': gymid,
             'guild': ctx.guild.id,
             'level': level,
             'pkmn': (boss.id, boss.quickMoveid or None, boss.chargeMoveid or None) if boss else (None, None, None),
@@ -1393,8 +1409,7 @@ class RaidCog(Cog):
         new_raid.id = rcrd[0][0]
         ctx.bot.add_listener(new_raid.on_raw_reaction_add)
         ctx.bot.add_listener(new_raid.on_command_completion)
-        loop = asyncio.get_event_loop()
-        loop.create_task(new_raid.monitor_status())
+        await new_raid.monitor_status()
         await ctx.bot.dbi.add_listener(f'rsvp_{new_raid.id}', new_raid._rsvp)
         if isinstance(gym, Gym):
             cellid = await gym._L10()

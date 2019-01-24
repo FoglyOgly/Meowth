@@ -695,7 +695,7 @@ class Raid():
                     await asyncio.sleep(sleeptime)
                 end = self.end
                 if end <= time.time():
-                    await self.expire_raid()
+                    self.bot.loop.create_task(self.expire_raid())
                 else:
                     continue
         

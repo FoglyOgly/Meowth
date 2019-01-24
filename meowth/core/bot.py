@@ -80,7 +80,8 @@ class Bot(commands.AutoShardedBot):
         self.data = DataManager(self.dbi)
         kwargs = dict(owner_id=self.owner,
                       command_prefix=self.dbi.prefix_manager,
-                      status=discord.Status.dnd, **kwargs)
+                      status=discord.Status.dnd, case_insensitive=True, 
+                      **kwargs)
         super().__init__(**kwargs)
         self.session = aiohttp.ClientSession(loop=self.loop)
         self.loop.run_until_complete(self._db_connect())

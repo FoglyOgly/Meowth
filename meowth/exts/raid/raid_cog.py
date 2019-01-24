@@ -386,7 +386,7 @@ class Raid():
             move2 = ctx.args[3]
             boss = self.pkmn
             moves = await boss.moves()
-            bad_move = (move1 if move1.id not in moves else False) or 
+            bad_move = (move1 if move1.id not in moves else False) or \
                 (move2 if move2 and move2.id not in moves else False)
             if bad_move:
                 boss_name = await boss.name()

@@ -1256,7 +1256,7 @@ class RaidCog(Cog):
         bot.raid_info = raid_info
         self.bot = bot
 
-    @command()
+    @command(aliases=['r'])
     @raid_checks.raid_enabled()
     async def raid(self, ctx, level_or_boss, *, gym_and_time):
         gym_split = gym_and_time.split()
@@ -1401,17 +1401,17 @@ class RaidCog(Cog):
         party = await meowthuser.party_list(total=total, *teamcounts)
         await meowthuser.rsvp(raid_id, status, party=party)
     
-    @command()
+    @command(aliases=['i', 'maybe'])
     @raid_checks.raid_channel()
     async def interested(self, ctx, total: int=0, *teamcounts):
         await self.rsvp(ctx, "maybe", total=total, *teamcounts)
         
-    @command()
+    @command(aliases=['c', 'omw'])
     @raid_checks.raid_channel()
     async def coming(self, ctx, total: int=0, *teamcounts):
         await self.rsvp(ctx, "coming", total=total, *teamcounts)
     
-    @command()
+    @command(aliases=['h'])
     @raid_checks.raid_channel()
     async def here(self, ctx, total: int=0, *teamcounts):
         await self.rsvp(ctx, "here", total=total, *teamcounts)
@@ -1426,7 +1426,7 @@ class RaidCog(Cog):
     async def group(self, ctx, time):
         pass
     
-    @command()
+    @command(aliases=['start'])
     @raid_checks.raid_channel()
     async def starting(self, ctx):
         pass
@@ -1436,12 +1436,12 @@ class RaidCog(Cog):
     async def weather(self, ctx, *, weather: Weather):
         pass
     
-    @command()
+    @command(aliases=['move'])
     @raid_checks.raid_channel()
     async def moveset(self, ctx, move1: Move, move2: Move=None):
         pass
     
-    @command()
+    @command(aliases=['timer'])
     @raid_checks.raid_channel()
     async def timerset(self, ctx, *, time):
         pass

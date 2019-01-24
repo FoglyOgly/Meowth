@@ -1419,7 +1419,8 @@ class RaidCog(Cog):
         new_raid.id = rcrd[0][0]
         ctx.bot.add_listener(new_raid.on_raw_reaction_add)
         ctx.bot.add_listener(new_raid.on_command_completion)
-        ctx.bot.loop.create_task(new_raid.monitor_status())
+        loop = asyncio.get_event_loop()
+        loop.create_task(new_raid.monitor_status())
         await ctx.bot.dbi.add_listener(f'rsvp_{new_raid.id}', new_raid._rsvp)
         if isinstance(gym, Gym):
             cellid = await gym._L10()

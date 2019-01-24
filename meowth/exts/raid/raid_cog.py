@@ -681,7 +681,8 @@ class Raid():
             end = self.end
             if self.status == 'egg':
                 sleeptime = time.time() - hatch
-                await asyncio.sleep(sleeptime)
+                if sleeptime > 0:
+                    await asyncio.sleep(sleeptime)
                 hatch = self.hatch
                 if hatch <= time.time():
                     await self.hatch_egg()
@@ -690,7 +691,8 @@ class Raid():
                     continue
             else:
                 sleeptime = time.time() - end
-                await asyncio.sleep(sleeptime)
+                if sleeptime > 0:
+                    await asyncio.sleep(sleeptime)
                 end = self.end
                 if end <= time.time():
                     await self.expire_raid()
@@ -1262,10 +1264,10 @@ class Raid():
         bot.add_listener(raid.on_raw_reaction_add)
         bot.add_listener(raid.on_command_completion)
         bot.loop.create_task(raid.monitor_status())
-        # await bot.dbi.add_listener(f'rsvp_{raid.id}', raid._rsvp)
-        # if isinstance(gym, Gym):
-        #     cellid = await gym._L10()
-        #     await bot.dbi.add_listener(f'weather_{cellid}', raid._weather)
+        await bot.dbi.add_listener(f'rsvp_{raid.id}', raid._rsvp)
+        if isinstance(gym, Gym):
+            cellid = await gym._L10()
+            await bot.dbi.add_listener(f'weather_{cellid}', raid._weather)
         return raid
     
 
@@ -1283,9 +1285,7 @@ class RaidCog(Cog):
         raid_table = self.bot.dbi.table('raids')
         query = raid_table.query()
         data = await query.get()
-        print(data)
         for rcrd in data:
-            print(rcrd)
             await Raid.from_data(self.bot, rcrd)
 
     @command(aliases=['r'])

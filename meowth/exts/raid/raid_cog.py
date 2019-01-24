@@ -1398,7 +1398,11 @@ class RaidCog(Cog):
     async def rsvp(self, ctx, status, total: int=0, *teamcounts):
         raid_id = await self.get_raidid(ctx)
         meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
-        party = await meowthuser.party_list(total=total, *teamcounts)
+        if teamcounts:
+            party = await meowthuser.party_list(total=total, *teamcounts)
+            await meowthuser.set_party(party=party)
+        else:
+            party = await meowthuser.party()
         await meowthuser.rsvp(raid_id, status, party=party)
     
     @command(aliases=['i', 'maybe'])

@@ -1277,9 +1277,15 @@ class RaidCog(Cog):
     def __init__(self, bot):
         bot.raid_info = raid_info
         self.bot = bot
+        loop = asyncio.get_event_loop()
+        loop.create_task(self.pickup_raiddata())
     
     async def pickup_raiddata(self):
         raid_table = self.bot.dbi.table('raids')
+        query = raid_table.query()
+        data = await query.get()
+        for rcrd in data:
+            await Raid.from_data(self.bot, rcrd)
 
     @command(aliases=['r'])
     @raid_checks.raid_enabled()

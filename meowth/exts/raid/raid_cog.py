@@ -1277,7 +1277,7 @@ class RaidCog(Cog):
     def __init__(self, bot):
         bot.raid_info = raid_info
         self.bot = bot
-        self.bot.loop.create_task(self.pickup_raiddata())
+        # self.bot.loop.create_task(self.pickup_raiddata())
     
     async def pickup_raiddata(self):
         raid_table = self.bot.dbi.table('raids')

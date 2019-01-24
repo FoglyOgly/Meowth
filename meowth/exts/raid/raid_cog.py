@@ -1263,8 +1263,7 @@ class Raid():
         raid.group_list = await raid.get_grp_list()
         bot.add_listener(raid.on_raw_reaction_add)
         bot.add_listener(raid.on_command_completion)
-        loop = asyncio.get_event_loop()
-        loop.create_task(raid.monitor_status())
+        await raid.monitor_status()
         # bot.loop.create_task(bot.dbi.add_listener(f'rsvp_{raid.id}', raid._rsvp))
         # if isinstance(gym, Gym):
         #     cellid = await gym._L10()
@@ -1419,8 +1418,7 @@ class RaidCog(Cog):
         new_raid.id = rcrd[0][0]
         ctx.bot.add_listener(new_raid.on_raw_reaction_add)
         ctx.bot.add_listener(new_raid.on_command_completion)
-        loop = asyncio.get_event_loop()
-        loop.create_task(new_raid.monitor_status())
+        await new_raid.monitor_status()
         await ctx.bot.dbi.add_listener(f'rsvp_{new_raid.id}', new_raid._rsvp)
         if isinstance(gym, Gym):
             cellid = await gym._L10()

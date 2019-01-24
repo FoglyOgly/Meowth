@@ -901,6 +901,7 @@ class Raid():
         ctrs_str = "\n".join(ctrs_str)
         rec = await self.rec_group_size()
         rec_str = str(rec)
+        moveset_embed = discord.Embed(description=moveset_str)
         has_embed = False
         for idstring in self.message_ids:
             chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
@@ -910,6 +911,10 @@ class Raid():
                 embed = raid_embed.embed
                 has_embed = True
             await msg.edit(embed=embed)
+        if self.channel_ids:
+            for chanid in self.channel_ids:
+                channel = self.bot.get_channel(int(chanid))
+                await channel.send("This raid boss's moveset has been updated!",embed=moveset_embed)
 
     async def egg_embed(self):
         return (await EggEmbed.from_raid(self)).embed

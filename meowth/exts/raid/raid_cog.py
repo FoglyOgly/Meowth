@@ -1264,10 +1264,10 @@ class Raid():
         bot.add_listener(raid.on_raw_reaction_add)
         bot.add_listener(raid.on_command_completion)
         bot.loop.create_task(raid.monitor_status())
-        bot.loop.create_task(bot.dbi.add_listener(f'rsvp_{raid.id}', raid._rsvp))
-        if isinstance(gym, Gym):
-            cellid = await gym._L10()
-            bot.loop.create_task(bot.dbi.add_listener(f'weather_{cellid}', raid._weather))
+        # bot.loop.create_task(bot.dbi.add_listener(f'rsvp_{raid.id}', raid._rsvp))
+        # if isinstance(gym, Gym):
+        #     cellid = await gym._L10()
+        #     bot.loop.create_task(bot.dbi.add_listener(f'weather_{cellid}', raid._weather))
         return raid
     
 

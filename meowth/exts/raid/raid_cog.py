@@ -679,7 +679,7 @@ class Raid():
         while True:
             hatch = self.hatch
             end = self.end
-            if hatch:
+            if self.status == 'egg':
                 sleeptime = time.time() - hatch
                 await asyncio.sleep(sleeptime)
                 hatch = self.hatch

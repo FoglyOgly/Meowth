@@ -862,15 +862,15 @@ class Raid():
                 charge = move2.id
         quick_move = Move(self.bot, fast) if fast else None
         charge_move = Move(self.bot, charge) if charge else None
-        self.pkmn.quickMoveid = quick_move.id
-        self.pkmn.chargeMoveid = charge_move.id
         if quick_move:
+            self.pkmn.quickMoveid = quick_move.id
             quick_name = await quick_move.name()
             quick_emoji = await quick_move.emoji()
         else:
             quick_name = "Unknown"
             quick_emoji = ""
         if charge_move:
+            self.pkmn.chargeMoveid = charge_move.id
             charge_name = await charge_move.name()
             charge_emoji = await charge_move.emoji()
         else:

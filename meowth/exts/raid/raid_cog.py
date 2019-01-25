@@ -365,7 +365,6 @@ class Raid():
                 try:
                     zone = self.tz
                     newdt = parse(newtime, settings={'TIMEZONE': zone, 'RETURN_AS_TIMEZONE_AWARE': True})
-                    print(newdt)
                     stamp = newdt.timestamp()
                 except:
                     raise
@@ -680,12 +679,9 @@ class Raid():
             hatch = self.hatch
             end = self.end
             if self.status == 'egg':
-                print(20)
                 sleeptime = hatch - time.time()
                 if sleeptime > 0:
-                    print(21)
                     await asyncio.sleep(sleeptime)
-                    print(22)
                 hatch = self.hatch
                 if hatch <= time.time():
                     await self.hatch_egg()
@@ -1259,25 +1255,19 @@ class Raid():
         hatch = data.get('hatch')
         end = data['endtime']
         raid = cls(bot, guild_id, gym, level=level, pkmn=boss, hatch=hatch, end=end)
-        print(10)
         raid.channel_ids = data.get('channels')
         raid.message_ids = data.get('messages')
         raid.id = data['id']
         raid.trainer_dict = await raid.get_trainer_dict()
-        print(11)
         raid.group_list = await raid.get_grp_list()
-        print(12)
         bot.add_listener(raid.on_raw_reaction_add)
-        print(13)
         bot.add_listener(raid.on_command_completion)
-        print(14)
         loop = asyncio.get_event_loop()
         loop.create_task(raid.monitor_status())
-        print(15)
-        # bot.loop.create_task(bot.dbi.add_listener(f'rsvp_{raid.id}', raid._rsvp))
-        # if isinstance(gym, Gym):
-        #     cellid = await gym._L10()
-        #     bot.loop.create_task(bot.dbi.add_listener(f'weather_{cellid}', raid._weather))
+        await bot.dbi.add_listener(f'rsvp_{raid.id}', raid._rsvp)
+        if isinstance(gym, Gym):
+            cellid = await gym._L10()
+            await bot.dbi.add_listener(f'weather_{cellid}', raid._weather)
         return raid
     
 
@@ -1297,7 +1287,6 @@ class RaidCog(Cog):
         query = raid_table.query()
         data = await query.get()
         for rcrd in data:
-            print(rcrd)
             await Raid.from_data(self.bot, rcrd)
 
     @command(aliases=['r'])
@@ -1426,22 +1415,14 @@ class RaidCog(Cog):
         insert.returning('id')
         rcrd = await insert.commit()
         new_raid.id = rcrd[0][0]
-        print(0)
         ctx.bot.add_listener(new_raid.on_raw_reaction_add)
-        print(1)
         ctx.bot.add_listener(new_raid.on_command_completion)
-        print(2)
         loop = asyncio.get_event_loop()
-        print(3)
         loop.create_task(new_raid.monitor_status())
-        print(4)
-        loop.create_task(ctx.bot.dbi.add_listener(f'rsvp_{new_raid.id}', new_raid._rsvp))
-        print(5)
+        await ctx.bot.dbi.add_listener(f'rsvp_{new_raid.id}', new_raid._rsvp)
         if isinstance(gym, Gym):
             cellid = await gym._L10()
-            print(6)
             await ctx.bot.dbi.add_listener(f'weather_{cellid}', new_raid._weather)
-            print(7)
     
     @staticmethod
     async def get_raidid(ctx):

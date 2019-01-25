@@ -697,7 +697,7 @@ class Raid():
                 end = self.end
                 if end <= time.time():
                     print(3)
-                    self.bot.loop.create_task(self.expire_raid())
+                    await self.expire_raid()
                 else:
                     continue
         
@@ -1284,7 +1284,6 @@ class RaidCog(Cog):
         bot.raid_info = raid_info
         self.bot = bot
         loop = asyncio.get_event_loop()
-        print(0)
         loop.create_task(self.pickup_raiddata())
     
     async def pickup_raiddata(self):
@@ -1293,7 +1292,6 @@ class RaidCog(Cog):
         data = await query.get()
         print(0.1)
         for rcrd in data:
-            print(rcrd)
             await Raid.from_data(self.bot, rcrd)
 
     @command(aliases=['r'])

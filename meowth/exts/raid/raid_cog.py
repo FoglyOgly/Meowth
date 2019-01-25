@@ -689,11 +689,14 @@ class Raid():
                 else:
                     continue
             else:
+                print(1)
                 sleeptime = end - time.time()
                 if sleeptime > 0:
+                    print(2)
                     await asyncio.sleep(sleeptime)
                 end = self.end
                 if end <= time.time():
+                    print(3)
                     self.bot.loop.create_task(self.expire_raid())
                 else:
                     continue
@@ -1259,17 +1262,13 @@ class Raid():
         raid.message_ids = data.get('messages')
         raid.id = data['id']
         raid.trainer_dict = await raid.get_trainer_dict()
-        print(1)
         raid.group_list = await raid.get_grp_list()
-        print(2)
         bot.add_listener(raid.on_raw_reaction_add)
-        print(3)
         bot.add_listener(raid.on_command_completion)
-        print(4)
         loop = asyncio.get_event_loop()
         loop.create_task(raid.monitor_status())
-        print(5)
         await bot.dbi.add_listener(f'rsvp_{raid.id}', raid._rsvp)
+        print(4)
         if isinstance(gym, Gym):
             cellid = await gym._L10()
             await bot.dbi.add_listener(f'weather_{cellid}', raid._weather)

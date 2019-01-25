@@ -1417,14 +1417,22 @@ class RaidCog(Cog):
         insert.returning('id')
         rcrd = await insert.commit()
         new_raid.id = rcrd[0][0]
+        print(0)
         ctx.bot.add_listener(new_raid.on_raw_reaction_add)
+        print(1)
         ctx.bot.add_listener(new_raid.on_command_completion)
+        print(2)
         loop = asyncio.get_event_loop()
+        print(3)
         loop.create_task(new_raid.monitor_status())
+        print(4)
         await ctx.bot.dbi.add_listener(f'rsvp_{new_raid.id}', new_raid._rsvp)
+        print(5)
         if isinstance(gym, Gym):
             cellid = await gym._L10()
+            print(6)
             await ctx.bot.dbi.add_listener(f'weather_{cellid}', new_raid._weather)
+            print(7)
     
     @staticmethod
     async def get_raidid(ctx):

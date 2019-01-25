@@ -690,14 +690,11 @@ class Raid():
                 else:
                     continue
             else:
-                print(1)
                 sleeptime = end - time.time()
                 if sleeptime > 0:
-                    print(2)
                     await asyncio.sleep(sleeptime)
                 end = self.end
                 if end <= time.time():
-                    print(3)
                     await self.expire_raid()
                 else:
                     continue
@@ -1269,7 +1266,6 @@ class Raid():
         loop = asyncio.get_event_loop()
         loop.create_task(raid.monitor_status())
         await bot.dbi.add_listener(f'rsvp_{raid.id}', raid._rsvp)
-        print(4)
         if isinstance(gym, Gym):
             cellid = await gym._L10()
             await bot.dbi.add_listener(f'weather_{cellid}', raid._weather)
@@ -1291,7 +1287,6 @@ class RaidCog(Cog):
         raid_table = self.bot.dbi.table('raids')
         query = raid_table.query()
         data = await query.get()
-        print(0.1)
         for rcrd in data:
             await Raid.from_data(self.bot, rcrd)
 

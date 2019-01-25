@@ -1285,6 +1285,7 @@ class RaidCog(Cog):
         bot.raid_info = raid_info
         self.bot = bot
         loop = asyncio.get_event_loop()
+        print(0)
         loop.create_task(self.pickup_raiddata())
     
     async def pickup_raiddata(self):

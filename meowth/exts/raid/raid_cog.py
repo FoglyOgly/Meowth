@@ -695,7 +695,7 @@ class Raid():
                     await asyncio.sleep(sleeptime)
                 end = self.end
                 if end <= time.time():
-                    await self.expire_raid()
+                    return await self.expire_raid()
                 else:
                     continue
         
@@ -1067,8 +1067,14 @@ class Raid():
                 channel = self.bot.get_channel(int(chanid))
                 await channel.delete()
         raid_table = self.bot.dbi.table('raids')
+        rsvp_table = self.bot.dbi.table('raid_rsvp')
+        grp_table = self.bot.dbi.table('raid_groups')
         query = raid_table.query().where(id=self.id)
         await query.delete()
+        rsvp = rsvp_table.query().where(raid_id=self.id)
+        await rsvp.delete()
+        grps = grp_table.query().where(raid_id=self.id)
+        await grps.delete()
     
     # async def update_gym(self, gym):
 

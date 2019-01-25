@@ -463,7 +463,7 @@ class Raid():
                     await meowthuser.rsvp(self.id, "lobby")
                 await self.update_rsvp()
                 await asyncio.sleep(120)
-                user_table = self.bot.dbi.table('users')
+                rsvp_table = self.bot.dbi.table('raid_rsvp')
                 update = user_table.update().where(user_table['id'].in_(grp['users']))
                 update.values(lobby=None)
                 await update.commit()
@@ -685,8 +685,7 @@ class Raid():
                     await asyncio.sleep(sleeptime)
                 hatch = self.hatch
                 if hatch <= time.time():
-                    await self.hatch_egg()
-                    continue
+                    return await self.hatch_egg()
                 else:
                     continue
             else:

@@ -1292,6 +1292,7 @@ class RaidCog(Cog):
         query = raid_table.query()
         data = await query.get()
         for rcrd in data:
+            print(rcrd)
             await Raid.from_data(self.bot, rcrd)
 
     @command(aliases=['r'])

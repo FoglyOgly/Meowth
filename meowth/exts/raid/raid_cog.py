@@ -1292,6 +1292,7 @@ class RaidCog(Cog):
         raid_table = self.bot.dbi.table('raids')
         query = raid_table.query()
         data = await query.get()
+        print(0.1)
         for rcrd in data:
             print(rcrd)
             await Raid.from_data(self.bot, rcrd)

@@ -1426,7 +1426,7 @@ class RaidCog(Cog):
         print(3)
         loop.create_task(new_raid.monitor_status())
         print(4)
-        await ctx.bot.dbi.add_listener(f'rsvp_{new_raid.id}', new_raid._rsvp)
+        loop.create_task(ctx.bot.dbi.add_listener(f'rsvp_{new_raid.id}', new_raid._rsvp))
         print(5)
         if isinstance(gym, Gym):
             cellid = await gym._L10()

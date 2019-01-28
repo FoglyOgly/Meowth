@@ -1273,6 +1273,7 @@ class Raid():
         loop = asyncio.get_event_loop()
         loop.create_task(raid.monitor_status())
         await bot.dbi.add_listener(f'rsvp_{raid.id}', raid._rsvp)
+        print(1)
         if isinstance(gym, Gym):
             cellid = await gym._L10()
             print(cellid)

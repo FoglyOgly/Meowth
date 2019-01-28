@@ -690,11 +690,13 @@ class Raid():
                     continue
             else:
                 sleeptime = end - time.time()
+                print(2)
                 if sleeptime > 0:
                     await asyncio.sleep(sleeptime)
                 end = self.end
                 if end <= time.time():
-                    return await self.expire_raid()
+                    self.bot.loop.create_task(self.expire_raid())
+                    return
                 else:
                     continue
         
@@ -1023,6 +1025,9 @@ class Raid():
     
     
     async def hatch_egg(self):
+        if self.end < time.time():
+            self.bot.loop.create_task(await self.expire_raid())
+            return
         content = "This raid egg has hatched! React below to report the boss!"
         boss_list = self.boss_list
         length = len(boss_list)

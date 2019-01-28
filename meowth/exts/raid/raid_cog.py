@@ -693,7 +693,6 @@ class Raid():
                     continue
             else:
                 sleeptime = end - time.time()
-                print(2)
                 if sleeptime > 0:
                     await asyncio.sleep(sleeptime)
                 end = self.end
@@ -1007,8 +1006,6 @@ class Raid():
             embed = self.expired_embed()
         for messageid in message_ids:
             chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
-            if not content:
-                content = msg.content
             await msg.edit(content=content, embed=embed)
             msg_list.append(msg)
         if self.channel_ids:
@@ -1273,7 +1270,6 @@ class Raid():
         raid.channel_ids = data.get('channels')
         raid.message_ids = data.get('messages')
         raid.id = data['id']
-        print(raid.id)
         raid.trainer_dict = await raid.get_trainer_dict()
         raid.group_list = await raid.get_grp_list()
         bot.add_listener(raid.on_raw_reaction_add)
@@ -1281,10 +1277,8 @@ class Raid():
         loop = asyncio.get_event_loop()
         loop.create_task(raid.monitor_status())
         await bot.dbi.add_listener(f'rsvp_{raid.id}', raid._rsvp)
-        print(1)
         if isinstance(gym, Gym):
             cellid = await gym._L10()
-            print(cellid)
             await bot.dbi.add_listener(f'weather_{cellid}', raid._weather)
         return raid
     

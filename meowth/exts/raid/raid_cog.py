@@ -511,6 +511,7 @@ class Raid():
                     grp['users'].append(user_id)
                     meowthuser = MeowthUser.from_id(self.bot, user_id)
                     await meowthuser.rsvp(self.id, "lobby")
+                    await react_channel.send(f'{meowthuser.user.display_name} has entered the lobby!')
                     await self.update_rsvp()
                     continue
                 elif payload and str(payload.emoji) == '⏸':
@@ -534,10 +535,10 @@ class Raid():
                         continue
                 else:
                     await lobbymsg.edit(content=f"Group {grp['emoji']} has entered the raid!")
-            user_table = self.bot.dbi.table('users')
-            update = user_table.update().where(user_table['id'].in_(grp['users']))
-            update.values(lobby=None)
-            await update.commit()
+            user_table = self.bot.dbi.table('raid_rsvp')
+            query = user_table.query().where(user_table['user_id'].in_(grp['users']))
+            query.where(raid_id=self.id)
+            await query.delete()
             self.group_list.remove(grp)
             await self.update_rsvp()
             return                
@@ -662,6 +663,8 @@ class Raid():
                         display_status = 'is at the raid'
                     elif status == 'cancel':
                         display_status = 'has canceled'
+                    else:
+                        break
                     content = f"{member.display_name} {display_status}!"
                     newmsg = await chn.send(content, embed=rsvpembed)
         elif user_id and group:

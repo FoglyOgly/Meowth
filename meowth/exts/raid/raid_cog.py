@@ -679,7 +679,7 @@ class Raid():
         while True:
             hatch = self.hatch
             end = self.end
-            if self.status == 'egg':
+            if not self.pkmn:
                 sleeptime = hatch - time.time()
                 if sleeptime > 0:
                     await asyncio.sleep(sleeptime)
@@ -1047,7 +1047,8 @@ class Raid():
         }
         update.values(**d)
         await update.commit()
-        return await self.update_messages()
+        await self.update_messages()
+        return await self.monitor_status()
 
     async def correct_weather(self, weather):
         if isinstance(self.gym, Gym):

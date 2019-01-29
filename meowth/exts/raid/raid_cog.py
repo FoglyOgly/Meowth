@@ -1470,7 +1470,7 @@ class RaidCog(Cog):
         print(ctx.kwargs)
         print(total)
         print(*teamcounts)
-        await self.rsvp(ctx, "coming", total=total, *teamcounts)
+        await self.rsvp(ctx, "coming", total, *teamcounts)
     
     @command(aliases=['h'])
     @raid_checks.raid_channel()

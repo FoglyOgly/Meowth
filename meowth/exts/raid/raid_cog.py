@@ -1466,6 +1466,8 @@ class RaidCog(Cog):
     @command(aliases=['c', 'omw'])
     @raid_checks.raid_channel()
     async def coming(self, ctx, total: int=0, *teamcounts):
+        print(ctx.args)
+        print(ctx.kwargs)
         await self.rsvp(ctx, "coming", total=total, *teamcounts)
     
     @command(aliases=['h'])

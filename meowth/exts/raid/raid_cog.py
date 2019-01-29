@@ -460,13 +460,14 @@ class Raid():
             if not channel:
                 for user in grp['users']:
                     meowthuser = MeowthUser.from_id(self.bot, user)
-                    await meowthuser.rsvp(self.id, "lobby")
+                    party = await meowthuser.party()
+                    await meowthuser.rsvp(self.id, "lobby", party=party)
                 await self.update_rsvp()
                 await asyncio.sleep(120)
                 rsvp_table = self.bot.dbi.table('raid_rsvp')
-                update = user_table.update().where(user_table['id'].in_(grp['users']))
-                update.values(lobby=None)
-                await update.commit()
+                query = user_table.query().where(user_table['user_id'].in_(grp['users']))
+                query.where(raid_id=self.id)
+                await query.delete()
                 self.group_list.remove(grp)
                 return await self.update_rsvp()
             grp_est = self.grp_est_power(grp)
@@ -492,7 +493,8 @@ class Raid():
                         return await channel.send('Thank you for waiting!')
             for user in grp['users']:
                 meowthuser = MeowthUser.from_id(self.bot, user)
-                await meowthuser.rsvp(self.id, "lobby")
+                party = await meowthuser.party()
+                await meowthuser.rsvp(self.id, "lobby", party=party)
             await self.update_rsvp()
             msg_list = []
             for chn in self.channel_ids:
@@ -1445,6 +1447,8 @@ class RaidCog(Cog):
         return raid_id
     
     async def rsvp(self, ctx, status, total: int=0, *teamcounts):
+        print(ctx.args)
+        print(ctx.kwargs)
         raid_id = await self.get_raidid(ctx)
         meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
         if total or teamcounts:

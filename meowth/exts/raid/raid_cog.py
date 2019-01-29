@@ -1469,7 +1469,7 @@ class RaidCog(Cog):
         print(ctx.args)
         print(ctx.kwargs)
         print(total)
-        print(teamcounts)
+        print(*teamcounts)
         await self.rsvp(ctx, "coming", total=total, *teamcounts)
     
     @command(aliases=['h'])

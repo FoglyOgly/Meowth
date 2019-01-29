@@ -1452,7 +1452,7 @@ class RaidCog(Cog):
         raid_id = await self.get_raidid(ctx)
         meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
         if total or teamcounts:
-            party = await meowthuser.party_list(total=total, *teamcounts)
+            party = await meowthuser.party_list(total, *teamcounts)
             await meowthuser.set_party(party=party)
         else:
             party = await meowthuser.party()
@@ -1461,7 +1461,7 @@ class RaidCog(Cog):
     @command(aliases=['i', 'maybe'])
     @raid_checks.raid_channel()
     async def interested(self, ctx, total: int=0, *teamcounts):
-        await self.rsvp(ctx, "maybe", total=total, *teamcounts)
+        await self.rsvp(ctx, "maybe", total, *teamcounts)
         
     @command(aliases=['c', 'omw'])
     @raid_checks.raid_channel()
@@ -1475,7 +1475,7 @@ class RaidCog(Cog):
     @command(aliases=['h'])
     @raid_checks.raid_channel()
     async def here(self, ctx, total: int=0, *teamcounts):
-        await self.rsvp(ctx, "here", total=total, *teamcounts)
+        await self.rsvp(ctx, "here", total, *teamcounts)
 
     @command()
     @raid_checks.raid_channel()

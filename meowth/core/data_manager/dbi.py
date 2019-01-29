@@ -33,6 +33,7 @@ class DatabaseInterface:
         self.settings_conn = None
         self.settings_stmt = None
         self.types = sqltypes
+        self.listeners = []
 
     async def start(self, loop=None):
         if loop:
@@ -133,6 +134,9 @@ class DatabaseInterface:
         
     async def add_listener(self, channel, callback):
         con = await self.pool.acquire()
+        if channel in self.listeners:
+            return
+        self.listeners.append(channel)
         return await con.add_listener(channel, callback)
 
     async def create_table(self, name, columns: list, *, primaries=None):

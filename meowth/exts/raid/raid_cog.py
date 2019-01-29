@@ -1028,7 +1028,7 @@ class Raid():
     
     async def hatch_egg(self):
         if self.end < time.time():
-            self.bot.loop.create_task(await self.expire_raid())
+            self.bot.loop.create_task(self.expire_raid())
             return
         content = "This raid egg has hatched! React below to report the boss!"
         boss_list = self.boss_list

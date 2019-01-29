@@ -1447,8 +1447,6 @@ class RaidCog(Cog):
         return raid_id
     
     async def rsvp(self, ctx, status, total: int=0, *teamcounts):
-        print(ctx.args)
-        print(ctx.kwargs)
         raid_id = await self.get_raidid(ctx)
         meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
         if total or teamcounts:
@@ -1466,10 +1464,6 @@ class RaidCog(Cog):
     @command(aliases=['c', 'omw'])
     @raid_checks.raid_channel()
     async def coming(self, ctx, total: int=0, *teamcounts):
-        print(ctx.args)
-        print(ctx.kwargs)
-        print(total)
-        print(*teamcounts)
         await self.rsvp(ctx, "coming", total, *teamcounts)
     
     @command(aliases=['h'])

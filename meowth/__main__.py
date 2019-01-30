@@ -4590,7 +4590,7 @@ async def _eggassume(args, raid_channel, author=None):
     await raid_channel.send(_('{roletest}Meowth! This egg will be assumed to be {pokemon} when it hatches!').format(roletest=roletest,pokemon=entered_raid.title()))
     if str(egglevel) in guild_dict[raid_channel.guild.id]['configure_dict']['counters']['auto_levels']:
         ctrs_dict = await _get_generic_counters(raid_channel.guild, entered_raid, weather)
-        ctrsmsg = "Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters."
+        ctrsmsg = _("Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters.")
         ctrsmessage = await raid_channel.send(content=ctrsmsg,embed=ctrs_dict[0]['embed'])
         ctrsmessage_id = ctrsmessage.id
         await ctrsmessage.pin()
@@ -4747,7 +4747,7 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
         egg_report = None
     if str(egglevel) in guild_dict[raid_channel.guild.id]['configure_dict']['counters']['auto_levels'] and not eggdetails.get('pokemon', None):
         ctrs_dict = await _get_generic_counters(raid_channel.guild, entered_raid, weather)
-        ctrsmsg = "Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters."
+        ctrsmsg = _("Here are the best counters for the raid boss in currently known weather conditions! Update weather with **!weather**. If you know the moveset of the boss, you can react to this message with the matching emoji and I will update the counters.")
         ctrsmessage = await raid_channel.send(content=ctrsmsg,embed=ctrs_dict[0]['embed'])
         ctrsmessage_id = ctrsmessage.id
         await ctrsmessage.pin()

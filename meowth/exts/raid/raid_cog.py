@@ -1306,6 +1306,7 @@ class RaidCog(Cog):
     @command(aliases=['r'])
     @raid_checks.raid_enabled()
     async def raid(self, ctx, level_or_boss, *, gym_and_time):
+        print(0)
         gym_split = gym_and_time.split()
         if gym_split[-1].isdigit():
             endtime = int(gym_split.pop(-1))
@@ -1359,6 +1360,7 @@ class RaidCog(Cog):
             hatch = None
         zone = await ctx.tz()
         new_raid = Raid(ctx.bot, ctx.guild.id, gym, level=level, pkmn=boss, hatch=hatch, end=end, tz=zone)
+        print(1)
         new_raid.channel_ids = []
         new_raid.message_ids = []
         react_list = new_raid.react_list
@@ -1428,12 +1430,18 @@ class RaidCog(Cog):
         insert.row(**data)
         insert.returning('id')
         rcrd = await insert.commit()
+        print(2)
         new_raid.id = rcrd[0][0]
+        print(new_raid.id)
         ctx.bot.add_listener(new_raid.on_raw_reaction_add)
+        print(3)
         ctx.bot.add_listener(new_raid.on_command_completion)
+        print(4)
         loop = asyncio.get_event_loop()
         loop.create_task(new_raid.monitor_status())
+        print(5)
         await ctx.bot.dbi.add_listener(f'rsvp_{new_raid.id}', new_raid._rsvp)
+        print(6)
         if isinstance(gym, Gym):
             cellid = await gym._L10()
             await ctx.bot.dbi.add_listener(f'weather_{cellid}', new_raid._weather)

@@ -1017,15 +1017,16 @@ class Raid():
         else:
             embed = self.expired_embed()
         for messageid in message_ids:
-            try:
-                chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
-            except AttributeError:
+            chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
+            if not msg:
                 continue
             await msg.edit(content=content, embed=embed)
             msg_list.append(msg)
         if self.channel_ids:
             for chanid in self.channel_ids:
                 channel = self.bot.get_channel(int(chanid))
+                if not channel:
+                    continue
                 new_name = await self.channel_name()
                 if new_name != channel.name:
                     await channel.edit(name=new_name)

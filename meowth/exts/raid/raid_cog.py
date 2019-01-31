@@ -1017,7 +1017,10 @@ class Raid():
         else:
             embed = self.expired_embed()
         for messageid in message_ids:
-            chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
+            try:
+                chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
+            except TypeError:
+                continue
             await msg.edit(content=content, embed=embed)
             msg_list.append(msg)
         if self.channel_ids:

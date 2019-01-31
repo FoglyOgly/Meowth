@@ -1043,6 +1043,7 @@ class Raid():
     
     async def hatch_egg(self):
         if self.end < time.time():
+            print(10)
             self.bot.loop.create_task(self.expire_raid())
             return
         content = "This raid egg has hatched! React below to report the boss!"
@@ -1082,10 +1083,13 @@ class Raid():
         
     
     async def expire_raid(self):
+        print(11)
         await self.update_messages()
+        print(12)
         await asyncio.sleep(60)
         if self.channel_ids:
             for chanid in self.channel_ids:
+                print(13)
                 channel = self.bot.get_channel(int(chanid))
                 if not channel:
                     continue
@@ -1093,12 +1097,16 @@ class Raid():
         raid_table = self.bot.dbi.table('raids')
         rsvp_table = self.bot.dbi.table('raid_rsvp')
         grp_table = self.bot.dbi.table('raid_groups')
+        print(14)
         query = raid_table.query().where(id=self.id)
         await query.delete()
+        print(15)
         rsvp = rsvp_table.query().where(raid_id=self.id)
         await rsvp.delete()
+        print(16)
         grps = grp_table.query().where(raid_id=self.id)
         await grps.delete()
+        print(17)
     
     # async def update_gym(self, gym):
 

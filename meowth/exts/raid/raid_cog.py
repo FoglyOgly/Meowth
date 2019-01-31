@@ -1019,7 +1019,7 @@ class Raid():
         for messageid in message_ids:
             try:
                 chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
-            except TypeError:
+            except AttributeError:
                 continue
             await msg.edit(content=content, embed=embed)
             msg_list.append(msg)

@@ -682,36 +682,27 @@ class Raid():
     
     async def monitor_status(self):
         while True:
-            print(1)
             hatch = self.hatch
             end = self.end
             if not self.pkmn:
-                print(2)
                 sleeptime = hatch - time.time()
                 if sleeptime > 0:
-                    print(3)
                     await asyncio.sleep(sleeptime)
                 hatch = self.hatch
                 if hatch <= time.time():
-                    print(4)
                     self.bot.loop.create_task(self.hatch_egg())
                     return
                 else:
-                    print(5)
                     continue
             else:
-                print(6)
                 sleeptime = end - time.time()
                 if sleeptime > 0:
-                    print(7)
                     await asyncio.sleep(sleeptime)
                 end = self.end
                 if end <= time.time():
-                    print(8)
                     self.bot.loop.create_task(self.expire_raid())
                     return
                 else:
-                    print(9)
                     continue
         
 
@@ -1043,7 +1034,6 @@ class Raid():
     
     async def hatch_egg(self):
         if self.end < time.time():
-            print(10)
             self.bot.loop.create_task(self.expire_raid())
             return
         content = "This raid egg has hatched! React below to report the boss!"
@@ -1083,13 +1073,10 @@ class Raid():
         
     
     async def expire_raid(self):
-        print(11)
         self.bot.loop.create_task(self.update_messages())
-        print(12)
         await asyncio.sleep(60)
         if self.channel_ids:
             for chanid in self.channel_ids:
-                print(13)
                 channel = self.bot.get_channel(int(chanid))
                 if not channel:
                     continue
@@ -1097,15 +1084,12 @@ class Raid():
         raid_table = self.bot.dbi.table('raids')
         query = raid_table.query().where(id=self.id)
         self.bot.loop.create_task(query.delete())
-        print(14)
         rsvp_table = self.bot.dbi.table('raid_rsvp')
         rsvp = rsvp_table.query().where(raid_id=self.id)
         self.bot.loop.create_task(rsvp.delete())
-        print(15)
         grp_table = self.bot.dbi.table('raid_groups')
         grps = grp_table.query().where(raid_id=self.id)
         self.bot.loop.create_task(grps.delete())
-        print(16)
     
     # async def update_gym(self, gym):
 
@@ -1317,8 +1301,8 @@ class RaidCog(Cog):
     def __init__(self, bot):
         bot.raid_info = raid_info
         self.bot = bot
-        loop = asyncio.get_event_loop()
-        loop.create_task(self.pickup_raiddata())
+        self.bot.loop.create_task(self.pickup_raiddata())
+        return
     
     async def pickup_raiddata(self):
         raid_table = self.bot.dbi.table('raids')
@@ -1483,16 +1467,22 @@ class RaidCog(Cog):
     @command(aliases=['i', 'maybe'])
     @raid_checks.raid_channel()
     async def interested(self, ctx, total: int=0, *teamcounts):
+        if total < 1:
+            return
         await self.rsvp(ctx, "maybe", total, *teamcounts)
         
     @command(aliases=['c', 'omw'])
     @raid_checks.raid_channel()
     async def coming(self, ctx, total: int=0, *teamcounts):
+        if total < 1:
+            return
         await self.rsvp(ctx, "coming", total, *teamcounts)
     
     @command(aliases=['h'])
     @raid_checks.raid_channel()
     async def here(self, ctx, total: int=0, *teamcounts):
+        if total < 1:
+            return
         await self.rsvp(ctx, "here", total, *teamcounts)
 
     @command()

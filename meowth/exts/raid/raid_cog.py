@@ -1087,6 +1087,8 @@ class Raid():
         if self.channel_ids:
             for chanid in self.channel_ids:
                 channel = self.bot.get_channel(int(chanid))
+                if not channel:
+                    continue
                 await channel.delete()
         raid_table = self.bot.dbi.table('raids')
         rsvp_table = self.bot.dbi.table('raid_rsvp')

@@ -1095,18 +1095,17 @@ class Raid():
                     continue
                 await channel.delete()
         raid_table = self.bot.dbi.table('raids')
-        rsvp_table = self.bot.dbi.table('raid_rsvp')
-        grp_table = self.bot.dbi.table('raid_groups')
-        print(14)
         query = raid_table.query().where(id=self.id)
         await query.delete()
-        print(15)
+        print(14)
+        rsvp_table = self.bot.dbi.table('raid_rsvp')
         rsvp = rsvp_table.query().where(raid_id=self.id)
         await rsvp.delete()
-        print(16)
+        print(15)
+        grp_table = self.bot.dbi.table('raid_groups')
         grps = grp_table.query().where(raid_id=self.id)
         await grps.delete()
-        print(17)
+        print(16)
     
     # async def update_gym(self, gym):
 

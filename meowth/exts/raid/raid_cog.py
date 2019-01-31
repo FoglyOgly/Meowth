@@ -1070,7 +1070,7 @@ class Raid():
         }
         update.values(**d)
         await update.commit()
-        await self.update_messages()
+        self.bot.loop.create_task(self.update_messages())
         return await self.monitor_status()
 
     async def correct_weather(self, weather):
@@ -1084,7 +1084,7 @@ class Raid():
     
     async def expire_raid(self):
         print(11)
-        await self.update_messages()
+        self.bot.loop.create_task(self.update_messages())
         print(12)
         await asyncio.sleep(60)
         if self.channel_ids:

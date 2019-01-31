@@ -682,26 +682,36 @@ class Raid():
     
     async def monitor_status(self):
         while True:
+            print(1)
             hatch = self.hatch
             end = self.end
             if not self.pkmn:
+                print(2)
                 sleeptime = hatch - time.time()
                 if sleeptime > 0:
+                    print(3)
                     await asyncio.sleep(sleeptime)
                 hatch = self.hatch
                 if hatch <= time.time():
-                    return await self.hatch_egg()
+                    print(4)
+                    self.bot.loop.create_task(self.hatch_egg())
+                    return
                 else:
+                    print(5)
                     continue
             else:
+                print(6)
                 sleeptime = end - time.time()
                 if sleeptime > 0:
+                    print(7)
                     await asyncio.sleep(sleeptime)
                 end = self.end
                 if end <= time.time():
+                    print(8)
                     self.bot.loop.create_task(self.expire_raid())
                     return
                 else:
+                    print(9)
                     continue
         
 
@@ -1306,7 +1316,6 @@ class RaidCog(Cog):
     @command(aliases=['r'])
     @raid_checks.raid_enabled()
     async def raid(self, ctx, level_or_boss, *, gym_and_time):
-        print(0)
         gym_split = gym_and_time.split()
         if gym_split[-1].isdigit():
             endtime = int(gym_split.pop(-1))
@@ -1360,7 +1369,6 @@ class RaidCog(Cog):
             hatch = None
         zone = await ctx.tz()
         new_raid = Raid(ctx.bot, ctx.guild.id, gym, level=level, pkmn=boss, hatch=hatch, end=end, tz=zone)
-        print(1)
         new_raid.channel_ids = []
         new_raid.message_ids = []
         react_list = new_raid.react_list
@@ -1430,18 +1438,12 @@ class RaidCog(Cog):
         insert.row(**data)
         insert.returning('id')
         rcrd = await insert.commit()
-        print(2)
         new_raid.id = rcrd[0][0]
-        print(new_raid.id)
         ctx.bot.add_listener(new_raid.on_raw_reaction_add)
-        print(3)
         ctx.bot.add_listener(new_raid.on_command_completion)
-        print(4)
         loop = asyncio.get_event_loop()
         loop.create_task(new_raid.monitor_status())
-        print(5)
         await ctx.bot.dbi.add_listener(f'rsvp_{new_raid.id}', new_raid._rsvp)
-        print(6)
         if isinstance(gym, Gym):
             cellid = await gym._L10()
             await ctx.bot.dbi.add_listener(f'weather_{cellid}', new_raid._weather)

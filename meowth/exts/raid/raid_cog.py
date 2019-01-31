@@ -1326,7 +1326,7 @@ class RaidCog(Cog):
         query = raid_table.query()
         data = await query.get()
         for rcrd in data:
-            await Raid.from_data(self.bot, rcrd)
+            self.bot.loop.create_task(Raid.from_data(self.bot, rcrd))
 
     @command(aliases=['r'])
     @raid_checks.raid_enabled()

@@ -61,13 +61,12 @@ class Raid():
         self.gym = gym
         self.level = level
         self.pkmn = pkmn
-        if hatch:
-            self.hatch = hatch
+        self.hatch = hatch
+        if not self.pkmn:
             active_time = bot.raid_info.raid_times[level][1]
             self.end = hatch + active_time*60
         elif end:
             self.end = end
-            self.hatch = hatch
         self.trainer_dict = {}
         self.group_list = []
         self.tz = tz

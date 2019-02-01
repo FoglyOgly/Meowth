@@ -33,7 +33,7 @@ class DatabaseInterface:
         self.settings_conn = None
         self.settings_stmt = None
         self.types = sqltypes
-        self.listeners = {}
+        self.listeners = []
 
     async def start(self, loop=None):
         if loop:

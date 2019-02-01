@@ -1013,6 +1013,7 @@ class Raid():
             except AttributeError:
                 continue
             await msg.edit(content=content, embed=embed)
+            await msg.clear_reactions()
             msg_list.append(msg)
         if self.channel_ids:
             for chanid in self.channel_ids:

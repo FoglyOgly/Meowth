@@ -101,6 +101,7 @@ class Raid():
         else:
             return None
         react_list = react_list + grp_reacts
+        print(react_list)
         return react_list
 
     @property

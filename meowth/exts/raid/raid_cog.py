@@ -140,6 +140,11 @@ class Raid():
             max_stamp = created + max_active*60 + max_hatch*60
             if new_time < max_stamp:
                 self.end = new_time
+        raid_table = self.bot.dbi.table('raids')
+        update = raid_table.update()
+        update.where(id=self.id)
+        update.values(hatch=self.hatch, endtime=self.end)
+        await update.commit()
         self.bot.loop.create_task(self.monitor_status())
     
     @property

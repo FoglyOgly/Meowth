@@ -1272,18 +1272,24 @@ class Raid():
         if pkmnid:
             pkmn = Pokemon(bot, pkmnid, quickMoveid=quick, chargeMoveid=charge)
             boss = RaidBoss(pkmn)
+            print(boss)
         else:
             boss = None
         hatch = data.get('hatch')
         end = data['endtime']
         raid = cls(bot, guild_id, gym, level=level, pkmn=boss, hatch=hatch, end=end)
+        print(1)
         raid.channel_ids = data.get('channels')
         raid.message_ids = data.get('messages')
         raid.id = data['id']
         raid.trainer_dict = await raid.get_trainer_dict()
+        print(2)
         raid.group_list = await raid.get_grp_list()
+        print(3)
         bot.add_listener(raid.on_raw_reaction_add)
+        print(4)
         bot.add_listener(raid.on_command_completion)
+        print(5)
         loop = asyncio.get_event_loop()
         loop.create_task(raid.monitor_status())
         await bot.dbi.add_listener(f'rsvp_{raid.id}', raid._rsvp)

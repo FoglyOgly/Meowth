@@ -89,6 +89,7 @@ class Raid():
         status_reacts = list(self.bot.config.emoji.values())
         status_reacts.append('\u25b6')
         grp_reacts = [x['emoji'] for x in self.group_list]
+        print(self.status)
         if self.status == 'egg':
             if len(self.boss_list) == 1:
                 react_list = status_reacts

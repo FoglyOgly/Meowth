@@ -144,7 +144,7 @@ class Raid():
         update = raid_table.update()
         update.where(id=self.id)
         update.values(hatch=self.hatch, endtime=self.end)
-        await update.commit()
+        self.bot.loop.create_task(update.commit())
         self.bot.loop.create_task(self.monitor_status())
     
     @property

@@ -1061,7 +1061,7 @@ class Raid():
         update.values(**d)
         await update.commit()
         self.bot.loop.create_task(self.update_messages())
-        return await self.monitor_status()
+        self.bot.loop.create_task(self.monitor_status())
 
     async def correct_weather(self, weather):
         if isinstance(self.gym, Gym):

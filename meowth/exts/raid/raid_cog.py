@@ -89,7 +89,6 @@ class Raid():
         status_reacts = list(self.bot.config.emoji.values())
         status_reacts.append('\u25b6')
         grp_reacts = [x['emoji'] for x in self.group_list]
-        print(self.status)
         if self.status == 'egg':
             if len(self.boss_list) == 1:
                 react_list = status_reacts
@@ -102,7 +101,6 @@ class Raid():
         else:
             return None
         react_list = react_list + grp_reacts
-        print(react_list)
         return react_list
 
     @property
@@ -300,11 +298,9 @@ class Raid():
         return datetime.fromtimestamp(stamp, tz=localzone)
     
     async def on_raw_reaction_add(self, payload):
-        print(10)
         id_string = f"{payload.channel_id}/{payload.message_id}"
         if id_string not in self.message_ids or payload.user_id == self.bot.user.id:
             return
-        print(11)
         user = self.bot.get_user(payload.user_id)
         channel = self.bot.get_channel(payload.channel_id)
         message = await channel.get_message(payload.message_id)
@@ -323,7 +319,6 @@ class Raid():
             emoji = str(payload.emoji)
         if emoji not in self.react_list:
             return
-        print(12)
         if isinstance(emoji, str):
             if emoji in emoji_letters:
                 for group in self.group_list:
@@ -1282,28 +1277,21 @@ class Raid():
         if pkmnid:
             pkmn = Pokemon(bot, pkmnid, quickMoveid=quick, chargeMoveid=charge)
             boss = RaidBoss(pkmn)
-            print(boss)
         else:
             boss = None
         hatch = data.get('hatch')
         end = data['endtime']
         raid = cls(bot, guild_id, gym, level=level, pkmn=boss, hatch=hatch, end=end)
-        print(1)
         raid.channel_ids = data.get('channels')
         raid.message_ids = data.get('messages')
         raid.id = data['id']
         raid.trainer_dict = await raid.get_trainer_dict()
-        print(2)
         raid.group_list = await raid.get_grp_list()
-        print(3)
         bot.add_listener(raid.on_raw_reaction_add)
-        print(4)
         bot.add_listener(raid.on_command_completion)
-        print(5)
         loop = asyncio.get_event_loop()
         loop.create_task(raid.monitor_status())
         await bot.dbi.add_listener(f'rsvp_{raid.id}', raid._rsvp)
-        print(6)
         if isinstance(gym, Gym):
             cellid = await gym._L10()
             await bot.dbi.add_listener(f'weather_{cellid}', raid._weather)

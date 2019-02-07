@@ -11,6 +11,7 @@ from . import raid_checks
 
 from math import ceil
 import discord
+from discord.ext import commands
 from discord import Embed
 import asyncio
 import aiohttp

@@ -87,16 +87,16 @@ class Raid():
     def react_list(self):
         boss_reacts = formatters.mc_emoji(len(self.boss_list))
         status_reacts = list(self.bot.config.emoji.values())
-        status_reacts.append('\u25b6')
         grp_reacts = [x['emoji'] for x in self.group_list]
         if self.status == 'egg':
             if len(self.boss_list) == 1:
                 react_list = status_reacts
             else:
-                react_list = boss_reacts
+                react_list = boss_reacts + status_reacts
         elif self.status == 'hatched':
             react_list = []
         elif self.status == 'active':
+            status_reacts.append('\u25b6')
             react_list = status_reacts
         else:
             return None
@@ -325,14 +325,23 @@ class Raid():
                     if emoji == group['emoji']:
                         await message.remove_reaction(emoji, user)
                         return await self.join_grp(payload.user_id, group)
-        if self.status == 'egg':
-            new_status = 'maybe'
-            i = self.react_list.index(emoji)
-            bossid = self.boss_list[i]
-            if bossid not in old_bosses:
-                new_bosses = old_bosses + [bossid]
+        if self.status == 'egg' and len(self.boss_list) > 1:
+            if self.react_list.index(emoji) <= len(self.boss_list) - 1:
+                new_status = 'maybe'
+                i = self.react_list.index(emoji)
+                bossid = self.boss_list[i]
+                if bossid not in old_bosses:
+                    new_bosses = old_bosses + [bossid]
+                else:
+                    new_bosses = old_bosses
             else:
-                new_bosses = old_bosses
+                for k, v in self.bot.config.emoji.items():
+                if v == emoji:
+                    new_status = k
+                if old_bosses:
+                    new_bosses = old_bosses
+                else:
+                    new_bosses = self.boss_list
         elif self.status == 'active':
             if emoji == '\u25b6':
                 if self.trainer_dict[payload.user_id]['status'] == 'here':
@@ -609,7 +618,6 @@ class Raid():
             await msg.edit(embed=embed)
     
     async def join_grp(self, user_id, group):
-        user_est = self.user_est_power(user_id)
         group_table = self.bot.dbi.table('raid_groups')
         insert = group_table.insert()
         old_query = group_table.query()
@@ -655,7 +663,7 @@ class Raid():
                     has_embed = True
             await msg.edit(embed=embed)
         if user_id and status:
-            if self.channel_ids and self.status != 'egg':
+            if self.channel_ids:
                 for chnid in self.channel_ids:
                     rsvpembed = RSVPEmbed.from_raid(self).embed
                     guild = self.bot.get_guild(self.guild_id)
@@ -674,7 +682,7 @@ class Raid():
                     content = f"{member.display_name} {display_status}!"
                     newmsg = await chn.send(content, embed=rsvpembed)
         elif user_id and group:
-            if self.channel_ids and self.status != 'egg':
+            if self.channel_ids:
                 for chnid in self.channel_ids:
                     rsvpembed = RSVPEmbed.from_raidgroup(self, group).embed
                     guild = self.bot.get_guild(self.guild_id)
@@ -793,7 +801,7 @@ class Raid():
     def user_est_power(self, user_id):
         trainer_dict = self.trainer_dict.get(user_id)
         if trainer_dict:
-            est_power = trainer_dict.get('est_power')
+            est_power = trainer_dict.get('est_power', 0)
             return est_power
         else:
             return 0
@@ -1458,22 +1466,26 @@ class RaidCog(Cog):
         raid_id = await id_query.get_value()
         return raid_id
     
-    async def rsvp(self, ctx, status, total: int=0, *teamcounts):
+    async def rsvp(self, ctx, status, bosses=[], total: int=0, *teamcounts):
         raid_id = await self.get_raidid(ctx)
         meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
+        if bosses:
+            boss_ids = []
+            for boss in bosses:
+                boss_ids.append(boss.id)
         if total or teamcounts:
             party = await meowthuser.party_list(total, *teamcounts)
             await meowthuser.set_party(party=party)
         else:
             party = await meowthuser.party()
-        await meowthuser.rsvp(raid_id, status, party=party)
+        await meowthuser.rsvp(raid_id, status, bosses=boss_ids, party=party)
     
     @command(aliases=['i', 'maybe'])
     @raid_checks.raid_channel()
-    async def interested(self, ctx, total: int=0, *teamcounts):
+    async def interested(self, ctx, bosses: commands.Greedy[Pokemon], total: int=0, *teamcounts):
         if total < 1:
             return
-        await self.rsvp(ctx, "maybe", total, *teamcounts)
+        await self.rsvp(ctx, "maybe", bosses, total, *teamcounts)
         
     @command(aliases=['c', 'omw'])
     @raid_checks.raid_channel()
@@ -1855,12 +1867,14 @@ class RSVPEmbed():
 
         fields = {
             "Status List": status_str,
-            "Team List": team_str,
-            "Starting (Boss Damage Estimate)": (False, f'{time} ({str(round(est*100)) + "%"})')
+            "Team List": team_str
         }
-        
         embed = formatters.make_embed(icon=RSVPEmbed.raid_icon, title="Current Group RSVP Totals",
             fields=fields, footer="Ending", footer_icon=RSVPEmbed.footer_icon)
+        if raid.status == 'active':
+            embed.add_field(name='Starting (Boss Damage Estimate)', value=f'{time} ({str(round(est*100)) + "%"})', inline=False)
+        else:
+            embed.add_field(name='Starting', value=time, inline=False)
         embed.timestamp = enddt
         return cls(embed)
     
@@ -1872,14 +1886,24 @@ class EggEmbed():
     raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png'
     footer_icon = 'https://media.discordapp.net/attachments/346766728132427777/512699022822080512/imageedit_10_6071805149.png'
             
-    weather_index = 0
-    team_index = 1
-    boss_list_index = 2
+    level_index = 0
+    status_index = 2
+    team_index = 3
+    boss_list_index = 4
+    weather_index = 1
 
     def set_weather(self, weather_str, boss_list_str):
         self.embed.set_field_at(EggEmbed.weather_index, name="Weather", value=weather_str)
         self.boss_str = boss_list_str
         return self
+    
+    @property
+    def status_str(self):
+        return self.embed.fields[EggEmbed.status_index].value
+    
+    @status_str.setter
+    def status_str(self, status_str):
+        self.embed.set_field_at(EggEmbed.status_index, name="Status List", value=status_str)
     
     @property
     def team_str(self):
@@ -1922,12 +1946,15 @@ class EggEmbed():
         weather = Weather(raid.bot, weather)
         weather_name = await weather.name()
         weather_emoji = await weather.boosted_emoji_str()
+        status_str = raid.status_str
         team_str = raid.team_str
         boss_str = await raid.boss_list_str()
         fields = {
+            "Raid Level": level,
             "Weather": f"{weather_name} {weather_emoji}",
+            "Status List", status_str
             "Team List": team_str,
-            "Boss Interest:": boss_str
+            "Boss Interest:": boss_str,
         }
         footer_text = "Hatching"
         embed = formatters.make_embed(icon=EggEmbed.raid_icon, title=directions_text,

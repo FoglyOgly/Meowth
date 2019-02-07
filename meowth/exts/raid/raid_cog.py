@@ -22,6 +22,7 @@ from dateparser import parse
 from copy import deepcopy
 import re
 from string import ascii_lowercase
+import typing
 
 emoji_letters = ['🇦','🇧','🇨','🇩','🇪','🇫','🇬','🇭','🇮','🇯','🇰','🇱',
     '🇲','🇳','🇴','🇵','🇶','🇷','🇸','🇹','🇺','🇻','🇼','🇽','🇾','🇿'
@@ -1483,7 +1484,7 @@ class RaidCog(Cog):
     
     @command(aliases=['i', 'maybe'])
     @raid_checks.raid_channel()
-    async def interested(self, ctx, bosses: commands.Greedy[Pokemon], total: int=0, *teamcounts):
+    async def interested(self, ctx, bosses: commands.Greedy[Pokemon], total: typing.Optional[int]=1, *teamcounts):
         if total < 1:
             return
         await self.rsvp(ctx, "maybe", bosses, total, *teamcounts)

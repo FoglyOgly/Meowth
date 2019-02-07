@@ -658,6 +658,7 @@ class Raid():
                     has_embed = True
                 elif self.status == 'egg':
                     egg_embed = EggEmbed(msg.embeds[0])
+                    egg_embed.status_str = self.status_str
                     egg_embed.team_str = self.team_str
                     egg_embed.boss_str = await self.boss_list_str()
                     egg_embed.grps_str = self.grps_str

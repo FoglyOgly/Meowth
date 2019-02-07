@@ -79,9 +79,15 @@ class MeowthUser:
         return party
     
     async def set_party(self, party: list = [0,0,0,1]):
-        update = self._update
-        update.values(party=party)
-        await update.commit()
+        data = await self._data.get()
+        if data:
+            update = self._update
+            update.values(party=party)
+            await update.commit()
+        else:
+            insert = self._insert
+            insert.row(id=self.user.id, party=party)
+            await insert.commit()
     
     async def party_list(self, total=0, *teamcounts):
         if not teamcounts:

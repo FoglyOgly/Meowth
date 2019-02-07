@@ -1952,7 +1952,7 @@ class EggEmbed():
         fields = {
             "Raid Level": level,
             "Weather": f"{weather_name} {weather_emoji}",
-            "Status List", status_str,
+            "Status List": status_str,
             "Team List": team_str,
             "Boss Interest:": boss_str,
         }

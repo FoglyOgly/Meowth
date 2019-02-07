@@ -336,8 +336,8 @@ class Raid():
                     new_bosses = old_bosses
             else:
                 for k, v in self.bot.config.emoji.items():
-                if v == emoji:
-                    new_status = k
+                    if v == emoji:
+                        new_status = k
                 if old_bosses:
                     new_bosses = old_bosses
                 else:

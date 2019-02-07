@@ -1471,10 +1471,15 @@ class RaidCog(Cog):
     async def rsvp(self, ctx, status, bosses=[], total: int=0, *teamcounts):
         raid_id = await self.get_raidid(ctx)
         meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
-        if bosses:
+        if self.status == 'egg':
+            if bosses:
+                boss_ids = []
+                for boss in bosses:
+                    boss_ids.append(boss.id)
+            else:
+                boss_ids = self.boss_list
+        else:
             boss_ids = []
-            for boss in bosses:
-                boss_ids.append(boss.id)
         if total or teamcounts:
             party = await meowthuser.party_list(total, *teamcounts)
             await meowthuser.set_party(party=party)

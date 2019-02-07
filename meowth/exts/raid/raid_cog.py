@@ -1467,6 +1467,14 @@ class RaidCog(Cog):
         id_query.where(raid_table['channels'].contains_(str(ctx.channel.id)))
         raid_id = await id_query.get_value()
         return raid_id
+
+    @staticmethod
+    async def get_raidlevel(ctx):
+        raid_table = ctx.bot.dbi.table('raids')
+        level_query = raid_table.query('level')
+        level_query.where(raid_table['channels'].contains_(str(ctx.channel.id)))
+        level = await level_query.get_value()
+        return level
     
     async def rsvp(self, ctx, status, bosses=[], total: int=0, *teamcounts):
         raid_id = await self.get_raidid(ctx)
@@ -1476,7 +1484,9 @@ class RaidCog(Cog):
             for boss in bosses:
                 boss_ids.append(boss.id)
         else:
-            boss_ids = self.boss_list
+            level = await self.get_raidlevel(ctx)
+            boss_list = self.bot.raid_info.raid_lists[level]
+            boss_ids = boss_list
         if total or teamcounts:
             party = await meowthuser.party_list(total, *teamcounts)
             await meowthuser.set_party(party=party)

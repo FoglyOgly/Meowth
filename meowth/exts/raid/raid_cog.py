@@ -1038,12 +1038,20 @@ class Raid():
                 new_name = await self.channel_name()
                 if new_name != channel.name:
                     await channel.edit(name=new_name)
+                newmsg = await channel.send(content, embed=embed)
+                msg_list.append(newmsg)
+                self.message_ids.append(f'{channel.id}/{newmsg.id}')
         if react_list:
             for msg in msg_list:
                 for react in react_list:
                     if isinstance(react, int):
                         react = self.bot.get_emoji(react)
                     await msg.add_reaction(react)
+        raid_table = self.bot.dbi.table('raids')
+        update = raid_table.update()
+        update.where(id=self.id)
+        update.values(message_ids=self.message_ids)
+        await update.commit()
         return msg_list
 
     
@@ -1068,6 +1076,8 @@ class Raid():
 
     async def report_hatch(self, pkmn):
         self.pkmn = RaidBoss(Pokemon(self.bot, pkmn))
+        name = await self.pkmn.name()
+        content = f"The egg has hatched into a {name} raid! RSVP using commands or reactions!" 
         raid_table = self.bot.dbi.table('raids')
         update = raid_table.update()
         update.where(id=self.id)
@@ -1076,7 +1086,7 @@ class Raid():
         }
         update.values(**d)
         await update.commit()
-        self.bot.loop.create_task(self.update_messages())
+        await self.update_messages(content=content)
         self.bot.loop.create_task(self.monitor_status())
 
     async def correct_weather(self, weather):
@@ -1504,17 +1514,17 @@ class RaidCog(Cog):
         
     @command(aliases=['c', 'omw'])
     @raid_checks.raid_channel()
-    async def coming(self, ctx, total: int=0, *teamcounts):
+    async def coming(self, ctx, bosses: commands.Greedy[Pokemon], total: typing.Optional[int]=1, *teamcounts):
         if total < 1:
             return
-        await self.rsvp(ctx, "coming", total, *teamcounts)
+        await self.rsvp(ctx, "coming", bosses, total, *teamcounts)
     
     @command(aliases=['h'])
     @raid_checks.raid_channel()
-    async def here(self, ctx, total: int=0, *teamcounts):
+    async def here(self, ctx, bosses: commands.Greedy[Pokemon], total: typing.Optional[int]=1, *teamcounts):
         if total < 1:
             return
-        await self.rsvp(ctx, "here", total, *teamcounts)
+        await self.rsvp(ctx, "here", bosses, total, *teamcounts)
 
     @command()
     @raid_checks.raid_channel()

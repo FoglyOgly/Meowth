@@ -1051,6 +1051,7 @@ class Raid():
             self.bot.loop.create_task(self.expire_raid())
             return
         content = "This raid egg has hatched! React below to report the boss!"
+        msg_list = []
         boss_list = self.boss_list
         length = len(boss_list)
         react_list = formatters.mc_emoji(length)

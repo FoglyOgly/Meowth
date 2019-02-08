@@ -1050,7 +1050,7 @@ class Raid():
         raid_table = self.bot.dbi.table('raids')
         update = raid_table.update()
         update.where(id=self.id)
-        update.values(message_ids=self.message_ids)
+        update.values(messages=self.message_ids)
         await update.commit()
         return msg_list
 

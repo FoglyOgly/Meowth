@@ -1815,7 +1815,6 @@ class RaidEmbed():
             "Status List": status_str,
             "Team List": team_str
         }
-        print(fields)
         i = 1
         ctrs_list = await raid.generic_counters_data()
         ctrs_str = []

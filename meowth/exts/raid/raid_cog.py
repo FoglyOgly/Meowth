@@ -1394,7 +1394,7 @@ class RaidCog(Cog):
             want = Want(ctx.bot, level, ctx.guild.id)
             role = await want.role()
             boss = None
-            if not endtime:
+            if not endtime or endtime > ctx.bot.raid_info.raid_times[level][0]:
                 hatch = time.time() + 60*ctx.bot.raid_info.raid_times[level][0]
             else:
                 hatch = time.time() + 60*endtime
@@ -1404,7 +1404,7 @@ class RaidCog(Cog):
             want = Want(ctx.bot, boss.id, ctx.guild.id)
             role = await want.role()
             level = boss.raid_level
-            if not endtime:
+            if not endtime or endtime > ctx.bot.raid_info.raid_times[level[1]]:
                 end = time.time() + 60*ctx.bot.raid_info.raid_times[level][1]
             else:
                 end = time.time() + 60*endtime

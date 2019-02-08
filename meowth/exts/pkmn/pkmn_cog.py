@@ -298,14 +298,20 @@ class Pokemon():
     async def weaknesses_emoji(self):
         type_chart = await self.type_chart()
         types_sorted = sorted(type_chart.items(), key=(lambda x: x[1]), reverse=True)
-        emoji_string = ''
+        emoji_string = '\u200b'
         i = 0
         for type_tuple in types_sorted:
             if i == 4:
                 emoji_string += '\n'
             type_ref = self.bot.dbi.table('types').query()
             emoji = await type_ref.select('emoji').where(typeid=type_tuple[0]).get_value()
-            if type_tuple[1] == 2:
+            if type_tuple[1] == 4:
+                emoji += 'x4'
+                emoji_string += emoji
+            elif type_tuple[1] == 3:
+                emoji += 'x3'
+                emoji_string += emoji
+            elif type_tuple[1] == 2:
                 emoji += 'x2'
                 emoji_string += emoji
             elif type_tuple[1] == 1:
@@ -319,15 +325,20 @@ class Pokemon():
     async def resistances_emoji(self):
         type_chart = await self.type_chart()
         types_sorted = sorted(type_chart.items(), key=(lambda x: x[1]))
-        print(types_sorted)
-        emoji_string = ''
+        emoji_string = '\u200b'
         i = 0
         for type_tuple in types_sorted:
             if i == 4:
                 emoji_string += '\n'
             type_ref = self.bot.dbi.table('types').query()
             emoji = await type_ref.select('emoji').where(typeid=type_tuple[0]).get_value()
-            if type_tuple[1] == -2:
+            if type_type[1] == -4:
+                emoji += 'x4'
+                emoji_string += emoji
+            elif type_tuple[1] == -3:
+                emoji += 'x3'
+                emoji_string += emoji
+            elif type_tuple[1] == -2:
                 emoji += 'x2'
                 emoji_string += emoji
             elif type_tuple[1] == -1:

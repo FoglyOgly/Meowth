@@ -1016,8 +1016,6 @@ class Raid():
         message_ids = self.message_ids
         if self.hatch and self.hatch > time.time():
             embed = await self.egg_embed()
-        elif self.pkmn is None:
-            embed = await self.hatched_embed()
         elif self.end > time.time():
             embed = await self.raid_embed()
         else:
@@ -1038,20 +1036,12 @@ class Raid():
                 new_name = await self.channel_name()
                 if new_name != channel.name:
                     await channel.edit(name=new_name)
-                newmsg = await channel.send(content, embed=embed)
-                msg_list.append(newmsg)
-                self.message_ids.append(f'{channel.id}/{newmsg.id}')
         if react_list:
             for msg in msg_list:
                 for react in react_list:
                     if isinstance(react, int):
                         react = self.bot.get_emoji(react)
                     await msg.add_reaction(react)
-        raid_table = self.bot.dbi.table('raids')
-        update = raid_table.update()
-        update.where(id=self.id)
-        update.values(messages=self.message_ids)
-        await update.commit()
         return msg_list
 
     
@@ -1065,7 +1055,35 @@ class Raid():
         length = len(boss_list)
         react_list = formatters.mc_emoji(length)
         boss_dict = dict(zip(react_list, boss_list))
-        msg_list = await self.update_messages(content=content)
+        embed = await self.hatched_embed()
+        if self.channel_ids:
+            channel_list = []
+            for chanid in self.channel_ids:
+                channel = self.bot.get_channel(int(chanid))
+                if not channel:
+                    self.channel_ids.remove(chanid)
+                    continue
+                channel_list.append(channel)
+                new_name = await self.channel_name()
+                if new_name != channel.name:
+                    await channel.edit(name=new_name)
+                newmsg = await channel.send(content, embed=embed)
+                msg_list.append(newmsg)
+        for messageid in self.message_ids:
+            try:
+                chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
+            except AttributeError:
+                continue
+            if chn in channel_list:
+                continue
+            await msg.edit(content=content, embed=embed)
+            await msg.clear_reactions()
+            msg_list.append(msg)
+        for msg in msg_list:
+            for react in react_list:
+                if isinstance(react, int):
+                    react = self.bot.get_emoji(react)
+                await msg.add_reaction(react)
         response = await formatters.ask(self.bot, msg_list, timeout=(self.end-time.time()),
             react_list=react_list)
         if response:

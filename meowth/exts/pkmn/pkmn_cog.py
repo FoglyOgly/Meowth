@@ -332,7 +332,7 @@ class Pokemon():
                 emoji_string += '\n'
             type_ref = self.bot.dbi.table('types').query()
             emoji = await type_ref.select('emoji').where(typeid=type_tuple[0]).get_value()
-            if type_type[1] == -4:
+            if type_tuple[1] == -4:
                 emoji += 'x4'
                 emoji_string += emoji
             elif type_tuple[1] == -3:

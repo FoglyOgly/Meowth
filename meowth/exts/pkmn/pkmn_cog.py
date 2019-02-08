@@ -319,6 +319,7 @@ class Pokemon():
     async def resistances_emoji(self):
         type_chart = await self.type_chart()
         types_sorted = sorted(type_chart.items(), key=(lambda x: x[1]))
+        print(types_sorted)
         emoji_string = ''
         i = 0
         for type_tuple in types_sorted:

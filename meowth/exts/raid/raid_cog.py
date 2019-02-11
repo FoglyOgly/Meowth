@@ -1099,10 +1099,11 @@ class Raid():
             emoji = str(response.emoji)
             idstring = f'{response.channel_id}/{response.message_id}'
             if idstring not in self.message_ids:
-                chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
-                await msg.delete()
-            except:
-                pass
+                try:
+                    chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+                    await msg.delete()
+                except:
+                    pass
             pkmn = boss_dict[emoji]
             return await self.report_hatch(pkmn)
         

@@ -291,7 +291,7 @@ class Pokemon():
         type_dict = await self.type_dict()
         type_chart = {}
         for type in type_dict:
-            type_chart[type] = round(log(float(type_dict[type]), 1.4))
+            type_chart[type] = round(log(float(type_dict[type]), 1.6))
         return type_chart
     
     

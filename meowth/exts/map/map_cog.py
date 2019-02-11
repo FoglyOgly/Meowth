@@ -98,6 +98,21 @@ class ReportChannel():
         gyms_query = gyms.query().where(gyms['l10'].in_(covering))
         gyms_query.where(guild=self.channel.guild.id)
         return gyms_query
+    
+    async def get_all_stops(self):
+        covering = await self.level_10_covering()
+        stops = self.bot.dbi.table('pokestops')
+        stops_query = stops.query().where(stops['l10'].in_(covering))
+        stops_query.where(guild=self.channel.guild.id)
+        return stops_query
+    
+    async def get_all_pois(self):
+        gyms_query = await self.get_all_gyms()
+        gyms = await gyms_query.get()
+        stops_query = await self.get_all_stops()
+        stops = await stops_query.get()
+        pois = gyms + stops
+        return pois
 
 
         
@@ -214,6 +229,10 @@ class POI():
         L10id = await self._L10()
         L10 = S2_L10(self.bot, L10id)
         await L10.correct_weather(weather)
+    
+    @classmethod
+    async def convert(cls, ctx, arg):
+
 
     
 

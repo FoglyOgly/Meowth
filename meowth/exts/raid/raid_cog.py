@@ -1072,8 +1072,8 @@ class Raid():
         react_list = formatters.mc_emoji(length)
         boss_dict = dict(zip(react_list, boss_list))
         embed = await self.hatched_embed()
+        channel_list = []
         if self.channel_ids:
-            channel_list = []
             for chanid in self.channel_ids:
                 channel = self.bot.get_channel(int(chanid))
                 if not channel:

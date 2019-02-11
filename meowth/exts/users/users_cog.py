@@ -133,6 +133,8 @@ class MeowthUser:
                     elif str_match in unknown_aliases:
                         unknown += int(int_match)
             if total:
+                if sum((mystic, instinct, valor, unknown)) > total:
+                    total = sum((mystic, instinct, valor, unknown))
                 unknown = total - sum((mystic, instinct, valor))
         return [mystic, instinct, valor, unknown]
 

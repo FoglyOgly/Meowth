@@ -1524,6 +1524,8 @@ class RaidCog(Cog):
     async def rsvp(self, ctx, status, bosses=[], total: int=0, *teamcounts):
         raid_id = await self.get_raidid(ctx)
         meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
+        if status == 'cancel':
+            return await meowthuser.cancel_rsvp(raid_id)
         if bosses:
             boss_ids = []
             for boss in bosses:
@@ -1559,6 +1561,11 @@ class RaidCog(Cog):
         if total < 1:
             return
         await self.rsvp(ctx, "here", bosses, total, *teamcounts)
+    
+    @command(aliases=['x'])
+    @raid_checks.raid_channel()
+    async def cancel(self, ctx):
+        await self.rsvp(ctx, "cancel")
 
     @command()
     @raid_checks.raid_channel()

@@ -160,6 +160,11 @@ class MeowthUser:
         insert.row(**d)
         await insert.commit(do_update=True)
     
+    async def cancel_rsvp(self, raid_id):
+        rsvp_table = self.bot.dbi.table('raid_rsvp')
+        current_rsvp = rsvp_table.query().where(user_id=self.user.id, raid_id=raid_id)
+        await current_rsvp.delete()
+    
     async def raid_estimator(self, raid_id):
         rsvp_table = self.bot.dbi.table('raid_rsvp')
         query = rsvp_table.query('estimator')

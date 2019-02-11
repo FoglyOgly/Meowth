@@ -710,6 +710,8 @@ class Raid():
                     await asyncio.sleep(sleeptime)
                 hatch = self.hatch
                 if hatch <= time.time():
+                    if getattr(self, 'hatch_routine', False):
+                        return
                     self.bot.loop.create_task(self.hatch_egg())
                     return
                 else:
@@ -1092,8 +1094,15 @@ class Raid():
                 await msg.add_reaction(react)
         response = await formatters.ask(self.bot, msg_list, timeout=(self.end-time.time()),
             react_list=react_list)
+        self.hatch_routine = True
         if response:
             emoji = str(response.emoji)
+            idstring = f'{response.channel_id}/{response.message_id}'
+            if idstring not in self.message_ids:
+                chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+                await msg.delete()
+            except:
+                pass
             pkmn = boss_dict[emoji]
             return await self.report_hatch(pkmn)
         

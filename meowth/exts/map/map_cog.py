@@ -230,8 +230,8 @@ class POI():
         L10 = S2_L10(self.bot, L10id)
         await L10.correct_weather(weather)
     
-    @classmethod
-    async def convert(cls, ctx, arg):
+    # @classmethod
+    # async def convert(cls, ctx, arg):
 
 
     

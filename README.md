@@ -40,7 +40,29 @@ https://discord.gg/hhVjAN8
 
 # Install your own Meowth
 
-## Dependancies
+## Using [docker](https://docs.docker.com/)
+
+1. Install [Docker CE](https://docs.docker.com/install/) on your server.
+
+1. Create a configuration directory where your configuration and all your generated files will reside.
+   Let's assume it's in the current directory : `config`
+
+1. Optionally create a logs directory, if you want to easily have access to your logging files.
+   Let's assume it's in the current directory : `logs` 
+   
+1. Now build your docker image. Place yourself in the sources directory you retreived via GIT: 
+   
+   `docker build . --tag meowth2`
+
+1. Run the docker image: 
+   ```
+   docker run -d --restart unless-stopped --name meowth2 \
+               -v $PWD/config:/opt/meowth/config \
+               -v $PWD/logs:/opt/meowth/logs \
+               meowth2
+   ```
+
+## \[Non Docker\] Dependancies
 
 ## **`Python 3.6.1+`**
 

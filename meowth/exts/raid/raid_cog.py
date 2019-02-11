@@ -777,10 +777,16 @@ class Raid():
             charge_move_id = 'random'
         if fast_move_id == 'random' and charge_move_id == 'random':
             query.where(fast_move='random', charge_move='random')
-        return (await query.get())[0]
+        data = await query.get()
+        if data:
+            return data[0]
+        else:
+            return None
     
     async def generic_counters_data(self, weather=None):
         data = await self.pb_data(weather=weather)
+        if not data:
+            return None
         ctrs_list = []
         for x in range(1,7):
             ctrid = data[f'counter_{x}_id']
@@ -1061,6 +1067,8 @@ class Raid():
         msg_list = []
         boss_list = self.boss_list
         length = len(boss_list)
+        if length == 1:
+            return await self.report_hatch(boss_list[0])
         react_list = formatters.mc_emoji(length)
         boss_dict = dict(zip(react_list, boss_list))
         embed = await self.hatched_embed()
@@ -1092,9 +1100,9 @@ class Raid():
                 if isinstance(react, int):
                     react = self.bot.get_emoji(react)
                 await msg.add_reaction(react)
+        self.hatch_routine = True
         response = await formatters.ask(self.bot, msg_list, timeout=(self.end-time.time()),
             react_list=react_list)
-        self.hatch_routine = True
         if response:
             emoji = str(response.emoji)
             idstring = f'{response.channel_id}/{response.message_id}'
@@ -1839,26 +1847,27 @@ class RaidEmbed():
         }
         i = 1
         ctrs_list = await raid.generic_counters_data()
-        ctrs_str = []
-        for ctr in ctrs_list:
-            name = await ctr.name()
-            fast = Move(bot, ctr.quickMoveid)
-            fast_name = await fast.name()
-            try:
-                fast_emoji = await fast.emoji()
-            except:
-                pass
-            charge = Move(bot, ctr.chargeMoveid)
-            charge_name = await charge.name()
-            try:
-                charge_emoji = await charge.emoji()
-            except:
-                pass
-            ctr_str = f"**{name}**: {fast_name} {fast_emoji} | {charge_name} {charge_emoji}"
-            ctrs_str.append(ctr_str)
-            i += 1
-        ctrs_str.append(f'[Results courtesy of Pokebattler](https://www.pokebattler.com/raids/{boss.id})')
-        fields['<:pkbtlr:512707623812857871> Counters'] = "\n".join(ctrs_str)
+        if ctrs_list:
+            ctrs_str = []
+            for ctr in ctrs_list:
+                name = await ctr.name()
+                fast = Move(bot, ctr.quickMoveid)
+                fast_name = await fast.name()
+                try:
+                    fast_emoji = await fast.emoji()
+                except:
+                    pass
+                charge = Move(bot, ctr.chargeMoveid)
+                charge_name = await charge.name()
+                try:
+                    charge_emoji = await charge.emoji()
+                except:
+                    pass
+                ctr_str = f"**{name}**: {fast_name} {fast_emoji} | {charge_name} {charge_emoji}"
+                ctrs_str.append(ctr_str)
+                i += 1
+            ctrs_str.append(f'[Results courtesy of Pokebattler](https://www.pokebattler.com/raids/{boss.id})')
+            fields['<:pkbtlr:512707623812857871> Counters'] = "\n".join(ctrs_str)
         grps_str = raid.grps_str
         if grps_str:
             fields['Groups (Boss Damage Estimate)'] = grps_str

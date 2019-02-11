@@ -20,6 +20,20 @@ class Pokemon():
     ):
         self.bot = bot
         self.id = pokemonId
+        if 'ALOLA' in pokemonId:
+            form = 1
+        elif 'RAINY' in pokemonId:
+            form = 2
+        elif 'SNOWY' in pokemonId:
+            form = 3
+        elif 'SUNNY' in pokemonId:
+            form = 4
+        elif 'ATTACK' in pokemonId:
+            form = 5
+        elif 'DEFENSE' in pokemonId:
+            form = 6
+        elif 'SPEED' in pokemonId:
+            form = 7
         self.form = form
         self.gender = gender
         self.shiny = shiny

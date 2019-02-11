@@ -619,7 +619,7 @@ class Raid():
                     has_embed = True
                 elif self.status == 'egg':
                     egg_embed = EggEmbed(msg.embeds[0])
-                    egg_embed.set_weather(weather_str, boss_list_str)
+                    egg_embed.set_weather(weather_str, boss_str)
                     embed = egg_embed.embed
                     has_embed = True
             await msg.edit(embed=embed)

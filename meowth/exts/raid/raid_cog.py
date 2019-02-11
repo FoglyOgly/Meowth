@@ -118,7 +118,7 @@ class Raid():
         return max_times[1]
     
     def update_time(self, new_time: float):
-        if new_time < 0:
+        if new_time < time.time():
             raise
         level = self.level
         max_times = self.bot.raid_info.raid_times[level]

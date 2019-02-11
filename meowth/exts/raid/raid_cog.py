@@ -143,14 +143,6 @@ class Raid():
                 self.end = new_time
             else:
                 raise
-        has_embed = False
-        for idstring in self.message_ids:
-            chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
-            if not has_embed:
-                embed = msg.embeds[0]
-                embed.timestamp = datetime.fromtimestamp(stamp)
-                has_embed = True
-            await msg.edit(embed=embed)
         raid_table = self.bot.dbi.table('raids')
         update = raid_table.update()
         update.where(id=self.id)
@@ -394,7 +386,18 @@ class Raid():
                     stamp = newdt.timestamp()
                 except:
                     raise
-            self.update_time(stamp)
+            try:
+                self.update_time(stamp)
+            except:
+                return
+            has_embed = False
+            for idstring in self.message_ids:
+                chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+                if not has_embed:
+                    embed = msg.embeds[0]
+                    embed.timestamp = datetime.fromtimestamp(stamp)
+                    has_embed = True
+                await msg.edit(embed=embed)
             return
         if ctx.command.name == 'moveset':
             if self.status != 'active':

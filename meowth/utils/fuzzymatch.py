@@ -2,12 +2,22 @@ from enum import Enum
 
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
+import re
+
+def is_empty(word: str):
+    s = re.sub(r'\W+', '', word)
+    if s == '':
+        return True
+    return False
 
 def get_match(word_list: list, word: str, score_cutoff: int = 80):
     """Uses fuzzywuzzy to see if word is close to entries in word_list
 
     Returns a tuple of (MATCH, SCORE)
     """
+
+    if is_empty(word):
+        return (None, None)
     result = process.extractOne(
         word, word_list, scorer=fuzz.ratio, score_cutoff=score_cutoff)
     if not result:
@@ -19,6 +29,8 @@ def get_matches(word_list: list, word: str, score_cutoff: int = 80):
 
     Returns a list of tuples with (MATCH, SCORE)
     """
+    if is_empty(word):
+        return []
     return process.extractBests(
         word, word_list, scorer=fuzz.ratio, score_cutoff=score_cutoff)
 

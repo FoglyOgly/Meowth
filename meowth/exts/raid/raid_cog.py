@@ -669,6 +669,8 @@ class Raid():
                     egg_embed.grps_str = self.grps_str
                     embed = egg_embed.embed
                     has_embed = True
+                else:
+                    return
             await msg.edit(embed=embed)
         if user_id and status:
             if self.channel_ids:
@@ -1384,6 +1386,8 @@ class RaidCog(Cog):
         gym_split = gym_and_time.split()
         if gym_split[-1].isdigit():
             endtime = int(gym_split.pop(-1))
+            if endtime == 0:
+                endtime = 1
             gymstr = " ".join(gym_split)
         else:
             gymstr = " ".join(gym_split)
@@ -1427,7 +1431,7 @@ class RaidCog(Cog):
             want = Want(ctx.bot, boss.id, ctx.guild.id)
             role = await want.role()
             level = boss.raid_level
-            if not endtime or endtime > ctx.bot.raid_info.raid_times[level[1]]:
+            if not endtime or endtime > ctx.bot.raid_info.raid_times[level][1]:
                 end = time.time() + 60*ctx.bot.raid_info.raid_times[level][1]
             else:
                 end = time.time() + 60*endtime

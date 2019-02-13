@@ -1458,8 +1458,6 @@ class RaidCog(Cog):
         if isinstance(gym, Gym):
             channel_list = await gym.get_all_channels()
             report_channels.extend(channel_list)
-            if report_channel not in channel_list:
-                report_channels.append(report_channel)
         else:
             report_channels.append(report_channel)
         if raid_mode == 'message':
@@ -1495,8 +1493,8 @@ class RaidCog(Cog):
                     react = self.bot.get_emoji(react)
                 await raidmsg.add_reaction(react)
             new_raid.message_ids.append(f"{raidmsg.channel.id}/{raidmsg.id}")
+            reportcontent += f"Coordinate this raid in {raid_channel.mention}!"
             for channel in report_channels:
-                reportcontent += f"Coordinate this raid in {raid_channel.mention}!"
                 if not role:
                     dm_content = f"Coordinate this raid in {raid_channel.name}!"
                     dms = await want.notify_users(dm_content, embed)

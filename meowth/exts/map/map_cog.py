@@ -106,13 +106,6 @@ class ReportChannel():
         stops_query.where(guild=self.channel.guild.id)
         return stops_query
     
-    async def get_all_pois(self):
-        gyms_query = await self.get_all_gyms()
-        gyms = await gyms_query.get()
-        stops_query = await self.get_all_stops()
-        stops = await stops_query.get()
-        pois = gyms + stops
-        return pois
 
 
         
@@ -209,7 +202,7 @@ class POI():
     
     async def guild(self):
         guildid = await self._guildid()
-        guild = bot.get_guild(guildid)
+        guild = self.bot.get_guild(guildid)
         return guild
     
     async def url(self):
@@ -230,12 +223,15 @@ class POI():
         L10 = S2_L10(self.bot, L10id)
         await L10.correct_weather(weather)
     
-    # @classmethod
-    # async def convert(cls, ctx, arg):
-
+    @classmethod
+    async def convert(cls, ctx, arg):
+        stop_convert = await Pokestop.convert(ctx, arg)
+        if isinstance(stop_convert, Pokestop):
+            return stop_convert
+        gym_convert = await Gym.convert(ctx, arg)
+        return gym_convert
 
     
-
 
 class Gym(POI):
 
@@ -272,7 +268,18 @@ class Gym(POI):
             return cls(ctx.bot, name_dict[match[0]])
         else:
             city = await report_channel.city()
-            return PartialGym(ctx.bot, city, arg)
+            return PartialPOI(ctx.bot, city, arg)
+    
+    async def get_all_channels(self):
+        report_table = self.bot.dbi.table('report_channels')
+        guild_id = await self._guildid()
+        coords = await self._coords()
+        query = report_table.query('channelid')
+        query.where(guild_id=guild_id)
+        channelid_list = await query.get_values()
+        channel_list = [ReportChannel(self.bot, self.bot.get_channel(x)) for x in channelid_list]
+        gym_channels = [y for y in channel_list if await y.point_in_channel(coords)]
+        return gym_channels
     
     @classmethod
     async def insert_from_data(cls, bot, guildid, data):
@@ -285,7 +292,7 @@ class Gym(POI):
         return cls(bot, rcrd['id'])
 
 
-class PartialGym():
+class PartialPOI():
 
     def __init__(self, bot, city, arg):
         self.bot = bot
@@ -316,6 +323,31 @@ class Pokestop(POI):
         data = self.bot.dbi.table('stops').query()
         data = data.where(stop_id=self.id)
         return data
+
+    @classmethod
+    async def convert(cls, ctx, arg):
+        report_channel = ReportChannel(ctx.bot, ctx.channel)
+        stops_query = await report_channel.get_all_stops()
+        stops_query.select('id', 'name', 'nickname')
+        data = await stops_query.get()
+        nick_dict = {}
+        for x in data:
+            if x.get('nickname'):
+                nick_dict[x['nickname']] = x['id']
+            else:
+                continue
+        name_dict = {x['name'] : x['id'] for x in data}
+        if nick_dict:
+            match = get_match(nick_dict.keys(), arg)
+            if match[0]:
+                return cls(ctx.bot, nick_dict[match[0]])
+        match = get_match(name_dict.keys(), arg)
+        if match[0]:
+            return cls(ctx.bot, name_dict[match[0]])
+        else:
+            city = await report_channel.city()
+            return PartialPOI(ctx.bot, city, arg)
+
 
 class Mapper(Cog):
 

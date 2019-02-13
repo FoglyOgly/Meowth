@@ -193,3 +193,22 @@ def mc_embed(choice_dict: dict):
     items = [f'{k}: {v}' for k,v in choice_dict.items()] 
     embed.add_field(name='Choices', value='\n'.join(items))
     return embed
+
+def perms_or(channel_list: list):
+    overwrite_dict = {}
+    pair_dict = {}
+    for channel in channel_list:
+        for overwrite in channel.overwrites:
+            key = overwrite[0]
+            a, d = overwrite[1].pair()
+            x, y = pair_dict.get(key, (0,2146958591))
+            x |= a
+            y &= d
+            pair_dict[key] = (x, y)
+    for key in pair_dict:
+        x, y = pair_dict[key]
+        a, d = (discord.Permissions(permissions=x), discord.Permissions(permissions=y))
+        overwrite = discord.PermissionOverwrite.from_pair(a, d)
+        overwrite_dict[key] = overwrite
+    return overwrite_dict
+            

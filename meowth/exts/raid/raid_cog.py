@@ -1469,8 +1469,13 @@ class RaidCog(Cog):
             else:
                 category = None
             raid_channel_name = await new_raid.channel_name()
+            if isinstance(gym, Gym):
+                channel_list = await gym.get_all_channels()
+                raid_channel_overwrites = formatters.perms_or(channel_list)
+            else:
+                raid_channel_overwrites = dict(ctx.channel.overwrites)
             raid_channel = await ctx.guild.create_text_channel(raid_channel_name,
-                category=category)
+                category=category, overwrites=raid_channel_overwrites)
             new_raid.channel_ids.append(str(raid_channel.id))
             raidmsg = await raid_channel.send(reportcontent, embed=embed)
             for react in react_list:

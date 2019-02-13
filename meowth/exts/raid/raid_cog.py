@@ -1,5 +1,5 @@
 from meowth import Cog, command, bot, checks
-from meowth.exts.map import Gym, ReportChannel, PartialGym
+from meowth.exts.map import Gym, ReportChannel, PartialPOI
 from meowth.exts.pkmn import Pokemon, Move
 from meowth.exts.weather import Weather
 from meowth.exts.want import Want
@@ -1335,7 +1335,7 @@ class Raid():
             gym = Gym(bot, int(data['gym']))
         else:
             city, arg = data['gym'].split('/')
-            gym = PartialGym(bot, city, arg)
+            gym = PartialPOI(bot, city, arg)
         level = data['level']
         guild_id = data['guild']
         pkmnid, quick, charge = data.get('pkmn', (None, None, None))

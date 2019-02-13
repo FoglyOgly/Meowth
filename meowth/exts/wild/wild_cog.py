@@ -1,5 +1,5 @@
 from meowth import Cog, command, bot, checks
-from meowth.exts.map import Gym, ReportChannel, PartialGym
+from meowth.exts.map import Gym, ReportChannel, PartialPOI
 from meowth.exts.pkmn import Pokemon, Move
 from meowth.exts.weather import Weather
 from meowth.exts.want import Want

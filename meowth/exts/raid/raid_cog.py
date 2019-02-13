@@ -329,15 +329,24 @@ class Raid():
                     if emoji == group['emoji']:
                         await message.remove_reaction(emoji, user)
                         return await self.join_grp(payload.user_id, group)
-        if self.status == 'egg' and len(self.boss_list) > 1:
-            if self.react_list.index(emoji) <= len(self.boss_list) - 1:
-                new_status = 'maybe'
-                i = self.react_list.index(emoji)
-                bossid = self.boss_list[i]
-                if bossid not in old_bosses:
-                    new_bosses = old_bosses + [bossid]
+        if self.status == 'egg':
+            if len(self.boss_list) > 1:
+                if self.react_list.index(emoji) <= len(self.boss_list) - 1:
+                    new_status = 'maybe'
+                    i = self.react_list.index(emoji)
+                    bossid = self.boss_list[i]
+                    if bossid not in old_bosses:
+                        new_bosses = old_bosses + [bossid]
+                    else:
+                        new_bosses = old_bosses
                 else:
-                    new_bosses = old_bosses
+                    for k, v in self.bot.config.emoji.items():
+                        if v == emoji:
+                            new_status = k
+                    if old_bosses:
+                        new_bosses = old_bosses
+                    else:
+                        new_bosses = self.boss_list
             else:
                 for k, v in self.bot.config.emoji.items():
                     if v == emoji:

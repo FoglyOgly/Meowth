@@ -558,9 +558,10 @@ class Raid():
                 else:
                     await lobbymsg.edit(content=f"Group {grp['emoji']} has entered the raid!")
             user_table = self.bot.dbi.table('raid_rsvp')
-            query = user_table.query().where(user_table['user_id'].in_(grp['users']))
-            query.where(raid_id=self.id)
-            await query.delete()
+            update = user_table.update.where(user_table['user_id'].in_(grp['users']))
+            update.where(raid_id=self.id)
+            update.values(status='complete')
+            await update.commit()
             self.group_list.remove(grp)
             await self.update_rsvp()
             return                
@@ -1145,6 +1146,8 @@ class Raid():
     async def expire_raid(self):
         self.bot.loop.create_task(self.update_messages())
         await asyncio.sleep(60)
+        self.bot.remove_listener(self.on_raw_reaction_add)
+        self.bot.remove_listener(self.on_command_completion)
         if self.channel_ids:
             for chanid in self.channel_ids:
                 channel = self.bot.get_channel(int(chanid))
@@ -1450,18 +1453,28 @@ class RaidCog(Cog):
         else:
             reportcontent = ""
         raid_mode = await raid_checks.raid_category(ctx, level)
+        report_channels = []
+        report_channel = ReportChannel(ctx.bot, ctx.channel)
+        if isinstance(gym, Gym):
+            channel_list = await gym.get_all_channels()
+            report_channels.extend(channel_list)
+            if report_channel not in channel_list:
+                report_channels.append(report_channel)
+        else:
+            report_channels.append(report_channel)
         if raid_mode == 'message':
             reportcontent += "Coordinate this raid here using the reactions below!"
             if not role:
                 dm_content = f"Coordinate this raid in {ctx.channel.name}!"
                 dms = await want.notify_users(dm_content, embed)
                 new_raid.message_ids.extend(dms)
-            reportmsg = await ctx.send(reportcontent, embed=embed)
-            for react in react_list:
-                if isinstance(react, int):
-                    react = self.bot.get_emoji(react)
-                await reportmsg.add_reaction(react)
-            new_raid.message_ids.append(f"{reportmsg.channel.id}/{reportmsg.id}")
+            for channel in report_channels:
+                reportmsg = await channel.channel.send(reportcontent, embed=embed)
+                for react in react_list:
+                    if isinstance(react, int):
+                        react = self.bot.get_emoji(react)
+                    await reportmsg.add_reaction(react)
+                new_raid.message_ids.append(f"{reportmsg.channel.id}/{reportmsg.id}")
         elif raid_mode.isdigit():
             catid = int(raid_mode)
             if catid:
@@ -1469,9 +1482,8 @@ class RaidCog(Cog):
             else:
                 category = None
             raid_channel_name = await new_raid.channel_name()
-            if isinstance(gym, Gym):
-                channel_list = await gym.get_all_channels()
-                raid_channel_overwrites = formatters.perms_or(channel_list)
+            if len(report_channels) > 1:
+                raid_channel_overwrites = formatters.perms_or(report_channels)
             else:
                 raid_channel_overwrites = dict(ctx.channel.overwrites)
             raid_channel = await ctx.guild.create_text_channel(raid_channel_name,
@@ -1483,17 +1495,18 @@ class RaidCog(Cog):
                     react = self.bot.get_emoji(react)
                 await raidmsg.add_reaction(react)
             new_raid.message_ids.append(f"{raidmsg.channel.id}/{raidmsg.id}")
-            reportcontent += f"Coordinate this raid in {raid_channel.mention}!"
-            if not role:
-                dm_content = f"Coordinate this raid in {raid_channel.name}!"
-                dms = await want.notify_users(dm_content, embed)
-                new_raid.message_ids.extend(dms)
-            reportmsg = await ctx.send(reportcontent, embed=embed)
-            for react in react_list:
-                if isinstance(react, int):
-                    react = self.bot.get_emoji(react)
-                await reportmsg.add_reaction(react)
-            new_raid.message_ids.append(f"{reportmsg.channel.id}/{reportmsg.id}")
+            for channel in report_channels:
+                reportcontent += f"Coordinate this raid in {raid_channel.mention}!"
+                if not role:
+                    dm_content = f"Coordinate this raid in {raid_channel.name}!"
+                    dms = await want.notify_users(dm_content, embed)
+                    new_raid.message_ids.extend(dms)
+                reportmsg = await channel.channel.send(reportcontent, embed=embed)
+                for react in react_list:
+                    if isinstance(react, int):
+                        react = self.bot.get_emoji(react)
+                    await reportmsg.add_reaction(react)
+                new_raid.message_ids.append(f"{reportmsg.channel.id}/{reportmsg.id}")
         insert = raid_table.insert()
         if isinstance(gym, Gym):
             gymid = str(gym.id)

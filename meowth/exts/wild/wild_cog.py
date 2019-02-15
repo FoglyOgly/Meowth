@@ -130,6 +130,7 @@ class Wild():
         name = await self.pkmn.name()
         embed = formatters.make_embed(content=f"This {name} has despawned!", footer="Despawned")
         embed.timestamp = datetime.fromtimestamp(self.end)
+        return embed
 
     async def despawn_wild(self):
         channels_users, message_list = await self.users_channels_messages()

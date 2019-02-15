@@ -180,6 +180,7 @@ class WildCog(Cog):
     async def wild(self, ctx, pkmn: Pokemon, *, location: POI):
         wild_table = self.bot.dbi.table('wilds')
         new_wild = Wild(self.bot, ctx.guild.id, location, pkmn)
+        react_list = new_wild.react_list
         name = await pkmn.name()
         want = Want(ctx.bot, boss.id, ctx.guild.id)
         role = await want.role()

@@ -181,6 +181,7 @@ class WildCog(Cog):
         wild_table = self.bot.dbi.table('wilds')
         new_wild = Wild(self.bot, ctx.guild.id, location, pkmn)
         react_list = list(new_wild.react_list.values())
+        print(react_list)
         name = await pkmn.name()
         want = Want(ctx.bot, new_wild.pkmn.id, ctx.guild.id)
         role = await want.role()
@@ -208,6 +209,7 @@ class WildCog(Cog):
             for react in react_list:
                 if isinstance(react, int):
                     react = self.bot.get_emoji(react)
+                print(react)
                 await reportmsg.add_reaction(react)
             new_wild.message_ids.append(f"{reportmsg.channel.id}/{reportmsg.id}")
         d = {

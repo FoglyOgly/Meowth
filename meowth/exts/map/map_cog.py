@@ -223,6 +223,17 @@ class POI():
         L10 = S2_L10(self.bot, L10id)
         await L10.correct_weather(weather)
     
+    async def get_all_channels(self):
+        report_table = self.bot.dbi.table('report_channels')
+        guild_id = await self._guildid()
+        coords = await self._coords()
+        query = report_table.query('channelid')
+        query.where(guild_id=guild_id)
+        channelid_list = await query.get_values()
+        channel_list = [ReportChannel(self.bot, self.bot.get_channel(x)) for x in channelid_list]
+        gym_channels = [y for y in channel_list if await y.point_in_channel(coords)]
+        return gym_channels
+    
     @classmethod
     async def convert(cls, ctx, arg):
         stop_convert = await Pokestop.convert(ctx, arg)
@@ -269,17 +280,6 @@ class Gym(POI):
         else:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
-    
-    async def get_all_channels(self):
-        report_table = self.bot.dbi.table('report_channels')
-        guild_id = await self._guildid()
-        coords = await self._coords()
-        query = report_table.query('channelid')
-        query.where(guild_id=guild_id)
-        channelid_list = await query.get_values()
-        channel_list = [ReportChannel(self.bot, self.bot.get_channel(x)) for x in channelid_list]
-        gym_channels = [y for y in channel_list if await y.point_in_channel(coords)]
-        return gym_channels
     
     @classmethod
     async def insert_from_data(cls, bot, guildid, data):

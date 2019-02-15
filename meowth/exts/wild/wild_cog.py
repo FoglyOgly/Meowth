@@ -184,7 +184,7 @@ class WildCog(Cog):
         name = await pkmn.name()
         want = Want(ctx.bot, new_wild.pkmn.id, ctx.guild.id)
         role = await want.role()
-        embed = WildEmbed.from_wild(new_wild)
+        embed = WildEmbed.from_wild(new_wild).embed
         if role:
             reportcontent = role.mention + " - "
         else:

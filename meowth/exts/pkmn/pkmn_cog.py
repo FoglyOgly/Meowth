@@ -546,9 +546,9 @@ class Pokemon():
             embed = formatters.mc_embed(display_dict)
             multi = await ctx.send('Multiple possible Pokemon found! Please select from the following list.',
                 embed=embed)
-            react, author = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
+            payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
                 react_list=react_list)
-            choice = choice_dict[react]
+            choice = choice_dict[payload.emoji]
             return choice
         return cls(ctx.bot, pokemonid, form=form, gender=gender, shiny=shiny,
             attiv=attiv, defiv=defiv, staiv=staiv, lvl=lvl, quickMoveid=quickMoveid,

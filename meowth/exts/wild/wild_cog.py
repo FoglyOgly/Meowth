@@ -216,7 +216,8 @@ class WildCog(Cog):
             'guild_id': ctx.guild.id,
             'location': loc_id,
             'pkmn': pkmn.id,
-            'created': new_wild.created
+            'created': new_wild.created,
+            'messages': new_wild.message_ids
         }
         insert = wild_table.insert()
         insert.row(**d)

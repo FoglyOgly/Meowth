@@ -1453,6 +1453,7 @@ class RaidCog(Cog):
         new_raid.channel_ids = []
         new_raid.message_ids = []
         react_list = new_raid.react_list
+        print(react_list)
         if new_raid.hatch:
             embed = await new_raid.egg_embed()
         else:

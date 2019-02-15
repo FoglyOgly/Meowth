@@ -538,7 +538,7 @@ class Pokemon():
         elif length == 0:
             raise PokemonNotFound
         else:
-            possible_mons = [(await cls(ctx.bot, x)) for x in possible_ids]
+            possible_mons = [(cls(ctx.bot, x)) for x in possible_ids]
             possible_names = [(await mon.name()) for mon in possible_mons]
             react_list = formatters.mc_emoji(length)
             choice_dict = dict(zip(react_list, possible_mons))

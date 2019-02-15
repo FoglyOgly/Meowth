@@ -132,15 +132,17 @@ class Wild():
 
     async def despawn_wild(self):
         channels_users, message_list = await self.users_channels_messages()
+        print(1)
         has_embed = False
         self.expired = True
         self.end = time.time()
         name = await self.pkmn.name()
         for message in message_list:
             if not has_embed:
+                print(2)
                 embed = await self.despawned_embed()
                 has_embed = True
-            await msg.edit(embed=embed)
+            await message.edit(embed=embed)
         for channel in channels_users:
             mentions = [x.mention for x in channels_users[channel]]
             if len(mentions) > 0:
@@ -169,6 +171,7 @@ class Wild():
         if emoji not in self.react_list.values():
             return
         if emoji == self.react_list['despawn']:
+            print(0)
             return await self.despawn_wild()
         
 

@@ -121,6 +121,7 @@ class Wild():
                 if react.emoji == self.react_list['coming']:
                     usrs = await react.users().flatten()
                     channels_users[chn].extend(usrs)
+                    channels_users[chn].remove(self.bot.user)
                     break
                 continue
         return (channels_users, message_list)
@@ -132,14 +133,12 @@ class Wild():
 
     async def despawn_wild(self):
         channels_users, message_list = await self.users_channels_messages()
-        print(1)
         has_embed = False
         self.expired = True
         self.end = time.time()
         name = await self.pkmn.name()
         for message in message_list:
             if not has_embed:
-                print(2)
                 embed = await self.despawned_embed()
                 has_embed = True
             await message.edit(embed=embed)
@@ -147,9 +146,7 @@ class Wild():
             mentions = [x.mention for x in channels_users[channel]]
             if len(mentions) > 0:
                 content = f"{' '.join(mentions)} - The {name} has despawned!"
-            else:
-                content = f"The {name} has despawned!"
-            await channel.send(content)
+                await channel.send(content)
 
 
     

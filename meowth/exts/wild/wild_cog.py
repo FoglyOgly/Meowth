@@ -213,7 +213,7 @@ class WildCog(Cog):
                 await reportmsg.add_reaction(react)
             new_wild.message_ids.append(f"{reportmsg.channel.id}/{reportmsg.id}")
         d = {
-            'guild_id': ctx.guild.id,
+            'guild': ctx.guild.id,
             'location': loc_id,
             'pkmn': pkmn.id,
             'created': new_wild.created,

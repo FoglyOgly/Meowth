@@ -236,9 +236,9 @@ class POI():
     
     @classmethod
     async def convert(cls, ctx, arg):
-        stop_convert = await Pokestop.convert(ctx, arg)
-        if isinstance(stop_convert, Pokestop):
-            return stop_convert
+        # stop_convert = await Pokestop.convert(ctx, arg)
+        # if isinstance(stop_convert, Pokestop):
+        #     return stop_convert
         gym_convert = await Gym.convert(ctx, arg)
         return gym_convert
 

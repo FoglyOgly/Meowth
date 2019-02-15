@@ -317,7 +317,7 @@ class WildEmbed():
             'CP': cp_str,
             "IVs: Atk/Def/Sta": iv_str,
             'Moveset': moveset,
-            'Gender': wild.pkmn.gender.title()
+            'Gender': wild.pkmn.gender.title() if wild.pkmn.gender else "Unknown"
         }
         reportdt = datetime.fromtimestamp(wild.created)
         embed = formatters.make_embed(title=directions_text, # msg_colour=color,

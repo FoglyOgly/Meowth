@@ -119,7 +119,7 @@ class Wild():
             message_list.append(msg)
             for react in msg.reactions:
                 if react.emoji == self.react_list['coming']:
-                    usrs = await reaction.users().flatten()
+                    usrs = await react.users().flatten()
                     channels_users[chn].extend(usrs)
                     break
                 continue

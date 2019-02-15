@@ -9,6 +9,7 @@ from meowth.utils.converters import ChannelMessage
 
 import time
 from datetime import datetime
+import asyncio
 
 from . import wild_info
 

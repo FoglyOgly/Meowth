@@ -23,6 +23,7 @@ class Wild():
         self.created = created
         self.message_ids = []
         self.react_list = bot.wild_info.emoji
+        print(self.react_list)
         self.expired = False
     
     async def weather(self):

@@ -542,6 +542,7 @@ class Pokemon():
                     self.gender = gender_type
             if self.chargeMove2id:
                 self.chargeMove2id = None
+        return self
 
     @classmethod    
     async def convert(cls, ctx, arg):

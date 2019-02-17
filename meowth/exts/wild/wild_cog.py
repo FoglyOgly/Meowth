@@ -172,6 +172,7 @@ class Wild():
         embed = formatters.make_embed(content=content, fields=fields)
         msg = await channel.send(embed=embed)
         def check(m):
+            print('checking')
             return m.author == user and m.channel == channel
         try:
             reply = await self.bot.wait_for('message', check=check, timeout=60)

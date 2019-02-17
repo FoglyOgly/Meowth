@@ -1,4 +1,5 @@
 emoji = {
     'coming': '🚗',
-    'despawn': '💨'
+    'despawn': '💨',
+    'info': 'ℹ'
 }

@@ -540,6 +540,61 @@ class Pokemon():
             if self.chargeMove2id:
                 self.chargeMove2id = None
         return self
+    
+    async def get_info_from_arg(self, ctx, arg):
+        if arg.startswith('cp'):
+            cp = int(arg[2:])
+            self.cp = cp
+        elif arg.startswith('@'):
+            arg = arg[1:]
+            move = await Move.convert(ctx, arg)
+            if move:
+                if await move._fast():
+                    self.quickMoveid = move.id
+                else:
+                    if not self.chargeMoveid:
+                        self.chargeMoveid = move.id
+                    else:
+                        self.chargeMove2id = move.id
+            else:
+                pass
+        elif arg == 'shiny':
+            self.shiny = True
+        elif arg == 'male':
+            self.gender = 'male'
+        elif arg == 'female':
+            self.gender = 'female'
+        elif arg.startswith('$att'):
+            attiv = int(arg[4:])
+            if attiv > 15:
+                attiv = 15
+            elif attiv < 0:
+                attiv = 0
+            self.attiv = attiv
+        elif arg.startswith('$def'):
+            defiv = int(arg[4:])
+            if defiv > 15:
+                defiv = 15
+            elif defiv < 0:
+                defiv = 0
+            self.defiv = defiv
+        elif arg.startswith('$sta'):
+            staiv = int(arg[4:])
+            if staiv > 15:
+                staiv = 15
+            elif staiv < 0:
+                staiv = 0
+            self.staiv = staiv
+        elif arg.startswith('$lvl'):
+            lvl = float(arg[4:])
+            double = lvl*2
+            rounded = round(double)
+            if rounded < 2:
+                rounded = 2
+            elif rounded > 80:
+                rounded = 80
+            valid_level = rounded/2
+            self.lvl = valid_level
 
     @classmethod    
     async def convert(cls, ctx, arg):

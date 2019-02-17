@@ -149,6 +149,48 @@ class Wild():
                 content = f"{' '.join(mentions)} - The {name} has despawned!"
                 await channel.send(content)
 
+    async def get_additional_info(self, channel, user):
+        content = "Specify information about the wild spawn! You can give as many of the below options as you like."
+        info_options = """
+            Set CP to #### -
+            Set IVs Atk/Def/Sta -
+            Set Level to ## - 
+            Set Moveset to MOVENAME -
+            Set Gender - 
+            """
+        info_strings = """
+            `cp####`
+            `$iv##/##/##`
+            `$lvl##`
+            `@movename`
+            `male` or `female`
+            """
+        fields = {
+            'Options': info_options,
+            '\u200b': info_strings
+        }
+        embed = formatters.make_embed(description=content, fields=fields)
+        msg = await channel.send(embed=embed)
+        def check(m):
+            return m.author == user and m.channel == channel
+        try:
+            reply = await self.bot.wait_for('message', check=check, timeout=60)
+        except asyncio.TimeoutError:
+            return await msg.delete()
+        else:
+            args = reply.content.lower().split()
+            ctx = await self.bot.get_context(reply)
+            for arg in args:
+                await self.pkmn.get_info_from_arg(ctx, arg)
+            weather = await self.weather()
+            if weather == 'NO_WEATHER':
+                weather = None
+            pkmn = await self.pkmn.validate('wild',weather=weather)
+            self.pkmn = pkmn
+            new_embed = (await WildEmbed.from_wild(self)).embed
+            for idstring in self.message_ids:
+                chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+                await msg.edit(embed=new_embed)
 
     
     async def on_raw_reaction_add(self, payload):
@@ -169,8 +211,9 @@ class Wild():
         if emoji not in self.react_list.values():
             return
         if emoji == self.react_list['despawn']:
-            print(0)
             return await self.despawn_wild()
+        elif emoji == self.react_list['info']:
+            return await self.get_additional_info(channel, user)
         
 
 class WildCog(Cog):

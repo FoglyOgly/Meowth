@@ -178,18 +178,22 @@ class Wild():
         except asyncio.TimeoutError:
             return await msg.delete()
         else:
+            print(0)
             args = reply.content.lower().split()
             ctx = await self.bot.get_context(reply)
             for arg in args:
                 await self.pkmn.get_info_from_arg(ctx, arg)
+            print(1)
             weather = await self.weather()
             if weather == 'NO_WEATHER':
                 weather = None
             pkmn = await self.pkmn.validate('wild',weather=weather)
             self.pkmn = pkmn
+            print(2)
             new_embed = (await WildEmbed.from_wild(self)).embed
             for idstring in self.message_ids:
                 chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+                print(3)
                 await msg.edit(embed=new_embed)
 
     

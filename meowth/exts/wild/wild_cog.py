@@ -181,6 +181,12 @@ class WildCog(Cog):
     
     @command(aliases=['w'])
     async def wild(self, ctx, pkmn: Pokemon, *, location: POI):
+        if not await pkmn._wild_available():
+            raise
+        weather = await location.weather()
+        if weather == 'NO_WEATHER':
+            weather = None
+        pkmn = await pkmn.validate('wild', weather=weather)
         wild_table = self.bot.dbi.table('wilds')
         new_wild = Wild(self.bot, ctx.guild.id, location, pkmn)
         react_list = list(new_wild.react_list.values())
@@ -227,8 +233,8 @@ class WildCog(Cog):
         new_wild.id = rcrd[0][0]
         self.bot.add_listener(new_wild.on_raw_reaction_add)
         await asyncio.sleep(3600)
-        if not self.expired:
-            return await self.despawn_wild()
+        if not new_wild.expired:
+            return await new_wild.despawn_wild()
 
 class WildEmbed():
 

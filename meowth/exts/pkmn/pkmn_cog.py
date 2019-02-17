@@ -238,7 +238,7 @@ class Pokemon():
             url += 'SHINY'
         if await self._gender_type() == 'DIMORPH' and self.gender:
             url += '_'
-            url += self.gender
+            url += self.gender.upper()
         url += '.png?cache=2'
         return url
     
@@ -461,7 +461,87 @@ class Pokemon():
             defense = (await self._baseDefense() + self.defiv)*cpm
             sta = (await self._baseStamina() + self.staiv)*cpm
             cp = floor((att*defense**0.5*sta**0.5)/10)
+            if cp < 10:
+                cp = 10
             return cp
+
+    async def min_cp(self, level=1):
+        cpm_ref = self.bot.dbi.table('cpm_table').query('cpm').where(
+            level=level)
+        cpm = await cpm_ref.get_value()
+        att = (await self._baseAttack())*cpm
+        defense = (await self._baseDefense())*cpm
+        sta = (await self._baseStamina())*cpm
+        cp = floor((att*defense**0.5*sta**0.5)/10)
+        if cp < 10:
+            cp = 10
+        return cp
+    
+    async def max_cp(self, level=40):
+        cpm_ref = self.bot.dbi.table('cpm_table').query('cpm').where(
+            level=level)
+        cpm = await cpm_ref.get_value()
+        att = (await self._baseAttack() + 15)*cpm
+        defense = (await self._baseDefense() + 15)*cpm
+        sta = (await self._baseStamina() + 15)*cpm
+        cp = floor((att*defense**0.5*sta**0.5)/10)
+        if cp < 10:
+            cp = 10
+        return cp
+    
+    async def validate(self, context, weather=None):
+        if self.quickMoveid:
+            quick_moves = await self.fast_moves()
+            if self.quickMoveid not in quick_moves:
+                self.quickMoveid = None
+        if self.chargeMoveid:
+            charge_moves = await self.charge_moves()
+            if self.chargeMoveid not in charge_moves:
+                self.chargeMoveid = None
+        if self.chargeMove2id:
+            if self.chargeMove2id not in charge_moves:
+                self.chargeMove2id = None
+            elif not self.chargeMoveid:
+                self.chargeMoveid = self.chargeMove2id
+                self.chargeMove2id = None
+        if context == 'wild':
+            if weather:
+                if await self.is_boosted(weather=weather):
+                    max_level = 35
+                    min_level = 6
+                else:
+                    max_level = 30
+                    min_level = 1
+            else:
+                max_level = 35
+                min_level = 1
+            if self.lvl:
+                if self.lvl > max_level:
+                    self.lvl = max_level
+                elif self.lvl < min_level:
+                    self.lvl = min_level
+                else:
+                    max_level = self.lvl
+                    min_level = self.lvl
+            if self.cp:
+                min_cp = await self.min_cp(level=min_level)
+                max_cp = await self.max_cp(level=max_level)
+                if self.cp and self.cp > max_cp:
+                    self.cp = max_cp
+                elif self.cp and self.cp < min_cp:
+                    self.cp = min_cp
+            else:
+                calc_cp = await self.calculate_cp()
+                if calc_cp:
+                    self.cp = calc_cp
+            if self.gender:
+                gender_type = await self._gender_type()
+                if gender_type == 'NONE':
+                    self.gender = None
+                elif gender_type in ('MALE', 'FEMALE'):
+                    self.gender = gender_type
+            if self.chargeMove2id:
+                self.chargeMove2id = None
 
     @classmethod    
     async def convert(cls, ctx, arg):
@@ -485,7 +565,6 @@ class Pokemon():
         chargeMoveid = None
         chargeMove2id = None
         cp = None
-        alolan = False
         for arg in args:
             if arg.startswith('cp'):
                 cp = int(arg[2:])
@@ -510,12 +589,32 @@ class Pokemon():
                 gender = 'female'
             elif arg.startswith('$att'):
                 attiv = int(arg[4:])
+                if attiv > 15:
+                    attiv = 15
+                elif attiv < 0:
+                    attiv = 0
             elif arg.startswith('$def'):
                 defiv = int(arg[4:])
+                if defiv > 15:
+                    defiv = 15
+                elif defiv < 0:
+                    defiv = 0
             elif arg.startswith('$sta'):
                 staiv = int(arg[4:])
+                if staiv > 15:
+                    staiv = 15
+                elif staiv < 0:
+                    staiv = 0
             elif arg.startswith('$lvl'):
-                lvl = int(arg[4:])
+                lvl = float(arg[4:])
+                double = lvl*2
+                rounded = round(double)
+                if rounded < 2:
+                    rounded = 2
+                elif rounded > 80:
+                    rounded = 80
+                valid_level = rounded/2
+                lvl = valid_level
             else:
                 form_name = fuzzymatch.get_match(form_list, arg)
                 if form_name[0]:
@@ -535,6 +634,7 @@ class Pokemon():
         length = len(possible_ids)
         if length == 1:
             pokemonid = possible_ids.pop()
+            pkmn = cls(ctx.bot, pokemonid)
         elif length == 0:
             raise PokemonNotFound
         else:
@@ -548,11 +648,20 @@ class Pokemon():
                 embed=embed)
             payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
                 react_list=react_list)
-            choice = choice_dict[str(payload.emoji)]
-            return choice
-        return cls(ctx.bot, pokemonid, form=form, gender=gender, shiny=shiny,
-            attiv=attiv, defiv=defiv, staiv=staiv, lvl=lvl, quickMoveid=quickMoveid,
-            chargeMoveid=chargeMoveid, cp=cp)
+            pkmn = choice_dict[str(payload.emoji)]
+            await multi.delete()
+        pkmn.form = form
+        pkmn.gender = gender
+        pkmn.shiny = shiny
+        pkmn.attiv = attiv
+        pkmn.defiv = defiv
+        pkmn.staiv = staiv
+        pkmn.lvl = lvl
+        pkmn.quickMoveid = quickMoveid
+        pkmn.chargeMoveid = chargeMoveid
+        pkmn.chargeMove2id = chargeMove2id
+        pkmn.cp = cp
+        return pkmn
 
 
 

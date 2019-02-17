@@ -169,7 +169,7 @@ class Wild():
             'Options': info_options,
             '\u200b': info_strings
         }
-        embed = formatters.make_embed(description=content, fields=fields)
+        embed = formatters.make_embed(content=content, fields=fields)
         msg = await channel.send(embed=embed)
         def check(m):
             return m.author == user and m.channel == channel

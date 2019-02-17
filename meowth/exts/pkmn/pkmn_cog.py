@@ -504,6 +504,9 @@ class Pokemon():
             elif not self.chargeMoveid:
                 self.chargeMoveid = self.chargeMove2id
                 self.chargeMove2id = None
+        gender_type = await self._gender_type()
+        if gender_type in ('NONE', 'MALE', 'FEMALE'):
+            self.gender = gender_type
         if context == 'wild':
             if weather:
                 if await self.is_boosted(weather=weather):
@@ -534,12 +537,6 @@ class Pokemon():
                 calc_cp = await self.calculate_cp()
                 if calc_cp:
                     self.cp = calc_cp
-            if self.gender:
-                gender_type = await self._gender_type()
-                if gender_type == 'NONE':
-                    self.gender = None
-                elif gender_type in ('MALE', 'FEMALE'):
-                    self.gender = gender_type
             if self.chargeMove2id:
                 self.chargeMove2id = None
         return self

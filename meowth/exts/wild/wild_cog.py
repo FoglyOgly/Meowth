@@ -132,6 +132,7 @@ class Wild():
             emoji = str(payload.emoji)
         if emoji not in self.react_list.values():
             return
+        await message.remove_reaction(emoji, user)
         if emoji == self.react_list['despawn']:
             return await self.despawn_wild()
         elif emoji == self.react_list['info']:

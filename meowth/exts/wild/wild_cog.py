@@ -187,6 +187,8 @@ class Wild():
             pkmn = await self.pkmn.validate('wild',weather=weather)
             self.pkmn = pkmn
             new_embed = (await WildEmbed.from_wild(self)).embed
+            await reply.delete()
+            await msg.delete()
             for idstring in self.message_ids:
                 chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
                 await msg.edit(embed=new_embed)

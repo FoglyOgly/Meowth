@@ -23,7 +23,6 @@ class Wild():
         self.created = created
         self.message_ids = []
         self.react_list = bot.wild_info.emoji
-        print(self.react_list)
         self.expired = False
     
     async def weather(self):
@@ -31,85 +30,7 @@ class Wild():
             return await self.location.weather()
         else:
             return "NO_WEATHER"
-    
-    async def set_cp(self, cp: int):
-        has_embed = False
-        for idstring in self.message_ids:
-            chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
-            if not has_embed:
-                embed = WildEmbed(msg.embeds[0])
-                embed.cp_str = str(cp)
-                has_embed = True
-            await msg.edit(embed=embed)
-    
-    async def set_gender(self, gender: str):
-        has_embed = False
-        gender_type = await self.pkmn._gender_type()
-        if gender_type in ('NONE', 'MALE', 'FEMALE'):
-            return
-        if self.pkmn.gender == gender.upper():
-            return
-        self.pkmn.gender = gender.upper()
-        for idstring in self.message_ids:
-            chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
-            if not has_embed:
-                embed = WildEmbed(msg.embeds[0])
-                embed.gender_str = gender.title()
-                if gender_type == 'DIMORPH':
-                    sprite_url = await self.pkmn.sprite_url()
-                    self.embed.set_thumbnail(url=sprite_url)
-                has_embed = True
-            await msg.edit(embed=embed)
-    
-    async def set_moveset(self, move1, move2=None):
-        has_embed = False
-        fast = self.pkmn.quickMoveid or None
-        charge = self.pkmn.chargeMoveid or None
-        if await move1._fast():
-            fast = move1.id
-        else:
-            charge = move1.id
-        if move2:
-            if await move2._fast():
-                fast = move2.id
-            else:
-                charge = move2.id
-        quick_move = Move(self.bot, fast) if fast else None
-        charge_move = Move(self.bot, charge) if charge else None
-        if quick_move:
-            self.pkmn.quickMoveid = quick_move.id
-            quick_name = await quick_move.name()
-            quick_emoji = await quick_move.emoji()
-        else:
-            quick_name = "Unknown"
-            quick_emoji = ""
-        if charge_move:
-            self.pkmn.chargeMoveid = charge_move.id
-            charge_name = await charge_move.name()
-            charge_emoji = await charge_move.emoji()
-        else:
-            charge_name = "Unknown"
-            charge_emoji = ""
-        moveset_str = f"{quick_name} {quick_emoji}| {charge_name} {charge_emoji}"
-        for idstring in self.message_ids:
-            chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
-            if not has_embed:
-                embed = WildEmbed(msg.embeds[0])
-                embed.moveset_str = moveset_str
-                has_embed = True
-            await msg.edit(embed=embed)
-    
-    async def set_ivs(self, attiv, defiv, staiv):
-        iv_str = f'{attiv}/{defiv}/{staiv}'
-        for idstring in self.message_ids:
-            chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
-            if not has_embed:
-                embed = WildEmbed(msg.embeds[0])
-                embed.iv_str = iv_str
-                has_embed = True
-            await msg.edit(embed=embed)
 
-    
     async def users_channels_messages(self):
         channels_users = {}
         message_list = []

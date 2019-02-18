@@ -508,6 +508,8 @@ class Pokemon():
         if gender_type in ('NONE', 'MALE', 'FEMALE'):
             self.gender = gender_type
         if context == 'wild':
+            if self.shiny:
+                self.shiny = False
             if weather:
                 if await self.is_boosted(weather=weather):
                     max_level = 35
@@ -564,22 +566,22 @@ class Pokemon():
             self.gender = 'male'
         elif arg == 'female':
             self.gender = 'female'
-        elif arg.startswith('$att'):
-            attiv = int(arg[4:])
+        elif arg.startswith('$iv'):
+            iv_arg = arg[3:]
+            attiv, defiv, staiv = iv_arg.split('/', maxsplit=2)
+            attiv = int(attiv)
+            defiv = int(defiv)
+            staiv = int(staiv)
             if attiv > 15:
                 attiv = 15
             elif attiv < 0:
                 attiv = 0
             self.attiv = attiv
-        elif arg.startswith('$def'):
-            defiv = int(arg[4:])
             if defiv > 15:
                 defiv = 15
             elif defiv < 0:
                 defiv = 0
             self.defiv = defiv
-        elif arg.startswith('$sta'):
-            staiv = int(arg[4:])
             if staiv > 15:
                 staiv = 15
             elif staiv < 0:
@@ -640,20 +642,20 @@ class Pokemon():
                 gender = 'male'
             elif arg == 'female':
                 gender = 'female'
-            elif arg.startswith('$att'):
-                attiv = int(arg[4:])
+            elif arg.startswith('$iv'):
+                iv_arg = arg[3:]
+                attiv, defiv, staiv = iv_arg.split('/', maxsplit=2)
+                attiv = int(attiv)
+                defiv = int(defiv)
+                staiv = int(staiv)
                 if attiv > 15:
                     attiv = 15
                 elif attiv < 0:
                     attiv = 0
-            elif arg.startswith('$def'):
-                defiv = int(arg[4:])
                 if defiv > 15:
                     defiv = 15
                 elif defiv < 0:
                     defiv = 0
-            elif arg.startswith('$sta'):
-                staiv = int(arg[4:])
                 if staiv > 15:
                     staiv = 15
                 elif staiv < 0:

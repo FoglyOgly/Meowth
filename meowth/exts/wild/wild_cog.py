@@ -172,29 +172,23 @@ class Wild():
         embed = formatters.make_embed(content=content, fields=fields)
         msg = await channel.send(embed=embed)
         def check(m):
-            print('checking')
             return m.author == user and m.channel == channel
         try:
             reply = await self.bot.wait_for('message', check=check, timeout=60)
         except asyncio.TimeoutError:
             return await msg.delete()
         else:
-            print(0)
             args = reply.content.lower().split()
-            ctx = await self.bot.get_context(reply)
             for arg in args:
-                await self.pkmn.get_info_from_arg(ctx, arg)
-            print(1)
+                await self.pkmn.get_info_from_arg(self.bot, arg)
             weather = await self.weather()
             if weather == 'NO_WEATHER':
                 weather = None
             pkmn = await self.pkmn.validate('wild',weather=weather)
             self.pkmn = pkmn
-            print(2)
             new_embed = (await WildEmbed.from_wild(self)).embed
             for idstring in self.message_ids:
                 chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
-                print(3)
                 await msg.edit(embed=new_embed)
 
     

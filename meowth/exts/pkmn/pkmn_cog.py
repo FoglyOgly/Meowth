@@ -541,13 +541,13 @@ class Pokemon():
                 self.chargeMove2id = None
         return self
     
-    async def get_info_from_arg(self, ctx, arg):
+    async def get_info_from_arg(self, bot, arg):
         if arg.startswith('cp'):
             cp = int(arg[2:])
             self.cp = cp
         elif arg.startswith('@'):
             arg = arg[1:]
-            move = await Move.convert(ctx, arg)
+            move = await Move.from_arg(bot, arg)
             if move:
                 if await move._fast():
                     self.quickMoveid = move.id
@@ -826,13 +826,17 @@ class Move:
         return name
     
     @classmethod
-    async def convert(cls, ctx, arg):
-        names = ctx.bot.dbi.table('move_names')
+    async def from_arg(cls, bot, arg):
+        names = bot.dbi.table('move_names')
         name_list = await names.query('name').get_values()
         match = fuzzymatch.get_match(name_list, arg)
         if match[0]:
             match_id = await names.query('moveid').where(name=match[0]).get_value()
-            return cls(ctx.bot, match_id)
+            return cls(bot, match_id)
+    
+    @classmethod
+    async def convert(cls, ctx, arg):
+        return await cls.from_arg(ctx.bot, arg)
             
             
 

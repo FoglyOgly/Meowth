@@ -15,12 +15,12 @@ from . import wild_info
 
 class Wild():
 
-    def __init__(self, bot, guild_id, location, pkmn: Pokemon, created: float=time.time()):
+    def __init__(self, bot, guild_id, location, pkmn: Pokemon):
         self.bot = bot
         self.guild_id = guild_id
         self.location = location
         self.pkmn = pkmn
-        self.created = created
+        self.created = time.time()
         self.message_ids = []
         self.react_list = bot.wild_info.emoji
         self.expired = False
@@ -69,6 +69,10 @@ class Wild():
             if len(mentions) > 0:
                 content = f"{' '.join(mentions)} - The {name} has despawned!"
                 await channel.send(content)
+        wild_table = self.bot.dbi.table('wilds')
+        query = wild_table.query
+        query.where(id=self.id)
+        await query.delete()
 
     async def get_additional_info(self, channel, user):
         content = "Specify information about the wild spawn! You can give as many of the below options as you like."

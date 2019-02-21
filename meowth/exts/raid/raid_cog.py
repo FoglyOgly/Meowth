@@ -469,19 +469,6 @@ class Raid():
                 self.group_list.append(d)
                 for idstring in self.message_ids:
                     chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
-                    has_embed = False
-                    if not has_embed:
-                        if self.status == 'active':
-                            raid_embed = RaidEmbed(msg.embeds[0])
-                            raid_embed.grps_str = self.grps_str
-                            embed = raid_embed.embed
-                            has_embed = True
-                        elif self.status == 'egg':
-                            egg_embed = EggEmbed(msg.embeds[0])
-                            egg_embed.grps_str = self.grps_str
-                            embed = egg_embed.embed
-                            has_embed = True
-                    await msg.edit(embed=embed)
                     await msg.add_reaction(emoji)
                 return await self.join_grp(ctx.author.id, d)
     
@@ -664,6 +651,8 @@ class Raid():
         self.group_list = await self.get_grp_list()
         if self.status == 'active':
             estimator_20 = await self.estimator_20()
+        else:
+            estimator_20 = None
         has_embed = False
         for idstring in self.message_ids:
             chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
@@ -672,7 +661,10 @@ class Raid():
                     raid_embed = RaidEmbed(msg.embeds[0])
                     raid_embed.status_str = self.status_str
                     raid_embed.team_str = self.team_str
-                    raid_embed.grps_str = self.grps_str
+                    if estimator_20:
+                        raid_embed.grps_str = "Groups (Boss Damage Estimate)", self.grps_str
+                    else:
+                        raid_embed.grps_str = "Groups", self.grps_str
                     embed = raid_embed.embed
                     has_embed = True
                 elif self.status == 'egg':
@@ -1822,8 +1814,8 @@ class RaidEmbed():
         return self.embed.fields[RaidEmbed.group_index].value
     
     @grps_str.setter
-    def grps_str(self, field_key, grps_str):
-        self.embed.set_field_at(RaidEmbed.group_index, name="Groups (Boss Damage Estimate)", value=grps_str)
+    def grps_str(self, grps_tuple):
+        self.embed.set_field_at(RaidEmbed.group_index, name=grps_tuple[0], value=grps_tuple[1])
 
 
 

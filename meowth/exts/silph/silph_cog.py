@@ -45,4 +45,7 @@ class SilphCog(Cog):
         async with aiohttp.ClientSession() as sess:
             async with sess.get(url, headers=headers) as resp:
                 data = await resp.json()
-                print(data)
+                data = data['data']
+                print(self.bot.raid_info.raid_lists)
+                self.parse_info_from_silph(data)
+                print(self.bot.raid_info.raid_lists)

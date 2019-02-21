@@ -21,7 +21,7 @@ class SilphCog(Cog):
             else:
                 new_level = level[-1]
             for boss in data[level]['boss']:
-                silphid = data[level]['boss']['id']
+                silphid = boss['id']
                 meowthid = silphid.upper().replace('-', '_')
                 forms = ['ALOLA', 'ATTACK', 'DEFENSE', 'SPEED', 'RAINY', 'SNOWY', 'SUNNY']
                 for form in forms:

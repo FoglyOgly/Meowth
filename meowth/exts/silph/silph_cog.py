@@ -14,6 +14,7 @@ class SilphCog(Cog):
         self.bot = bot
 
     def parse_info_from_silph(self, data):
+        verified = True
         raid_lists = self.bot.raid_info.raid_lists
         for level in data:
             if level == 'LEVEL_6':
@@ -22,6 +23,10 @@ class SilphCog(Cog):
                 new_level = level[-1]
             for boss in data[level]['boss']:
                 silphid = boss['id']
+                if not boss['available']:
+                    continue
+                if not boss['verified']:
+                    verified = False
                 meowthid = silphid.upper().replace('-', '_')
                 forms = ['ALOLA', 'ATTACK', 'DEFENSE', 'SPEED', 'RAINY', 'SNOWY', 'SUNNY']
                 for form in forms:
@@ -29,10 +34,12 @@ class SilphCog(Cog):
                         meowthid += "_FORM"
                 if meowthid not in raid_lists[new_level]:
                     raid_lists[new_level].append(meowthid)
+        return verified
     
     @command()
     @checks.is_co_owner()
-    async def shakeup(self, ctx, shaketime=None):
+    async def shakeup(self, ctx, *, shaketime=None):
+        i = 0
         if shaketime:
             newdt = parse(shaketime, settings={'TIMEZONE': 'America/Chicago', 'RETURN_AS_TIMEZONE_AWARE': True})
             stamp = newdt.timestamp()
@@ -42,10 +49,27 @@ class SilphCog(Cog):
         await asyncio.sleep(sleeptime)
         url = 'https://api.thesilphroad.com/v0/raids'
         headers = {'Authorization': f'Silph {silph_info.api_key}'}
-        async with aiohttp.ClientSession() as sess:
-            async with sess.get(url, headers=headers) as resp:
-                data = await resp.json()
-                data = data['data']
-                print(self.bot.raid_info.raid_lists)
-                self.parse_info_from_silph(data)
-                print(self.bot.raid_info.raid_lists)
+        while True:
+            async with aiohttp.ClientSession() as sess:
+                async with sess.get(url, headers=headers) as resp:
+                    data = await resp.json()
+                    data = data['data']
+                    verified = self.parse_info_from_silph(data)
+                    i += 1
+                    if not verified or i < 60:
+                        await asyncio.sleep(60)
+                        continue
+                    else:
+                        self.bot.raid_info.raid_lists = {
+                            '1': [],
+                            '2': [],
+                            '3': [],
+                            '4': [],
+                            '5': [],
+                            '6': [],
+                            'EX': []
+                        }
+                        self.parse_info_from_silph(data)
+                        break
+        with open('/meowth/exts/raid/raid_info.py', 'w') as f:
+            f.write(self.bot.raid_info)

@@ -44,6 +44,5 @@ class SilphCog(Cog):
         headers = {'Authorization': f'Silph {silph_info.api_key}'}
         async with aiohttp.ClientSession(headers=headers) as sess:
             async with sess.get(url) as resp:
-                print(resp.content_type)
-                data = await resp.json(content_type='text/plain')
+                data = await resp.text()
                 print(data)

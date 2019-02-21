@@ -42,7 +42,7 @@ class SilphCog(Cog):
         await asyncio.sleep(sleeptime)
         url = 'https://api.thesilphroad.com/v0/raids'
         headers = {'Authorization': f'Silph {silph_info.api_key}'}
-        async with aiohttp.ClientSession(headers=headers) as sess:
+        async with aiohttp.ClientSession() as sess:
             async with sess.get(url, headers=headers) as resp:
-                data = await resp.text()
+                data = await resp.json()
                 print(data)

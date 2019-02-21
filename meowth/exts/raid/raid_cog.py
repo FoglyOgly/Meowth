@@ -1778,17 +1778,19 @@ class RaidEmbed():
         self.embed.set_field_at(RaidEmbed.moveset_index, name="Moveset", value=moveset_str)
         return self
     
-    def set_weather(self, weather_str, cp_str, ctrs_str, rec_str):
+    def set_weather(self, weather_str, cp_str, ctrs_str, rec_str=None):
         self.embed.set_field_at(RaidEmbed.weather_index, name="Weather", value=weather_str)
         self.embed.set_field_at(RaidEmbed.cp_index, name="CP Range", value=cp_str)
         self.embed.set_field_at(RaidEmbed.ctrs_index, name='<:pkbtlr:512707623812857871> Counters', value=ctrs_str)
-        self.embed.set_field_at(RaidEmbed.rec_index, name="Recommended Group Size", value=rec_str)
+        if rec_str:
+            self.embed.set_field_at(RaidEmbed.rec_index, name="Recommended Group Size", value=rec_str)
         return self
     
-    def set_moveset(self, moveset_str, ctrs_str, rec_str):
+    def set_moveset(self, moveset_str, ctrs_str, rec_str=None):
         self.embed.set_field_at(RaidEmbed.moveset_index, name="Moveset", value=moveset_str)
         self.embed.set_field_at(RaidEmbed.ctrs_index, name='<:pkbtlr:512707623812857871> Counters', value=ctrs_str)
-        self.embed.set_field_at(RaidEmbed.rec_index, name="Recommended Group Size", value=rec_str)
+        if rec_str:
+            self.embed.set_field_at(RaidEmbed.rec_index, name="Recommended Group Size", value=rec_str)
         return self
     
     @property
@@ -1820,7 +1822,7 @@ class RaidEmbed():
         return self.embed.fields[RaidEmbed.group_index].value
     
     @grps_str.setter
-    def grps_str(self, grps_str):
+    def grps_str(self, field_key, grps_str):
         self.embed.set_field_at(RaidEmbed.group_index, name="Groups (Boss Damage Estimate)", value=grps_str)
 
 
@@ -1912,14 +1914,14 @@ class RaidEmbed():
             fields['<:pkbtlr:512707623812857871> Counters'] = "\n".join(ctrs_str)
         else:
             ctrs_str = "Currently unavailable"
-            fields['<:pkbtlr:512707623812857871> Counters'] = ctrs_str
+            fields['<:pkbtlr:512707623812857871> Counters'] = (False, ctrs_str)
         grps_str = raid.grps_str + "\u200b"
         if ctrs_list:
             fields['Groups (Boss Damage Estimate)'] = grps_str
             rec = await raid.rec_group_size()
             fields['Recommended Group Size'] = str(rec)
         else:
-            fields['Groups'] = grps_str
+            fields['Groups'] = (False, grps_str)
         embed = formatters.make_embed(icon=RaidEmbed.raid_icon, title=directions_text, # msg_colour=color,
             title_url=directions_url, thumbnail=img_url, fields=fields, footer="Ending",
             footer_icon=RaidEmbed.footer_icon)

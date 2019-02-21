@@ -37,7 +37,8 @@ class Weather():
         phrase_query = accuweather.query()
         phrase_query.where(phrase=phrase)
         wind_speed = data['Wind']['Speed']['Value']
-        if wind_speed > 24:
+        wind_gust = data['WindGust']['Speed']['Value']
+        if wind_speed + wind_gust > 55:
             phrase_query.select('precipitation')
             precip = await phrase_query.get_value()
             if not precip:

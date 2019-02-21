@@ -192,9 +192,13 @@ class Raid():
                 dt = self.local_datetime(group['starttime'])
                 time = dt.strftime('%I:%M %p')
                 est = str(round(group['est_power']*100))
-                grp_str = f"{emoji}: Starting {time} ({est}%)"
+                if est:
+                    grp_str = f"{emoji}: Starting {time} ({est}%)"
+                else:
+                    grp_str = f"{emoji}: Starting {time}"
                 grps_str.append(grp_str)
-        grps_str.append(f"Ungrouped: ({ungrp_est}%)")
+        if ungrp_est:
+            grps_str.append(f"Ungrouped: ({ungrp_est}%)")
         return "\n".join(grps_str)
     
     @property
@@ -810,20 +814,28 @@ class Raid():
     
     async def estimator_20(self, weather=None):
         data = await self.pb_data(weather=weather)
+        if not data:
+            return None
         estimator = data['estimator_20']
         return estimator
     
     async def estimator_min(self, weather=None):
         data = await self.pb_data(weather=weather)
+        if not data:
+            return None
         estimator = query_dict['estimator_min']
         return estimator
     
     async def rec_group_size(self, weather=None):
         estimator = await self.estimator_20(weather=weather)
+        if not estimator:
+            return None
         return ceil(estimator)
     
     async def min_group_size(self):
         estimator = await self.estimator_min()
+        if not estimator:
+            return None
         return ceil(estimator)
     
     def user_est_power(self, user_id):
@@ -1966,7 +1978,7 @@ class RSVPEmbed():
 
         status_str = raid.grp_status_str(group)
         team_str = raid.grp_team_str(group)
-        est = group['est_power']
+        est = group.get('est_power', 0)
         start = raid.local_datetime(group['starttime'])
         time = start.strftime('%I:%M %p')
 
@@ -1976,7 +1988,7 @@ class RSVPEmbed():
         }
         embed = formatters.make_embed(icon=RSVPEmbed.raid_icon, title="Current Group RSVP Totals",
             fields=fields, footer="Ending", footer_icon=RSVPEmbed.footer_icon)
-        if raid.status == 'active':
+        if est:
             embed.add_field(name='Starting (Boss Damage Estimate)', value=f'{time} ({str(round(est*100)) + "%"})', inline=False)
         else:
             embed.add_field(name='Starting', value=time, inline=False)

@@ -1910,13 +1910,15 @@ class RaidEmbed():
                 i += 1
             ctrs_str.append(f'[Results courtesy of Pokebattler](https://www.pokebattler.com/raids/{boss.id})')
             fields['<:pkbtlr:512707623812857871> Counters'] = "\n".join(ctrs_str)
-        grps_str = raid.grps_str
-        if grps_str:
-            fields['Groups (Boss Damage Estimate)'] = grps_str
         else:
-            fields['Groups (Boss Damage Estimate)'] = "\u200b"
-        rec = await raid.rec_group_size()
-        fields['Recommended Group Size'] = str(rec)
+            ctrs_str = "Currently unavailable"
+        grps_str = raid.grps_str + "\u200b"
+        if ctrs_list:
+            fields['Groups (Boss Damage Estimate)'] = grps_str
+            rec = await raid.rec_group_size()
+            fields['Recommended Group Size'] = str(rec)
+        else:
+            fields['Groups'] = grps_str
         embed = formatters.make_embed(icon=RaidEmbed.raid_icon, title=directions_text, # msg_colour=color,
             title_url=directions_url, thumbnail=img_url, fields=fields, footer="Ending",
             footer_icon=RaidEmbed.footer_icon)

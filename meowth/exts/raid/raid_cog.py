@@ -178,7 +178,7 @@ class Raid():
                 name += ' :sparkles:'
             boss_names.append(f"{name} {type_emoji}: **{interest}**")
         boss_list_str = "\n".join(boss_names)
-        boss_list_str += "\nBoss list provided by [The Silph Road](https://thesilphroad.com/raid-bosses)"
+        boss_list_str += "\n<:silph:548259248442703895>Boss list provided by [The Silph Road](https://thesilphroad.com/raid-bosses)"
         return boss_list_str
     
     @property

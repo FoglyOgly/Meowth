@@ -1912,6 +1912,7 @@ class RaidEmbed():
             fields['<:pkbtlr:512707623812857871> Counters'] = "\n".join(ctrs_str)
         else:
             ctrs_str = "Currently unavailable"
+            fields['<:pkbtlr:512707623812857871> Counters'] = ctrs_str
         grps_str = raid.grps_str + "\u200b"
         if ctrs_list:
             fields['Groups (Boss Damage Estimate)'] = grps_str

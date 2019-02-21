@@ -49,27 +49,19 @@ class SilphCog(Cog):
         await asyncio.sleep(sleeptime)
         url = 'https://api.thesilphroad.com/v0/raids'
         headers = {'Authorization': f'Silph {silph_info.api_key}'}
-        while True:
-            async with aiohttp.ClientSession() as sess:
-                async with sess.get(url, headers=headers) as resp:
-                    data = await resp.json()
-                    data = data['data']
-                    verified = self.parse_info_from_silph(data)
-                    i += 1
-                    if not verified or i < 60:
-                        await asyncio.sleep(60)
-                        continue
-                    else:
-                        self.bot.raid_info.raid_lists = {
-                            '1': [],
-                            '2': [],
-                            '3': [],
-                            '4': [],
-                            '5': [],
-                            '6': [],
-                            'EX': []
-                        }
-                        self.parse_info_from_silph(data)
-                        break
+        async with aiohttp.ClientSession() as sess:
+            async with sess.get(url, headers=headers) as resp:
+                data = await resp.json()
+                data = data['data']
+                self.bot.raid_info.raid_lists = {
+                    '1': [],
+                    '2': [],
+                    '3': [],
+                    '4': [],
+                    '5': [],
+                    '6': [],
+                    'EX': []
+                }
+                self.parse_info_from_silph(data)
         with open('/meowth/exts/raid/raid_info.py', 'w') as f:
             f.write(self.bot.raid_info)

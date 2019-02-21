@@ -63,5 +63,5 @@ class SilphCog(Cog):
                     'EX': []
                 }
                 self.parse_info_from_silph(data)
-        with open(self.bot.ext_dir + '/raid/raid_info.py', 'w') as f:
-            f.write(self.bot.raid_info)
+        with open(self.bot.ext_dir + '/raid/raid_info.py', 'a') as f:
+            f.write(str(self.bot.raid_info.raid_lists))

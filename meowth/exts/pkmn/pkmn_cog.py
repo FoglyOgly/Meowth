@@ -118,7 +118,7 @@ class Pokemon():
             shiny_str = "Shiny "
         else:
             shiny_str = ""
-        if not any(self.quickMoveid, self.chargeMoveid, self.chargeMove2id):
+        if not any((self.quickMoveid, self.chargeMoveid, self.chargeMove2id)):
             moveset_str = ""
         else:
             moveset_str = " " + await self.moveset_str()

@@ -101,9 +101,9 @@ class TradeEmbed():
             want_list.append(want_str)
         offer_list = []
         for i in range(len(trade.offered_pkmn)):
-            offer_str = await trade.offered_pkmn[i].trade_display_str()}
+            offer_str = await trade.offered_pkmn[i].trade_display_str()
             offer_list.append(offer_str)
-        title = f"Pokemon Trade"
+        title = "Pokemon Trade"
         footer = trade.lister_name
         footer_url = trade.lister_avy
         fields = {'Wants': "\n".join(want_list), 'Offers': "\n".join(offer_list)}

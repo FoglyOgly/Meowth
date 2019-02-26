@@ -108,7 +108,7 @@ class TradeEmbed():
         footer_url = trade.lister_avy
         fields = {'Wants': "\n".join(want_list), 'Offers': "\n".join(offer_list)}
         if len(offer_list) == 1:
-            thumbnail = await offer_list[0].sprite_url()
+            thumbnail = await trade.offered_pkmn[0].sprite_url()
         else:
             thumbnail = None
         embed = formatters.make_embed(title=title, footer=footer, footer_icon=footer_url,

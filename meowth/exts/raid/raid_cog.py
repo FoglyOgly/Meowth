@@ -57,7 +57,7 @@ class RaidBoss(Pokemon):
 class Raid():
 
     def __init__(self, bot, guild_id, gym=None, level=None,
-        pkmn: RaidBoss=None, hatch: float=None, end: float=None, tz: str=None, created: float=time.time()):
+        pkmn: RaidBoss=None, hatch: float=None, end: float=None, tz: str=None):
         self.bot = bot
         self.guild_id = guild_id
         self.gym = gym
@@ -72,7 +72,7 @@ class Raid():
         self.trainer_dict = {}
         self.group_list = []
         self.tz = tz
-        self.created = created
+        self.created = time.time()
     
     @property
     def status(self):
@@ -449,8 +449,8 @@ class Raid():
         elif ctx.command.name == 'group':
             group_table = ctx.bot.dbi.table('raid_groups')
             insert = group_table.insert()
-            num_current_groups = len(self.group_list)
-            emoji = emoji_letters[num_current_groups]
+            i = len(self.group_list)
+            emoji = f'{i+1}\u20e3'
             grptime = ctx.args[2]
             if grptime.isdigit():
                 stamp = time.time() + int(grptime)*60
@@ -1131,6 +1131,8 @@ class Raid():
                     pass
             pkmn = boss_dict[emoji]
             return await self.report_hatch(pkmn)
+        else:
+            return await self.expire_raid()
         
 
     async def report_hatch(self, pkmn):

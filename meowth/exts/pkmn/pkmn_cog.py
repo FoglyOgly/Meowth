@@ -64,6 +64,78 @@ class Pokemon():
         }
         return d
     
+    def __repr__(self):
+        return repr(self.to_dict)
+    
+    @classmethod
+    def from_dict(cls, bot, data):
+        pkmn_id = data['id']
+        form = data['form']
+        gender = data['gender']
+        shiny = data['shiny']
+        attiv = data['attiv']
+        defiv = data['defiv']
+        staiv = data['staiv']
+        lvl = data['lvl']
+        cp = data['cp']
+        quickMoveid = data['quickMoveid']
+        chargeMoveid = data['chargeMoveid']
+        chargeMove2id = data['chargeMove2id']
+        return cls(bot, pkmn_id, form=form, gender=gender,
+            shiny=shiny, attiv=attiv, defiv=defiv, staiv=staiv,
+            lvl=lvl, cp=cp, quickMoveid=quickMoveid, 
+            chargeMoveid=chargeMoveid, chargeMove2id=chargeMove2id)
+    
+    async def moveset_str(self):
+        fast = self.quickMoveid or None
+        charge = self.chargeMoveid or None
+        charge2 = self.chargeMove2id or None
+        quick_move = Move(self.bot, fast) if fast else None
+        charge_move = Move(self.bot, charge) if charge else None
+        charge2_move = Move(self.bot, charge2) if charge2 else None
+        if quick_move:
+            quick_name = await quick_move.name()
+            quick_emoji = await quick_move.emoji()
+        else:
+            quick_name = "Unknown"
+            quick_emoji = ""
+        if charge_move:
+            charge_name = await charge_move.name()
+            charge_emoji = await charge_move.emoji()
+        else:
+            charge_name = "Unknown"
+            charge_emoji = ""
+        moveset_str = f"{quick_name} {quick_emoji}| {charge_name} {charge_emoji}"
+        if charge2_move:
+            charge2_name = await charge2_move.name()
+            charge2_emoji = await charge2_move.emoji()
+            moveset_str += f'| {charge2_name} {charge2_emoji}'
+        return moveset_str
+    
+    async def trade_display_str(self):
+        name = await self.name()
+        if self.shiny:
+            shiny_str = "Shiny "
+        else:
+            shiny_str = ""
+        if not any(self.quickMoveid, self.chargeMoveid, self.chargeMove2id):
+            moveset_str = ""
+        else:
+            moveset_str = " " + await self.moveset_str()
+        if self.gender:
+            if (await self._gender_type()) in ('MALE', 'FEMALE', 'NONE'):
+                gender_str = ""
+            else:
+                gender_str = self.gender.title() + " "
+        else:
+            gender_str = ""
+        if self.lvl:
+            level_str = f"Level {self.lvl}"
+        else:
+            level_str = ""
+        display_str = f"{shiny_str}{gender_str}{level_str}{name}{moveset_str}"
+        return display_str
+    
     @property
     def _data(self):
         pokemon_ref = self.bot.dbi.table('pokemon').query()
@@ -154,7 +226,10 @@ class Pokemon():
     async def _wild_available(self):
         data = self._data
         return await data.select('wild_available').get_value()
-    
+
+    async def _trade_available(self):
+        data = self._data
+        return await data.select('trade_available').get_value()
     
     async def _shiny_available(self):
         data = self._data
@@ -563,9 +638,9 @@ class Pokemon():
         elif arg == 'shiny':
             self.shiny = True
         elif arg == 'male':
-            self.gender = 'male'
+            self.gender = 'MALE'
         elif arg == 'female':
-            self.gender = 'female'
+            self.gender = 'FEMALE'
         elif arg.startswith('$iv'):
             iv_arg = arg[3:]
             attiv, defiv, staiv = iv_arg.split('/', maxsplit=2)

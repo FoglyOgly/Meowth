@@ -12,6 +12,7 @@ from datetime import datetime
 import asyncio
 
 from . import wild_info
+from . import wild_checks
 
 class Wild():
 
@@ -141,6 +142,26 @@ class Wild():
             return await self.despawn_wild()
         elif emoji == self.react_list['info']:
             return await self.get_additional_info(channel, user)
+    
+    @classmethod
+    async def from_data(cls, bot, data):
+        if data['location'].startswith('gym/'):
+            loc_id = data['location'].split('/')[1]
+            location = Gym(bot, int(loc_id))
+        elif data['location'].startswith('pokestop/'):
+            loc_id = data['location'].split('/')[1]
+            location = Pokestop(bot, int(loc_id))
+        else:
+            city, arg = data['location'].split('/')
+            location = PartialPOI(bot, city, arg)
+        guild_id = data['guild']
+        pkmn_id = data['pkmn']
+        pkmn = Pokemon(bot, pkmn_id)
+        wild = cls(bot, guild_id, location, pkmn)
+        wild.message_ids = data['messages']
+        wild.created = data['created']
+        return wild
+
         
 
 class WildCog(Cog):
@@ -148,8 +169,17 @@ class WildCog(Cog):
     def __init__(self, bot):
         bot.wild_info = wild_info
         self.bot = bot
+        self.pickup_task = self.bot.loop.create_task(self.pickup_wilddata())
+    
+    async def pickup_wilddata(self):
+        wild_table = self.bot.dbi.table('wilds')
+        query = wild_table.query()
+        data = await query.get()
+        for rcrd in data:
+            self.bot.loop.create_task(Wild.from_data(self.bot, rcrd))
     
     @command(aliases=['w'])
+    @wild_checks.wild_enabled()
     async def wild(self, ctx, pkmn: Pokemon, *, location: POI):
         if not await pkmn._wild_available():
             raise
@@ -172,7 +202,10 @@ class WildCog(Cog):
         report_channels = []
         report_channel = ReportChannel(ctx.bot, ctx.channel)
         if isinstance(location, POI):
-            loc_id = str(location.id)
+            if isinstance(location, Gym):
+                loc_id = 'gym/' + str(location.id)
+            elif isinstance(location, Pokestop):
+                loc_id = 'pokestop/' + str(location.id)
             channel_list = await gym.get_all_channels()
             report_channels.extend(channel_list)
         else:

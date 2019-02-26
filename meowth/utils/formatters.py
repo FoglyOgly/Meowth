@@ -9,6 +9,9 @@ from colorthief import ColorThief
 
 import discord
 
+emoji_letters = ['🇦','🇧','🇨','🇩','🇪','🇫','🇬','🇭','🇮','🇯','🇰','🇱',
+    '🇲','🇳','🇴','🇵','🇶','🇷','🇸','🇹','🇺','🇻','🇼','🇽','🇾','🇿'
+]
 
 def colour(*args):
     """Returns a discord Colour object.
@@ -181,12 +184,7 @@ async def ask(bot, message_list, user_list=None, timeout=60, *, react_list=['✅
         return
 
 def mc_emoji(length: int):
-    if length > 10:
-        return None
-    elif length < 10:
-        return [f'{i}\u20e3' for i in range(1, length+1)]
-    else:
-        return [f'{i}\u20e3' for i in range(length+1)]
+    return [emoji_letters[i] for i in range(length+1)]
 
 def mc_embed(choice_dict: dict):
     embed = discord.Embed()

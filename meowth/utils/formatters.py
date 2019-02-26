@@ -184,7 +184,7 @@ async def ask(bot, message_list, user_list=None, timeout=60, *, react_list=['✅
         return
 
 def mc_emoji(length: int):
-    return [emoji_letters[i] for i in range(length+1)]
+    return [emoji_letters[i] for i in range(length)]
 
 def mc_embed(choice_dict: dict):
     embed = discord.Embed()

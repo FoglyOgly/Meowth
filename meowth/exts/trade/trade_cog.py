@@ -106,6 +106,8 @@ class TradeEmbed():
         title = "Pokemon Trade"
         footer = trade.lister_name
         footer_url = trade.lister_avy
+        print(want_list)
+        print(offer_list)
         fields = {'Wants': "\n".join(want_list), 'Offers': "\n".join(offer_list)}
         if len(offer_list) == 1:
             thumbnail = await trade.offered_pkmn[0].sprite_url()

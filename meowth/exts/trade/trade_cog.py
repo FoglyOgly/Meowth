@@ -65,7 +65,7 @@ class TradeCog(Cog):
             accept_other = True
         else:
             accept_other = False
-        wants = await asyncio.gather(*[Pokemon.convert(ctx, arg) for arg in wantargs])
+        wants = await asyncio.gather([Pokemon.convert(ctx, arg) for arg in wantargs])
         if accept_any:
             wants.append('any')
         if accept_other:

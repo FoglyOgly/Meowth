@@ -70,6 +70,7 @@ class TradeCog(Cog):
             wants.append('any')
         if accept_other:
             wants.append('obo')
+        print(wants)
         new_trade = Trade(self.bot, ctx.guild.id, ctx.author.id, listmsg.id, offers, wants)
         embed = await TradeEmbed.from_trade(new_trade)
         await listmsg.edit(content="", embed=embed.embed)

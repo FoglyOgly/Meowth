@@ -65,8 +65,10 @@ class TradeCog(Cog):
             accept_other = True
         else:
             accept_other = False
+        print(wantargs)
         pkmn_convert = partial(Pokemon.convert, ctx)
         wantpkmns = map(pkmn_convert, wantargs)
+        print(wantpkmns)
         wants = [await mon for mon in wantpkmns]
         if accept_any:
             wants.append('any')

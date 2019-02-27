@@ -87,7 +87,7 @@ class Trade():
         idstring = f'{payload.channel_id}/{payload.message_id}'
         print(idstring)
         print(self.listing_id)
-        if idstring != self.listing_id or idstring not in self.offer_msgs:
+        if idstring != self.listing_id and idstring not in self.offer_msgs:
             return
         if payload.emoji.is_custom_emoji():
             emoji = payload.emoji.id

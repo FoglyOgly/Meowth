@@ -65,7 +65,7 @@ class Trade():
             'listed': await listed_pokemon.trade_display_str(),
             'offered': await offered_pokemon.trade_display_str(),
         }
-        embed = self.make_offer_embed(trader, listed_pokemon, offered_pokemon)
+        embed = await self.make_offer_embed(trader, listed_pokemon, offered_pokemon)
         offermsg = await trader.send(
             f"{trader.display_name} has made an offer on your trade! Use the reactions to accept or reject the offer.",
             embed=embed

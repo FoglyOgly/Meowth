@@ -83,6 +83,7 @@ class Trade():
         
 
     async def on_raw_reaction_add(self, payload):
+        print(1)
         idstring = f'{payload.channel_id}/{payload.message_id}'
         if idstring != self.listing_id or idstring not in self.offer_msgs:
             return
@@ -91,6 +92,7 @@ class Trade():
         else:
             emoji = str(payload.emoji)
         if idstring == self.listing_id:
+            print(2)
             if emoji not in self.react_list:
                 return
             i = self.react_list.index(emoji)

@@ -31,15 +31,88 @@ class Trade():
     def lister_avy(self):
         u = self.bot.get_user(self.lister_id)
         return u.avatar_url
+    
+    @property
+    def react_list(self):
+        return formatters.mc_emoji(len(self.wanted_pkmn))
+    
+    @property
+    def offer_msgs(self):
+        return [x['msg'] for x in self.offer_list]
 
     async def listing_chnmsg(self):
         chn, msg = await ChannelMessage.from_id_string(self.bot, self.listing_id)
         return chn, msg
+    
+    @staticmethod
+    async def make_offer_embed(trader, listed_pokemon, offer):
+        return formatters.make_embed(
+            title="Pokemon Trade Offer",
+            icon=Trade.icon_url,
+            fields={
+                "You Offered": await listed_pokemon.trade_display_str(),
+                "They Offer": await offer.trade_display_str()
+                },
+            inline=True,
+            footer=trader.display_name,
+            footer_icon=trader.avatar_url_as(format='png', size=256),
+            thumbnail=await offer.sprite_url()
+        )
+    
+    async def make_offer(self, trader, listed_pokemon, offered_pokemon):
+        offer_dict = {
+            'trader': trader.id,
+            'listed': await listed_pokemon.trade_display_str(),
+            'offered': await offered_pokemon.trade_display_str(),
+        }
+        embed = self.make_offer_embed(trader, listed_pokemon, offered_pokemon)
+        offermsg = await trader.send(
+            f"{trader.display_name} has made an offer on your trade! Use the reactions to accept or reject the offer.",
+            embed=embed
+        )
+        react_list = ['✅', '❎']
+        for react in react_list:
+            await offermsg.add_reaction(react)
+        offer_dict['msg'] = f'{offermsg.channel.id}/{offermsg.id}'
+        self.offer_list.append(offer_dict)
+        offer_list_data = [repr(x) for x in self.offer_list]
+        trade_table = self.bot.dbi.table('trades')
+        update = trade_table.update.where(id=self.id)
+        update.values(offer_list=offer_list_data)
+        await update.commit()
+        
 
     async def on_raw_reaction_add(self, payload):
         idstring = f'{payload.channel_id}/{payload.message_id}'
-        if idstring != self.listing_id:
+        if idstring != self.listing_id or idstring not in self.offer_msgs:
             return
+        if payload.emoji.is_custom_emoji():
+            emoji = payload.emoji.id
+        else:
+            emoji = str(payload.emoji)
+        if idstring == self.listing_id:
+            if emoji not in self.react_list:
+                return
+            i = self.react_list.index(emoji)
+            offer = self.wanted_pkmn[i]
+            g = self.bot.get_guild(self.guild_id)
+            trader = g.get_member(payload.user_id)
+            if len(self.listed_pokemon) > 1:
+                content = f"{trader.display_name}, which of the following Pokemon do you want to trade for?"
+                mc_emoji = formatters.mc_emoji(len(self.listed_pokemon))
+                choice_dict = dict(zip(mc_emoji, self.listed_pokemon))
+                display_list = [await x.trade_display_str() for x in self.listed_pokemon]
+                display_dict = dict(zip(mc_emoji, display_list))
+                embed = formatters.mc_embed(display_dict)
+                channel = self.bot.get_channel(payload.channel_id)
+                choicemsg = await channel.send(content, embed=embed)
+                response = await formatters.ask(self.bot, [choicemsg], user_list=[trader],
+                    react_list=mc_emoji)
+                pkmn = choice_dict[str(response.emoji)]
+            else:
+                pkmn = self.listed_pokemon[0]
+            return await self.make_offer(trader, pkmn, offer)
+            
         
 
 
@@ -72,9 +145,30 @@ class TradeCog(Cog):
             wants.append('any')
         if accept_other:
             wants.append('obo')
-        new_trade = Trade(self.bot, ctx.guild.id, ctx.author.id, listmsg.id, offers, wants)
+        listing_id = f'{ctx.channel.id}/{listmsg.id}'
+        new_trade = Trade(self.bot, ctx.guild.id, ctx.author.id, listing_id, offers, wants)
         embed = await TradeEmbed.from_trade(new_trade)
+        await wantmsg.delete()
         await listmsg.edit(content="", embed=embed.embed)
+        want_emoji = formatters.mc_emoji(len(wants))
+        for emoji in want_emoji:
+            await listmsg.add_reaction(emoji)
+        offer_data = [repr(x) for x in offers]
+        want_data = [repr(x) for x in wants]
+        data = {
+            'guild_id': ctx.guild.id,
+            'lister_id': ctx.author.id,
+            'listing_id': listing_id,
+            'offers': offer_data,
+            'wants': want_data,
+        }
+        trade_table = ctx.bot.dbi.table('trades')
+        insert = trade_table.insert.row(**data)
+        insert.returning('id')
+        rcrd = await insert.commit()
+        new_trade.id = rcrd[0][0]
+        ctx.bot.add_listener(new_trade.on_raw_reaction_add)
+
 
 
 
@@ -97,7 +191,7 @@ class TradeEmbed():
             elif trade.wanted_pkmn[i] == 'any':
                 want_str = f'{want_emoji[i]}: Any Pokemon'
             elif trade.wanted_pkmn[i] == 'obo':
-                want_str = f'{want_emoji[i]}: Offer Another Pokemon'
+                want_str = f'{want_emoji[i]}: Other Pokemon'
             want_list.append(want_str)
         offer_list = []
         for i in range(len(trade.offered_pkmn)):
@@ -106,8 +200,6 @@ class TradeEmbed():
         title = "Pokemon Trade"
         footer = trade.lister_name
         footer_url = trade.lister_avy
-        print(want_list)
-        print(offer_list)
         fields = {'Wants': "\n".join(want_list), 'Offers': "\n".join(offer_list)}
         if len(offer_list) == 1:
             thumbnail = await trade.offered_pkmn[0].sprite_url()

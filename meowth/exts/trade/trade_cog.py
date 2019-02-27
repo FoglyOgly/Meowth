@@ -8,6 +8,7 @@ from meowth.utils import formatters
 from discord.ext import commands
 
 import asyncio
+from functools import partial
 
 class Trade():
 
@@ -65,12 +66,12 @@ class TradeCog(Cog):
             accept_other = True
         else:
             accept_other = False
-        wants = await asyncio.gather([Pokemon.convert(ctx, arg) for arg in wantargs])
+        pkmn_convert = partial(Pokemon.convert, ctx)
+        wants = [await pkmn_convert(arg) for arg in wantargs]
         if accept_any:
             wants.append('any')
         if accept_other:
             wants.append('obo')
-        print(wants)
         new_trade = Trade(self.bot, ctx.guild.id, ctx.author.id, listmsg.id, offers, wants)
         embed = await TradeEmbed.from_trade(new_trade)
         await listmsg.edit(content="", embed=embed.embed)

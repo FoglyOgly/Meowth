@@ -121,7 +121,7 @@ class Trade():
                 embed = formatters.mc_embed(display_dict)
                 channel = self.bot.get_channel(payload.channel_id)
                 choicemsg = await channel.send(content, embed=embed)
-                response = await formatters.ask(self.bot, [choicemsg], user_list=[trader],
+                response = await formatters.ask(self.bot, [choicemsg], user_list=[trader.id],
                     react_list=mc_emoji)
                 pkmn = choice_dict[str(response.emoji)]
             else:

@@ -164,6 +164,8 @@ async def ask(bot, message_list, user_list=None, timeout=60, *, react_list=['✅
             emoji = payload.emoji.id
         else:
             emoji = str(payload.emoji)
+        print(react_list)
+        print(emoji)
         if user_list and type(user_list) is list:
             return (user_id in user_list) and (message_id in message_id_list) and (emoji in react_list)
         elif not user_list:

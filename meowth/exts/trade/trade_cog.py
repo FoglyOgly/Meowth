@@ -89,7 +89,7 @@ class Trade():
     
     async def accept_offer(self, trader, listed, offer):
         content = f'{self.lister_name} has accepted your trade offer! Please DM them to coordinate the trade.'
-        embed = self.make_offer_embed(self.lister, offer, listed)
+        embed = await self.make_offer_embed(self.lister, offer, listed)
         await trader.send(content, embed=embed)
         trade_table = self.bot.dbi.table('trades')
         query = trade_table.query.where(id=self.id)

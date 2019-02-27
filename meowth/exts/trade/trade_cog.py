@@ -28,6 +28,12 @@ class Trade():
         return m.display_name
     
     @property
+    def lister(self):
+        g = self.bot.get_guild(self.guild_id)
+        m = g.get_member(self.lister_id)
+        return m
+    
+    @property
     def lister_avy(self):
         u = self.bot.get_user(self.lister_id)
         return u.avatar_url
@@ -62,8 +68,8 @@ class Trade():
     async def make_offer(self, trader, listed_pokemon, offered_pokemon):
         offer_dict = {
             'trader': trader.id,
-            'listed': await listed_pokemon.trade_display_str(),
-            'offered': await offered_pokemon.trade_display_str(),
+            'listed': listed_pokemon,
+            'offered': offered_pokemon,
         }
         embed = await self.make_offer_embed(trader, listed_pokemon, offered_pokemon)
         offermsg = await trader.send(
@@ -80,13 +86,19 @@ class Trade():
         update = trade_table.update.where(id=self.id)
         update.values(offer_list=offer_list_data)
         await update.commit()
-        
+    
+    async def accept_offer(self, trader, listed, offer):
+        content = f'{self.lister_name} has accepted your trade offer! Please DM them to coordinate the trade.'
+        embed = self.make_offer_embed(self.lister, offer, listed)
+        await trader.send(content, embed=embed)
+        trade_table = self.bot.dbi.table('trades')
+        query = trade_table.query.where(id=self.id)
+        chn, msg = await self.listing_chnmsg()
+        await msg.delete()
+        return await query.delete()    
 
     async def on_raw_reaction_add(self, payload):
-        print(1)
         idstring = f'{payload.channel_id}/{payload.message_id}'
-        print(idstring)
-        print(self.listing_id)
         if idstring != self.listing_id and idstring not in self.offer_msgs:
             return
         if payload.emoji.is_custom_emoji():
@@ -94,7 +106,6 @@ class Trade():
         else:
             emoji = str(payload.emoji)
         if idstring == self.listing_id:
-            print(3)
             if emoji not in self.react_list:
                 return
             i = self.react_list.index(emoji)
@@ -116,6 +127,15 @@ class Trade():
             else:
                 pkmn = self.offered_pkmn[0]
             return await self.make_offer(trader, pkmn, offer)
+        if idstring in self.offer_msgs:
+            if emoji == '\u2705':
+                for offer in self.offer_list:
+                    if offer['msg'] == idstring:
+                        g = self.bot.get_guild(self.guild_id)
+                        trader = g.get_member(offer['trader'])
+                        listed = offer['listed']
+                        offered = offer['offered']
+                        return await self.accept_offer(trader, listed, offered)
             
         
 

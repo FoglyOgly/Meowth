@@ -48,7 +48,7 @@ class Trade():
     async def make_offer_embed(trader, listed_pokemon, offer):
         return formatters.make_embed(
             title="Pokemon Trade Offer",
-            icon=Trade.icon_url,
+            # icon=Trade.icon_url,
             fields={
                 "You Offered": await listed_pokemon.trade_display_str(),
                 "They Offer": await offer.trade_display_str()

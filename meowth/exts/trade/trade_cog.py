@@ -101,11 +101,11 @@ class Trade():
             offer = self.wanted_pkmn[i]
             g = self.bot.get_guild(self.guild_id)
             trader = g.get_member(payload.user_id)
-            if len(self.listed_pokemon) > 1:
+            if len(self.offered_pkmn) > 1:
                 content = f"{trader.display_name}, which of the following Pokemon do you want to trade for?"
-                mc_emoji = formatters.mc_emoji(len(self.listed_pokemon))
-                choice_dict = dict(zip(mc_emoji, self.listed_pokemon))
-                display_list = [await x.trade_display_str() for x in self.listed_pokemon]
+                mc_emoji = formatters.mc_emoji(len(self.offered_pkmn))
+                choice_dict = dict(zip(mc_emoji, self.offered_pkmn))
+                display_list = [await x.trade_display_str() for x in self.offered_pkmn]
                 display_dict = dict(zip(mc_emoji, display_list))
                 embed = formatters.mc_embed(display_dict)
                 channel = self.bot.get_channel(payload.channel_id)
@@ -114,7 +114,7 @@ class Trade():
                     react_list=mc_emoji)
                 pkmn = choice_dict[str(response.emoji)]
             else:
-                pkmn = self.listed_pokemon[0]
+                pkmn = self.offered_pkmn[0]
             return await self.make_offer(trader, pkmn, offer)
             
         

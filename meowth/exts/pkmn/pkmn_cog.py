@@ -673,13 +673,13 @@ class Pokemon():
             valid_level = rounded/2
             self.lvl = valid_level
 
-    @classmethod    
-    async def convert(cls, ctx, arg):
-        pokemon = ctx.bot.dbi.table('pokemon')
-        pokedex = ctx.bot.dbi.table('pokedex')
-        form_names = ctx.bot.dbi.table('form_names')
-        forms_table = ctx.bot.dbi.table('forms')
-        movesets = ctx.bot.dbi.table('movesets')
+    @classmethod
+    async def from_arg(cls, bot, chn, user_id, arg):
+        pokemon = bot.dbi.table('pokemon')
+        pokedex = bot.dbi.table('pokedex')
+        form_names = bot.dbi.table('form_names')
+        forms_table = bot.dbi.table('forms')
+        movesets = bot.dbi.table('movesets')
         id_list = await pokemon.query('pokemonid').where(formid=0).get_values()
         name_list = await pokedex.query('name').get_values()
         form_list = await form_names.query('name').get_values()
@@ -700,7 +700,7 @@ class Pokemon():
                 cp = int(arg[2:])
             elif arg.startswith('@'):
                 arg = arg[1:]
-                move = await Move.convert(ctx, arg)
+                move = await Move.from_arg(bot, arg)
                 if move:
                     if await move._fast():
                         quickMoveid = move.id
@@ -764,19 +764,19 @@ class Pokemon():
         length = len(possible_ids)
         if length == 1:
             pokemonid = possible_ids.pop()
-            pkmn = cls(ctx.bot, pokemonid)
+            pkmn = cls(bot, pokemonid)
         elif length == 0:
             raise PokemonNotFound
         else:
-            possible_mons = [(cls(ctx.bot, x)) for x in possible_ids]
+            possible_mons = [(cls(bot, x)) for x in possible_ids]
             possible_names = [(await mon.name()) for mon in possible_mons]
             react_list = formatters.mc_emoji(length)
             choice_dict = dict(zip(react_list, possible_mons))
             display_dict = dict(zip(react_list, possible_names))
             embed = formatters.mc_embed(display_dict)
-            multi = await ctx.send('Multiple possible Pokemon found! Please select from the following list.',
+            multi = await chn.send('Multiple possible Pokemon found! Please select from the following list.',
                 embed=embed)
-            payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
+            payload = await formatters.ask(ctx.bot, [multi], user_list=[user_id],
                 react_list=react_list)
             pkmn = choice_dict[str(payload.emoji)]
             await multi.delete()
@@ -792,6 +792,10 @@ class Pokemon():
         pkmn.chargeMove2id = chargeMove2id
         pkmn.cp = cp
         return pkmn
+
+    @classmethod    
+    async def convert(cls, ctx, arg):
+        return await cls.from_arg(ctx.bot, ctx.channel, ctx.author.id, arg)
 
 
 

@@ -120,6 +120,7 @@ class Trade():
 
     async def on_raw_reaction_add(self, payload):
         idstring = f'{payload.channel_id}/{payload.message_id}'
+        chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
         if idstring != self.listing_id and idstring not in self.offer_msgs:
             return
         if payload.emoji.is_custom_emoji():
@@ -145,6 +146,13 @@ class Trade():
                 response = await formatters.ask(self.bot, [choicemsg], user_list=[trader.id],
                     react_list=mc_emoji)
                 pkmn = choice_dict[str(response.emoji)]
+                if pkmn == 'obo':
+                    content = f'{trader.display_name} - what Pokemon would you like to offer?'
+                    askmsg = await chn.send(content)
+                    def check(m):
+                        return m.channel == chn and m.author == trader
+                    offermsg = await self.bot.wait_for('message', check=check)
+                    pkmn = await Pokemon.from_arg(self.bot, chn, trader.id, offermsg.content)
             else:
                 pkmn = self.offered_pkmn[0]
             return await self.make_offer(trader, pkmn, offer)

@@ -148,14 +148,13 @@ class Trade():
                 pkmn = choice_dict[str(response.emoji)]
             else:
                 pkmn = self.offered_pkmn[0]
-            print(pkmn)
-            if pkmn == 'obo':
+            if offer == 'obo':
                 content = f'{trader.display_name} - what Pokemon would you like to offer?'
                 askmsg = await chn.send(content)
                 def check(m):
                     return m.channel == chn and m.author == trader
                 offermsg = await self.bot.wait_for('message', check=check)
-                pkmn = await Pokemon.from_arg(self.bot, chn, trader.id, offermsg.content)
+                offer = await Pokemon.from_arg(self.bot, chn, trader.id, offermsg.content)
             return await self.make_offer(trader, pkmn, offer)
         if idstring in self.offer_msgs:
             if emoji == '\u2705':

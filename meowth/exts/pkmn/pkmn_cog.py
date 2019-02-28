@@ -776,7 +776,7 @@ class Pokemon():
             embed = formatters.mc_embed(display_dict)
             multi = await chn.send('Multiple possible Pokemon found! Please select from the following list.',
                 embed=embed)
-            payload = await formatters.ask(ctx.bot, [multi], user_list=[user_id],
+            payload = await formatters.ask(bot, [multi], user_list=[user_id],
                 react_list=react_list)
             pkmn = choice_dict[str(payload.emoji)]
             await multi.delete()

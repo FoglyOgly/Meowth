@@ -148,6 +148,7 @@ class Trade():
                 pkmn = choice_dict[str(response.emoji)]
             else:
                 pkmn = self.offered_pkmn[0]
+            print(pkmn)
             if pkmn == 'obo':
                 content = f'{trader.display_name} - what Pokemon would you like to offer?'
                 askmsg = await chn.send(content)

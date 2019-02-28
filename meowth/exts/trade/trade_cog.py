@@ -52,12 +52,20 @@ class Trade():
     
     @staticmethod
     async def make_offer_embed(trader, listed_pokemon, offer):
+        if isinstance(listed_pokemon, Pokemon):
+            listed_str = await listed_pokemon.trade_display_str()
+        elif listed_pokemon == 'any':
+            listed_str = "Any Pokemon"
+        if isinstance(offer, Pokemon):
+            offer_str = await offer.trade_display_str()
+        elif offer == 'any':
+            offer_str = "Any Pokemon"
         return formatters.make_embed(
             title="Pokemon Trade Offer",
             # icon=Trade.icon_url,
             fields={
-                "You Offered": await listed_pokemon.trade_display_str(),
-                "They Offer": await offer.trade_display_str()
+                "You Offered": listed_str,
+                "They Offer": offer_str
                 },
             inline=True,
             footer=trader.display_name,
@@ -121,14 +129,14 @@ class Trade():
     async def on_raw_reaction_add(self, payload):
         idstring = f'{payload.channel_id}/{payload.message_id}'
         chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
-        if idstring != self.listing_id and idstring not in self.offer_msgs:
+        if idstring != self.listing_id and idstring not in self.offer_msgs or payload.user_id == self.bot.user.id:
             return
         if payload.emoji.is_custom_emoji():
             emoji = payload.emoji.id
         else:
             emoji = str(payload.emoji)
         if idstring == self.listing_id:
-            if emoji not in self.react_list:
+            if emoji not in self.react_list or payload.user_id == self.lister_id:
                 return
             i = self.react_list.index(emoji)
             offer = self.wanted_pkmn[i]

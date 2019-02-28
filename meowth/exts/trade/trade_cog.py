@@ -95,7 +95,28 @@ class Trade():
         query = trade_table.query.where(id=self.id)
         chn, msg = await self.listing_chnmsg()
         await msg.delete()
-        return await query.delete()    
+        return await query.delete()
+
+    async def reject_offer(self, trader, listed, offer, msg):
+        content = f'{self.lister_name} has rejected your trade offer.'
+        embed = await self.make_offer_embed(self.lister, offer, listed)
+        await trader.send(content, embed=embed)
+        offer_dict = {
+            'trader': trader.id,
+            'listed': listed,
+            'offered': offer,
+            'msg': msg
+        }
+        for offer in self.offer_list:
+            if offer_dict == offer:
+                self.offer_list.remove(offer)
+                offer_list_data = [repr(x) for x in self.offer_list]
+                trade_table = self.bot.dbi.table('trades')
+                update = trade_table.update.where(id=self.id)
+                update.values(offer_list=offer_list_data)
+                return await update.commit()         
+
+          
 
     async def on_raw_reaction_add(self, payload):
         idstring = f'{payload.channel_id}/{payload.message_id}'
@@ -136,6 +157,15 @@ class Trade():
                         listed = offer['listed']
                         offered = offer['offered']
                         return await self.accept_offer(trader, listed, offered)
+            elif emoji == '❎':
+                for offer in self.offer_list:
+                    if offer['msg'] == idstring:
+                        g = self.bot.get_guild(self.guild_id)
+                        trader = g.get_member(offer['trader'])
+                        listed = offer['listed']
+                        offered = offer['offered']
+                        msg = offer['msg']
+                        return await self.reject_offer(trader, listed, offered, msg)
             
         
 

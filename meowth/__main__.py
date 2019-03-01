@@ -4357,7 +4357,7 @@ async def _raid(ctx, content):
     await raidmessage.pin()
     if gyms:
         await asyncio.sleep(1)
-        content = _('Meowth! {pokemon} raid reported by {member}! Details: {location_details}. Coordinate in {raid_channel}').format(pokemon=entered_raid.capitalize(), member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention)
+        content = _('Meowth! {pokemon} raid reported by {member}! Details: {location_details}. Coordinate in {raid_channel}').format(pokemon=entered_raid.capitalize(), member=member_name, location_details=raid_details, raid_channel=raid_channel.mention)
         embed = report_embed
         district_reports = await _report_to_districts(message.channel, gym, content, embed)
         if district_reports is not None:
@@ -4589,16 +4589,16 @@ async def _raidegg(ctx, content):
         raid_embed.add_field(name=_('**Hatches:**'), value=_('Set with **!timerset**'), inline=True)
         raid_embed.set_footer(text=_('Reported by @{author} - {timestamp}').format(author=message.author.display_name, timestamp=timestamp), icon_url=message.author.avatar_url_as(format=None, static_format='jpg', size=32))
         raid_embed.set_thumbnail(url=raid_img_url)
-        raidreport = await message.channel.send(content=_('Meowth! Level {level} raid egg reported by {member}! Details: {location_details}. Coordinate in {raid_channel}').format(level=egg_level, member=message.author.mention, location_details=raid_details, raid_channel=raid_channel.mention), embed=raid_embed)
+        member_name = message.author.nick if message.author.nick is not None else message.author.name
+        raidreport = await message.channel.send(content=_('Meowth! Level {level} raid egg reported by {member}! Details: {location_details}. Coordinate in {raid_channel}').format(level=egg_level, member=member_name, location_details=raid_details, raid_channel=raid_channel.mention), embed=raid_embed)
         await asyncio.sleep(1)
         raid_reports = {message.channel.id: raidreport.id}
-        raidmsg = _("Meowth! Level {level} raid egg reported by {member} in {citychannel}! Details: {location_details}. Coordinate here!\n\nClick the question mark reaction to get help on the commands that work in here.\n\nThis channel will be deleted five minutes after the timer expires.").format(level=egg_level, member=message.author.mention, citychannel=message.channel.mention, location_details=raid_details)
+        raidmsg = _("Meowth! Level {level} raid egg reported by {member} in {citychannel}! Details: {location_details}. Coordinate here!\n\nClick the question mark reaction to get help on the commands that work in here.\n\nThis channel will be deleted five minutes after the timer expires.").format(level=egg_level, member=member_name, citychannel=message.channel.mention, location_details=raid_details)
         raidmessage = await raid_channel.send(content=raidmsg, embed=raid_embed)
         await raidmessage.add_reaction('\u2754')
         await raidmessage.pin()
         if gyms:
             await asyncio.sleep(1)
-            member_name = message.author.nick if message.author.nick is not None else message.author.name
             content = _('Meowth! Level {level} raid egg reported by {member}! Details: {location_details}. Coordinate in {raid_channel}').format(level=egg_level, member=member_name, location_details=raid_details, raid_channel=raid_channel.mention)
             embed = raid_embed
             district_reports = await _report_to_districts(message.channel, gym, content, embed)

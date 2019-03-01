@@ -525,16 +525,17 @@ def get_category(channel, level, category_type="raid"):
         return None
 
 def get_raidtext(type, pkmn, level, member, channel):
+    member_name = member.nick if member.nick is not None else member.name
     if type == "raid":
         roletest = ""
         role = discord.utils.get(channel.guild.roles, name=pkmn)
         if role:
             roletest = _("{pokemon} - ").format(pokemon=role.mention)
-            raidtext = _("{roletest}Meowth! {pkmn} raid reported by {member} in {channel}! Coordinate here!\n\nFor help, react to this message with the question mark and I will DM you a list of commands you can use!").format(roletest=roletest, pkmn=pkmn.title(), member=member.mention, channel=channel.mention)
+            raidtext = _("{roletest}Meowth! {pkmn} raid reported by {member} in {channel}! Coordinate here!\n\nFor help, react to this message with the question mark and I will DM you a list of commands you can use!").format(roletest=roletest, pkmn=pkmn.title(), member=member_name, channel=channel.mention)
     elif type == "egg":
-        raidtext = _("Meowth! Level {level} raid egg reported by {member} in {channel}! Coordinate here!\n\nFor help, react to this message with the question mark and I will DM you a list of commands you can use!").format(level=level, member=member.mention, channel=channel.mention)
+        raidtext = _("Meowth! Level {level} raid egg reported by {member} in {channel}! Coordinate here!\n\nFor help, react to this message with the question mark and I will DM you a list of commands you can use!").format(level=level, member=member_name, channel=channel.mention)
     elif type == "exraid":
-        raidtext = _("Meowth! EX raid reported by {member} in {channel}! Coordinate here!\n\nFor help, react to this message with the question mark and I will DM you a list of commands you can use!").format(member=member.mention, channel=channel.mention)
+        raidtext = _("Meowth! EX raid reported by {member} in {channel}! Coordinate here!\n\nFor help, react to this message with the question mark and I will DM you a list of commands you can use!").format(member=member_name, channel=channel.mention)
     return raidtext
 
 # async def create_raid_channel(type, pkmn, level, details, report_channel):

@@ -10,5 +10,5 @@ async def is_wild_enabled(ctx):
     else:
         return True
     
-def raid_enabled():
+def wild_enabled():
     return commands.check(is_raid_enabled)

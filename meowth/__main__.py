@@ -4732,14 +4732,14 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
     duplicate = eggdetails.get('duplicate',0)
     archive = eggdetails.get('archive',False)
     meetup = eggdetails.get('meetup',{})
-    if not author:
-        try:
-            raid_messageauthor = raid_message.mentions[0]
-        except IndexError:
-            raid_messageauthor = ('<@' + raid_message.raw_mentions[0]) + '>'
-            logger.info('Hatching Mention Failed - Trying alternative method: channel: {} (id: {}) - server: {} | Attempted mention: {}...'.format(raid_channel.name, raid_channel.id, raid_channel.guild.name, raid_message.content[:125]))
-    else:
-        raid_messageauthor = author
+    #if not author:
+    #    try:
+    #        raid_messageauthor = raid_message.mentions[0]
+    #    except IndexError:
+    #        raid_messageauthor = ('<@' + raid_message.raw_mentions[0]) + '>'
+    #        logger.info('Hatching Mention Failed - Trying alternative method: channel: {} (id: {}) - server: {} | Attempted mention: {}...'.format(raid_channel.name, raid_channel.id, raid_channel.guild.name, raid_message.content[:125]))
+    #else:
+    raid_messageauthor = author
     raid_match = True if entered_raid in get_raidlist() else False
     if (not raid_match):
         await raid_channel.send(_('Meowth! The Pokemon {pokemon} does not appear in raids!').format(pokemon=entered_raid.capitalize()))
@@ -4761,10 +4761,13 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
         await raid_channel.edit(topic="")
         event_loop.create_task(expiry_check(raid_channel))
         return
+    member_name = "?"
+    if raid_messageauthor is not None:
+        member_name = raid_messageauthor.nick if raid_messageauthor.nick is not None else raid_messageauthor.name
     if egglevel.isdigit():
         hatchtype = 'raid'
         raidreportcontent = _('Meowth! The egg has hatched into a {pokemon} raid! Details: {location_details}. Coordinate in {raid_channel}').format(pokemon=entered_raid.capitalize(), location_details=egg_address, raid_channel=raid_channel.mention)
-        member_name = raid_messageauthor.nick if raid_messageauthor.nick is not None else raid_messageauthor.name
+        
         raidmsg = _("Meowth! The egg reported by {member} hatched into a {pokemon} raid! Details: {location_details}. Coordinate here!\n\nClick the question mark reaction to get help on the commands that work in here.\n\nThis channel will be deleted five minutes after the timer expires.").format(member=member_name, pokemon=entered_raid.capitalize(), location_details=egg_address)
     elif egglevel == 'EX':
         hatchtype = 'exraid'
@@ -4774,7 +4777,6 @@ async def _eggtoraid(entered_raid, raid_channel, author=None):
         else:
             invitemsgstr = _("Coordinate")
             invitemsgstr2 = ""
-        member_name = raid_messageauthor.nick if raid_messageauthor.nick is not None else raid_messageauthor.name
         raidreportcontent = _('Meowth! The EX egg has hatched into a {pokemon} raid! Details: {location_details}. {invitemsgstr} coordinate in {raid_channel}').format(pokemon=entered_raid.capitalize(), location_details=egg_address, invitemsgstr=invitemsgstr,raid_channel=raid_channel.mention)
         raidmsg = _("Meowth! {pokemon} EX raid reported by {member}! Details: {location_details}. Coordinate here{invitemsgstr2}!\n\nClick the question mark reaction to get help on the commands that work in here.\n\nThis channel will be deleted five minutes after the timer expires.").format(pokemon=entered_raid.capitalize(), member=member_name, location_details=egg_address, invitemsgstr2=invitemsgstr2)
     raid_channel_name = (entered_raid + '-') + sanitize_channel_name(egg_address)
@@ -5954,16 +5956,16 @@ async def duplicate(ctx):
                 await channel.send(_('Duplicate Confirmed'))
                 logger.info((('Duplicate Report - Channel Expired - ' + channel.name) + ' - Last Report by ') + author.name)
                 raidmsg = await channel.get_message(rc_d['raidmessage'])
-                reporter = raidmsg.mentions[0]
-                if 'egg' in raidmsg.content:
-                    egg_reports = guild_dict[guild.id]['trainers'][reporter.id]['egg_reports']
-                    guild_dict[guild.id]['trainers'][reporter.id]['egg_reports'] = egg_reports - 1
-                elif 'EX' in raidmsg.content:
-                    ex_reports = guild_dict[guild.id]['trainers'][reporter.id]['ex_reports']
-                    guild_dict[guild.id]['trainers'][reporter.id]['ex_reports'] = ex_reports - 1
-                else:
-                    raid_reports = guild_dict[guild.id]['trainers'][reporter.id]['raid_reports']
-                    guild_dict[guild.id]['trainers'][reporter.id]['raid_reports'] = raid_reports - 1
+                #reporter = raidmsg.mentions[0]
+                #if 'egg' in raidmsg.content:
+                #    egg_reports = guild_dict[guild.id]['trainers'][reporter.id]['egg_reports']
+                #    guild_dict[guild.id]['trainers'][reporter.id]['egg_reports'] = egg_reports - 1
+                #elif 'EX' in raidmsg.content:
+                #    ex_reports = guild_dict[guild.id]['trainers'][reporter.id]['ex_reports']
+                #    guild_dict[guild.id]['trainers'][reporter.id]['ex_reports'] = ex_reports - 1
+                #else:
+                #    raid_reports = guild_dict[guild.id]['trainers'][reporter.id]['raid_reports']
+                #    guild_dict[guild.id]['trainers'][reporter.id]['raid_reports'] = raid_reports - 1
                 await expire_channel(channel)
                 return
         else:

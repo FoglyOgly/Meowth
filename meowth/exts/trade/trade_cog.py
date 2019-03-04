@@ -191,7 +191,10 @@ class Trade():
             emoji = payload.emoji.id
         else:
             emoji = str(payload.emoji)
-        await msg.remove_reaction(emoji, user)
+        try:
+            await msg.remove_reaction(emoji, user)
+        except:
+            pass
         if idstring == self.listing_id:
             if emoji == '\u23f9' and payload.user_id == self.lister_id:
                 return await self.cancel_trade()

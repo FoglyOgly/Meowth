@@ -103,8 +103,10 @@ class Trade():
             listed_str = "Any Pokemon"
         if isinstance(offer, Pokemon):
             offer_str = await offer.trade_display_str()
+            offer_url = await offer.sprite_url()
         elif offer == 'any':
             offer_str = "Any Pokemon"
+            offer_url = None
         return formatters.make_embed(
             title="Pokemon Trade Offer",
             icon=Trade.icon_url,
@@ -115,7 +117,7 @@ class Trade():
             inline=True,
             footer=trader.display_name,
             footer_icon=trader.avatar_url_as(format='png', size=256),
-            thumbnail=await offer.sprite_url()
+            thumbnail=offer_url
         )
     
     async def make_offer(self, trader, listed_pokemon, offered_pokemon):
@@ -289,7 +291,7 @@ class TradeCog(Cog):
         embed = await TradeEmbed.from_trade(new_trade)
         await wantmsg.delete()
         await listmsg.edit(content="", embed=embed.embed)
-        want_emoji = formatters.mc_emoji(len(wants))
+        want_emoji = new_trade.react_list
         for emoji in want_emoji:
             await listmsg.add_reaction(emoji)
         offer_data = [repr(x) for x in offers]

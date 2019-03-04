@@ -233,6 +233,8 @@ class Trade():
                     return m.channel == chn and m.author == trader
                 offermsg = await self.bot.wait_for('message', check=check)
                 offer = await Pokemon.from_arg(self.bot, chn, trader.id, offermsg.content)
+                if not await offer._trade_available():
+                    return await chn.send(f'{await offer.name()} cannot be traded!')
                 await askmsg.delete()
                 await offermsg.delete()
             return await self.make_offer(trader, pkmn, offer)
@@ -276,6 +278,9 @@ class TradeCog(Cog):
     @command(aliases=['t'])
     @trade_checks.trade_enabled()
     async def trade(self, ctx, offers: commands.Greedy[Pokemon]):
+        for offer in offers:
+            if not await offer._trade_available():
+                return await ctx.send(f'{await offer.name()} cannot be traded!')
         listmsg = await ctx.send(f"{ctx.author.display_name} - what Pokemon are you willing to accept in exchange? Use 'any' if you will accept anything and 'OBO' if you want to allow other offers. Use commas to separate Pokemon.")
         def check(m):
             return m.channel == ctx.channel and m.author == ctx.author

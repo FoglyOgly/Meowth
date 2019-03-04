@@ -39,23 +39,24 @@ class Trade():
             wanted_pokemon.append('any')
         if 'obo' in data['wants']:
             wanted_pokemon.append('obo')
-        offer_list_data = [eval(x) for x in data['offer_list']]
         offer_list = []
-        for x in offer_list_data:
-            listed = Pokemon.from_dict(bot, x['listed'])
-            if isinstance(x['offered'], dict):
-                offered = Pokemon.from_dict(bot, x['offered'])
-            else:
-                offered = x['offered']
-            trader_id = x['trader']
-            msg = x['msg']
-            d = {
-                'trader': trader_id,
-                'listed': listed,
-                'offered': offered,
-                'msg': msg
-            }
-            offer_list.append(d)
+        if data['offer_list']:
+            offer_list_data = [eval(x) for x in data['offer_list']]
+            for x in offer_list_data:
+                listed = Pokemon.from_dict(bot, x['listed'])
+                if isinstance(x['offered'], dict):
+                    offered = Pokemon.from_dict(bot, x['offered'])
+                else:
+                    offered = x['offered']
+                trader_id = x['trader']
+                msg = x['msg']
+                d = {
+                    'trader': trader_id,
+                    'listed': listed,
+                    'offered': offered,
+                    'msg': msg
+                }
+                offer_list.append(d)
         new_trade = cls(bot, guild_id, lister_id, listing_id, offered_pokemon, wanted_pokemon, offer_list=offer_list)
         new_trade.id = data['id']
         bot.add_listener(new_trade.on_raw_reaction_add)

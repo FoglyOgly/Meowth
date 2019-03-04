@@ -10,6 +10,8 @@ from discord.ext import commands
 import asyncio
 from functools import partial
 
+from . import trade_checks
+
 class Trade():
 
     def __init__(self, bot, guild_id, lister_id, listing_id, offered_pkmn, wanted_pkmn, offer_list = []):
@@ -268,6 +270,7 @@ class TradeCog(Cog):
 
     
     @command(aliases=['t'])
+    @trade_checks.trade_enabled()
     async def trade(self, ctx, offers: commands.Greedy[Pokemon]):
         listmsg = await ctx.send(f"{ctx.author.display_name} - what Pokemon are you willing to accept in exchange? Use 'any' if you will accept anything and 'OBO' if you want to allow other offers. Use commas to separate Pokemon.")
         def check(m):

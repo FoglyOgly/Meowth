@@ -14,14 +14,14 @@ from . import trade_checks
 
 class Trade():
 
-    def __init__(self, bot, guild_id, lister_id, listing_id, offered_pkmn, wanted_pkmn, offer_list = []):
+    def __init__(self, bot, guild_id, lister_id, listing_id, offered_pkmn, wanted_pkmn):
         self.bot = bot
         self.guild_id = guild_id
         self.lister_id = lister_id
         self.listing_id = listing_id
         self.offered_pkmn = offered_pkmn
         self.wanted_pkmn = wanted_pkmn
-        self.offer_list = offer_list
+        self.offer_list = []
     
     icon_url = 'https://github.com/FoglyOgly/Meowth/blob/new-core/meowth/images/misc/trade_icon_small.png?raw=true'
 
@@ -59,8 +59,9 @@ class Trade():
                     'msg': msg
                 }
                 offer_list.append(d)
-        new_trade = cls(bot, guild_id, lister_id, listing_id, offered_pokemon, wanted_pokemon, offer_list=offer_list)
+        new_trade = cls(bot, guild_id, lister_id, listing_id, offered_pokemon, wanted_pokemon)
         new_trade.id = data['id']
+        new_trade.offer_list = offer_list
         bot.add_listener(new_trade.on_raw_reaction_add)
         return new_trade
 
@@ -190,7 +191,7 @@ class Trade():
         idstring = f'{payload.channel_id}/{payload.message_id}'
         chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
         user = self.bot.get_user(payload.user_id)
-        if idstring != self.listing_id and idstring not in self.offer_msgs or payload.user_id == self.bot.user.id:
+        if (idstring != self.listing_id and idstring not in self.offer_msgs) or payload.user_id == self.bot.user.id:
             return
         print(1)
         if payload.emoji.is_custom_emoji():

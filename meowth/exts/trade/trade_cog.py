@@ -25,13 +25,6 @@ class Trade():
 
     @classmethod
     def from_data(cls, bot, data):
-        data = {
-            'guild_id': ctx.guild.id,
-            'lister_id': ctx.author.id,
-            'listing_id': listing_id,
-            'offers': offer_data,
-            'wants': want_data,
-        }
         guild_id = data['guild_id']
         lister_id = data['lister_id']
         listing_id = data['listing_id']

@@ -90,7 +90,9 @@ class Trade():
     
     @property
     def react_list(self):
-        return formatters.mc_emoji(len(self.wanted_pkmn))
+        reacts = formatters.mc_emoji(len(self.wanted_pkmn))
+        reacts.append('\u23f9')
+        return reacts
     
     @property
     def offer_msgs(self):
@@ -176,7 +178,12 @@ class Trade():
                 update.values(offer_list=offer_list_data)
                 return await update.commit()         
 
-          
+    async def cancel_trade(self):
+        trade_table = self.bot.dbi.table('trades')
+        query = trade_table.query.where(id=self.id)
+        chn, msg = await self.listing_chnmsg()
+        await msg.delete()
+        return await query.delete()
 
     async def on_raw_reaction_add(self, payload):
         idstring = f'{payload.channel_id}/{payload.message_id}'
@@ -190,6 +197,8 @@ class Trade():
             emoji = str(payload.emoji)
         await msg.remove_reaction(emoji, user)
         if idstring == self.listing_id:
+            if emoji == '\u23f9' and payload.user_id == self.lister_id:
+                return await self.cancel_trade()
             if emoji not in self.react_list or payload.user_id == self.lister_id:
                 return
             i = self.react_list.index(emoji)

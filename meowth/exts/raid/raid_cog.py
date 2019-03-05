@@ -1472,6 +1472,8 @@ class RaidCog(Cog):
         raid_table = ctx.bot.dbi.table('raids')
         if want:
             role = await want.role()
+        else:
+            role = None
         new_raid.channel_ids = []
         new_raid.message_ids = []
         react_list = new_raid.react_list

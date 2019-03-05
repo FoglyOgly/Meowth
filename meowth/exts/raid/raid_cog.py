@@ -28,6 +28,12 @@ emoji_letters = ['🇦','🇧','🇨','🇩','🇪','🇫','🇬','🇭','🇮',
     '🇲','🇳','🇴','🇵','🇶','🇷','🇸','🇹','🇺','🇻','🇼','🇽','🇾','🇿'
 ]
 
+class hatch_converter(commands.Converter):
+    async def convert(self, ctx, argument):
+        zone = await ctx.tz()
+        hatch_dt = parse(argument, settings={'TIMEZONE': zone, 'RETURN_AS_TIMEZONE_AWARE': True})
+        return hatch_dt.timestamp()
+
 class RaidBoss(Pokemon):
 
     def __init__(self, pkmn):
@@ -2183,10 +2189,3 @@ class CountersEmbed():
             fields=fields, footer=footer_text, footer_icon=CountersEmbed.footer_icon)
         embed.timestamp = enddt
         return cls(embed)
-
-class hatch_converter(commands.Converter):
-    async def convert(self, ctx, argument):
-        zone = await ctx.tz()
-        hatch_dt = parse(argument, settings={'TIMEZONE': zone, 'RETURN_AS_TIMEZONE_AWARE': True})
-        return hatch_dt.timestamp()
-

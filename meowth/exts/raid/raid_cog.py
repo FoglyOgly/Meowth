@@ -1561,10 +1561,9 @@ class RaidCog(Cog):
     
     @command(aliases=['ex'])
     @raid_checks.raid_enabled()
-    async def exraid(self, ctx, gym: Gym, *, hatch_time: parse(settings={'TIMEZONE': await ctx.tz(), 'RETURN_AS_TIMEZONE_AWARE': True})):
+    async def exraid(self, ctx, gym: Gym, *, hatch_time: hatch_converter):
         zone = await ctx.tz()
-        stamp = hatch_time.timestamp()
-        new_exraid = Raid(ctx.bot, ctx.guild.id, gym, level="EX", hatch=stamp, tz=zone)
+        new_exraid = Raid(ctx.bot, ctx.guild.id, gym, level="EX", hatch=hatch_time, tz=zone)
         return await self.setup_raid(ctx, new_exraid)
 
     
@@ -2184,3 +2183,10 @@ class CountersEmbed():
             fields=fields, footer=footer_text, footer_icon=CountersEmbed.footer_icon)
         embed.timestamp = enddt
         return cls(embed)
+
+class hatch_converter(commands.Converter):
+    async def convert(self, ctx, argument):
+        zone = await ctx.tz()
+        hatch_dt = parse(argument, settings={'TIMEZONE': zone, 'RETURN_AS_TIMEZONE_AWARE': True})
+        return hatch_dt.timestamp()
+

@@ -1489,7 +1489,7 @@ class RaidCog(Cog):
         report_channels = []
         report_channel = ReportChannel(ctx.bot, ctx.channel)
         if isinstance(gym, Gym):
-            channel_list = await gym.get_all_channels()
+            channel_list = await gym.get_all_channels('raid')
             report_channels.extend(channel_list)
         else:
             report_channels.append(report_channel)

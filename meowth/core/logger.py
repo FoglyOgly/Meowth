@@ -10,7 +10,7 @@ import asyncpg
 import discord
 
 from meowth.utils import snowflake
-from meowth import Cog
+from .cog_base import Cog
 
 get_id = snowflake.create()
 

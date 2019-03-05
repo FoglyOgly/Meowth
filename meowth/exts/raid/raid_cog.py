@@ -1444,7 +1444,6 @@ class RaidCog(Cog):
         if level_or_boss.isdigit():
             level = level_or_boss
             want = Want(ctx.bot, level, ctx.guild.id)
-            role = await want.role()
             boss = None
             if not endtime or endtime > ctx.bot.raid_info.raid_times[level][0]:
                 hatch = time.time() + 60*ctx.bot.raid_info.raid_times[level][0]
@@ -1454,7 +1453,6 @@ class RaidCog(Cog):
         else:
             boss = await RaidBoss.convert(ctx, level_or_boss)
             want = Want(ctx.bot, boss.id, ctx.guild.id)
-            role = await want.role()
             level = boss.raid_level
             if not endtime or endtime > ctx.bot.raid_info.raid_times[level][1]:
                 end = time.time() + 60*ctx.bot.raid_info.raid_times[level][1]
@@ -1472,7 +1470,8 @@ class RaidCog(Cog):
         hatch = new_raid.hatch
         end = new_raid.end
         raid_table = ctx.bot.dbi.table('raids')
-        role = await want.role()
+        if want:
+            role = await want.role()
         new_raid.channel_ids = []
         new_raid.message_ids = []
         react_list = new_raid.react_list

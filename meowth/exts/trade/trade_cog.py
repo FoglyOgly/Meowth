@@ -284,6 +284,7 @@ class TradeCog(Cog):
         else:
             offers = [offer for offer in offers if await offer._trade_available()]
         pkmn_validate = partial(Pokemon.validate, 'trade')
+        print(offers)
         offers = [await pkmn_validate(offer) for offer in offers]
         listmsg = await ctx.send(f"{ctx.author.display_name} - what Pokemon are you willing to accept in exchange? Use 'any' if you will accept anything and 'OBO' if you want to allow other offers. Use commas to separate Pokemon.")
         def check(m):

@@ -278,9 +278,11 @@ class TradeCog(Cog):
     @command(aliases=['t'])
     @trade_checks.trade_enabled()
     async def trade(self, ctx, offers: commands.Greedy[Pokemon]):
-        for offer in offers:
-            if not await offer._trade_available():
-                return await ctx.send(f'{await offer.name()} cannot be traded!')
+        if len(offers) == 1:
+            if not await offers[0]._trade_available():
+                return await ctx.send(f'{await offers[0].name()} cannot be traded!')
+        else:
+            offers = [offer for offer in offers if await offer._trade_available()]
         listmsg = await ctx.send(f"{ctx.author.display_name} - what Pokemon are you willing to accept in exchange? Use 'any' if you will accept anything and 'OBO' if you want to allow other offers. Use commas to separate Pokemon.")
         def check(m):
             return m.channel == ctx.channel and m.author == ctx.author
@@ -299,7 +301,11 @@ class TradeCog(Cog):
             accept_other = False
         pkmn_convert = partial(Pokemon.convert, ctx)
         wants = [await pkmn_convert(arg) for arg in wantargs]
-        wants = [want for want in wants if await want._trade_available()]
+        if len(wants) == 1:
+            if not await wants[0]._trade_available():
+                return await ctx.send(f'{await wants[0].name()} cannot be traded!')
+        else:
+            wants = [want for want in wants if await want._trade_available()]
         if accept_any:
             wants.append('any')
         if accept_other:

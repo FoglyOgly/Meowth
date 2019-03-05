@@ -283,6 +283,8 @@ class TradeCog(Cog):
                 return await ctx.send(f'{await offers[0].name()} cannot be traded!')
         else:
             offers = [offer for offer in offers if await offer._trade_available()]
+        pkmn_validate = partial(Pokemon.validate, 'trade')
+        offers [await pkmn_validate(offer) for offer in offers]
         listmsg = await ctx.send(f"{ctx.author.display_name} - what Pokemon are you willing to accept in exchange? Use 'any' if you will accept anything and 'OBO' if you want to allow other offers. Use commas to separate Pokemon.")
         def check(m):
             return m.channel == ctx.channel and m.author == ctx.author
@@ -300,7 +302,6 @@ class TradeCog(Cog):
         else:
             accept_other = False
         pkmn_convert = partial(Pokemon.convert, ctx)
-        pkmn_validate = partial(Pokemon.validate, 'trade')
         wants = [await pkmn_convert(arg) for arg in wantargs]
         wants = [await pkmn_validate(want) for want in wants]
         if len(wants) == 1:

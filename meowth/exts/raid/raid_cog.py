@@ -1530,8 +1530,9 @@ class RaidCog(Cog):
             for channel in report_channels:
                 if not role:
                     dm_content = f"Coordinate this raid in {raid_channel.name}!"
-                    dms = await want.notify_users(dm_content, embed)
-                    new_raid.message_ids.extend(dms)
+                    if want:
+                        dms = await want.notify_users(dm_content, embed)
+                        new_raid.message_ids.extend(dms)
                 reportmsg = await channel.channel.send(reportcontent, embed=embed)
                 for react in react_list:
                     if isinstance(react, int):

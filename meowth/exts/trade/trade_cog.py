@@ -299,6 +299,7 @@ class TradeCog(Cog):
             accept_other = False
         pkmn_convert = partial(Pokemon.convert, ctx)
         wants = [await pkmn_convert(arg) for arg in wantargs]
+        wants = [want for want in wants if await want._trade_available()]
         if accept_any:
             wants.append('any')
         if accept_other:

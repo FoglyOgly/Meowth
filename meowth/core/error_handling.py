@@ -7,6 +7,7 @@ import discord
 from discord.ext import commands
 
 from meowth import errors
+from .cog_base import Cog
 
 async def delete_error(message, error):
     try:
@@ -46,7 +47,7 @@ def missing_arg_msg(ctx):
             msg += ' <{0}>'.format(a)
     return msg
 
-class ErrorHandler:
+class ErrorHandler(Cog):
 
     async def on_command_error(self, ctx, error):
         channel = ctx.channel

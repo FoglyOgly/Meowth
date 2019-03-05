@@ -16,14 +16,14 @@ import pathlib
 import discord
 from discord.ext import commands
 
-from meowth import checks, command, group
+from meowth import checks, command, group, Cog
 from meowth.utils import make_embed, get_match
 from meowth.utils.formatters import ilcode
 from meowth.utils.converters import BotCommand, Guild, Multi
 
 logger = logging.getLogger('meowth.cogs.dev')
 
-class Dev:
+class Dev(Cog):
     """Developer Tools"""
 
     def __init__(self, bot):

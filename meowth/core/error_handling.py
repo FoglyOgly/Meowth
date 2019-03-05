@@ -415,4 +415,4 @@ class ErrorHandler(Cog):
             ctx.bot.logger.exception(type(error).__name__, exc_info=error)
 
 def setup(bot):
-    bot.add_cog(ErrorHandler())
+    bot.add_cog(ErrorHandler(bot))

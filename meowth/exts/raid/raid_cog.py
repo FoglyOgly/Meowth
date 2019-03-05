@@ -1561,9 +1561,10 @@ class RaidCog(Cog):
     
     @command(aliases=['ex'])
     @raid_checks.raid_enabled()
-    async def exraid(self, ctx, gym: Gym, *, hatch_time: parse):
+    async def exraid(self, ctx, gym: Gym, *, hatch_time: parse(settings={'TIMEZONE': await ctx.tz(), 'RETURN_AS_TIMEZONE_AWARE': True})):
         zone = await ctx.tz()
-        new_exraid = Raid(ctx.bot, ctx.guild.id, gym, level="EX", hatch=hatch_time, tz=zone)
+        stamp = hatch_time.timestamp()
+        new_exraid = Raid(ctx.bot, ctx.guild.id, gym, level="EX", hatch=stamp, tz=zone)
         return await self.setup_raid(ctx, new_exraid)
 
     

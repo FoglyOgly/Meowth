@@ -2,9 +2,10 @@ import importlib
 import logging
 
 from meowth.utils import Map
+from discord.ext.commands import Cog
 
 
-class Cog:
+class Cog(Cog):
     """Base Class for Cogs to inherit in order to automate Cog setup.
 
     Defined ``__new__`` method ensures the Cog class is initialised

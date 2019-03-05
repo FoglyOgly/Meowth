@@ -10,6 +10,7 @@ import asyncpg
 import discord
 
 from meowth.utils import snowflake
+from meowth import Cog
 
 get_id = snowflake.create()
 
@@ -111,7 +112,7 @@ class DBLogHandler(logging.Handler):
         except asyncpg.PostgresError as e:
             self.logger.exception(type(e).__name__, exc_info=e)
 
-class ActivityLogging:
+class ActivityLogging(Cog):
     def __init__(self, bot):
         self.bot = bot
         self.logger = module_logger.getChild('ActivityLogging')

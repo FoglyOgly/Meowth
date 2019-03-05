@@ -300,7 +300,9 @@ class TradeCog(Cog):
         else:
             accept_other = False
         pkmn_convert = partial(Pokemon.convert, ctx)
+        pkmn_validate = partial(Pokemon.validate, 'trade')
         wants = [await pkmn_convert(arg) for arg in wantargs]
+        wants = [await pkmn_validate(want) for want in wants]
         if len(wants) == 1:
             if not await wants[0]._trade_available():
                 return await ctx.send(f'{await wants[0].name()} cannot be traded!')

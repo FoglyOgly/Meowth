@@ -1457,6 +1457,16 @@ class RaidCog(Cog):
             hatch = None
         zone = await ctx.tz()
         new_raid = Raid(ctx.bot, ctx.guild.id, gym, level=level, pkmn=boss, hatch=hatch, end=end, tz=zone)
+        return await self.setup_raid(ctx, new_raid, want=want)
+    
+    async def setup_raid(self, ctx, new_raid: Raid, want: Want=None):
+        boss = new_raid.pkmn
+        gym = new_raid.gym
+        level = new_raid.level
+        hatch = new_raid.hatch
+        end = new_raid.end
+        raid_table = ctx.bot.dbi.table('raids')
+        role = await want.role()
         new_raid.channel_ids = []
         new_raid.message_ids = []
         react_list = new_raid.react_list
@@ -1548,6 +1558,14 @@ class RaidCog(Cog):
         if isinstance(gym, Gym):
             cellid = await gym._L10()
             await ctx.bot.dbi.add_listener(f'weather_{cellid}', new_raid._weather)
+    
+    @command(aliases=['ex'])
+    @raid_checks.raid_enabled()
+    async def exraid(self, ctx, gym: Gym, *, hatch_time: parse):
+        zone = await ctx.tz()
+        new_exraid = Raid(ctx.bot, ctx.guild.id, gym, level="EX", hatch=hatch_time, tz=zone)
+        return await self.setup_raid(ctx, new_exraid)
+
     
     @staticmethod
     async def get_raidid(ctx):

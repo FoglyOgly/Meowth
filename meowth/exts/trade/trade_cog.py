@@ -283,7 +283,8 @@ class TradeCog(Cog):
                 return await ctx.send(f'{await offers[0].name()} cannot be traded!')
         else:
             offers = [offer for offer in offers if await offer._trade_available()]
-        print(offers)
+        for offer in offers:
+            print(isinstance(offer, Pokemon))
         listmsg = await ctx.send(f"{ctx.author.display_name} - what Pokemon are you willing to accept in exchange? Use 'any' if you will accept anything and 'OBO' if you want to allow other offers. Use commas to separate Pokemon.")
         def check(m):
             return m.channel == ctx.channel and m.author == ctx.author

@@ -13,8 +13,9 @@ from discord.ext import commands
 from meowth import command, group, checks, errors
 from meowth.utils import snowflake, url_color, make_embed, convert_to_bool
 from meowth.utils.pagination import Pagination
+from .cog_base import Cog
 
-class Core:
+class Core(Cog):
     """General bot functions."""
 
     def __init__(self, bot):

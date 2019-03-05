@@ -1,8 +1,9 @@
 import pkgutil
 
 from meowth import command, group, checks
+from .cog_base import Cog
 
-class CogManager:
+class CogManager(Cog):
     """Commands to add, remove and change cogs/extensions."""
 
     def __init__(self, bot):

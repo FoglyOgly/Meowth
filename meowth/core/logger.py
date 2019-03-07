@@ -117,6 +117,7 @@ class ActivityLogging(Cog):
         self.bot = bot
         self.logger = module_logger.getChild('ActivityLogging')
 
+    @Cog.listener()
     async def on_message(self, msg):
         sent = int(msg.created_at.replace(tzinfo=timezone.utc).timestamp())
         guild_id = msg.guild.id if msg.guild else None
@@ -134,6 +135,7 @@ class ActivityLogging(Cog):
         except asyncpg.PostgresError as e:
             self.logger.exception(type(e).__name__, exc_info=e)
 
+    @Cog.listener()
     async def on_raw_message_delete(self, payload):
         try:
             table = self.bot.dbi.table('discord_messages')
@@ -143,6 +145,7 @@ class ActivityLogging(Cog):
         except asyncpg.PostgresError as e:
             self.logger.exception(type(e).__name__, exc_info=e)
 
+    @Cog.listener()
     async def on_raw_bulk_message_delete(self, payload):
         try:
             table = self.bot.dbi.table('discord_messages')
@@ -154,6 +157,7 @@ class ActivityLogging(Cog):
         except asyncpg.PostgresError as e:
             self.logger.exception(type(e).__name__, exc_info=e)
 
+    @Cog.listener()
     async def on_message_edit(self, before, after):
         if before.type == discord.MessageType.call:
             return
@@ -178,6 +182,7 @@ class ActivityLogging(Cog):
         except asyncpg.PostgresError as e:
             self.logger.exception(type(e).__name__, exc_info=e)
 
+    @Cog.listener()
     async def on_command(self, ctx):
         created = ctx.message.created_at
         sent = int(created.replace(tzinfo=timezone.utc).timestamp())

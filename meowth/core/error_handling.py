@@ -49,6 +49,7 @@ def missing_arg_msg(ctx):
 
 class ErrorHandler(Cog):
 
+    @Cog.listener()
     async def on_command_error(self, ctx, error):
         channel = ctx.channel
         prefix = ctx.prefix.replace(ctx.bot.user.mention, '@' + ctx.bot.user.name)

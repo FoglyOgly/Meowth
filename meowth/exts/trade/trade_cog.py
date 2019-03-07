@@ -34,7 +34,7 @@ class Trade():
         wanted_pokemon = []
         for want in data['wants']:
             print(want)
-            if want in ('obo', 'any'):
+            if want in ['obo', 'any']:
                 continue
             print(type(eval(want)))
             want = Pokemon.from_dict(bot, eval(want))

@@ -159,7 +159,10 @@ class Trade():
 
     async def reject_offer(self, trader, listed, offer, msg):
         c, m = await ChannelMessage.from_id_string(msg)
-        await m.delete()
+        try:
+            await m.delete()
+        except:
+            pass
         content = f'{self.lister_name} has rejected your trade offer.'
         embed = await self.make_offer_embed(self.lister, offer, listed)
         await trader.send(content, embed=embed)
@@ -182,7 +185,10 @@ class Trade():
         trade_table = self.bot.dbi.table('trades')
         query = trade_table.query.where(id=self.id)
         chn, msg = await self.listing_chnmsg()
-        await msg.delete()
+        try:
+            await msg.delete()
+        except:
+            pass
         return await query.delete()
 
     async def on_raw_reaction_add(self, payload):
@@ -220,7 +226,10 @@ class Trade():
                 response = await formatters.ask(self.bot, [choicemsg], user_list=[trader.id],
                     react_list=mc_emoji)
                 pkmn = choice_dict[str(response.emoji)]
-                await choicemsg.delete()
+                try:
+                    await choicemsg.delete()
+                except:
+                    pass
             else:
                 pkmn = self.offered_pkmn[0]
             if offer == 'obo':
@@ -233,7 +242,10 @@ class Trade():
                 if not await offer._trade_available():
                     return await chn.send(f'{await offer.name()} cannot be traded!')
                 await askmsg.delete()
-                await offermsg.delete()
+                try:
+                    await offermsg.delete()
+                except:
+                    pass
             return await self.make_offer(trader, pkmn, offer)
         if idstring in self.offer_msgs:
             if emoji == '\u2705':
@@ -312,7 +324,10 @@ class TradeCog(Cog):
         listing_id = f'{ctx.channel.id}/{listmsg.id}'
         new_trade = Trade(self.bot, ctx.guild.id, ctx.author.id, listing_id, offers, wants)
         embed = await TradeEmbed.from_trade(new_trade)
-        await wantmsg.delete()
+        try:
+            await wantmsg.delete()
+        except:
+            pass
         await listmsg.edit(content="", embed=embed.embed)
         want_emoji = new_trade.react_list
         for emoji in want_emoji:

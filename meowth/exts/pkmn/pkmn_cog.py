@@ -579,6 +579,11 @@ class Pokemon():
             elif not self.chargeMoveid:
                 self.chargeMoveid = self.chargeMove2id
                 self.chargeMove2id = None
+        if self.shiny:
+            print(0)
+            if not await self._shiny_available():
+                print(1)
+                self.shiny = False
         gender_type = await self._gender_type()
         if gender_type in ('NONE', 'MALE', 'FEMALE'):
             self.gender = gender_type

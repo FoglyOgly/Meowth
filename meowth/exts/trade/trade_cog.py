@@ -186,14 +186,11 @@ class Trade():
         return await query.delete()
 
     async def on_raw_reaction_add(self, payload):
-        print(0)
-        print(self.offer_list)
         idstring = f'{payload.channel_id}/{payload.message_id}'
         chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
         user = self.bot.get_user(payload.user_id)
         if (idstring != self.listing_id and idstring not in self.offer_msgs) or payload.user_id == self.bot.user.id:
             return
-        print(1)
         if payload.emoji.is_custom_emoji():
             emoji = payload.emoji.id
         else:

@@ -606,54 +606,54 @@ class Core(Cog):
         except Exception as e:
             await ctx.send(e)
 
-    @group(category='Server Config', name='enable', aliases=['disable'],
-           invoke_without_command=True, hidden=True)
-    @commands.guild_only()
-    @checks.is_admin()
-    async def _enable(self, ctx, cog):
-        """Enable/Disable bot features within your guild."""
-        if ctx.invoked_with == 'disable':
-            value = False
-        else:
-            value = True
-        try:
-            if cog in {*ctx.bot.cogs}:
-                await ctx.setting(cog+'Enabled', value)
-                action = 'enabled' if value else 'disabled'
-                embed = make_embed(msg_type='success', title=f'{cog} {action}.')
-                await ctx.send(embed=embed)
-                return
-            else:
-                embed = make_embed(msg_type='error', title=f'{cog} not found.')
-                await ctx.send(embed=embed)
-                return
-        except errors.PostgresError as e:
-            msg = "{}: {}".format(type(e).__name__, e)
-            embed = make_embed(
-                msg_type='error', title=f'Error enabling {cog}', content=msg)
-            await ctx.send(embed=embed)
-            raise
+    # @group(category='Server Config', name='enable', aliases=['disable'],
+    #        invoke_without_command=True, hidden=True)
+    # @commands.guild_only()
+    # @checks.is_admin()
+    # async def _enable(self, ctx, cog):
+    #     """Enable/Disable bot features within your guild."""
+    #     if ctx.invoked_with == 'disable':
+    #         value = False
+    #     else:
+    #         value = True
+    #     try:
+    #         if cog in {*ctx.bot.cogs}:
+    #             await ctx.setting(cog+'Enabled', value)
+    #             action = 'enabled' if value else 'disabled'
+    #             embed = make_embed(msg_type='success', title=f'{cog} {action}.')
+    #             await ctx.send(embed=embed)
+    #             return
+    #         else:
+    #             embed = make_embed(msg_type='error', title=f'{cog} not found.')
+    #             await ctx.send(embed=embed)
+    #             return
+    #     except errors.PostgresError as e:
+    #         msg = "{}: {}".format(type(e).__name__, e)
+    #         embed = make_embed(
+    #             msg_type='error', title=f'Error enabling {cog}', content=msg)
+    #         await ctx.send(embed=embed)
+    #         raise
 
-    @_enable.command(name='list')
-    @checks.is_admin()
-    async def _list(self, ctx):
-        """List all loaded cogs."""
-        cog_list = []
-        for cog in ctx.bot.cogs:
-            value = await ctx.setting(f'{cog}Enabled')
-            if value is not None:
-                value = convert_to_bool(value)
-            if value is None:
-                status = ":black_small_square:"
-            elif value is True:
-                status = ":white_small_square:"
-            elif value is False:
-                status = ":small_orange_diamond:"
-            cog_list.append(f"{status} {cog}")
-        cog_msg = '\n'.join(cog_list)
-        embed = make_embed(
-            msg_type='info', title='Available Cogs', content=cog_msg)
-        await ctx.send(embed=embed)
+    # @_enable.command(name='list')
+    # @checks.is_admin()
+    # async def _list(self, ctx):
+    #     """List all loaded cogs."""
+    #     cog_list = []
+    #     for cog in ctx.bot.cogs:
+    #         value = await ctx.setting(f'{cog}Enabled')
+    #         if value is not None:
+    #             value = convert_to_bool(value)
+    #         if value is None:
+    #             status = ":black_small_square:"
+    #         elif value is True:
+    #             status = ":white_small_square:"
+    #         elif value is False:
+    #             status = ":small_orange_diamond:"
+    #         cog_list.append(f"{status} {cog}")
+    #     cog_msg = '\n'.join(cog_list)
+    #     embed = make_embed(
+    #         msg_type='info', title='Available Cogs', content=cog_msg)
+    #     await ctx.send(embed=embed)
 
 
 def setup(bot):

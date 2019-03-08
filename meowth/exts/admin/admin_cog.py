@@ -27,7 +27,7 @@ class AdminCog(Cog):
         d['timezone'] = zone
         insert = report_channel_table.insert()
         insert.row(**d)
-        await insert.commit()
+        await insert.commit(do_update=True)
 
     @command()
     @commands.has_permissions(manage_guild=True)

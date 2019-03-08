@@ -97,5 +97,7 @@ class AdminCog(Cog):
                             continue
         insert = channel_table.insert
         insert.row(**rcrd)
+        print(rcrd)
+        print(insert.sql())
         await insert.commit(do_update=True)
         return await ctx.send(f'The following commands have been enabled in this channel: `{", ".join(enabled_commands)}`')

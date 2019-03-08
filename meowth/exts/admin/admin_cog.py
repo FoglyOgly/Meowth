@@ -31,7 +31,7 @@ class AdminCog(Cog):
 
     @command()
     @commands.has_permissions(manage_guild=True)
-    async def enable(self, ctx, *commands):
+    async def enable(self, ctx, *features):
         channel_id = ctx.channel.id
         channel_table = self.bot.dbi.table('report_channels')
         query = channel_table.query.where(channelid=channel_id)
@@ -42,12 +42,12 @@ class AdminCog(Cog):
             rcrd = {'channelid': channel_id}
         possible_commands = ['raid', 'wild', 'research', 'user', 'raidparty', 'trade',
             'clean']
-        commands = [x for x in commands if x in possible_commands]
-        if not commands:
+        features = [x for x in features if x in possible_commands]
+        if not features:
             return await ctx.send("The list of valid command groups to enable is `raid, wild, research, user, raidparty, trade, clean`.")
         location_commands = ['raid', 'wild', 'research', 'raidparty']
         enabled_commands = []
-        for x in commands:
+        for x in features:
             if x in location_commands:
                 if not rcrd.get('city'):
                     await ctx.send(f"You must set a location for this channel before enabling `{ctx.prefix}{x}`. Use `{ctx.prefix}setlocation`")

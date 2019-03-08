@@ -463,6 +463,7 @@ class Mapper(Cog):
         f = io.BytesIO()
         await attachment.save(f)
         await self.gyms_from_csv(guildid, f)
+        await ctx.send("Import successful")
 
     @command()
     @commands.has_permissions(manage_guild=True)

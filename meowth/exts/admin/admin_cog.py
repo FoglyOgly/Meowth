@@ -28,6 +28,7 @@ class AdminCog(Cog):
         insert = report_channel_table.insert()
         insert.row(**d)
         await insert.commit(do_update=True)
+        return await ctx.send(f"Location set. Timezone is `{zone}`")
 
     @command()
     @commands.has_permissions(manage_guild=True)

@@ -82,8 +82,10 @@ class AdminCog(Cog):
                         break
                     if resp.content.lower() == 'message':
                         rcrd[column] = 'message'
+                        break
                     elif resp.content.lower() == 'disable':
                         rcrd[column] = None
+                        break
                     else:
                         category = await commands.CategoryChannelConverter.convert(ctx, resp.content)
                         if category:

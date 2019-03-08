@@ -166,6 +166,7 @@ class Raid():
         boss_names = []
         boss_list = self.boss_list
         boss_interest_dict = await self.boss_interest_dict()
+        emoji = formatters.mc_emoji(len(boss_list))
         if not weather:
             weather = await self.weather()
         weather = Weather(self.bot, weather)
@@ -173,7 +174,7 @@ class Raid():
             x = boss_list[i]
             interest = boss_interest_dict[x]
             boss = RaidBoss(Pokemon(self.bot, x))
-            name = f'{i+1}\u20e3 '
+            name = emoji[i]
             name += await boss.name()
             is_boosted = await boss.is_boosted(weather.value)
             if is_boosted:

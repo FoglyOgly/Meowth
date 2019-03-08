@@ -15,7 +15,7 @@ class AdminCog(Cog):
         query = report_channel_table.query.where(channelid=channel_id)
         data = await query.get()
         if data:
-            d = data[0]
+            d = dict(data[0])
         else:
             d = {}
         d['city'] = city

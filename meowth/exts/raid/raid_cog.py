@@ -267,7 +267,7 @@ class Raid():
         
     @staticmethod
     def pokebattler_data_url(pkmnid, level, att_level, weather):
-        json_url = 'https://fight.pokebattler.com/raids/defenders/'
+        json_url = 'https://fight2.pokebattler.com/raids/defenders/'
         json_url += f"{pkmnid}/levels/RAID_LEVEL_{level}/attackers/levels/"
         json_url += f"{att_level}/strategies/CINEMATIC_ATTACK_WHEN_POSSIBLE/"
         json_url += f"DEFENSE_RANDOM_MC"
@@ -278,7 +278,7 @@ class Raid():
     
     @staticmethod
     def user_pokebattler_data_url(pkmnid, level, pb_id, weather):
-        json_url = 'https://fight.pokebattler.com/raids/defenders/'
+        json_url = 'https://fight2.pokebattler.com/raids/defenders/'
         json_url += f"{pkmnid}/levels/RAID_LEVEL_{level}/attackers/users/"
         json_url += f"{pb_id}/strategies/CINEMATIC_ATTACK_WHEN_POSSIBLE/"
         json_url += "DEFENSE_RANDOM_MC"

@@ -18,8 +18,11 @@ def get_match(word_list: list, word: str, score_cutoff: int = 80):
 
     if is_empty(word):
         return (None, None)
-    result = process.extractOne(
-        word, word_list, scorer=fuzz.ratio, score_cutoff=score_cutoff)
+    try:
+        result = process.extractOne(
+            word, word_list, scorer=fuzz.ratio, score_cutoff=score_cutoff)
+    except:
+        return (None, None)
     if not result:
         return (None, None)
     return result

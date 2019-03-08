@@ -57,7 +57,7 @@ class AdminCog(Cog):
         if 'raid' in enabled_commands:
             raid_levels = ['1', '2', '3', '4', '5', 'EX', 'EX Raid Gyms']
             for level in raid_levels:
-                column = f'category_{level}'
+                column = f'category_{level.lower()}'
                 if level == 'EX Raid Gyms':
                     column = 'category_ex_gyms'
                     content = ('I can categorize raids of any level that are reported at '

@@ -98,7 +98,31 @@ class AdminCog(Cog):
                             continue
         insert = channel_table.insert
         insert.row(**rcrd)
-        print(rcrd)
-        print(insert.sql())
         await insert.commit(do_update=True)
         return await ctx.send(f'The following commands have been enabled in this channel: `{", ".join(enabled_commands)}`')
+
+    @command()
+    @commands.has_permissions(manage_guild=True)
+    async def disable(self, ctx, *features):
+        channel_id = ctx.channel.id
+        channel_table = self.bot.dbi.table('report_channels')
+        query = channel_table.query.where(channelid=channel_id)
+        data = await query.get()
+        if data:
+            rcrd = dict(data[0])
+        else:
+            rcrd = {'channelid': channel_id}
+        possible_commands = ['raid', 'wild', 'research', 'users', 'raidparty', 'trade',
+            'clean']
+        features = [x for x in features if x in possible_commands]
+        if not features:
+            return await ctx.send("The list of valid command groups to disable is `raid, wild, research, user, raidparty, trade, clean`.")
+        disabled_commands = []
+        for x in features:
+            rcrd[x] = False
+            disabled_commands.append(x)
+        insert = channel_table.insert
+        insert.row(**rcrd)
+        await insert.commit(do_update=True)
+        return await ctx.send(f'The following commands have been disabled in this channel: `{", ".join(disabled_commands)}`')
+        

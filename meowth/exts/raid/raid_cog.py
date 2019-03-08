@@ -1485,7 +1485,12 @@ class RaidCog(Cog):
             reportcontent = role.mention + " - "
         else:
             reportcontent = ""
-        raid_mode = await raid_checks.raid_category(ctx, level)
+        exgymcat = None
+        if isinstance(gym, Gym):
+            if level != 'EX':
+                if await gym._exraid():
+                    exgymcat = await raid_checks.raid_category(ctx, 'ex_gyms')
+        raid_mode = exgymcat if exgymcat else await raid_checks.raid_category(ctx, level)
         report_channels = []
         report_channel = ReportChannel(ctx.bot, ctx.channel)
         if isinstance(gym, Gym):

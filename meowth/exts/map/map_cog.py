@@ -392,6 +392,67 @@ class Mapper(Cog):
             rows.append(valid_data)
         insert.rows(rows)
         await insert.commit(do_update=True)
+
+    async def stops_from_csv(self, guildid, file):
+        bot = self.bot
+        stops_table = bot.dbi.table('pokestops')
+        insert = stops_table.insert()
+        reader = csv.DictReader(codecs.iterdecode(file.readlines(), 'utf-8'))
+        rows = []
+        for row in reader:
+            valid_data = {}
+            valid_data['guild'] = guildid
+            if isinstance(row.get('name'), str):
+                valid_data['name'] = row['name']
+            else:
+                continue
+            if isinstance(row.get('nickname'), str):
+                valid_data['nickname'] = row.get('nickname')
+            else:
+                pass
+            try:
+                lat = float(row.get('lat'))
+                lon = float(row.get('lon'))
+            except:
+                continue
+            l10 = S2_L10.from_coords(bot, (lat, lon))
+            valid_data['lat'] = lat
+            valid_data['lon'] = lon
+            valid_data['l10'] = l10.cellid
+            rows.append(valid_data)
+        insert.rows(rows)
+        await insert.commit(do_update=True)
+    
+    async def add_gym(self, guild_id, name, lat, lon, exraid=False, nickname=None):
+        gyms_table = self.bot.dbi.table('gyms')
+        insert = gyms_table.insert()
+        l10 = S2_L10.from_coords(self.bot, (lat, lon))
+        d = {
+            'guild': guild_id,
+            'name': name,
+            'lat': lat,
+            'lon': lon,
+            'l10': l10.cellid,
+            'nickname': nickname,
+            'exraid': exraid
+        }
+        insert.row(**d)
+        await insert.commit()
+    
+    async def add_stop(self, guild_id, name, lat, lon, nickname=None):
+        stops_table = self.bot.dbi.table('pokestops')
+        insert = stops_table.insert()
+        l10 = S2_L10.from_coords(self.bot, (lat, lon))
+        d = {
+            'guild': guild_id,
+            'name': name,
+            'lat': lat,
+            'lon': lon,
+            'l10': l10.cellid,
+            'nickname': nickname
+        }
+        insert.row(**d)
+        await insert.commit()
     
     @command()
     @commands.has_permissions(manage_guild=True)
@@ -402,6 +463,28 @@ class Mapper(Cog):
         f = io.BytesIO()
         await attachment.save(f)
         await self.gyms_from_csv(guildid, f)
+
+    @command()
+    @commands.has_permissions(manage_guild=True)
+    async def importstops(self, ctx):
+        attachment = ctx.message.attachments[0]
+        guildid = ctx.guild.id
+        bot = ctx.bot
+        f = io.BytesIO()
+        await attachment.save(f)
+        await self.stops_from_csv(guildid, f)
+    
+    @command()
+    @commands.has_permissions(manage_guild=True)
+    async def gym(self, ctx, name: str, lat: float, lon: float, *, nickname: str=None):
+        guild_id = ctx.guild.id
+        await self.add_gym(guild_id, name, lat, lon, nickname=nickname)
+    
+    @command()
+    @commands.has_permissions(manage_guild=True)
+    async def exraidgym(self, ctx, name: str, lat: float, lon: float, *, nickname: str=None):
+        guild_id = ctx.guild.id
+        await self.add_gym(guild_id, name, lat, lon, exraid=True, nickname=nickname)
 
     
     

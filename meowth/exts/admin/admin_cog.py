@@ -37,7 +37,7 @@ class AdminCog(Cog):
         query = channel_table.query.where(channelid=channel_id)
         data = await query.get()
         if data:
-            rcrd = data[0]
+            rcrd = dict(data[0])
         else:
             rcrd = {'channelid': channel_id}
         possible_commands = ['raid', 'wild', 'research', 'user', 'raidparty', 'trade',
@@ -96,10 +96,3 @@ class AdminCog(Cog):
         insert.row(**rcrd)
         await insert.commit()
         return await ctx.send(f'The following commands have been enabled in this channel: `{", ".join(enabled_commands)}`')
-
-    
-
-
-        
-        
-    

@@ -87,7 +87,8 @@ class AdminCog(Cog):
                         rcrd[column] = None
                         break
                     else:
-                        category = await commands.CategoryChannelConverter.convert(ctx, resp.content)
+                        converter = commands.CategoryChannelConverter()
+                        category = await converter.convert(ctx, resp.content)
                         if category:
                             rcrd[column] = str(category.id)
                             break

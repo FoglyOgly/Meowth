@@ -387,7 +387,7 @@ class Pokestop(POI):
                 continue
         name_dict = {x['name'] : x['id'] for x in data}
         if nick_dict:
-            nick_matches = get_matches(nick_dict.keys(), arg)
+            nick_matches = get_matches(nick_dict.keys(), arg, score_cutoff=70)
             if nick_matches:
                 nick_ids = [nick_dict[x[0]] for x in nick_matches]
             else:
@@ -395,7 +395,7 @@ class Pokestop(POI):
         else:
             nick_matches = []
             nick_ids = []
-        name_matches = get_matches(name_dict.keys(), arg)
+        name_matches = get_matches(name_dict.keys(), arg, score_cutoff=70)
         if name_matches:
             name_ids = [name_dict[x[0]] for x in name_matches]
         else:

@@ -319,7 +319,7 @@ class Gym(POI):
             embed = formatters.mc_embed(display_dict)
             multi = await ctx.send('Multiple possible Gyms found! Please select from the following list.',
                 embed=embed)
-            payload = await formatters.ask(bot, [multi], user_list=[ctx.author.id],
+            payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
                 react_list=react_list)
             gym_id = choice_dict[str(payload.emoji)]
             await multi.delete()
@@ -411,7 +411,7 @@ class Pokestop(POI):
             embed = formatters.mc_embed(display_dict)
             multi = await ctx.send('Multiple possible Pokestops found! Please select from the following list.',
                 embed=embed)
-            payload = await formatters.ask(bot, [multi], user_list=[ctx.author.id],
+            payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
                 react_list=react_list)
             stop_id = choice_dict[str(payload.emoji)]
             await multi.delete()

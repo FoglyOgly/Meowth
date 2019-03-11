@@ -1,6 +1,7 @@
 from meowth import Cog, command, bot
 from discord.ext import commands
-from meowth.utils.fuzzymatch import get_match
+from meowth.utils.fuzzymatch import get_match, get_matches
+from meowth.utils import formatters
 import pywraps2 as s2
 import aiohttp
 import asyncio
@@ -13,6 +14,11 @@ import codecs
 from math import radians, degrees
 import csv
 from urllib.parse import quote_plus
+import googlemaps
+
+from .map_info import gmaps_api_key
+
+gmaps = googlemaps.Client(key=gmaps_api_key)
 
 class ReportChannel():
     def __init__(self, bot, channel):
@@ -212,6 +218,20 @@ class POI():
         prefix += "&dir_action=navigate"
         return prefix
     
+    async def address(self):
+        lat, lon = await self._coords()
+        result = gmaps.reverse_geocode((lat, lon))
+        if result:
+            address = result[0].get('formatted_address', '')
+        else:
+            address = ''
+        return address
+    
+    async def display_str(self):
+        name = await self._name()
+        address = await self.address()
+        return f'{name} - {address}'
+    
     async def weather(self):
         L10id = await self._L10()
         L10 = S2_L10(self.bot, L10id)
@@ -275,15 +295,40 @@ class Gym(POI):
                 continue
         name_dict = {x['name'] : x['id'] for x in data}
         if nick_dict:
-            match = get_match(nick_dict.keys(), arg)
-            if match[0]:
-                return cls(ctx.bot, nick_dict[match[0]])
-        match = get_match(name_dict.keys(), arg)
-        if match[0]:
-            return cls(ctx.bot, name_dict[match[0]])
+            nick_matches = get_matches(nick_dict.keys(), arg)
+            if nick_matches:
+                nick_ids = [nick_dict[x[0]] for x in nick_matches]
+            else:
+                nick_ids = []
+        else:
+            nick_matches = []
+            nick_ids = []
+        name_matches = get_matches(name_dict.keys(), arg)
+        if name_matches:
+            name_ids = [name_dict[x[0]] for x in name_matches]
+        else:
+            name_ids = []
+        possible_ids = set(nick_ids) | set(name_ids)
+        id_list = list(possible_ids)
+        if len(id_list) > 1:
+            possible_gyms = [cls(ctx.bot, y) for y in id_list]
+            names = [await z.display_str() for z in possible_gyms]
+            react_list = formatters.mc_emoji(len(id_list))
+            choice_dict = dict(zip(react_list, id_list))
+            display_dict = dict(zip(react_list, names))
+            embed = formatters.mc_embed(display_dict)
+            multi = await chn.send('Multiple possible Gyms found! Please select from the following list.',
+                embed=embed)
+            payload = await formatters.ask(bot, [multi], user_list=[user_id],
+                react_list=react_list)
+            gym_id = choice_dict[str(payload.emoji)]
+            await multi.delete()
+        elif id_list == 1:
+            gym_id = id_list[0]
         else:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
+        return cls(ctx.bot, gym_id)
     
     @classmethod
     async def insert_from_data(cls, bot, guildid, data):
@@ -342,15 +387,40 @@ class Pokestop(POI):
                 continue
         name_dict = {x['name'] : x['id'] for x in data}
         if nick_dict:
-            match = get_match(nick_dict.keys(), arg)
-            if match[0]:
-                return cls(ctx.bot, nick_dict[match[0]])
-        match = get_match(name_dict.keys(), arg)
-        if match[0]:
-            return cls(ctx.bot, name_dict[match[0]])
+            nick_matches = get_matches(nick_dict.keys(), arg)
+            if nick_matches:
+                nick_ids = [nick_dict[x[0]] for x in nick_matches]
+            else:
+                nick_ids = []
+        else:
+            nick_matches = []
+            nick_ids = []
+        name_matches = get_matches(name_dict.keys(), arg)
+        if name_matches:
+            name_ids = [name_dict[x[0]] for x in name_matches]
+        else:
+            name_ids = []
+        possible_ids = set(nick_ids) | set(name_ids)
+        id_list = list(possible_ids)
+        if len(id_list) > 1:
+            possible_stops = [cls(ctx.bot, y) for y in id_list]
+            names = [await z.display_str() for z in possible_stops]
+            react_list = formatters.mc_emoji(len(id_list))
+            choice_dict = dict(zip(react_list, id_list))
+            display_dict = dict(zip(react_list, names))
+            embed = formatters.mc_embed(display_dict)
+            multi = await chn.send('Multiple possible Pokestops found! Please select from the following list.',
+                embed=embed)
+            payload = await formatters.ask(bot, [multi], user_list=[user_id],
+                react_list=react_list)
+            stop_id = choice_dict[str(payload.emoji)]
+            await multi.delete()
+        elif id_list == 1:
+            stop_id = id_list[0]
         else:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
+        return cls(ctx.bot, stop_id)
 
 
 class Mapper(Cog):

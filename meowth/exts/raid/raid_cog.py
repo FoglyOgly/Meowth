@@ -602,19 +602,23 @@ class Raid():
             cp_str = f"{cp_range[0]}-{cp_range[1]}"
             ctrs_list = await self.generic_counters_data(weather=weather.value)
             ctrs_str = []
-            for ctr in ctrs_list:
-                name = await ctr.name()
-                fast = Move(self.bot, ctr.quickMoveid)
-                fast_name = await fast.name()
-                fast_emoji = await fast.emoji()
-                charge = Move(self.bot, ctr.chargeMoveid)
-                charge_name = await charge.name()
-                charge_emoji = await charge.emoji()
-                ctr_str = f"**{name}**: {fast_name} {fast_emoji} | {charge_name} {charge_emoji}"
-                ctrs_str.append(ctr_str)
-            ctrs_str.append(f'[Results courtesy of Pokebattler](https://www.pokebattler.com/raids/{self.pkmn.id})')
-            ctrs_str = "\n".join(ctrs_str)
-            rec_str = await self.rec_group_size(weather=weather.value)
+            if ctrs_list:
+                for ctr in ctrs_list:
+                    name = await ctr.name()
+                    fast = Move(self.bot, ctr.quickMoveid)
+                    fast_name = await fast.name()
+                    fast_emoji = await fast.emoji()
+                    charge = Move(self.bot, ctr.chargeMoveid)
+                    charge_name = await charge.name()
+                    charge_emoji = await charge.emoji()
+                    ctr_str = f"**{name}**: {fast_name} {fast_emoji} | {charge_name} {charge_emoji}"
+                    ctrs_str.append(ctr_str)
+                ctrs_str.append(f'[Results courtesy of Pokebattler](https://www.pokebattler.com/raids/{self.pkmn.id})')
+                ctrs_str = "\n".join(ctrs_str)
+                rec_str = await self.rec_group_size(weather=weather.value)
+            else:
+                ctrs_str = "Currently unavailable"
+                rec_str = None
         elif self.status == 'egg':
             boss_str = await self.boss_list_str(weather=weather.value)
         has_embed = False
@@ -1200,15 +1204,14 @@ class Raid():
                 d[boss] += total
         return d
 
-    @property
-    def status_dict(self):
+    @staticmethod
+    def status_dict(trainer_dict):
         d = {
             'maybe': 0,
             'coming': 0,
             'here': 0,
             'lobby': 0
         }
-        trainer_dict = self.trainer_dict
         for trainer in trainer_dict:
             total = sum(trainer_dict[trainer]['party'])
             status = trainer_dict[trainer]['status']
@@ -1217,21 +1220,25 @@ class Raid():
     
     @property
     def status_str(self):
-        status_dict = self.status_dict
-        status_str = f"{self.bot.config.emoji['maybe']}: {status_dict['maybe']} | "
-        status_str += f"{self.bot.config.emoji['coming']}: {status_dict['coming']} | "
-        status_str += f"{self.bot.get_emoji(self.bot.config.emoji['here'])}: {status_dict['here']}"
+        status_str = self.status_string(self.bot, self.trainer_dict)
         return status_str
     
-    @property
-    def team_dict(self):
+    @staticmethod
+    def status_string(bot, trainer_dict):
+        status_dict = Raid.status_dict(trainer_dict)
+        status_str = f"{bot.config.emoji['maybe']}: {status_dict['maybe']} | "
+        status_str += f"{bot.config.emoji['coming']}: {status_dict['coming']} | "
+        status_str += f"{bot.get_emoji(self.bot.config.emoji['here'])}: {status_dict['here']}"
+        return status_str
+    
+    @staticmethod
+    def team_dict(trainer_dict):
         d = {
             'mystic': 0,
             'instinct': 0,
             'valor': 0,
             'unknown': 0
         }
-        trainer_dict = self.trainer_dict
         for trainer in trainer_dict:
             bluecount = trainer_dict[trainer]['party'][0]
             yellowcount = trainer_dict[trainer]['party'][1]
@@ -1245,11 +1252,16 @@ class Raid():
 
     @property
     def team_str(self):
-        team_dict = self.team_dict
-        team_str = f"{self.bot.config.team_emoji['mystic']}: {team_dict['mystic']} | "
-        team_str += f"{self.bot.config.team_emoji['instinct']}: {team_dict['instinct']} | "
-        team_str += f"{self.bot.config.team_emoji['valor']}: {team_dict['valor']} | "
-        team_str += f"{self.bot.config.team_emoji['unknown']}: {team_dict['unknown']}"
+        team_str = self.team_string(self.bot, self.trainer_dict)
+        return team_str
+
+    @staticmethod
+    def team_string(bot, trainer_dict):
+        team_dict = Raid.team_dict(trainer_dict)
+        team_str = f"{bot.config.team_emoji['mystic']}: {team_dict['mystic']} | "
+        team_str += f"{bot.config.team_emoji['instinct']}: {team_dict['instinct']} | "
+        team_str += f"{bot.config.team_emoji['valor']}: {team_dict['valor']} | "
+        team_str += f"{bot.config.team_emoji['unknown']}: {team_dict['unknown']}"
         return team_str
     
     def grp_status_dict(self, group):
@@ -1378,15 +1390,38 @@ class Raid():
         raid.id = data['id']
         raid.trainer_dict = await raid.get_trainer_dict()
         raid.group_list = await raid.get_grp_list()
-        bot.add_listener(raid.on_raw_reaction_add)
-        bot.add_listener(raid.on_command_completion)
-        loop = asyncio.get_event_loop()
-        loop.create_task(raid.monitor_status())
-        await bot.dbi.add_listener(f'rsvp_{raid.id}', raid._rsvp)
-        if isinstance(gym, Gym):
-            cellid = await gym._L10()
-            await bot.dbi.add_listener(f'weather_{cellid}', raid._weather)
         return raid
+    
+    async def add_listeners(self):
+        self.bot.add_listener(self.on_raw_reaction_add)
+        self.bot.add_listener(self.on_command_completion)
+        loop = asyncio.get_event_loop()
+        loop.create_task(self.monitor_status())
+        await self.bot.dbi.add_listener(f'rsvp_{self.id}', self._rsvp)
+        if isinstance(self.gym, Gym):
+            cellid = await self.gym._L10()
+            await self.bot.dbi.add_listener(f'weather_{cellid}', self._weather)
+    
+    async def summary_str(self):
+        if self.status == 'egg':
+            pre_str = f'Level {self.level} Raid:'
+        elif self.status == 'hatched':
+            pre_str = f'Hatched Level {self.level} Raid:'
+        elif self.status == 'active':
+            pre_str = f'{await self.pkmn.name()} Raid:'
+        else:
+            return None
+        if isinstance(self.gym, Gym):
+            gym_str = await self.gym._name()
+        else:
+            gym_str = self.gym._name
+        status_str = self.status_str
+        summary_str = f'🔹 {pre_str} {gym_str} - {status_str}'
+        if self.channel_ids:
+            channel = self.bot.get_channel(self.channel_ids[0])
+            channel_str = channel.mention
+            summary_str += f' {channel_str}'
+        return summary_str
     
 
 
@@ -1404,7 +1439,11 @@ class RaidCog(Cog):
         query = raid_table.query()
         data = await query.get()
         for rcrd in data:
-            self.bot.loop.create_task(Raid.from_data(self.bot, rcrd))
+            self.bot.loop.create_task(self.pickup_raid(self.bot, rcrd))
+    
+    async def pickup_raid(self, rcrd):
+        raid = await Raid.from_data(self.bot, rcrd)
+        await raid.add_listeners()
 
     @command(aliases=['r'])
     @raid_checks.raid_enabled()
@@ -1463,6 +1502,40 @@ class RaidCog(Cog):
         zone = await ctx.tz()
         new_raid = Raid(ctx.bot, ctx.guild.id, gym, level=level, pkmn=boss, hatch=hatch, end=end, tz=zone)
         return await self.setup_raid(ctx, new_raid, want=want)
+    
+    @command(name='list')
+    @raid_checks.raid_enabled()
+    async def _list(self, ctx):
+        return await self.list_raids(ctx.channel)
+    
+    async def list_raids(self, channel):
+        report_channel = ReportChannel(self.bot, channel)
+        data = await report_channel.get_all_raids()
+        eggs_list = []
+        hatched_list = []
+        active_list = []
+        for rcrd in data:
+            raid = await Raid.from_data(self.bot, rcrd)
+            if raid.status == 'egg':
+                eggs_list.append(await raid.summary_str())
+            elif raid.status == 'hatched':
+                hatched_list.append(await raid.summary_str())
+            elif raid.status == 'active':
+                active_list.append(await raid.summary_str())
+        list_str = ""
+        if eggs_list:
+            list_str += "**Eggs:**\n"
+            list_str += "\n".join(eggs_list)
+        if hatched_list:
+            list_str += "**Hatched:**\n"
+            list_str += "\n".join(hatched_list)
+        if active_list:
+            list_str += "**Active:**\n"
+            list_str += "\n".join(active_list)
+        return await channel.send(list_str)
+
+
+
     
     async def setup_raid(self, ctx, new_raid: Raid, want: Want=None):
         boss = new_raid.pkmn
@@ -1564,14 +1637,7 @@ class RaidCog(Cog):
         insert.returning('id')
         rcrd = await insert.commit()
         new_raid.id = rcrd[0][0]
-        ctx.bot.add_listener(new_raid.on_raw_reaction_add)
-        ctx.bot.add_listener(new_raid.on_command_completion)
-        loop = asyncio.get_event_loop()
-        loop.create_task(new_raid.monitor_status())
-        await ctx.bot.dbi.add_listener(f'rsvp_{new_raid.id}', new_raid._rsvp)
-        if isinstance(gym, Gym):
-            cellid = await gym._L10()
-            await ctx.bot.dbi.add_listener(f'weather_{cellid}', new_raid._weather)
+        await new_raid.add_listeners()
     
     @command(aliases=['ex'])
     @raid_checks.raid_enabled()
@@ -1588,6 +1654,31 @@ class RaidCog(Cog):
         id_query.where(raid_table['channels'].contains_(str(ctx.channel.id)))
         raid_id = await id_query.get_value()
         return raid_id
+
+    async def get_raid_trainerdict(self, raid_id):
+        def data(rcrd):
+            trainer = rcrd['user_id']
+            status = rcrd.get('status')
+            bosses = rcrd.get('bosses')
+            party = rcrd.get('party', [0,0,0,1])
+            estimator = rcrd.get('estimator')
+            rcrd_dict = {
+                'bosses': bosses,
+                'status': status,
+                'party': party,
+                'estimator': estimator
+            }
+            return trainer, rcrd_dict
+        trainer_dict = {}
+        user_table = self.bot.dbi.table('raid_rsvp')
+        query = user_table.query()
+        query.where(raid_id=raid_id)
+        rsvp_data = await query.get()
+        for rcrd in rsvp_data:
+            trainer, rcrd_dict = data(rcrd)
+            total = sum(rcrd_dict['party'])
+            trainer_dict[trainer] = rcrd_dict
+        return trainer_dict
 
     @staticmethod
     async def get_raidlevel(ctx):

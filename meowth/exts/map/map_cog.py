@@ -112,6 +112,13 @@ class ReportChannel():
         stops_query.where(guild=self.channel.guild.id)
         return stops_query
     
+    async def get_all_raids(self):
+        channel_id = self.channel.id
+        raid_table = self.bot.dbi.table('raids')
+        query = raid_table.query
+        query.where(raid_table['messages'].like(f'{channel_id}%'))
+        return await query.get()
+    
 
 
         
@@ -426,6 +433,7 @@ class Pokestop(POI):
 class Mapper(Cog):
 
     def __init__(self, bot):
+        bot.gmaps = gmaps
         self.bot = bot
     
     async def gyms_from_csv(self, guildid, file):

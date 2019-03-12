@@ -1405,10 +1405,19 @@ class Raid():
     async def summary_str(self):
         if self.status == 'egg':
             pre_str = f'**Level {self.level} Raid at'
+            hatchdt = self.local_datetime(self.hatch)
+            time = hatchdt.strftime('%I:%M %p')
+            post_str = f"Hatches at {time}"
         elif self.status == 'hatched':
             pre_str = f'**Level {self.level} Raid at'
+            enddt = self.local_datetime(self.end)
+            time = enddt.strftime('%I:%M %p')
+            post_str = f"Ends at {time}"
         elif self.status == 'active':
             pre_str = f'**{await self.pkmn.name()} Raid at'
+            enddt = self.local_datetime(self.end)
+            time = enddt.strftime('%I:%M %p')
+            post_str = f"Ends at {time}"
         else:
             return None
         if isinstance(self.gym, Gym):
@@ -1421,6 +1430,7 @@ class Raid():
             channel = self.bot.get_channel(int(self.channel_ids[0]))
             channel_str = channel.mention
             summary_str += f' | {channel_str}'
+        summary_str += f"\n{post_str}"
         return summary_str
     
 

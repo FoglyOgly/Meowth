@@ -1640,7 +1640,7 @@ class RaidCog(Cog):
             'endtime': end,
             'messages': new_raid.message_ids,
             'channels': new_raid.channel_ids,
-            'tz': self.tz
+            'tz': new_raid.tz
         }
         insert.row(**data)
         insert.returning('id')

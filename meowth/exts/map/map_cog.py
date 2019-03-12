@@ -300,8 +300,6 @@ class Gym(POI):
             else:
                 continue
         name_dict = {x['name'] : x['id'] for x in data}
-        print(nick_dict)
-        print(name_dict)
         if nick_dict:
             nick_matches = get_matches(nick_dict.keys(), arg)
             if nick_matches:
@@ -316,11 +314,8 @@ class Gym(POI):
             name_ids = [name_dict[x[0]] for x in name_matches]
         else:
             name_ids = []
-        print(nick_ids)
-        print(name_ids)
         possible_ids = set(nick_ids) | set(name_ids)
         id_list = list(possible_ids)
-        print(id_list)
         if len(id_list) > 1:
             possible_gyms = [cls(ctx.bot, y) for y in id_list]
             names = [await z.display_str() for z in possible_gyms]

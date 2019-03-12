@@ -114,10 +114,9 @@ class ReportChannel():
     
     async def get_all_raids(self):
         channel_id = self.channel.id
-        raid_table = self.bot.dbi.table('raids')
-        query = raid_table.query
-        query.where(raid_table['messages'].like(f'{channel_id}%'))
-        return await query.get()
+        query = f"SELECT * FROM raids WHERE exists (SELECT * FROM (SELECT unnest(messages)) x(message) WHERE x.message LIKE $1);"
+        query_args = ['534771943610646534%']
+        return await self.bot.dbi.execute_query(query, *query_args)
     
 
 

@@ -1526,11 +1526,13 @@ class RaidCog(Cog):
         if eggs_list:
             list_str += "**Eggs:**\n"
             list_str += "\n".join(eggs_list)
+            list_str += "\n"
         if hatched_list:
-            list_str += "**Hatched:**\n"
+            list_str += "\n**Hatched:**\n"
             list_str += "\n".join(hatched_list)
+            list_str += "\n"
         if active_list:
-            list_str += "**Active:**\n"
+            list_str += "\n**Active:**\n"
             list_str += "\n".join(active_list)
         return await channel.send(list_str)
 

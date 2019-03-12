@@ -1420,7 +1420,7 @@ class Raid():
         if self.channel_ids:
             channel = self.bot.get_channel(int(self.channel_ids[0]))
             channel_str = channel.mention
-            summary_str += f' {channel_str}'
+            summary_str += f'| {channel_str}'
         return summary_str
     
 

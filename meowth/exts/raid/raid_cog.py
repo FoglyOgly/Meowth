@@ -1449,7 +1449,7 @@ class RaidCog(Cog):
         query = raid_table.query()
         data = await query.get()
         for rcrd in data:
-            self.bot.loop.create_task(self.pickup_raid(self.bot, rcrd))
+            self.bot.loop.create_task(self.pickup_raid(rcrd))
     
     async def pickup_raid(self, rcrd):
         raid = await Raid.from_data(self.bot, rcrd)

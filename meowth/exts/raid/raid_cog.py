@@ -1416,7 +1416,7 @@ class Raid():
         else:
             gym_str = self.gym._name
         status_str = self.status_str
-        summary_str = f'🔹 {pre_str} {gym_str}\n\tRSVPs: {status_str}'
+        summary_str = f'🔹 {pre_str} {gym_str}\nRSVPs: {status_str}'
         if self.channel_ids:
             channel = self.bot.get_channel(int(self.channel_ids[0]))
             channel_str = channel.mention
@@ -1524,11 +1524,11 @@ class RaidCog(Cog):
                 active_list.append(await raid.summary_str())
         fields = {}
         if eggs_list:
-            fields['**Eggs**'] = "\n".join(eggs_list)
+            fields['**Eggs**'] = "\n\n".join(eggs_list)
         if hatched_list:
-            fields['**Hatched**'] = "\n".join(hatched_list)
+            fields['**Hatched**'] = "\n\n".join(hatched_list)
         if active_list:
-            fields['**Active**'] = "\n".join(active_list)
+            fields['**Active**'] = "\n\n".join(active_list)
         embed = formatters.make_embed(title='Current Raids', fields=fields)
         return await channel.send(embed=embed)
 

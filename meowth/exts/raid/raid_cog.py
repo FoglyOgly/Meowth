@@ -1535,11 +1535,11 @@ class RaidCog(Cog):
                 active_list.append(await raid.summary_str())
         fields = {}
         if eggs_list:
-            fields['**Eggs**'] = "\n\n".join(eggs_list) + "\n\u200b"
+            fields['Eggs'] = "\n\n".join(eggs_list) + "\n\u200b"
         if hatched_list:
-            fields['**Hatched**'] = "\n\n".join(hatched_list) + "\n\u200b"
+            fields['Hatched'] = "\n\n".join(hatched_list) + "\n\u200b"
         if active_list:
-            fields['**Active**'] = "\n\n".join(active_list)
+            fields['Active'] = "\n\n".join(active_list)
         embed = formatters.make_embed(title='Current Raids', fields=fields)
         return await channel.send(embed=embed)
 

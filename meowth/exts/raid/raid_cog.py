@@ -1228,7 +1228,7 @@ class Raid():
         status_dict = Raid.status_dict(trainer_dict)
         status_str = f"{bot.config.emoji['maybe']}: {status_dict['maybe']} | "
         status_str += f"{bot.config.emoji['coming']}: {status_dict['coming']} | "
-        status_str += f"{bot.get_emoji(self.bot.config.emoji['here'])}: {status_dict['here']}"
+        status_str += f"{bot.get_emoji(bot.config.emoji['here'])}: {status_dict['here']}"
         return status_str
     
     @staticmethod

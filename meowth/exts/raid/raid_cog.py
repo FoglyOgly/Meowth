@@ -1534,7 +1534,8 @@ class RaidCog(Cog):
         if active_list:
             list_str += "\n**Active:**\n"
             list_str += "\n".join(active_list)
-        return await channel.send(list_str)
+        embed = formatters.make_embed(content=list_str)
+        return await channel.send(list_str, embed=embed)
 
 
 

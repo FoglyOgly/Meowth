@@ -1404,11 +1404,11 @@ class Raid():
     
     async def summary_str(self):
         if self.status == 'egg':
-            pre_str = f'Level {self.level} Raid:'
+            pre_str = f'**Level {self.level} Raid:**'
         elif self.status == 'hatched':
-            pre_str = f'Level {self.level} Raid:'
+            pre_str = f'**Level {self.level} Raid:**'
         elif self.status == 'active':
-            pre_str = f'{await self.pkmn.name()} Raid:'
+            pre_str = f'**{await self.pkmn.name()} Raid:**'
         else:
             return None
         if isinstance(self.gym, Gym):

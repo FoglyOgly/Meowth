@@ -1226,9 +1226,9 @@ class Raid():
     @staticmethod
     def status_string(bot, trainer_dict):
         status_dict = Raid.status_dict(trainer_dict)
-        status_str = f"{bot.config.emoji['maybe']}: {status_dict['maybe']} | "
-        status_str += f"{bot.config.emoji['coming']}: {status_dict['coming']} | "
-        status_str += f"{bot.get_emoji(bot.config.emoji['here'])}: {status_dict['here']}"
+        status_str = f"{bot.config.emoji['maybe']}: **{status_dict['maybe']}** | "
+        status_str += f"{bot.config.emoji['coming']}: **{status_dict['coming']}** | "
+        status_str += f"{bot.get_emoji(bot.config.emoji['here'])}: **{status_dict['here']}**"
         return status_str
     
     @staticmethod
@@ -1524,9 +1524,9 @@ class RaidCog(Cog):
                 active_list.append(await raid.summary_str())
         fields = {}
         if eggs_list:
-            fields['**Eggs**'] = "\n\n".join(eggs_list) + "\n"
+            fields['**Eggs**'] = "\n\n".join(eggs_list) + "\n\u200b"
         if hatched_list:
-            fields['**Hatched**'] = "\n\n".join(hatched_list) + "\n"
+            fields['**Hatched**'] = "\n\n".join(hatched_list) + "\n\u200b"
         if active_list:
             fields['**Active**'] = "\n\n".join(active_list)
         embed = formatters.make_embed(title='Current Raids', fields=fields)

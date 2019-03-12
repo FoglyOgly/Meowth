@@ -1426,7 +1426,7 @@ class Raid():
         else:
             gym_str = self.gym._name
         status_str = self.status_str
-        summary_str = f'🔹 {pre_str} {gym_str}**\nRSVPs: {status_str}'
+        summary_str = f'{pre_str} {gym_str}**\nRSVPs: {status_str}'
         if self.channel_ids:
             channel = self.bot.get_channel(int(self.channel_ids[0]))
             channel_str = channel.mention

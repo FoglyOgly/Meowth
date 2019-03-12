@@ -1390,6 +1390,7 @@ class Raid():
         raid.id = data['id']
         raid.trainer_dict = await raid.get_trainer_dict()
         raid.group_list = await raid.get_grp_list()
+        raid.tz = data['tz']
         return raid
     
     async def add_listeners(self):

@@ -86,6 +86,9 @@ class Raid():
         else:
             return False
     
+    def __hash__(self):
+        return hash(self.id)
+    
     @property
     def status(self):
         if self.hatch and time.time() < self.hatch:

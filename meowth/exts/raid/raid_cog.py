@@ -80,6 +80,12 @@ class Raid():
         self.tz = tz
         self.created = time.time()
     
+    def __eq__(self, other):
+        if isinstance(other, Raid):
+            return self.id == other.id
+        else:
+            return False
+    
     @property
     def status(self):
         if self.hatch and time.time() < self.hatch:

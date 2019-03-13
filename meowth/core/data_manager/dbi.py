@@ -140,7 +140,9 @@ class DatabaseInterface:
             return
         self.listeners.append((channel, callback))
         print(1)
-        return await con.add_listener(channel, callback)
+        await con.add_listener(channel, callback)
+        print(2)
+        return
 
     async def create_table(self, name, columns: list, *, primaries=None):
         """Create table."""

@@ -134,9 +134,12 @@ class DatabaseInterface:
         
     async def add_listener(self, channel, callback):
         con = await self.pool.acquire()
+        print(self.listeners)
         if (channel, callback) in self.listeners:
+            print(0)
             return
         self.listeners.append((channel, callback))
+        print(1)
         return await con.add_listener(channel, callback)
 
     async def create_table(self, name, columns: list, *, primaries=None):

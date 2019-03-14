@@ -1376,8 +1376,8 @@ class RaidCog(Cog):
         self.bot.dbi.raid_listener = await self.bot.dbi.pool.acquire()
         rsvp_listener = ('rsvp', self._rsvp)
         weather_listener = ('weather', self._weather)
-        await self.bot.dbi.raid_listener.add_listener(rsvp_listener)
-        await self.bot.dbi.raid_listener.add_listener(weather_listener)
+        await self.bot.dbi.raid_listener.add_listener(*rsvp_listener)
+        await self.bot.dbi.raid_listener.add_listener(*weather_listener)
     
     async def pickup_raiddata(self):
         raid_table = self.bot.dbi.table('raids')

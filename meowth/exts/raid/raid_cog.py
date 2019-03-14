@@ -1390,6 +1390,7 @@ class RaidCog(Cog):
     
     def _rsvp(self, connection, pid, channel, payload):
         print(0)
+        print(payload)
         if channel != 'rsvp':
             return
         payload_args = payload.split('/')

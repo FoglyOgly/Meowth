@@ -69,7 +69,8 @@ class Raid():
     def __new__(cls, raid_id, *args, **kwargs):
         if raid_id in cls.instances:
             return cls.instances[raid_id]
-        instance = super(Raid, cls).__new__(cls, raid_id, *args, **kwargs)
+        print(super())
+        instance = super().__new__(cls, raid_id, *args, **kwargs)
         cls.instances[raid_id] = instance
         return instance
 

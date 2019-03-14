@@ -1393,7 +1393,7 @@ class RaidCog(Cog):
         if channel != 'rsvp':
             return
         payload_args = payload.split('/')
-        raid_id = payload_args[0]
+        raid_id = int(payload_args[0])
         print(Raid.instances)
         raid = Raid.instances.get('raid_id')
         if not raid:

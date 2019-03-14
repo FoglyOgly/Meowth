@@ -1601,7 +1601,7 @@ class RaidCog(Cog):
         else:
             gymid = f'{gym.city}/{gym.arg}'
         data = {
-            'id': new_raid.id
+            'id': new_raid.id,
             'gym': gymid,
             'guild': ctx.guild.id,
             'level': level,

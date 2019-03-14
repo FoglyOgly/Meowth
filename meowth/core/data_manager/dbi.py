@@ -136,20 +136,22 @@ class DatabaseInterface:
             await self.recreate_pool()
             return await self.execute_transaction(query, *query_args)
         
-    async def add_listener(self, channel, callback):
+    async def add_listeners(self, listeners):
         con = self.listener_conn
-        if (channel, callback) in self.listeners:
-            return
-        self.listeners.append((channel, callback))
-        await con.add_listener(channel, callback)
+        for listener in listeners:
+            if listener in self.listeners:
+                continue
+            self.listeners.append(listener)
+            await con.add_listener(listener[0], listener[1])
         return
     
-    async def remove_listener(self, channel, callback):
+    async def remove_listeners(self, listeners):
         con = self.listener_conn
-        if (channel, callback) not in self.listeners:
-            return
-        self.listeners.remove((channel, callback))
-        await con.remove_listener(channel, callback)
+        for listener in listeners:
+            if listener not in self.listeners:
+                continue
+            self.listeners.remove(listener)
+            await con.remove_listener(listener[0], listener[1])
         return
 
     async def create_table(self, name, columns: list, *, primaries=None):

@@ -1370,8 +1370,9 @@ class RaidCog(Cog):
         bot.raid_info = raid_info
         self.bot = bot
         self.pickup_task = self.bot.loop.create_task(self.pickup_raiddata())
-        self.bot.loop.create_task(self.bot.dbi.add_listener('rsvp', self._rsvp))
-        self.bot.loop.create_task(self.bot.dbi.add_listener('weather', self._weather))
+        rsvp_listener = ('rsvp', self._rsvp)
+        weather_listener = ('weather', self._weather)
+        self.bot.loop.create_task(self.bot.dbi.add_listeners(rsvp_listener, weather_listener))
     
     async def pickup_raiddata(self):
         raid_table = self.bot.dbi.table('raids')
@@ -1389,8 +1390,9 @@ class RaidCog(Cog):
         return await raid.process_reactions(payload)
     
     def cog_unload(self):
-        self.bot.loop.create_task(self.bot.dbi.remove_listener('rsvp', self._rsvp))
-        self.bot.loop.create_task(self.bot.dbi.remove_listener('weather', self._weather))
+        rsvp_listener = ('rsvp', self._rsvp)
+        weather_listener = ('weather', self._weather)
+        self.bot.loop.create_task(self.bot.dbi.remove_listeners(rsvp_listener, weather_listener))
     
     def _rsvp(self, connection, pid, channel, payload):
         if channel != 'rsvp':

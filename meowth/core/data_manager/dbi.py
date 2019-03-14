@@ -32,7 +32,7 @@ class DatabaseInterface:
         self.prefix_stmt = None
         self.settings_conn = None
         self.settings_stmt = None
-        self.listener_conn = None
+        self.raid_listener = None
         self.listeners = []
         self.types = sqltypes
 

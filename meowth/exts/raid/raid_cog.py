@@ -1388,6 +1388,10 @@ class RaidCog(Cog):
             return
         return await raid.process_reactions(payload)
     
+    def cog_unload(self):
+        self.bot.loop.create_task(self.bot.dbi.remove_listener('rsvp', self._rsvp))
+        self.bot.loop.create_task(self.bot.dbi.remove_listener('weather', self._weather))
+    
     def _rsvp(self, connection, pid, channel, payload):
         if channel != 'rsvp':
             return

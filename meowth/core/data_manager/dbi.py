@@ -32,8 +32,9 @@ class DatabaseInterface:
         self.prefix_stmt = None
         self.settings_conn = None
         self.settings_stmt = None
-        self.types = sqltypes
+        self.listener_conn = None
         self.listeners = []
+        self.types = sqltypes
 
     async def start(self, loop=None):
         if loop:
@@ -61,6 +62,9 @@ class DatabaseInterface:
         settings_sql = ('SELECT config_value FROM guild_config '
                         'WHERE guild_id=$1 AND config_name=$2;')
         self.settings_stmt = await self.settings_conn.prepare(settings_sql)
+
+        # listener connection
+        self.listener_conn = await self.pool.acquire()
 
     async def core_tables_exist(self):
         core_sql = core_table_sqls()
@@ -133,9 +137,19 @@ class DatabaseInterface:
             return await self.execute_transaction(query, *query_args)
         
     async def add_listener(self, channel, callback):
-        con = await self.pool.acquire()
+        con = self.listener_conn
+        if (channel, callback) in self.listeners:
+            return
         self.listeners.append((channel, callback))
         await con.add_listener(channel, callback)
+        return
+    
+    async def remove_listener(self, channel, callback):
+        con = self.listener_conn
+        if (channel, callback) not in self.listeners:
+            return
+        self.listeners.remove((channel, callback))
+        await con.remove_listener(channel, callback)
         return
 
     async def create_table(self, name, columns: list, *, primaries=None):

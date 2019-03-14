@@ -182,6 +182,7 @@ class S2_L10():
     
     async def get_all_raids(self):
         gyms = await self.get_all_gyms()
+        gyms = [str(x) for x in gyms]
         raid_table = self.bot.dbi.table('raids')
         query = raid_table.query('id')
         query.where(raid_table['gym'].in_(gyms))

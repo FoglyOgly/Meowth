@@ -1396,7 +1396,7 @@ class RaidCog(Cog):
         payload_args = payload.split('/')
         raid_id = int(payload_args[0])
         print(Raid.instances)
-        raid = Raid.instances.get('raid_id')
+        raid = Raid.instances.get(raid_id)
         if not raid:
             return
         print(1)

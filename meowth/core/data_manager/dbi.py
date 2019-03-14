@@ -134,8 +134,6 @@ class DatabaseInterface:
         
     async def add_listener(self, channel, callback):
         con = await self.pool.acquire()
-        if (channel, callback) in self.listeners:
-            return
         self.listeners.append((channel, callback))
         await con.add_listener(channel, callback)
         return

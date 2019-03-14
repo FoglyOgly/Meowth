@@ -1384,7 +1384,7 @@ class RaidCog(Cog):
     async def on_raw_reaction_add(self, payload):
         idstring = f'{payload.channel_id}/{payload.message_id}'
         raid = Raid.by_message.get(idstring)
-        if not raid:
+        if not raid or payload.user_id == self.bot.user.id:
             return
         return await raid.process_reactions(payload)
     

@@ -1373,6 +1373,8 @@ class RaidCog(Cog):
         self.bot.loop.create_task(self.add_listeners())
     
     async def add_listeners(self):
+        if self.bot.dbi.raid_listener:
+            await self.bot.dbi.pool.release(self.bot.dbi.raid_listener)
         self.bot.dbi.raid_listener = await self.bot.dbi.pool.acquire()
         rsvp_listener = ('rsvp', self._rsvp)
         weather_listener = ('weather', self._weather)

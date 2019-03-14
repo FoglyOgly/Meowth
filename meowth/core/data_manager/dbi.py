@@ -136,7 +136,7 @@ class DatabaseInterface:
             await self.recreate_pool()
             return await self.execute_transaction(query, *query_args)
         
-    async def add_listeners(self, listeners):
+    async def add_listeners(self, *listeners):
         con = self.listener_conn
         for listener in listeners:
             if listener in self.listeners:
@@ -145,7 +145,7 @@ class DatabaseInterface:
             await con.add_listener(listener[0], listener[1])
         return
     
-    async def remove_listeners(self, listeners):
+    async def remove_listeners(self, *listeners):
         con = self.listener_conn
         for listener in listeners:
             if listener not in self.listeners:

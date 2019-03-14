@@ -67,7 +67,7 @@ class Raid():
     by_channel = dict()
 
     def __new__(cls, raid_id, *args, **kwargs):
-        if raid_id in instances:
+        if raid_id in cls.instances:
             return cls.instances[raid_id]
         instance = super().__new__(cls, raid_id, *args, **kwargs)
         cls.instances[raid_id] = instance

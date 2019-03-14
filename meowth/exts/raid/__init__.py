@@ -5,4 +5,4 @@ def setup(bot):
 
 def teardown(bot):
     print(0)
-    bot.remove_cog(RaidCog(bot))
+    bot.remove_cog('RaidCog')

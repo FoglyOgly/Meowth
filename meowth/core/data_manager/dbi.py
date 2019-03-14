@@ -76,7 +76,7 @@ class DatabaseInterface:
                 logger.warning(f'Core table {k} created.')
 
     async def stop(self):
-        conns = (self.prefix_conn, self.settings_conn)
+        conns = (self.prefix_conn, self.settings_conn, self.listener_conn)
         for c in conns:
             if c:
                 await self.pool.release(c)

@@ -1389,17 +1389,13 @@ class RaidCog(Cog):
         return await raid.process_reactions(payload)
     
     def _rsvp(self, connection, pid, channel, payload):
-        print(0)
-        print(payload)
         if channel != 'rsvp':
             return
         payload_args = payload.split('/')
         raid_id = int(payload_args[0])
-        print(Raid.instances)
         raid = Raid.instances.get(raid_id)
         if not raid:
             return
-        print(1)
         event_loop = asyncio.get_event_loop()
         if payload_args[1].isdigit():
             user_id = int(payload_args[1])

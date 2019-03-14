@@ -175,9 +175,18 @@ class S2_L10():
 
     async def get_all_gyms(self):
         gyms_table = self.bot.dbi.table('gyms')
-        gyms_query.select('id').where(l10=self.cellid)
+        gyms_query = gyms_table.query('id')
+        gyms_query.where(l10=self.cellid)
         gyms = await gyms_query.get_values()
         return gyms
+    
+    async def get_all_raids(self):
+        gyms = await self.get_all_gyms()
+        raid_table = self.bot.dbi.table('raids')
+        query = raid_table.query('id')
+        query.where(raid_table['gym'].in_(gyms))
+        raids = await query.get_values()
+        return raids
 
 
 

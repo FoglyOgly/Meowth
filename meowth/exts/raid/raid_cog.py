@@ -1,10 +1,10 @@
 from meowth import Cog, command, bot, checks
-from meowth.exts.map import Gym, ReportChannel, PartialPOI
+from meowth.exts.map import Gym, ReportChannel, PartialPOI, S2_L10
 from meowth.exts.pkmn import Pokemon, Move
 from meowth.exts.weather import Weather
 from meowth.exts.want import Want
 from meowth.exts.users import MeowthUser
-from meowth.utils import formatters
+from meowth.utils import formatters, snowflake
 from meowth.utils.converters import ChannelMessage
 from . import raid_info
 from . import raid_checks
@@ -62,8 +62,20 @@ class RaidBoss(Pokemon):
 
 class Raid():
 
-    def __init__(self, bot, guild_id, gym=None, level=None,
+    instances = dict()
+    by_message = dict()
+    by_channel = dict()
+
+    def __new__(cls, raid_id, *args, **kwargs):
+        if raid_id in instances:
+            return cls.instances[raid_id]
+        instance = super().__new__(cls, raid_id, *args, **kwargs)
+        cls.instances[raid_id] = instance
+        return instance
+
+    def __init__(self, raid_id, bot, guild_id, gym=None, level=None,
         pkmn: RaidBoss=None, hatch: float=None, end: float=None, tz: str=None):
+        self.id = raid_id
         self.bot = bot
         self.guild_id = guild_id
         self.gym = gym
@@ -322,10 +334,7 @@ class Raid():
         localzone = timezone(zone)
         return datetime.fromtimestamp(stamp, tz=localzone)
     
-    async def on_raw_reaction_add(self, payload):
-        id_string = f"{payload.channel_id}/{payload.message_id}"
-        if id_string not in self.message_ids or payload.user_id == self.bot.user.id:
-            return
+    async def process_reactions(self, payload):
         user = self.bot.get_user(payload.user_id)
         channel = self.bot.get_channel(payload.channel_id)
         message = await channel.get_message(payload.message_id)
@@ -399,95 +408,6 @@ class Raid():
         await message.remove_reaction(emoji, user)
         if new_bosses != old_bosses or new_status != old_status:
             await meowthuser.rsvp(self.id, new_status, bosses=new_bosses, party=party)
-    
-    async def on_command_completion(self, ctx):
-        if ctx.command.name not in ('counters', 'group', 'starting', 'weather', 'moveset', 'timerset'):
-            return
-        if str(ctx.channel.id) not in self.channel_ids:
-            return
-        if ctx.command.name == 'timerset':
-            newtime = ctx.kwargs['time']
-            if newtime.isdigit():
-                stamp = time.time() + 60*int(newtime)
-            else:
-                try:
-                    zone = self.tz
-                    newdt = parse(newtime, settings={'TIMEZONE': zone, 'RETURN_AS_TIMEZONE_AWARE': True})
-                    stamp = newdt.timestamp()
-                except:
-                    raise
-            try:
-                self.update_time(stamp)
-            except:
-                return
-            has_embed = False
-            for idstring in self.message_ids:
-                chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
-                if not has_embed:
-                    embed = msg.embeds[0]
-                    embed.timestamp = datetime.fromtimestamp(stamp)
-                    has_embed = True
-                await msg.edit(embed=embed)
-            return
-        if ctx.command.name == 'moveset':
-            if self.status != 'active':
-                return
-            move1 = ctx.args[2]
-            move2 = ctx.args[3]
-            boss = self.pkmn
-            moves = await boss.moves()
-            bad_move = (move1 if move1.id not in moves else False) or \
-                (move2 if move2 and move2.id not in moves else False)
-            if bad_move:
-                boss_name = await boss.name()
-                move_name = await bad_move.name()
-                return await ctx.send(f'{boss_name} can not use {move_name}!')
-            return await self.set_moveset(move1, move2=move2)
-        if ctx.command.name == 'weather':
-            weather = ctx.kwargs['weather']
-            return await self.correct_weather(weather)
-        if ctx.command.name == 'starting':
-            if self.status != 'active':
-                raise
-            grp = self.user_grp(ctx.author.id)
-            if not grp:
-                grp = self.here_grp
-            return await self.start_grp(grp, ctx.author, channel=ctx.channel)
-        elif ctx.command.name == 'counters':
-            if self.status != 'active':
-                raise
-            meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
-            embed = await self.counters_embed(meowthuser)
-            if not embed:
-                return await ctx.author.send("You likely have better counters than the ones in your Pokebattler Pokebox! Please update your Pokebox!")
-            await ctx.author.send(embed=embed)
-            await self.update_rsvp()
-        elif ctx.command.name == 'group':
-            group_table = ctx.bot.dbi.table('raid_groups')
-            insert = group_table.insert()
-            i = len(self.group_list)
-            emoji = f'{i+1}\u20e3'
-            grptime = ctx.args[2]
-            if grptime.isdigit():
-                stamp = time.time() + int(grptime)*60
-                if stamp > self.end:
-                    raise
-                elif self.hatch and stamp < self.hatch:
-                    raise
-                d = {
-                    'raid_id': self.id,
-                    'emoji': emoji,
-                    'starttime': stamp,
-                    'users': [],
-                    'est_power': 0
-                }
-                insert.row(**d)
-                await insert.commit()
-                self.group_list.append(d)
-                for idstring in self.message_ids:
-                    chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
-                    await msg.add_reaction(emoji)
-                return await self.join_grp(ctx.author.id, d)
     
     async def start_grp(self, grp, author, channel=None):
         if not self.grp_is_here(grp):
@@ -1182,10 +1102,12 @@ class Raid():
     async def expire_raid(self):
         self.bot.loop.create_task(self.update_messages())
         await asyncio.sleep(60)
-        self.bot.remove_listener(self.on_raw_reaction_add)
-        self.bot.remove_listener(self.on_command_completion)
+        del Raid.instances[self.id]
+        for message_id in self.message_ids:
+            del Raid.by_message[message_id]
         if self.channel_ids:
             for chanid in self.channel_ids:
+                del Raid.by_channel[chanid]
                 channel = self.bot.get_channel(int(chanid))
                 if not channel:
                     continue
@@ -1396,21 +1318,16 @@ class Raid():
         raid = cls(bot, guild_id, gym, level=level, pkmn=boss, hatch=hatch, end=end)
         raid.channel_ids = data.get('channels')
         raid.message_ids = data.get('messages')
+        for message_id in raid.message_ids:
+            Raid.by_message[message_id] = raid
+        for channel_id in raid.channel_ids:
+            Raid.by_channel[channel_id] = raid
         raid.id = data['id']
         raid.trainer_dict = await raid.get_trainer_dict()
         raid.group_list = await raid.get_grp_list()
         raid.tz = data['tz']
         return raid
     
-    async def add_listeners(self):
-        self.bot.add_listener(self.on_raw_reaction_add)
-        self.bot.add_listener(self.on_command_completion)
-        loop = asyncio.get_event_loop()
-        loop.create_task(self.monitor_status())
-        await self.bot.dbi.add_listener(f'rsvp_{self.id}', self._rsvp)
-        if isinstance(self.gym, Gym):
-            cellid = await self.gym._L10()
-            await self.bot.dbi.add_listener(f'weather_{cellid}', self._weather)
     
     async def summary_str(self):
         if self.status == 'egg':
@@ -1453,17 +1370,58 @@ class RaidCog(Cog):
         bot.raid_info = raid_info
         self.bot = bot
         self.pickup_task = self.bot.loop.create_task(self.pickup_raiddata())
+        self.bot.loop.create_task(self.bot.dbi.add_listener('rsvp', self._rsvp))
+        self.bot.loop.create_task(self.bot.dbi.add_listener('weather', self._weather))
     
     async def pickup_raiddata(self):
         raid_table = self.bot.dbi.table('raids')
         query = raid_table.query()
         data = await query.get()
         for rcrd in data:
-            self.bot.loop.create_task(self.pickup_raid(rcrd))
+            self.bot.loop.create_task(Raid.from_data(self.bot, rcrd))
     
-    async def pickup_raid(self, rcrd):
-        raid = await Raid.from_data(self.bot, rcrd)
-        await raid.add_listeners()
+    @Cog.listener()
+    async def on_raw_reaction_add(self, payload):
+        idstring = f'{payload.channel_id}/{payload.message_id}'
+        raid = Raid.by_message.get(idstring)
+        if not raid:
+            return
+        return await raid.process_reactions(payload)
+    
+    def _rsvp(self, connection, pid, channel, payload):
+        if channel != 'rsvp':
+            return
+        payload_args = payload.split('/')
+        raid_id = payload_args[0]
+        raid = Raid.instances.get('raid_id')
+        if not raid:
+            return
+        event_loop = asyncio.get_event_loop()
+        if payload_args[1].isdigit():
+            user_id = int(payload_args[1])
+            status = payload_args[2]
+            event_loop.create_task(raid.update_rsvp(user_id=user_id, status=status))
+            return
+        elif payload_args[1] == 'power' or payload_args[1] == 'bosses':
+            event_loop.create_task(raid.update_rsvp())
+            return
+
+    def _weather(self, connection, pid, channel, payload):
+        if channel != 'weather':
+            return
+        cellid, new_weather = payload.split('/')
+        event_loop = asyncio.get_event_loop()
+        event_loop.create_task(self.correct_weather(cellid, new_weather))
+    
+    async def correct_weather(self, cellid, weather):
+        cell = S2_L10(self.bot, cellid)
+        raids = await cell.get_all_raids()
+        for raid_id in raids:
+            raid = Raid.instances.get(raid_id)
+            if not raid:
+                continue
+            self.bot.loop.create_task(raid.change_weather(weather))
+        
 
     @command(aliases=['r'])
     @raid_checks.raid_enabled()
@@ -1520,7 +1478,8 @@ class RaidCog(Cog):
                 end = time.time() + 60*endtime
             hatch = None
         zone = await ctx.tz()
-        new_raid = Raid(ctx.bot, ctx.guild.id, gym, level=level, pkmn=boss, hatch=hatch, end=end, tz=zone)
+        raid_id = next(snowflake.create())
+        new_raid = Raid(raid_id, ctx.bot, ctx.guild.id, gym, level=level, pkmn=boss, hatch=hatch, end=end, tz=zone)
         return await self.setup_raid(ctx, new_raid, want=want)
     
     @command(name='list')
@@ -1642,6 +1601,7 @@ class RaidCog(Cog):
         else:
             gymid = f'{gym.city}/{gym.arg}'
         data = {
+            'id': new_raid.id
             'gym': gymid,
             'guild': ctx.guild.id,
             'level': level,
@@ -1653,10 +1613,11 @@ class RaidCog(Cog):
             'tz': new_raid.tz
         }
         insert.row(**data)
-        insert.returning('id')
-        rcrd = await insert.commit()
-        new_raid.id = rcrd[0][0]
-        await new_raid.add_listeners()
+        await insert.commit()
+        for message_id in new_raid.message_ids:
+            Raid.by_message[message_id] = new_raid
+        for channel_id in new_raid.channel_ids:
+            Raid.by_channel[channel_id] = new_raid
     
     @command(aliases=['ex'])
     @raid_checks.raid_enabled()
@@ -1756,32 +1717,116 @@ class RaidCog(Cog):
     @command()
     @raid_checks.raid_channel()
     async def counters(self, ctx):
-        pass
+        raid = Raid.by_channel.get(str(ctx.channel.id))
+        if not raid:
+            return
+        if raid.status != 'active':
+            raise
+        meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
+        embed = await self.counters_embed(meowthuser)
+        if not embed:
+            return await ctx.author.send("You likely have better counters than the ones in your Pokebattler Pokebox! Please update your Pokebox!")
+        await ctx.author.send(embed=embed)
+        await raid.update_rsvp()
         
     @command()
     @raid_checks.raid_channel()
-    async def group(self, ctx, time):
-        pass
+    async def group(self, ctx, grptime):
+        raid = Raid.by_channel.get(str(ctx.channel.id))
+        if not raid:
+            return
+        group_table = ctx.bot.dbi.table('raid_groups')
+        insert = group_table.insert()
+        i = len(raid.group_list)
+        emoji = f'{i+1}\u20e3'
+        if grptime.isdigit():
+            stamp = time.time() + int(grptime)*60
+            if stamp > raid.end:
+                raise
+            elif raid.hatch and stamp < raid.hatch:
+                raise
+            d = {
+                'raid_id': raid.id,
+                'emoji': emoji,
+                'starttime': stamp,
+                'users': [],
+                'est_power': 0
+            }
+            insert.row(**d)
+            await insert.commit()
+            raid.group_list.append(d)
+            for idstring in raid.message_ids:
+                chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+                await msg.add_reaction(emoji)
+            return await raid.join_grp(ctx.author.id, d)
     
     @command(aliases=['start'])
     @raid_checks.raid_channel()
     async def starting(self, ctx):
-        pass
+        raid = Raid.by_channel.get(str(ctx.channel.id))
+        if not raid:
+            return
+        if raid.status != 'active':
+            raise
+        grp = raid.user_grp(ctx.author.id)
+        if not grp:
+            grp = raid.here_grp
+        return await raid.start_grp(grp, ctx.author, channel=ctx.channel)
     
     @command()
     @raid_checks.raid_channel()
     async def weather(self, ctx, *, weather: Weather):
-        pass
+        raid = Raid.by_channel.get(str(ctx.channel.id))
+        if not raid:
+            return
+        return await raid.correct_weather(weather)
     
     @command(aliases=['move'])
     @raid_checks.raid_channel()
     async def moveset(self, ctx, move1: Move, move2: Move=None):
-        pass
+        raid = Raid.by_channel.get(str(ctx.channel.id))
+        if not raid:
+            return
+        if raid.status != 'active':
+            return
+        boss = raid.pkmn
+        moves = await boss.moves()
+        bad_move = (move1 if move1.id not in moves else False) or \
+            (move2 if move2 and move2.id not in moves else False)
+        if bad_move:
+            boss_name = await boss.name()
+            move_name = await bad_move.name()
+            return await ctx.send(f'{boss_name} can not use {move_name}!')
+        return await raid.set_moveset(move1, move2=move2)
     
     @command(aliases=['timer'])
     @raid_checks.raid_channel()
-    async def timerset(self, ctx, *, time):
-        pass
+    async def timerset(self, ctx, *, newtime):
+        raid = Raid.by_channel(str(ctx.channel.id))
+        if not raid:
+            return
+        if newtime.isdigit():
+            stamp = time.time() + 60*int(newtime)
+        else:
+            try:
+                zone = raid.tz
+                newdt = parse(newtime, settings={'TIMEZONE': zone, 'RETURN_AS_TIMEZONE_AWARE': True})
+                stamp = newdt.timestamp()
+            except:
+                raise
+        try:
+            raid.update_time(stamp)
+        except:
+            return
+        has_embed = False
+        for idstring in raid.message_ids:
+            chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+            if not has_embed:
+                embed = msg.embeds[0]
+                embed.timestamp = datetime.fromtimestamp(stamp)
+                has_embed = True
+            await msg.edit(embed=embed)
+        return
     
     @command()
     @checks.is_co_owner()

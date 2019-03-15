@@ -3,7 +3,7 @@ from meowth.utils.converters import ChannelMessage
 from meowth.exts.pkmn import Pokemon, Move
 from meowth.exts.want import Want
 from meowth.exts.users import MeowthUser
-from meowth.utils import formatters
+from meowth.utils import formatters, snowflake
 
 from discord.ext import commands
 
@@ -14,7 +14,19 @@ from . import trade_checks
 
 class Trade():
 
-    def __init__(self, bot, guild_id, lister_id, listing_id, offered_pkmn, wanted_pkmn):
+    instances = dict()
+    by_listing = dict()
+    by_offer = dict()
+
+    def __new__(cls, trade_id, *args, **kwargs):
+        if trade_id in cls.instances:
+            return cls.instances[trade_id]
+        instance = super().__new__(cls)
+        cls.instances[trade_id] = instance
+        return instance
+
+    def __init__(self, trade_id, bot, guild_id, lister_id, listing_id, offered_pkmn, wanted_pkmn):
+        self.id = trade_id
         self.bot = bot
         self.guild_id = guild_id
         self.lister_id = lister_id
@@ -60,8 +72,8 @@ class Trade():
                     'msg': msg
                 }
                 offer_list.append(d)
-        new_trade = cls(bot, guild_id, lister_id, listing_id, offered_pokemon, wanted_pokemon)
-        new_trade.id = data['id']
+        trade_id = data['id']
+        new_trade = cls(trade_id, bot, guild_id, lister_id, listing_id, offered_pokemon, wanted_pokemon)
         new_trade.offer_list = offer_list
         bot.add_listener(new_trade.on_raw_reaction_add)
         return new_trade
@@ -140,6 +152,7 @@ class Trade():
         for react in react_list:
             await offermsg.add_reaction(react)
         offer_dict['msg'] = f'{offermsg.channel.id}/{offermsg.id}'
+        Trade.by_offer[f'{offermsg.channel.id}/{offermsg.id}'] = self
         self.offer_list.append(offer_dict)
         offer_list_data = [repr(x) for x in self.offer_list]
         trade_table = self.bot.dbi.table('trades')
@@ -192,12 +205,10 @@ class Trade():
             pass
         return await query.delete()
 
-    async def on_raw_reaction_add(self, payload):
+    async def process_reactions(self, payload):
         idstring = f'{payload.channel_id}/{payload.message_id}'
         chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
         user = self.bot.get_user(payload.user_id)
-        if (idstring != self.listing_id and idstring not in self.offer_msgs) or payload.user_id == self.bot.user.id:
-            return
         if payload.emoji.is_custom_emoji():
             emoji = payload.emoji.id
         else:
@@ -284,6 +295,14 @@ class TradeCog(Cog):
         for rcrd in data:
             Trade.from_data(self.bot, rcrd)
 
+    @Cog.listener()
+    async def on_raw_reaction_add(self, payload):
+        idstring = f'{payload.channel_id}/{payload.message_id}'
+        trade = Trade.by_listing.get(idstring)
+        if not trade:
+            trade = Trade.by_offer.get(idstring)
+        if trade:
+            await trade.process_reactions(payload)
     
     @command(aliases=['t'])
     @trade_checks.trade_enabled()
@@ -323,7 +342,9 @@ class TradeCog(Cog):
         if accept_other:
             wants.append('obo')
         listing_id = f'{ctx.channel.id}/{listmsg.id}'
-        new_trade = Trade(self.bot, ctx.guild.id, ctx.author.id, listing_id, offers, wants)
+        trade_id = next(snowflake.create())
+        new_trade = Trade(trade_id, self.bot, ctx.guild.id, ctx.author.id, listing_id, offers, wants)
+        Trade.by_listing[listing_id] = new_trade
         embed = await TradeEmbed.from_trade(new_trade)
         try:
             await wantmsg.delete()
@@ -336,6 +357,7 @@ class TradeCog(Cog):
         offer_data = [repr(x) for x in offers]
         want_data = [repr(x) for x in wants]
         data = {
+            'id': trade_id,
             'guild_id': ctx.guild.id,
             'lister_id': ctx.author.id,
             'listing_id': listing_id,

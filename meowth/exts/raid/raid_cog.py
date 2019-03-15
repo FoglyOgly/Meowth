@@ -91,6 +91,9 @@ class Raid():
         self.group_list = []
         self.tz = tz
         self.created = time.time()
+        self.monitor_task = None
+        self.hatch_task = None
+        self.expire_task = None
     
     def __eq__(self, other):
         if isinstance(other, Raid):
@@ -145,6 +148,8 @@ class Raid():
         return max_times[1]
     
     def update_time(self, new_time: float):
+        if self.monitor_task:
+            self.monitor_task.cancel()
         if new_time < time.time():
             raise
         level = self.level
@@ -175,7 +180,7 @@ class Raid():
         update.where(id=self.id)
         update.values(hatch=self.hatch, endtime=self.end)
         self.bot.loop.create_task(update.commit())
-        self.bot.loop.create_task(self.monitor_status())
+        self.monitor_task = self.bot.loop.create_task(self.monitor_status())
     
     @property
     def boss_list(self):
@@ -650,31 +655,26 @@ class Raid():
         
     
     async def monitor_status(self):
-        while True:
+        try:
             hatch = self.hatch
             end = self.end
             if not self.pkmn:
                 sleeptime = hatch - time.time()
-                if sleeptime > 0:
-                    await asyncio.sleep(sleeptime)
-                hatch = self.hatch
-                if hatch <= time.time():
-                    if getattr(self, 'hatch_routine', False):
-                        return
-                    self.bot.loop.create_task(self.hatch_egg())
+                await asyncio.sleep(sleeptime)
+                if getattr(self, 'hatch_routine', False):
                     return
-                else:
-                    continue
+                self.hatch_task = self.bot.loop.create_task(self.hatch_egg())
+                return
             else:
                 sleeptime = end - time.time()
-                if sleeptime > 0:
-                    await asyncio.sleep(sleeptime)
-                end = self.end
-                if end <= time.time():
-                    self.bot.loop.create_task(self.expire_raid())
-                    return
-                else:
-                    continue
+                await asyncio.sleep(sleeptime)
+                self.expire_task = self.bot.loop.create_task(self.expire_raid())
+                return
+        except asyncio.CancelledError:
+            if self.hatch_task:
+                self.hatch_task.cancel()
+            elif self.expire_task:
+                self.expire_task.cancel()
         
 
     
@@ -1017,62 +1017,73 @@ class Raid():
     
     
     async def hatch_egg(self):
-        if self.end < time.time():
-            self.bot.loop.create_task(self.expire_raid())
-            return
-        content = "This raid egg has hatched! React below to report the boss!"
-        msg_list = []
-        boss_list = self.boss_list
-        length = len(boss_list)
-        if length == 1:
-            return await self.report_hatch(boss_list[0])
-        react_list = formatters.mc_emoji(length)
-        boss_dict = dict(zip(react_list, boss_list))
-        embed = await self.hatched_embed()
-        channel_list = []
-        if self.channel_ids:
-            for chanid in self.channel_ids:
-                channel = self.bot.get_channel(int(chanid))
-                if not channel:
-                    self.channel_ids.remove(chanid)
-                    continue
-                channel_list.append(channel)
-                new_name = await self.channel_name()
-                if new_name != channel.name:
-                    await channel.edit(name=new_name)
-                newmsg = await channel.send(content, embed=embed)
-                msg_list.append(newmsg)
-        for messageid in self.message_ids:
-            try:
-                chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
-            except AttributeError:
-                continue
-            if chn in channel_list:
-                continue
-            await msg.edit(content=content, embed=embed)
-            await msg.clear_reactions()
-            msg_list.append(msg)
-        for msg in msg_list:
-            for react in react_list:
-                if isinstance(react, int):
-                    react = self.bot.get_emoji(react)
-                await msg.add_reaction(react)
-        self.hatch_routine = True
-        response = await formatters.ask(self.bot, msg_list, timeout=(self.end-time.time()),
-            react_list=react_list)
-        if response:
-            emoji = str(response.emoji)
-            idstring = f'{response.channel_id}/{response.message_id}'
-            if idstring not in self.message_ids:
+        try:
+            if self.end < time.time():
+                self.bot.loop.create_task(self.expire_raid())
+                return
+            content = "This raid egg has hatched! React below to report the boss!"
+            msg_list = []
+            boss_list = self.boss_list
+            length = len(boss_list)
+            if length == 1:
+                return await self.report_hatch(boss_list[0])
+            react_list = formatters.mc_emoji(length)
+            boss_dict = dict(zip(react_list, boss_list))
+            embed = await self.hatched_embed()
+            channel_list = []
+            if self.channel_ids:
+                for chanid in self.channel_ids:
+                    channel = self.bot.get_channel(int(chanid))
+                    if not channel:
+                        self.channel_ids.remove(chanid)
+                        continue
+                    channel_list.append(channel)
+                    new_name = await self.channel_name()
+                    if new_name != channel.name:
+                        await channel.edit(name=new_name)
+                    newmsg = await channel.send(content, embed=embed)
+                    msg_list.append(newmsg)
+            for messageid in self.message_ids:
                 try:
-                    chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
-                    await msg.delete()
-                except:
-                    pass
-            pkmn = boss_dict[emoji]
-            return await self.report_hatch(pkmn)
-        else:
-            return await self.expire_raid()
+                    chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
+                except AttributeError:
+                    continue
+                if chn in channel_list:
+                    continue
+                await msg.edit(content=content, embed=embed)
+                await msg.clear_reactions()
+                msg_list.append(msg)
+            for msg in msg_list:
+                for react in react_list:
+                    if isinstance(react, int):
+                        react = self.bot.get_emoji(react)
+                    await msg.add_reaction(react)
+            response = await formatters.ask(self.bot, msg_list, timeout=(self.end-time.time()),
+                react_list=react_list)
+            if response:
+                emoji = str(response.emoji)
+                for m in msg_list:
+                    idstring = f'{m.channel.id}/{m.id}'
+                    if idstring not in self.message_ids:
+                        try:
+                            chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+                            await msg.delete()
+                        except:
+                            pass
+                pkmn = boss_dict[emoji]
+                return await self.report_hatch(pkmn)
+            else:
+                return await self.expire_raid()
+        except asyncio.CancelledError:
+            for m in msg_list:
+                idstring = f'{m.channel.id}/{m.id}'
+                if idstring not in self.message_ids:
+                    try:
+                        chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+                        await msg.delete()
+                    except:
+                        pass
+
         
 
     async def report_hatch(self, pkmn):
@@ -1100,27 +1111,30 @@ class Raid():
         
     
     async def expire_raid(self):
-        self.bot.loop.create_task(self.update_messages())
-        await asyncio.sleep(60)
-        del Raid.instances[self.id]
-        for message_id in self.message_ids:
-            del Raid.by_message[message_id]
-        if self.channel_ids:
-            for chanid in self.channel_ids:
-                del Raid.by_channel[chanid]
-                channel = self.bot.get_channel(int(chanid))
-                if not channel:
-                    continue
-                await channel.delete()
-        raid_table = self.bot.dbi.table('raids')
-        query = raid_table.query().where(id=self.id)
-        self.bot.loop.create_task(query.delete())
-        rsvp_table = self.bot.dbi.table('raid_rsvp')
-        rsvp = rsvp_table.query().where(raid_id=self.id)
-        self.bot.loop.create_task(rsvp.delete())
-        grp_table = self.bot.dbi.table('raid_groups')
-        grps = grp_table.query().where(raid_id=self.id)
-        self.bot.loop.create_task(grps.delete())
+        try:
+            self.bot.loop.create_task(self.update_messages())
+            await asyncio.sleep(60)
+            del Raid.instances[self.id]
+            for message_id in self.message_ids:
+                del Raid.by_message[message_id]
+            if self.channel_ids:
+                for chanid in self.channel_ids:
+                    del Raid.by_channel[chanid]
+                    channel = self.bot.get_channel(int(chanid))
+                    if not channel:
+                        continue
+                    await channel.delete()
+            raid_table = self.bot.dbi.table('raids')
+            query = raid_table.query().where(id=self.id)
+            self.bot.loop.create_task(query.delete())
+            rsvp_table = self.bot.dbi.table('raid_rsvp')
+            rsvp = rsvp_table.query().where(raid_id=self.id)
+            self.bot.loop.create_task(rsvp.delete())
+            grp_table = self.bot.dbi.table('raid_groups')
+            grps = grp_table.query().where(raid_id=self.id)
+            self.bot.loop.create_task(grps.delete())
+        except asyncio.CancelledError:
+            raise
     
     # async def update_gym(self, gym):
 

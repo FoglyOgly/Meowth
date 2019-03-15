@@ -4,7 +4,7 @@ from meowth.exts.pkmn import Pokemon, Move
 from meowth.exts.weather import Weather
 from meowth.exts.want import Want
 from meowth.exts.users import MeowthUser
-from meowth.utils import formatters
+from meowth.utils import formatters, snowflake
 from meowth.utils.converters import ChannelMessage
 
 import time
@@ -16,7 +16,18 @@ from . import wild_checks
 
 class Wild():
 
-    def __init__(self, bot, guild_id, location, pkmn: Pokemon):
+    instances = dict()
+    by_message = dict()
+
+    def __new__(cls, wild_id, *args, **kwargs):
+        if wild_id in cls.instances:
+            return cls.instances[wild_id]
+        instance = super().__new__(cls)
+        cls.instances[wild_id] = instance
+        return instance
+
+    def __init__(self, wild_id, bot, guild_id, location, pkmn: Pokemon):
+        self.id = wild_id
         self.bot = bot
         self.guild_id = guild_id
         self.location = location
@@ -24,7 +35,20 @@ class Wild():
         self.created = time.time()
         self.message_ids = []
         self.react_list = bot.wild_info.emoji
-        self.expired = False
+        self.monitor_task = None
+
+    async def monitor_status(self):
+        halfhourdespawn = self.created + 1800
+        hourdespawn = self.created + 3600
+        halfsleep = halfhourdespawn - time.time()
+        if halfsleep > 0:
+            await asyncio.sleep(halfsleep)
+        await self.probably_despawned()
+        hoursleep = hourdespawn - time.time()
+        if hoursleep > 0:
+            await asyncio.sleep(hoursleep)
+        self.monitor_task = None
+        await self.despawn_wild()
     
     async def weather(self):
         if isinstance(self.location, POI):
@@ -53,6 +77,13 @@ class Wild():
         embed = formatters.make_embed(content=f"This {name} has despawned!", footer="Despawned")
         embed.timestamp = datetime.fromtimestamp(self.end)
         return embed
+    
+    async def probably_despawned(self):
+        channels_users, message_list = await self.users_channels_messages()
+        has_embed = False
+        name = await self.pkmn.name()
+        for message in message_list:
+            await message.edit(content=f"This {name} has probably despawned!")
 
     async def despawn_wild(self):
         channels_users, message_list = await self.users_channels_messages()
@@ -74,6 +105,8 @@ class Wild():
         query = wild_table.query
         query.where(id=self.id)
         await query.delete()
+        if self.monitor_task:
+            self.monitor_task.cancel()
 
     async def get_additional_info(self, channel, user):
         content = "Specify information about the wild spawn! You can give as many of the below options as you like."
@@ -120,10 +153,8 @@ class Wild():
                 await msg.edit(embed=new_embed)
 
     
-    async def on_raw_reaction_add(self, payload):
+    async def process_reactions(self, payload):
         id_string = f"{payload.channel_id}/{payload.message_id}"
-        if id_string not in self.message_ids or payload.user_id == self.bot.user.id:
-            return
         user = self.bot.get_user(payload.user_id)
         channel = self.bot.get_channel(payload.channel_id)
         message = await channel.get_message(payload.message_id)
@@ -159,7 +190,10 @@ class Wild():
         pkmn = Pokemon(bot, pkmn_id)
         wild = cls(bot, guild_id, location, pkmn)
         wild.message_ids = data['messages']
+        for idstring in wild.message_ids:
+            Wild.by_message[idstring] = wild
         wild.created = data['created']
+        wild.monitor_task = bot.loop.create_task(wild.monitor_status())
         return wild
 
         
@@ -177,6 +211,14 @@ class WildCog(Cog):
         data = await query.get()
         for rcrd in data:
             self.bot.loop.create_task(Wild.from_data(self.bot, rcrd))
+
+    @Cog.listener()
+    async def on_raw_reaction_add(self, payload):
+        idstring = f'{payload.channel_id}/{payload.message_id}'
+        wild = Wild.by_message.get(idstring)
+        if not wild or payload.user_id == self.bot.user.id:
+            return
+        return await wild.process_reactions(payload)
     
     @command(aliases=['w'])
     @wild_checks.wild_enabled()
@@ -188,7 +230,8 @@ class WildCog(Cog):
             weather = None
         pkmn = await pkmn.validate('wild', weather=weather)
         wild_table = self.bot.dbi.table('wilds')
-        new_wild = Wild(self.bot, ctx.guild.id, location, pkmn)
+        wild_id = next(snowflake.create())
+        new_wild = Wild(wild_id, self.bot, ctx.guild.id, location, pkmn)
         react_list = list(new_wild.react_list.values())
         name = await pkmn.name()
         want = Want(ctx.bot, new_wild.pkmn.id, ctx.guild.id)
@@ -223,21 +266,19 @@ class WildCog(Cog):
                 await reportmsg.add_reaction(react)
             new_wild.message_ids.append(f"{reportmsg.channel.id}/{reportmsg.id}")
         d = {
+            'id': wild_id,
             'guild': ctx.guild.id,
             'location': loc_id,
             'pkmn': pkmn.id,
             'created': new_wild.created,
             'messages': new_wild.message_ids
         }
+        for idstring in new_wild.message_ids:
+            Wild.by_message[idstring] = new_wild
         insert = wild_table.insert()
         insert.row(**d)
-        insert.returning('id')
-        rcrd = await insert.commit()
-        new_wild.id = rcrd[0][0]
-        self.bot.add_listener(new_wild.on_raw_reaction_add)
-        await asyncio.sleep(3600)
-        if not new_wild.expired:
-            return await new_wild.despawn_wild()
+        self.bot.loop.create_task(new_wild.monitor_status())
+        await insert.commit()
 
 class WildEmbed():
 

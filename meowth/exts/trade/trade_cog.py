@@ -75,6 +75,9 @@ class Trade():
         trade_id = data['id']
         new_trade = cls(trade_id, bot, guild_id, lister_id, listing_id, offered_pokemon, wanted_pokemon)
         new_trade.offer_list = offer_list
+        cls.by_listing[listing_id] = new_trade
+        for offer in offer_list:
+            cls.by_offer[offer['msg']] = new_trade
         return new_trade
 
 

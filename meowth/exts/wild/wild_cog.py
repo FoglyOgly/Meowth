@@ -214,11 +214,12 @@ class WildCog(Cog):
 
     @Cog.listener()
     async def on_raw_reaction_add(self, payload):
+        if payload.user_id == self.bot.user.id:
+            return
         idstring = f'{payload.channel_id}/{payload.message_id}'
         wild = Wild.by_message.get(idstring)
-        if not wild or payload.user_id == self.bot.user.id:
-            return
-        return await wild.process_reactions(payload)
+        if wild:
+            return await wild.process_reactions(payload)
     
     @command(aliases=['w'])
     @wild_checks.wild_enabled()

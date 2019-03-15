@@ -75,7 +75,6 @@ class Trade():
         trade_id = data['id']
         new_trade = cls(trade_id, bot, guild_id, lister_id, listing_id, offered_pokemon, wanted_pokemon)
         new_trade.offer_list = offer_list
-        bot.add_listener(new_trade.on_raw_reaction_add)
         return new_trade
 
 
@@ -297,6 +296,8 @@ class TradeCog(Cog):
 
     @Cog.listener()
     async def on_raw_reaction_add(self, payload):
+        if payload.user_id == self.bot.user.id:
+            return
         idstring = f'{payload.channel_id}/{payload.message_id}'
         trade = Trade.by_listing.get(idstring)
         if not trade:
@@ -366,11 +367,7 @@ class TradeCog(Cog):
         }
         trade_table = ctx.bot.dbi.table('trades')
         insert = trade_table.insert.row(**data)
-        insert.returning('id')
         rcrd = await insert.commit()
-        new_trade.id = rcrd[0][0]
-        ctx.bot.add_listener(new_trade.on_raw_reaction_add)
-
 
 
 

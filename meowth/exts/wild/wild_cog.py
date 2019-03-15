@@ -188,7 +188,8 @@ class Wild():
         guild_id = data['guild']
         pkmn_id = data['pkmn']
         pkmn = Pokemon(bot, pkmn_id)
-        wild = cls(bot, guild_id, location, pkmn)
+        wild_id = data['id']
+        wild = cls(wild_id, bot, guild_id, location, pkmn)
         wild.message_ids = data['messages']
         for idstring in wild.message_ids:
             Wild.by_message[idstring] = wild

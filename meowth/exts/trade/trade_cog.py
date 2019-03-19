@@ -311,6 +311,8 @@ class TradeCog(Cog):
     @command(aliases=['t'])
     @trade_checks.trade_enabled()
     async def trade(self, ctx, offers: commands.Greedy[Pokemon]):
+        if len(offers) == 0:
+            return await ctx.send(f'Did not receive any valid offers! Remember to wrap multi-word Pokemon arguments in quotes.')
         if len(offers) == 1:
             if not await offers[0]._trade_available():
                 return await ctx.send(f'{await offers[0].name()} cannot be traded!')

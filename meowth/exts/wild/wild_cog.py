@@ -95,7 +95,7 @@ class Wild():
             if not has_embed:
                 embed = await self.despawned_embed()
                 has_embed = True
-            await message.edit(embed=embed)
+            await message.edit(content="", embed=embed)
         for channel in channels_users:
             mentions = [x.mention for x in channels_users[channel]]
             if len(mentions) > 0:
@@ -167,11 +167,12 @@ class Wild():
         else:
             emoji = str(payload.emoji)
         if emoji not in self.react_list.values():
+            await message.remove_reaction(emoji, user)
             return
-        await message.remove_reaction(emoji, user)
         if emoji == self.react_list['despawn']:
             return await self.despawn_wild()
         elif emoji == self.react_list['info']:
+            await message.remove_reaction(emoji, user)
             return await self.get_additional_info(channel, user)
     
     @classmethod

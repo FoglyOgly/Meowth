@@ -87,6 +87,9 @@ class Wild():
 
     async def despawn_wild(self):
         channels_users, message_list = await self.users_channels_messages()
+        del Wild.instances[self.id]
+        for idstring in self.message_ids:
+            del Wild.by_message[idstring]
         has_embed = False
         self.expired = True
         self.end = time.time()

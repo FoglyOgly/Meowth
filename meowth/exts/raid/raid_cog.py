@@ -150,8 +150,6 @@ class Raid():
     def update_time(self, new_time: float):
         if self.monitor_task:
             self.monitor_task.cancel()
-        if new_time < time.time():
-            raise
         level = self.level
         max_times = self.bot.raid_info.raid_times[level]
         max_hatch = max_times[0]
@@ -1520,8 +1518,10 @@ class RaidCog(Cog):
         eggs_list = []
         hatched_list = []
         active_list = []
-        for rcrd in data:
-            raid = await Raid.from_data(self.bot, rcrd)
+        for raid_id in data:
+            raid = Raid.instances.get(raid_id)
+            if not raid:
+                continue
             if raid.status == 'egg':
                 eggs_list.append(await raid.summary_str())
             elif raid.status == 'hatched':

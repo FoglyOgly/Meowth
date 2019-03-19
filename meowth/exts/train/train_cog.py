@@ -1,12 +1,17 @@
 from meowth import Cog, command, bot, checks
-from meowth.exts.map import Gym
+from meowth.exts.map import Gym, ReportChannel
+from meowth.exts.raid import Raid
 
 class Train:
 
-    def __init__(self, bot, guild_id, channel_id):
+    instances = dict()
+    by_channel = dict()
+
+    def __init__(self, bot, guild_id, channel_id, report_channel_id):
         self.bot = bot
         self.guild_id = guild_id
         self.channel_id = channel_id
+        self.report_channel_id = report_channel_id
         self.current_raid = None
     
     @property
@@ -16,6 +21,25 @@ class Train:
     @property
     def channel(self):
         return self.bot.get_channel(self.channel_id)
+    
+    @property
+    def report_channel(self):
+        rchan = self.bot.get_channel(self.report_channel_id)
+        return ReportChannel(self.bot, rchan)
+    
+    async def possible_raids(self):
+        return await self.report_channel.get_all_raids()
+    
+    async def distance_matrix(self):
+        if not isinstance(self.current_raid.gym, Gym):
+            return None
+        origin = await self.current_raid.gym._coords()
+        raid_ids = await self.possible_raids()
+        raids = [Raid.instances.get(x) for x in raid_ids]
+        dests = [x.gym._coords() for x in raids if isinstance(x.gym, Gym)]
+        matrix = self.bot.gmaps.distance_matrix(origin, dests)
+        print(matrix)
+        return matrix
     
     async def route_url(self, next_raid):
         if isinstance(next_raid.gym, Gym):
@@ -31,5 +55,20 @@ class Train:
         prefix += dest_str
         prefix += "&dir_action=navigate"
 
+class TrainCog(Cog):
+
+    def __init__(self, bot):
+        self.bot = bot
     
+    @command()
+    async def train(self, ctx):
+        name = f'raid-train-{ctx.channel.name}'
+        cat = ctx.channel.category
+        ow = dict(ctx.channel.overwrites)
+        train_channel = await ctx.guild.create_text_channel(name, category=cat, overwrites=ow)
+        new_train = Train(self.bot, ctx.guild.id, train_channel.id, ctx.channel.id)
+        await train_channel.send(repr(await new_train.possible_raids()))
+        await train_channel.send(repr(await new_train.distance_matrix()))
+
+
 

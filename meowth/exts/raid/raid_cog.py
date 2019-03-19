@@ -1641,6 +1641,7 @@ class RaidCog(Cog):
             Raid.by_message[message_id] = new_raid
         for channel_id in new_raid.channel_ids:
             Raid.by_channel[channel_id] = new_raid
+        new_raid.monitor_task = self.bot.loop.create_task(new_raid.monitor_status())
     
     @command(aliases=['ex'])
     @raid_checks.raid_enabled()

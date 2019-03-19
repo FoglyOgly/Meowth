@@ -96,6 +96,7 @@ class Wild():
                 embed = await self.despawned_embed()
                 has_embed = True
             await message.edit(content="", embed=embed)
+            await message.clear_reactions()
         for channel in channels_users:
             mentions = [x.mention for x in channels_users[channel]]
             if len(mentions) > 0:

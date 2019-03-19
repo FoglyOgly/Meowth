@@ -1400,7 +1400,11 @@ class RaidCog(Cog):
         query = raid_table.query()
         data = await query.get()
         for rcrd in data:
-            self.bot.loop.create_task(Raid.from_data(self.bot, rcrd))
+            self.bot.loop.create_task(self.pickup_raid(self, rcrd))
+    
+    async def pickup_raid(self, rcrd):
+        raid = await Raid.from_data(self.bot, rcrd)
+        self.bot.loop.create_task(raid.monitor_status())
     
     @Cog.listener()
     async def on_raw_reaction_add(self, payload):
@@ -1826,7 +1830,7 @@ class RaidCog(Cog):
     @command(aliases=['timer'])
     @raid_checks.raid_channel()
     async def timerset(self, ctx, *, newtime):
-        raid = Raid.by_channel(str(ctx.channel.id))
+        raid = Raid.by_channel.get(str(ctx.channel.id))
         if not raid:
             return
         if newtime.isdigit():

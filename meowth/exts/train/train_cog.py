@@ -1,6 +1,5 @@
 from meowth import Cog, command, bot, checks
-from meowth.exts.map import Gym, ReportChannel
-from meowth.exts.map.Mapper import get_travel_times
+from meowth.exts.map import Gym, ReportChannel, Mapper
 from meowth.exts.raid import Raid
 from meowth.utils import formatters
 
@@ -45,7 +44,7 @@ class Train:
                 origin = self.current_raid.gym.id
                 known_dest_ids = [x.id for x in raids if isinstance(x.gym, Gym)]
                 dests = [Raid.instances[x].gym.id for x in known_dest_ids]
-                times = await get_travel_times([origin], dests)
+                times = await Mapper.get_travel_times([origin], dests)
                 dest_dict = {}
                 for d in times:
                     if d['origin_id'] == origin and d['dest_id'] in dests:

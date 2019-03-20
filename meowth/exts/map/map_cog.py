@@ -116,7 +116,8 @@ class ReportChannel():
         channel_id = self.channel.id
         query = f"SELECT id FROM raids WHERE exists (SELECT * FROM (SELECT unnest(messages)) x(message) WHERE x.message LIKE $1) ORDER BY endtime DESC;"
         query_args = [f'{channel_id}%']
-        return await self.bot.dbi.execute_query(query, *query_args)
+        data = await self.bot.dbi.execute_query(query, *query_args)
+        return [next(row.values()) for row in data]
     
 
 

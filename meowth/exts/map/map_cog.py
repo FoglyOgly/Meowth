@@ -629,7 +629,7 @@ class Mapper(Cog):
                         'travel_time': element
                     }
                     times.append(e)
-        await insert.commit(do_update=True)
+            await insert.commit(do_update=True)
         return times
 
 

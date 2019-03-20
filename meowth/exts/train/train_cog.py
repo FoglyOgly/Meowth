@@ -101,10 +101,11 @@ class Train:
         else:
             return next_raid.gym.url
         prefix = "https://www.google.com/maps/dir/?api=1"
-        if isinstance(self.current_raid.gym, Gym):
-            lat1, lon1 = await self.current_raid.gym._coords()
-            origin_str = f"&origin={lat1},{lon1}"
-            prefix += origin_str
+        if self.current_raid:
+            if isinstance(self.current_raid.gym, Gym):
+                lat1, lon1 = await self.current_raid.gym._coords()
+                origin_str = f"&origin={lat1},{lon1}"
+                prefix += origin_str
         prefix += dest_str
         prefix += "&dir_action=navigate"
 

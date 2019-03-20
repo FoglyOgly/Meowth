@@ -57,7 +57,7 @@ class Train:
             x = raids[i]
             e = react_list[i]
             summary = f'{e} {await x.summary_str()}'
-            if x.id in dest_dict:
+            if x.gym.id in dest_dict:
                 travel = f'Travel Time: {dest_dict[x.id]/60} mins'
             else:
                 travel = "Travel Time: Unknown"

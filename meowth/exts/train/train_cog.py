@@ -46,11 +46,13 @@ class Train:
                 dests = [Raid.instances[x].gym.id for x in known_dest_ids]
                 times = await Mapper.get_travel_times(self.bot, [origin], dests)
                 dest_dict = {}
+                print(times)
                 for d in times:
                     if d['origin_id'] == origin and d['dest_id'] in dests:
                         dest_dict[d['dest_id']] = d['travel_time']
         urls = {x.id: await self.route_url(x) for x in raids}
         react_list = formatters.mc_emoji(len(raids))
+        print(dest_dict)
         for i in range(len(raids)):
             x = raids[i]
             e = react_list[i]

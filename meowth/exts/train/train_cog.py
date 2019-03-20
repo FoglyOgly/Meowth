@@ -67,6 +67,20 @@ class TrainCog(Cog):
         ow = dict(ctx.channel.overwrites)
         train_channel = await ctx.guild.create_text_channel(name, category=cat, overwrites=ow)
         new_train = Train(self.bot, ctx.guild.id, train_channel.id, ctx.channel.id)
+        possible_raid_ids = await new_train.possible_raids()
+        possible_raids = [Raid.instances.get(x) for x in possible_raid_ids]
+        raid_display = [await x.summary_str() for x in possible_raids]
+        react_list = formatters.mc_emoji(len(possible_raids))
+        choice_dict = dict(zip(react_list, possible_raids))
+        display_dict = dict(zip(react_list, raid_display))
+        embed = formatters.mc_embed(display_dict)
+        multi = await train_channel.send('Which raid would you like to start with?',
+            embed=embed)
+        payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
+            react_list=react_list)
+        first_raid = choice_dict[str(payload.emoji)]
+        await multi.delete()
+        new_train.current_raid = first_raid
         await train_channel.send(repr(await new_train.possible_raids()))
         await train_channel.send(repr(await new_train.distance_matrix()))
 

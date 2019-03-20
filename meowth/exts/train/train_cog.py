@@ -37,7 +37,7 @@ class Train:
         origin = await self.current_raid.gym._coords()
         raid_ids = await self.possible_raids()
         raids = [Raid.instances.get(x) for x in raid_ids]
-        dests = [x.gym._coords() for x in raids if isinstance(x.gym, Gym)]
+        dests = [await x.gym._coords() for x in raids if isinstance(x.gym, Gym)]
         matrix = self.bot.gmaps.distance_matrix(origin, dests)
         print(matrix)
         return matrix

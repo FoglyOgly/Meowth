@@ -1,6 +1,7 @@
 from meowth import Cog, command, bot, checks
 from meowth.exts.map import Gym, ReportChannel
 from meowth.exts.raid import Raid
+from meowth.utils import formatters
 
 class Train:
 

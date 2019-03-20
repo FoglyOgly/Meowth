@@ -576,9 +576,10 @@ class Mapper(Cog):
         guild_id = ctx.guild.id
         await self.add_gym(guild_id, name, lat, lon, exraid=True, nickname=nickname)
 
-    async def get_travel_times(self, origins: List[int], dests: List[int]):
+    @staticmethod
+    async def get_travel_times(bot, origins: List[int], dests: List[int]):
         times = []
-        table = self.bot.dbi.table('gym_travel')
+        table = bot.dbi.table('gym_travel')
         query = table.query
         query.where(table['origin_id'].in_(origins))
         query.where(table['dest_id'].in_(dests))

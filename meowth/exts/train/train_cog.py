@@ -44,7 +44,7 @@ class Train:
                 origin = self.current_raid.gym.id
                 known_dest_ids = [x.id for x in raids if isinstance(x.gym, Gym)]
                 dests = [Raid.instances[x].gym.id for x in known_dest_ids]
-                times = await Mapper.get_travel_times(Mapper, [origin], dests)
+                times = await Mapper.get_travel_times(self.bot, [origin], dests)
                 dest_dict = {}
                 for d in times:
                     if d['origin_id'] == origin and d['dest_id'] in dests:

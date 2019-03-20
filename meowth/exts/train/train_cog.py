@@ -53,7 +53,7 @@ class Train:
             if isinstance(self.current_raid.gym, Gym):
                 origin = await self.current_raid.gym._coords()
                 known_dest_ids = [x.id for x in raids if isinstance(x.gym, Gym)]
-                dests = [await x.gym._coords() for x in known_dest_ids]
+                dests = [await Raid.instances[x].gym._coords() for x in known_dest_ids]
                 matrix = self.bot.gmaps.distance_matrix(origin, dests)
                 row = matrix['rows'][0]['elements']
                 times = [row[i]['duration']['text'] for i in range(len(row))]

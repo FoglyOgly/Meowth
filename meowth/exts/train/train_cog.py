@@ -1,5 +1,6 @@
 from meowth import Cog, command, bot, checks
 from meowth.exts.map import Gym, ReportChannel
+from meowth.exts.map.Mapper import get_travel_times
 from meowth.exts.raid import Raid
 from meowth.utils import formatters
 
@@ -32,16 +33,6 @@ class Train:
         idlist = await self.report_channel.get_all_raids()
         return [Raid.instances.get(x) for x in idlist]
     
-    async def distance_matrix(self):
-        if not isinstance(self.current_raid.gym, Gym):
-            return None
-        origin = await self.current_raid.gym._coords()
-        raids = await self.possible_raids()
-        dests = [await x.gym._coords() for x in raids if isinstance(x.gym, Gym)]
-        matrix = self.bot.gmaps.distance_matrix(origin, dests)
-        print(matrix)
-        return matrix
-    
     async def display_choices(self):
         raids = await self.possible_raids()
         dest_dict = {}
@@ -51,13 +42,14 @@ class Train:
         if self.current_raid:
             raids.remove(self.current_raid)
             if isinstance(self.current_raid.gym, Gym):
-                origin = await self.current_raid.gym._coords()
+                origin = self.current_raid.gym.id
                 known_dest_ids = [x.id for x in raids if isinstance(x.gym, Gym)]
-                dests = [await Raid.instances[x].gym._coords() for x in known_dest_ids]
-                matrix = self.bot.gmaps.distance_matrix(origin, dests)
-                row = matrix['rows'][0]['elements']
-                times = [row[i]['duration']['text'] for i in range(len(row))]
-                dest_dict = dict(zip(known_dest_ids, times))
+                dests = [Raid.instances[x].gym.id for x in known_dest_ids]
+                times = await get_travel_times([origin], dests)
+                dest_dict = {}
+                for d in times:
+                    if d['origin_id'] == origin and d['dest_id'] in dests:
+                        dest_dict[d['dest_id']] = d['travel_time']
         urls = {x.id: await self.route_url(x) for x in raids}
         react_list = formatters.mc_emoji(len(raids))
         for i in range(len(raids)):
@@ -65,7 +57,7 @@ class Train:
             e = react_list[i]
             summary = f'{e} {await x.summary_str()}'
             if x.id in dest_dict:
-                travel = f'Travel Time: {dest_dict[x.id]}'
+                travel = f'Travel Time: {dest_dict[x.id]/60} mins'
             else:
                 travel = "Travel Time: Unknown"
             directions = f'[{travel}]({urls[x.id]})'

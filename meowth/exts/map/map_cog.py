@@ -15,6 +15,7 @@ from math import radians, degrees
 import csv
 from urllib.parse import quote_plus
 import googlemaps
+from typing import List
 
 from .map_info import gmaps_api_key
 
@@ -574,6 +575,61 @@ class Mapper(Cog):
     async def exraidgym(self, ctx, name: str, lat: float, lon: float, *, nickname: str=None):
         guild_id = ctx.guild.id
         await self.add_gym(guild_id, name, lat, lon, exraid=True, nickname=nickname)
+
+    async def get_travel_times(self, origins: List[int], dests: List[int]):
+        times = []
+        table = self.bot.dbi.table('gym_travel')
+        query = table.query
+        query.where(table['origin_id'].in_(origins))
+        query.where(table['dest_id'].in_(dests))
+        data = await query.get()
+        looking_for = set()
+        for i in origins:
+            for j in dests:
+                if i != j:
+                    looking_for.add(frozenset((i,j)))
+        already_found = set()
+        for rcrd in data:
+            f = frozenset((rcrd['origin_id'], rcrd['dest_id']))
+            already_found.add(f)
+            times.append(dict(rcrd))
+        not_found = looking_for - already_found
+        actual_origins = set()
+        actual_dests = set()
+        for i in origins:
+            for j in dests:
+                if i != j:
+                    f = frozenset((i,j))
+                    if f in not_found:
+                        actual_origins.add(i)
+                        actual_dests.add(j)
+        o_list = list(actual_origins)
+        d_list = list(actual_dests)
+        o_gyms = [Gym(self.bot, x) for x in o_list]
+        d_gyms = [Gym(self.bot, x) for x in d_list]
+        o_coords = [await x._coords() for x in o_gyms]
+        d_coords = [await x._coords() for x in d_gyms]
+        matrix = self.bot.gmaps.distance_matrix(o_coords, d_coords)
+        insert = table.insert
+        for i in range(len(o_list)):
+            for j in range(len(d_list)):
+                element = matrix['rows'][i]['elements'][j]['duration']['value']
+                d = {
+                    'origin_id': o_list[i],
+                    'dest_id': d_list[j],
+                    'travel_time': element
+                }
+                times.append(d)
+                insert.row(**d)
+                e = {
+                    'origin_id': d_list[j],
+                    'dest_id': o_list[i],
+                    'travel_time': element
+                }
+                times.append(e)
+        await insert.commit(do_update=True)
+        return times
+
 
     
     

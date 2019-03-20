@@ -29,18 +29,70 @@ class Train:
         return ReportChannel(self.bot, rchan)
     
     async def possible_raids(self):
-        return await self.report_channel.get_all_raids()
+        idlist = await self.report_channel.get_all_raids()
+        return [Raid.instances.get(x) for x in idlist]
     
     async def distance_matrix(self):
         if not isinstance(self.current_raid.gym, Gym):
             return None
         origin = await self.current_raid.gym._coords()
-        raid_ids = await self.possible_raids()
-        raids = [Raid.instances.get(x) for x in raid_ids]
+        raids = await self.possible_raids()
         dests = [await x.gym._coords() for x in raids if isinstance(x.gym, Gym)]
         matrix = self.bot.gmaps.distance_matrix(origin, dests)
         print(matrix)
         return matrix
+    
+    async def display_choices(self):
+        raids = await self.possible_raids()
+        dest_dict = {}
+        eggs_list = []
+        hatched_list = []
+        active_list = []
+        if self.current_raid:
+            raids.remove(self.current_raid)
+            if isinstance(self.current_raid.gym, Gym):
+                origin = await self.current_raid.gym._coords()
+                known_dest_ids = [x.id for x in raids if isinstance(x.gym, Gym)]
+                dests = [await x.gym._coords() for x in known_dest_ids]
+                matrix = self.bot.gmaps.distance_matrix(origin, dests)
+                row = matrix['rows'][0]['elements']
+                times = [row[i]['duration']['text'] for i in range(len(row))]
+                dest_dict = dict(zip(known_dest_ids, times))
+        urls = {x.id: await self.route_url(x) for x in raids}
+        react_list = formatters.mc_emoji(len(raids))
+        for i in range(len(raids)):
+            x = raids[i]
+            e = react_list[i]
+            summary = f'{e} {await x.summary_str()}'
+            if x.id in dest_dict:
+                travel = f'Travel Time: {dest_dict[x.id]}'
+            else:
+                travel = "Travel Time: Unknown"
+            directions = f'[{travel}]({urls[x.id]})'
+            summary += f"\n{directions}"
+            if x.status == 'egg':
+                eggs_list.append(summary)
+            elif x.status == 'hatched':
+                hatched_list.append(summary)
+            elif x.status == 'active':
+                active_list.append(summary)
+        fields = {}
+        if active_list:
+            fields['Active'] = "\n\n".join(active_list) + "\n\u200b"
+        if hatched_list:
+            fields['Hatched'] = "\n\n".join(hatched_list) + "\n\u200b"
+        if eggs_list:
+            fields['Eggs'] = "\n\n".join(eggs_list)
+        embed = formatters.make_embed(title="Raid Choices", fields=fields)
+        content = "Select a raid from the list below."
+        multi = await self.channel.send(content, embed=embed)
+        payload = await formatters.ask(ctx.bot, [multi],
+            react_list=react_list)
+        choice_dict = dict(zip(react_list, raids))
+        next_raid = choice_dict[str(payload.emoji)]
+        self.current_raid = next_raid
+        
+
     
     async def route_url(self, next_raid):
         if isinstance(next_raid.gym, Gym):
@@ -68,24 +120,7 @@ class TrainCog(Cog):
         ow = dict(ctx.channel.overwrites)
         train_channel = await ctx.guild.create_text_channel(name, category=cat, overwrites=ow)
         new_train = Train(self.bot, ctx.guild.id, train_channel.id, ctx.channel.id)
-        possible_raid_ids = await new_train.possible_raids()
-        print(possible_raid_ids)
-        possible_raids = [Raid.instances.get(x) for x in possible_raid_ids]
-        print(possible_raids)
-        raid_display = [await x.summary_str() for x in possible_raids]
-        react_list = formatters.mc_emoji(len(possible_raids))
-        choice_dict = dict(zip(react_list, possible_raids))
-        display_dict = dict(zip(react_list, raid_display))
-        embed = formatters.mc_embed(display_dict)
-        multi = await train_channel.send('Which raid would you like to start with?',
-            embed=embed)
-        payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
-            react_list=react_list)
-        first_raid = choice_dict[str(payload.emoji)]
-        await multi.delete()
-        new_train.current_raid = first_raid
-        await train_channel.send(repr(await new_train.possible_raids()))
-        await train_channel.send(repr(await new_train.distance_matrix()))
+        await new_train.display_choices()
 
 
 

@@ -86,7 +86,7 @@ class Train:
         embed = formatters.make_embed(title="Raid Choices", fields=fields)
         content = "Select a raid from the list below."
         multi = await self.channel.send(content, embed=embed)
-        payload = await formatters.ask(ctx.bot, [multi],
+        payload = await formatters.ask(self.bot, [multi],
             react_list=react_list)
         choice_dict = dict(zip(react_list, raids))
         next_raid = choice_dict[str(payload.emoji)]

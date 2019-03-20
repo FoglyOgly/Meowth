@@ -122,6 +122,7 @@ class TrainCog(Cog):
         train_channel = await ctx.guild.create_text_channel(name, category=cat, overwrites=ow)
         new_train = Train(self.bot, ctx.guild.id, train_channel.id, ctx.channel.id)
         await new_train.display_choices()
+        await new_train.display_choices()
 
 
 

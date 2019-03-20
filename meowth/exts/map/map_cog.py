@@ -606,28 +606,29 @@ class Mapper(Cog):
                         actual_dests.add(j)
         o_list = list(actual_origins)
         d_list = list(actual_dests)
-        o_gyms = [Gym(bot, x) for x in o_list]
-        d_gyms = [Gym(bot, x) for x in d_list]
-        o_coords = [await x._coords() for x in o_gyms]
-        d_coords = [await x._coords() for x in d_gyms]
-        matrix = bot.gmaps.distance_matrix(o_coords, d_coords)
-        insert = table.insert
-        for i in range(len(o_list)):
-            for j in range(len(d_list)):
-                element = matrix['rows'][i]['elements'][j]['duration']['value']
-                d = {
-                    'origin_id': o_list[i],
-                    'dest_id': d_list[j],
-                    'travel_time': element
-                }
-                times.append(d)
-                insert.row(**d)
-                e = {
-                    'origin_id': d_list[j],
-                    'dest_id': o_list[i],
-                    'travel_time': element
-                }
-                times.append(e)
+        if o_list and d_list:
+            o_gyms = [Gym(bot, x) for x in o_list]
+            d_gyms = [Gym(bot, x) for x in d_list]
+            o_coords = [await x._coords() for x in o_gyms]
+            d_coords = [await x._coords() for x in d_gyms]
+            matrix = bot.gmaps.distance_matrix(o_coords, d_coords)
+            insert = table.insert
+            for i in range(len(o_list)):
+                for j in range(len(d_list)):
+                    element = matrix['rows'][i]['elements'][j]['duration']['value']
+                    d = {
+                        'origin_id': o_list[i],
+                        'dest_id': d_list[j],
+                        'travel_time': element
+                    }
+                    times.append(d)
+                    insert.row(**d)
+                    e = {
+                        'origin_id': d_list[j],
+                        'dest_id': o_list[i],
+                        'travel_time': element
+                    }
+                    times.append(e)
         await insert.commit(do_update=True)
         return times
 

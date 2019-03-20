@@ -68,7 +68,9 @@ class TrainCog(Cog):
         train_channel = await ctx.guild.create_text_channel(name, category=cat, overwrites=ow)
         new_train = Train(self.bot, ctx.guild.id, train_channel.id, ctx.channel.id)
         possible_raid_ids = await new_train.possible_raids()
+        print(possible_raid_ids)
         possible_raids = [Raid.instances.get(x) for x in possible_raid_ids]
+        print(possible_raids)
         raid_display = [await x.summary_str() for x in possible_raids]
         react_list = formatters.mc_emoji(len(possible_raids))
         choice_dict = dict(zip(react_list, possible_raids))

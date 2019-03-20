@@ -69,6 +69,7 @@ class Train:
             else:
                 travel = "Travel Time: Unknown"
             directions = f'[{travel}]({urls[x.id]})'
+            print(directions)
             summary += f"\n{directions}"
             if x.status == 'egg':
                 eggs_list.append(summary)

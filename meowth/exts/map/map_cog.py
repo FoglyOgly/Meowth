@@ -606,11 +606,11 @@ class Mapper(Cog):
                         actual_dests.add(j)
         o_list = list(actual_origins)
         d_list = list(actual_dests)
-        o_gyms = [Gym(self.bot, x) for x in o_list]
-        d_gyms = [Gym(self.bot, x) for x in d_list]
+        o_gyms = [Gym(bot, x) for x in o_list]
+        d_gyms = [Gym(bot, x) for x in d_list]
         o_coords = [await x._coords() for x in o_gyms]
         d_coords = [await x._coords() for x in d_gyms]
-        matrix = self.bot.gmaps.distance_matrix(o_coords, d_coords)
+        matrix = bot.gmaps.distance_matrix(o_coords, d_coords)
         insert = table.insert
         for i in range(len(o_list)):
             for j in range(len(d_list)):

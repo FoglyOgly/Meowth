@@ -183,6 +183,30 @@ async def ask(bot, message_list, user_list=None, timeout=60, *, react_list=['✅
             await message.clear_reactions()
         return
 
+async def poll(bot, message_list, timeout=3600, *, react_list=['✅', '❎']):
+    for r in react_list:
+        if isinstance(r, int):
+            r = bot.get_emoji(r)
+        for message in message_list:
+            await message.add_reaction(r)
+    try:
+        await asyncio.sleep(timeout)
+    except asyncio.CancelledError:
+        pass
+    finally:
+        react_dict = {}
+        for r in react_list:
+            if isinstance(r, int):
+                r = bot.get_emoji(r)
+            react_dict[r] = 0
+        for message in message_list:
+            for reaction in message.reactions:
+                if reaction.emoji in react_dict:
+                    react_dict[reaction.emoji] += reaction.count
+        results = [(k, react_dict[k]) for k in sorted(react_dict, key=react_dict.get, reverse=True)]
+        return results
+
+
 def mc_emoji(length: int):
     return [emoji_letters[i] for i in range(length)]
 

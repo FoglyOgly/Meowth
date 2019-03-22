@@ -104,6 +104,41 @@ class Raid():
     def __hash__(self):
         return hash(self.id)
     
+    def to_dict(self):
+        if isinstance(self.gym, Gym):
+            gymid = str(self.gym.id)
+        else:
+            gymid = f'{self.gym.city}/{self.gym.arg}'
+        d = {
+            'id': self.id,
+            'gym': gymid,
+            'guild': self.guild_id,
+            'level': self.level,
+            'pkmn': (self.boss.id, self.boss.quickMoveid or None, self.boss.chargeMoveid or None) if self.boss else (None, None, None),
+            'hatch': self.hatch,
+            'endtime': self.end,
+            'messages': self.message_ids,
+            'channels': self.channel_ids,
+            'tz': self.tz
+        }
+        return d
+    
+    @property
+    def _data(self):
+        table = self.bot.dbi.table('raids')
+        query = table.query.where(id=self.id)
+    
+    @property
+    def _insert(self):
+        table = self.bot.dbi.table('raids')
+        insert = table.insert
+        d = self.to_dict()
+        insert.row(**d)
+    
+    async def upsert(self):
+        insert = self._insert
+        await insert.commit(do_update=True)
+    
     @property
     def status(self):
         if self.hatch and time.time() < self.hatch:
@@ -1622,25 +1657,7 @@ class RaidCog(Cog):
                         react = self.bot.get_emoji(react)
                     await reportmsg.add_reaction(react)
                 new_raid.message_ids.append(f"{reportmsg.channel.id}/{reportmsg.id}")
-        insert = raid_table.insert()
-        if isinstance(gym, Gym):
-            gymid = str(gym.id)
-        else:
-            gymid = f'{gym.city}/{gym.arg}'
-        data = {
-            'id': new_raid.id,
-            'gym': gymid,
-            'guild': ctx.guild.id,
-            'level': level,
-            'pkmn': (boss.id, boss.quickMoveid or None, boss.chargeMoveid or None) if boss else (None, None, None),
-            'hatch': hatch,
-            'endtime': end,
-            'messages': new_raid.message_ids,
-            'channels': new_raid.channel_ids,
-            'tz': new_raid.tz
-        }
-        insert.row(**data)
-        await insert.commit()
+        await new_raid.upsert()
         for message_id in new_raid.message_ids:
             Raid.by_message[message_id] = new_raid
         for channel_id in new_raid.channel_ids:

@@ -203,7 +203,10 @@ async def poll(bot, message_list, timeout=3600, *, react_list=['✅', '❎']):
             react_dict[r] = 0
         for message in message_list:
             for reaction in message.reactions:
+                print(reaction.emoji)
+                print(react_dict)
                 if reaction.emoji in react_dict:
+                    print(reaction.count)
                     react_dict[reaction.emoji] += reaction.count
         results = [(k, react_dict[k]) for k in sorted(react_dict, key=react_dict.get, reverse=True)]
         return results

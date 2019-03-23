@@ -120,7 +120,6 @@ class Train:
         hatched_list = []
         active_list = []
         if self.current_raid:
-            raids.remove(self.current_raid)
             if isinstance(self.current_raid.gym, Gym):
                 origin = self.current_raid.gym.id
                 known_dest_ids = [x.id for x in raids if isinstance(x.gym, Gym)]

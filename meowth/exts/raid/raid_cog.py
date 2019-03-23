@@ -114,7 +114,7 @@ class Raid():
             'gym': gymid,
             'guild': self.guild_id,
             'level': self.level,
-            'pkmn': (self.boss.id, self.boss.quickMoveid or None, self.boss.chargeMoveid or None) if self.boss else (None, None, None),
+            'pkmn': (self.pkmn.id, self.pkmn.quickMoveid or None, self.pkmn.chargeMoveid or None) if self.pkmn else (None, None, None),
             'hatch': self.hatch,
             'endtime': self.end,
             'messages': self.message_ids,

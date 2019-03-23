@@ -98,7 +98,7 @@ class Train:
         try:
             results = await self.poll_task
         except asyncio.CancelledError:
-            results = poll_task.result()
+            results = self.poll_task.result()
         emoji = results[0][0]
         choice_dict = dict(zip(react_list, raids))
         self.next_raid = choice_dict[str(emoji)]

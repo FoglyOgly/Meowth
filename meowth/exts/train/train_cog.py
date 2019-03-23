@@ -71,6 +71,7 @@ class Train:
         if not self.poll_task.done():
             print(4)
             self.poll_task.cancel()
+            await self.poll_task
             print(5)
             print(self.poll_task.done())
         await self.select_raid(self.next_raid)

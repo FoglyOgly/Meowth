@@ -127,6 +127,7 @@ class Raid():
     def _data(self):
         table = self.bot.dbi.table('raids')
         query = table.query.where(id=self.id)
+        return query
     
     @property
     def _insert(self):
@@ -134,6 +135,7 @@ class Raid():
         insert = table.insert
         d = self.to_dict()
         insert.row(**d)
+        return insert
     
     async def upsert(self):
         insert = self._insert

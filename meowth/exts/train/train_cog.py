@@ -104,6 +104,7 @@ class Train:
     
     async def display_choices(self, raids, react_list):
         raids = await self.possible_raids()
+        print(raids)
         dest_dict = {}
         eggs_list = []
         hatched_list = []

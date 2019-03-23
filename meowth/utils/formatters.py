@@ -203,6 +203,7 @@ async def poll(bot, message_list, timeout=3600, *, react_list=['✅', '❎']):
             react_dict[r] = 0
         for message in message_list:
             print(message.content)
+            print(message.reactions)
             for reaction in message.reactions:
                 print(reaction.emoji)
                 print(react_dict)

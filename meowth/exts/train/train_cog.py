@@ -69,7 +69,10 @@ class Train:
                 raid.message_ids.remove(msgid)
         await raid.upsert()
         if not self.poll_task.done():
+            print(4)
             self.poll_task.cancel()
+            print(5)
+            print(self.poll_task.done())
         await self.select_raid(self.next_raid)
         
 
@@ -96,9 +99,13 @@ class Train:
         self.poll_task = self.bot.loop.create_task(formatters.poll(self.bot, [multi],
             react_list=react_list))
         try:
+            print(1)
             results = await self.poll_task
+            print(2)
         except asyncio.CancelledError:
+            print(3)
             results = self.poll_task.result()
+            print(6)
         emoji = results[0][0]
         choice_dict = dict(zip(react_list, raids))
         self.next_raid = choice_dict[str(emoji)]

@@ -190,8 +190,10 @@ async def poll(bot, message_list, timeout=3600, *, react_list=['✅', '❎']):
         for message in message_list:
             await message.add_reaction(r)
     try:
+        print(0)
         await asyncio.sleep(timeout)
     except asyncio.CancelledError:
+        print('canceled')
         pass
     finally:
         react_dict = {}

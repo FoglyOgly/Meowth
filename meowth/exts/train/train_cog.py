@@ -74,6 +74,7 @@ class Train:
             await self.poll_task
             print(5)
             print(self.poll_task.done())
+        print(self.next_raid)
         await self.select_raid(self.next_raid)
         
 
@@ -107,13 +108,13 @@ class Train:
             print(3)
             results = self.poll_task.result()
             print(6)
+        print(results)
         emoji = results[0][0]
         choice_dict = dict(zip(react_list, raids))
         self.next_raid = choice_dict[str(emoji)]
+        print(self.next_raid)
     
     async def display_choices(self, raids, react_list):
-        raids = await self.possible_raids()
-        print(raids)
         dest_dict = {}
         eggs_list = []
         hatched_list = []

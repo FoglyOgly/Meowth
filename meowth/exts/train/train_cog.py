@@ -100,6 +100,7 @@ class Train:
         except asyncio.CancelledError:
             results = poll_task.result()
         emoji = results[0][0]
+        choice_dict = dict(zip(react_list, raids))
         self.next_raid = choice_dict[str(emoji)]
     
     async def display_choices(self, raids, react_list):

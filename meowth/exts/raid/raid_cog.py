@@ -4,7 +4,8 @@ from meowth.exts.pkmn import Pokemon, Move
 from meowth.exts.weather import Weather
 from meowth.exts.want import Want
 from meowth.exts.users import MeowthUser
-from meowth.exts.train import Train, TrainEmbed
+import meowth.exts.train.train_cog.Train as Train
+import meowth.exts.train.train_cog.TrainEmbed as TrainEmbed
 from meowth.utils import formatters, snowflake
 from meowth.utils.converters import ChannelMessage
 from . import raid_info

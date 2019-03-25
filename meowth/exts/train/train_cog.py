@@ -198,7 +198,7 @@ class Train:
     async def new_raid(self, raid: Raid):
         embed = await TrainEmbed.from_raid(self, raid)
         content = "Use the reaction below to vote for this raid next!"
-        msg = await self.channel.send(content, embed=embed)
+        msg = await self.channel.send(content, embed=embed.embed)
         await msg.add_reaction('\u2b06')
 
 

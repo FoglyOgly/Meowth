@@ -1048,7 +1048,7 @@ class Raid():
                 continue
             train_embed = await train.TrainEmbed.from_raid(t, self)
             train_content = "Use the reaction below to vote for this raid next!"
-            await msg.edit(content=train_content, embed=train_embed)
+            await msg.edit(content=train_content, embed=train_embed.embed)
             await msg.clear_reactions()
             await msg.add_reaction('\u2b06')
         if self.channel_ids:
@@ -1644,7 +1644,7 @@ class RaidCog(Cog):
             for t in trains:
                 if t:
                     train_embed = await train.TrainEmbed.from_raid(t, new_raid)
-                    msg = await t.channel.send(train_content, embed=train_embed)
+                    msg = await t.channel.send(train_content, embed=train_embed.embed)
                     await msg.add_reaction('\u2b06')
                     new_raid.train_msgs.append(f'{msg.channel.id}/{msg.id}')
         if isinstance(gym, Gym):

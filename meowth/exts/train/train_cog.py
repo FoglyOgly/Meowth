@@ -1,22 +1,61 @@
 from meowth import Cog, command, bot, checks
 from meowth.exts.map import Gym, ReportChannel, Mapper
 from meowth.exts.raid import Raid
-from meowth.utils import formatters
+from meowth.utils import formatters, snowflake
 from meowth.utils.converters import ChannelMessage
 
 import asyncio
+from datetime import datetime
 
 class Train:
 
     instances = dict()
     by_channel = dict()
 
-    def __init__(self, bot, guild_id, channel_id, report_channel_id):
+    def __new__(cls, train_id, *args, **kwargs):
+        if train_id in cls.instances:
+            return cls.instances[train_id]
+        instance = super().__new__(cls)
+        cls.instances[train_id] = instance
+        return instance
+
+    def __init__(self, train_id, bot, guild_id, channel_id, report_channel_id):
+        self.id = train_id
         self.bot = bot
         self.guild_id = guild_id
         self.channel_id = channel_id
         self.report_channel_id = report_channel_id
         self.current_raid = None
+        self.report_msgs = []
+    
+    def to_dict(self):
+        d = {
+            'id': self.id,
+            'guild_id': self.guild_id,
+            'channel_id': self.channel_id,
+            'report_channel_id': self.report_channel_id,
+            'current_raid_id': self.current_raid.id if self.current_raid else None,
+            'next_raid_id': self.next_raid.id if self.next_raid else None,
+            'report_msgs': self.report_msgs
+        }
+        return d
+    
+    @property
+    def _data(self):
+        table = self.bot.dbi.table('trains')
+        query = table.query.where(id=self.id)
+        return query
+    
+    @property
+    def _insert(self):
+        table = self.bot.dbi.table('trains')
+        insert = table.insert
+        d = self.to_dict()
+        insert.row(**d)
+
+    async def upsert(self):
+        insert = self._insert
+        await insert.commit(do_update=True)
     
     @property
     def guild(self):
@@ -54,6 +93,7 @@ class Train:
         Raid.by_channel[str(self.channel_id)] = raid
         self.current_raid = raid
         self.next_raid = None
+        await self.upsert()
         await self.poll_next_raid()
     
     async def finish_current_raid(self):
@@ -69,12 +109,8 @@ class Train:
                 raid.message_ids.remove(msgid)
         await raid.upsert()
         if not self.poll_task.done():
-            print(4)
             self.poll_task.cancel()
             await self.poll_task
-            print(5)
-            print(self.poll_task.done())
-        print(self.next_raid)
         await self.select_raid(self.next_raid)
         
 
@@ -101,18 +137,12 @@ class Train:
         self.poll_task = self.bot.loop.create_task(formatters.poll(self.bot, [multi],
             react_list=react_list))
         try:
-            print(1)
             results = await self.poll_task
-            print(2)
         except asyncio.CancelledError:
-            print(3)
             results = self.poll_task.result()
-            print(6)
-        print(results)
         emoji = results[0][0]
         choice_dict = dict(zip(react_list, raids))
         self.next_raid = choice_dict[str(emoji)]
-        print(self.next_raid)
     
     async def display_choices(self, raids, react_list):
         dest_dict = {}
@@ -162,11 +192,27 @@ class Train:
             return await next_raid.gym.url()
         else:
             return next_raid.gym.url
+    
+    async def new_raid(self, raid: Raid):
+        embed = await TrainEmbed.from_raid(self, raid)
+        content = "Use the reaction below to vote for this raid next!"
+        msg = await self.channel.send(content, embed=embed)
+        await msg.add_reaction('\u2b06')
+
 
 class TrainCog(Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.bot.loop.create_task(self.add_listeners())
+    
+    async def add_listeners(self):
+        if self.bot.dbi.train_listener:
+            await self.bot.dbi.pool.release(self.bot.dbi.train_listener)
+        self.bot.dbi.train_listener = await self.bot.dbi.pool.acquire()
+        newraid = ('train', self._newraid)
+        await self.bot.dbi.train_listener.add_listener(*newraid)
+        
     
     @command()
     async def train(self, ctx):
@@ -174,7 +220,9 @@ class TrainCog(Cog):
         cat = ctx.channel.category
         ow = dict(ctx.channel.overwrites)
         train_channel = await ctx.guild.create_text_channel(name, category=cat, overwrites=ow)
-        new_train = Train(self.bot, ctx.guild.id, train_channel.id, ctx.channel.id)
+        train_id = next(snowflake.create())
+        new_train = Train(train_id, self.bot, ctx.guild.id, train_channel.id, ctx.channel.id)
+        await new_train.upsert()
         Train.by_channel[train_channel.id] = new_train
         await new_train.select_first_raid(ctx.author)
     
@@ -184,6 +232,58 @@ class TrainCog(Cog):
         if not train:
             return
         await train.finish_current_raid()
+
+class TrainEmbed():
+
+    def __init__(self, embed):
+        self.embed = embed
+    
+    @classmethod
+    async def from_raid(cls, train: Train, raid: Raid):
+        if raid.status == 'active':
+            bossfield = "Boss"
+            boss = raid.pkmn
+            name = await boss.name()
+            type_emoji = await boss.type_emoji()
+            shiny_available = await boss._shiny_available()
+            if shiny_available:
+                name += " :sparkles:"
+            name += f" {type_emoji}"
+            img_url = await boss.sprite_url()
+        elif raid.status == 'egg':
+            bossfield = "Level"
+            name = raid.level
+            img_url = raid.bot.raid_info.egg_images[level]
+        bot = raid.bot
+        end = raid.end
+        enddt = datetime.fromtimestamp(end)
+        # color = await boss.color()
+        gym = raid.gym
+        travel_time = "Unknown"
+        if isinstance(gym, Gym):
+            directions_url = await gym.url()
+            directions_text = await gym._name()
+            exraid = await gym._exraid()
+            if train.current_raid:
+                current_gym = train.current_raid.gym
+                if isinstance(current_gym, Gym):
+                    times = await Mapper.get_travel_times(bot, [current_gym], [gym])
+                    travel_time = times[0]['travel_time']
+        else:
+            directions_url = gym.url
+            directions_text = gym._name + " (Unknown Gym)"
+            exraid = False
+        if exraid:
+            directions_text += " (EX Raid Gym)"
+        fields = {
+            bossfield: name,
+            "Gym": f"[{directions_text}]({directions_url})",
+            "Travel Time": travel_time
+        }
+        embed = formatters.make_embed(title="Raid Report", # msg_colour=color,
+            thumbnail=img_url, fields=fields, footer="Ending")
+        embed.timestamp = enddt
+        return cls(embed)
 
 
 

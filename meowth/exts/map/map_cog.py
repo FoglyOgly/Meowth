@@ -120,6 +120,13 @@ class ReportChannel():
         data = await self.bot.dbi.execute_query(query, *query_args)
         return [next(row.values()) for row in data]
     
+    async def get_all_trains(self):
+        channel_id = self.channel.id
+        table = self.bot.dbi.table('trains')
+        query = table.query('id')
+        query.where(report_channel_id=channel_id)
+        return await query.get_values()
+    
 
 
         

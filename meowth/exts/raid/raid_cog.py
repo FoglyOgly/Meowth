@@ -4,6 +4,7 @@ from meowth.exts.pkmn import Pokemon, Move
 from meowth.exts.weather import Weather
 from meowth.exts.want import Want
 from meowth.exts.users import MeowthUser
+from meowth.exts.train import Train, TrainEmbed
 from meowth.utils import formatters, snowflake
 from meowth.utils.converters import ChannelMessage
 from . import raid_info
@@ -94,6 +95,7 @@ class Raid():
         self.monitor_task = None
         self.hatch_task = None
         self.expire_task = None
+        self.train_msgs = []
     
     def __eq__(self, other):
         if isinstance(other, Raid):
@@ -1013,12 +1015,15 @@ class Raid():
         embed.timestamp = datetime.fromtimestamp(self.end)
         return embed
     
+    async def report_embed(self):
+        return (await ReportEmbed.from_raid(self)).embed
 
     
     async def update_messages(self, content=''):
         msg_list = []
         react_list = self.react_list
         message_ids = self.message_ids
+        train_msgs = self.train_msgs
         if self.hatch and self.hatch > time.time():
             embed = await self.egg_embed()
         elif self.end > time.time():
@@ -1033,6 +1038,19 @@ class Raid():
             await msg.edit(content=content, embed=embed)
             await msg.clear_reactions()
             msg_list.append(msg)
+        for msgid in train_msgs:
+            try:
+                chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
+            except AttributeError:
+                continue
+            train = Train.by_channel.get(chn.id)
+            if not train:
+                continue
+            train_embed = await TrainEmbed.from_raid(train, self)
+            train_content = "Use the reaction below to vote for this raid next!"
+            await msg.edit(content=train_content, embed=train_embed)
+            await msg.clear_reactions()
+            await msg.add_reaction('\u2b06')
         if self.channel_ids:
             for chanid in self.channel_ids:
                 channel = self.bot.get_channel(int(chanid))
@@ -1081,6 +1099,16 @@ class Raid():
             for messageid in self.message_ids:
                 try:
                     chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
+                except AttributeError:
+                    continue
+                if chn in channel_list:
+                    continue
+                await msg.edit(content=content, embed=embed)
+                await msg.clear_reactions()
+                msg_list.append(msg)
+            for msgid in self.train_msgs:
+                try:
+                    chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
                 except AttributeError:
                     continue
                 if chn in channel_list:
@@ -1596,6 +1624,7 @@ class RaidCog(Cog):
             embed = await new_raid.egg_embed()
         else:
             embed = await new_raid.raid_embed()
+        reportembed = await new_raid.report_embed()
         if role:
             reportcontent = role.mention + " - "
         else:
@@ -1608,6 +1637,15 @@ class RaidCog(Cog):
         raid_mode = exgymcat if exgymcat else await raid_checks.raid_category(ctx, level)
         report_channels = []
         report_channel = ReportChannel(ctx.bot, ctx.channel)
+        train_ids = await report_channel.get_all_trains()
+        trains = [Train.instances.get(x) for x in train_ids]
+        if trains:
+            train_content = "Use the reaction below to vote for this raid next!"
+            for train in trains:
+                train_embed = await TrainEmbed.from_raid(train, new_raid)
+                msg = await train.channel.send(train_content, embed=train_embed)
+                await msg.add_reaction('\u2b06')
+                new_raid.train_msgs.append(f'{msg.channel.id}/{msg.id}')
         if isinstance(gym, Gym):
             channel_list = await gym.get_all_channels('raid')
             report_channels.extend(channel_list)
@@ -1653,7 +1691,7 @@ class RaidCog(Cog):
                     if want:
                         dms = await want.notify_users(dm_content, embed)
                         new_raid.message_ids.extend(dms)
-                reportmsg = await channel.channel.send(reportcontent, embed=embed)
+                reportmsg = await channel.channel.send(reportcontent, embed=reportembed)
                 for react in react_list:
                     if isinstance(react, int):
                         react = self.bot.get_emoji(react)
@@ -1968,6 +2006,63 @@ class RaidCog(Cog):
         await insert.commit(do_update=True)
         return await ctx.send("Counters update successful")
 
+
+class ReportEmbed():
+
+    def __init__(self, embed):
+        self.embed = embed
+    
+    raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png' #TODO
+    footer_icon = 'https://media.discordapp.net/attachments/346766728132427777/512699022822080512/imageedit_10_6071805149.png'
+
+    boss_index = 0
+    gym_index = 1
+    status_index = 2
+    team_index = 3
+
+    @classmethod
+    async def from_raid(cls, raid: Raid):
+        if raid.status == 'active':
+            bossfield = "Boss"
+            boss = raid.pkmn
+            name = await boss.name()
+            type_emoji = await boss.type_emoji()
+            shiny_available = await boss._shiny_available()
+            if shiny_available:
+                name += " :sparkles:"
+            name += f" {type_emoji}"
+            img_url = await boss.sprite_url()
+        elif raid.status == 'egg':
+            bossfield = "Level"
+            name = raid.level
+            img_url = raid.bot.raid_info.egg_images[level]
+        bot = raid.bot
+        end = raid.end
+        enddt = datetime.fromtimestamp(end)
+        # color = await boss.color()
+        gym = raid.gym
+        if isinstance(gym, Gym):
+            directions_url = await gym.url()
+            directions_text = await gym._name()
+            exraid = await gym._exraid()
+        else:
+            directions_url = gym.url
+            directions_text = gym._name + " (Unknown Gym)"
+            exraid = False
+        if exraid:
+            directions_text += " (EX Raid Gym)"
+        status_str = raid.status_str
+        team_str = raid.team_str
+        fields = {
+            bossfield: name,
+            "Gym": f"[{directions_text}]({directions_url})",
+            "Status List": status_str,
+            "Team List": team_str
+        }
+        embed = formatters.make_embed(icon=RaidEmbed.raid_icon, title="Raid Report", # msg_colour=color,
+            thumbnail=img_url, fields=fields, footer="Ending", footer_icon=RaidEmbed.footer_icon)
+        embed.timestamp = enddt
+        return cls(embed)
 
 class RaidEmbed():
 

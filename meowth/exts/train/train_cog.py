@@ -26,6 +26,7 @@ class Train:
         self.channel_id = channel_id
         self.report_channel_id = report_channel_id
         self.current_raid = None
+        self.next_raid = None
         self.report_msgs = []
     
     def to_dict(self):

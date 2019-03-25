@@ -255,7 +255,7 @@ class TrainEmbed():
         elif raid.status == 'egg':
             bossfield = "Level"
             name = raid.level
-            img_url = raid.bot.raid_info.egg_images[level]
+            img_url = raid.bot.raid_info.egg_images[name]
         bot = raid.bot
         end = raid.end
         enddt = datetime.fromtimestamp(end)

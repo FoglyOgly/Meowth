@@ -53,6 +53,7 @@ class Train:
         insert = table.insert
         d = self.to_dict()
         insert.row(**d)
+        return insert
 
     async def upsert(self):
         insert = self._insert

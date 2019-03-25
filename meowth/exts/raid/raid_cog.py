@@ -4,8 +4,7 @@ from meowth.exts.pkmn import Pokemon, Move
 from meowth.exts.weather import Weather
 from meowth.exts.want import Want
 from meowth.exts.users import MeowthUser
-import meowth.exts.train.train_cog.Train as Train
-import meowth.exts.train.train_cog.TrainEmbed as TrainEmbed
+import meowth.exts.train as train
 from meowth.utils import formatters, snowflake
 from meowth.utils.converters import ChannelMessage
 from . import raid_info
@@ -1044,10 +1043,10 @@ class Raid():
                 chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
             except AttributeError:
                 continue
-            train = Train.by_channel.get(chn.id)
-            if not train:
+            t = train.Train.by_channel.get(chn.id)
+            if not t:
                 continue
-            train_embed = await TrainEmbed.from_raid(train, self)
+            train_embed = await train.TrainEmbed.from_raid(t, self)
             train_content = "Use the reaction below to vote for this raid next!"
             await msg.edit(content=train_content, embed=train_embed)
             await msg.clear_reactions()
@@ -1639,12 +1638,12 @@ class RaidCog(Cog):
         report_channels = []
         report_channel = ReportChannel(ctx.bot, ctx.channel)
         train_ids = await report_channel.get_all_trains()
-        trains = [Train.instances.get(x) for x in train_ids]
+        trains = [train.Train.instances.get(x) for x in train_ids]
         if trains:
             train_content = "Use the reaction below to vote for this raid next!"
-            for train in trains:
-                train_embed = await TrainEmbed.from_raid(train, new_raid)
-                msg = await train.channel.send(train_content, embed=train_embed)
+            for t in trains:
+                train_embed = await train.TrainEmbed.from_raid(t, new_raid)
+                msg = await t.channel.send(train_content, embed=train_embed)
                 await msg.add_reaction('\u2b06')
                 new_raid.train_msgs.append(f'{msg.channel.id}/{msg.id}')
         if isinstance(gym, Gym):

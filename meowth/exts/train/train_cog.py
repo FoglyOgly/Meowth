@@ -161,7 +161,7 @@ class Train:
             results = self.poll_task.result()
         emoji = results[0][0]
         count = results[0][1]
-        report_results = [x, y async for x, y in self.report_results()]
+        report_results = [(x, y) async for x, y in self.report_results()]
         sorted_reports = sorted(report_results, key=lambda x: x[1], reverse=True)
         report_max = sorted_reports[0][1]
         if report_max >= count:

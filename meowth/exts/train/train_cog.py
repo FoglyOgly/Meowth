@@ -6,6 +6,7 @@ from meowth.utils.converters import ChannelMessage
 
 import asyncio
 from datetime import datetime
+from math import ceil
 
 class Train:
 
@@ -133,9 +134,10 @@ class Train:
         if self.current_raid:
             raids.remove(self.current_raid)
         react_list = formatters.mc_emoji(len(raids))
-        choice_embed = await self.display_choices(raids, react_list)
         content = "Vote on the next raid from the list below!"
-        multi = await self.channel.send(content, embed=choice_embed)
+        async for embed in self.display_choices(raids, react_list):
+            multi = await self.channel.send(content, embed=embed)
+            content = ""
         self.poll_task = self.bot.loop.create_task(formatters.poll(self.bot, [multi],
             react_list=react_list))
         try:
@@ -179,16 +181,54 @@ class Train:
                 hatched_list.append(summary)
             elif x.status == 'active':
                 active_list.append(summary)
-        fields = {}
-        if active_list:
-            fields['Active'] = "\n\n".join(active_list) + "\n\u200b"
-        if hatched_list:
-            fields['Hatched'] = "\n\n".join(hatched_list) + "\n\u200b"
-        if eggs_list:
-            fields['Eggs'] = "\n\n".join(eggs_list)
-        embed = formatters.make_embed(title="Raid Choices", fields=fields)
-        return embed
-    
+        number = len(raids)
+        pages = ceil(number/3)
+        for i in range(pages):
+            fields = {}
+            left = 3
+            if pages == 1:
+                title = 'Raid Choices'
+            else:
+                title = f'Raid Choices (Page {i+1} of {pages})'
+            if len(active_list) > left:
+                fields['Active'] = "\n\n".join(active_list[:3])
+                active_list = active_list[3:]
+                embed = formatters.make_embed(title=title, fields=fields)
+                yield embed
+                continue
+            elif active_list:
+                fields['Active'] = "\n\n".join(active_list) + "\n\u200b"
+                left -= len(active_list)
+                active_list = []
+            if not left:
+                embed = formatters.make_embed(title=title, fields=fields)
+                yield embed
+                continue
+            if len(hatched_list) > left:
+                fields['Hatched'] = "\n\n".join(hatched_list[:left])
+                hatched_list = hatched_list[left:]
+                embed = formatters.make_embed(title=title, fields=fields)
+                yield embed
+                continue
+            elif hatched_list:
+                fields['Hatched'] = "\n\n".join(hatched_list) + "\n\u200b"
+                left -= len(hatched_list)
+                hatched_list = []
+            if not left:
+                embed = formatters.make_embed(title=title, fields=fields)
+                yield embed
+                continue
+            if len(eggs_list) > left:
+                fields['Eggs'] = "\n\n".join(eggs_list[:left])
+                eggs_list = eggs_list[left:]
+                embed = formatters.make_embed(title=title, fields=fields)
+                yield embed
+                continue
+            elif eggs_list:
+                fields['Eggs'] = "\n\n".join(eggs_list)
+            embed = formatters.make_embed(title=title, fields=fields)
+            yield embed
+
     async def route_url(self, next_raid):
         if isinstance(next_raid.gym, Gym):
             return await next_raid.gym.url()

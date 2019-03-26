@@ -1583,6 +1583,8 @@ class RaidCog(Cog):
         eggs_list = []
         hatched_list = []
         active_list = []
+        if not data:
+            return await channel.send('No raids reported!')
         for raid_id in data:
             raid = Raid.instances.get(raid_id)
             if not raid:
@@ -1598,7 +1600,10 @@ class RaidCog(Cog):
         for i in range(pages):
             fields = {}
             left = 3
-            title = f'Current Raids (Page {i+1} of {pages})'
+            if pages == 1:
+                title = 'Current Raids'
+            else:
+                title = f'Current Raids (Page {i+1} of {pages})'
             if len(active_list) > left:
                 fields['Active'] = "\n\n".join(active_list[:3])
                 active_list = active_list[3:]

@@ -28,7 +28,7 @@ class Train:
         self.report_channel_id = report_channel_id
         self.current_raid = None
         self.next_raid = None
-        self.report_msgs = []
+        self.report_msg_ids = []
     
     def to_dict(self):
         d = {
@@ -38,7 +38,7 @@ class Train:
             'report_channel_id': self.report_channel_id,
             'current_raid_id': self.current_raid.id if self.current_raid else None,
             'next_raid_id': self.next_raid.id if self.next_raid else None,
-            'report_msgs': self.report_msgs
+            'report_msg_ids': self.report_msg_ids
         }
         return d
     
@@ -72,6 +72,21 @@ class Train:
     def report_channel(self):
         rchan = self.bot.get_channel(self.report_channel_id)
         return ReportChannel(self.bot, rchan)
+    
+    async def reported_raids(self):
+        for msgid in self.report_msg_ids:
+            raid = Raid.by_trainreport.get(msgid)
+            msg = await self.channel.get_message(msgid)
+            yield (msg, raid)
+    
+    async def report_results(self):
+        async for msg, raid in self.reported_raids():
+            reacts = msg.reactions
+            for react in reacts:
+                if react.emoji != '\u2b06':
+                    continue
+                count = react.count
+                yield (raid, count)
     
     async def possible_raids(self):
         idlist = await self.report_channel.get_all_raids()
@@ -145,8 +160,15 @@ class Train:
         except asyncio.CancelledError:
             results = self.poll_task.result()
         emoji = results[0][0]
-        choice_dict = dict(zip(react_list, raids))
-        self.next_raid = choice_dict[str(emoji)]
+        count = results[0][1]
+        report_results = [x, y async for x, y in self.report_results()]
+        sorted_reports = sorted(report_results, key=lambda x: x[1], reverse=True)
+        report_max = sorted_reports[0][1]
+        if report_max >= count:
+            self.next_raid = sorted_reports[0][0]
+        else:
+            choice_dict = dict(zip(react_list, raids))
+            self.next_raid = choice_dict[str(emoji)]    
     
     async def display_choices(self, raids, react_list):
         dest_dict = {}

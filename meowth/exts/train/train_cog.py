@@ -135,8 +135,10 @@ class Train:
     async def select_first_raid(self, author):
         raids = await self.possible_raids()
         react_list = formatters.mc_emoji(len(raids))
-        choice_embed = await self.display_choices(raids, react_list)
         content = "Select your first raid from the list below!"
+        async for embed in self.display_choices(raids, react_list):
+            multi = await self.channel.send(content, embed=embed)
+            content = ""
         multi = await self.channel.send(content, embed=choice_embed)
         payload = await formatters.ask(self.bot, [multi], user_list=[author.id], 
             react_list=react_list)

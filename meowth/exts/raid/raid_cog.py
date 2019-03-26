@@ -1595,13 +1595,14 @@ class RaidCog(Cog):
                 active_list.append(await raid.summary_str())
         number = len(data)
         pages = ceil(number/3)
-        while True:
+        for i in range(pages):
             fields = {}
             left = 3
+            title = f'Current Raids (Page {i+1} of {pages})'
             if len(active_list) > left:
                 fields['Active'] = "\n\n".join(active_list[:3])
                 active_list = active_list[3:]
-                embed = formatters.make_embed(title='Current Raids', fields=fields)
+                embed = formatters.make_embed(title=title, fields=fields)
                 await channel.send(embed=embed)
                 continue
             elif active_list:
@@ -1609,13 +1610,13 @@ class RaidCog(Cog):
                 left -= len(active_list)
                 active_list = []
             if not left:
-                embed = formatters.make_embed(title='Current Raids', fields=fields)
+                embed = formatters.make_embed(title=title, fields=fields)
                 await channel.send(embed=embed)
                 continue
             if len(hatched_list) > left:
                 fields['Hatched'] = "\n\n".join(hatched_list[:left])
                 hatched_list = hatched_list[left:]
-                embed = formatters.make_embed(title='Current Raids', fields=fields)
+                embed = formatters.make_embed(title=title, fields=fields)
                 await channel.send(embed=embed)
                 continue
             elif hatched_list:
@@ -1623,18 +1624,18 @@ class RaidCog(Cog):
                 left -= len(hatched_list)
                 hatched_list = []
             if not left:
-                embed = formatters.make_embed(title='Current Raids', fields=fields)
+                embed = formatters.make_embed(title=title, fields=fields)
                 await channel.send(embed=embed)
                 continue
             if len(eggs_list) > left:
                 fields['Eggs'] = "\n\n".join(eggs_list[:left])
                 eggs_list = eggs_list[left:]
-                embed = formatters.make_embed(title='Current Raids', fields=fields)
+                embed = formatters.make_embed(title=title, fields=fields)
                 await channel.send(embed=embed)
                 continue
             elif eggs_list:
                 fields['Eggs'] = "\n\n".join(eggs_list)
-            embed = formatters.make_embed(title='Current Raids', fields=fields)
+            embed = formatters.make_embed(title=title, fields=fields)
             return await channel.send(embed=embed)
 
 

@@ -161,6 +161,7 @@ class Train:
         except asyncio.CancelledError:
             results = self.poll_task.result()
         if results:
+            print(results)
             emoji = results[0][0]
             count = results[0][1]
         else:
@@ -169,6 +170,7 @@ class Train:
         report_results = [(x, y) async for x, y in self.report_results()]
         if report_results:
             sorted_reports = sorted(report_results, key=lambda x: x[1], reverse=True)
+            print(sorted_reports)
             report_max = sorted_reports[0][1]
         else:
             report_max = 0

@@ -28,6 +28,7 @@ class Train:
         self.report_channel_id = report_channel_id
         self.current_raid = None
         self.next_raid = None
+        self.done_raids = []
         self.report_msg_ids = []
     
     def to_dict(self):
@@ -118,6 +119,7 @@ class Train:
     
     async def finish_current_raid(self):
         raid = self.current_raid
+        self.done_raids.append(raid)
         raid.channel_ids.remove(str(self.channel_id))
         for msgid in raid.message_ids:
             if msgid.startswith(str(self.channel_id)):
@@ -151,6 +153,7 @@ class Train:
         raids = await self.possible_raids()
         if self.current_raid:
             raids.remove(self.current_raid)
+        raids = [x for x in raids if x not in self.done_raids]
         react_list = formatters.mc_emoji(len(raids))
         content = "Vote on the next raid from the list below!"
         async for embed in self.display_choices(raids, react_list):

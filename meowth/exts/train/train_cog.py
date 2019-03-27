@@ -137,6 +137,7 @@ class Train:
                 print(0)
                 try:
                     chn, msg = await ChannelMessage.from_id_string(msgid)
+                    print(msg.id)
                     await msg.delete()
                 except:
                     pass

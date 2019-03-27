@@ -378,6 +378,10 @@ class PartialPOI():
         return self.arg.title()
     
     @property
+    def id(self):
+        return f'{self.city}/{self.arg}'
+    
+    @property
     def url(self):
         urlbase = 'https://www.google.com/maps/search/?api=1&query='
         urlsuff = self.arg + '+'

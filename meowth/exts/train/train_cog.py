@@ -147,8 +147,6 @@ class Train:
         raid = self.current_raid
         self.done_raids.append(raid)
         raid.channel_ids.remove(str(self.channel_id))
-        await self.clear_reports()
-        await self.clear_multis()
         for msgid in raid.message_ids:
             if msgid.startswith(str(self.channel_id)):
                 try:
@@ -162,6 +160,8 @@ class Train:
             self.poll_task.cancel()
             self.next_raid = await self.poll_task
         await self.select_raid(self.next_raid)
+        await self.clear_reports()
+        await self.clear_multis()
         
 
     async def select_first_raid(self, author):

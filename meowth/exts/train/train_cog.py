@@ -160,16 +160,25 @@ class Train:
             results = await self.poll_task
         except asyncio.CancelledError:
             results = self.poll_task.result()
-        emoji = results[0][0]
-        count = results[0][1]
-        report_results = [(x, y) async for x, y in self.report_results()]
-        sorted_reports = sorted(report_results, key=lambda x: x[1], reverse=True)
-        report_max = sorted_reports[0][1]
-        if report_max >= count:
-            self.next_raid = sorted_reports[0][0]
+        if results:
+            emoji = results[0][0]
+            count = results[0][1]
         else:
+            emoji = None
+            count = 0
+        report_results = [(x, y) async for x, y in self.report_results()]
+        if report_results:
+            sorted_reports = sorted(report_results, key=lambda x: x[1], reverse=True)
+            report_max = sorted_reports[0][1]
+        else:
+            report_max = 0
+        if report_max and report_max >= count:
+            self.next_raid = sorted_reports[0][0]
+        elif emoji:
             choice_dict = dict(zip(react_list, raids))
-            self.next_raid = choice_dict[str(emoji)]    
+            self.next_raid = choice_dict[str(emoji)]
+        else:
+            return 
     
     async def display_choices(self, raids, react_list):
         dest_dict = {}

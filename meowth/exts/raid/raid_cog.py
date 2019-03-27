@@ -66,6 +66,7 @@ class Raid():
     instances = dict()
     by_message = dict()
     by_channel = dict()
+    by_trainreport = dict()
 
     def __new__(cls, raid_id, *args, **kwargs):
         if raid_id in cls.instances:
@@ -1687,6 +1688,9 @@ class RaidCog(Cog):
                     msg = await t.channel.send(train_content, embed=train_embed.embed)
                     await msg.add_reaction('\u2b06')
                     new_raid.train_msgs.append(f'{msg.channel.id}/{msg.id}')
+                    t.report_msg_ids.append(msg.id)
+                    Raid.by_trainreport[msg.id] = new_raid
+                    await t.upsert()
         if isinstance(gym, Gym):
             channel_list = await gym.get_all_channels('raid')
             report_channels.extend(channel_list)

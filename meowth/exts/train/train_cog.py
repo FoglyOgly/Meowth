@@ -30,6 +30,7 @@ class Train:
         self.next_raid = None
         self.done_raids = []
         self.report_msg_ids = []
+        self.multi_msg_ids = []
     
     def to_dict(self):
         d = {
@@ -39,7 +40,8 @@ class Train:
             'report_channel_id': self.report_channel_id,
             'current_raid_id': self.current_raid.id if self.current_raid else None,
             'next_raid_id': self.next_raid.id if self.next_raid else None,
-            'report_msg_ids': self.report_msg_ids
+            'report_msg_ids': self.report_msg_ids,
+            'multi_msg_ids': self.multi_msg_ids
         }
         return d
     
@@ -76,7 +78,7 @@ class Train:
     
     async def report_msgs(self):
         for msgid in self.report_msg_ids:
-            msg = await self.channel.get_message(msg)
+            msg = await self.channel.get_message(msgid)
             if msg:
                 yield msg
             continue
@@ -84,6 +86,19 @@ class Train:
     async def clear_reports(self):
         async for msg in self.report_msgs():
             await msg.delete()
+            self.report_msg_ids.remove(msg.id)
+    
+    async def multi_msgs(self):
+        for msgid in self.multi_msg_ids:
+            msg = await self.channel.get_message(msgid)
+            if msg:
+                yield msg
+            continue
+    
+    async def clear_multis(self):
+        async for msg in self.multi_msgs():
+            await msg.delete()
+            self.multi_msg_ids.remove(msg.id)
     
     async def reported_raids(self):
         for msgid in self.report_msg_ids:
@@ -132,6 +147,8 @@ class Train:
         raid = self.current_raid
         self.done_raids.append(raid)
         raid.channel_ids.remove(str(self.channel_id))
+        await self.clear_reports()
+        await self.clear_multis()
         for msgid in raid.message_ids:
             if msgid.startswith(str(self.channel_id)):
                 try:
@@ -170,6 +187,7 @@ class Train:
         async for embed in self.display_choices(raids, react_list):
             multi = await self.channel.send(content, embed=embed)
             content = ""
+            self.multi_msg_ids.append(multi.id)
         multitask = self.bot.loop.create_task(formatters.poll(self.bot, [multi],
             react_list=react_list))
         try:

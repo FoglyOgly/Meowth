@@ -114,7 +114,7 @@ class Train:
         self.current_raid = raid
         self.next_raid = None
         await self.upsert()
-        await self.poll_next_raid()
+        self.poll_task = self.bot.loop.create_task(self.poll_next_raid())
     
     async def finish_current_raid(self):
         raid = self.current_raid
@@ -130,7 +130,7 @@ class Train:
         await raid.upsert()
         if not self.poll_task.done():
             self.poll_task.cancel()
-            await self.poll_task
+            self.next_raid = await self.poll_task
         await self.select_raid(self.next_raid)
         
 
@@ -156,12 +156,13 @@ class Train:
         async for embed in self.display_choices(raids, react_list):
             multi = await self.channel.send(content, embed=embed)
             content = ""
-        self.poll_task = self.bot.loop.create_task(formatters.poll(self.bot, [multi],
+        multitask = self.bot.loop.create_task(formatters.poll(self.bot, [multi],
             react_list=react_list))
         try:
-            results = await self.poll_task
+            results = await multitask
         except asyncio.CancelledError:
-            results = self.poll_task.result()
+            multitask.cancel()
+            results = await multitask
         if results:
             print(results)
             emoji = results[0][0]
@@ -177,10 +178,10 @@ class Train:
         else:
             report_max = 0
         if report_max and report_max >= count:
-            self.next_raid = sorted_reports[0][0]
+            return sorted_reports[0][0]
         elif emoji:
             choice_dict = dict(zip(react_list, raids))
-            self.next_raid = choice_dict[str(emoji)]
+            return choice_dict[str(emoji)]
         else:
             return 
     

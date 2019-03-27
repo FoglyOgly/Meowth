@@ -98,6 +98,8 @@ class Train:
             embed = await raid.raid_embed()
         elif raid.status == 'egg':
             embed = await raid.egg_embed()
+        elif raid.status == 'hatched':
+            embed = await raid.hatched_embed()
         raidmsg = await self.channel.send(embed=embed)
         react_list = raid.react_list
         for react in react_list:

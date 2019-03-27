@@ -74,6 +74,17 @@ class Train:
         rchan = self.bot.get_channel(self.report_channel_id)
         return ReportChannel(self.bot, rchan)
     
+    async def report_msgs(self):
+        for msgid in self.report_msg_ids:
+            msg = await self.channel.get_message(msg)
+            if msg:
+                yield msg
+            continue
+    
+    async def clear_reports(self):
+        async for msg in self.report_msgs():
+            await msg.delete()
+    
     async def reported_raids(self):
         for msgid in self.report_msg_ids:
             raid = Raid.by_trainreport.get(msgid)
@@ -123,6 +134,7 @@ class Train:
         raid.channel_ids.remove(str(self.channel_id))
         for msgid in raid.message_ids:
             if msgid.startswith(str(self.channel_id)):
+                print(0)
                 try:
                     chn, msg = await ChannelMessage.from_id_string(msgid)
                     await msg.delete()

@@ -134,10 +134,8 @@ class Train:
         raid.channel_ids.remove(str(self.channel_id))
         for msgid in raid.message_ids:
             if msgid.startswith(str(self.channel_id)):
-                print(0)
                 try:
-                    chn, msg = await ChannelMessage.from_id_string(msgid)
-                    print(msg.id)
+                    chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
                     await msg.delete()
                 except:
                     pass

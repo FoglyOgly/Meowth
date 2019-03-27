@@ -139,7 +139,6 @@ class Train:
         async for embed in self.display_choices(raids, react_list):
             multi = await self.channel.send(content, embed=embed)
             content = ""
-        multi = await self.channel.send(content, embed=choice_embed)
         payload = await formatters.ask(self.bot, [multi], user_list=[author.id], 
             react_list=react_list)
         choice_dict = dict(zip(react_list, raids))

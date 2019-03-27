@@ -159,9 +159,10 @@ class Train:
         if not self.poll_task.done():
             self.poll_task.cancel()
             self.next_raid = await self.poll_task
-        await self.select_raid(self.next_raid)
         await self.clear_reports()
         await self.clear_multis()
+        await self.select_raid(self.next_raid)
+
         
 
     async def select_first_raid(self, author):

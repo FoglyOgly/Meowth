@@ -2064,6 +2064,7 @@ class ReportEmbed():
     gym_index = 1
     status_index = 2
     team_index = 3
+    boss_list_index = 4
 
     @classmethod
     async def from_raid(cls, raid: Raid):
@@ -2104,6 +2105,9 @@ class ReportEmbed():
             "Status List": status_str,
             "Team List": team_str
         }
+        if raid.status == 'egg':
+            boss_str = await raid.boss_list_str()
+            fields['Boss Interest'] = boss_str
         embed = formatters.make_embed(icon=RaidEmbed.raid_icon, title="Raid Report", # msg_colour=color,
             thumbnail=img_url, fields=fields, footer="Ending", footer_icon=RaidEmbed.footer_icon)
         embed.timestamp = enddt

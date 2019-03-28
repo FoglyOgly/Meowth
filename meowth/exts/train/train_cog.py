@@ -167,7 +167,53 @@ class Train:
         await self.clear_multis()
         await self.select_raid(self.next_raid)
 
-        
+    async def get_trainer_dict(self):
+        def data(rcrd):
+            trainer = rcrd['user_id']
+            party = rcrd.get('party', [0,0,0,1])
+            return trainer, party
+        trainer_dict = {}
+        user_table = self.bot.dbi.table('train_rsvp')
+        query = user_table.query()
+        query.where(train_id=self.id)
+        rsvp_data = await query.get()
+        for rcrd in rsvp_data:
+            trainer, party = data(rcrd)
+            trainer_dict[trainer] = party
+        return trainer_dict
+
+    @staticmethod
+    def team_dict(trainer_dict):
+        d = {
+            'mystic': 0,
+            'instinct': 0,
+            'valor': 0,
+            'unknown': 0
+        }
+        for trainer in trainer_dict:
+            bluecount = trainer_dict[trainer][0]
+            yellowcount = trainer_dict[trainer][1]
+            redcount = trainer_dict[trainer][2]
+            unknowncount = trainer_dict[trainer][3]
+            d['mystic'] += bluecount
+            d['instinct'] += yellowcount
+            d['valor'] += redcount
+            d['unknown'] += unknowncount
+        return d
+
+    @property
+    def team_str(self):
+        team_str = self.team_string(self.bot, self.trainer_dict)
+        return team_str
+
+    @staticmethod
+    def team_string(bot, trainer_dict):
+        team_dict = Raid.team_dict(trainer_dict)
+        team_str = f"{bot.config.team_emoji['mystic']}: {team_dict['mystic']} | "
+        team_str += f"{bot.config.team_emoji['instinct']}: {team_dict['instinct']} | "
+        team_str += f"{bot.config.team_emoji['valor']}: {team_dict['valor']} | "
+        team_str += f"{bot.config.team_emoji['unknown']}: {team_dict['unknown']}"
+        return team_str
 
     async def select_first_raid(self, author):
         raids = await self.possible_raids()
@@ -300,7 +346,7 @@ class Train:
             return next_raid.gym.url
     
     async def new_raid(self, raid: Raid):
-        embed = await TrainEmbed.from_raid(self, raid)
+        embed = await RaidEmbed.from_raid(self, raid)
         content = "Use the reaction below to vote for this raid next!"
         msg = await self.channel.send(content, embed=embed.embed)
         await msg.add_reaction('\u2b06')
@@ -318,7 +364,7 @@ class TrainCog(Cog):
         self.bot.dbi.train_listener = await self.bot.dbi.pool.acquire()
         newraid = ('train', self._newraid)
         await self.bot.dbi.train_listener.add_listener(*newraid)
-        
+  
     
     @command()
     async def train(self, ctx):
@@ -330,16 +376,48 @@ class TrainCog(Cog):
         new_train = Train(train_id, self.bot, ctx.guild.id, train_channel.id, ctx.channel.id)
         await new_train.upsert()
         Train.by_channel[train_channel.id] = new_train
+        embed = await TrainEmbed.from_train(new_train)
+        msg = await ctx.send(f"{ctx.author.display_name} has started a raid train! You can join by reacting to this message and coordinate in {train_channel.mention}!", embed=embed.embed)
+        await msg.add_reaction('\u1f682')
         await new_train.select_first_raid(ctx.author)
     
     @command()
-    async def done(self, ctx):
+    async def next(self, ctx):
         train = Train.by_channel.get(ctx.channel.id)
         if not train:
             return
         await train.finish_current_raid()
+    
+    @command()
+    async def join(self, ctx):
 
 class TrainEmbed():
+
+    def __init__(self, embed):
+        self.embed = embed
+    
+    title = "Raid Train"
+    current_raid_index = 1 
+    team_index = 2
+    channel_index = 0 
+    
+    @classmethod
+    async def from_train(cls, train: Train):
+        title = cls.title
+        current_raid_str = await train.current_raid.train_summary()
+        channel_str = train.channel.mention
+        team_str = train.team_str
+        fields = {
+            'Channel': channel_str,
+            'Current Raid': current_raid_str,
+            'Team List': team_str
+        }
+        embed = formatters.make_embed(title=title, fields=fields)
+        return cls(embed)
+
+
+
+class RaidEmbed():
 
     def __init__(self, embed):
         self.embed = embed

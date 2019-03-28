@@ -81,7 +81,6 @@ class Train:
             msg = await self.channel.get_message(msgid)
             if msg:
                 yield msg
-            continue
     
     async def clear_reports(self):
         async for msg in self.report_msgs():
@@ -93,7 +92,6 @@ class Train:
             msg = await self.channel.get_message(msgid)
             if msg:
                 yield msg
-            continue
     
     async def clear_multis(self):
         print(self.multi_msg_ids)

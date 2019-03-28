@@ -1047,7 +1047,7 @@ class Raid():
             t = train.Train.by_channel.get(chn.id)
             if not t:
                 continue
-            train_embed = await train.TrainEmbed.from_raid(t, self)
+            train_embed = await train.RaidEmbed.from_raid(t, self)
             train_content = "Use the reaction below to vote for this raid next!"
             await msg.edit(content=train_content, embed=train_embed.embed)
             await msg.clear_reactions()
@@ -1437,6 +1437,20 @@ class Raid():
             summary_str += f' | {channel_str}'
         summary_str += f"\n{post_str}"
         return summary_str
+
+    async def train_summary(self):
+        if self.status == 'egg' or self.status == 'hatched':
+            pre_str = f'**Level {self.level} Raid at'
+        elif self.status == 'active':
+            pre_str = f'**{await self.pkmn.name()} Raid at'
+        else:
+            return None
+        if isinstance(self.gym, Gym):
+            gym_str = await self.gym._name()
+        else:
+            gym_str = self.gym._name
+        summary_str = f'{pre_str} {gym_str}'
+        return summary_str
     
 
 
@@ -1684,7 +1698,7 @@ class RaidCog(Cog):
             train_content = "Use the reaction below to vote for this raid next!"
             for t in trains:
                 if t:
-                    train_embed = await train.TrainEmbed.from_raid(t, new_raid)
+                    train_embed = await train.RaidEmbed.from_raid(t, new_raid)
                     msg = await t.channel.send(train_content, embed=train_embed.embed)
                     await msg.add_reaction('\u2b06')
                     new_raid.train_msgs.append(f'{msg.channel.id}/{msg.id}')

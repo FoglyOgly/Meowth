@@ -89,8 +89,10 @@ class Train:
     
     async def multi_msgs(self):
         for msgid in self.multi_msg_ids:
+            print(f'Finding {msgid}')
             msg = await self.channel.get_message(msgid)
             if msg:
+                print(f'Found {msg.id}')
                 yield msg
     
     async def clear_multis(self):

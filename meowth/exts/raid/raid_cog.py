@@ -1683,9 +1683,7 @@ class RaidCog(Cog):
         if trains:
             train_content = "Use the reaction below to vote for this raid next!"
             for t in trains:
-                print(t)
                 if t:
-                    print(t.channel.id)
                     train_embed = await train.TrainEmbed.from_raid(t, new_raid)
                     msg = await t.channel.send(train_content, embed=train_embed.embed)
                     await msg.add_reaction('\u2b06')

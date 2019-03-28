@@ -98,7 +98,7 @@ class Train:
     async def clear_multis(self):
         print(self.multi_msg_ids)
         async for msg in self.multi_msgs():
-            print(msg.id)
+            print("deleting " + msg.id)
             await msg.delete()
             self.multi_msg_ids.remove(msg.id)
     
@@ -193,7 +193,7 @@ class Train:
             multi = await self.channel.send(content, embed=embed)
             content = ""
             self.multi_msg_ids.append(multi.id)
-            print(multi.id)
+            print("sent " + multi.id)
         multitask = self.bot.loop.create_task(formatters.poll(self.bot, [multi],
             react_list=react_list))
         try:
@@ -202,7 +202,6 @@ class Train:
             multitask.cancel()
             results = await multitask
         if results:
-            print(results)
             emoji = results[0][0]
             count = results[0][1]
         else:
@@ -211,7 +210,6 @@ class Train:
         report_results = [(x, y) async for x, y in self.report_results()]
         if report_results:
             sorted_reports = sorted(report_results, key=lambda x: x[1], reverse=True)
-            print(sorted_reports)
             report_max = sorted_reports[0][1]
         else:
             report_max = 0

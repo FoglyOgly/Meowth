@@ -90,17 +90,19 @@ class Train:
     async def multi_msgs(self):
         for msgid in self.multi_msg_ids:
             print(f'Finding {msgid}')
-            msg = await self.channel.get_message(msgid)
-            if msg:
-                print(f'Found {msg.id}')
-                yield msg
+            try:
+                msg = await self.channel.get_message(msgid)
+                if msg:
+                    print(f'Found {msg.id}')
+                    yield msg
+            except:
+                continue
     
     async def clear_multis(self):
         print(self.multi_msg_ids)
         async for msg in self.multi_msgs():
             print(f"deleting {msg.id}")
             await msg.delete()
-            self.multi_msg_ids.remove(msg.id)
     
     async def reported_raids(self):
         for msgid in self.report_msg_ids:

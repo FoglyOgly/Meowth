@@ -96,7 +96,9 @@ class Train:
             continue
     
     async def clear_multis(self):
+        print(self.multi_msg_ids)
         async for msg in self.multi_msgs():
+            print(msg.id)
             await msg.delete()
             self.multi_msg_ids.remove(msg.id)
     
@@ -172,23 +174,26 @@ class Train:
         async for embed in self.display_choices(raids, react_list):
             multi = await self.channel.send(content, embed=embed)
             content = ""
+            self.multi_msg_ids.append(multi.id)
         payload = await formatters.ask(self.bot, [multi], user_list=[author.id], 
             react_list=react_list)
         choice_dict = dict(zip(react_list, raids))
         first_raid = choice_dict[str(payload.emoji)]
+        await self.clear_multis()
         await self.select_raid(first_raid)
     
     async def poll_next_raid(self):
         raids = await self.possible_raids()
         if self.current_raid:
             raids.remove(self.current_raid)
-        raids = [x for x in raids if x not in self.done_raids]
+        raids = [x for x in raids if x not in self.done_raids and x.status != 'expired']
         react_list = formatters.mc_emoji(len(raids))
         content = "Vote on the next raid from the list below!"
         async for embed in self.display_choices(raids, react_list):
             multi = await self.channel.send(content, embed=embed)
             content = ""
             self.multi_msg_ids.append(multi.id)
+            print(multi.id)
         multitask = self.bot.loop.create_task(formatters.poll(self.bot, [multi],
             react_list=react_list))
         try:
@@ -247,9 +252,7 @@ class Train:
             summary += f"\n{directions}"
             if x.status == 'egg':
                 eggs_list.append(summary)
-            elif x.status == 'hatched':
-                hatched_list.append(summary)
-            elif x.status == 'active':
+            elif x.status == 'active' or x.status == 'hatched':
                 active_list.append(summary)
         number = len(raids)
         pages = ceil(number/3)
@@ -274,16 +277,6 @@ class Train:
                 embed = formatters.make_embed(title=title, fields=fields)
                 yield embed
                 continue
-            if len(hatched_list) > left:
-                fields['Hatched'] = "\n\n".join(hatched_list[:left])
-                hatched_list = hatched_list[left:]
-                embed = formatters.make_embed(title=title, fields=fields)
-                yield embed
-                continue
-            elif hatched_list:
-                fields['Hatched'] = "\n\n".join(hatched_list) + "\n\u200b"
-                left -= len(hatched_list)
-                hatched_list = []
             if not left:
                 embed = formatters.make_embed(title=title, fields=fields)
                 yield embed

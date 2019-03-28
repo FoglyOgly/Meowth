@@ -388,8 +388,8 @@ class TrainCog(Cog):
             return
         await train.finish_current_raid()
     
-    @command()
-    async def join(self, ctx):
+    # @command()
+    # async def join(self, ctx):
 
 class TrainEmbed():
 

@@ -98,7 +98,7 @@ class Train:
     async def clear_multis(self):
         print(self.multi_msg_ids)
         async for msg in self.multi_msgs():
-            print("deleting " + msg.id)
+            print(f"deleting {msg.id}")
             await msg.delete()
             self.multi_msg_ids.remove(msg.id)
     
@@ -175,6 +175,7 @@ class Train:
             multi = await self.channel.send(content, embed=embed)
             content = ""
             self.multi_msg_ids.append(multi.id)
+            print(f"sent {multi.id}")
         payload = await formatters.ask(self.bot, [multi], user_list=[author.id], 
             react_list=react_list)
         choice_dict = dict(zip(react_list, raids))
@@ -193,7 +194,7 @@ class Train:
             multi = await self.channel.send(content, embed=embed)
             content = ""
             self.multi_msg_ids.append(multi.id)
-            print("sent " + multi.id)
+            print(f"sent {multi.id}")
         multitask = self.bot.loop.create_task(formatters.poll(self.bot, [multi],
             react_list=react_list))
         try:

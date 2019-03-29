@@ -380,7 +380,7 @@ class TrainCog(Cog):
         Train.by_channel[train_channel.id] = new_train
         embed = await TrainEmbed.from_train(new_train)
         msg = await ctx.send(f"{ctx.author.display_name} has started a raid train! You can join by reacting to this message and coordinate in {train_channel.mention}!", embed=embed.embed)
-        await msg.add_reaction('\u1f682')
+        await msg.add_reaction('🚂')
         new_train.message_id = msg.id
         await new_train.upsert()
         Train.by_message[msg.id] = new_train

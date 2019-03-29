@@ -427,7 +427,8 @@ class Train:
         train.message_id = message_id
         cls.by_channel[channel_id] = train
         cls.by_message[message_id] = train
-        multi = max(multi_msg_ids)
+        idstring = multi_msg_ids[-1]
+        multi = await ChannelMessage.from_id_string(bot, idstring)
         raids = await train.possible_raids()
         if train.current_raid:
             raids.remove(train.current_raid)

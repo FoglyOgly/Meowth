@@ -523,7 +523,7 @@ class TrainCog(Cog):
         new_train.message_id = msg.id
         await new_train.upsert()
         Train.by_message[msg.id] = new_train
-        meowthuser = Meowthuser(self.bot, ctx.author)
+        meowthuser = MeowthUser(self.bot, ctx.author)
         await self._join(meowthuser, new_train)
     
     @command()

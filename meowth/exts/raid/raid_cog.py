@@ -122,7 +122,8 @@ class Raid():
             'endtime': self.end,
             'messages': self.message_ids,
             'channels': self.channel_ids,
-            'tz': self.tz
+            'tz': self.tz,
+            'train_msgs': self.train_msgs
         }
         return d
     
@@ -1403,10 +1404,14 @@ class Raid():
         raid = cls(raid_id, bot, guild_id, gym, level=level, pkmn=boss, hatch=hatch, end=end)
         raid.channel_ids = data.get('channels')
         raid.message_ids = data.get('messages')
+        raid.train_msgs = data.get('train_msgs')
         for message_id in raid.message_ids:
             Raid.by_message[message_id] = raid
         for channel_id in raid.channel_ids:
             Raid.by_channel[channel_id] = raid
+        for idstring in raid.train_msgs:
+            chnid, msgid = idstring.split('/')
+            Raid.by_trainreport[msgid] = raid
         raid.trainer_dict = await raid.get_trainer_dict()
         raid.group_list = await raid.get_grp_list()
         raid.tz = data['tz']

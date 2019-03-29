@@ -45,6 +45,7 @@ class Train:
             'report_channel_id': self.report_channel_id,
             'current_raid_id': self.current_raid.id if self.current_raid else None,
             'next_raid_id': self.next_raid.id if self.next_raid else None,
+            'done_raid_ids': [x.id for x in self.done_raids]
             'report_msg_ids': self.report_msg_ids,
             'multi_msg_ids': self.multi_msg_ids,
             'message_id': self.message_id
@@ -380,8 +381,13 @@ class Train:
         content = f'{member.display_name}{status_str}'
         embed = RSVPEmbed.from_train(self).embed
         await channel.send(content, embed=embed)
+        if not self.trainer_dict:
+            await self.end_train()
+
     
     async def end_train(self):
+        await self.channel.send('This train is now empty! This channel will be deleted in one minute.')
+        await asyncio.sleep(60)
         await self._data.delete()
         train_rsvp_table = self.bot.dbi.table('train_rsvp')
         query = train_rsvp_table.query
@@ -395,8 +401,29 @@ class Train:
         await msg.clear_reactions()
         embed = formatters.make_embed(content="This raid train has ended!")
         await msg.edit(content="", embed=embed)
-
-        
+    
+    @classmethod
+    async def from_data(cls, bot, data):
+        train_id = data['id']
+        guild_id = data['guild_id']
+        channel_id = data['channel_id']
+        report_channel_id = data['report_channel_id']
+        current_raid_id = data.get('current_raid_id')
+        next_raid_id = data.get('next_raid_id')
+        done_raid_ids = data.get('done_raid_ids', [])
+        report_msg_ids = data.get('report_msg_ids', [])
+        multi_msg_ids = data.get('multi_msg_ids', [])
+        message_id = data['message_id']
+        train = cls(train_id, bot, guild_id, channel_id, report_channel_id)
+        train.current_raid = Raid.instances.get(current_raid_id) if current_raid_id else None
+        train.next_raid = Raid.instances.get(next_raid_id) if next_raid_id else None
+        train.done_raids = [Raid.instances.get(x) for x in done_raid_ids]
+        train.report_msg_ids = report_msg_ids
+        train.multi_msg_ids = multi_msg_ids
+        train.message_id = message_id
+        cls.by_channel[channel_id] = train
+        cls.by_message[message_id] = train
+        return train
 
 
 
@@ -405,6 +432,17 @@ class TrainCog(Cog):
     def __init__(self, bot):
         self.bot = bot
         self.bot.loop.create_task(self.add_listeners())
+    
+    async def pickup_traindata(self):
+        train_table = self.bot.dbi.table('trains')
+        query = train_table.query
+        data = await query.get()
+        for rcrd in data:
+            self.bot.loop.create_task(self.pickup_train(rcrd))
+
+    async def pickup_train(self, rcrd):
+        train = await Train.from_data(self.bot, rcrd)
+
     
     async def add_listeners(self):
         if self.bot.dbi.train_listener:
@@ -452,7 +490,10 @@ class TrainCog(Cog):
     
     @command()
     async def train(self, ctx):
-        name = f'raid-train-{ctx.channel.name}'
+        report_channel = ReportChannel(self.bot, ctx.channel)
+        city = await report_channel.city()
+        city = city.split()[0]
+        name = f'{city}-raid-train'
         cat = ctx.channel.category
         ow = dict(ctx.channel.overwrites)
         train_channel = await ctx.guild.create_text_channel(name, category=cat, overwrites=ow)

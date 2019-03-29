@@ -7,6 +7,7 @@ from meowth.utils.converters import ChannelMessage
 import asyncio
 from datetime import datetime
 from math import ceil
+import typing
 
 class Train:
 
@@ -392,8 +393,18 @@ class TrainCog(Cog):
             return
         await train.finish_current_raid()
     
-    # @command()
-    # async def join(self, ctx):
+    @command()
+    async def join(self, ctx, total: typing.Optional[int]=1, *teamcounts):
+        train = Train.by_channel.get(ctx.channel.id)
+        if not train:
+            return
+        meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
+        if total or teamcounts:
+            party = await meowthuser.party_list(total, *teamcounts)
+            await meowthuser.set_party(party=party)
+        else:
+            party = await meowthuser.party()
+        await meowthuser.train_rsvp(train.id, party=party)
 
 class TrainEmbed():
 

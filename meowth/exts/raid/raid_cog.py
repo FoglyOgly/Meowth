@@ -1449,7 +1449,7 @@ class Raid():
             gym_str = await self.gym._name()
         else:
             gym_str = self.gym._name
-        summary_str = f'{pre_str} {gym_str}'
+        summary_str = f'{pre_str} {gym_str}**'
         return summary_str
     
 

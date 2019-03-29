@@ -221,7 +221,7 @@ class Train:
 
     @staticmethod
     def team_string(bot, trainer_dict):
-        team_dict = Raid.team_dict(trainer_dict)
+        team_dict = Train.team_dict(trainer_dict)
         team_str = f"{bot.config.team_emoji['mystic']}: {team_dict['mystic']} | "
         team_str += f"{bot.config.team_emoji['instinct']}: {team_dict['instinct']} | "
         team_str += f"{bot.config.team_emoji['valor']}: {team_dict['valor']} | "

@@ -400,7 +400,7 @@ class Train:
         del Train.by_message[self.message_id]
         del Train.instances[self.id]
         await self.channel.delete()
-        msg = await self.message()
+        msg = await self.report_message()
         await msg.clear_reactions()
         embed = formatters.make_embed(content="This raid train has ended!")
         await msg.edit(content="", embed=embed)

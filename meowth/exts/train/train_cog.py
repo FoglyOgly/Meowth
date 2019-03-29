@@ -259,6 +259,7 @@ class Train:
         self.poll_task = self.bot.loop.create_task(self.get_poll_results(multi, raids, react_list))
         
     async def get_poll_results(self, multi, raids, react_list):
+        print(multi.id)
         multitask = self.bot.loop.create_task(formatters.poll(self.bot, [multi],
             react_list=react_list))
         try:

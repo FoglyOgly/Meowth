@@ -416,10 +416,12 @@ class TrainCog(Cog):
     @Cog.listener()
     async def on_raw_reaction_add(self, payload):
         msg_id = payload.message_id
+        channel = self.bot.get_channel(payload.channel_id)
         train = Train.by_message.get(msg_id)
         if not train:
             return
-        meowthuser = MeowthUser.from_id(self.bot, payload.user_id)
+        user = self.bot.get_user(payload.user_id)
+        meowthuser = MeowthUser(self.bot, user)
         if payload.emoji.is_custom_emoji():
             emoji = payload.emoji.id
         else:
@@ -427,6 +429,10 @@ class TrainCog(Cog):
         if emoji == '🚂':
             party = await meowthuser.party()
             await self._join(meowthuser, train, party)
+        elif emoji == '❌':
+            await self._leave(meowthuser, train)
+        msg = await channel.get_message(msg_id)
+        await msg.remove_reaction(emoji, user)
 
     
     @command()
@@ -442,6 +448,7 @@ class TrainCog(Cog):
         embed = await TrainEmbed.from_train(new_train)
         msg = await ctx.send(f"{ctx.author.display_name} has started a raid train! You can join by reacting to this message and coordinate in {train_channel.mention}!", embed=embed.embed)
         await msg.add_reaction('🚂')
+        await msg.add_reaction('❌')
         new_train.message_id = msg.id
         await new_train.upsert()
         Train.by_message[msg.id] = new_train
@@ -468,6 +475,17 @@ class TrainCog(Cog):
     
     async def _join(self, user, train, party=[0,0,0,1]):
         await user.train_rsvp(train, party=party)
+    
+    @command()
+    async def leave(self, ctx):
+        train = Train.by_channel.get(ctx.channel.id)
+        if not train:
+            return
+        meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
+        await self._leave(meowthuser, train)
+    
+    async def _leave(self, user, train):
+        await user.leave_train(train)
 
 class TrainEmbed():
 

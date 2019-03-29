@@ -171,6 +171,7 @@ class MeowthUser:
         insert.row(**d)
         await insert.commit(do_update=True)
         if train.current_raid:
+            raid_id = train.current_raid.id
             rsvp_table = self.bot.dbi.table('raid_rsvp')
             current_rsvp = rsvp_table.query().where(user_id=self.user.id, raid_id=raid_id)
             current_rsvp = await current_rsvp.get()
@@ -182,7 +183,12 @@ class MeowthUser:
                     insert = rsvp_table.insert
                     insert.row(**old_d)
                     await insert.commit(do_update=True)
-
+    
+    async def leave_train(self, train):
+        train_rsvp_table = self.bot.dbi.table('train_rsvp')
+        query = train_rsvp_table.query
+        query.where(user_id=self.user.id, train_id=train.id)
+        await query.delete()
 
     async def cancel_rsvp(self, raid_id):
         rsvp_table = self.bot.dbi.table('raid_rsvp')

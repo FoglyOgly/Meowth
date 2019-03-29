@@ -432,6 +432,7 @@ class TrainCog(Cog):
     def __init__(self, bot):
         self.bot = bot
         self.bot.loop.create_task(self.add_listeners())
+        self.bot.loop.create_task(self.pickup_traindata())
     
     async def pickup_traindata(self):
         train_table = self.bot.dbi.table('trains')

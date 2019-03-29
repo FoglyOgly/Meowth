@@ -1057,6 +1057,9 @@ class Raid():
                 channel = self.bot.get_channel(int(chanid))
                 if not channel:
                     continue
+                t = train.Train.by_channel.get(chanid)
+                if t:
+                    continue
                 new_name = await self.channel_name()
                 if new_name != channel.name:
                     await channel.edit(name=new_name)
@@ -1186,6 +1189,9 @@ class Raid():
                     del Raid.by_channel[chanid]
                     channel = self.bot.get_channel(int(chanid))
                     if not channel:
+                        continue
+                    t = train.Train.by_channel.get(chanid)
+                    if t:
                         continue
                     await channel.delete()
             raid_table = self.bot.dbi.table('raids')

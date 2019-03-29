@@ -380,6 +380,21 @@ class Train:
         content = f'{member.display_name}{status_str}'
         embed = RSVPEmbed.from_train(self).embed
         await channel.send(content, embed=embed)
+    
+    async def end_train(self):
+        await self._data.delete()
+        train_rsvp_table = self.bot.dbi.table('train_rsvp')
+        query = train_rsvp_table.query
+        query.where(train_id=self.id)
+        await query.delete()
+        del Train.by_channel[self.channel_id]
+        del Train.by_message[self.message_id]
+        del Train.instances[self.id]
+        await self.channel.delete()
+        msg = await self.message()
+        await msg.clear_reactions()
+        embed = formatters.make_embed(content="This raid train has ended!")
+        await msg.edit(content="", embed=embed)
 
         
 

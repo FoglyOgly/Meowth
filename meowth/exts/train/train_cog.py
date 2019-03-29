@@ -33,6 +33,7 @@ class Train:
         self.report_msg_ids = []
         self.multi_msg_ids = []
         self.message_id = None
+        self.trainer_dict = {}
     
     def to_dict(self):
         d = {

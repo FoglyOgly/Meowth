@@ -473,6 +473,8 @@ class TrainCog(Cog):
         train = Train.by_message.get(msg_id)
         if not train:
             return
+        if payload.user_id == self.bot.user.id:
+            return
         user = self.bot.get_user(payload.user_id)
         meowthuser = MeowthUser(self.bot, user)
         if payload.emoji.is_custom_emoji():

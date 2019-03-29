@@ -77,6 +77,13 @@ class Train:
     def channel(self):
         return self.bot.get_channel(self.channel_id)
     
+    async def report_message(self):
+        try:
+            msg = await self.report_channel.channel.get_message(self.message_id)
+            return msg
+        except:
+            return None
+    
     @property
     def report_channel(self):
         rchan = self.bot.get_channel(self.report_channel_id)
@@ -354,6 +361,28 @@ class Train:
         content = "Use the reaction below to vote for this raid next!"
         msg = await self.channel.send(content, embed=embed.embed)
         await msg.add_reaction('\u2b06')
+        
+    async def update_rsvp(self, user_id, status):
+        self.trainer_dict = await self.get_trainer_dict()
+        msg = await self.report_message()
+        if not msg:
+            return
+        train_embed = TrainEmbed(msg.embeds[0])
+        train_embed.team_str = self.team_str
+        await msg.edit(embed=train_embed.embed)
+        channel = self.channel
+        guild = channel.guild
+        member = guild.get_member(user_id)
+        if status == 'join':
+            status_str = ' has joined the train!'
+        elif status == 'cancel':
+            status_str =' has left the train!'
+        content = f'{member.display_name}{status_str}'
+        embed = RSVPEmbed.from_train(self).embed
+        await channel.send(content, embed=embed)
+
+        
+
 
 
 class TrainCog(Cog):
@@ -366,8 +395,23 @@ class TrainCog(Cog):
         if self.bot.dbi.train_listener:
             await self.bot.dbi.pool.release(self.bot.dbi.train_listener)
         self.bot.dbi.train_listener = await self.bot.dbi.pool.acquire()
-        newraid = ('train', self._newraid)
-        await self.bot.dbi.train_listener.add_listener(*newraid)
+        trainrsvp = ('train', self._rsvp)
+        await self.bot.dbi.train_listener.add_listener(*trainrsvp)
+    
+    def _rsvp(self, connection, pid, channel, payload):
+        if channel != 'train':
+            return
+        payload_args = payload.split('/')
+        train_id = int(payload_args[0])
+        train = Train.instances.get(train_id)
+        if not train:
+            return
+        event_loop = asyncio.get_event_loop()
+        if payload_args[1].isdigit():
+            user_id = int(payload_args[1])
+            status = payload_args[2]
+            event_loop.create_task(train.update_rsvp(user_id, status))
+            return
   
     
     @command()
@@ -426,6 +470,23 @@ class TrainEmbed():
         fields = {
             'Channel': channel_str,
             'Current Raid': current_raid_str,
+            'Team List': team_str
+        }
+        embed = formatters.make_embed(title=title, fields=fields)
+        return cls(embed)
+
+class RSVPEmbed():
+
+    def __init__(self, embed):
+        self.embed = embed
+    
+    title = 'Current Train Totals'
+    
+    @classmethod
+    def from_train(cls, train: Train):
+        title = cls.title
+        team_str = train.team_str
+        fields = {
             'Team List': team_str
         }
         embed = formatters.make_embed(title=title, fields=fields)

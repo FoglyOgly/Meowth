@@ -413,6 +413,21 @@ class TrainCog(Cog):
             event_loop.create_task(train.update_rsvp(user_id, status))
             return
   
+    @Cog.listener()
+    async def on_raw_reaction_add(self, payload):
+        msg_id = payload.message_id
+        train = Train.by_message.get(msg_id)
+        if not train:
+            return
+        meowthuser = MeowthUser.from_id(self.bot, payload.user_id)
+        if payload.emoji.is_custom_emoji():
+            emoji = payload.emoji.id
+        else:
+            emoji = str(payload.emoji)
+        if emoji == '🚂':
+            party = await meowthuser.party()
+            await self._join(meowthuser, train, party)
+
     
     @command()
     async def train(self, ctx):
@@ -449,7 +464,10 @@ class TrainCog(Cog):
             await meowthuser.set_party(party=party)
         else:
             party = await meowthuser.party()
-        await meowthuser.train_rsvp(train.id, party=party)
+        await self._join(meowthuser, train, party=party)
+    
+    async def _join(self, user, train, party=[0,0,0,1]):
+        await user.train_rsvp(train.id, party=party)
 
 class TrainEmbed():
 

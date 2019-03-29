@@ -160,10 +160,26 @@ class MeowthUser:
         insert.row(**d)
         await insert.commit(do_update=True)
     
+    async def train_rsvp(self, train_id, party=[0,0,0,1]):
+        d = {
+            'user_id': self.user.id,
+            'train_id': train_id,
+            'party': party
+        }
+        train_rsvp_table = self.bot.dbi.table('train_rsvp')
+        insert = train_rsvp_table.insert
+        insert.row(**d)
+        await insert.commit(do_update=True)
+
     async def cancel_rsvp(self, raid_id):
         rsvp_table = self.bot.dbi.table('raid_rsvp')
         current_rsvp = rsvp_table.query().where(user_id=self.user.id, raid_id=raid_id)
         await current_rsvp.delete()
+    
+    async def cancel_train(self):
+        train_rsvp_table = self.bot.dbi.table('train_rsvp')
+        query = train_rsvp_table.query.where(user_id=self.user.id)
+        await query.delete()
     
     async def raid_estimator(self, raid_id):
         rsvp_table = self.bot.dbi.table('raid_rsvp')

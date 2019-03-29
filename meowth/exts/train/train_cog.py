@@ -12,6 +12,7 @@ class Train:
 
     instances = dict()
     by_channel = dict()
+    by_message = dict()
 
     def __new__(cls, train_id, *args, **kwargs):
         if train_id in cls.instances:
@@ -31,6 +32,7 @@ class Train:
         self.done_raids = []
         self.report_msg_ids = []
         self.multi_msg_ids = []
+        self.message_id = None
     
     def to_dict(self):
         d = {
@@ -41,7 +43,8 @@ class Train:
             'current_raid_id': self.current_raid.id if self.current_raid else None,
             'next_raid_id': self.next_raid.id if self.next_raid else None,
             'report_msg_ids': self.report_msg_ids,
-            'multi_msg_ids': self.multi_msg_ids
+            'multi_msg_ids': self.multi_msg_ids,
+            'message_id': self.message_id
         }
         return d
     
@@ -93,7 +96,7 @@ class Train:
     async def multi_msgs(self):
         for msgid in self.multi_msg_ids:
             try:
-                msg = await self.channel.get_message(msgid)
+                chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
                 if msg:
                     yield msg
             except:
@@ -220,10 +223,9 @@ class Train:
         react_list = formatters.mc_emoji(len(raids))
         content = "Select your first raid from the list below!"
         async for embed in self.display_choices(raids, react_list):
-            multi = await self.channel.send(content, embed=embed)
+            multi = await self.report_channel.send(content, embed=embed)
             content = ""
-            self.multi_msg_ids.append(multi.id)
-            print(f"sent {multi.id}")
+            self.multi_msg_ids.append(f'{self.report_channel_id}/{multi.id}')
         payload = await formatters.ask(self.bot, [multi], user_list=[author.id], 
             react_list=react_list)
         choice_dict = dict(zip(react_list, raids))
@@ -241,8 +243,7 @@ class Train:
         async for embed in self.display_choices(raids, react_list):
             multi = await self.channel.send(content, embed=embed)
             content = ""
-            self.multi_msg_ids.append(multi.id)
-            print(f"sent {multi.id}")
+            self.multi_msg_ids.append(f'{self.channel_id}/{multi.id}')
         multitask = self.bot.loop.create_task(formatters.poll(self.bot, [multi],
             react_list=react_list))
         try:
@@ -374,12 +375,14 @@ class TrainCog(Cog):
         train_channel = await ctx.guild.create_text_channel(name, category=cat, overwrites=ow)
         train_id = next(snowflake.create())
         new_train = Train(train_id, self.bot, ctx.guild.id, train_channel.id, ctx.channel.id)
-        await new_train.upsert()
+        await new_train.select_first_raid(ctx.author)
         Train.by_channel[train_channel.id] = new_train
         embed = await TrainEmbed.from_train(new_train)
         msg = await ctx.send(f"{ctx.author.display_name} has started a raid train! You can join by reacting to this message and coordinate in {train_channel.mention}!", embed=embed.embed)
         await msg.add_reaction('\u1f682')
-        await new_train.select_first_raid(ctx.author)
+        new_train.message_id = msg.id
+        await new_train.upsert()
+        Train.by_message[msg.id] = new_train
     
     @command()
     async def next(self, ctx):

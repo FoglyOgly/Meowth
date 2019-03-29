@@ -159,7 +159,7 @@ class Train:
         self.current_raid = raid
         self.next_raid = None
         await self.upsert()
-        self.poll_task = self.bot.loop.create_task(self.poll_next_raid())
+        self.bot.loop.create_task(self.poll_next_raid())
     
     async def finish_current_raid(self):
         raid = self.current_raid
@@ -255,6 +255,9 @@ class Train:
             multi = await self.channel.send(content, embed=embed)
             content = ""
             self.multi_msg_ids.append(f'{self.channel_id}/{multi.id}')
+        self.poll_task = self.bot.loop.create_task(self.get_poll_results(multi, raids, react_list))
+        
+    async def get_poll_results(self, multi, raids, react_list):
         multitask = self.bot.loop.create_task(formatters.poll(self.bot, [multi],
             react_list=react_list))
         try:
@@ -423,6 +426,13 @@ class Train:
         train.message_id = message_id
         cls.by_channel[channel_id] = train
         cls.by_message[message_id] = train
+        multi = max(multi_msg_ids)
+        raids = await train.possible_raids()
+        if train.current_raid:
+            raids.remove(train.current_raid)
+        raids = [x for x in raids if x not in train.done_raids and x.status != 'expired']
+        react_list = formatters.mc_emoji(len(raids))
+        train.poll_task = bot.loop.create_task(train.get_poll_results(multi, raids, react_list))
         return train
 
 

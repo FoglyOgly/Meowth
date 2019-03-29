@@ -467,7 +467,7 @@ class TrainCog(Cog):
         await self._join(meowthuser, train, party=party)
     
     async def _join(self, user, train, party=[0,0,0,1]):
-        await user.train_rsvp(train.id, party=party)
+        await user.train_rsvp(train, party=party)
 
 class TrainEmbed():
 

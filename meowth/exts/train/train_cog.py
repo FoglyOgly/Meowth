@@ -259,7 +259,6 @@ class Train:
         self.poll_task = self.bot.loop.create_task(self.get_poll_results(multi, raids, react_list))
         
     async def get_poll_results(self, multi, raids, react_list):
-        print(multi.id)
         multitask = self.bot.loop.create_task(formatters.poll(self.bot, [multi],
             react_list=react_list))
         try:
@@ -524,6 +523,8 @@ class TrainCog(Cog):
         new_train.message_id = msg.id
         await new_train.upsert()
         Train.by_message[msg.id] = new_train
+        meowthuser = Meowthuser(self.bot, ctx.author)
+        await self._join(meowthuser, new_train)
     
     @command()
     async def next(self, ctx):

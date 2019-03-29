@@ -459,7 +459,15 @@ class TrainEmbed():
     title = "Raid Train"
     current_raid_index = 1 
     team_index = 2
-    channel_index = 0 
+    channel_index = 0
+
+    @property
+    def team_str(self):
+        return self.embed.fields[TrainEmbed.team_index].value
+    
+    @team_str.setter
+    def team_str(self, team_str):
+        self.embed.set_field_at(TrainEmbed.team_index, name="Team List", value=team_str)
     
     @classmethod
     async def from_train(cls, train: Train):

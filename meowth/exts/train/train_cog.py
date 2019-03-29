@@ -1,6 +1,7 @@
 from meowth import Cog, command, bot, checks
 from meowth.exts.map import Gym, ReportChannel, Mapper
 from meowth.exts.raid import Raid
+from meowth.exts.users import MeowthUser
 from meowth.utils import formatters, snowflake
 from meowth.utils.converters import ChannelMessage
 

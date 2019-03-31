@@ -150,32 +150,32 @@ def sanitize_channel_name(name):
 
 async def get_raid_help(prefix, avatar, user=None):
     helpembed = discord.Embed(colour=discord.Colour.lighter_grey())
-    helpembed.set_author(name="Raid Coordination Help", icon_url=avatar)
+    helpembed.set_author(name=_("Raid Coordination Help"), icon_url=avatar)
     helpembed.add_field(
-        name="Key",
-        value="<> denote required arguments, [] denote optional arguments",
+        name=_("Key"),
+        value=_("<> denote required arguments, [] denote optional arguments"),
         inline=False)
     helpembed.add_field(
-        name="Raid MGMT Commands",
+        name=_("Raid MGMT Commands"),
         value=(
-            f"`{prefix}raid <species>`\n"
-            f"`{prefix}weather <weather>`\n"
-            f"`{prefix}timerset <minutes>`\n"
-            f"`{prefix}starttime <time>`\n"
+            _("`{prefix}raid <species>`\n"
+            "`{prefix}weather <weather>`\n"
+            "`{prefix}timerset <minutes>`\n"
+            "`{prefix}starttime <time>`\n"
             "`<google maps link>`\n"
             "**RSVP**\n"
-            f"`{prefix}(i/c/h)...\n"
+            "`{prefix}(i/c/h)...\n"
             "[total]...\n"
             "[team counts]`\n"
             "**Lists**\n"
-            f"`{prefix}list [status]`\n"
-            f"`{prefix}list [status] tags`\n"
-            f"`{prefix}list teams`\n\n"
-            f"`{prefix}starting [team]`"))
+            "`{prefix}list [status]`\n"
+            "`{prefix}list [status] tags`\n"
+            "`{prefix}list teams`\n\n"
+            "`{prefix}starting [team]`").format(prefix=prefix)))
     helpembed.add_field(
-        name="Description",
+        name=_("Description"),
         value=(
-            "`Hatches Egg channel`\n"
+            _("`Hatches Egg channel`\n"
             "`Sets in-game weather`\n"
             "`Sets hatch/raid timer`\n"
             "`Sets start time`\n"
@@ -186,7 +186,7 @@ async def get_raid_help(prefix, avatar, user=None):
             "`Lists trainers by status`\n"
             "`@mentions trainers by status`\n"
             "`Lists trainers by team`\n\n"
-            "`Moves trainers on 'here' list to a lobby.`"))
+            "`Moves trainers on 'here' list to a lobby.`")))
     if not user:
         return helpembed
     await user.send(embed=helpembed)

@@ -1843,11 +1843,17 @@ class Train:
         query.where(train_id=self.id)
         await query.delete()
         if self.current_raid:
-            self.current_raid.channel_ids.remove(self.channel_id)
-            await self.current_raid.upsert()
-        del Train.by_channel[self.channel_id]
-        del Train.by_message[self.message_id]
-        del Train.instances[self.id]
+            try:
+                self.current_raid.channel_ids.remove(self.channel_id)
+                await self.current_raid.upsert()
+            except ValueError:
+                pass
+        try:
+            del Train.by_channel[self.channel_id]
+            del Train.by_message[self.message_id]
+            del Train.instances[self.id]
+        except KeyError:
+            pass
         await self.channel.delete()
         msg = await self.report_message()
         await msg.clear_reactions()

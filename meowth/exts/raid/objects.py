@@ -1637,6 +1637,8 @@ class Train:
         for rcrd in rsvp_data:
             trainer, party = data(rcrd)
             trainer_dict[trainer] = party
+        if not trainer_dict:
+            await self.end_train()
         return trainer_dict
 
     @staticmethod
@@ -1868,6 +1870,7 @@ class Train:
         multi_msg_ids = data.get('multi_msg_ids', [])
         message_id = data['message_id']
         train = cls(train_id, bot, guild_id, channel_id, report_channel_id)
+        train.trainer_dict = await train.get_trainer_dict()
         train.current_raid = Raid.instances.get(current_raid_id) if current_raid_id else None
         train.next_raid = Raid.instances.get(next_raid_id) if next_raid_id else None
         train.done_raids = [Raid.instances.get(x) for x in done_raid_ids]

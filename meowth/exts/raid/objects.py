@@ -1815,7 +1815,7 @@ class Train:
         elif status == 'cancel':
             status_str =' has left the train!'
         content = f'{member.display_name}{status_str}'
-        embed = RSVPEmbed.from_train(self).embed
+        embed = TRSVPEmbed.from_train(self).embed
         await channel.send(content, embed=embed)
         if not self.trainer_dict:
             await self.end_train()

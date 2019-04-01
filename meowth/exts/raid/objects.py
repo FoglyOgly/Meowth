@@ -652,10 +652,12 @@ class Raid:
         if user_id and status:
             if self.channel_ids:
                 for chnid in self.channel_ids:
+                    chn = self.bot.get_channel(int(chnid))
+                    if not chn:
+                        continue
                     rsvpembed = RSVPEmbed.from_raid(self).embed
                     guild = self.bot.get_guild(self.guild_id)
                     member = guild.get_member(user_id)
-                    chn = self.bot.get_channel(int(chnid))
                     if status == 'maybe':
                         display_status = 'is interested'
                     elif status == 'coming':
@@ -671,10 +673,12 @@ class Raid:
         elif user_id and group:
             if self.channel_ids:
                 for chnid in self.channel_ids:
+                    chn = self.bot.get_channel(int(chnid))
+                    if not chn:
+                        continue
                     rsvpembed = RSVPEmbed.from_raidgroup(self, group).embed
                     guild = self.bot.get_guild(self.guild_id)
                     member = guild.get_member(user_id)
-                    chn = self.bot.get_channel(int(chnid))
                     content = f"{member.display_name} has joined Group {group['emoji']}!"
                     newmsg = await chn.send(content, embed=rsvpembed)
         

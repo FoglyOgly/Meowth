@@ -710,7 +710,8 @@ class RaidCog(Cog):
         await new_train.upsert()
         Train.by_message[msg.id] = new_train
         meowthuser = MeowthUser(self.bot, ctx.author)
-        await self._join(meowthuser, new_train)
+        party = await meowthuser.party()
+        await self._join(meowthuser, new_train, party=party)
     
     @command()
     async def next(self, ctx):

@@ -28,7 +28,7 @@ class SilphCog(Cog):
                 if not boss['verified']:
                     verified = False
                 meowthid = silphid.upper().replace('-', '_')
-                forms = ['ALOLA', 'ATTACK', 'DEFENSE', 'SPEED', 'RAINY', 'SNOWY', 'SUNNY']
+                forms = ['ALOLA', 'ATTACK', 'DEFENSE', 'SPEED', 'RAINY', 'SNOWY', 'SUNNY', 'ALTERED', 'ORIGIN']
                 for form in forms:
                     if meowthid.endswith(form):
                         meowthid += "_FORM"

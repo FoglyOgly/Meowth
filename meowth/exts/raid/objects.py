@@ -1,6 +1,6 @@
 from meowth.exts.map import Gym, ReportChannel, Mapper, PartialPOI
 from meowth.exts.users import MeowthUser
-from meowth.exts.pokemon import Pokemon, Move
+from meowth.exts.pkmn import Pokemon, Move
 from meowth.exts.weather import Weather
 from meowth.utils import formatters, snowflake
 from meowth.utils.converters import ChannelMessage

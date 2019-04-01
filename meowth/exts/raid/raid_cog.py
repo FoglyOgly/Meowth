@@ -317,7 +317,7 @@ class RaidCog(Cog):
         report_channels = []
         report_channel = ReportChannel(ctx.bot, ctx.channel)
         train_ids = await report_channel.get_all_trains()
-        trains = [train.Train.instances.get(x) for x in train_ids]
+        trains = [Train.instances.get(x) for x in train_ids]
         if trains:
             train_content = "Use the reaction below to vote for this raid next!"
             for t in trains:

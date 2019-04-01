@@ -702,7 +702,7 @@ class RaidCog(Cog):
         new_train = Train(train_id, self.bot, ctx.guild.id, train_channel.id, ctx.channel.id)
         await new_train.select_first_raid(ctx.author)
         Train.by_channel[train_channel.id] = new_train
-        embed = await TrainEmbed.from_train(new_train)
+        embed = await new_train.train_embed()
         msg = await ctx.send(f"{ctx.author.display_name} has started a raid train! You can join by reacting to this message and coordinate in {train_channel.mention}!", embed=embed.embed)
         await msg.add_reaction('🚂')
         await msg.add_reaction('❌')

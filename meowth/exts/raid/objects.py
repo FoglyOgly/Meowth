@@ -623,7 +623,10 @@ class Raid:
             estimator_20 = None
         has_embed = False
         for idstring in self.message_ids:
-            chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+            try:
+                chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+            except:
+                continue
             if not has_embed:
                 if self.status == 'active':
                     raid_embed = RaidEmbed(msg.embeds[0])

@@ -53,7 +53,7 @@ class RaidCog(Cog):
         trainrsvp = ('train', self._trsvp)
         await self.bot.dbi.raid_listener.add_listener(*rsvp_listener)
         await self.bot.dbi.raid_listener.add_listener(*weather_listener)
-        await self.bot.dbi.train_listener.add_listener(*trainrsvp)
+        await self.bot.dbi.raid_listener.add_listener(*trainrsvp)
 
     
     async def pickup_raiddata(self):

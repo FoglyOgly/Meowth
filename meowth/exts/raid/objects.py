@@ -1833,6 +1833,9 @@ class Train:
         query = train_rsvp_table.query
         query.where(train_id=self.id)
         await query.delete()
+        if self.current_raid:
+            self.current_raid.channel_ids.remove(self.channel_id)
+            await self.current_raid.upsert()
         del Train.by_channel[self.channel_id]
         del Train.by_message[self.message_id]
         del Train.instances[self.id]

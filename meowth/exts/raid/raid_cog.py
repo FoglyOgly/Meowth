@@ -208,7 +208,7 @@ class RaidCog(Cog):
             hatch = None
         zone = await ctx.tz()
         raid_id = next(snowflake.create())
-        new_raid = Raid(raid_id, ctx.bot, ctx.guild.id, gym, level=level, pkmn=boss, hatch=hatch, end=end, tz=zone)
+        new_raid = Raid(raid_id, ctx.bot, ctx.guild.id, ctx.channel.id, gym, level=level, pkmn=boss, hatch=hatch, end=end, tz=zone)
         return await self.setup_raid(ctx, new_raid, want=want)
     
     @command(name='list')
@@ -391,7 +391,7 @@ class RaidCog(Cog):
     @raid_checks.raid_enabled()
     async def exraid(self, ctx, gym: Gym, *, hatch_time: hatch_converter):
         zone = await ctx.tz()
-        new_exraid = Raid(ctx.bot, ctx.guild.id, gym, level="EX", hatch=hatch_time, tz=zone)
+        new_exraid = Raid(ctx.bot, ctx.guild.id, ctx.channel.id, gym, level="EX", hatch=hatch_time, tz=zone)
         return await self.setup_raid(ctx, new_exraid)
 
     
@@ -690,6 +690,7 @@ class RaidCog(Cog):
         return await ctx.send("Counters update successful")
 
     @command()
+    @raid_checks.train_enabled()
     async def train(self, ctx):
         report_channel = ReportChannel(self.bot, ctx.channel)
         city = await report_channel.city()
@@ -700,13 +701,20 @@ class RaidCog(Cog):
         train_channel = await ctx.guild.create_text_channel(name, category=cat, overwrites=ow)
         train_id = next(snowflake.create())
         new_train = Train(train_id, self.bot, ctx.guild.id, train_channel.id, ctx.channel.id)
-        await new_train.select_first_raid(ctx.author)
+        if ctx.raid_id:
+            first_raid = Raid.instances.get(ctx.raid_id)
+            if first_raid:
+                await new_train.select_raid(first_raid)
+            else:
+                await new_train.select_first_raid(ctx.author)
+        else:
+            await new_train.select_first_raid(ctx.author)
         Train.by_channel[train_channel.id] = new_train
         embed = await new_train.train_embed()
         msg = await ctx.send(f"{ctx.author.display_name} has started a raid train! You can join by reacting to this message and coordinate in {train_channel.mention}!", embed=embed.embed)
         await msg.add_reaction('🚂')
         await msg.add_reaction('❌')
-        new_train.message_id = msg.id
+        new_train.message_ids.append(msg.id)
         await new_train.upsert()
         Train.by_message[msg.id] = new_train
         meowthuser = MeowthUser(self.bot, ctx.author)

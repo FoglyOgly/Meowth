@@ -64,11 +64,12 @@ class Raid:
         cls.instances[raid_id] = instance
         return instance
 
-    def __init__(self, raid_id, bot, guild_id, gym=None, level=None,
+    def __init__(self, raid_id, bot, guild_id, report_channel_id, gym=None, level=None,
         pkmn: RaidBoss=None, hatch: float=None, end: float=None, tz: str=None):
         self.id = raid_id
         self.bot = bot
         self.guild_id = guild_id
+        self.report_channel_id = report_channel_id
         self.gym = gym
         self.level = level
         self.pkmn = pkmn
@@ -105,6 +106,7 @@ class Raid:
             'id': self.id,
             'gym': gymid,
             'guild': self.guild_id,
+            'report_channel': self.report_channel_id
             'level': self.level,
             'pkmn': (self.pkmn.id, self.pkmn.quickMoveid or None, self.pkmn.chargeMoveid or None) if self.pkmn else (None, None, None),
             'hatch': self.hatch,
@@ -1388,6 +1390,7 @@ class Raid:
             gym = PartialPOI(bot, city, arg)
         level = data['level']
         guild_id = data['guild']
+        report_channel_id = data['report_channel']
         pkmnid, quick, charge = data.get('pkmn', (None, None, None))
         if pkmnid:
             pkmn = Pokemon(bot, pkmnid, quickMoveid=quick, chargeMoveid=charge)
@@ -1397,7 +1400,7 @@ class Raid:
         hatch = data.get('hatch')
         end = data['endtime']
         raid_id = data['id']
-        raid = cls(raid_id, bot, guild_id, gym, level=level, pkmn=boss, hatch=hatch, end=end)
+        raid = cls(raid_id, bot, guild_id, report_channel_id, gym, level=level, pkmn=boss, hatch=hatch, end=end)
         raid.channel_ids = data.get('channels')
         raid.message_ids = data.get('messages')
         raid.train_msgs = data.get('train_msgs')
@@ -1483,7 +1486,7 @@ class Train:
         self.done_raids = []
         self.report_msg_ids = []
         self.multi_msg_ids = []
-        self.message_id = None
+        self.message_ids = []
         self.trainer_dict = {}
     
     def to_dict(self):
@@ -1497,7 +1500,7 @@ class Train:
             'done_raid_ids': [x.id for x in self.done_raids],
             'report_msg_ids': self.report_msg_ids,
             'multi_msg_ids': self.multi_msg_ids,
-            'message_id': self.message_id
+            'message_ids': self.message_ids
         }
         return d
     
@@ -1527,12 +1530,14 @@ class Train:
     def channel(self):
         return self.bot.get_channel(self.channel_id)
     
-    async def report_message(self):
-        try:
-            msg = await self.report_channel.channel.get_message(self.message_id)
-            return msg
-        except:
-            return None
+    async def messages(self):
+        for msgid in self.message_ids:
+            try:
+                chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
+                if msg:
+                    yield msg
+            except:
+                continue
     
     @property
     def report_channel(self):
@@ -1587,6 +1592,17 @@ class Train:
         return [Raid.instances.get(x) for x in idlist]
     
     async def select_raid(self, raid):
+        train_embed = await self.train_embed()
+        content = "A raid train is coming to this raid! React to this message to join the train!"
+        for chanid in raid.channel_ids:
+            channel_id = int(chanid)
+            if not Train.by_channel.get(channel_id):
+                channel = self.bot.get_channel(channel_id)
+                msg = await channel.send(content, embed=train_embed)
+                self.message_ids.append(f'{channel.id}/{msg.id}')
+                await msg.add_reaction('🚂')
+                await msg.add_reaction('❌')
+                Train.by_message[msg.id] = self
         raid.channel_ids.append(str(self.channel_id))
         if raid.status == 'active':
             embed = await raid.raid_embed()
@@ -1621,7 +1637,11 @@ class Train:
                     await msg.delete()
                 except:
                     pass
-                raid.message_ids.remove(msgid)
+                try:
+                    raid.message_ids.remove(msgid)
+                    del Raid.by_message[msgid]
+                except:
+                    pass
         await raid.upsert()
         if not self.poll_task.done():
             self.poll_task.cancel()
@@ -1820,12 +1840,12 @@ class Train:
         
     async def update_rsvp(self, user_id, status):
         self.trainer_dict = await self.get_trainer_dict()
-        msg = await self.report_message()
-        if not msg:
-            return
-        train_embed = TrainEmbed(msg.embeds[0])
-        train_embed.team_str = self.team_str
-        await msg.edit(embed=train_embed.embed)
+        has_embed = False
+        async for msg in self.messages():
+            if not has_embed:
+                train_embed = TrainEmbed(msg.embeds[0])
+                train_embed.team_str = self.team_str
+            await msg.edit(embed=train_embed.embed)
         channel = self.channel
         guild = channel.guild
         member = guild.get_member(user_id)
@@ -1856,15 +1876,16 @@ class Train:
                 pass
         try:
             del Train.by_channel[self.channel_id]
-            del Train.by_message[self.message_id]
+            for msgid in self.message_ids:
+                del Train.by_message[msgid]
             del Train.instances[self.id]
         except KeyError:
             pass
         await self.channel.delete()
-        msg = await self.report_message()
-        await msg.clear_reactions()
-        embed = formatters.make_embed(content="This raid train has ended!")
-        await msg.edit(content="", embed=embed)
+        async for msg in self.messages():
+            await msg.clear_reactions()
+            embed = formatters.make_embed(content="This raid train has ended!")
+            await msg.edit(content="", embed=embed)
     
     async def train_embed(self):
         return await TrainEmbed.from_train(self)
@@ -1880,7 +1901,7 @@ class Train:
         done_raid_ids = data.get('done_raid_ids', [])
         report_msg_ids = data.get('report_msg_ids', [])
         multi_msg_ids = data.get('multi_msg_ids', [])
-        message_id = data['message_id']
+        message_ids = data['message_ids']
         train = cls(train_id, bot, guild_id, channel_id, report_channel_id)
         train.trainer_dict = await train.get_trainer_dict()
         train.current_raid = Raid.instances.get(current_raid_id) if current_raid_id else None
@@ -1888,9 +1909,10 @@ class Train:
         train.done_raids = [Raid.instances.get(x) for x in done_raid_ids]
         train.report_msg_ids = report_msg_ids
         train.multi_msg_ids = multi_msg_ids
-        train.message_id = message_id
+        train.message_ids = message_ids
         cls.by_channel[channel_id] = train
-        cls.by_message[message_id] = train
+        for msgid in message_ids:
+            cls.by_message[msgid] = train
         idstring = multi_msg_ids[-1]
         chn, multi = await ChannelMessage.from_id_string(bot, idstring)
         raids = await train.possible_raids()

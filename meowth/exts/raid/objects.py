@@ -106,7 +106,7 @@ class Raid:
             'id': self.id,
             'gym': gymid,
             'guild': self.guild_id,
-            'report_channel': self.report_channel_id
+            'report_channel': self.report_channel_id,
             'level': self.level,
             'pkmn': (self.pkmn.id, self.pkmn.quickMoveid or None, self.pkmn.chargeMoveid or None) if self.pkmn else (None, None, None),
             'hatch': self.hatch,

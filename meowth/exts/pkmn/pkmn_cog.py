@@ -497,7 +497,7 @@ class Pokemon():
             emoji = await move.emoji()
             charge_move_names.append(name+' '+emoji)
         charge_moves_str = "\n".join(charge_move_names)
-        embed_desc = f"```{description}```"
+        embed_desc = f"#{num} {pkmn_name} - {category}\n```{description}```"
         weather_str = await self.weather_str()
         # author_icon = type icon TODO
         fields = {
@@ -510,7 +510,7 @@ class Pokemon():
         }
         embed = formatters.make_embed(
             # icon = author_icon,
-            title=f"#{num} {pkmn_name} - {category}",
+            title="Pokedex Entry",
             content=embed_desc,
             # msg_colour = color,
             thumbnail = sprite_url,

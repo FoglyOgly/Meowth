@@ -476,6 +476,8 @@ class Pokemon():
         weaks = await self.weaknesses_emoji()
         resists = await self.resistances_emoji()
         pkmn_name = await self.name()
+        if await self._shiny_available():
+            pkmn_name += ":sparkles:"
         type_emoji = await self.type_emoji()
         sprite_url = await self.sprite_url()
         # color = await self.color()

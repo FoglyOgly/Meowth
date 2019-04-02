@@ -1599,7 +1599,7 @@ class Train:
             channel_id = int(chanid)
             if not Train.by_channel.get(channel_id):
                 channel = self.bot.get_channel(channel_id)
-                msg = await channel.send(content, embed=train_embed)
+                msg = await channel.send(content, embed=train_embed.embed)
                 self.message_ids.append(f'{channel.id}/{msg.id}')
                 await msg.add_reaction('🚂')
                 await msg.add_reaction('❌')

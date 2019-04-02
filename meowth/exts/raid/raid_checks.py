@@ -33,3 +33,16 @@ async def is_raid_channel(ctx):
 
 def raid_channel():
     return commands.check(is_raid_channel)
+
+async def is_train_enabled(ctx):
+    report_table = ctx.bot.dbi.table('report_channels')
+    query = report_table.query('train')
+    query.where(channelid=ctx.channel.id)
+    train = await query.get_value()
+    if not train:
+        return False
+    else:
+        return True
+
+def train_enabled():
+    return commands.check(is_train_enabled)

@@ -36,7 +36,13 @@ class RaidBoss(Pokemon):
         for level in self.bot.raid_info.raid_lists:
             if self.id in self.bot.raid_info.raid_lists[level]:
                 return level
-        
+
+    async def _shiny_available(self):
+        if not await super()._shiny_available():
+            return False
+        elif await super()._evolves_from():
+            return False
+        return True
     
     @classmethod
     async def convert(cls, ctx, arg):

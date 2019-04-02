@@ -41,12 +41,12 @@ class AdminCog(Cog):
             rcrd = dict(data[0])
         else:
             rcrd = {'channelid': channel_id}
-        possible_commands = ['raid', 'wild', 'research', 'users', 'raidparty', 'trade',
+        possible_commands = ['raid', 'wild', 'research', 'users', 'train', 'trade',
             'clean']
         features = [x for x in features if x in possible_commands]
         if not features:
-            return await ctx.send("The list of valid command groups to enable is `raid, wild, research, user, raidparty, trade, clean`.")
-        location_commands = ['raid', 'wild', 'research', 'raidparty']
+            return await ctx.send("The list of valid command groups to enable is `raid, train, wild, research, user, trade, clean`.")
+        location_commands = ['raid', 'wild', 'research', 'train']
         enabled_commands = []
         for x in features:
             if x in location_commands:
@@ -112,11 +112,11 @@ class AdminCog(Cog):
             rcrd = dict(data[0])
         else:
             rcrd = {'channelid': channel_id}
-        possible_commands = ['raid', 'wild', 'research', 'users', 'raidparty', 'trade',
+        possible_commands = ['raid', 'wild', 'research', 'users', 'train', 'trade',
             'clean']
         features = [x for x in features if x in possible_commands]
         if not features:
-            return await ctx.send("The list of valid command groups to disable is `raid, wild, research, user, raidparty, trade, clean`.")
+            return await ctx.send("The list of valid command groups to disable is `raid, wild, research, user, train, trade, clean`.")
         disabled_commands = []
         for x in features:
             rcrd[x] = False

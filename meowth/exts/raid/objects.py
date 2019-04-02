@@ -1592,6 +1592,7 @@ class Train:
         return [Raid.instances.get(x) for x in idlist]
     
     async def select_raid(self, raid):
+        self.current_raid = raid
         train_embed = await self.train_embed()
         content = "A raid train is coming to this raid! React to this message to join the train!"
         for chanid in raid.channel_ids:
@@ -1621,7 +1622,6 @@ class Train:
         await raid.upsert()
         Raid.by_message[idstring] = raid
         Raid.by_channel[str(self.channel_id)] = raid
-        self.current_raid = raid
         self.next_raid = None
         await self.upsert()
         self.bot.loop.create_task(self.poll_next_raid())

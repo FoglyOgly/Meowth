@@ -714,7 +714,7 @@ class RaidCog(Cog):
         msg = await ctx.send(f"{ctx.author.display_name} has started a raid train! You can join by reacting to this message and coordinate in {train_channel.mention}!", embed=embed.embed)
         await msg.add_reaction('🚂')
         await msg.add_reaction('❌')
-        new_train.message_ids.append(msg.id)
+        new_train.message_ids.append(f'{ctx.channel.id}/{msg.id}')
         await new_train.upsert()
         Train.by_message[msg.id] = new_train
         meowthuser = MeowthUser(self.bot, ctx.author)

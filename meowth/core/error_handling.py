@@ -19,7 +19,7 @@ async def delete_error(message, error):
     except (discord.errors.Forbidden, discord.errors.HTTPException):
         pass
 
-def missing_arg_msg(ctx):
+def missing_args(ctx):
     prefix = ctx.prefix.replace(ctx.bot.user.mention, '@' + ctx.bot.user.name)
     command = ctx.invoked_with
     callback = ctx.command.callback
@@ -38,17 +38,7 @@ def missing_arg_msg(ctx):
         sig.remove('self')
         arg_num = len(ctx.args) - 2
     args_missing = sig[arg_num:]
-    msg = ("Meowth! I'm missing some details! Usage: {prefix}{command}").format(prefix=prefix, command=command)
-    for a in sig:
-        if kwonlydefaults:
-            if a in kwonlydefaults.keys():
-                msg += ' [{0}]'.format(a)
-                continue
-        if a in args_missing:
-            msg += ' **<{0}>**'.format(a)
-        else:
-            msg += ' <{0}>'.format(a)
-    return msg
+    return args_missing
 
 class ErrorHandler(Cog):
 
@@ -58,7 +48,10 @@ class ErrorHandler(Cog):
         prefix = ctx.prefix.replace(ctx.bot.user.mention, '@' + ctx.bot.user.name)
 
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.error(title="Missing Required Arguments", details=missing_arg_msg(ctx))
+            fields = {
+                'Missing Arguments': "\n".join(missing_args(ctx))
+            }
+            await ctx.error(title="Error: Missing Required Arguments", fields=fields)
             def check(m):
                 return m.author == ctx.author
             reply = await ctx.bot.wait_for('message')

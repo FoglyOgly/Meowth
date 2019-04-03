@@ -34,6 +34,8 @@ def missing_arg_msg(ctx):
             rq_args.append(varargs)
     arg_num = len(ctx.args) - 1
     sig.remove('ctx')
+    if 'self' in sig:
+        sig.remove('self')
     args_missing = sig[arg_num:]
     msg = ("Meowth! I'm missing some details! Usage: {prefix}{command}").format(prefix=prefix, command=command)
     for a in sig:
@@ -55,7 +57,7 @@ class ErrorHandler(Cog):
         prefix = ctx.prefix.replace(ctx.bot.user.mention, '@' + ctx.bot.user.name)
 
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(missing_arg_msg(ctx))
+            await ctx.error(title="Missing Required Arguments", details=missing_arg_msg(ctx))
             def check(m):
                 return m.author == ctx.author
             reply = await ctx.bot.wait_for('message')

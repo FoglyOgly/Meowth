@@ -36,6 +36,7 @@ def missing_arg_msg(ctx):
     sig.remove('ctx')
     if 'self' in sig:
         sig.remove('self')
+        arg_num = len(ctx.args) - 2
     args_missing = sig[arg_num:]
     msg = ("Meowth! I'm missing some details! Usage: {prefix}{command}").format(prefix=prefix, command=command)
     for a in sig:

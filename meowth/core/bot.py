@@ -5,6 +5,7 @@ import sys
 import platform
 from collections import Counter
 from datetime import datetime
+from multiprocessing import Pool
 
 import asyncpg
 import aiohttp
@@ -78,6 +79,7 @@ class Bot(commands.AutoShardedBot):
         self.preload_ext = config.preload_extensions
         self.dbi = DatabaseInterface(**config.db_details)
         self.data = DataManager(self.dbi)
+        self.pool = Pool()
         kwargs = dict(owner_id=self.owner,
                       command_prefix=self.dbi.prefix_manager,
                       status=discord.Status.dnd, case_insensitive=True, 
@@ -266,7 +268,7 @@ class Bot(commands.AutoShardedBot):
     # events
     async def on_message(self, message):
         self.counter["messages_read"] += 1
-        await self.process_commands(message)
+        self.pool.apply_async(self.process_commands, message)
 
     async def on_resumed(self):
         self.counter["sessions_resumed"] += 1

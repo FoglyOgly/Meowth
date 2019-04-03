@@ -1093,6 +1093,8 @@ class Raid:
                     if not channel:
                         self.channel_ids.remove(chanid)
                         continue
+                    if Train.by_channel.get(channel.id):
+                        continue
                     channel_list.append(channel)
                     new_name = await self.channel_name()
                     if new_name != channel.name:
@@ -1589,7 +1591,8 @@ class Train:
     
     async def possible_raids(self):
         idlist = await self.report_channel.get_all_raids()
-        return [Raid.instances.get(x) for x in idlist]
+        raid_list = [Raid.instances.get(x) for x in idlist if Raid.instances.get(x)]
+        return raid_list
     
     async def select_raid(self, raid):
         self.current_raid = raid

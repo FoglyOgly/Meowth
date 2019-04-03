@@ -461,7 +461,6 @@ class Dev(Cog):
                         insert.row(*row)
                     else:
                         break
-        print(insert.sql(do_update=True))
         await insert.commit(do_update=True)
         await ctx.send('Table update successful.')
 

@@ -7,9 +7,6 @@ import aiohttp
 import discord
 from discord.ext.commands import CommandError
 
-class PokemonNotFound(CommandError):
-    'Exception raised, Pokemon not found'
-    pass
 
 class Pokemon():
 
@@ -34,6 +31,8 @@ class Pokemon():
             form = 6
         elif 'SPEED' in pokemonId:
             form = 7
+        elif 'ORIGIN' in pokemonId:
+            form = 53
         self.form = form
         self.gender = gender
         self.shiny = shiny
@@ -226,6 +225,13 @@ class Pokemon():
     async def _wild_available(self):
         data = self._data
         return await data.select('wild_available').get_value()
+    
+    def _raid_available(self):
+        raid_lists = self.bot.raid_info.raid_lists
+        for level in raid_lists:
+            if self.id in raid_lists[level]:
+                return True
+        return False
 
     async def _trade_available(self):
         data = self._data
@@ -679,7 +685,7 @@ class Pokemon():
             self.lvl = valid_level
 
     @classmethod
-    async def from_arg(cls, bot, chn, user_id, arg):
+    async def from_arg(cls, bot, command_name, chn, user_id, arg):
         pokemon = bot.dbi.table('pokemon')
         pokedex = bot.dbi.table('pokedex')
         form_names = bot.dbi.table('form_names')
@@ -774,6 +780,14 @@ class Pokemon():
             raise PokemonNotFound
         else:
             possible_mons = [(cls(bot, x)) for x in possible_ids]
+            if command_name == 'raid':
+                possible_mons = [x for x in possible_mons if x._raid_available()]
+            elif command_name == 'wild':
+                possible_mons = [x for x in possible_mons if x._wild_available()]
+            elif command_name == 'trade':
+                possible_mons = [x for x in possible_mons if x._trade_available()]
+            if len(possible_mons) == 0:
+                raise PokemonInvalidContext
             possible_names = [(await mon.name()) for mon in possible_mons]
             react_list = formatters.mc_emoji(length)
             choice_dict = dict(zip(react_list, possible_mons))
@@ -800,7 +814,7 @@ class Pokemon():
 
     @classmethod    
     async def convert(cls, ctx, arg):
-        return await cls.from_arg(ctx.bot, ctx.channel, ctx.author.id, arg)
+        return await cls.from_arg(ctx.bot, ctx.command.name, ctx.channel, ctx.author.id, arg)
 
 
 

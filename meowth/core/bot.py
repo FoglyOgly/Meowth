@@ -269,7 +269,7 @@ class Bot(commands.AutoShardedBot):
     async def on_message(self, message):
         self.counter["messages_read"] += 1
         task = self.loop.create_task(self.process_commands(message))
-        self.pool.apply(task)
+        self.pool.apply_async(task)
 
     async def on_resumed(self):
         self.counter["sessions_resumed"] += 1

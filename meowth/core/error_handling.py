@@ -55,8 +55,7 @@ class ErrorHandler(Cog):
         prefix = ctx.prefix.replace(ctx.bot.user.mention, '@' + ctx.bot.user.name)
 
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.bot.send_cmd_help(
-                ctx, title=f'Missing Arguments - {error}', msg_type='error')
+            await ctx.send(missing_arg_msg(ctx))
             def check(m):
                 return m.author == ctx.author
             reply = await ctx.bot.wait_for('message')

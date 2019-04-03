@@ -35,7 +35,7 @@ def missing_arg_msg(ctx):
     arg_num = len(ctx.args) - 1
     sig.remove('ctx')
     args_missing = sig[arg_num:]
-    msg = _("Meowth! I'm missing some details! Usage: {prefix}{command}").format(prefix=prefix, command=command)
+    msg = ("Meowth! I'm missing some details! Usage: {prefix}{command}").format(prefix=prefix, command=command)
     for a in sig:
         if kwonlydefaults:
             if a in kwonlydefaults.keys():

@@ -56,7 +56,12 @@ class ErrorHandler(Cog):
 
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.bot.send_cmd_help(
-                ctx, title='Missing Arguments', msg_type='error')
+                ctx, title=f'Missing Arguments - {error}', msg_type='error')
+            def check(m):
+                return m.author == ctx.author
+            reply = await ctx.bot.wait_for('message')
+            ctx.message.content += f' {reply.content}'
+            await ctx.bot.process_commands(ctx.message)
 
         elif isinstance(error, commands.BadArgument):
             await ctx.bot.send_cmd_help(

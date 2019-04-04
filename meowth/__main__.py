@@ -28,7 +28,7 @@ if discord.version_info.major < 1:
           "correctly. Please install the correct version.")
     sys.exit(1)
 
-def run_bot(shard_id=0, shard_count=1, debug=False, launcher=None, from_restart=False):
+def run_bot(debug=False, launcher=None, from_restart=False):
     """Sets up the bot, runs it and handles exit codes."""
 
     # create async loop and setup contextvar
@@ -39,8 +39,7 @@ def run_bot(shard_id=0, shard_count=1, debug=False, launcher=None, from_restart=
     description = "Meowth v3 - Beta"
     bot = Bot(
         description=description, launcher=launcher,
-        debug=debug, from_restart=from_restart,
-        shard_count=shard_count, shard_id=shard_id)
+        debug=debug, from_restart=from_restart)
 
     # setup logging
     bot.logger = logger.init_logger(bot, debug)
@@ -88,14 +87,8 @@ def parse_cli_args():
     return parser.parse_args()
 
 def main():
-    cores = os.cpu_count()
-    args = parse_cli_args()
-    func = partial(run_bot, debug=args.debug, launcher=args.launcher, 
+    run_bot(debug=args.debug, launcher=args.launcher, 
         from_restart=args.fromrestart, shard_count=cores)
-    p = Pool(cores)
-    r = p.imap_unordered(func, range(cores))
-    for i in r:
-        print(i)
 
 
 if __name__ == '__main__':

@@ -21,7 +21,7 @@ from meowth.core.data_manager import DatabaseInterface, DataManager
 from meowth.utils import ExitCodes, fuzzymatch, make_embed, pagination
 
 
-class Bot(commands.Bot):
+class Bot(commands.AutoShardedBot):
     """Represents the bot.
 
     Bases: :class:`discord.ext.commands.Bot`.
@@ -34,10 +34,6 @@ class Bot(commands.Bot):
         Flag indicating if the bot was started via launcher.
     debug: :class:`bool`
         Flag indicating if the bot was started in debug mode via CLI arg.
-    shard_count: :class:`int`
-        Total number of shards.
-    shard_id: :class:`int`
-        Shard ID of the current process.
 
     Attributes
     -----------
@@ -286,7 +282,6 @@ class Bot(commands.Bot):
         print(f'Shard {shard_id} is ready.')
 
     async def on_ready(self):
-        await self.change_presence(status=discord.Status.online)
         intro = "Meowth - Discord bot for Pokemon Go Communities"
         intro_deco = "{0}\n{1}\n{0}".format('='*len(intro), intro)
         if not self.launch_time:

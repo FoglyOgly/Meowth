@@ -5,6 +5,7 @@ from inspect import signature, getfullargspec
 
 import discord
 from discord.ext import commands
+from discord.ext.commands.view import StringView
 
 from meowth import errors
 from meowth.core.context import Context
@@ -58,7 +59,8 @@ class ErrorHandler(Cog):
             reply = await ctx.bot.wait_for('message')
             await asyncio.sleep(1)
             ctx.message.content += f' {reply.content}'
-            await ctx.bot.process_commands(ctx.message)
+            ctx.view = StringView(ctx.message.context)
+            await ctx.invoke(ctx.command, *ctx.args, **ctx.kwargs)
 
         elif isinstance(error, commands.BadArgument):
             await ctx.bot.send_cmd_help(

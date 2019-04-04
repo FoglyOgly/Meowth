@@ -62,7 +62,7 @@ class ErrorHandler(Cog):
             print(ctx.args)
             print(ctx.kwargs)
             ctx.view = StringView(ctx.message.content)
-            ctx.view.index = 1
+            ctx.view.get_word()
             try:
                 await ctx.command.invoke(ctx)
             except errors.CommandError as exc:

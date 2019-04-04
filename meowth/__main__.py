@@ -34,6 +34,7 @@ def run_bot(debug=False, launcher=None, from_restart=False, shard_count=1, shard
     # create async loop and setup contextvar
     loop = asyncio.get_event_loop()
     context.ctx_setup(loop)
+    print(5)
 
     # create bot instance
     description = "Meowth v3 - Beta"
@@ -42,6 +43,7 @@ def run_bot(debug=False, launcher=None, from_restart=False, shard_count=1, shard
         debug=debug, from_restart=from_restart,
         shard_count=shard_count, shard_id=shard_id)
 
+    print(6)
     # setup logging
     bot.logger = logger.init_logger(bot, debug)
 
@@ -50,17 +52,18 @@ def run_bot(debug=False, launcher=None, from_restart=False, shard_count=1, shard
     bot.load_extension('meowth.core.commands')
     bot.load_extension('meowth.core.cog_manager')
 
+    print(7)
     # load extensions marked for preload in config
     for ext in bot.preload_ext:
         ext_name = ("meowth.exts."+ext)
         bot.load_extension(ext_name)
 
+    print(8)
     if bot.token is None or not bot.default_prefix:
         bot.logger.critical(
             "Token and prefix must be set in order to login.")
         sys.exit(1)
     try:
-        print(0)
         loop.run_until_complete(bot.start(bot.token))
     except discord.LoginFailure:
         bot.logger.critical("Invalid token")
@@ -89,12 +92,17 @@ def parse_cli_args():
     return parser.parse_args()
 
 def main():
+    print(0)
     cores = os.cpu_count()
     args = parse_cli_args()
+    print(1)
     func = partial(run_bot, debug=args.debug, launcher=args.launcher, 
         from_restart=args.fromrestart, shard_count=cores)
+    print(2)
     p = Pool(cores)
+    print(3)
     p.imap_unordered(func, range(cores))
+    print(4)
 
 if __name__ == '__main__':
     main()

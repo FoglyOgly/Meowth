@@ -286,6 +286,7 @@ class Bot(commands.Bot):
         print(f'Shard {shard_id} is ready.')
 
     async def on_ready(self):
+        await self.change_presence(status=discord.Status.online)
         intro = "Meowth - Discord bot for Pokemon Go Communities"
         intro_deco = "{0}\n{1}\n{0}".format('='*len(intro), intro)
         if not self.launch_time:

@@ -5,7 +5,6 @@ import sys
 import platform
 from collections import Counter
 from datetime import datetime
-from multiprocessing import Pool
 
 import asyncpg
 import aiohttp
@@ -22,14 +21,10 @@ from meowth.core.data_manager import DatabaseInterface, DataManager
 from meowth.utils import ExitCodes, fuzzymatch, make_embed, pagination
 
 
-class Bot(commands.AutoShardedBot):
+class Bot(commands.Bot):
     """Represents the bot.
 
-    Bases: :class:`discord.ext.commands.AutoShardedBot`.
-
-    The ``AutoShardedBot`` subclass provides the benefits of
-    :class:`discord.ext.commands.Bot` while handling the complications
-    of sharding.
+    Bases: :class:`discord.ext.commands.Bot`.
 
     Parameters
     -----------
@@ -39,6 +34,10 @@ class Bot(commands.AutoShardedBot):
         Flag indicating if the bot was started via launcher.
     debug: :class:`bool`
         Flag indicating if the bot was started in debug mode via CLI arg.
+    shard_count: :class:`int`
+        Total number of shards.
+    shard_id: :class:`int`
+        Shard ID of the current process.
 
     Attributes
     -----------
@@ -79,7 +78,6 @@ class Bot(commands.AutoShardedBot):
         self.preload_ext = config.preload_extensions
         self.dbi = DatabaseInterface(**config.db_details)
         self.data = DataManager(self.dbi)
-        self.pool = Pool()
         kwargs = dict(owner_id=self.owner,
                       command_prefix=self.dbi.prefix_manager,
                       status=discord.Status.dnd, case_insensitive=True, 
@@ -268,8 +266,7 @@ class Bot(commands.AutoShardedBot):
     # events
     async def on_message(self, message):
         self.counter["messages_read"] += 1
-        task = self.loop.create_task(self.process_commands(message))
-        self.pool.apply_async(task)
+        await self.process_commands(message)
 
     async def on_resumed(self):
         self.counter["sessions_resumed"] += 1

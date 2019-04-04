@@ -13,6 +13,9 @@ Options:
 import argparse
 import asyncio
 import sys
+import os
+from multiprocessing import Pool
+from functools import partial
 
 import discord
 
@@ -25,7 +28,7 @@ if discord.version_info.major < 1:
           "correctly. Please install the correct version.")
     sys.exit(1)
 
-def run_bot(debug=False, launcher=None, from_restart=False):
+def run_bot(debug=False, launcher=None, from_restart=False, shard_count=1, shard_id=0):
     """Sets up the bot, runs it and handles exit codes."""
 
     # create async loop and setup contextvar
@@ -36,7 +39,8 @@ def run_bot(debug=False, launcher=None, from_restart=False):
     description = "Meowth v3 - Beta"
     bot = Bot(
         description=description, launcher=launcher,
-        debug=debug, from_restart=from_restart)
+        debug=debug, from_restart=from_restart,
+        shard_count=shard_count, shard_id=shard_id)
 
     # setup logging
     bot.logger = logger.init_logger(bot, debug)
@@ -84,8 +88,12 @@ def parse_cli_args():
     return parser.parse_args()
 
 def main():
+    cores = os.cpu_count()
     args = parse_cli_args()
-    run_bot(debug=args.debug, launcher=args.launcher, from_restart=args.fromrestart)
+    func = partial(run_bot, debug=args.debug, launcher=args.launcher, 
+        from_restart=args.fromrestart, shard_count=cores)
+    with Pool(processes=cores) as p:
+        p.imap_unordered(func, range(cores))
 
 if __name__ == '__main__':
     main()

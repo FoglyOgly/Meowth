@@ -817,8 +817,6 @@ class Insert:
         if not do_update is None and not self._primaries:
             self._primaries = await self._from.columns.get_primaries()
         sql, data = self.sql(do_update)
-        print(sql)
-        print(data)
         return await self._dbi.execute_transaction(sql, *data)
 
     def set_columns(self, *columns):

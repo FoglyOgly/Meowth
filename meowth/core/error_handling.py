@@ -7,6 +7,7 @@ import discord
 from discord.ext import commands
 
 from meowth import errors
+from meowth.core.context import Context
 from .cog_base import Cog
 
 async def delete_error(message, error):
@@ -56,7 +57,8 @@ class ErrorHandler(Cog):
                 return m.author == ctx.author
             reply = await ctx.bot.wait_for('message')
             ctx.message.content += f' {reply.content}'
-            await ctx.bot.invoke(ctx)
+            ctx = await ctx.bot.get_context(ctx.message, cls=Context)
+            await ctx.invoke(*ctx.args, **ctx.kwargs)
 
         elif isinstance(error, commands.BadArgument):
             await ctx.bot.send_cmd_help(

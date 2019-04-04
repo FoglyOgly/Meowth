@@ -101,7 +101,7 @@ def main():
     print(2)
     p = Pool(cores)
     print(3)
-    r = p.imap_unordered(func, range(cores))
+    r = p.imap_unordered(func, shard_id=range(cores))
     for i in r:
         print(i)
     print(4)

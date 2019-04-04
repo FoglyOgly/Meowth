@@ -102,7 +102,8 @@ def main():
     p = Pool(cores)
     print(3)
     r = p.imap_unordered(func, range(cores))
-    print(r)
+    for i in r:
+        print(i)
     print(4)
 
 if __name__ == '__main__':

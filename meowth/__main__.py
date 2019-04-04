@@ -92,8 +92,8 @@ def main():
     args = parse_cli_args()
     func = partial(run_bot, debug=args.debug, launcher=args.launcher, 
         from_restart=args.fromrestart, shard_count=cores)
-    with Pool(cores) as p:
-        p.imap_unordered(func, range(cores))
+    p = Pool(cores)
+    p.imap_unordered(func, range(cores))
 
 if __name__ == '__main__':
     main()

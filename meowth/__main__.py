@@ -87,6 +87,7 @@ def parse_cli_args():
     return parser.parse_args()
 
 def main():
+    args = parse_cli_args()
     run_bot(debug=args.debug, launcher=args.launcher, 
         from_restart=args.fromrestart, shard_count=cores)
 

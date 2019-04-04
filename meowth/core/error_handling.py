@@ -56,8 +56,9 @@ class ErrorHandler(Cog):
             def check(m):
                 return m.author == ctx.author
             reply = await ctx.bot.wait_for('message')
+            await asyncio.sleep(1)
             ctx.message.content += f' {reply.content}'
-            await ctx.invoke(ctx.command)
+            await ctx.bot.process_commands(ctx.message)
 
         elif isinstance(error, commands.BadArgument):
             await ctx.bot.send_cmd_help(

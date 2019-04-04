@@ -60,6 +60,7 @@ def run_bot(debug=False, launcher=None, from_restart=False, shard_count=1, shard
             "Token and prefix must be set in order to login.")
         sys.exit(1)
     try:
+        print(0)
         loop.run_until_complete(bot.start(bot.token))
     except discord.LoginFailure:
         bot.logger.critical("Invalid token")

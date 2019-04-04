@@ -57,7 +57,7 @@ class ErrorHandler(Cog):
                 return m.author == ctx.author
             reply = await ctx.bot.wait_for('message')
             ctx.message.content += f' {reply.content}'
-            ctx.bot.loop.call_soon(ctx.bot.process_commands,ctx.message)
+            ctx.bot.loop.create_task(ctx.bot.process_commands(ctx.message))
 
         elif isinstance(error, commands.BadArgument):
             await ctx.bot.send_cmd_help(

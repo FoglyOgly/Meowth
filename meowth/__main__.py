@@ -28,7 +28,7 @@ if discord.version_info.major < 1:
           "correctly. Please install the correct version.")
     sys.exit(1)
 
-def run_bot(debug=False, launcher=None, from_restart=False, shard_count=1, shard_id=0):
+def run_bot(shard_id=0, shard_count=1, debug=False, launcher=None, from_restart=False):
     """Sets up the bot, runs it and handles exit codes."""
 
     # create async loop and setup contextvar
@@ -101,10 +101,8 @@ def main():
     print(2)
     p = Pool(cores)
     print(3)
-    r = p.imap_unordered(func, shard_id=range(cores))
-    for i in r:
-        print(i)
-    print(4)
+    r = p.imap_unordered(func, range(cores))
+
 
 if __name__ == '__main__':
     main()

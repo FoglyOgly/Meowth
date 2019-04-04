@@ -62,7 +62,12 @@ class ErrorHandler(Cog):
             print(ctx.args)
             print(ctx.kwargs)
             ctx.view = StringView(ctx.message.content)
-            await ctx.command.invoke(ctx)
+            try:
+                await ctx.command.invoke(ctx)
+            except errors.CommandError as exc:
+                await ctx.command.dispatch_error(ctx, exc)
+            else:
+                ctx.bot.dispatch('command_completion', ctx)
 
         elif isinstance(error, commands.BadArgument):
             await ctx.bot.send_cmd_help(

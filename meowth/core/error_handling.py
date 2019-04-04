@@ -59,7 +59,11 @@ class ErrorHandler(Cog):
             reply = await ctx.bot.wait_for('message')
             await asyncio.sleep(1)
             ctx.message.content += f' {reply.content}'
+            print(ctx.args)
+            print(ctx.kwargs)
             ctx.view = StringView(ctx.message.content)
+            print(ctx.args)
+            print(ctx.kwargs)
             await ctx.invoke(ctx.command, *ctx.args, **ctx.kwargs)
 
         elif isinstance(error, commands.BadArgument):

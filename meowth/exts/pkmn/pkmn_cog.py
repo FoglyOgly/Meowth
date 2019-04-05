@@ -777,15 +777,16 @@ class Pokemon():
         if length == 0:
             raise PokemonNotFound
         else:
-            possible_mons = [(cls(bot, x)) for x in possible_ids]
+            mons = [(cls(bot, x)) for x in possible_ids]
             if command_name == 'raid':
-                possible_mons = [x for x in possible_mons if x._raid_available()]
+                possible_mons = [x for x in mons if x._raid_available()]
             elif command_name == 'wild':
-                possible_mons = [x for x in possible_mons if await x._wild_available()]
+                possible_mons = [x for x in mons if await x._wild_available()]
             elif command_name == 'trade':
-                possible_mons = [x for x in possible_mons if await x._trade_available()]
+                possible_mons = [x for x in mons if await x._trade_available()]
+            impossible_mons = [x for x in mons if x not in possible_mons]
             if len(possible_mons) == 0:
-                raise PokemonInvalidContext
+                raise PokemonInvalidContext([impossible_mons])
             elif len(possible_mons) == 1:
                 pkmn = possible_mons[0]
             else:
@@ -955,7 +956,9 @@ class Pokedex(Cog):
         elif isinstance(error, MoveNotFound):
             await ctx.error('Move not found!')
         elif isinstance(error, PokemonInvalidContext):
-            await ctx.error('Pokemon invalid in current context.')
+            invalid_names = [await x.name() for x in error.invalid_mons]
+            await ctx.error(f'Pokemon invalid for {ctx.prefix}{ctx.invoked_with}',
+                fields={"Invalid Pokemon": "\n".join(invalid_names)})
         elif isinstance(error, MoveInvalid):
             await ctx.error('Move not learned by Pokemon.')
 

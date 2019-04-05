@@ -4,7 +4,7 @@ from meowth.exts.pkmn import Pokemon, Move
 from meowth.exts.weather import Weather
 from meowth.utils import formatters, snowflake
 from meowth.utils.converters import ChannelMessage
-from .errors import *
+from .errors import * 
 
 import asyncio
 import aiohttp

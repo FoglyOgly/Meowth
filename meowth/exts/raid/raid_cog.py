@@ -1,6 +1,7 @@
 from meowth import Cog, command, bot, checks
 from meowth.exts.map import Gym, ReportChannel, PartialPOI, S2_L10
 from meowth.exts.pkmn import Pokemon, Move
+from meowth.exts.pkmn.errors import MoveInvalid
 from meowth.exts.weather import Weather
 from meowth.exts.want import Want
 from meowth.exts.users import MeowthUser
@@ -111,11 +112,11 @@ class RaidCog(Cog):
         elif isinstance(error, InvalidTime):
             await ctx.error(f'Invalid time for {ctx.prefix}{ctx.invoked_with}')
         elif isinstance(error, GroupTooBig):
-            await ctx.error('Group too big for raid.')
+            await ctx.error('This group is too big for the raid!')
         elif isinstance(error, NotRaidChannel):
-            await ctx.error('Current channel is not a raid channel.')
+            await ctx.error(f'{ctx.prefix}{ctx.invoked_with} must be used in a Raid Channel!')
         elif isinstance(error, NotTrainChannel):
-            await ctx.error('Current channel is not a train channel.')
+            await ctx.error(f'{ctx.prefix}{ctx.invoked_with} must be used in a Train Channel!')
         elif isinstance(error, RaidNotActive):
             await ctx.error(f'Raid must be active to use {ctx.prefix}{ctx.invoked_with}')
         
@@ -581,7 +582,16 @@ class RaidCog(Cog):
             raise NotRaidChannel
         if raid.status != 'active':
             raise RaidNotActive
-        return await raid.set_moveset(move1, move2=move2)
+        if not move2:
+            return await raid.set_moveset(move1, move2=move2)
+        try:
+            return await raid.set_moveset(move1, move2=move2)
+        except MoveInvalid as e:
+            if e.move == move2.id:
+                move = await move2.name()
+                pokemon = await raid.pkmn.name()
+                await ctx.warning(f'{pokemon} does not learn {move}.')
+                return await raid.set_moveset(move1)
     
     @command(aliases=['timer'])
     @raid_checks.raid_channel()

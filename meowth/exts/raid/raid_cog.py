@@ -171,6 +171,7 @@ class RaidCog(Cog):
 
     @command(aliases=['r'])
     @raid_checks.raid_enabled()
+    @raid_checks.bot_has_permissions()
     async def raid(self, ctx, level_or_boss, *, gym_and_time):
         gym_split = gym_and_time.split()
         if gym_split[-1].isdigit():
@@ -719,7 +720,10 @@ class RaidCog(Cog):
         name = f'{city}-raid-train'
         cat = ctx.channel.category
         ow = dict(ctx.channel.overwrites)
-        train_channel = await ctx.guild.create_text_channel(name, category=cat, overwrites=ow)
+        try:
+            train_channel = await ctx.guild.create_text_channel(name, category=cat, overwrites=ow)
+        except discord.Forbidden:
+            raise commands.BotMissingPermissions(['Manage Channels'])
         train_id = next(snowflake.create())
         new_train = Train(train_id, self.bot, ctx.guild.id, train_channel.id, ctx.channel.id)
         if ctx.raid_id:

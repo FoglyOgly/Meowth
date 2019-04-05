@@ -16,6 +16,10 @@ class MoveNotFound(CommandError):
 
 class MoveInvalid(CommandError):
     'Exception raised, move not learned by Pokemon'
+
+    def __init__(self, pokemon, move):
+        self.pokemon = pokemon
+        self.move = move
     pass
 
 

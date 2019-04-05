@@ -577,13 +577,16 @@ class Pokemon():
         if self.quickMoveid:
             quick_moves = await self.fast_moves()
             if self.quickMoveid not in quick_moves:
+                raise MoveInvalid(self, self.quickMoveid)
                 self.quickMoveid = None
         if self.chargeMoveid:
             charge_moves = await self.charge_moves()
             if self.chargeMoveid not in charge_moves:
+                raise MoveInvalid(self, self.chargeMoveid)
                 self.chargeMoveid = None
         if self.chargeMove2id:
             if self.chargeMove2id not in charge_moves:
+                raise MoveInvalid(self, self.chargeMove2id)
                 self.chargeMove2id = None
             elif not self.chargeMoveid:
                 self.chargeMoveid = self.chargeMove2id
@@ -960,7 +963,10 @@ class Pokedex(Cog):
             await ctx.error(f'Pokemon invalid for {ctx.prefix}{ctx.invoked_with}',
                 fields={"Invalid Pokemon": "\n".join(invalid_names)})
         elif isinstance(error, MoveInvalid):
-            await ctx.error('Move not learned by Pokemon.')
+            move = Move(self.bot, error.move)
+            move_name = await move.name()
+            pokemon_name = await error.pokemon.name()
+            await ctx.error(f'{pokemon_name} does not learn {move_name}.')
 
     @command()
     async def pokedex(self, ctx, *, pokemon: Pokemon):

@@ -532,9 +532,9 @@ class RaidCog(Cog):
         if grptime.isdigit():
             stamp = time.time() + int(grptime)*60
             if stamp > raid.end:
-                raise
+                raise InvalidTime
             elif raid.hatch and stamp < raid.hatch:
-                raise
+                raise InvalidTime
             d = {
                 'raid_id': raid.id,
                 'emoji': emoji,
@@ -579,14 +579,6 @@ class RaidCog(Cog):
             return
         if raid.status != 'active':
             return
-        boss = raid.pkmn
-        moves = await boss.moves()
-        bad_move = (move1 if move1.id not in moves else False) or \
-            (move2 if move2 and move2.id not in moves else False)
-        if bad_move:
-            boss_name = await boss.name()
-            move_name = await bad_move.name()
-            return await ctx.send(f'{boss_name} can not use {move_name}!')
         return await raid.set_moveset(move1, move2=move2)
     
     @command(aliases=['timer'])

@@ -966,7 +966,9 @@ class Pokedex(Cog):
             await ctx.error(f'Pokemon invalid for {ctx.prefix}{ctx.invoked_with}',
                 fields={"Invalid Pokemon": "\n".join(invalid_names)})
         elif isinstance(error, MoveInvalid):
+            print(error.move)
             move = Move(self.bot, error.move)
+            print(move)
             move_name = await move.name()
             pokemon_name = await error.pokemon.name()
             await ctx.error(f'{pokemon_name} does not learn {move_name}.')

@@ -577,17 +577,20 @@ class Pokemon():
         if self.quickMoveid:
             quick_moves = await self.fast_moves()
             if self.quickMoveid not in quick_moves:
-                raise MoveInvalid(self, self.quickMoveid)
+                bad_move = self.quickMoveid
                 self.quickMoveid = None
+                raise MoveInvalid(self, self.quickMoveid)
         if self.chargeMoveid:
             charge_moves = await self.charge_moves()
             if self.chargeMoveid not in charge_moves:
-                raise MoveInvalid(self, self.chargeMoveid)
+                bad_move = self.chargeMoveid
                 self.chargeMoveid = None
+                raise MoveInvalid(self, self.chargeMoveid)
         if self.chargeMove2id:
             if self.chargeMove2id not in charge_moves:
-                raise MoveInvalid(self, self.chargeMove2id)
+                bad_move = self.chargeMove2id
                 self.chargeMove2id = None
+                raise MoveInvalid(self, self.chargeMove2id)
             elif not self.chargeMoveid:
                 self.chargeMoveid = self.chargeMove2id
                 self.chargeMove2id = None

@@ -109,13 +109,15 @@ class RaidCog(Cog):
         elif isinstance(error, TrainDisabled):
             await ctx.error('Train command disabled in current channel.')
         elif isinstance(error, InvalidTime):
-            await ctx.error('Invalid time for raid.')
+            await ctx.error(f'Invalid time for {ctx.prefix}{ctx.invoked_with}')
         elif isinstance(error, GroupTooBig):
             await ctx.error('Group too big for raid.')
         elif isinstance(error, NotRaidChannel):
             await ctx.error('Current channel is not a raid channel.')
         elif isinstance(error, NotTrainChannel):
             await ctx.error('Current channel is not a train channel.')
+        elif isinstance(error, RaidNotActive):
+            await ctx.error(f'Raid must be active to use {ctx.prefix}{ctx.invoked_with}')
         
 
 
@@ -511,7 +513,7 @@ class RaidCog(Cog):
         if not raid:
             return
         if raid.status != 'active':
-            raise
+            raise RaidNotActive
         meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
         embed = await self.counters_embed(meowthuser)
         if not embed:
@@ -524,7 +526,7 @@ class RaidCog(Cog):
     async def group(self, ctx, grptime):
         raid = Raid.by_channel.get(str(ctx.channel.id))
         if not raid:
-            return
+            raise NotRaidChannel
         group_table = ctx.bot.dbi.table('raid_groups')
         insert = group_table.insert()
         i = len(raid.group_list)
@@ -557,7 +559,7 @@ class RaidCog(Cog):
         if not raid:
             return
         if raid.status != 'active':
-            raise
+            raise RaidNotActive
         grp = raid.user_grp(ctx.author.id)
         if not grp:
             grp = raid.here_grp
@@ -576,9 +578,9 @@ class RaidCog(Cog):
     async def moveset(self, ctx, move1: Move, move2: Move=None):
         raid = Raid.by_channel.get(str(ctx.channel.id))
         if not raid:
-            return
+            raise NotRaidChannel
         if raid.status != 'active':
-            return
+            raise RaidNotActive
         return await raid.set_moveset(move1, move2=move2)
     
     @command(aliases=['timer'])

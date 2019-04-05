@@ -231,7 +231,7 @@ class WildCog(Cog):
     @wild_checks.wild_enabled()
     async def wild(self, ctx, pkmn: Pokemon, *, location: POI):
         if not await pkmn._wild_available():
-            raise
+            raise 
         weather = await location.weather()
         if weather == 'NO_WEATHER':
             weather = None

@@ -24,5 +24,9 @@ class NotTrainChannel(CommandError):
     'Exception raised, not train channel'
     pass
 
+class RaidNotActive(CommandError):
+    'Exception raised, raid not active'
+    pass
+
 
 

@@ -4,6 +4,7 @@ from meowth.exts.pkmn import Pokemon, Move
 from meowth.exts.weather import Weather
 from meowth.utils import formatters, snowflake
 from meowth.utils.converters import ChannelMessage
+from .errors import *
 
 import asyncio
 import aiohttp
@@ -196,7 +197,7 @@ class Raid:
                 self.hatch = new_time
                 self.end = new_time + max_active*60
             else:
-                raise
+                raise InvalidTime
         else:
             if not self.hatch:
                 max_hatch = 0
@@ -204,7 +205,7 @@ class Raid:
             if new_time < max_stamp:
                 self.end = new_time
             else:
-                raise
+                raise InvalidTime
         raid_table = self.bot.dbi.table('raids')
         update = raid_table.update()
         update.where(id=self.id)
@@ -449,6 +450,8 @@ class Raid:
             if channel:
                 return await channel.send('Please wait until your whole group is here!')
         else:
+            if self.grp_total(grp) > 20:
+                raise GroupTooBig
             if not channel:
                 for user in grp['users']:
                     meowthuser = MeowthUser.from_id(self.bot, user)
@@ -1317,6 +1320,13 @@ class Raid:
             status = trainer_dict[trainer]['status']
             d[status] += total
         return d
+    
+    def grp_total(self, group):
+        total = 0
+        trainer_dict = self.trainer_dict
+        for trainer in group['users']:
+            total += sum(trainer_dict[trainer]['party'])
+        return total
     
     def grp_status_str(self, group):
         status_dict = self.grp_status_dict(group)

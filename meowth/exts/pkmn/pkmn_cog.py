@@ -786,7 +786,7 @@ class Pokemon():
                 possible_mons = [x for x in mons if await x._trade_available()]
             impossible_mons = [x for x in mons if x not in possible_mons]
             if len(possible_mons) == 0:
-                raise PokemonInvalidContext([impossible_mons])
+                raise PokemonInvalidContext(impossible_mons)
             elif len(possible_mons) == 1:
                 pkmn = possible_mons[0]
             else:

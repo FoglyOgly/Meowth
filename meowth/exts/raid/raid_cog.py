@@ -380,7 +380,7 @@ class RaidCog(Cog):
                 raid_channel = await ctx.guild.create_text_channel(raid_channel_name,
                     category=category, overwrites=raid_channel_overwrites)
             except discord.Forbidden:
-                raise commands.BotMissingPermissions
+                raise commands.BotMissingPermissions(['Manage Channels'])
             new_raid.channel_ids.append(str(raid_channel.id))
             raidmsg = await raid_channel.send(reportcontent, embed=embed)
             for react in react_list:

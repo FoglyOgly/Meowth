@@ -8,6 +8,7 @@ from meowth.utils import formatters, snowflake
 from meowth.utils.converters import ChannelMessage
 from . import raid_info
 from . import raid_checks
+from .errors import *
 from .objects import Raid, RaidBoss, Train
 
 from math import ceil

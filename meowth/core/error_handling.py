@@ -96,10 +96,12 @@ class ErrorHandler(Cog):
             await ctx.send(message)
         
         elif isinstance(error, commands.MissingPermissions):
-            await ctx.error(fields={"User Missing Permissions": "\n".join(error.missing_perms)})
+            await ctx.error("User Missing Required Permissions",
+                fields={"Missing": "\n".join(error.missing_perms)})
         
         elif isinstance(error, commands.BotMissingPermissions):
-            await ctx.error(fields={"Bot Missing Permissions": "\n".join(error.missing_perms)})
+            await ctx.error("Bot Missing Required Permissions",
+                fields={"Missing": "\n".join(error.missing_perms)})
 
         elif isinstance(error, commands.CommandNotFound):
             pass

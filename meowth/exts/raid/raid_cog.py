@@ -592,6 +592,11 @@ class RaidCog(Cog):
                 pokemon = await raid.pkmn.name()
                 await ctx.warning(f'{pokemon} does not learn {move}.')
                 return await raid.set_moveset(move1)
+            elif e.move == move1.id:
+                move = await move1.name()
+                pokemon = await raid.pkmn.name()
+                await ctx.warning(f'{pokemon} does not learn {move}.')
+                return await raid.set_moveset(move2)
     
     @command(aliases=['timer'])
     @raid_checks.raid_channel()

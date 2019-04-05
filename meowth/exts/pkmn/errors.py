@@ -6,8 +6,10 @@ class PokemonNotFound(CommandError):
 
 class PokemonInvalidContext(CommandError):
     'Exception raised, Pokemon invalid in context'
-    pass
 
+    def __init__(self, invalid_mons):
+        self.invalid_mons = invalid_mons
+    
 class MoveNotFound(CommandError):
     'Exception raised, move not found'
     pass

@@ -34,6 +34,12 @@ async def raid_category(ctx, level):
     query = report_table.query(f'category_{level}')
     query.where(channelid=ctx.channel.id)
     cat = await query.get_value()
+    if cat.isdigit():
+        me = ctx.guild.me
+        channel = ctx.channel
+        perms = channel.permissions_for(me)
+        if not perms.manage_channels:
+            raise commands.BotMissingPermissions(['Manage Channels'])
     return cat
 
 def raid_enabled():

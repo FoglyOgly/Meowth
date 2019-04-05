@@ -898,6 +898,9 @@ class Raid:
                 fast = move2.id
             else:
                 charge = move2.id
+        self.pkmn.quickMoveid = fast
+        self.pkmn.chargeMoveid = charge
+        self.pkmn = await self.pkmn.validate('raid')
         quick_move = Move(self.bot, fast) if fast else None
         charge_move = Move(self.bot, charge) if charge else None
         if quick_move:
@@ -1036,7 +1039,10 @@ class Raid:
             except AttributeError:
                 continue
             await msg.edit(content=content, embed=embed)
-            await msg.clear_reactions()
+            try:
+                await msg.clear_reactions()
+            except discord.Forbidden:
+                raise commands.BotMissingPermissions(['Manage Messages'])
             msg_list.append(msg)
         for msgid in train_msgs:
             try:
@@ -1049,7 +1055,10 @@ class Raid:
             train_embed = await TRaidEmbed.from_raid(t, self)
             train_content = "Use the reaction below to vote for this raid next!"
             await msg.edit(content=train_content, embed=train_embed.embed)
-            await msg.clear_reactions()
+            try:
+                await msg.clear_reactions()
+            except discord.Forbidden:
+                raise commands.BotMissingPermissions(['Manage Messages'])
             await msg.add_reaction('\u2b06')
         if self.channel_ids:
             for chanid in self.channel_ids:
@@ -1061,7 +1070,10 @@ class Raid:
                     continue
                 new_name = await self.channel_name()
                 if new_name != channel.name:
-                    await channel.edit(name=new_name)
+                    try:
+                        await channel.edit(name=new_name)
+                    except discord.Forbidden:
+                        raise commands.BotMissingPermissions(['Manage Channels'])
         if react_list:
             for msg in msg_list:
                 for react in react_list:
@@ -1098,7 +1110,10 @@ class Raid:
                     channel_list.append(channel)
                     new_name = await self.channel_name()
                     if new_name != channel.name:
-                        await channel.edit(name=new_name)
+                        try:
+                            await channel.edit(name=new_name)
+                        except discord.Forbidden:
+                            raise commands.BotMissingPermissions(['Manage Channels'])
                     newmsg = await channel.send(content, embed=embed)
                     msg_list.append(newmsg)
             for messageid in self.message_ids:
@@ -1109,7 +1124,10 @@ class Raid:
                 if chn in channel_list:
                     continue
                 await msg.edit(content=content, embed=embed)
-                await msg.clear_reactions()
+                try:
+                    await msg.clear_reactions()
+                except discord.Forbidden:
+                    raise commands.BotMissingPermissions(['Manage Messages'])
                 msg_list.append(msg)
             for msgid in self.train_msgs:
                 try:
@@ -1119,7 +1137,10 @@ class Raid:
                 if chn in channel_list:
                     continue
                 await msg.edit(content=content, embed=embed)
-                await msg.clear_reactions()
+                try:
+                    await msg.clear_reactions()
+                except discord.Forbidden:
+                    raise commands.BotMissingPermissions(['Manage Messages'])
                 msg_list.append(msg)
             for msg in msg_list:
                 for react in react_list:
@@ -1194,7 +1215,10 @@ class Raid:
                     t = Train.by_channel.get(chanid)
                     if t:
                         continue
-                    await channel.delete()
+                    try:
+                        await channel.delete()
+                    except discord.Forbidden:
+                        raise commands.BotMissingPermissions(['Manage Channels'])
             raid_table = self.bot.dbi.table('raids')
             query = raid_table.query().where(id=self.id)
             self.bot.loop.create_task(query.delete())

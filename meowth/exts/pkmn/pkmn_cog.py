@@ -6,6 +6,7 @@ import aiohttp
 
 import discord
 from discord.ext.commands import CommandError
+from .errors import *
 
 
 class Pokemon():
@@ -933,6 +934,8 @@ class Move:
         if match[0]:
             match_id = await names.query('moveid').where(name=match[0]).get_value()
             return cls(bot, match_id)
+        else:
+            raise MoveNotFound
     
     @classmethod
     async def convert(cls, ctx, arg):
@@ -945,9 +948,16 @@ class Pokedex(Cog):
     def __init__(self, bot):
         self.bot = bot
     
+    @Cog.listener()
     async def on_command_error(self, ctx, error):
         if isinstance(error, PokemonNotFound):
-            await ctx.send('Pokemon not ')
+            await ctx.error('Pokemon not found!')
+        elif isinstance(error, MoveNotFound):
+            await ctx.error('Move not found!')
+        elif isinstance(error, PokemonInvalidContext):
+            await ctx.error('Pokemon invalid in current context.')
+        elif isinstance(error, MoveInvalid):
+            await ctx.error('Move not learned by Pokemon.')
 
     @command()
     async def pokedex(self, ctx, *, pokemon: Pokemon):

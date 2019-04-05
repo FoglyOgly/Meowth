@@ -101,7 +101,23 @@ class RaidCog(Cog):
                 return await self._leave(meowthuser, train)
         return await raid.process_reactions(payload)
 
-    
+    @Cog.listener()
+    async def on_command_error(self, ctx, error):
+        if isinstance(error, RaidDisabled):
+            await ctx.error('Raid command disabled in current channel.')
+        elif isinstance(error, TrainDisabled):
+            await ctx.error('Train command disabled in current channel.')
+        elif isinstance(error, InvalidTime):
+            await ctx.error('Invalid time for raid.')
+        elif isinstance(error, GroupTooBig):
+            await ctx.error('Group too big for raid.')
+        elif isinstance(error, NotRaidChannel):
+            await ctx.error('Current channel is not a raid channel.')
+        elif isinstance(error, NotTrainChannel):
+            await ctx.error('Current channel is not a train channel.')
+        
+
+
     def _rsvp(self, connection, pid, channel, payload):
         if channel != 'rsvp':
             return
@@ -359,8 +375,11 @@ class RaidCog(Cog):
                 raid_channel_overwrites = formatters.perms_or(report_channels)
             else:
                 raid_channel_overwrites = dict(ctx.channel.overwrites)
-            raid_channel = await ctx.guild.create_text_channel(raid_channel_name,
-                category=category, overwrites=raid_channel_overwrites)
+            try:
+                raid_channel = await ctx.guild.create_text_channel(raid_channel_name,
+                    category=category, overwrites=raid_channel_overwrites)
+            except commands.BotMissingPermissions:
+                raise
             new_raid.channel_ids.append(str(raid_channel.id))
             raidmsg = await raid_channel.send(reportcontent, embed=embed)
             for react in react_list:

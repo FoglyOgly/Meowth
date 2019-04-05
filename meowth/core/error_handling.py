@@ -94,6 +94,12 @@ class ErrorHandler(Cog):
                 type(error), error, error.__traceback__))
             ctx.bot._last_exception = exception_log
             await ctx.send(message)
+        
+        elif isinstance(error, commands.MissingPermissions):
+            await ctx.error(fields={"User Missing Permissions": "\n".join(error.missing_perms)})
+        
+        elif isinstance(error, commands.BotMissingPermissions):
+            await ctx.error(fields={"Bot Missing Permissions": "\n".join(error.missing_perms)})
 
         elif isinstance(error, commands.CommandNotFound):
             pass

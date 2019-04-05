@@ -18,6 +18,7 @@ import googlemaps
 from typing import List
 
 from .map_info import gmaps_api_key
+from .errors import *
 
 gmaps = googlemaps.Client(key=gmaps_api_key)
 
@@ -458,6 +459,15 @@ class Mapper(Cog):
         bot.gmaps = gmaps
         self.bot = bot
     
+    @Cog.listener()
+    async def on_command_error(self, ctx, error):
+        if isinstance(error, InvalidLocation):
+            await ctx.error("Invalid coordinates given.")
+        elif isinstance(error, MapCSVImportFailure):
+            await ctx.error('CSV Import error. Check for compliance with the template')
+        elif isinstance(error, InvalidGMapsKey):
+            await ctx.error('Google Maps API Key invalid.')
+    
     async def gyms_from_csv(self, guildid, file):
         bot = self.bot
         gyms_table = bot.dbi.table('gyms')
@@ -524,6 +534,14 @@ class Mapper(Cog):
         await insert.commit(do_update=True)
     
     async def add_gym(self, guild_id, name, lat, lon, exraid=False, nickname=None):
+        valid_loc = (
+            lat <= 90,
+            lat >= -90,
+            lon <= 180,
+            lon >= -180
+        )
+        if not all(valid_loc):
+            raise InvalidLocation
         gyms_table = self.bot.dbi.table('gyms')
         insert = gyms_table.insert()
         l10 = S2_L10.from_coords(self.bot, (lat, lon))
@@ -540,6 +558,14 @@ class Mapper(Cog):
         await insert.commit()
     
     async def add_stop(self, guild_id, name, lat, lon, nickname=None):
+        valid_loc = (
+            lat <= 90,
+            lat >= -90,
+            lon <= 180,
+            lon >= -180
+        )
+        if not all(valid_loc):
+            raise InvalidLocation
         stops_table = self.bot.dbi.table('pokestops')
         insert = stops_table.insert()
         l10 = S2_L10.from_coords(self.bot, (lat, lon))
@@ -562,7 +588,10 @@ class Mapper(Cog):
         bot = ctx.bot
         f = io.BytesIO()
         await attachment.save(f)
-        await self.gyms_from_csv(guildid, f)
+        try:
+            await self.gyms_from_csv(guildid, f)
+        except:
+            raise MapCSVImportError
         await ctx.send("Import successful")
 
     @command()
@@ -573,7 +602,11 @@ class Mapper(Cog):
         bot = ctx.bot
         f = io.BytesIO()
         await attachment.save(f)
-        await self.stops_from_csv(guildid, f)
+        try:
+            await self.stops_from_csv(guildid, f)
+        except:
+            raise MapCSVImportError
+        await ctx.send("Import successful")
     
     @command()
     @commands.has_permissions(manage_guild=True)

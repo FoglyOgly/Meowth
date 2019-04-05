@@ -1,4 +1,5 @@
 from discord.ext import commands
+from .errors import *
 
 async def is_raid_enabled(ctx):
     report_table = ctx.bot.dbi.table('report_channels')
@@ -6,7 +7,7 @@ async def is_raid_enabled(ctx):
     query.where(channelid=ctx.channel.id)
     raid = await query.get_value()
     if not raid:
-        return False
+        raise RaidDisabled
     else:
         return True
 
@@ -34,7 +35,7 @@ async def is_raid_channel(ctx):
         return True
     else:
         ctx.raid_id = None
-        return False
+        raise NotRaidChannel
 
 def raid_channel():
     return commands.check(is_raid_channel)
@@ -46,13 +47,13 @@ async def is_train_enabled(ctx):
             ctx.channel = report_channel
             return await is_train_enabled(ctx)
         else:
-            return False
+            raise TrainDisabled
     report_table = ctx.bot.dbi.table('report_channels')
     query = report_table.query('train')
     query.where(channelid=ctx.channel.id)
     train = await query.get_value()
     if not train:
-        return False
+        raise TrainDisabled
     else:
         return True
 

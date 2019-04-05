@@ -774,10 +774,7 @@ class Pokemon():
                         raise PokemonNotFound
         possible_ids = set(ids) & set(id_list)
         length = len(possible_ids)
-        if length == 1:
-            pokemonid = possible_ids.pop()
-            pkmn = cls(bot, pokemonid)
-        elif length == 0:
+        if length == 0:
             raise PokemonNotFound
         else:
             possible_mons = [(cls(bot, x)) for x in possible_ids]
@@ -789,17 +786,20 @@ class Pokemon():
                 possible_mons = [x for x in possible_mons if await x._trade_available()]
             if len(possible_mons) == 0:
                 raise PokemonInvalidContext
-            possible_names = [(await mon.name()) for mon in possible_mons]
-            react_list = formatters.mc_emoji(length)
-            choice_dict = dict(zip(react_list, possible_mons))
-            display_dict = dict(zip(react_list, possible_names))
-            embed = formatters.mc_embed(display_dict)
-            multi = await chn.send('Multiple possible Pokemon found! Please select from the following list.',
-                embed=embed)
-            payload = await formatters.ask(bot, [multi], user_list=[user_id],
-                react_list=react_list)
-            pkmn = choice_dict[str(payload.emoji)]
-            await multi.delete()
+            elif len(possible_mons) == 1:
+                pkmn = possible_mons[0]
+            else:
+                possible_names = [(await mon.name()) for mon in possible_mons]
+                react_list = formatters.mc_emoji(length)
+                choice_dict = dict(zip(react_list, possible_mons))
+                display_dict = dict(zip(react_list, possible_names))
+                embed = formatters.mc_embed(display_dict)
+                multi = await chn.send('Multiple possible Pokemon found! Please select from the following list.',
+                    embed=embed)
+                payload = await formatters.ask(bot, [multi], user_list=[user_id],
+                    react_list=react_list)
+                pkmn = choice_dict[str(payload.emoji)]
+                await multi.delete()
         pkmn.form = form
         pkmn.gender = gender
         pkmn.shiny = shiny

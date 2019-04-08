@@ -533,10 +533,9 @@ class Raid:
                 else:
                     await lobbymsg.edit(content=f"Group {grp['emoji']} has entered the raid!")
             user_table = self.bot.dbi.table('raid_rsvp')
-            update = user_table.update.where(user_table['user_id'].in_(grp['users']))
-            update.where(raid_id=self.id)
-            update.values(status='complete')
-            await update.commit()
+            query = user_table.query.where(user_table['user_id'].in_(grp['users']))
+            query.where(raid_id=self.id)
+            await query.delete()
             self.group_list.remove(grp)
             await self.update_rsvp()
             return                

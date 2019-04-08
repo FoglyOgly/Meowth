@@ -179,10 +179,11 @@ class RaidCog(Cog):
         """Report a raid or raid egg.
 
         **Arguments**
-        `level_or_boss`: Either level of the raid egg (1-5) or
+
+        *level_or_boss*: Either level of the raid egg (1-5) or
             name of the raid boss. If the boss's name is multiple
             words, wrap it in quotes.
-        `gym_and_time`: Name of the gym optionally followed by 
+        *gym_and_time*: Name of the gym optionally followed by 
             the number of minutes until hatch (if raid egg) 
             or expire (if active raid)
 

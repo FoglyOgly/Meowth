@@ -179,15 +179,14 @@ class RaidCog(Cog):
         """Report a raid or raid egg.
 
         **Arguments**
-
-        *level_or_boss*: Either level of the raid egg (1-5) or
+        *level_or_boss:* Either level of the raid egg (1-5) or
             name of the raid boss. If the boss's name is multiple
             words, wrap it in quotes.
-        *gym_and_time*: Name of the gym optionally followed by 
+        *gym_and_time:* Name of the gym optionally followed by 
             the number of minutes until hatch (if raid egg) 
             or expire (if active raid)
 
-        Example: `!raid "Raichu Alola" city park 33`
+        **Example:** `!raid "Raichu Alola" city park 33`
         Reports a Raichu (Alola) raid at City Park with 33 minutes
         until expiry.
         """
@@ -432,14 +431,13 @@ class RaidCog(Cog):
     async def exraid(self, ctx, gym: Gym, *, hatch_time: hatch_converter):
         """Report an EX Raid.
 
-        Arguments:
+        **Arguments**
+        *gym:* Name of the gym. Must be wrapped in quotes if multiple words.
 
-        gym: Name of the gym. Must be wrapped in quotes if multiple words.
-
-        hatch_time (optional): Date and time the EX Raid will begin.
+        *hatch_time (optional):* Date and time the EX Raid will begin.
             Does not need to be wrapped in quotes.
         
-        Example: `!exraid "city park" April 9 1:00 PM`
+        **Example:** `!exraid "city park" April 9 1:00 PM`
         Reports an EX Raid at City Park beginning on April 9 at 1:00 PM.
         """
         zone = await ctx.tz()
@@ -513,14 +511,13 @@ class RaidCog(Cog):
     async def interested(self, ctx, bosses: commands.Greedy[Pokemon], total: typing.Optional[int]=1, *teamcounts):
         """RSVP as interested to the current raid.
 
-        Arguments:
+        **Arguments**
+        *bosses (optional):* Names of the bosses you are interested in.
 
-        bosses (optional): Names of the bosses you are interested in.
-
-        total (optional): Number of trainers you are bringing. Defaults to
+        *total (optional):* Number of trainers you are bringing. Defaults to
             your last RSVP total, or 1.
         
-        teamcounts (optional): Counts of each team in your group. Format:
+        *teamcounts (optional):* Counts of each team in your group. Format:
             `3m 2v 1i` means 3 Mystic, 2 Valor, 1 Instinct.
         """
         if total < 1:
@@ -532,14 +529,13 @@ class RaidCog(Cog):
     async def coming(self, ctx, bosses: commands.Greedy[Pokemon], total: typing.Optional[int]=1, *teamcounts):
         """RSVP as on your way to the current raid.
 
-        Arguments:
+       **Arguments**
+        *bosses (optional):* Names of the bosses you are interested in.
 
-        bosses (optional): Names of the bosses you are interested in.
-
-        total (optional): Number of trainers you are bringing. Defaults to
+        *total (optional):* Number of trainers you are bringing. Defaults to
             your last RSVP total, or 1.
         
-        teamcounts (optional): Counts of each team in your group. Format:
+        *teamcounts (optional):* Counts of each team in your group. Format:
             `3m 2v 1i` means 3 Mystic, 2 Valor, 1 Instinct.
         """
         if total < 1:
@@ -551,14 +547,13 @@ class RaidCog(Cog):
     async def here(self, ctx, bosses: commands.Greedy[Pokemon], total: typing.Optional[int]=1, *teamcounts):
         """RSVP as being at the current raid.
 
-        Arguments:
+        **Arguments**
+        *bosses (optional):* Names of the bosses you are interested in.
 
-        bosses (optional): Names of the bosses you are interested in.
-
-        total (optional): Number of trainers you are bringing. Defaults to
+        *total (optional):* Number of trainers you are bringing. Defaults to
             your last RSVP total, or 1.
         
-        teamcounts (optional): Counts of each team in your group. Format:
+        *teamcounts (optional):* Counts of each team in your group. Format:
             `3m 2v 1i` means 3 Mystic, 2 Valor, 1 Instinct.
         """
         if total < 1:
@@ -596,9 +591,8 @@ class RaidCog(Cog):
     async def group(self, ctx, group_time):
         """Create a group for the current raid.
 
-        Arguments:
-
-        group_time: Number of minutes until the group
+        **Arguments**
+        *group_time:* Number of minutes until the group
             will enter the raid.
         """
         raid = Raid.by_channel.get(str(ctx.channel.id))
@@ -668,7 +662,7 @@ class RaidCog(Cog):
 
         One or both moves may be given. If the name of the move
         is multiple words long, wrap it in quotes.
-        Example: `!moveset "hydro pump"`"""
+        **Example:** `!moveset "hydro pump"`"""
         raid = Raid.by_channel.get(str(ctx.channel.id))
         if not raid:
             raise NotRaidChannel
@@ -699,7 +693,7 @@ class RaidCog(Cog):
         to be the number of minutes until hatch/expire.
         Otherwise, Meowth attempts to parse newtime as a
         time.
-        Examples: `!timerset 12:00 PM`
+        **Examples:** `!timerset 12:00 PM`
         `!timerset 5`
         """
         raid = Raid.by_channel.get(str(ctx.channel.id))

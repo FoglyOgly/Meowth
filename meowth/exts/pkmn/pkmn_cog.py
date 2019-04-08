@@ -782,8 +782,6 @@ class Pokemon():
                 possible_mons = [x for x in mons if x._raid_available()]
             elif command_name == 'wild':
                 possible_mons = [x for x in mons if await x._wild_available()]
-            elif command_name == 'trade':
-                possible_mons = [x for x in mons if await x._trade_available()]
             impossible_mons = [x for x in mons if x not in possible_mons]
             if len(possible_mons) == 0:
                 raise PokemonInvalidContext(impossible_mons)
@@ -957,8 +955,19 @@ class Pokedex(Cog):
             await ctx.error('Move not found!')
         elif isinstance(error, PokemonInvalidContext):
             invalid_names = [await x.name() for x in error.invalid_mons]
-            await ctx.error(f'Pokemon invalid for {ctx.prefix}{ctx.invoked_with}',
-                fields={"Invalid Pokemon": "\n".join(invalid_names)})
+            fields={"Invalid Pokemon": "\n".join(invalid_names)}
+            if ctx.command.name == 'wild':
+                await ctx.error('The following Pokemon do not spawn in the wild!',
+                    fields=fields)
+            elif ctx.command.name == 'trade':
+                await ctx.error('The following Pokemon cannot be traded!',
+                    fields=fields)
+            elif ctx.command.name == 'raid':
+                await ctx.error('The given Pokemon does not currently appear in raids!',
+                    fields=fields)
+            else:
+                await ctx.error(f'The following Pokemon are not valid for {ctx.prefix}{ctx.invoked_with}',
+                    fields=fields)
         elif isinstance(error, MoveInvalid):
             move = Move(self.bot, error.move)
             move_name = await move.name()

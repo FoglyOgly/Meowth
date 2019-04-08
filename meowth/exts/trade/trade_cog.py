@@ -1,4 +1,4 @@
-from meowth import Cog, command, bot, checks
+nfrom meowth import Cog, command, bot, checks
 from meowth.utils.converters import ChannelMessage
 from meowth.exts.pkmn import Pokemon, Move
 from meowth.exts.want import Want
@@ -313,11 +313,6 @@ class TradeCog(Cog):
     async def trade(self, ctx, offers: commands.Greedy[Pokemon]):
         if len(offers) == 0:
             return await ctx.send(f'Did not receive any valid offers! Remember to wrap multi-word Pokemon arguments in quotes.')
-        if len(offers) == 1:
-            if not await offers[0]._trade_available():
-                return await ctx.send(f'{await offers[0].name()} cannot be traded!')
-        else:
-            offers = [offer for offer in offers if await offer._trade_available()]
         offers = [await offer.validate('trade') for offer in offers]
         listmsg = await ctx.send(f"{ctx.author.display_name} - what Pokemon are you willing to accept in exchange? Use 'any' if you will accept anything and 'OBO' if you want to allow other offers. Use commas to separate Pokemon.")
         def check(m):

@@ -229,13 +229,22 @@ class WildCog(Cog):
     
     @command(aliases=['w'])
     @wild_checks.wild_enabled()
-    async def wild(self, ctx, pkmn: Pokemon, *, location: POI):
-        if not await pkmn._wild_available():
+    async def wild(self, ctx, pokemon: Pokemon, *, location: POI):
+        """Report a wild Pokemon.
+
+        **Arguments**
+        *pkmn:* The name of the wild Pokemon.
+        *location:* The location of the wild spawn.
+
+        If *location* is the name of a known Gym or Pokestop,
+        directions will be accurate. Otherwise Meowth just Googles
+        the supplied *location* plus the name of the city."""
+        if not await pokemon._wild_available():
             raise 
         weather = await location.weather()
         if weather == 'NO_WEATHER':
             weather = None
-        pkmn = await pkmn.validate('wild', weather=weather)
+        pkmn = await pokemon.validate('wild', weather=weather)
         wild_table = self.bot.dbi.table('wilds')
         wild_id = next(snowflake.create())
         new_wild = Wild(wild_id, self.bot, ctx.guild.id, location, pkmn)

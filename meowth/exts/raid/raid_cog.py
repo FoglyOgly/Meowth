@@ -172,10 +172,26 @@ class RaidCog(Cog):
             self.bot.loop.create_task(raid.change_weather(weather))
         
 
-    @command(aliases=['r'])
+    @command(aliases=['r'], category='Raid')
     @raid_checks.raid_enabled()
     @raid_checks.bot_has_permissions()
     async def raid(self, ctx, level_or_boss, *, gym_and_time):
+        """Report a raid or raid egg.
+
+        Arguments:
+
+        level_or_boss: Either level of the raid egg (1-5) or
+            name of the raid boss. If the boss's name is multiple
+            words, wrap it in quotes.
+        
+        gym_and_time: Name of the gym optionally followed by 
+            the number of minutes until hatch (if raid egg) 
+            or expire (if active raid)
+
+        Example: `!raid "Raichu Alola" city park 33`
+        Reports a Raichu (Alola) raid at City Park with 33 minutes
+        until expiry.
+        """
         gym_split = gym_and_time.split()
         if gym_split[-1].isdigit():
             endtime = int(gym_split.pop(-1))
@@ -412,9 +428,21 @@ class RaidCog(Cog):
             Raid.by_channel[channel_id] = new_raid
         new_raid.monitor_task = self.bot.loop.create_task(new_raid.monitor_status())
     
-    @command(aliases=['ex'])
+    @command(aliases=['ex'], category='Raid')
     @raid_checks.raid_enabled()
     async def exraid(self, ctx, gym: Gym, *, hatch_time: hatch_converter):
+        """Report an EX Raid.
+
+        Arguments:
+
+        gym: Name of the gym. Must be wrapped in quotes if multiple words.
+
+        hatch_time (optional): Date and time the EX Raid will begin.
+            Does not need to be wrapped in quotes.
+        
+        Example: `!exraid "city park" April 9 1:00 PM`
+        Reports an EX Raid at City Park beginning on April 9 at 1:00 PM.
+        """
         zone = await ctx.tz()
         new_exraid = Raid(ctx.bot, ctx.guild.id, ctx.channel.id, gym, level="EX", hatch=hatch_time, tz=zone)
         return await self.setup_raid(ctx, new_exraid)
@@ -484,6 +512,18 @@ class RaidCog(Cog):
     @command(aliases=['i', 'maybe'])
     @raid_checks.raid_channel()
     async def interested(self, ctx, bosses: commands.Greedy[Pokemon], total: typing.Optional[int]=1, *teamcounts):
+        """RSVP as interested to the current raid.
+
+        Arguments:
+
+        bosses (optional): Names of the bosses you are interested in.
+
+        total (optional): Number of trainers you are bringing. Defaults to
+            your last RSVP total, or 1.
+        
+        teamcounts (optional): Counts of each team in your group. Format:
+            `3m 2v 1i` means 3 Mystic, 2 Valor, 1 Instinct.
+        """
         if total < 1:
             return
         await self.rsvp(ctx, "maybe", bosses, total, *teamcounts)
@@ -491,6 +531,18 @@ class RaidCog(Cog):
     @command(aliases=['c', 'omw'])
     @raid_checks.raid_channel()
     async def coming(self, ctx, bosses: commands.Greedy[Pokemon], total: typing.Optional[int]=1, *teamcounts):
+        """RSVP as on your way to the current raid.
+
+        Arguments:
+
+        bosses (optional): Names of the bosses you are interested in.
+
+        total (optional): Number of trainers you are bringing. Defaults to
+            your last RSVP total, or 1.
+        
+        teamcounts (optional): Counts of each team in your group. Format:
+            `3m 2v 1i` means 3 Mystic, 2 Valor, 1 Instinct.
+        """
         if total < 1:
             return
         await self.rsvp(ctx, "coming", bosses, total, *teamcounts)
@@ -498,6 +550,18 @@ class RaidCog(Cog):
     @command(aliases=['h'])
     @raid_checks.raid_channel()
     async def here(self, ctx, bosses: commands.Greedy[Pokemon], total: typing.Optional[int]=1, *teamcounts):
+        """RSVP as being at the current raid.
+
+        Arguments:
+
+        bosses (optional): Names of the bosses you are interested in.
+
+        total (optional): Number of trainers you are bringing. Defaults to
+            your last RSVP total, or 1.
+        
+        teamcounts (optional): Counts of each team in your group. Format:
+            `3m 2v 1i` means 3 Mystic, 2 Valor, 1 Instinct.
+        """
         if total < 1:
             return
         await self.rsvp(ctx, "here", bosses, total, *teamcounts)
@@ -505,11 +569,17 @@ class RaidCog(Cog):
     @command(aliases=['x'])
     @raid_checks.raid_channel()
     async def cancel(self, ctx):
+        """Cancel your RSVP to the current raid."""
         await self.rsvp(ctx, "cancel")
 
     @command()
     @raid_checks.raid_channel()
     async def counters(self, ctx):
+        """Request your optimal counters for the current box from Pokebattler.
+
+        Use `!set pokebattler` before using this command to link your
+        Pokebattler account.
+        """
         raid = Raid.by_channel.get(str(ctx.channel.id))
         if not raid:
             return
@@ -524,7 +594,14 @@ class RaidCog(Cog):
         
     @command()
     @raid_checks.raid_channel()
-    async def group(self, ctx, grptime):
+    async def group(self, ctx, group_time):
+        """Create a group for the current raid.
+
+        Arguments:
+
+        group_time: Number of minutes until the group
+            will enter the raid.
+        """
         raid = Raid.by_channel.get(str(ctx.channel.id))
         if not raid:
             raise NotRaidChannel
@@ -532,8 +609,8 @@ class RaidCog(Cog):
         insert = group_table.insert()
         i = len(raid.group_list)
         emoji = f'{i+1}\u20e3'
-        if grptime.isdigit():
-            stamp = time.time() + int(grptime)*60
+        if group_time.isdigit():
+            stamp = time.time() + int(group_time)*60
             if stamp > raid.end:
                 raise InvalidTime
             elif raid.hatch and stamp < raid.hatch:
@@ -556,6 +633,12 @@ class RaidCog(Cog):
     @command(aliases=['start'])
     @raid_checks.raid_channel()
     async def starting(self, ctx):
+        """Notify Meowth that your group is entering the raid lobby.
+
+        If the user is not in a group, Meowth assumes everyone
+        listed as 'here' is starting the raid.
+        A backout can be requested via reaction for two minutes
+        after this command is sent."""
         raid = Raid.by_channel.get(str(ctx.channel.id))
         if not raid:
             return
@@ -569,6 +652,11 @@ class RaidCog(Cog):
     @command()
     @raid_checks.raid_channel()
     async def weather(self, ctx, *, weather: Weather):
+        """Report the weather at the current raid.
+
+        If the raid is at a known gym, this command will update
+        the weather at all other known gyms in the cell.
+        """
         raid = Raid.by_channel.get(str(ctx.channel.id))
         if not raid:
             return
@@ -577,6 +665,11 @@ class RaidCog(Cog):
     @command(aliases=['move'])
     @raid_checks.raid_channel()
     async def moveset(self, ctx, move1: Move, move2: Move=None):
+        """Report the raid boss's moveset.
+
+        One or both moves may be given. If the name of the move
+        is multiple words long, wrap it in quotes.
+        Example: `!moveset "hydro pump"`"""
         raid = Raid.by_channel.get(str(ctx.channel.id))
         if not raid:
             raise NotRaidChannel
@@ -601,6 +694,15 @@ class RaidCog(Cog):
     @command(aliases=['timer'])
     @raid_checks.raid_channel()
     async def timerset(self, ctx, *, newtime):
+        """Set the raid's hatch time or expire time.
+
+        If *newtime* is an integer, it is assumed
+        to be the number of minutes until hatch/expire.
+        Otherwise, Meowth attempts to parse newtime as a
+        time.
+        Examples: `!timerset 12:00 PM`
+        `!timerset 5`
+        """
         raid = Raid.by_channel.get(str(ctx.channel.id))
         if not raid:
             return
@@ -630,6 +732,9 @@ class RaidCog(Cog):
     @command()
     @checks.is_co_owner()
     async def countersupdate(self, ctx):
+        """Updates the generic counters data.
+
+        Must be bot co-owner to use."""
         data_table = ctx.bot.dbi.table('counters_data')
         raid_lists = ctx.bot.raid_info.raid_lists
         weather_list = ['CLEAR', 'PARTLY_CLOUDY', 'OVERCAST', 'RAINY', 'SNOW', 'FOG', 'WINDY', 'NO_WEATHER']
@@ -723,6 +828,12 @@ class RaidCog(Cog):
     @command()
     @raid_checks.train_enabled()
     async def train(self, ctx):
+        """Reports a raid train.
+
+        If used in a report channel, Meowth will
+        ask for the first raid. If used in a raid channel,
+        Meowth will assume the current raid to be the first raid.
+        """
         report_channel = ReportChannel(self.bot, ctx.channel)
         city = await report_channel.city()
         city = city.split()[0]
@@ -757,6 +868,10 @@ class RaidCog(Cog):
     
     @command()
     async def next(self, ctx):
+        """Switch the train channel to the next raid.
+
+        The next raid is the raid which got the most reaction
+        votes during the previous raid."""
         train = Train.by_channel.get(ctx.channel.id)
         if not train:
             return
@@ -764,6 +879,11 @@ class RaidCog(Cog):
     
     @command()
     async def join(self, ctx, total: typing.Optional[int]=1, *teamcounts):
+        """Join a raid train.
+
+        This does not automatically RSVP you to the raids
+        in the train. You must still RSVP for yourself or else
+        have another user count you in their RSVP."""
         train = Train.by_channel.get(ctx.channel.id)
         if not train:
             return
@@ -780,6 +900,9 @@ class RaidCog(Cog):
     
     @command()
     async def leave(self, ctx):
+        """Leave a raid train.
+
+        This does not affect your RSVP to the current raid."""
         train = Train.by_channel.get(ctx.channel.id)
         if not train:
             return

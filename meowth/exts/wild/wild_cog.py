@@ -233,12 +233,17 @@ class WildCog(Cog):
         """Report a wild Pokemon.
 
         **Arguments**
-        *pkmn:* The name of the wild Pokemon.
+        *pokemon:* The name of the wild Pokemon plus additional
+        information.
         *location:* The location of the wild spawn.
 
+        If the *pokemon* argument is multiple words, wrap it in quotes.
+        You may optionally supply additional information.
         If *location* is the name of a known Gym or Pokestop,
         directions will be accurate. Otherwise Meowth just Googles
-        the supplied *location* plus the name of the city."""
+        the supplied *location* plus the name of the city.
+        
+        **Example:** `!wild "female combee" city park`"""
         if not await pokemon._wild_available():
             raise 
         weather = await location.weather()

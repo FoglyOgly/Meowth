@@ -59,8 +59,6 @@ class ErrorHandler(Cog):
                 return m.author == ctx.author and m.channel == ctx.channel
             reply = await ctx.bot.wait_for('message')
             ctx.message.content += f' {reply.content}'
-            print(ctx.args)
-            print(ctx.kwargs)
             ctx.view = StringView(ctx.message.content)
             ctx.view.get_word()
             try:

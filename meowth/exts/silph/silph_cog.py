@@ -93,7 +93,6 @@ class SilphCog(Cog):
             async with sess.get(url, headers=headers) as resp:
                 data = await resp.json()
                 data = data['data']
-                print(data)
                 self.parse_info_from_silph(data)
         with open(self.bot.ext_dir + '/raid/raid_info.py', 'a') as f:
             print('\nraid_lists = ' + str(self.bot.raid_info.raid_lists), file=f)

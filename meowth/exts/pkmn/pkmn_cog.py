@@ -321,7 +321,7 @@ class Pokemon():
         if await self._gender_type() == 'DIMORPH' and self.gender:
             url += '_'
             url += self.gender.upper()
-        url += '.png?cache=2'
+        url += '.png?cache=3'
         return url
     
     async def color(self):

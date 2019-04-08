@@ -10,6 +10,14 @@ class AdminCog(Cog):
     @command()
     @commands.has_permissions(manage_guild=True)
     async def setlocation(self, ctx, city: str, lat: float, lon: float, radius: float):
+        """Set the reporting location for the channel.
+
+        **Arguments**
+        *city:* The name of the city. Include the state or country for better results.
+        *lat:* The latitude of the central point of the area.
+        *lon:* The longitude of the central point of the area.
+        *radius:* The radius in kilometers of the area.
+        """
         report_channel_table = self.bot.dbi.table('report_channels')
         channel_id = ctx.channel.id
         query = report_channel_table.query.where(channelid=channel_id)
@@ -33,6 +41,15 @@ class AdminCog(Cog):
     @command()
     @commands.has_permissions(manage_guild=True)
     async def enable(self, ctx, *features):
+        """Enable features in the current channel.
+
+        **Arguments**
+        *features:* list of features to enable. Can include any of
+        `['raid', 'wild', 'research', 'users', 'train', 'trade', 'clean']`
+
+        Raid, wild, research, and train require a defined location. Use `!setlocation`
+        before enabling these.
+        """
         channel_id = ctx.channel.id
         channel_table = self.bot.dbi.table('report_channels')
         query = channel_table.query.where(channelid=channel_id)
@@ -104,6 +121,12 @@ class AdminCog(Cog):
     @command()
     @commands.has_permissions(manage_guild=True)
     async def disable(self, ctx, *features):
+        """Disable features in the current channel.
+
+        **Arguments**
+        *features:* list of features to disable. Can include any of
+        `['raid', 'wild', 'research', 'users', 'train', 'trade', 'clean']`
+        """
         channel_id = ctx.channel.id
         channel_table = self.bot.dbi.table('report_channels')
         query = channel_table.query.where(channelid=channel_id)

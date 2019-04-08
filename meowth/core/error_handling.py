@@ -53,11 +53,11 @@ class ErrorHandler(Cog):
             fields = {
                 'Missing Arguments': "\n".join(missing_args(ctx))
             }
-            await ctx.error(title="Error: Missing Required Arguments", fields=fields)
+            await ctx.error(title="Error: Missing Required Arguments",
+                description="Reply to this message with the missing arguments!", fields=fields)
             def check(m):
-                return m.author == ctx.author
+                return m.author == ctx.author and m.channel == ctx.channel
             reply = await ctx.bot.wait_for('message')
-            await asyncio.sleep(1)
             ctx.message.content += f' {reply.content}'
             print(ctx.args)
             print(ctx.kwargs)

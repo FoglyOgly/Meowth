@@ -583,6 +583,11 @@ class Mapper(Cog):
     @command()
     @commands.has_permissions(manage_guild=True)
     async def importgyms(self, ctx):
+        """Import list of Gyms from a CSV attachment.
+
+        Format must match the [template.](https://docs.google.com/spreadsheets/d/1W-VTAzlnDefgBIXoc7kuRcxJIlYo7iojqRRQ0uwTifc/edit?usp=sharing)
+        Gyms will only be usable by the server they were imported in.
+        """
         attachment = ctx.message.attachments[0]
         guildid = ctx.guild.id
         bot = ctx.bot
@@ -597,6 +602,11 @@ class Mapper(Cog):
     @command()
     @commands.has_permissions(manage_guild=True)
     async def importstops(self, ctx):
+        """Import list of Pokestops from a CSV attachment.
+
+        Format must match the [template.](https://docs.google.com/spreadsheets/d/1W-VTAzlnDefgBIXoc7kuRcxJIlYo7iojqRRQ0uwTifc/edit?usp=sharing)
+        Pokestops will only be usable by the server they were imported in.
+        """
         attachment = ctx.message.attachments[0]
         guildid = ctx.guild.id
         bot = ctx.bot
@@ -611,12 +621,34 @@ class Mapper(Cog):
     @command()
     @commands.has_permissions(manage_guild=True)
     async def gym(self, ctx, name: str, lat: float, lon: float, *, nickname: str=None):
+        """Add a single Gym.
+
+        **Arguments**
+        *name:* name of the Gym.
+        *lat:* latitude of the Gym.
+        *lon:* longitude of the Gym.
+        *nickname (optional):* nickname of the Gym.
+        
+        To add multiple gyms, use `!importgyms`
+        To add an EX Raid Gym, use `!exraidgym`
+        """
         guild_id = ctx.guild.id
         await self.add_gym(guild_id, name, lat, lon, nickname=nickname)
     
     @command()
     @commands.has_permissions(manage_guild=True)
     async def exraidgym(self, ctx, name: str, lat: float, lon: float, *, nickname: str=None):
+        """Add a single EX Raid Gym.
+
+        **Arguments**
+        *name:* name of the Gym.
+        *lat:* latitude of the Gym.
+        *lon:* longitude of the Gym.
+        *nickname (optional):* nickname of the Gym.
+        
+        To add multiple gyms, use `!importgyms`
+        To add a regular Gym, use `!gym`
+        """
         guild_id = ctx.guild.id
         await self.add_gym(guild_id, name, lat, lon, exraid=True, nickname=nickname)
 

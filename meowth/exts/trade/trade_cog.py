@@ -312,6 +312,14 @@ class TradeCog(Cog):
     @command(aliases=['t'])
     @trade_checks.trade_enabled()
     async def trade(self, ctx, offers: commands.Greedy[Pokemon]):
+        """Offer one or more Pokemon for trade.
+
+        **Arguments**
+        *offers:* List of Pokemon you are offering. Wrap multi-word
+        arguments in quotes.
+
+        **Example:** `!trade "shiny magikarp" "female combee"`
+        """
         if len(offers) == 0:
             return await ctx.send(f'Did not receive any valid offers! Remember to wrap multi-word Pokemon arguments in quotes.')
         valid_offers = [await offer.validate('trade') for offer in offers if await offer._trade_available()]

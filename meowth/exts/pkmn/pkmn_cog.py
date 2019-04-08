@@ -959,7 +959,7 @@ class Pokedex(Cog):
             invalid_names = [await x.name() for x in error.invalid_mons]
             fields={"Invalid Pokemon": "\n".join(invalid_names)}
             if ctx.command.name == 'wild':
-                await ctx.error('The following Pokemon do not spawn in the wild!',
+                await ctx.error('The given Pokemon does not spawn in the wild!',
                     fields=fields)
             elif ctx.command.name == 'trade':
                 await ctx.error('The following Pokemon cannot be traded!',
@@ -978,6 +978,7 @@ class Pokedex(Cog):
 
     @command()
     async def pokedex(self, ctx, *, pokemon: Pokemon):
+        """Display a Pokedex entry."""
         return await ctx.send(embed=await pokemon.dex_embed())
     
     @command()

@@ -507,7 +507,7 @@ class RaidCog(Cog):
             party = await meowthuser.party()
         await meowthuser.rsvp(raid_id, status, bosses=boss_ids, party=party)
     
-    @command(aliases=['i', 'maybe'])
+    @command(aliases=['i', 'maybe'], category="Raid RSVP")
     @raid_checks.raid_channel()
     async def interested(self, ctx, bosses: commands.Greedy[Pokemon], total: typing.Optional[int]=1, *teamcounts):
         """RSVP as interested to the current raid.
@@ -525,7 +525,7 @@ class RaidCog(Cog):
             return
         await self.rsvp(ctx, "maybe", bosses, total, *teamcounts)
         
-    @command(aliases=['c', 'omw'])
+    @command(aliases=['c', 'omw'], category="Raid RSVP")
     @raid_checks.raid_channel()
     async def coming(self, ctx, bosses: commands.Greedy[Pokemon], total: typing.Optional[int]=1, *teamcounts):
         """RSVP as on your way to the current raid.
@@ -561,13 +561,13 @@ class RaidCog(Cog):
             return
         await self.rsvp(ctx, "here", bosses, total, *teamcounts)
     
-    @command(aliases=['x'])
+    @command(aliases=['x'], category="Raid RSVP")
     @raid_checks.raid_channel()
     async def cancel(self, ctx):
         """Cancel your RSVP to the current raid."""
         await self.rsvp(ctx, "cancel")
 
-    @command()
+    @command(category="Raid Info")
     @raid_checks.raid_channel()
     async def counters(self, ctx):
         """Request your optimal counters for the current box from Pokebattler.
@@ -587,7 +587,7 @@ class RaidCog(Cog):
         await ctx.author.send(embed=embed)
         await raid.update_rsvp()
         
-    @command()
+    @command(category="Raid RSVP")
     @raid_checks.raid_channel()
     async def group(self, ctx, group_time):
         """Create a group for the current raid.
@@ -624,7 +624,7 @@ class RaidCog(Cog):
                 await msg.add_reaction(emoji)
             return await raid.join_grp(ctx.author.id, d)
     
-    @command(aliases=['start'])
+    @command(aliases=['start'], category="Raid RSVP")
     @raid_checks.raid_channel()
     async def starting(self, ctx):
         """Notify Meowth that your group is entering the raid lobby.
@@ -643,7 +643,7 @@ class RaidCog(Cog):
             grp = raid.here_grp
         return await raid.start_grp(grp, ctx.author, channel=ctx.channel)
     
-    @command()
+    @command(category="Raid Info")
     @raid_checks.raid_channel()
     async def weather(self, ctx, *, weather: Weather):
         """Report the weather at the current raid.
@@ -656,7 +656,7 @@ class RaidCog(Cog):
             return
         return await raid.correct_weather(weather)
     
-    @command(aliases=['move'])
+    @command(aliases=['move'], category="Raid Info")
     @raid_checks.raid_channel()
     async def moveset(self, ctx, move1: Move, move2: Move=None):
         """Report the raid boss's moveset.
@@ -685,7 +685,7 @@ class RaidCog(Cog):
                 await ctx.warning(f'{pokemon} does not learn {move}.')
                 return await raid.set_moveset(move2)
     
-    @command(aliases=['timer'])
+    @command(aliases=['timer'], category="Raid Info")
     @raid_checks.raid_channel()
     async def timerset(self, ctx, *, newtime):
         """Set the raid's hatch time or expire time.
@@ -819,7 +819,7 @@ class RaidCog(Cog):
         await insert.commit(do_update=True)
         return await ctx.send("Counters update successful")
 
-    @command()
+    @command(category="Raid Train")
     @raid_checks.train_enabled()
     async def train(self, ctx):
         """Reports a raid train.
@@ -860,7 +860,7 @@ class RaidCog(Cog):
         party = await meowthuser.party()
         await self._join(meowthuser, new_train, party=party)
     
-    @command()
+    @command(category="Raid Train")
     async def next(self, ctx):
         """Switch the train channel to the next raid.
 
@@ -871,7 +871,7 @@ class RaidCog(Cog):
             return
         await train.finish_current_raid()
     
-    @command()
+    @command(category="Raid Train")
     async def join(self, ctx, total: typing.Optional[int]=1, *teamcounts):
         """Join a raid train.
 
@@ -892,7 +892,7 @@ class RaidCog(Cog):
     async def _join(self, user, train, party=[0,0,0,1]):
         await user.train_rsvp(train, party=party)
     
-    @command()
+    @command(category="Raid Train")
     async def leave(self, ctx):
         """Leave a raid train.
 

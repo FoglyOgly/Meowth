@@ -315,7 +315,7 @@ class TradeCog(Cog):
         if len(offers) == 0:
             return await ctx.send(f'Did not receive any valid offers! Remember to wrap multi-word Pokemon arguments in quotes.')
         valid_offers = [await offer.validate('trade') for offer in offers if await offer._trade_available()]
-        invalid_offers = [x for offer in offers if x not in valid_offers]
+        invalid_offers = [x for x in offers if x not in valid_offers]
         if len(valid_offers) == 0:
             raise PokemonInvalidContext(invalid_offers)
         elif len(invalid_offers) > 0:

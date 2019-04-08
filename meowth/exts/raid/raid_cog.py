@@ -434,7 +434,7 @@ class RaidCog(Cog):
         **Arguments**
         *gym:* Name of the gym. Must be wrapped in quotes if multiple words.
 
-        *hatch_time (optional):* Date and time the EX Raid will begin.
+        *hatch_time:* Date and time the EX Raid will begin.
             Does not need to be wrapped in quotes.
         
         **Example:** `!exraid "city park" April 9 1:00 PM`

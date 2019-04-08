@@ -1,4 +1,4 @@
-nfrom meowth import Cog, command, bot, checks
+from meowth import Cog, command, bot, checks
 from meowth.utils.converters import ChannelMessage
 from meowth.exts.pkmn import Pokemon, Move
 from meowth.exts.want import Want

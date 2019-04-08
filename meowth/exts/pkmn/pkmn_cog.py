@@ -782,6 +782,10 @@ class Pokemon():
                 possible_mons = [x for x in mons if x._raid_available()]
             elif command_name == 'wild':
                 possible_mons = [x for x in mons if await x._wild_available()]
+            elif command_name == 'trade':
+                possible_mons = [x for x in mons if await x._trade_available()]
+            else:
+                possible_mons = mons
             impossible_mons = [x for x in mons if x not in possible_mons]
             if len(possible_mons) == 0:
                 raise PokemonInvalidContext(impossible_mons)

@@ -441,7 +441,8 @@ class RaidCog(Cog):
         Reports an EX Raid at City Park beginning on April 9 at 1:00 PM.
         """
         zone = await ctx.tz()
-        new_exraid = Raid(ctx.bot, ctx.guild.id, ctx.channel.id, gym, level="EX", hatch=hatch_time, tz=zone)
+        raid_id = next(snowflake.create())
+        new_exraid = Raid(raid_id, ctx.bot, ctx.guild.id, ctx.channel.id, gym, level="EX", hatch=hatch_time, tz=zone)
         return await self.setup_raid(ctx, new_exraid)
 
     

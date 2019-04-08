@@ -74,3 +74,25 @@ class SilphCog(Cog):
                     break
         with open(self.bot.ext_dir + '/raid/raid_info.py', 'a') as f:
             print('\nraid_lists = ' + str(self.bot.raid_info.raid_lists), file=f)
+        
+    @command()
+    @checks.is_co_owner()
+    async def replace(self, ctx):
+        self.bot.raid_info.raid_lists = {
+            '1': [],
+            '2': [],
+            '3': [],
+            '4': [],
+            '5': [],
+            '6': [],
+            'EX': []
+        }
+        url = 'https://api.thesilphroad.com/v0/raids'
+        headers = {'Authorization': f'Silph {silph_info.api_key}'}
+        async with aiohttp.ClientSession() as sess:
+            async with sess.get(url, headers=headers) as resp:
+                data = await resp.json()
+                data = data['data']
+                self.parse_info_from_silph(data)
+        with open(self.bot.ext_dir + '/raid/raid_info.py', 'a') as f:
+            print('\nraid_lists = ' + str(self.bot.raid_info.raid_lists), file=f)

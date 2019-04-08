@@ -1,6 +1,7 @@
 from meowth import Cog, command, bot, checks
 from meowth.utils.converters import ChannelMessage
 from meowth.exts.pkmn import Pokemon, Move
+from meowth.exts.pkmn.errors import PokemonInvalidContext
 from meowth.exts.want import Want
 from meowth.exts.users import MeowthUser
 from meowth.utils import formatters, snowflake
@@ -313,7 +314,15 @@ class TradeCog(Cog):
     async def trade(self, ctx, offers: commands.Greedy[Pokemon]):
         if len(offers) == 0:
             return await ctx.send(f'Did not receive any valid offers! Remember to wrap multi-word Pokemon arguments in quotes.')
-        offers = [await offer.validate('trade') for offer in offers]
+        valid_offers = [await offer.validate('trade') for offer in offers if await offer._trade_available()]
+        invalid_offers = [x for offer in offers if x not in valid_offers]
+        if len(valid_offers) == 0:
+            raise PokemonInvalidContext(invalid_offers)
+        elif len(invalid_offers) > 0:
+            invalid_names = [await x.name() for x in error.invalid_offers]
+            fields={"Invalid Pokemon": "\n".join(invalid_names)}
+            await ctx.warning('The following Pokemon cannot be traded!',
+                fields=fields)
         listmsg = await ctx.send(f"{ctx.author.display_name} - what Pokemon are you willing to accept in exchange? Use 'any' if you will accept anything and 'OBO' if you want to allow other offers. Use commas to separate Pokemon.")
         def check(m):
             return m.channel == ctx.channel and m.author == ctx.author

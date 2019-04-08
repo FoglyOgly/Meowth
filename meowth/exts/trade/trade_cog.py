@@ -353,7 +353,7 @@ class TradeCog(Cog):
             wants.append('obo')
         listing_id = f'{ctx.channel.id}/{listmsg.id}'
         trade_id = next(snowflake.create())
-        new_trade = Trade(trade_id, self.bot, ctx.guild.id, ctx.author.id, listing_id, offers, wants)
+        new_trade = Trade(trade_id, self.bot, ctx.guild.id, ctx.author.id, listing_id, valid_offers, wants)
         Trade.by_listing[listing_id] = new_trade
         embed = await TradeEmbed.from_trade(new_trade)
         try:
@@ -364,7 +364,7 @@ class TradeCog(Cog):
         want_emoji = new_trade.react_list
         for emoji in want_emoji:
             await listmsg.add_reaction(emoji)
-        offer_data = [repr(x) for x in offers]
+        offer_data = [repr(x) for x in valid_offers]
         want_data = [repr(x) for x in wants]
         data = {
             'id': trade_id,

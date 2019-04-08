@@ -319,7 +319,7 @@ class TradeCog(Cog):
         if len(valid_offers) == 0:
             raise PokemonInvalidContext(invalid_offers)
         elif len(invalid_offers) > 0:
-            invalid_names = [await x.name() for x in error.invalid_offers]
+            invalid_names = [await x.name() for x in invalid_offers]
             fields={"Invalid Pokemon": "\n".join(invalid_names)}
             await ctx.warning('The following Pokemon cannot be traded!',
                 fields=fields)

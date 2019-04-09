@@ -702,6 +702,7 @@ class Pokemon():
         form_names = bot.dbi.table('form_names')
         forms_table = bot.dbi.table('forms')
         movesets = bot.dbi.table('movesets')
+        id_list = []
         name_list = await pokedex.query('name').get_values()
         form_list = await form_names.query('name').get_values()
         args = arg.lower().split()

@@ -702,7 +702,6 @@ class Pokemon():
         form_names = bot.dbi.table('form_names')
         forms_table = bot.dbi.table('forms')
         movesets = bot.dbi.table('movesets')
-        id_list = await pokemon.query('pokemonid').where(formid=0).get_values()
         name_list = await pokedex.query('name').get_values()
         form_list = await form_names.query('name').get_values()
         args = arg.lower().split()
@@ -785,7 +784,10 @@ class Pokemon():
                         raise PokemonNotFound
         print(ids)
         print(id_list)
-        possible_ids = set(ids) & set(id_list)
+        if id_list:
+            possible_ids = set(ids) & set(id_list)
+        else:
+            possible_ids = set(ids)
         length = len(possible_ids)
         if length == 0:
             raise PokemonNotFound

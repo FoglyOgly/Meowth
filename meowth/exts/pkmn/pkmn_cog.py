@@ -782,8 +782,6 @@ class Pokemon():
                     else:
                         print(0)
                         raise PokemonNotFound
-        print(ids)
-        print(id_list)
         if id_list:
             possible_ids = set(ids) & set(id_list)
         else:

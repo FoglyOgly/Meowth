@@ -1985,13 +1985,13 @@ class ReportEmbed():
                 name += " :sparkles:"
             name += f" {type_emoji}"
             img_url = await boss.sprite_url()
+            enddt = datetime.fromtimestamp(raid.end)
         elif raid.status == 'egg':
             bossfield = "Level"
             name = raid.level
             img_url = raid.bot.raid_info.egg_images[name]
+            enddt = datetime.fromtimestamp(raid.hatch)
         bot = raid.bot
-        end = raid.end
-        enddt = datetime.fromtimestamp(end)
         # color = await boss.color()
         gym = raid.gym
         if isinstance(gym, Gym):

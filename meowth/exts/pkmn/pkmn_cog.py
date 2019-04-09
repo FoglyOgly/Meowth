@@ -525,6 +525,16 @@ class Pokemon():
         )
         return embed
     
+    @staticmethod
+    async def get_all_forms(bot, pokemonid):
+        table = bot.dbi.table('pokemon')
+        query = table.query('num')
+        query.where(pokemonid=pokemonid)
+        num = await query.get_value()
+        new_query = table.query('pokemonid')
+        new_query.where(num=num)
+        ids = await query.get_values()
+        return ids
     
     async def cpm(self):
         if not self.lvl:
@@ -771,7 +781,10 @@ class Pokemon():
                             pokedex['name'].in_(names))
                         ids = await ref.get_values()
                     else:
+                        print(0)
                         raise PokemonNotFound
+        print(ids)
+        print(id_list)
         possible_ids = set(ids) & set(id_list)
         length = len(possible_ids)
         if length == 0:

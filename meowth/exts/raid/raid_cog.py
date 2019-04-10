@@ -699,11 +699,11 @@ class RaidCog(Cog):
         raid = Raid.by_channel.get(str(ctx.channel.id))
         if not raid:
             return
+        zone = raid.tz
         if newtime.isdigit():
             stamp = time.time() + 60*int(newtime)
         else:
             try:
-                zone = raid.tz
                 newdt = parse(newtime, settings={'TIMEZONE': zone, 'RETURN_AS_TIMEZONE_AWARE': True})
                 stamp = newdt.timestamp()
             except:
@@ -712,6 +712,10 @@ class RaidCog(Cog):
             raid.update_time(stamp)
         except:
             return
+        dt = datetime.fromtimestamp(stamp)
+        localdt = raid.local_datetime(stamp)
+        timestr = localdt.strftime('%I:%M %p')
+        datestr = localdt.strftime('%b %d')
         has_embed = False
         for idstring in raid.message_ids:
             chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
@@ -720,7 +724,20 @@ class RaidCog(Cog):
                 embed.timestamp = datetime.fromtimestamp(stamp)
                 has_embed = True
             await msg.edit(embed=embed)
-        return
+        if raid.level == 'EX':
+            if raid.status == 'egg':
+                title = "Hatch Time Updated"
+                details = f"This EX Raid Egg will hatch on {datestr} at {timestr}"
+            elif raid.status == 'active':
+                title = "Expire Time Updated"
+                details = f"This EX Raid will end at {timestr}"
+        elif raid.status == 'egg':
+            title = "Hatch Time Updated"
+            details = f"This Raid Egg will hatch at {timestr}"
+        elif raid.status == 'active':
+            title = "Expire Time Updated"
+            details = f"This Raid will end at {timestr}"
+        return await ctx.success(title=title, details=details)
     
     @command()
     @checks.is_co_owner()

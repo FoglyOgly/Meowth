@@ -395,7 +395,7 @@ class WildEmbed():
             directions_text = wild.location._name + " (Unknown Location)"
         fields = {
             'Pokemon': f'{name} {type_emoji}',
-            'Weather': f'{weather_name} {weather_emoji}',
+            'Weather': f'{weather_name}{weather_emoji}',
             'CP': cp_str,
             "IVs: Atk/Def/Sta": iv_str,
             'Moveset': moveset,

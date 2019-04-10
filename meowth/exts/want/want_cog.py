@@ -142,7 +142,6 @@ class WantCog(Cog):
         self.bot = bot
     
     @command()
-    async def want(self, ctx, wants: commands.Greedy[Want]):
-        for want in wants:
-            await want.add_user(ctx.author.id)
+    async def want(self, ctx, want: Want]):
+        await want.add_user(ctx.author.id)
 

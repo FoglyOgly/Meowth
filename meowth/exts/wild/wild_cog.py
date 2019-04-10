@@ -157,6 +157,8 @@ class Wild():
                 old_embed = msg.embeds[0]
                 old_dict = old_embed.to_dict()
                 new_dict = new_embed.to_dict()
+                print(old_dict)
+                print(new_dict)
                 if old_dict == new_dict:
                     return await channel.send('No valid arguments were received!')
                 await msg.edit(embed=new_embed)

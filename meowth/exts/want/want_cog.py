@@ -128,7 +128,7 @@ class Want():
         if arg in tiers:
             return cls(ctx.bot, arg, ctx.guild)
         try:
-            pkmn = await Pokemon.convert(ctx, want)
+            pkmn = await Pokemon.convert(ctx, arg)
         except:
             pkmn = False
         if pkmn:

@@ -126,7 +126,7 @@ class Want():
         print(0)
         tiers = ['1', '2', '3', '4', '5', 'EX']
         if arg in tiers:
-            return cls(ctx.bot, arg, ctx.guild)
+            return cls(ctx.bot, arg, ctx.guild.id)
         try:
             pkmn = await Pokemon.convert(ctx, arg)
         except:
@@ -134,7 +134,7 @@ class Want():
         if pkmn:
             print(1)
             family = await pkmn._familyId()
-            return cls(ctx.bot, family, ctx.guild)
+            return cls(ctx.bot, family, ctx.guild.id)
 
 class WantCog(Cog):
 

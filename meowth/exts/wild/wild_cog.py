@@ -395,10 +395,10 @@ class WildEmbed():
             directions_text = wild.location._name + " (Unknown Location)"
         fields = {
             'Pokemon': f'{name} {type_emoji}',
-            'Weather': f'{weather_name}{weather_emoji}',
+            'Weather': f'{weather_name} {weather_emoji}'.strip(),
             'CP': cp_str,
             "IVs: Atk/Def/Sta": iv_str,
-            'Moveset': moveset,
+            'Moveset': moveset.strip(),
             'Gender': wild.pkmn.gender.title() if wild.pkmn.gender else "Unknown"
         }
         reportdt = datetime.fromtimestamp(wild.created)

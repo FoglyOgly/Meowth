@@ -712,31 +712,34 @@ class RaidCog(Cog):
             raid.update_time(stamp)
         except:
             raise
-        dt = datetime.fromtimestamp(stamp)
-        localdt = raid.local_datetime(stamp)
-        timestr = localdt.strftime('%I:%M %p')
-        datestr = localdt.strftime('%b %d')
+        if raid.status == 'egg':
+            dt = datetime.fromtimestamp(raid.hatch)
+            local = raid.local_datetime(raid.hatch)
+            timestr = local.strftime('%I:%M %p')
+            datestr = local.strftime('%b %d')
+            title = "Hatch Time Updated"
+            if raid.level == 'EX':
+                details = f"This EX Raid Egg will hatch on {datestr} at {timestr}"
+            else:
+                details = f"This Raid Egg will hatch at {timestr}"
+        elif raid.status == 'active':
+            title = "Expire Time Updated"
+            dt = datetime.fromtimestamp(raid.end)
+            localdt = raid.local_datetime(raid.end)
+            timestr = localdt.strftime('%I:%M %p')
+            datestr = localdt.strftime('%b %d')
+            if raid.level == 'EX':
+                details = f"This EX Raid will end at {timestr}"
+            else:
+                details = f"This Raid will end at {timestr}"
         has_embed = False
         for idstring in raid.message_ids:
             chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
             if not has_embed:
                 embed = msg.embeds[0]
-                embed.timestamp = datetime.fromtimestamp(stamp)
+                embed.timestamp = dt
                 has_embed = True
             await msg.edit(embed=embed)
-        if raid.level == 'EX':
-            if raid.status == 'egg':
-                title = "Hatch Time Updated"
-                details = f"This EX Raid Egg will hatch on {datestr} at {timestr}"
-            elif raid.status == 'active':
-                title = "Expire Time Updated"
-                details = f"This EX Raid will end at {timestr}"
-        elif raid.status == 'egg':
-            title = "Hatch Time Updated"
-            details = f"This Raid Egg will hatch at {timestr}"
-        elif raid.status == 'active':
-            title = "Expire Time Updated"
-            details = f"This Raid will end at {timestr}"
         return await ctx.success(title=title, details=details)
     
     @command()

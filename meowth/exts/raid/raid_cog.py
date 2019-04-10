@@ -711,7 +711,7 @@ class RaidCog(Cog):
         try:
             raid.update_time(stamp)
         except:
-            return
+            raise
         dt = datetime.fromtimestamp(stamp)
         localdt = raid.local_datetime(stamp)
         timestr = localdt.strftime('%I:%M %p')

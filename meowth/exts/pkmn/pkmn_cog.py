@@ -642,8 +642,11 @@ class Pokemon():
     
     async def get_info_from_arg(self, bot, arg):
         if arg.startswith('cp'):
-            cp = int(arg[2:])
-            self.cp = cp
+            if len(arg) == 2:
+                pass
+            else:
+                cp = int(arg[2:])
+                self.cp = cp
         elif arg.startswith('@'):
             arg = arg[1:]
             move = await Move.from_arg(bot, arg)

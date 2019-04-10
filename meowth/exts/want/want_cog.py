@@ -123,6 +123,7 @@ class Want():
     
     @classmethod
     async def convert(cls, ctx, arg):
+        print(0)
         tiers = ['1', '2', '3', '4', '5', 'EX']
         if arg in tiers:
             return cls(ctx.bot, arg, ctx.guild)
@@ -131,6 +132,7 @@ class Want():
         except:
             pkmn = False
         if pkmn:
+            print(1)
             family = await pkmn._familyId()
             return cls(ctx.bot, family, ctx.guild)
 

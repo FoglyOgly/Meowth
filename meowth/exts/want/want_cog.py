@@ -3,6 +3,7 @@ from meowth.exts.pkmn import Pokemon
 from meowth.utils import fuzzymatch
 
 import discord
+from discord.ext import commands
 
 class Want():
 
@@ -27,6 +28,14 @@ class Want():
         want_table = self.bot.dbi.table('wants')
         insert = want_table.insert()
         insert.row(guild=self.guildid, want=self.want)
+        return insert
+    
+    @property
+    def _update(self):
+        want_table = self.bot.dbi.table('wants')
+        update = want_table.update
+        update.where(guild=self.guildid, want=self.want)
+        return update
     
     async def _users(self):
         _data = self._data
@@ -35,6 +44,13 @@ class Want():
         if not users:
             users = []
         return users
+    
+    async def add_user(self, user_id):
+        users = await self._users()
+        users.append(user_id)
+        update = self._update
+        update.values(users=users)
+        await update.commit()
     
     async def notify_users(self, content, embed):
         msgs = []
@@ -83,12 +99,12 @@ class Want():
                 elif self.want in raid_tiers:
                     name = "Tier " + self.want
                     role = await guild.create_role(name=name, mentionable=True)
-                elif self.want.startswith('POKEMON_TYPE'):
-                    types_table = self.bot.dbi.table('type_names')
-                    name_query = types_table.query('name')
-                    name_query.where(typeid=self.want, language_id=9)
-                    name = await name_query.get_value()
-                    role = await guild.create_role(name=name, mentionable=True)
+                # elif self.want.startswith('POKEMON_TYPE'):
+                #     types_table = self.bot.dbi.table('type_names')
+                #     name_query = types_table.query('name')
+                #     name_query.where(typeid=self.want, language_id=9)
+                #     name = await name_query.get_value()
+                #     role = await guild.create_role(name=name, mentionable=True)
                 else:
                     items_table = self.bot.dbi.table('item_names')
                     name_query = items_table.query('name')
@@ -101,6 +117,19 @@ class Want():
                 for user in users:
                     await user.add_roles(role)
             return role
+    
+    @classmethod
+    async def convert(cls, ctx, arg):
+        tiers = ['1', '2', '3', '4', '5', 'EX']
+        if arg in tiers:
+            return cls(ctx.bot, arg, ctx.guild)
+        try:
+            pkmn = await Pokemon.convert(ctx, want)
+        except:
+            pkmn = False
+        if pkmn:
+            family = await pkmn._familyId()
+            return cls(ctx.bot, family, ctx.guild)
 
 class WantCog(Cog):
 
@@ -108,7 +137,7 @@ class WantCog(Cog):
         self.bot = bot
     
     @command()
-    async def want(self, ctx, *wants):
+    async def want(self, ctx, wants: commands.Greedy[Want]):
         for want in wants:
-            pkmn = await Pokemon.convert(ctx, want)
+            await want.add_user(ctx.author.id)
 

@@ -154,6 +154,11 @@ class Wild():
             await msg.delete()
             for idstring in self.message_ids:
                 chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+                old_embed = msg.embeds[0]
+                old_dict = old_embed.to_dict()
+                new_dict = new_embed.to_dict()
+                if old_dict == new_dict:
+                    return await channel.send('No valid arguments were received!')
                 await msg.edit(embed=new_embed)
 
     

@@ -155,8 +155,8 @@ class Wild():
             for idstring in self.message_ids:
                 chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
                 old_embed = msg.embeds[0]
-                old_fields = old_embed.fields
-                new_fields = new_embed.fields
+                old_fields = old_embed.to_dict()['fields']
+                new_fields = new_embed.to_dict()['fields']
                 print(old_fields)
                 print(new_fields)
                 if old_fields == new_fields:

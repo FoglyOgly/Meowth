@@ -199,9 +199,12 @@ class Raid:
             else:
                 raise InvalidTime
         else:
-            if not self.hatch:
-                max_hatch = 0
-            max_stamp = created + max_active*60 + max_hatch*60
+            if not max_hatch:
+                max_stamp = time.time() + max_active*60
+            else:
+                if not self.hatch:
+                    max_hatch = 0
+                max_stamp = created + max_active*60 + max_hatch*60
             if new_time < max_stamp:
                 self.end = new_time
             else:

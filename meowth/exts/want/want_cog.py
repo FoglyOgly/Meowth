@@ -142,6 +142,6 @@ class WantCog(Cog):
         self.bot = bot
     
     @command()
-    async def want(self, ctx, want: Want]):
+    async def want(self, ctx, want: Want):
         await want.add_user(ctx.author.id)
 

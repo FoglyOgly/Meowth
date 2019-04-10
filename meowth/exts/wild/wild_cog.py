@@ -155,11 +155,9 @@ class Wild():
             for idstring in self.message_ids:
                 chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
                 old_embed = msg.embeds[0]
-                old_dict = old_embed.to_dict()
-                new_dict = new_embed.to_dict()
-                print(old_dict)
-                print(new_dict)
-                if old_dict == new_dict:
+                old_fields = old_embed.fields
+                new_fields = new_embed.fields
+                if old_fields == new_fields:
                     return await channel.send('No valid arguments were received!')
                 await msg.edit(embed=new_embed)
 

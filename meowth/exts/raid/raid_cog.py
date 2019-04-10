@@ -712,7 +712,7 @@ class RaidCog(Cog):
             raid.update_time(stamp)
         except:
             raise
-        if raid.status == 'egg':
+        if raid.status == 'egg' or raid.status == 'hatched':
             dt = datetime.fromtimestamp(raid.hatch)
             local = raid.local_datetime(raid.hatch)
             timestr = local.strftime('%I:%M %p')
@@ -722,7 +722,7 @@ class RaidCog(Cog):
                 details = f"This EX Raid Egg will hatch on {datestr} at {timestr}"
             else:
                 details = f"This Raid Egg will hatch at {timestr}"
-        elif raid.status == 'active':
+        elif raid.status == 'active' or raid.status == 'expired':
             title = "Expire Time Updated"
             dt = datetime.fromtimestamp(raid.end)
             localdt = raid.local_datetime(raid.end)

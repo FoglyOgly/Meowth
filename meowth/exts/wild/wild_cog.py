@@ -157,10 +157,10 @@ class Wild():
                 old_embed = msg.embeds[0]
                 old_fields = old_embed.to_dict()['fields']
                 new_fields = new_embed.to_dict()['fields']
-                print(old_fields)
-                print(new_fields)
                 if old_fields == new_fields:
-                    return await channel.send('No valid arguments were received!')
+                    badmsg = return await channel.send('No valid arguments were received!')
+                    await asyncio.sleep(10)
+                    await badmsg.delete()
                 await msg.edit(embed=new_embed)
 
     

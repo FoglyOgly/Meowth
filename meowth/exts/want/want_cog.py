@@ -47,6 +47,9 @@ class Want():
     
     async def add_user(self, user_id):
         users = await self._users()
+        if not users:
+            insert = self._insert
+            await insert.commit()
         users.append(user_id)
         update = self._update
         update.values(users=users)

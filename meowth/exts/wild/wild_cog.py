@@ -262,7 +262,8 @@ class WildCog(Cog):
         new_wild = Wild(wild_id, self.bot, ctx.guild.id, location, pkmn)
         react_list = list(new_wild.react_list.values())
         name = await pkmn.name()
-        want = Want(ctx.bot, new_wild.pkmn.id, ctx.guild.id)
+        family = await pkmn._familyId()
+        want = Want(ctx.bot, family, ctx.guild.id)
         role = await want.role()
         embed = (await WildEmbed.from_wild(new_wild)).embed
         if role:

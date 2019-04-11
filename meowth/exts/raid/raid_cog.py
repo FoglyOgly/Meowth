@@ -327,7 +327,7 @@ class RaidCog(Cog):
         raid_table = ctx.bot.dbi.table('raids')
         wants = await new_raid.get_wants()
         role_wants = [wants.get(x) for x in wants if wants.get(x)]
-        dm_wants = [x for x in wants if x not wants.get(x)]
+        dm_wants = [x for x in wants if not wants.get(x)]
         role_mentions = "\u200b".join([x.mention for x in role_wants])
         new_raid.channel_ids = []
         new_raid.message_ids = []

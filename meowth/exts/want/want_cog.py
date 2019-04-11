@@ -55,12 +55,14 @@ class Want():
         update.values(users=users)
         await update.commit()
     
-    async def notify_users(self, content, embed):
+    async def notify_users(self, content, embed, author=None):
         msgs = []
         users = await self._users()
         guild = self.guild
         members = [guild.get_member(x) for x in users]
         for member in members:
+            # if member == author:
+            #     continue
             msg = await member.send(content, embed=embed)
             msgs.append(f"{msg.channel.id}/{msg.id}")
         return msgs

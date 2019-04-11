@@ -72,6 +72,12 @@ class Wild():
                 continue
         return (channels_users, message_list)
     
+    async def get_wants(self):
+        wants = []
+        family = await self.pkmn._familyId()
+        wants.append(Want(self.bot, family, self.guild_id))
+        return wants
+    
     async def despawned_embed(self):
         name = await self.pkmn.name()
         embed = formatters.make_embed(content=f"This {name} has despawned!", footer="Despawned")

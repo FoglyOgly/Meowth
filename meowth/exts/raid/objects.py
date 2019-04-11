@@ -2,6 +2,7 @@ from meowth.exts.map import Gym, ReportChannel, Mapper, PartialPOI
 from meowth.exts.users import MeowthUser
 from meowth.exts.pkmn import Pokemon, Move
 from meowth.exts.weather import Weather
+from meowth.exts.want import Want
 from meowth.utils import formatters, snowflake
 from meowth.utils.converters import ChannelMessage
 from .errors import * 
@@ -1237,6 +1238,23 @@ class Raid:
             raise
     
     # async def update_gym(self, gym):
+
+    async def get_wants(self):
+        wants = []
+        wants.append(self.level)
+        if self.pkmn:
+            family = await self.pkmn._familyId()
+            wants.append(family)
+        else:
+            if len(self.boss_list) == 1:
+                pkmn = Pokemon(self.bot, self.boss_list[0])
+                family = await pkmn._familyId()
+                wants.append(family)
+        wants = [Want(self.bot, x, self.guild_id) for x in wants]
+        want_dict = {x: await x.role() for x in wants}
+        return want_dict
+
+        
 
     async def boss_interest_dict(self):
         boss_list = self.boss_list

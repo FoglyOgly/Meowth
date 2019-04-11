@@ -225,7 +225,6 @@ class RaidCog(Cog):
                     return msg
         if level_or_boss.isdigit():
             level = level_or_boss
-            want = Want(ctx.bot, level, ctx.guild.id)
             boss = None
             if not endtime or endtime > ctx.bot.raid_info.raid_times[level][0]:
                 hatch = time.time() + 60*ctx.bot.raid_info.raid_times[level][0]
@@ -234,8 +233,6 @@ class RaidCog(Cog):
             end = hatch + 60*ctx.bot.raid_info.raid_times[level][1]
         else:
             boss = await RaidBoss.convert(ctx, level_or_boss)
-            family = await boss._familyId()
-            want = Want(ctx.bot, family, ctx.guild.id)
             level = boss.raid_level
             if not endtime or endtime > ctx.bot.raid_info.raid_times[level][1]:
                 end = time.time() + 60*ctx.bot.raid_info.raid_times[level][1]
@@ -245,7 +242,7 @@ class RaidCog(Cog):
         zone = await ctx.tz()
         raid_id = next(snowflake.create())
         new_raid = Raid(raid_id, ctx.bot, ctx.guild.id, ctx.channel.id, gym, level=level, pkmn=boss, hatch=hatch, end=end, tz=zone)
-        return await self.setup_raid(ctx, new_raid, want=want)
+        return await self.setup_raid(ctx, new_raid)
     
     @command(name='list')
     @raid_checks.raid_enabled()
@@ -321,17 +318,17 @@ class RaidCog(Cog):
 
 
     
-    async def setup_raid(self, ctx, new_raid: Raid, want: Want=None):
+    async def setup_raid(self, ctx, new_raid: Raid):
         boss = new_raid.pkmn
         gym = new_raid.gym
         level = new_raid.level
         hatch = new_raid.hatch
         end = new_raid.end
         raid_table = ctx.bot.dbi.table('raids')
-        if want:
-            role = await want.role()
-        else:
-            role = None
+        wants = await new_raid.get_wants()
+        role_wants = [wants.get(x) for x in wants if wants.get(x)]
+        dm_wants = [x for x in wants if x not wants.get(x)]
+        role_mentions = "\u200b".join([x.mention for x in role_wants])
         new_raid.channel_ids = []
         new_raid.message_ids = []
         react_list = new_raid.react_list
@@ -340,8 +337,8 @@ class RaidCog(Cog):
         else:
             embed = await new_raid.raid_embed()
         reportembed = await new_raid.report_embed()
-        if role:
-            reportcontent = role.mention + " - "
+        if role_mentions:
+            reportcontent = role_mentions + " - "
         else:
             reportcontent = ""
         exgymcat = None
@@ -372,10 +369,11 @@ class RaidCog(Cog):
             report_channels.append(report_channel)
         if raid_mode == 'message':
             reportcontent += "Coordinate this raid here using the reactions below!"
-            if not role:
+            if dm_wants:
                 dm_content = f"Coordinate this raid in {ctx.channel.name}!"
-                dms = await want.notify_users(dm_content, embed)
-                new_raid.message_ids.extend(dms)
+                for want in dm_wants:
+                    dms = await want.notify_users(dm_content, embed)
+                    new_raid.message_ids.extend(dms)
             for channel in report_channels:
                 reportmsg = await channel.channel.send(reportcontent, embed=embed)
                 for react in react_list:
@@ -408,9 +406,9 @@ class RaidCog(Cog):
             new_raid.message_ids.append(f"{raidmsg.channel.id}/{raidmsg.id}")
             reportcontent += f"Coordinate this raid in {raid_channel.mention}!"
             for channel in report_channels:
-                if not role:
+                if dm_wants:
                     dm_content = f"Coordinate this raid in {raid_channel.name}!"
-                    if want:
+                    for want in dm_wants:
                         dms = await want.notify_users(dm_content, embed)
                         new_raid.message_ids.extend(dms)
                 reportmsg = await channel.channel.send(reportcontent, embed=reportembed)

@@ -198,6 +198,7 @@ class AdminCog(Cog):
                         continue
                     else:
                         await ctx.send('Thanks for fixing those!')
+                        break
         insert = channel_table.insert
         insert.row(**rcrd)
         await insert.commit(do_update=True)

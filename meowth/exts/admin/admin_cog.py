@@ -14,9 +14,11 @@ class AdminCog(Cog):
         if not coms:
             return
         req_perms = self.required_perms(coms)
-        reqs_met = self.check_channel_perms(after, req_perms)
-        if not reqs_met:
-            return await after.send('My permissions in this channel have been restricted! I may not be able to process all enabled commands in this channel.')
+        missing_perms = self.check_channel_perms(after, req_perms)
+        if missing_perms:
+            content = 'I have lost the following required permissions in this channel!\n\n'
+            content += "\n".join(missing_perms)
+            return await after.send(content)
 
 
     async def enabled_commands(self, channel):
@@ -46,15 +48,13 @@ class AdminCog(Cog):
     def check_channel_perms(self, channel, required_perms):
         me = channel.guild.me
         perms = channel.permissions_for(me)
-        for x in required_perms:
-            print(x)
-        print(bin(required_perms.value))
-        for x in perms:
-            print(x)
-        print(bin(perms.value))
         if perms >= required_perms:
-            return True
-        return False
+            return None
+        missing_perms = []
+        for x in required_perms:
+            if x[1] and x not in perms:
+                missing_perms.append(x[0])
+        return missing_perms
 
 
     @command()

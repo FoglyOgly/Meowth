@@ -83,3 +83,17 @@ async def is_train_enabled(ctx):
 
 def train_enabled():
     return commands.check(is_train_enabled)
+
+async def is_train_channel(ctx):
+    train_table = ctx.bot.dbi.table('trains')
+    query = train_table.query('id')
+    query.where(channel_id=ctx.channel.id)
+    train_id = await query.get_value()
+    if not train_id:
+        raise NotTrainChannel
+    else:
+        return True
+
+def train_channel():
+    return commands.check(is_train_channel)
+

@@ -1250,6 +1250,9 @@ class Raid:
                 pkmn = Pokemon(self.bot, self.boss_list[0])
                 family = await pkmn._familyId()
                 wants.append(family)
+        if isinstance(self.gym, Gym):
+            if await self.gym._exraid():
+                wants.append('exgym')
         wants = [Want(self.bot, x, self.guild_id) for x in wants]
         want_dict = {x: await x.role() for x in wants}
         return want_dict

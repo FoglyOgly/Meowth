@@ -50,10 +50,20 @@ class Want():
         if not users:
             insert = self._insert
             await insert.commit()
-        users.append(user_id)
-        update = self._update
-        update.values(users=users)
-        await update.commit()
+            users = []
+        if user_id not in users:
+            users.append(user_id)
+            update = self._update
+            update.values(users=users)
+            await update.commit()
+            role = await self.role()
+            if role:
+                member = self.guild.get_member(user_id)
+                if role not in member.roles:
+                    await member.add_roles(role)
+            return 'success'
+        else:
+            return 'already done'
     
     async def notify_users(self, content, embed, author=None):
         msgs = []
@@ -119,14 +129,14 @@ class Want():
                 insert = self._update
                 insert.row(role=role.id)
                 await insert.commit(do_update=True)
-                for user in users:
-                    await user.add_roles(role)
+                for member in members:
+                    await member.add_roles(role)
             return role
     
     @classmethod
     async def convert(cls, ctx, arg):
-        print(0)
-        tiers = ['1', '2', '3', '4', '5', 'EX']
+        arg = arg.lower()
+        tiers = ['1', '2', '3', '4', '5', 'ex', 'exgym']
         if arg in tiers:
             return cls(ctx.bot, arg, ctx.guild.id)
         try:
@@ -134,7 +144,6 @@ class Want():
         except:
             pkmn = False
         if pkmn:
-            print(1)
             family = await pkmn._familyId()
             return cls(ctx.bot, family, ctx.guild.id)
 
@@ -144,6 +153,12 @@ class WantCog(Cog):
         self.bot = bot
     
     @command()
-    async def want(self, ctx, want: Want):
-        await want.add_user(ctx.author.id)
+    async def want(self, ctx, wants: commands.Greedy[Want]):
+        added_wants = []
+        for want in wants:
+            status = await want.add_user(ctx.author.id)
+            if status == 'already done':
+                continue
+            added_wants.append(want.want)
+        await ctx.success(title="Wants Added", details="\n".join(added_wants))
 

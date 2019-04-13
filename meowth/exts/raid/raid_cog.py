@@ -246,6 +246,7 @@ class RaidCog(Cog):
     
     @command(name='list')
     @raid_checks.raid_enabled()
+    @raid_checks.bot_has_permissions()
     async def _list(self, ctx):
         return await self.list_raids(ctx.channel)
     
@@ -426,6 +427,7 @@ class RaidCog(Cog):
     
     @command(aliases=['ex'], category='Raid')
     @raid_checks.raid_enabled()
+    @raid_checks.bot_has_permissions()
     async def exraid(self, ctx, gym: Gym, *, hatch_time: hatch_converter):
         """Report an EX Raid.
 
@@ -507,6 +509,7 @@ class RaidCog(Cog):
     
     @command(aliases=['i', 'maybe'], category="Raid RSVP")
     @raid_checks.raid_channel()
+    @raid_checks.bot_has_permissions()
     async def interested(self, ctx, bosses: commands.Greedy[Pokemon], total: typing.Optional[int]=1, *teamcounts):
         """RSVP as interested to the current raid.
 
@@ -525,6 +528,7 @@ class RaidCog(Cog):
         
     @command(aliases=['c', 'omw'], category="Raid RSVP")
     @raid_checks.raid_channel()
+    @raid_checks.bot_has_permissions()
     async def coming(self, ctx, bosses: commands.Greedy[Pokemon], total: typing.Optional[int]=1, *teamcounts):
         """RSVP as on your way to the current raid.
 
@@ -543,6 +547,7 @@ class RaidCog(Cog):
     
     @command(aliases=['h'])
     @raid_checks.raid_channel()
+    @raid_checks.bot_has_permissions()
     async def here(self, ctx, bosses: commands.Greedy[Pokemon], total: typing.Optional[int]=1, *teamcounts):
         """RSVP as being at the current raid.
 
@@ -561,12 +566,14 @@ class RaidCog(Cog):
     
     @command(aliases=['x'], category="Raid RSVP")
     @raid_checks.raid_channel()
+    @raid_checks.bot_has_permissions()
     async def cancel(self, ctx):
         """Cancel your RSVP to the current raid."""
         await self.rsvp(ctx, "cancel")
 
     @command(category="Raid Info")
     @raid_checks.raid_channel()
+    @raid_checks.bot_has_permissions()
     async def counters(self, ctx):
         """Request your optimal counters for the current box from Pokebattler.
 
@@ -587,6 +594,7 @@ class RaidCog(Cog):
         
     @command(category="Raid RSVP")
     @raid_checks.raid_channel()
+    @raid_checks.bot_has_permissions()
     async def group(self, ctx, group_time):
         """Create a group for the current raid.
 
@@ -624,6 +632,7 @@ class RaidCog(Cog):
     
     @command(aliases=['start'], category="Raid RSVP")
     @raid_checks.raid_channel()
+    @raid_checks.bot_has_permissions()
     async def starting(self, ctx):
         """Notify Meowth that your group is entering the raid lobby.
 
@@ -643,6 +652,7 @@ class RaidCog(Cog):
     
     @command(category="Raid Info")
     @raid_checks.raid_channel()
+    @raid_checks.bot_has_permissions()
     async def weather(self, ctx, *, weather: Weather):
         """Report the weather at the current raid.
 
@@ -656,6 +666,7 @@ class RaidCog(Cog):
     
     @command(aliases=['move'], category="Raid Info")
     @raid_checks.raid_channel()
+    @raid_checks.bot_has_permissions()
     async def moveset(self, ctx, move1: Move, move2: Move=None):
         """Report the raid boss's moveset.
 
@@ -685,6 +696,7 @@ class RaidCog(Cog):
     
     @command(aliases=['timer'], category="Raid Info")
     @raid_checks.raid_channel()
+    @raid_checks.bot_has_permissions()
     async def timerset(self, ctx, *, newtime):
         """Set the raid's hatch time or expire time.
 
@@ -839,6 +851,7 @@ class RaidCog(Cog):
 
     @command(category="Raid Train")
     @raid_checks.train_enabled()
+    @raid_checks.bot_has_permissions()
     async def train(self, ctx):
         """Reports a raid train.
 
@@ -879,6 +892,8 @@ class RaidCog(Cog):
         await self._join(meowthuser, new_train, party=party)
     
     @command(category="Raid Train")
+    @raid_checks.train_channel()
+    @raid_checks.bot_has_permissions()
     async def next(self, ctx):
         """Switch the train channel to the next raid.
 
@@ -890,6 +905,8 @@ class RaidCog(Cog):
         await train.finish_current_raid()
     
     @command(category="Raid Train")
+    @raid_checks.train_channel()
+    @raid_checks.bot_has_permissions()
     async def join(self, ctx, total: typing.Optional[int]=1, *teamcounts):
         """Join a raid train.
 
@@ -911,6 +928,8 @@ class RaidCog(Cog):
         await user.train_rsvp(train, party=party)
     
     @command(category="Raid Train")
+    @raid_checks.train_channel()
+    @raid_checks.bot_has_permissions()
     async def leave(self, ctx):
         """Leave a raid train.
 

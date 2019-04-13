@@ -1,11 +1,55 @@
 from meowth import checks, command, group, Cog
 from discord.ext import commands
+import discord
 from timezonefinder import TimezoneFinder
 
 class AdminCog(Cog):
     
     def __init__(self, bot):
         self.bot = bot
+
+    @Cog.listener()
+    async def on_guild_channel_update(self, before, after):
+        coms = await self.enabled_commands(after)
+        if not coms:
+            return
+        req_perms = self.required_perms(coms)
+        reqs_met = self.check_channel_perms(after, req_perms)
+        if not reqs_met:
+            return await after.send('My permissions in this channel have been restricted! I may not be able to process all enabled commands in this channel.')
+
+
+    async def enabled_commands(self, channel):
+        table = self.bot.dbi.table('report_channels')
+        query = table.query.where(channelid=after.id)
+        data = await query.get()
+        if not data:
+            return None
+        data = dict(data[0])
+        coms = [x for x in data if data[x] is True]
+        if not coms:
+            return None
+        return coms
+
+    def required_perms(self, coms):
+        permissions = discord.Permissions()
+        permissions.add_reactions = True
+        permissions.manage_messages = True
+        permissions.external_emojis = True
+        permissions.embed_links = True
+        if 'users' in coms:
+            permissions.manage_roles = True
+        if 'train' in coms:
+            permissions.manage_channels = True
+        return permissions
+
+    def check_channel_perms(self, channel, required_perms):
+        me = channel.guild.me
+        perms = channel.permissions_for(me)
+        if perms >= required_perms:
+            return True
+        return False
+
 
     @command()
     @commands.has_permissions(manage_guild=True)
@@ -65,7 +109,16 @@ class AdminCog(Cog):
             return await ctx.send("The list of valid command groups to enable is `raid, train, wild, research, user, trade, clean`.")
         location_commands = ['raid', 'wild', 'research', 'train']
         enabled_commands = []
+        required_perms = {}
+        me = ctx.guild.me
+        perms = ctx.channel.permissions_for(me)
         for x in features:
+            if x in ['raid', 'wild', 'trade', 'train', 'research', 'users']:
+                required_perms['Add Reactions'] = perms.add_reactions
+                required_perms['Manage Messages'] = perms.manage_messages
+                required_perms['Use External Emojis'] = perms.external_emojis
+            if x == 'users':
+                required_perms['Manage Roles'] = perms.manage_roles
             if x in location_commands:
                 if not rcrd.get('city'):
                     await ctx.send(f"You must set a location for this channel before enabling `{ctx.prefix}{x}`. Use `{ctx.prefix}setlocation`")
@@ -109,10 +162,40 @@ class AdminCog(Cog):
                         category = await converter.convert(ctx, resp.content)
                         if category:
                             rcrd[column] = str(category.id)
+                            required_perms['Manage Channels'] = perms.manage_channels
                             break
                         else:
                             await ctx.send('I could not interpret your response. Try again!')
                             continue
+        if not all(required_perms.values()):
+            missing_perms = [x for x in required_perms if not required_perms[x]]
+            while True:
+                await ctx.send(f'I am missing the following required permissions in this channel. Please respond with `done` when you have granted me those permissions or `cancel` to cancel.\n\n{"\n".join(missing_perms)}')
+                def check(m):
+                    return m.author == ctx.message.author and m.channel == ctx.channel
+                resp = await self.bot.wait_for('message', check=check)
+                if resp.content.lower() == 'cancel':
+                    return await ctx.send("Configuration canceled.")
+                elif resp.content.lower() == 'done':
+                    channel = resp.channel
+                    new_perms = channel.permissions_for(me)
+                    req_perms = {x: None for x in required_perms}
+                    for x in req_perms:
+                        if x == 'Manage Channels':
+                            req_perms[x] = new_perms.manage_channels
+                        elif x == 'Manage Roles':
+                            req_perms[x] = new_perms.manage_roles
+                        elif x == 'Manage Messages':
+                            req_perms[x] = new_perms.manage_messages
+                        elif x == 'Use External Emojis':
+                            req_perms[x] = new_perms.external_emojis
+                        elif x == 'Add Reactions':
+                            req_perms[x] = new_perms.add_reactions
+                    if not all(req_perms.values()):
+                        missing_perms = [x for x in req_perms if not req_perms[x]]
+                        continue
+                    else:
+                        await ctx.send('Thanks for fixing those!')
         insert = channel_table.insert
         insert.row(**rcrd)
         await insert.commit(do_update=True)

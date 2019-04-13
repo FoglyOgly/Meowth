@@ -58,3 +58,14 @@ async def check_cog_enabled(ctx, default=True):
 
 def cog_enabled():
     return commands.check(check_cog_enabled)
+
+async def check_is_report_channel(ctx):
+    table = ctx.bot.dbi.table('report_channels')
+    query = table.query.where(channelid=ctx.channel.id)
+    data = await query.get()
+    if data:
+        return True
+    return False
+
+def is_report_channel():
+    return commands.check(check_is_report_channel)

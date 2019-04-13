@@ -46,9 +46,11 @@ class AdminCog(Cog):
     def check_channel_perms(self, channel, required_perms):
         me = channel.guild.me
         perms = channel.permissions_for(me)
-        print(iter(required_perms))
+        for x in required_perms:
+            print(x)
         print(bin(required_perms.value))
-        print(iter(perms))
+        for x in perms:
+            print(x)
         print(bin(perms.value))
         if perms >= required_perms:
             return True

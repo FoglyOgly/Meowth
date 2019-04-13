@@ -21,7 +21,7 @@ class AdminCog(Cog):
 
     async def enabled_commands(self, channel):
         table = self.bot.dbi.table('report_channels')
-        query = table.query.where(channelid=after.id)
+        query = table.query.where(channelid=channel.id)
         data = await query.get()
         if not data:
             return None

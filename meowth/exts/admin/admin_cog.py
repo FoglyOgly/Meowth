@@ -170,7 +170,9 @@ class AdminCog(Cog):
         if not all(required_perms.values()):
             missing_perms = [x for x in required_perms if not required_perms[x]]
             while True:
-                await ctx.send(f'I am missing the following required permissions in this channel. Please respond with `done` when you have granted me those permissions or `cancel` to cancel.\n\n{"\n".join(missing_perms)}')
+                content = "I am missing the following required permissions in this channel. Please respond with `done` when you have granted me those permissions or `cancel` to cancel.\n\n"
+                content += "\n".join(missing_perms)
+                await ctx.send(content)
                 def check(m):
                     return m.author == ctx.message.author and m.channel == ctx.channel
                 resp = await self.bot.wait_for('message', check=check)

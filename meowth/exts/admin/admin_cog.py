@@ -54,6 +54,7 @@ class AdminCog(Cog):
         for x in required_perms:
             if x[1] and x not in perms:
                 missing_perms.append(x[0])
+        missing_perms = [x.replace('_', ' ').replace('guild', 'server').title() for x in missing_perms]
         return missing_perms
 
 

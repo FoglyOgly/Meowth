@@ -181,6 +181,10 @@ class Raid:
         max_times = self.bot.raid_info.raid_times[level]
         return max_times[1]
     
+    @property
+    def guild(self):
+        return self.bot.get_guild(self.guild_id)
+    
     def update_time(self, new_time: float):
         if self.monitor_task:
             self.monitor_task.cancel()
@@ -1401,7 +1405,40 @@ class Raid:
             grp['est_power'] = self.grp_est_power(grp)
             group_list.append(grp)
         return group_list
-
+    
+    async def list_rsvp(self, channel):
+        trainer_dict = self.trainer_dict
+        interested_users = []
+        coming_users = []
+        here_users = []
+        lobby_users = []
+        for trainer in trainer_dict:
+            member = self.guild.get_member(trainer)
+            name = member.display_name
+            party = trainer_dict[trainer]['party']
+            total = sum(party)
+            status = trainer_dict[trainer]['status']
+            sumstr = name
+            if total != 1:
+                sumstr += f' ({total})'
+            if status == 'maybe':
+                interested_users.append(sumstr)
+            elif status == 'coming':
+                coming_users.append(sumstr)
+            elif status == 'here':
+                here_users.append(sumstr)
+            elif status == 'lobby':
+                lobby_users.append(sumstr)
+        liststr = "Current RSVP Totals:"
+        if interested_users:
+            liststr += f'\n\nInterested: {", ".join(interested_users)}'
+        if coming_users:
+            liststr += f'\n\nComing: {", ".join(coming_users)}'
+        if here_users:
+            liststr += f'\n\nHere: {", ".join(here_users)}'
+        if lobby_users:
+            liststr += f'\n\nLobby: {", ".join(lobby_users)}'
+        return await channel.send(liststr)
 
     async def get_trainer_dict(self):
         def data(rcrd):

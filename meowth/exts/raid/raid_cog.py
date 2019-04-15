@@ -570,15 +570,6 @@ class RaidCog(Cog):
     async def cancel(self, ctx):
         """Cancel your RSVP to the current raid."""
         await self.rsvp(ctx, "cancel")
-    
-    @_list.command(name='rsvp', category="Raid RSVP")
-    @raid_checks.raid_channel()
-    @raid_checks.bot_has_permissions()
-    async def _list_rsvp(self, ctx):
-        """List name and status of everyone who has RSVP'd to the raid."""
-        raid = Raid.by_channel[ctx.channel.id]
-        if not raid:
-            return
         
 
     @command(category="Raid Info")

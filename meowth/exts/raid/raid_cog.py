@@ -130,7 +130,7 @@ class RaidCog(Cog):
                 pass
             try:
                 if await raid_checks.is_raid_channel(ctx):
-                    raid = Raid.by_channel[ctx.channel.id]
+                    raid = Raid.by_channel[str(ctx.channel.id)]
                     return await raid.list_rsvp(ctx.channel)
             except NotRaidChannel:
                 pass

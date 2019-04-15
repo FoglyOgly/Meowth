@@ -1438,7 +1438,7 @@ class Raid:
             liststr += f"\n\n{self.bot.get_emoji(self.bot.config.emoji['here'])}: {', '.join(here_users)}"
         if lobby_users:
             liststr += f"\n\nLobby: {', '.join(lobby_users)}"
-        embed = formatters.make_embed(title="Current RSVP Totals", description=liststr)
+        embed = formatters.make_embed(title="Current RSVP Totals", content=liststr)
         return await channel.send(embed=embed)
 
     async def get_trainer_dict(self):

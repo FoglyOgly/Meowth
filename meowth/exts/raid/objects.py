@@ -1429,16 +1429,17 @@ class Raid:
                 here_users.append(sumstr)
             elif status == 'lobby':
                 lobby_users.append(sumstr)
-        liststr = "Current RSVP Totals:"
+        liststr = ""
         if interested_users:
-            liststr += f'\n\nInterested: {", ".join(interested_users)}'
+            liststr += f'\n\n{self.bot.config.emoji['maybe']}: {", ".join(interested_users)}'
         if coming_users:
-            liststr += f'\n\nComing: {", ".join(coming_users)}'
+            liststr += f'\n\n{self.bot.config.emoji['coming']}: {", ".join(coming_users)}'
         if here_users:
-            liststr += f'\n\nHere: {", ".join(here_users)}'
+            liststr += f'\n\n{self.bot.get_emoji(self.bot.config.emoji['here'])}: {", ".join(here_users)}'
         if lobby_users:
             liststr += f'\n\nLobby: {", ".join(lobby_users)}'
-        return await channel.send(liststr)
+        embed = formatters.make_embed(title="Current RSVP Totals", description=liststr)
+        return await channel.send(embed=embed)
 
     async def get_trainer_dict(self):
         def data(rcrd):

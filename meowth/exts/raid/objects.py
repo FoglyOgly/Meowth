@@ -1431,13 +1431,13 @@ class Raid:
                 lobby_users.append(sumstr)
         liststr = ""
         if interested_users:
-            liststr += f"\n\n{self.bot.config.emoji['maybe']}: {", ".join(interested_users)}"
+            liststr += f"\n\n{self.bot.config.emoji['maybe']}: {', '.join(interested_users)}"
         if coming_users:
-            liststr += f"\n\n{self.bot.config.emoji['coming']}: {", ".join(coming_users)}"
+            liststr += f"\n\n{self.bot.config.emoji['coming']}: {', '.join(coming_users)}"
         if here_users:
-            liststr += f"\n\n{self.bot.get_emoji(self.bot.config.emoji['here'])}: {", ".join(here_users)}"
+            liststr += f"\n\n{self.bot.get_emoji(self.bot.config.emoji['here'])}: {', '.join(here_users)}"
         if lobby_users:
-            liststr += f"\n\nLobby: {", ".join(lobby_users)}"
+            liststr += f"\n\nLobby: {', '.join(lobby_users)}"
         embed = formatters.make_embed(title="Current RSVP Totals", description=liststr)
         return await channel.send(embed=embed)
 

@@ -45,8 +45,6 @@ class RaidCog(Cog):
         self.bot.loop.create_task(self.pickup_raiddata())
         self.bot.loop.create_task(self.pickup_traindata())
         self.bot.loop.create_task(self.add_listeners())
-        global _list
-        _list = bot.get_command('list')
     
     async def add_listeners(self):
         if self.bot.dbi.raid_listener:

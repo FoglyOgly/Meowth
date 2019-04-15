@@ -550,6 +550,7 @@ class Core(Cog):
             await ctx.send(embed=embed)
 
     @command(name="prefix", category='Bot Info')
+    @checks.is_admin()
     async def _prefix(self, ctx, *, new_prefix: str = None):
         """Get prefix and set server prefix.
         Use the argument 'reset' to reset the guild prefix to default.
@@ -605,6 +606,12 @@ class Core(Cog):
             await p.paginate()
         except Exception as e:
             await ctx.send(e)
+    
+    @group(name='list')
+    async def _list(self, ctx):
+        """Base command for listing reports or RSVPs."""
+        if not ctx.invoked_subcommand:
+            return #TODO handle context
 
     # @group(category='Server Config', name='enable', aliases=['disable'],
     #        invoke_without_command=True, hidden=True)

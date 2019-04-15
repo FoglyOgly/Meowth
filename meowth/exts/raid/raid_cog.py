@@ -1,4 +1,5 @@
 from meowth import Cog, command, bot, checks
+from meowth.core.commands.Core import _list
 from meowth.exts.map import Gym, ReportChannel, PartialPOI, S2_L10
 from meowth.exts.pkmn import Pokemon, Move
 from meowth.exts.pkmn.errors import MoveInvalid
@@ -244,10 +245,10 @@ class RaidCog(Cog):
         new_raid = Raid(raid_id, ctx.bot, ctx.guild.id, ctx.channel.id, gym, level=level, pkmn=boss, hatch=hatch, end=end, tz=zone)
         return await self.setup_raid(ctx, new_raid)
     
-    @command(name='list')
+    @_list.command(name='raids')
     @raid_checks.raid_enabled()
     @raid_checks.bot_has_permissions()
-    async def _list(self, ctx):
+    async def _list_raids(self, ctx):
         return await self.list_raids(ctx.channel)
     
     async def list_raids(self, channel):
@@ -570,6 +571,16 @@ class RaidCog(Cog):
     async def cancel(self, ctx):
         """Cancel your RSVP to the current raid."""
         await self.rsvp(ctx, "cancel")
+    
+    @_list.command(name='rsvp', category="Raid RSVP")
+    @raid_checks.raid_channel()
+    @raid_checks.bot_has_permissions()
+    async def _list_rsvp(self, ctx):
+        """List name and status of everyone who has RSVP'd to the raid."""
+        raid = Raid.by_channel[ctx.channel.id]
+        if not raid:
+            return
+        
 
     @command(category="Raid Info")
     @raid_checks.raid_channel()

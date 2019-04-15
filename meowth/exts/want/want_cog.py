@@ -65,6 +65,23 @@ class Want():
         else:
             return 'already done'
     
+    async def remove_user(self, user_id):
+        users = await self._users()
+        if not users:
+            return 'already done'
+        if user_id not in users:
+            return 'already done'
+        users.remove(user_id)
+        update = self._update
+        update.values(users=users)
+        await update.commit()
+        role = await self.role()
+        if role:
+            member = self.guild.get_member(user_id)
+            if role in member.roles:
+                await member.remove_roles(role)
+        return 'success'
+    
     async def notify_users(self, content, embed, author=None):
         msgs = []
         users = await self._users()
@@ -161,4 +178,14 @@ class WantCog(Cog):
                 continue
             added_wants.append(want.want)
         await ctx.success(title="Wants Added", details="\n".join(added_wants))
+    
+    @command()
+    async def unwant(self, ctx, wants: commands.Greedy[Want]):
+        removed_wants = []
+        for want in wants:
+            status = await want.remove_user(ctx.author.id)
+            if status == 'already done':
+                continue
+            removed_wants.append(want.want)
+        await ctx.success(title="Wants Removed", details="\n".join(removed_wants))
 

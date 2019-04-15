@@ -607,11 +607,10 @@ class Core(Cog):
         except Exception as e:
             await ctx.send(e)
     
-    @group(name='list')
+    @command(name='list')
     async def _list(self, ctx):
         """Base command for listing reports or RSVPs."""
-        if not ctx.invoked_subcommand:
-            return #TODO handle context
+        pass
 
     # @group(category='Server Config', name='enable', aliases=['disable'],
     #        invoke_without_command=True, hidden=True)

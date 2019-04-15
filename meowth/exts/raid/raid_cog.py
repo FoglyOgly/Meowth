@@ -1,5 +1,4 @@
 from meowth import Cog, command, bot, checks
-from meowth.core.commands.Core import _list
 from meowth.exts.map import Gym, ReportChannel, PartialPOI, S2_L10
 from meowth.exts.pkmn import Pokemon, Move
 from meowth.exts.pkmn.errors import MoveInvalid
@@ -46,6 +45,8 @@ class RaidCog(Cog):
         self.bot.loop.create_task(self.pickup_raiddata())
         self.bot.loop.create_task(self.pickup_traindata())
         self.bot.loop.create_task(self.add_listeners())
+        global _list
+        _list = bot.get_command('list')
     
     async def add_listeners(self):
         if self.bot.dbi.raid_listener:

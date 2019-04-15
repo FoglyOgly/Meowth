@@ -123,11 +123,17 @@ class RaidCog(Cog):
     @Cog.listener()
     async def on_command_completion(self, ctx):
         if ctx.command.name == 'list':
-            if await raid_checks.is_raid_enabled(ctx):
-                return await self.list_raids(ctx.channel)
-            if await raid_checks.is_raid_channel(ctx):
-                raid = Raid.by_channel[ctx.channel.id]
-                return await raid.list_rsvp(ctx.channel)
+            try:
+                if await raid_checks.is_raid_enabled(ctx):
+                    return await self.list_raids(ctx.channel)
+            except RaidDisabled:
+                pass
+            try:
+                if await raid_checks.is_raid_channel(ctx):
+                    raid = Raid.by_channel[ctx.channel.id]
+                    return await raid.list_rsvp(ctx.channel)
+            except NotRaidChannel:
+                pass
             
         
 

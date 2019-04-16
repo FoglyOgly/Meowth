@@ -140,16 +140,7 @@ class RaidCog(Cog):
                         return await raid.list_groups(ctx.channel)
             except NotRaidChannel:
                 pass
-            try:
-                if await raid_checks.is_train_channel(ctx):
-                    train = Train.by_channel[ctx.channel.id]
-                    if len(ctx.args) == 2 or 'teams' in ctx.args:
-                        return await train.list_teams(ctx.channel)
-            except NotTrainChannel:
-                pass
-            
         
-
 
     def _rsvp(self, connection, pid, channel, payload):
         if channel != 'rsvp':

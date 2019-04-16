@@ -70,6 +70,7 @@ async def is_train_enabled(ctx):
     except:
         is_raid = False
     if is_raid:
+        print(ctx.report_channel_id)
         report_channel = ctx.bot.get_channel(ctx.report_channel_id)
         if report_channel:
             ctx.channel = report_channel

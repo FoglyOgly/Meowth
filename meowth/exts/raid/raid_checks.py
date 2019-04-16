@@ -65,7 +65,11 @@ def raid_channel():
     return commands.check(is_raid_channel)
 
 async def is_train_enabled(ctx):
-    if await is_raid_channel(ctx):
+    try:
+        is_raid = await is_raid_channel(ctx)
+    except:
+        is_raid = False
+    if is_raid:
         report_channel = ctx.bot.get_channel(ctx.report_channel_id)
         if report_channel:
             ctx.channel = report_channel

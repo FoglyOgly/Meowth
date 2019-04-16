@@ -1649,7 +1649,7 @@ class Train:
             'id': self.id,
             'guild_id': self.guild_id,
             'channel_id': self.channel_id,
-            'report_channel_id': self.report_channel_id,
+            'report_channel': self.report_channel_id,
             'current_raid_id': self.current_raid.id if self.current_raid else None,
             'next_raid_id': self.next_raid.id if self.next_raid else None,
             'done_raid_ids': [x.id for x in self.done_raids],

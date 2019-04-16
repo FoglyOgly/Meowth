@@ -876,6 +876,7 @@ class RaidCog(Cog):
         Meowth will assume the current raid to be the first raid.
         """
         print(ctx.raid_id)
+        print(ctx.channel.name)
         report_channel = ReportChannel(self.bot, ctx.channel)
         city = await report_channel.city()
         city = city.split()[0]

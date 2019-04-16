@@ -10,6 +10,7 @@ from meowth.utils.converters import ChannelMessage
 import time
 from datetime import datetime
 import asyncio
+from pytz import timezone
 
 from . import wild_info
 from . import wild_checks
@@ -36,6 +37,19 @@ class Wild():
         self.message_ids = []
         self.react_list = bot.wild_info.emoji
         self.monitor_task = None
+
+    async def summary_str(self, tz):
+        name = await self.pkmn.name()
+        if isinstance(self.location, POI):
+            locname = await self.location._name()
+        else:
+            locname = self.location._name
+        stamp = self.created
+        localzone = timezone(tz)
+        reported_dt = datetime.fromtimestamp(stamp, tz=localzone)
+        reported_str = reported_dt.strftime('%I:%M %p')
+        summary = f'{name} at {locname} reported at {reported_str}'
+        return summary
 
     async def monitor_status(self):
         halfhourdespawn = self.created + 1800
@@ -240,6 +254,13 @@ class WildCog(Cog):
         if wild:
             return await wild.process_reactions(payload)
     
+    @Cog.listener()
+    async def on_command_completion(self, ctx):
+        if ctx.command.name == 'list':
+            if await wild_checks.is_wild_enabled(ctx):
+                tz = await ctx.tz()
+                return await self.list_wilds(ctx.channel, tz)
+    
     @command(aliases=['w'])
     @wild_checks.wild_enabled()
     async def wild(self, ctx, pokemon: Pokemon, *, location: POI):
@@ -314,6 +335,23 @@ class WildCog(Cog):
         insert.row(**d)
         self.bot.loop.create_task(new_wild.monitor_status())
         await insert.commit()
+    
+    async def list_wilds(self, channel, tz):
+        report_channel = ReportChannel(self.bot, channel)
+        data = await report_channel.get_all_wilds()
+        if not data:
+            return await channel.send("No wild spawns reported!")
+        wild_list = []
+        for wild_id in data:
+            wild = Wild.instances.get(wild_id)
+            if not wild:
+                continue
+            wild_list.append(await wild.summary_str(tz))
+        title = "Current Wild Spawns"
+        content = "\n\n".join(wild_list)
+        embed = formatters.make_embed(title=title, content=content)
+        await channel.send(embed=embed)
+        
 
 class WildEmbed():
 

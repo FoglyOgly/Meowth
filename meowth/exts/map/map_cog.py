@@ -128,6 +128,13 @@ class ReportChannel():
         query.where(report_channel_id=channel_id)
         return await query.get_values()
     
+    async def get_all_wilds(self):
+        channel_id = self.channel.id
+        query = f"SELECT id FROM wilds WHERE exists (SELECT * FROM (SELECT unnest(messages)) x(message) WHERE x.message LIKE $1) ORDER BY created ASC;"
+        query_args = [f'{channel_id}%']
+        data = await self.bot.dbi.execute_query(query, *query_args)
+        return [next(row.values()) for row in data]
+    
 
 
         

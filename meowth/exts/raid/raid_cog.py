@@ -875,6 +875,7 @@ class RaidCog(Cog):
         ask for the first raid. If used in a raid channel,
         Meowth will assume the current raid to be the first raid.
         """
+        print(ctx.raid_id)
         report_channel = ReportChannel(self.bot, ctx.channel)
         city = await report_channel.city()
         city = city.split()[0]

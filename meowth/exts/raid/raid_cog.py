@@ -888,6 +888,7 @@ class RaidCog(Cog):
         train_id = next(snowflake.create())
         new_train = Train(train_id, self.bot, ctx.guild.id, train_channel.id, ctx.channel.id)
         if ctx.raid_id:
+            print(ctx.raid_id)
             first_raid = Raid.instances.get(ctx.raid_id)
             if first_raid:
                 await new_train.select_raid(first_raid)

@@ -608,7 +608,7 @@ class Core(Cog):
             await ctx.send(e)
     
     @command(name='list')
-    async def _list(self, ctx):
+    async def _list(self, ctx, *args):
         """Base command for listing reports or RSVPs."""
         pass
 

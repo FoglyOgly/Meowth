@@ -125,14 +125,27 @@ class RaidCog(Cog):
         if ctx.command.name == 'list':
             try:
                 if await raid_checks.is_raid_enabled(ctx):
-                    return await self.list_raids(ctx.channel)
+                    if len(ctx.args) == 2 or 'raids' in ctx.args:
+                        return await self.list_raids(ctx.channel)
             except RaidDisabled:
                 pass
             try:
                 if await raid_checks.is_raid_channel(ctx):
                     raid = Raid.by_channel[str(ctx.channel.id)]
-                    return await raid.list_rsvp(ctx.channel)
+                    if len(ctx.args) == 2 or 'rsvp' in ctx.args:
+                        return await raid.list_rsvp(ctx.channel)
+                    if 'teams' in ctx.args:
+                        return await raid.list_teams(ctx.channel)
+                    if 'groups' in ctx.args:
+                        return await raid.list_groups(ctx.channel)
             except NotRaidChannel:
+                pass
+            try:
+                if await raid_checks.is_train_channel(ctx):
+                    train = Train.by_channel[ctx.channel.id]
+                    if len(ctx.args) == 2 or 'teams' in ctx.args:
+                        return await train.list_teams(ctx.channel)
+            except NotTrainChannel:
                 pass
             
         

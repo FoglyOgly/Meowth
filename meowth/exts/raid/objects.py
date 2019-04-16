@@ -1438,7 +1438,65 @@ class Raid:
             liststr += f"\n\n{self.bot.get_emoji(self.bot.config.emoji['here'])}: {', '.join(here_users)}"
         if lobby_users:
             liststr += f"\n\nLobby: {', '.join(lobby_users)}"
-        embed = formatters.make_embed(title="Current RSVP Totals", content=liststr)
+        embed = formatters.make_embed(title="Current Raid RSVP Totals", content=liststr)
+        return await channel.send(embed=embed)
+    
+    async def list_teams(self, channel):
+        trainer_dict = self.trainer_dict
+        mystic_list = []
+        instinct_list = []
+        valor_list = []
+        other_list = []
+        for trainer in trainer_dict:
+            member = self.guild.get_member(trainer)
+            name = member.display_name
+            party = trainer_dict[trainer]['party']
+            total = sum(party)
+            sumstr = name
+            if total != 1:
+                sumstr += f' ({total})'
+            if party[0] == total:
+                mystic_list.append(sumstr)
+            elif party[1] == total:
+                instinct_list.append(sumstr)
+            elif party[2] == total:
+                valor_list.append(sumstr)
+            else:
+                other_list.append(sumstr)
+        liststr = ""
+        if mystic_list:
+            liststr += f"\n\n{self.bot.config.team_emoji['mystic']}: {', '.join(mystic_list)}"
+        if instinct_list:
+            liststr += f"\n\n{self.bot.config.team_emoji['instinct']}: {', '.join(instinct_list)}"
+        if valor_list:
+            liststr += f"\n\n{self.bot.config.team_emoji['valor']}: {', '.join(valor_users)}"
+        if other_list:
+            liststr += f"\n\nOther: {', '.join(other_list)}"
+        embed = formatters.make_embed(title="Current Raid Team Totals", content=liststr)
+        return await channel.send(embed=embed)
+    
+    async def list_groups(self, channel):
+        liststr = ""
+        group_list = self.group_list
+        trainer_dict = self.trainer_dict
+        for group in group_list:
+            user_strs = []
+            users = group['users']
+            emoji = group['emoji']
+            start = self.local_datetime(group['starttime'])
+            time = start.strftime('%I:%M %p')
+            for user in users:
+                member = self.guild.get_member(user)
+                name = member.display_name
+                party = trainer_dict[user]['party']
+                total = sum(party)
+                sumstr = name
+                if total != 1:
+                    sumstr += f' ({total})'
+                user_strs.append(sumstr)
+            liststr += f"\n\n {emoji}: {', '.join(user_strs)}"
+            liststr += f"\nStarting at {time}"
+        embed = formatters.make_embed(title="Current Raid Groups", content=liststr)
         return await channel.send(embed=embed)
 
     async def get_trainer_dict(self):
@@ -1797,6 +1855,40 @@ class Train:
         team_str += f"{bot.config.team_emoji['valor']}: {team_dict['valor']} | "
         team_str += f"{bot.config.team_emoji['unknown']}: {team_dict['unknown']}"
         return team_str
+
+    async def list_teams(self, channel):
+        trainer_dict = self.trainer_dict
+        mystic_list = []
+        instinct_list = []
+        valor_list = []
+        other_list = []
+        for trainer in trainer_dict:
+            member = self.guild.get_member(trainer)
+            name = member.display_name
+            party = trainer_dict[trainer]['party']
+            total = sum(party)
+            sumstr = name
+            if total != 1:
+                sumstr += f' ({total})'
+            if party[0] == total:
+                mystic_list.append(sumstr)
+            elif party[1] == total:
+                instinct_list.append(sumstr)
+            elif party[2] == total:
+                valor_list.append(sumstr)
+            else:
+                other_list.append(sumstr)
+        liststr = ""
+        if mystic_list:
+            liststr += f"\n\n{self.bot.config.team_emoji['mystic']}: {', '.join(mystic_list)}"
+        if instinct_list:
+            liststr += f"\n\n{self.bot.config.team_emoji['instinct']}: {', '.join(instinct_list)}"
+        if valor_list:
+            liststr += f"\n\n{self.bot.config.team_emoji['valor']}: {', '.join(valor_users)}"
+        if other_list:
+            liststr += f"\n\nOther: {', '.join(other_list)}"
+        embed = formatters.make_embed(title="Current Train Team Totals", content=liststr)
+        return await channel.send(embed=embed)
 
     async def select_first_raid(self, author):
         raids = await self.possible_raids()

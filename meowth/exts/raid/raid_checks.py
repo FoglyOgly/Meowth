@@ -58,7 +58,6 @@ async def is_raid_channel(ctx):
         ctx.report_channel_id = report_channel_id
         return True
     else:
-        ctx.raid_id = None
         raise NotRaidChannel
 
 def raid_channel():

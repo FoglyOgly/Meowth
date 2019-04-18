@@ -123,7 +123,7 @@ class AdminCog(Cog):
         data = await query.get()
         if data:
             data = data[0]
-            channelid = data['channel']
+            channelid = data['channelid']
             message = data['message']
         else:
             return None, None

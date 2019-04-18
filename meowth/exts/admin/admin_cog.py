@@ -310,7 +310,10 @@ class AdminCog(Cog):
                         continue
                     message, errors = do_template(reply.content, ctx.author, ctx.guild)
                     if errors:
-                        await ctx.send(f"The following could not be found:\n{'\n'.join(errors)}\nPlease try again.")
+                        content = "The following could not be found:\n"
+                        content += "\n".join(errors)
+                        content += "\nPlease try again."
+                        await ctx.send(content)
                         continue
                     q = await ctx.send(f"Here's what you sent:\n\n{message}\n\nDoes that look right?")
                     payload = await ask(ctx.bot, [q], user_list=[ctx.author.id], timeout=None)

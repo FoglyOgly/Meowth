@@ -390,10 +390,10 @@ class AdminCog(Cog):
         else:
             rcrd = {'channelid': channel_id}
         possible_commands = ['raid', 'wild', 'research', 'users', 'train', 'trade',
-            'clean']
+            'clean', 'welcome']
         features = [x for x in features if x in possible_commands]
         if not features:
-            return await ctx.send("The list of valid command groups to disable is `raid, wild, research, user, train, trade, clean`.")
+            return await ctx.send("The list of valid command groups to disable is `raid, wild, research, user, train, trade, clean, welcome`.")
         disabled_commands = []
         if 'welcome' in features:
             table = ctx.bot.dbi.table('welcome')

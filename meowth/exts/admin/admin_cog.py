@@ -278,13 +278,16 @@ class AdminCog(Cog):
                 reply = await ctx.bot.wait_for('message', check=check)
                 if reply.content.lower() == 'dm':
                     new_welcome_channel = 'dm'
+                    break
                 else:
                     converter = commands.TextChannelConverter()
                     channel = await converter.convert(ctx, reply.content)
                     if channel:
                         new_welcome_channel = str(channel.id)
+                        break
                     else:
                         await ctx.send("I couldn't understand your reply. Try again.")
+                        continue
             if not message:
                 message = "Welcome to {server}, {user}!"
             content = f"Current welcome message: {message}\n"
@@ -324,6 +327,7 @@ class AdminCog(Cog):
                         continue
                     elif payload.emoji == '✅':
                         newmessage = message
+                        break
             d = {
                 'guild_id': ctx.guild.id,
                 'channelid': new_welcome_channel,

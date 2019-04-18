@@ -279,7 +279,8 @@ class AdminCog(Cog):
                 if reply.content.lower() == 'dm':
                     new_welcome_channel = 'dm'
                 else:
-                    channel = await commands.TextChannelConverter.convert(ctx, reply.content)
+                    converter = commands.TextChannelConverter()
+                    channel = await converter.convert(ctx, reply.content)
                     if channel:
                         new_welcome_channel = str(channel.id)
                     else:

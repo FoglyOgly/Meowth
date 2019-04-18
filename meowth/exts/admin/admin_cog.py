@@ -26,6 +26,8 @@ def do_template(message, author, guild):
             mention_match = re.search('(#|@!?|&)([0-9]+)', match)
             match_type = mention_match.group(1)[0]
             match = mention_match.group(2)
+            print(match_type)
+            print(match)
         if match_type == '@':
             member = guild.get_member_named(match)
             if match.isdigit() and (not member):

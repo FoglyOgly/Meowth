@@ -19,15 +19,10 @@ def do_template(message, author, guild):
         match_type = match.group(1)
         full_match = match.group(0)
         match = match.group(2)
-        print(match)
-        print(full_match)
-        print(match_type)
         if match_type == '<':
             mention_match = re.search('(#|@!?|&)([0-9]+)', match)
             match_type = mention_match.group(1)[0]
             match = mention_match.group(2)
-            print(match_type)
-            print(match)
         if match_type == '@':
             member = guild.get_member_named(match)
             if match.isdigit() and (not member):
@@ -72,7 +67,6 @@ class AdminCog(Cog):
     
     @Cog.listener()
     async def on_member_join(self, member):
-        print(0)
         guild = member.guild
         welcome_channel, message = await self.welcome_channel(guild)
         if not welcome_channel:
@@ -80,10 +74,8 @@ class AdminCog(Cog):
         if welcome_channel == 'dm':
             send_to = member
         else:
-            print(2)
             send_to = welcome_channel
         await send_to.send(message.format(server=guild.name, user=member.mention))
-        print(3)
 
     async def enabled_commands(self, channel):
         table = self.bot.dbi.table('report_channels')
@@ -342,7 +334,7 @@ class AdminCog(Cog):
             }
             table = ctx.bot.dbi.table('welcome')
             insert = table.insert.row(**d)
-            await insert.commit()
+            await insert.commit(do_update=True)
         if not all(required_perms.values()):
             missing_perms = [x for x in required_perms if not required_perms[x]]
             while True:

@@ -31,14 +31,14 @@ def do_template(message, author, guild):
         if match_type == '@':
             member = guild.get_member_named(match)
             if match.isdigit() and (not member):
-                member = guild.get_member(match)
+                member = guild.get_member(int(match))
             if (not member):
                 not_found.append(full_match)
             return member.mention if member else full_match
         elif match_type == '#':
             channel = discord.utils.get(guild.text_channels, name=match)
             if match.isdigit() and (not channel):
-                channel = guild.get_channel(match)
+                channel = guild.get_channel(int(match))
             if (not channel):
                 not_found.append(full_match)
             return channel.mention if channel else full_match

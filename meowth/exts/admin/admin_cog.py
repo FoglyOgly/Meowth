@@ -20,6 +20,8 @@ def do_template(message, author, guild):
         full_match = match.group(0)
         match = match.group(2)
         print(match)
+        print(full_match)
+        print(match_type)
         if match_type == '<':
             mention_match = re.search('(#|@!?|&)([0-9]+)', match)
             match_type = mention_match.group(1)[0]

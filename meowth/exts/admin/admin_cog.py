@@ -264,12 +264,12 @@ class AdminCog(Cog):
                 payload = await ask(ctx.bot, [oldmsg], user_list=[ctx.author.id])
                 if not payload:
                     await oldmsg.edit(content='Timed out!')
-                elif payload.emoji == '❎':
+                elif str(payload.emoji) == '❎':
                     if old_welcome_channel == 'dm':
                         new_welcome_channel = 'dm'
                     else:
                         new_welcome_channel = str(old_welcome_channel.id)
-                elif payload.emoji == '✅':
+                elif str(payload.emoji) == '✅':
                     pass
             await ctx.send('What channel do you want to use? You can type the name or ID of a text channel, or type `dm` if you want the welcome message sent to DMs.')
             def check(m):
@@ -296,9 +296,9 @@ class AdminCog(Cog):
             payload = await ask(ctx.bot, [oldmsg], user_list=[ctx.author.id])
             if not payload:
                 await oldmsg.edit(content='Timed out!')
-            elif payload.emoji == '❎':
+            elif str(payload.emoji) == '❎':
                 newmessage = message
-            elif payload.emoji == '✅':
+            elif str(payload.emoji) == '✅':
                 content = ("Type your welcome message below. Key: \n**{@member}** - Replace member with user name or ID\n"
                     "**{#channel}** - Replace channel with channel name or ID\n"
                     "**{&role}** - Replace role name or ID (shows as @deleted-role DM preview)\n"
@@ -322,10 +322,10 @@ class AdminCog(Cog):
                         continue
                     q = await ctx.send(f"Here's what you sent:\n\n{message}\n\nDoes that look right?")
                     payload = await ask(ctx.bot, [q], user_list=[ctx.author.id], timeout=None)
-                    if payload.emoji == '❎':
+                    if str(payload.emoji) == '❎':
                         await ctx.send('Try again.')
                         continue
-                    elif payload.emoji == '✅':
+                    elif str(payload.emoji) == '✅':
                         newmessage = message
                         break
             d = {

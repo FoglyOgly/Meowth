@@ -293,9 +293,9 @@ class POI():
     
     @classmethod
     async def convert(cls, ctx, arg):
-        # stop_convert = await Pokestop.convert(ctx, arg)
-        # if isinstance(stop_convert, Pokestop):
-        #     return stop_convert
+        stop_convert = await Pokestop.convert(ctx, arg)
+        if isinstance(stop_convert, Pokestop):
+            return stop_convert
         gym_convert = await Gym.convert(ctx, arg)
         return gym_convert
 
@@ -320,6 +320,9 @@ class Gym(POI):
         gyms_query = await report_channel.get_all_gyms()
         gyms_query.select('id', 'name', 'nickname')
         data = await gyms_query.get()
+        if not data:
+            city = await report_channel.city()
+            return PartialPOI(ctx.bot, city, arg)
         nick_dict = {}
         for x in data:
             if x.get('nickname'):
@@ -416,6 +419,9 @@ class Pokestop(POI):
         stops_query = await report_channel.get_all_stops()
         stops_query.select('id', 'name', 'nickname')
         data = await stops_query.get()
+        if not data:
+            city = await report_channel.city()
+            return PartialPOI(ctx.bot, city, arg)
         nick_dict = {}
         for x in data:
             if x.get('nickname'):

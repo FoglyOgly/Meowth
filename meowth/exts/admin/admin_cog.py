@@ -1,7 +1,55 @@
 from meowth import checks, command, group, Cog
+from meowth.utils.formatters import ask
 from discord.ext import commands
 import discord
 from timezonefinder import TimezoneFinder
+import re
+
+def do_template(message, author, guild):
+    not_found = []
+
+    def template_replace(match):
+        if match.group(3):
+            if match.group(3) == 'user':
+                return '{user}'
+            elif match.group(3) == 'server':
+                return guild.name
+            else:
+                return match.group(0)
+        if match.group(4):
+            emoji = (':' + match.group(4)) + ':'
+            return parse_emoji(guild, emoji)
+        match_type = match.group(1)
+        full_match = match.group(0)
+        match = match.group(2)
+        if match_type == '<':
+            mention_match = re.search('(#|@!?|&)([0-9]+)', match)
+            match_type = mention_match.group(1)[0]
+            match = mention_match.group(2)
+        if match_type == '@':
+            member = guild.get_member_named(match)
+            if match.isdigit() and (not member):
+                member = guild.get_member(match)
+            if (not member):
+                not_found.append(full_match)
+            return member.mention if member else full_match
+        elif match_type == '#':
+            channel = discord.utils.get(guild.text_channels, name=match)
+            if match.isdigit() and (not channel):
+                channel = guild.get_channel(match)
+            if (not channel):
+                not_found.append(full_match)
+            return channel.mention if channel else full_match
+        elif match_type == '&':
+            role = discord.utils.get(guild.roles, name=match)
+            if match.isdigit() and (not role):
+                role = discord.utils.get(guild.roles, id=int(match))
+            if (not role):
+                not_found.append(full_match)
+            return role.mention if role else full_match
+    template_pattern = '(?i){(@|#|&|<)([^{}]+)}|{(user|server)}|<*:([a-zA-Z0-9]+):[0-9]*>*'
+    msg = re.sub(template_pattern, template_replace, message)
+    return (msg, not_found)
 
 class AdminCog(Cog):
     
@@ -19,7 +67,18 @@ class AdminCog(Cog):
             content = 'I have lost the following required permissions in this channel!\n\n'
             content += "\n".join(missing_perms)
             return await after.send(content)
-
+    
+    @Cog.listener()
+    async def on_member_join(self, member):
+        guild = member.guild
+        welcome_channel, message = await self.welcome_channel(guild)
+        if not welcome_channel:
+            return
+        if welcome_channel == 'dm':
+            send_to = member
+        else:
+            send_to = welcome_channel
+        await send_to.send(message.format(server=guild.name, user=member.mention))
 
     async def enabled_commands(self, channel):
         table = self.bot.dbi.table('report_channels')
@@ -56,7 +115,24 @@ class AdminCog(Cog):
                 missing_perms.append(x[0])
         missing_perms = [x.replace('_', ' ').replace('guild', 'server').title() for x in missing_perms]
         return missing_perms
-
+    
+    async def welcome_channel(self, guild):
+        table = self.bot.dbi.table('welcome')
+        query = table.query
+        query.where(guild_id=guild.id)
+        data = await query.get()
+        if data:
+            data = data[0]
+            channelid = data['channel']
+            message = data['message']
+        else:
+            return None, None
+        if channelid.isdigit():
+            return self.bot.get_channel(channelid), message
+        elif channelid == 'dm':
+            return 'dm', message
+        else:
+            return None, None
 
     @command()
     @commands.has_permissions(manage_guild=True)
@@ -110,10 +186,10 @@ class AdminCog(Cog):
         else:
             rcrd = {'channelid': channel_id}
         possible_commands = ['raid', 'wild', 'research', 'users', 'train', 'trade',
-            'clean']
+            'clean', 'welcome']
         features = [x for x in features if x in possible_commands]
         if not features:
-            return await ctx.send("The list of valid command groups to enable is `raid, train, wild, research, user, trade, clean`.")
+            return await ctx.send("The list of valid command groups to enable is `raid, train, wild, research, user, trade, clean, welcome`.")
         location_commands = ['raid', 'wild', 'research', 'train']
         enabled_commands = []
         required_perms = {}
@@ -130,7 +206,7 @@ class AdminCog(Cog):
                 if not rcrd.get('city'):
                     await ctx.send(f"You must set a location for this channel before enabling `{ctx.prefix}{x}`. Use `{ctx.prefix}setlocation`")
                     continue
-            rcrd[x] = True
+            rcrd[x] = True if x != 'welcome'
             enabled_commands.append(x)
         if 'raid' in enabled_commands:
             raid_levels = ['1', '2', '3', '4', '5', 'EX', 'EX Raid Gyms']
@@ -174,6 +250,82 @@ class AdminCog(Cog):
                         else:
                             await ctx.send('I could not interpret your response. Try again!')
                             continue
+        if 'welcome' in enabled_commands:
+            old_welcome_channel, message = await self.welcome_channel(ctx.guild)
+            if old_welcome_channel:
+                if old_welcome_channel == 'dm':
+                    name = 'Direct Message'
+                else:
+                    name = old_welcome_channel.mention
+                content = f"This server's current welcome channel is {name}. "
+                content += "Do you want to disable that channel and enable another?"
+                oldmsg = await ctx.send(content)
+                payload = await ask(ctx.bot, [oldmsg], user_list=[ctx.author.id])
+                if not payload:
+                    await oldmsg.edit(content='Timed out!')
+                elif payload.emoji == '❎':
+                    if old_welcome_channel == 'dm':
+                        new_welcome_channel = 'dm'
+                    else:
+                        new_welcome_channel = str(old_welcome_channel.id)
+                elif payload.emoji == '✅':
+                    await ctx.send('What channel do you want to use? You can type the name or ID of a text channel, or type `dm` if you want the welcome message sent to DMs.')
+                    def check(m):
+                        return m.author == ctx.author and m.channel == ctx.channel
+                    while True:
+                        reply = ctx.bot.wait_for('message', check=check)
+                        if reply.content.lower() == 'dm':
+                            new_welcome_channel = 'dm'
+                        else:
+                            channel = await commands.TextChannelConverter.convert(ctx, reply.content)
+                            if channel:
+                                new_welcome_channel = str(channel.id)
+                            else:
+                                await ctx.send("I couldn't understand your reply. Try again.")
+            if not message:
+                message = "Welcome to {server}, {user}!"
+            content = f"Current welcome message: {message}\n"
+            content += "Do you want to change the welcome message?"
+            oldmsg = await ctx.send(content)
+            payload = await ask(ctx.bot, [oldmsg], user_list=[ctx.author.id])
+            if not payload:
+                await oldmsg.edit(content='Timed out!')
+            elif payload.emoji == '❎':
+                newmessage = message
+            elif payload.emoji == '✅':
+                content = ("Type your welcome message below. Key: \n**{@member}** - Replace member with user name or ID\n"
+                    "**{#channel}** - Replace channel with channel name or ID\n"
+                    "**{&role}** - Replace role name or ID (shows as @deleted-role DM preview)\n"
+                    "**{user}** - Will mention the new user\n"
+                    "**{server}** - Will print your server's name\n"
+                    )
+                await ctx.send(content)
+                def check(m):
+                    return m.author == ctx.author and m.channel == ctx.channel
+                while True:
+                    reply = ctx.bot.wait_for('message', check=check)
+                    if len(reply.content) > 500:
+                        await ctx.send("Please shorten your message to fewer than 500 characters.")
+                        continue
+                    message, errors = do_template(reply.content, ctx.author, ctx.guild)
+                    if errors:
+                        await ctx.send(f"The following could not be found:\n{'\n'.join(errors)}\nPlease try again.")
+                        continue
+                    q = await ctx.send(f"Here's what you sent:\n\n{message}\n\nDoes that look right?")
+                    payload = await ask(ctx.bot, [q], user_list=[ctx.author.id], timeout=None)
+                    if payload.emoji == '❎':
+                        await ctx.send('Try again.')
+                        continue
+                    elif payload.emoji == '✅':
+                        newmessage = message
+            d = {
+                'guild_id': ctx.guild.id,
+                'channelid': new_welcome_channel,
+                'message': newmessage
+            }
+            table = ctx.bot.dbi.table('welcome')
+            insert = table.insert.row(**d)
+            await insert.commit()
         if not all(required_perms.values()):
             missing_perms = [x for x in required_perms if not required_perms[x]]
             while True:

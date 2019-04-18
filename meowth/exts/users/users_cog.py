@@ -37,6 +37,17 @@ class MeowthUser:
         user = bot.get_user(user_id)
         return cls(bot, user)
     
+    @classmethod
+    async def from_ign(cls, bot, ign):
+        users_table = bot.dbi.table('users')
+        query = users_table.query('id')
+        query.where(ign=ign)
+        user_id = await query.get_value()
+        if user_id:
+            return cls.from_id(bot, user_id)
+        else:
+            return None
+    
     async def team(self):
         data = self._data
         data.select('team')
@@ -287,6 +298,7 @@ class Users(Cog):
 
     @command()
     @users_checks.team_not_set()
+    @users_checks.users_enabled()
     async def team(self, ctx, *, chosen_team: Team):
         """Set your Pokemon Go team."""
 
@@ -300,6 +312,7 @@ class Users(Cog):
             await ctx.send("Adding roles failed")
     
     @command()
+    @users_checks.users_enabled()
     async def pokebattler(self, ctx, pb_id: int):
         """Set your Pokebattler ID."""
 
@@ -316,6 +329,46 @@ class Users(Cog):
             update.values(pokebattler=pb_id)
             await update.commit()
         return await ctx.send(f'Pokebattler ID set to {pb_id}')
+    
+    @command()
+    @users_checks.users_enabled()
+    async def ign(self, ctx, ign):
+        """Set your in-game name."""
 
+        user_table = ctx.bot.dbi.table('users')
+        meowthuser = MeowthUser(ctx.bot, ctx.author)
+        data = await meowthuser._data.get()
+        if len(data) == 0:
+            insert = meowthuser._insert
+            d = {'id': ctx.author.id, 'ign': ign}
+            insert.row(**d)
+            await insert.commit()
+        else:
+            update = meowthuser._update
+            update.values(ign=ign)
+            await update.commit()
+        return await ctx.send(f'In-game name set to {ign}')
+
+    @command()
+    @users_checks.users_enabled()
+    async def whois(self, ctx, ign):
+        """Lookup player by in-game name."""
+
+        user_table = ctx.bot.dbi.table('users')
+        query = user_table.query('ign')
+        ign_list = await query.get_values()
+        if not ign_list:
+            return await ctx.send(f"No match for {ign}")
+        match = get_match(ign_list, ign)[0]
+        if match:
+            meowthuser = await MeowthUser.from_ign(ctx.bot, match)
+            member = ctx.guild.get_member(meowthuser.user.id)
+            if member:
+                name = member.display_name
+            else:
+                name = str(meowthuser.user)
+            return await ctx.send(f'Closest match for {ign}: {name}')
+        else:
+            return await ctx.send(f"No match for {ign}")
 
 

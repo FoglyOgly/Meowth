@@ -21,7 +21,7 @@ def bot_has_permissions():
 
 async def is_want_enabled(ctx):
     report_table = ctx.bot.dbi.table('report_channels')
-    query = report_table.query('user')
+    query = report_table.query('users')
     query.where(channelid=ctx.channel.id)
     want = await query.get_value()
     return want

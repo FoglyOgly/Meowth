@@ -70,6 +70,7 @@ class AdminCog(Cog):
     
     @Cog.listener()
     async def on_member_join(self, member):
+        print(0)
         guild = member.guild
         welcome_channel, message = await self.welcome_channel(guild)
         if not welcome_channel:
@@ -77,8 +78,10 @@ class AdminCog(Cog):
         if welcome_channel == 'dm':
             send_to = member
         else:
+            print(2)
             send_to = welcome_channel
         await send_to.send(message.format(server=guild.name, user=member.mention))
+        print(3)
 
     async def enabled_commands(self, channel):
         table = self.bot.dbi.table('report_channels')

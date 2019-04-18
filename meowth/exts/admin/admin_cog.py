@@ -270,19 +270,20 @@ class AdminCog(Cog):
                     else:
                         new_welcome_channel = str(old_welcome_channel.id)
                 elif payload.emoji == '✅':
-                    await ctx.send('What channel do you want to use? You can type the name or ID of a text channel, or type `dm` if you want the welcome message sent to DMs.')
-                    def check(m):
-                        return m.author == ctx.author and m.channel == ctx.channel
-                    while True:
-                        reply = ctx.bot.wait_for('message', check=check)
-                        if reply.content.lower() == 'dm':
-                            new_welcome_channel = 'dm'
-                        else:
-                            channel = await commands.TextChannelConverter.convert(ctx, reply.content)
-                            if channel:
-                                new_welcome_channel = str(channel.id)
-                            else:
-                                await ctx.send("I couldn't understand your reply. Try again.")
+                    pass
+            await ctx.send('What channel do you want to use? You can type the name or ID of a text channel, or type `dm` if you want the welcome message sent to DMs.')
+            def check(m):
+                return m.author == ctx.author and m.channel == ctx.channel
+            while True:
+                reply = ctx.bot.wait_for('message', check=check)
+                if reply.content.lower() == 'dm':
+                    new_welcome_channel = 'dm'
+                else:
+                    channel = await commands.TextChannelConverter.convert(ctx, reply.content)
+                    if channel:
+                        new_welcome_channel = str(channel.id)
+                    else:
+                        await ctx.send("I couldn't understand your reply. Try again.")
             if not message:
                 message = "Welcome to {server}, {user}!"
             content = f"Current welcome message: {message}\n"

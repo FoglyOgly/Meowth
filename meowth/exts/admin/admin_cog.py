@@ -275,7 +275,7 @@ class AdminCog(Cog):
             def check(m):
                 return m.author == ctx.author and m.channel == ctx.channel
             while True:
-                reply = ctx.bot.wait_for('message', check=check)
+                reply = await ctx.bot.wait_for('message', check=check)
                 if reply.content.lower() == 'dm':
                     new_welcome_channel = 'dm'
                 else:

@@ -206,7 +206,8 @@ class AdminCog(Cog):
                 if not rcrd.get('city'):
                     await ctx.send(f"You must set a location for this channel before enabling `{ctx.prefix}{x}`. Use `{ctx.prefix}setlocation`")
                     continue
-            rcrd[x] = True if x != 'welcome'
+            if x != 'welcome':
+                rcrd[x] = True
             enabled_commands.append(x)
         if 'raid' in enabled_commands:
             raid_levels = ['1', '2', '3', '4', '5', 'EX', 'EX Raid Gyms']

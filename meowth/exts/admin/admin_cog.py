@@ -380,7 +380,7 @@ class AdminCog(Cog):
 
         **Arguments**
         *features:* list of features to disable. Can include any of
-        `['raid', 'wild', 'research', 'users', 'train', 'trade', 'clean']`
+        `['raid', 'wild', 'research', 'users', 'train', 'trade', 'clean', 'welcome']`
         """
         channel_id = ctx.channel.id
         channel_table = self.bot.dbi.table('report_channels')
@@ -396,6 +396,13 @@ class AdminCog(Cog):
         if not features:
             return await ctx.send("The list of valid command groups to disable is `raid, wild, research, user, train, trade, clean`.")
         disabled_commands = []
+        if 'welcome' in features:
+            table = ctx.bot.dbi.table('welcome')
+            query = table.query
+            query.where(guild_id=ctx.guild.id)
+            await query.delete()
+            features.remove('welcome')
+            disabled_commands.append('welcome')
         for x in features:
             rcrd[x] = False
             disabled_commands.append(x)

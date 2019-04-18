@@ -131,7 +131,7 @@ class AdminCog(Cog):
         else:
             return None, None
         if channelid.isdigit():
-            return self.bot.get_channel(channelid), message
+            return self.bot.get_channel(int(channelid)), message
         elif channelid == 'dm':
             return 'dm', message
         else:

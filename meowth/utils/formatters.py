@@ -176,7 +176,10 @@ async def ask(bot, message_list, user_list=None, timeout=60, *, react_list=['✅
     try:
         payload = await bot.wait_for('raw_reaction_add', check=check, timeout=timeout)
         for message in message_list:
-            await message.clear_reactions()
+            try:
+                await message.clear_reactions()
+            except discord.Forbidden:
+                pass
         return payload
     except asyncio.TimeoutError:
         for message in message_list:

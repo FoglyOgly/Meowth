@@ -179,7 +179,7 @@ class RaidCog(Cog):
             'user_id': user_id,
             'reason': reason
         }
-        table = ctx.bot.dbi.table('to_archive')
+        table = self.bot.dbi.table('to_archive')
         insert = table.insert
         insert.row(**d)
         await insert.commit(do_update=True)

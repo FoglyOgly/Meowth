@@ -130,6 +130,20 @@ class AdminCog(Cog):
             return 'dm', message
         else:
             return None, None
+    
+    async def archive_cat_phrases(self, guild):
+        table = self.bot.dbi.table('archive')
+        query = table.query
+        query.where(guild_id=guild.id)
+        data = await query.get()
+        if data:
+            data = data[0]
+        else:
+            return None, None
+        catid = data['category']
+        cat = self.bot.get_channel(catid)
+        phrase_list = data.get('phrase_list', [])
+        return cat, phrase_list
 
     @command()
     @commands.has_permissions(manage_guild=True)
@@ -333,6 +347,68 @@ class AdminCog(Cog):
                 'message': newmessage
             }
             table = ctx.bot.dbi.table('welcome')
+            insert = table.insert.row(**d)
+            await insert.commit(do_update=True)
+        if 'archive' in enabled_commands:
+            category, phrase_list = await self.archive_cat_phrases(ctx.guild)
+            new_category = None
+            new_phrase_list = []
+            if category:
+                content = f"This server's current archive category is {category.name}. "
+                content += "Do you want to disable that category and enable another?"
+                oldmsg = await ctx.send(content)
+                payload = await ask(ctx.bot, [oldmsg], user_list=[ctx.author.id])
+                if not payload:
+                    await oldmsg.edit(content='Timed out!')
+                elif str(payload.emoji) == '❎':
+                    new_category = category.id
+                elif str(payload.emoji) == '✅':
+                    pass
+            if not new_category:
+                await ctx.send('What category do you want to use? You can type the name or ID of a category.')
+                def check(m):
+                    return m.author == ctx.author and m.channel == ctx.channel
+                while True:
+                    reply = await ctx.bot.wait_for('message', check=check)
+                    converter = commands.CategoryChannelConverter()
+                    channel = await converter.convert(ctx, reply.content)
+                    if channel:
+                        new_category = channel.id
+                        break
+                    else:
+                        await ctx.send("I couldn't understand your reply. Try again.")
+                        continue
+            content = f"Current phrase list: {phrase_list}\n"
+            content += "Do you want to change the phrase list?"
+            oldmsg = await ctx.send(content)
+            payload = await ask(ctx.bot, [oldmsg], user_list=[ctx.author.id])
+            if not payload:
+                await oldmsg.edit(content='Timed out!')
+            elif str(payload.emoji) == '❎':
+                new_phrase_list = phrase_list
+            elif str(payload.emoji) == '✅':
+                content = "Type your phrase list below. I will automatically archive any temporary channel in which your phrases are said. Separate each phrase with a comma."
+                await ctx.send(content)
+                def check(m):
+                    return m.author == ctx.author and m.channel == ctx.channel
+                while True:
+                    reply = await ctx.bot.wait_for('message', check=check)
+                    phrases = reply.content.split(',')
+                    phrases = [x.strip() for x in phrases]
+                    q = await ctx.send(f"Here's what you sent:\n\n`{phrases}`\n\nDoes that look right?")
+                    payload = await ask(ctx.bot, [q], user_list=[ctx.author.id], timeout=None)
+                    if str(payload.emoji) == '❎':
+                        await ctx.send('Try again.')
+                        continue
+                    elif str(payload.emoji) == '✅':
+                        new_phrase_list = phrases
+                        break
+            d = {
+                'guild_id': ctx.guild.id,
+                'category': new_category,
+                'phrase_list': new_phrase_list
+            }
+            table = ctx.bot.dbi.table('archive')
             insert = table.insert.row(**d)
             await insert.commit(do_update=True)
         if not all(required_perms.values()):

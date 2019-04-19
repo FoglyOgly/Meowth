@@ -78,6 +78,37 @@ class RaidCog(Cog):
 
     async def pickup_train(self, rcrd):
         train = await Train.from_data(self.bot, rcrd)
+
+    async def archive_cat_phrases(self, guild):
+        table = self.bot.dbi.table('archive')
+        query = table.query
+        query.where(guild_id=guild.id)
+        data = await query.get()
+        if data:
+            data = data[0]
+        else:
+            return None, None
+        catid = data['category']
+        cat = self.bot.get_channel(catid)
+        phrase_list = data.get('phrase_list', [])
+        return cat, phrase_list
+    
+    @Cog.listener()
+    async def on_message(self, message):
+        channel = message.channel
+        guild = channel.guild
+        raid = Raid.by_channel.get(str(channel.id))
+        train = Train.by_channel.get(channel.id)
+        if not (raid or train):
+            return
+        category, phrase_list = await self.archive_cat_phrases(guild)
+        if not phrase_list:
+            return
+        for phrase in phrase_list:
+            if phrase in message.content:
+                return await self.mark_for_archival(channel.id, guild.me.id, reason=f'{phrase} was said by {message.author.display_name}')
+        
+        
     
     @Cog.listener()
     async def on_raw_reaction_add(self, payload):
@@ -141,6 +172,17 @@ class RaidCog(Cog):
             except NotRaidChannel:
                 pass
         
+    
+    async def mark_for_archival(self, channel_id, user_id, reason=None):
+        d = {
+            'channel_id': channel_id,
+            'user_id': user_id,
+            'reason': reason
+        }
+        table = ctx.bot.dbi.table('to_archive')
+        insert = table.insert
+        insert.row(**d)
+        await insert.commit(do_update=True)
 
     def _rsvp(self, connection, pid, channel, payload):
         if channel != 'rsvp':
@@ -191,6 +233,15 @@ class RaidCog(Cog):
                 continue
             self.bot.loop.create_task(raid.change_weather(weather))
         
+
+    @command()
+    @raid_checks.archive_enabled()
+    @raid_checks.temp_channel()
+    async def archive(self, ctx, *, reason=None):
+        await ctx.message.delete()
+        channel_id = ctx.channel.id
+        user_id = ctx.author.id
+        await self.mark_for_archival(channel_id, user_id, reason)
 
     @command(aliases=['r'], category='Raid')
     @raid_checks.raid_enabled()

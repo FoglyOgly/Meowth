@@ -5,7 +5,8 @@ from meowth.exts.weather import Weather
 from meowth.exts.want import Want
 from meowth.utils import formatters, snowflake
 from meowth.utils.converters import ChannelMessage
-from .errors import * 
+from .errors import *
+from .raid_checks import archive_category
 
 import asyncio
 import aiohttp
@@ -1075,7 +1076,7 @@ class Raid:
                 channel = self.bot.get_channel(int(chanid))
                 if not channel:
                     continue
-                t = Train.by_channel.get(chanid)
+                t = Train.by_channel.get(int(chanid))
                 if t:
                     continue
                 new_name = await self.channel_name()
@@ -1222,8 +1223,15 @@ class Raid:
                     channel = self.bot.get_channel(int(chanid))
                     if not channel:
                         continue
-                    t = Train.by_channel.get(chanid)
+                    t = Train.by_channel.get(int(chanid))
                     if t:
+                        continue
+                    archive_table = self.bot.dbi.table('to_archive')
+                    query = archive_table.query
+                    query.where(channel_id=int(chanid))
+                    data = await query.get()
+                    if data:
+                        await self.archive_raid(channel)
                         continue
                     try:
                         await channel.delete()
@@ -1241,6 +1249,15 @@ class Raid:
         except asyncio.CancelledError:
             raise
     
+    async def archive_raid(self, channel):
+        guild = channel.guild
+        bot = self.bot
+        old_name = channel.name
+        new_name = 'archived-' + old_name
+        category = await archive_category(bot, guild)
+        await channel.edit(name=new_name, category=category, sync_permissions=True)
+
+
     # async def update_gym(self, gym):
 
     async def get_wants(self):
@@ -2071,11 +2088,26 @@ class Train:
             del Train.instances[self.id]
         except KeyError:
             pass
-        await self.channel.delete()
+        archive_table = self.bot.dbi.table('to_archive')
+        query = archive_table.query
+        query.where(channel_id=int(chanid))
+        data = await query.get()
+        if data:
+            await self.archive_train(channel)
+        else:
+            await self.channel.delete()
         async for msg in self.messages():
             await msg.clear_reactions()
             embed = formatters.make_embed(content="This raid train has ended!")
             await msg.edit(content="", embed=embed)
+    
+    async def archive_train(self, channel):
+        guild = channel.guild
+        bot = self.bot
+        old_name = channel.name
+        new_name = 'archived-' + old_name
+        category = await archive_category(bot, guild)
+        await channel.edit(name=new_name, category=category, sync_permissions=True)
     
     async def train_embed(self):
         return await TrainEmbed.from_train(self)

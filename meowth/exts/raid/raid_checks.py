@@ -102,3 +102,32 @@ async def is_train_channel(ctx):
 def train_channel():
     return commands.check(is_train_channel)
 
+async def is_archive_enabled(ctx):
+    table = ctx.bot.dbi.table('archive')
+    query = table.query
+    query.where(guild_id=ctx.guild.id)
+    data = await query.get()
+    if data:
+        return True
+    return False
+
+def archive_enabled():
+    return commands.check(is_archive_enabled)
+
+async def archive_category(bot, guild):
+    table = bot.dbi.table('archive')
+    query = table.query('category')
+    query.where(guild_id=guild.id)
+    catid = await query.get_value()
+    if catid:
+        cat = bot.get_channel(catid)
+        if cat:
+            return cat
+    return None
+
+async def is_temp_channel(ctx):
+    return await is_raid_channel(ctx) or await is_train_channel(ctx)
+
+def temp_channel():
+    return commands.check(is_temp_channel)
+

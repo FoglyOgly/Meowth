@@ -1054,7 +1054,7 @@ class Raid:
             try:
                 await msg.clear_reactions()
             except discord.Forbidden:
-                raise commands.BotMissingPermissions(['Manage Messages'])
+                continue
             msg_list.append(msg)
         for msgid in train_msgs:
             try:

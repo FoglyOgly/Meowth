@@ -812,7 +812,10 @@ class RaidCog(Cog):
                 details = f"This Raid will end at {timestr}"
         has_embed = False
         for idstring in raid.message_ids:
-            chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+            try:
+                chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+            except:
+                continue
             if not has_embed:
                 embed = msg.embeds[0]
                 embed.timestamp = dt

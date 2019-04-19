@@ -13,6 +13,7 @@ import aiohttp
 from datetime import datetime
 from math import ceil
 import discord
+from discord.ext import commands
 import time
 from pytz import timezone
 
@@ -1138,7 +1139,7 @@ class Raid:
                 try:
                     await msg.clear_reactions()
                 except discord.Forbidden:
-                    raise commands.BotMissingPermissions(['Manage Messages'])
+                    pass
                 msg_list.append(msg)
             for msgid in self.train_msgs:
                 try:

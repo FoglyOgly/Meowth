@@ -4,6 +4,7 @@ import functools
 from io import BytesIO
 
 import aiohttp
+from datetime import datetime
 
 from colorthief import ColorThief
 
@@ -237,4 +238,15 @@ def perms_or(channel_list: list):
         overwrite = discord.PermissionOverwrite.from_pair(a, d)
         overwrite_dict[key] = overwrite
     return overwrite_dict
-            
+
+def deleted_message_embed(bot, data):
+    guild_id = data['guild_id']
+    guild = bot.get_guild(guild_id)
+    author_id = data['author_id']
+    author = guild.get_member(author_id)
+    content = data['content']
+    embed = make_embed(title=author.display_name, content=content, icon=author.avatar_url)
+    sent = data['sent']
+    sentdt = datetime.from_timestamp(sent)
+    embed.timestamp = sentdt
+    return embed

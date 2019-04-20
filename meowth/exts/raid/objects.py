@@ -1232,7 +1232,10 @@ class Raid:
                     query.where(channel_id=int(chanid))
                     data = await query.get()
                     if data:
-                        await self.archive_raid(channel)
+                        d = data[0]
+                        user_id = d.get('user_id')
+                        reason = d.get('reason')
+                        await self.archive_raid(channel, user_id, reason)
                         continue
                     try:
                         await channel.delete()
@@ -1250,13 +1253,29 @@ class Raid:
         except asyncio.CancelledError:
             raise
     
-    async def archive_raid(self, channel):
+    async def archive_raid(self, channel, user_id, reason=None):
         guild = channel.guild
         bot = self.bot
         old_name = channel.name
         new_name = 'archived-' + old_name
         category = await archive_category(bot, guild)
         await channel.edit(name=new_name, category=category, sync_permissions=True)
+        member = guild.get_member(user_id)
+        content = f"Channel archive initiated by {member.display_name}."
+        if reason:
+            content += f" Reason: {reason}"
+        content += "\nDeleted messages from this channel will be posted below."
+        await channel.send(content)
+        table = self.bot.dbi.table('discord_messages')
+        query = table.query
+        query.where(channel_id=channel.id)
+        query.where(deleted=True)
+        data = await query.get()
+        for row in data:
+            embed = formatters.deleted_message_embed(self.bot, row)
+            await channel.send(embed=embed)
+
+
 
 
     # async def update_gym(self, gym):
@@ -2094,7 +2113,10 @@ class Train:
         query.where(channel_id=int(chanid))
         data = await query.get()
         if data:
-            await self.archive_train(channel)
+            d = data[0]
+            user_id = d.get('user_id')
+            reason = d.get('reason')
+            await self.archive_train(channel, user_id, reason)
         else:
             await self.channel.delete()
         async for msg in self.messages():
@@ -2102,13 +2124,27 @@ class Train:
             embed = formatters.make_embed(content="This raid train has ended!")
             await msg.edit(content="", embed=embed)
     
-    async def archive_train(self, channel):
+    async def archive_train(self, channel, user_id, reason):
         guild = channel.guild
         bot = self.bot
         old_name = channel.name
         new_name = 'archived-' + old_name
         category = await archive_category(bot, guild)
         await channel.edit(name=new_name, category=category, sync_permissions=True)
+        member = guild.get_member(user_id)
+        content = f"Channel archive initiated by {member.display_name}."
+        if reason:
+            content += f" Reason: {reason}"
+        content += "\nDeleted messages from this channel will be posted below."
+        await channel.send(content)
+        table = self.bot.dbi.table('discord_messages')
+        query = table.query
+        query.where(channel_id=channel.id)
+        query.where(deleted=True)
+        data = await query.get()
+        for row in data:
+            embed = formatters.deleted_message_embed(self.bot, row)
+            await channel.send(embed=embed)
     
     async def train_embed(self):
         return await TrainEmbed.from_train(self)

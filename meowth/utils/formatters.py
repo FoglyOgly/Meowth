@@ -204,7 +204,7 @@ async def poll(bot, message_list, timeout=3600, *, react_list=['✅', '❎']):
                 r = bot.get_emoji(r)
             react_dict[r] = 0
         for message in message_list:
-            msg = await message.channel.get_message(message.id)
+            msg = await message.channel.fetch_message(message.id)
             for reaction in msg.reactions:
                 if reaction.emoji in react_dict:
                     react_dict[reaction.emoji] += reaction.count

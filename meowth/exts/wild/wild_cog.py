@@ -192,7 +192,7 @@ class Wild():
         id_string = f"{payload.channel_id}/{payload.message_id}"
         user = self.bot.get_user(payload.user_id)
         channel = self.bot.get_channel(payload.channel_id)
-        message = await channel.get_message(payload.message_id)
+        message = await channel.fetch_message(payload.message_id)
         meowthuser = MeowthUser(self.bot, user)
         if payload.guild_id:
             guild = self.bot.get_guild(payload.guild_id)

@@ -124,7 +124,7 @@ class RaidCog(Cog):
             return await meetup.process_reactions(payload)
         if train:
             channel = self.bot.get_channel(payload.channel_id)
-            msg = await channel.get_message(payload.message_id)
+            msg = await channel.fetch_message(payload.message_id)
             user = self.bot.get_user(payload.user_id)
             meowthuser = MeowthUser(self.bot, user)
             if payload.emoji.is_custom_emoji():

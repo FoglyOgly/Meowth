@@ -182,7 +182,7 @@ class Meetup:
     async def process_reactions(self, payload):
         user = self.bot.get_user(payload.user_id)
         channel = self.bot.get_channel(payload.channel_id)
-        message = await channel.get_message(payload.message_id)
+        message = await channel.fetch_message(payload.message_id)
         meowthuser = MeowthUser(self.bot, user)
         if payload.guild_id:
             guild = self.bot.get_guild(payload.guild_id)
@@ -613,7 +613,7 @@ class Raid:
     async def process_reactions(self, payload):
         user = self.bot.get_user(payload.user_id)
         channel = self.bot.get_channel(payload.channel_id)
-        message = await channel.get_message(payload.message_id)
+        message = await channel.fetch_message(payload.message_id)
         meowthuser = MeowthUser(self.bot, user)
         if payload.guild_id:
             guild = self.bot.get_guild(payload.guild_id)
@@ -1969,7 +1969,7 @@ class Train:
     async def report_msgs(self):
         for msgid in self.report_msg_ids:
             try:
-                msg = await self.channel.get_message(msgid)
+                msg = await self.channel.fetch_message(msgid)
                 if msg:
                     yield msg
             except:
@@ -1997,7 +1997,7 @@ class Train:
     async def reported_raids(self):
         for msgid in self.report_msg_ids:
             raid = Raid.by_trainreport.get(msgid)
-            msg = await self.channel.get_message(msgid)
+            msg = await self.channel.fetch_message(msgid)
             yield (msg, raid)
     
     async def report_results(self):

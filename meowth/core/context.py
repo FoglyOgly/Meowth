@@ -362,7 +362,7 @@ class GetTools:
             if msg:
                 return msg
         try:
-            return await channel.get_message(id)
+            return await channel.fetch_message(id)
         except discord.NotFound:
             return None
 

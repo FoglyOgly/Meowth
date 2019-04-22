@@ -321,7 +321,7 @@ class Bot(commands.AutoShardedBot):
                 channel = guild.get_channel(last_restart['restart_channel'])
 
                 if channel:
-                    original_message = await channel.get_message(
+                    original_message = await channel.fetch_message(
                         last_restart['restart_message'])
                     return await original_message.edit(embed=embed)
 

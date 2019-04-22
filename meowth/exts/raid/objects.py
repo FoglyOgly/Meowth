@@ -1,4 +1,4 @@
-from meowth.exts.map import Gym, ReportChannel, Mapper, PartialPOI
+from meowth.exts.map import Gym, ReportChannel, Mapper, PartialPOI, POI
 from meowth.exts.users import MeowthUser
 from meowth.exts.pkmn import Pokemon, Move
 from meowth.exts.weather import Weather
@@ -52,6 +52,235 @@ class RaidBoss(Pokemon):
     async def convert(cls, ctx, arg):
         pkmn = await Pokemon.convert(ctx, arg)
         return cls(pkmn)   
+
+
+class Meetup:
+
+    instances = dict()
+    by_message = dict()
+    by_channel = dict()
+
+    def __new__(cls, meetup_id, *args, **kwargs):
+        if meetup_id in cls.instances:
+            return cls.instances[meetup_id]
+        instance = super().__new__(cls)
+        cls.instances[meetup_id] = instance
+        return instance
+    
+    def __init__(self, meetup_id, bot, guild_id, channel_id, report_channel_id, location, start, tz):
+        self.id = meetup_id
+        self.bot = bot
+        self.guild_id = guild_id
+        self.report_channel_id = report_channel_id
+        self.location = location
+        self.start = start
+        self.tz = tz
+        self.message_ids = []
+        self.channel_id = channel_id
+    
+    def to_dict(self):
+        if isinstance(self.location, POI):
+            locid = str(self.location.id)
+        else:
+            locid = f'{self.location.city}/{self.location.arg}'
+        d = {
+            'id': self.id,
+            'guild_id': self.guild_id,
+            'report_channel_id': self.report_channel_id,
+            'channel_id': self.channel_id
+            'location': locid,
+            'start': self.start
+            'tz': self.tz,
+            'message_ids': self.message_ids
+        }
+        return d
+    
+    @property
+    def _data(self):
+        table = self.bot.dbi.table('meetups')
+        query = table.query.where(id=self.id)
+        return query
+    
+    @property
+    def _insert(self):
+        table = self.bot.dbi.table('meetups')
+        insert = table.insert
+        d = self.to_dict()
+        insert.row(**d)
+        return insert
+    
+    async def upsert(self):
+        insert = self._insert
+        await insert.commit(do_update=True)
+
+    @property
+    def guild(self):
+        return self.bot.get_guild(self.guild_id)
+    
+    @property
+    def channel(self):
+        return self.bot.get_channel(self.channel_id)
+    
+    @property
+    def report_channel(self):
+        return self.bot.get_channel(self.report_channel_id)
+    
+    async def get_trainer_dict(self):
+        def data(rcrd):
+            trainer = rcrd['user_id']
+            status = rcrd.get('status')
+            party = rcrd.get('party', [0,0,0,1])
+            rcrd_dict = {
+                'status': status,
+                'party': party,
+            }
+            return trainer, rcrd_dict
+        trainer_dict = {}
+        user_table = self.bot.dbi.table('meetup_rsvp')
+        query = user_table.query()
+        query.where(meetup_id=self.id)
+        rsvp_data = await query.get()
+        for rcrd in rsvp_data:
+            trainer, rcrd_dict = data(rcrd)
+            trainer_dict[trainer] = rcrd_dict
+        return trainer_dict
+    
+    async def update_rsvp(self, user_id=None, status=None, group=None):
+        self.trainer_dict = await self.get_trainer_dict()
+        has_embed = False
+        for idstring in self.message_ids:
+            try:
+                chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+            except:
+                continue
+            if not has_embed:
+                meetup_embed = MeetupEmbed(msg.embeds[0])
+                meetup_embed.status_str = self.status_str
+                meetup_embed.team_str = self.team_str
+                has_embed = True
+            await msg.edit(embed=embed)
+        if user_id and status:
+            chn = self.channel
+            if chn:
+                rsvpembed = RSVPEmbed.from_meetup(self).embed
+                guild = self.guild
+                member = guild.get_member(user_id)
+                if status == 'maybe':
+                    display_status = 'is interested'
+                elif status == 'coming':
+                    display_status = 'is attending'
+                elif status == 'here':
+                    display_status = 'is at the meetup'
+                elif status == 'cancel':
+                    display_status = 'has canceled'
+                else:
+                    break
+                content = f"{member.display_name} {display_status}!"
+                newmsg = await chn.send(content, embed=rsvpembed)
+    
+    async def process_reactions(self, payload):
+        user = self.bot.get_user(payload.user_id)
+        channel = self.bot.get_channel(payload.channel_id)
+        message = await channel.get_message(payload.message_id)
+        meowthuser = MeowthUser(self.bot, user)
+        if payload.guild_id:
+            guild = self.bot.get_guild(payload.guild_id)
+            user = guild.get_member(user.id)
+        trainer_dict = self.trainer_dict
+        trainer_data = trainer_dict.get(payload.user_id, {})
+        old_status = trainer_data.get('status')
+        party = await meowthuser.party()
+        if payload.emoji.is_custom_emoji():
+            emoji = payload.emoji.id
+        else:
+            emoji = str(payload.emoji)
+        if emoji not in self.react_list:
+            return
+        for k, v in self.bot.config.emoji.items():
+            if v == emoji:
+                new_status = k
+        if isinstance(emoji, int):
+            emoji = self.bot.get_emoji(emoji)
+        await message.remove_reaction(emoji, user)
+        if new_status != old_status:
+            await meowthuser.meetup_rsvp(self.id, new_status, party=party)
+    
+    async def meetup_embed(self):
+        return (await MeetupEmbed.from_meetup(self)).embed
+    
+    @staticmethod
+    def status_dict(trainer_dict):
+        d = {
+            'maybe': 0,
+            'coming': 0,
+            'here': 0,
+        }
+        for trainer in trainer_dict:
+            total = sum(trainer_dict[trainer]['party'])
+            status = trainer_dict[trainer]['status']
+            d[status] += total
+        return d
+    
+    @property
+    def status_str(self):
+        status_str = self.status_string(self.bot, self.trainer_dict)
+        return status_str
+    
+    @staticmethod
+    def status_string(bot, trainer_dict):
+        status_dict = Meetup.status_dict(trainer_dict)
+        status_str = f"{bot.config.emoji['maybe']}: **{status_dict['maybe']}** | "
+        status_str += f"{bot.config.emoji['coming']}: **{status_dict['coming']}** | "
+        status_str += f"{bot.get_emoji(bot.config.emoji['here'])}: **{status_dict['here']}**"
+        return status_str
+    
+    @staticmethod
+    def team_dict(trainer_dict):
+        d = {
+            'mystic': 0,
+            'instinct': 0,
+            'valor': 0,
+            'unknown': 0
+        }
+        for trainer in trainer_dict:
+            bluecount = trainer_dict[trainer]['party'][0]
+            yellowcount = trainer_dict[trainer]['party'][1]
+            redcount = trainer_dict[trainer]['party'][2]
+            unknowncount = trainer_dict[trainer]['party'][3]
+            d['mystic'] += bluecount
+            d['instinct'] += yellowcount
+            d['valor'] += redcount
+            d['unknown'] += unknowncount
+        return d
+
+    @property
+    def team_str(self):
+        team_str = self.team_string(self.bot, self.trainer_dict)
+        return team_str
+
+    @staticmethod
+    def team_string(bot, trainer_dict):
+        team_dict = Meetup.team_dict(trainer_dict)
+        team_str = f"{bot.config.team_emoji['mystic']}: {team_dict['mystic']} | "
+        team_str += f"{bot.config.team_emoji['instinct']}: {team_dict['instinct']} | "
+        team_str += f"{bot.config.team_emoji['valor']}: {team_dict['valor']} | "
+        team_str += f"{bot.config.team_emoji['unknown']}: {team_dict['unknown']}"
+        return team_str
+    
+    @property
+    def current_local_datetime(self):
+        zone = self.tz
+        localzone = timezone(zone)
+        return datetime.now(tz=localzone)
+    
+    def local_datetime(self, stamp):
+        zone = self.tz
+        localzone = timezone(zone)
+        return datetime.fromtimestamp(stamp, tz=localzone)
+    
+    @property
+    def start_datetime(self):
+        return self.local_datetime(self.start)
 
 
 class Raid:
@@ -2458,6 +2687,24 @@ class RSVPEmbed():
         self.embed.set_field_at(RSVPEmbed.team_index, name="Team List", value=team_str)
     
     @classmethod
+    def from_meetup(cls, meetup: Meetup):
+        bot = meetup.bot
+
+        start_dt = meetup.start_datetime
+
+        status_str = meetup.status_str
+        team_str = meetup.team_str
+
+        fields = {
+            "Status List": status_str,
+            "Team List": team_str
+        }
+
+        embed = formatters.make_embed(title="Current RSVP Totals", fields=fields, footer="Starting")
+        embed.timestamp = start_dt
+        return cls(embed)
+    
+    @classmethod
     def from_raid(cls, raid: Raid):
         bot = raid.bot
 
@@ -2775,4 +3022,51 @@ class TRaidEmbed():
         embed = formatters.make_embed(title="Raid Report", # msg_colour=color,
             thumbnail=img_url, fields=fields, footer="Ending")
         embed.timestamp = enddt
+        return cls(embed)
+
+class MeetupEmbed:
+
+    def __init__(self, embed):
+        self.embed = embed
+    
+    status_index = 0
+    team_index = 1
+
+    @property
+    def status_str(self):
+        return self.embed.fields[MeetupEmbed.status_index].value
+    
+    @status_str.setter
+    def status_str(self, status_str):
+        self.embed.set_field_at(MeetupEmbed.status_index, name="Status List", value=status_str)
+    
+    @property
+    def team_str(self):
+        return self.embed.fields[MeetupEmbed.team_index].value
+    
+    @team_str.setter
+    def team_str(self, team_str):
+        self.embed.set_field_at(MeetupEmbed.team_index, name="Team List", value=team_str)
+    
+    @classmethod
+    async def from_meetup(cls, meetup: Meetup):
+        location = meetup.location
+        if isinstance(location, POI):
+            directions_url = await location.url()
+            directions_text = await location._name()
+        else:
+            directions_url = location.url
+            directions_text = location._name + " (Unknown Location)"
+            exraid = False
+        status_str = meetup.status_str
+        team_str = meetup.team_str
+        fields = {
+            "Team List": team_str,
+            "Boss Interest:": boss_str,
+        }
+        footer_text = "Starting"
+        embed = formatters.make_embed(title=directions_text,
+            thumbnail='', title_url=directions_url, # msg_colour=color,
+            fields=fields, footer=footer_text)
+        embed.timestamp = meetup.start_datetime
         return cls(embed)

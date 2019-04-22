@@ -195,6 +195,17 @@ class MeowthUser:
                     insert.row(**old_d)
                     await insert.commit(do_update=True)
     
+    async def meetup_rsvp(self, meetup, party=[0,0,0,1]):
+        d = {
+            'user_id': self.user.id,
+            'meetup_id': meetup.id,
+            'party': party
+        }
+        meetup_rsvp_table = self.bot.dbi.table('meetup_rsvp')
+        insert = meetup_rsvp_table.insert
+        insert.row(**d)
+        await insert.commit(do_update=True)
+    
     async def leave_train(self, train):
         train_rsvp_table = self.bot.dbi.table('train_rsvp')
         query = train_rsvp_table.query
@@ -205,6 +216,12 @@ class MeowthUser:
         rsvp_table = self.bot.dbi.table('raid_rsvp')
         current_rsvp = rsvp_table.query().where(user_id=self.user.id, raid_id=raid_id)
         await current_rsvp.delete()
+    
+    async def cancel_mrsvp(self, meetup):
+        meetup_rsvp_table = self.bot.dbi.table('meetup_rsvp')
+        query = meetup_rsvp_table.query
+        query.where(user_id=self.user.id, meetup_id=meetup.id)
+        await query.delete()
     
     async def cancel_train(self):
         train_rsvp_table = self.bot.dbi.table('train_rsvp')

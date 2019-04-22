@@ -1,5 +1,5 @@
 from meowth import Cog, command, bot, checks
-from meowth.exts.map import Gym, ReportChannel, PartialPOI, S2_L10
+from meowth.exts.map import Gym, ReportChannel, PartialPOI, S2_L10, POI
 from meowth.exts.pkmn import Pokemon, Move
 from meowth.exts.pkmn.errors import MoveInvalid
 from meowth.exts.weather import Weather
@@ -10,7 +10,7 @@ from meowth.utils.converters import ChannelMessage
 from . import raid_info
 from . import raid_checks
 from .errors import *
-from .objects import Raid, RaidBoss, Train
+from .objects import Raid, RaidBoss, Train, Meetup
 
 from math import ceil
 import discord
@@ -27,7 +27,7 @@ emoji_letters = ['🇦','🇧','🇨','🇩','🇪','🇫','🇬','🇭','🇮',
     '🇲','🇳','🇴','🇵','🇶','🇷','🇸','🇹','🇺','🇻','🇼','🇽','🇾','🇿'
 ]
 
-class hatch_converter(commands.Converter):
+class time_converter(commands.Converter):
     async def convert(self, ctx, argument):
         zone = await ctx.tz()
         hatch_dt = parse(argument, settings={'TIMEZONE': zone, 'RETURN_AS_TIMEZONE_AWARE': True})
@@ -115,8 +115,11 @@ class RaidCog(Cog):
         idstring = f'{payload.channel_id}/{payload.message_id}'
         train = Train.by_message.get(payload.message_id)
         raid = Raid.by_message.get(idstring)
-        if (not raid and not train) or payload.user_id == self.bot.user.id:
+        meetup = Meetup.by_message.get(idstring)
+        if (not raid and not train and not meetup) or payload.user_id == self.bot.user.id:
             return
+        if meetup:
+            return await meetup.process_reactions(payload)
         if train:
             channel = self.bot.get_channel(payload.channel_id)
             msg = await channel.get_message(payload.message_id)
@@ -201,6 +204,21 @@ class RaidCog(Cog):
         elif payload_args[1] == 'power' or payload_args[1] == 'bosses':
             event_loop.create_task(raid.update_rsvp())
             return
+    
+    def _mrsvp(self, connection, pid, channel, payload):
+        if channel != 'meetup':
+            return
+        payload_args = payload.split('/')
+        meetup_id = int(payload_args[0])
+        meetup = Meetup.instances.get(meetup_id)
+        if not meetup:
+            return
+        event_loop = asyncio.get_event_loop()
+        if payload_args[1].isdigit():
+            user_id = int(payload_args[1])
+            status = payload_args[2]
+            event_loop.create_task(meetup.update_rsvp(user_id, status))
+            return
         
     def _trsvp(self, connection, pid, channel, payload):
         if channel != 'train':
@@ -232,12 +250,49 @@ class RaidCog(Cog):
             if not raid:
                 continue
             self.bot.loop.create_task(raid.change_weather(weather))
+    
+    @command()
+    @checks.is_mod()
+    @raid_checks.meetup_enabled()
+    async def meetup(self, ctx, location: POI, start_time: time_converter):
+        """Create a Meetup channel.
+        
+        **Arguments**
+        *location:* Location of the Meetup. Meowth searches 
+            for known locations (Gyms and Pokestops) and returns a guess if
+            no match is found.
+        *start_time:* The date and time of the Meetup.
+        
+        Usable only by moderators. Remember to wrap multi-word arguments in quotes."""
+
+        guild = ctx.guild
+        guild_id = guild.id
+        report_channel_id = ctx.channel.id
+        if isinstance(location, POI):
+            loc_name = await location._name()
+        else:
+            loc_name = location._name
+        channel_name = f'meetup-{loc_name}'
+        overwrites = ctx.channel.overwrites
+        category = await raid_checks.meetup_category(ctx)
+        meetup_channel = await guild.create_text_channel(channel_name, overwrites=overwrites, category=category)
+        meetup_id = next(snowflake.create())
+        tz = await ctx.tz()
+        meetup = Meetup(meetup_id, ctx.bot, guild_id, meetup_channel.id, ctx.channel.id, location, start_time, tz)
+        reportcontent = f"Plan for this meetup in {meetup_channel.mention}!"
+        embed = await meetup.meetup_embed()
+        await ctx.send(reportcontent, embed=embed)
+        await meetup_channel.send(embed=embed)
         
 
     @command()
     @raid_checks.archive_enabled()
     @raid_checks.temp_channel()
     async def archive(self, ctx, *, reason=None):
+        """Mark a temporary channel for archival rather than deletion.
+        
+        **Arguments**
+        *reason (optional):* Reason for archiving the channel."""
         await ctx.message.delete()
         channel_id = ctx.channel.id
         user_id = ctx.author.id
@@ -494,7 +549,7 @@ class RaidCog(Cog):
     @command(aliases=['ex'], category='Raid')
     @raid_checks.raid_enabled()
     @raid_checks.bot_has_permissions()
-    async def exraid(self, ctx, gym: Gym, *, hatch_time: hatch_converter):
+    async def exraid(self, ctx, gym: Gym, *, hatch_time: time_converter):
         """Report an EX Raid.
 
         **Arguments**
@@ -573,11 +628,24 @@ class RaidCog(Cog):
             party = await meowthuser.party()
         await meowthuser.rsvp(raid_id, status, bosses=boss_ids, party=party)
     
-    @command(aliases=['i', 'maybe'], category="Raid RSVP")
-    @raid_checks.raid_channel()
+    async def mrsvp(self, ctx, status, total: int=0, *teamcounts):
+        meetup = Meetup.by_channel[ctx.channel.id]
+        meetup_id = meetup.id
+        meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
+        if status == 'cancel':
+            return await meowthuser.cancel_mrsvp(meetup_id)
+        if total or teamcounts:
+            party = await meowthuser.party_list(total, *teamcounts)
+            await meowthuser.set_party(party=party)
+        else:
+            party = await meowthuser.party()
+        await meowthuser.meetup_rsvp(meetup, status, party=party)
+    
+    @command(aliases=['i', 'maybe'], category="RSVP")
+    @raid_checks.raid_or_meetup()
     @raid_checks.bot_has_permissions()
     async def interested(self, ctx, bosses: commands.Greedy[Pokemon], total: typing.Optional[int]=1, *teamcounts):
-        """RSVP as interested to the current raid.
+        """RSVP as interested to the current raid or meetup.
 
         **Arguments**
         *bosses (optional):* Names of the bosses you are interested in.
@@ -590,13 +658,16 @@ class RaidCog(Cog):
         """
         if total < 1:
             return
+        meetup = Meetup.by_channel.get(ctx.channel.id)
+        if meetup:
+            return await self.mrsvp(ctx, "maybe", total, *teamcounts)
         await self.rsvp(ctx, "maybe", bosses, total, *teamcounts)
         
-    @command(aliases=['c', 'omw'], category="Raid RSVP")
-    @raid_checks.raid_channel()
+    @command(aliases=['c', 'omw'], category="RSVP")
+    @raid_checks.raid_or_meetup()
     @raid_checks.bot_has_permissions()
     async def coming(self, ctx, bosses: commands.Greedy[Pokemon], total: typing.Optional[int]=1, *teamcounts):
-        """RSVP as on your way to the current raid.
+        """RSVP as on your way to the current raid or meetup.
 
        **Arguments**
         *bosses (optional):* Names of the bosses you are interested in.
@@ -609,13 +680,16 @@ class RaidCog(Cog):
         """
         if total < 1:
             return
+        meetup = Meetup.by_channel.get(ctx.channel.id)
+        if meetup:
+            return await self.mrsvp(ctx, "coming", total, *teamcounts)
         await self.rsvp(ctx, "coming", bosses, total, *teamcounts)
     
-    @command(aliases=['h'])
-    @raid_checks.raid_channel()
+    @command(aliases=['h'], category="RSVP")
+    @raid_checks.raid_or_meetup()
     @raid_checks.bot_has_permissions()
     async def here(self, ctx, bosses: commands.Greedy[Pokemon], total: typing.Optional[int]=1, *teamcounts):
-        """RSVP as being at the current raid.
+        """RSVP as being at the current raid or meetup.
 
         **Arguments**
         *bosses (optional):* Names of the bosses you are interested in.
@@ -628,13 +702,19 @@ class RaidCog(Cog):
         """
         if total < 1:
             return
+        meetup = Meetup.by_channel.get(ctx.channel.id)
+        if meetup:
+            return await self.mrsvp(ctx, "here", total, *teamcounts)
         await self.rsvp(ctx, "here", bosses, total, *teamcounts)
     
-    @command(aliases=['x'], category="Raid RSVP")
-    @raid_checks.raid_channel()
+    @command(aliases=['x'], category="RSVP")
+    @raid_checks.raid_or_meetup()
     @raid_checks.bot_has_permissions()
     async def cancel(self, ctx):
-        """Cancel your RSVP to the current raid."""
+        """Cancel your RSVP to the current raid or meetup."""
+        meetup = Meetup.by_channel.get(ctx.channel.id)
+        if meetup:
+            return await self.mrsvp(ctx, "cancel")
         await self.rsvp(ctx, "cancel")
         
 

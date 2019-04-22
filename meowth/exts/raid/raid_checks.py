@@ -63,14 +63,40 @@ async def is_raid_channel(ctx):
 def raid_channel():
     return commands.check(is_raid_channel)
 
+async def is_meetup_channel(ctx):
+    meetup_table = ctx.bot.dbi.table('meetups')
+    query = meetup_table.query
+    query.where(channel_id=ctx.channel.id)
+    data = await query.get()
+    if data:
+        return True
+    else:
+        return False
+
+def meetup_channel():
+    return commands.check(is_meetup_channel)
+
+async def is_raid_or_meetup(ctx):
+    try:
+        is_raid = await is_raid_channel(ctx)
+        if is_raid:
+            return True
+    except:
+        pass
+    is_meetup = await is_meetup_channel(ctx)
+    if is_meetup:
+        return True
+    return False
+
+def raid_or_meetup():
+    return commands.check(is_raid_or_meetup)
+
 async def is_train_enabled(ctx):
     try:
         is_raid = await is_raid_channel(ctx)
     except:
         is_raid = False
     if is_raid:
-        print(ctx.report_channel_id)
-        print(ctx.raid_id)
         report_channel = ctx.bot.get_channel(ctx.report_channel_id)
         if report_channel:
             ctx.channel = report_channel
@@ -131,3 +157,20 @@ async def is_temp_channel(ctx):
 def temp_channel():
     return commands.check(is_temp_channel)
 
+async def is_meetup_enabled(ctx):
+    table = ctx.bot.dbi.table('report_channels')
+    query = table.query('meetup')
+    query.where(channelid=ctx.channel.id)
+    meetup = await query.get_value()
+    if not meetup:
+        raise MeetupDisabled
+    else:
+        return True
+
+def meetup_enabled():
+    return commands.check(is_meetup_enabled)
+
+async def meetup_category(ctx):
+    catid = await raid_category(ctx, 'meetup')
+    category = ctx.bot.get_channel(int(catid))
+    return category

@@ -22,8 +22,10 @@ class CogManager(Cog):
             return await ctx.error(f'Extention {name} not found')
         was_loaded = extension in ctx.bot.extensions
         try:
-            ctx.bot.unload_extension(extension)
-            ctx.bot.load_extension(extension)
+            if was_loaded:
+                ctx.bot.reload_extension(extension)
+            else:
+                ctx.bot.load_extension(extension)
         except Exception as e:
             await ctx.error(
                 f'Error when loading extension {name}',

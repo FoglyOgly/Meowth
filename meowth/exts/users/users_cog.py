@@ -195,10 +195,11 @@ class MeowthUser:
                     insert.row(**old_d)
                     await insert.commit(do_update=True)
     
-    async def meetup_rsvp(self, meetup, party=[0,0,0,1]):
+    async def meetup_rsvp(self, meetup, status, party=[0,0,0,1]):
         d = {
             'user_id': self.user.id,
             'meetup_id': meetup.id,
+            'status': status,
             'party': party
         }
         meetup_rsvp_table = self.bot.dbi.table('meetup_rsvp')

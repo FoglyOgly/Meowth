@@ -288,6 +288,9 @@ class RaidCog(Cog):
         chanmsgid = f'{meetup_channel.id}/{chanmsg.id}'
         meetup.message_ids.append(chanmsgid)
         await meetup.upsert()
+        for message_id in meetup.message_ids:
+            Meetup.by_message[message_id] = meetup
+        Meetup.by_channel[meetup_channel.id] = meetup
 
         
 

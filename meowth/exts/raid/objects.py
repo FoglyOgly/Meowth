@@ -209,7 +209,7 @@ class Meetup:
             emoji = self.bot.get_emoji(emoji)
         await message.remove_reaction(emoji, user)
         if new_status != old_status:
-            await meowthuser.meetup_rsvp(self.id, new_status, party=party)
+            await meowthuser.meetup_rsvp(self, new_status, party=party)
     
     async def meetup_embed(self):
         return (await MeetupEmbed.from_meetup(self)).embed

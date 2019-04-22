@@ -158,6 +158,7 @@ class Meetup:
                 meetup_embed = MeetupEmbed(msg.embeds[0])
                 meetup_embed.status_str = self.status_str
                 meetup_embed.team_str = self.team_str
+                embed = meetup_embed.embed
                 has_embed = True
             await msg.edit(embed=embed)
         if user_id and status:

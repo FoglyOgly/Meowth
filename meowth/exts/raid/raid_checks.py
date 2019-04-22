@@ -34,6 +34,8 @@ async def raid_category(ctx, level):
     query = report_table.query(f'category_{level}')
     query.where(channelid=ctx.channel.id)
     cat = await query.get_value()
+    if isinstance(cat, int):
+        return cat
     if cat.isdigit():
         me = ctx.guild.me
         channel = ctx.channel
@@ -172,5 +174,5 @@ def meetup_enabled():
 
 async def meetup_category(ctx):
     catid = await raid_category(ctx, 'meetup')
-    category = ctx.bot.get_channel(int(catid))
+    category = ctx.bot.get_channel(catid)
     return category

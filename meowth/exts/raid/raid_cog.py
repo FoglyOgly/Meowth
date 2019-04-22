@@ -70,6 +70,16 @@ class RaidCog(Cog):
     async def pickup_raid(self, rcrd):
         raid = await Raid.from_data(self.bot, rcrd)
         self.bot.loop.create_task(raid.monitor_status())
+
+    async def pickup_meetupdata(self):
+        meetup_table = self.bot.dbi.table('meetups')
+        query = meetup_table.query
+        data = await query.get()
+        for rcrd in data:
+            self.bot.loop.create_task(self.pickup_meetup(rcrd))
+    
+    async def pickup_meetup(self, rcrd):
+        meetup = await Meetup.from_data(self.bot, rcrd)
     
     async def pickup_traindata(self):
         train_table = self.bot.dbi.table('trains')

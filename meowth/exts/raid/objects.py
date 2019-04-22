@@ -289,6 +289,28 @@ class Meetup:
     def start_datetime(self):
         return self.local_datetime(self.start)
 
+    @classmethod
+    async def from_data(cls, bot, data):
+        if data['location'].isdigit():
+            location = POI(bot, int(data['location']))
+        else:
+            city, arg = data['location'].split('/')
+            location = PartialPOI(bot, city, arg)
+        meetup_id = data['meetup_id']
+        guild_id = data['guild_id']
+        report_channel_id = data['report_channel_id']
+        start = data['start']
+        tz = data['tz']
+        channel_id = data['channel_id']
+        meetup = cls(meetup_id, bot, guild_id, channel_id, report_channel_id, location, start, tz)
+        message_ids = data['message_ids']
+        meetup.message_ids = message_ids
+        meetup.trainer_dict = await meetup.get_trainer_dict()
+        cls.by_channel[channel_id] = meetup
+        for msgid in meetup.message_ids:
+            cls.by_message[msgid] = meetup
+        return meetup
+
 
 class Raid:
 

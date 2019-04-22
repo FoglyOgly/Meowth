@@ -146,7 +146,7 @@ class Meetup:
             trainer_dict[trainer] = rcrd_dict
         return trainer_dict
     
-    async def update_rsvp(self, user_id=None, status=None, group=None):
+    async def update_rsvp(self, user_id=None, status=None):
         self.trainer_dict = await self.get_trainer_dict()
         has_embed = False
         for idstring in self.message_ids:
@@ -178,6 +178,11 @@ class Meetup:
                     return
                 content = f"{member.display_name} {display_status}!"
                 newmsg = await chn.send(content, embed=rsvpembed)
+    
+    @property
+    def react_list(self):
+        status_reacts = list(self.bot.config.emoji.values())
+        return status_reacts
     
     async def process_reactions(self, payload):
         user = self.bot.get_user(payload.user_id)

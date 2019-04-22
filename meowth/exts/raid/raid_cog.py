@@ -44,6 +44,7 @@ class RaidCog(Cog):
         self.bot = bot
         self.bot.loop.create_task(self.pickup_raiddata())
         self.bot.loop.create_task(self.pickup_traindata())
+        self.bot.loop.create_task(self.pickup_meetupdata())
         self.bot.loop.create_task(self.add_listeners())
     
     async def add_listeners(self):

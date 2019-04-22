@@ -293,6 +293,12 @@ class RaidCog(Cog):
         for message_id in meetup.message_ids:
             Meetup.by_message[message_id] = meetup
         Meetup.by_channel[meetup_channel.id] = meetup
+        react_list = meetup.react_list
+        for react in react_list:
+            if isinstance(react, int):
+                react = self.bot.get_emoji(react)
+            await reportmsg.add_reaction(react)
+            await chanmsg.add_reaction(react)
 
         
 

@@ -3062,8 +3062,8 @@ class MeetupEmbed:
         status_str = meetup.status_str
         team_str = meetup.team_str
         fields = {
-            "Team List": team_str,
-            "Boss Interest:": boss_str,
+            "Status List": status_str,
+            "Team List": team_str
         }
         footer_text = "Starting"
         embed = formatters.make_embed(title=directions_text,

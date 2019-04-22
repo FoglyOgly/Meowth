@@ -322,7 +322,7 @@ class Core(Cog):
     @group(category="Bot Info", name='permissions',
            aliases=['perms'], invoke_without_command='True')
     @checks.is_mod()
-    async def bot_perms(self, ctx, *, channel_id: int = None):
+    async def get_bot_perms(self, ctx, *, channel_id: int = None):
         """Show bot's permissions for the guild and channel."""
         if not await ctx.is_co_owner() and channel_id is not None:
             return await ctx.error(
@@ -383,7 +383,7 @@ class Core(Cog):
                 pass
             await ctx.author.send(embed=embed)
 
-    @bot_perms.command(name='guild')
+    @get_bot_perms.command(name='guild')
     @checks.is_mod()
     async def guild_perms(self, ctx, guild_id=None):
         """Gets bot's permissions for the guild."""
@@ -437,7 +437,7 @@ class Core(Cog):
                 content=msg)
             await ctx.author.send(embed=embed)
 
-    @bot_perms.command(name='channel', aliases=['chan'])
+    @get_bot_perms.command(name='channel', aliases=['chan'])
     @checks.is_mod()
     async def channel_perms(self, ctx, channel_id=None):
         """Gets bot's permissions for the channel."""

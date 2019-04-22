@@ -296,7 +296,7 @@ class Meetup:
         else:
             city, arg = data['location'].split('/')
             location = PartialPOI(bot, city, arg)
-        meetup_id = data['meetup_id']
+        meetup_id = data['id']
         guild_id = data['guild_id']
         report_channel_id = data['report_channel_id']
         start = data['start']

@@ -281,8 +281,14 @@ class RaidCog(Cog):
         meetup = Meetup(meetup_id, ctx.bot, guild_id, meetup_channel.id, ctx.channel.id, location, start_time, tz)
         reportcontent = f"Plan for this meetup in {meetup_channel.mention}!"
         embed = await meetup.meetup_embed()
-        await ctx.send(reportcontent, embed=embed)
-        await meetup_channel.send(embed=embed)
+        reportmsg = await ctx.send(reportcontent, embed=embed)
+        reportid = f'{ctx.channel.id}/{reportmsg.id}'
+        meetup.message_ids.append(reportid)
+        chanmsg = await meetup_channel.send(embed=embed)
+        chanmsgid = f'{meetup_channel.id}/{chanmsg.id}'
+        meetup.message_ids.append(chanmsgid)
+        await meetup.upsert()
+
         
 
     @command()

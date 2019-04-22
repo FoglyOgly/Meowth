@@ -174,7 +174,7 @@ class Meetup:
                 elif status == 'cancel':
                     display_status = 'has canceled'
                 else:
-                    break
+                    return
                 content = f"{member.display_name} {display_status}!"
                 newmsg = await chn.send(content, embed=rsvpembed)
     

@@ -77,6 +77,7 @@ class Meetup:
         self.tz = tz
         self.message_ids = []
         self.channel_id = channel_id
+        self.trainer_dict = {}
     
     def to_dict(self):
         if isinstance(self.location, POI):

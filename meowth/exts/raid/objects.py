@@ -89,7 +89,7 @@ class Meetup:
             'report_channel_id': self.report_channel_id,
             'channel_id': self.channel_id,
             'location': locid,
-            'start': self.start
+            'start': self.start,
             'tz': self.tz,
             'message_ids': self.message_ids
         }

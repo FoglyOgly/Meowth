@@ -246,7 +246,7 @@ class SilphCard:
                 f"Updated"),
             icon_url=silph_icon)
         
-        embed.timestamp = self.modified
+        embed.timestamp = self.modified()
 
         return embed
 

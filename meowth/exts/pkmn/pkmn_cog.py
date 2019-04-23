@@ -784,7 +784,6 @@ class Pokemon():
                             pokedex['name'].in_(names))
                         ids = await ref.get_values()
                     else:
-                        print(0)
                         raise PokemonNotFound
         if id_list:
             possible_ids = set(ids) & set(id_list)

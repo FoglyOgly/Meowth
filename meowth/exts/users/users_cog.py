@@ -3,6 +3,7 @@ from meowth.utils import get_match
 import re
 
 import discord
+from discord.ext import commands
 
 from . import users_checks
 
@@ -258,6 +259,13 @@ class MeowthUser:
         insert = rsvp_table.insert()
         insert.row(**d)
         return await insert.commit(do_update=True)
+
+    @classmethod
+    async def convert(cls, ctx, arg):
+        converter = commands.MemberConverter()
+        member = await converter.convert(ctx, arg)
+        user_id = member.id
+        return cls.from_id(ctx.bot, user_id)
         
 
         

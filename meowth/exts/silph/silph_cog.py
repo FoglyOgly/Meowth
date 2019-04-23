@@ -1,4 +1,5 @@
 from meowth import Cog, command, bot, checks
+from meowth.exts.users import MeowthUser
 
 import asyncio
 import aiohttp
@@ -7,6 +8,7 @@ from datetime import datetime
 from dateparser import parse
 
 from . import silph_info
+from .objects import SilphTrainer
 
 class SilphCog(Cog):
 
@@ -38,6 +40,21 @@ class SilphCog(Cog):
                     raid_lists[new_level].append(meowthid)
         return verified
     
+    @command()
+    async def silphcard(self, ctx, silph_user: SilphTrainer = None):
+        """Displays a user's Silph Road Trainer Card."""
+        if not silph_user:
+            user_id = ctx.author.id
+            meowth_user = MeowthUser(ctx.bot, user_id)
+            silph_id = await meowth_user.silph()
+            if not silph_id:
+                return await ctx.error(f"You haven't setup a silphcard!")
+            silph_user = SilphTrainer.load_trainer_data(silph_id)
+        card = silph_user.card
+        await ctx.send(embed=card.embed())
+        else:
+            await ctx.error(f'Silph Card for {silph_user} not found.')
+
     @command()
     @checks.is_co_owner()
     async def shakeup(self, ctx, *, shaketime=None):

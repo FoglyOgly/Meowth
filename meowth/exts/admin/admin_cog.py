@@ -197,17 +197,17 @@ class AdminCog(Cog):
         else:
             rcrd = {'channelid': channel_id}
         possible_commands = ['raid', 'wild', 'research', 'users', 'train', 'trade',
-            'clean', 'welcome', 'archive']
+            'clean', 'welcome', 'archive', 'meetup']
         features = [x for x in features if x in possible_commands]
         if not features:
-            return await ctx.send("The list of valid command groups to enable is `raid, train, wild, research, user, trade, clean, welcome, archive`.")
-        location_commands = ['raid', 'wild', 'research', 'train']
+            return await ctx.send("The list of valid command groups to enable is `raid, train, wild, research, user, trade, clean, welcome, archive, meetup`.")
+        location_commands = ['raid', 'wild', 'research', 'train', 'meetup']
         enabled_commands = []
         required_perms = {}
         me = ctx.guild.me
         perms = ctx.channel.permissions_for(me)
         for x in features:
-            if x in ['raid', 'wild', 'trade', 'train', 'research', 'users']:
+            if x in ['raid', 'wild', 'trade', 'train', 'research', 'users', 'meetup']:
                 required_perms['Add Reactions'] = perms.add_reactions
                 required_perms['Manage Messages'] = perms.manage_messages
                 required_perms['Use External Emojis'] = perms.external_emojis
@@ -220,6 +220,28 @@ class AdminCog(Cog):
             if x != 'welcome' and x!= 'archive':
                 rcrd[x] = True
             enabled_commands.append(x)
+        if 'meetup' in enabled_commands:
+            column = 'category_meetup'
+            content = ('How do you want Meetup channels created from this channel '
+            'to be categorized? You can type the name or ID of the category you want 
+            'the channel to appear in.')
+            await ctx.send(content)
+            def check(m):
+                return m.author == ctx.message.author and m.channel == ctx.channel
+            while True:
+                try:
+                    resp = await self.bot.wait_for('message', check=check)
+                except:
+                    break
+                converter = commands.CategoryChannelConverter()
+                category = await converter.convert(ctx, resp.content)
+                if category:
+                    rcrd[column] = category.id
+                    required_perms['Manage Channels'] = perms.manage_channels
+                    break
+                else:
+                    await ctx.send('I could not interpret your response. Try again!')
+                    continue
         if 'raid' in enabled_commands:
             raid_levels = ['1', '2', '3', '4', '5', 'EX', 'EX Raid Gyms']
             for level in raid_levels:

@@ -156,6 +156,8 @@ class RaidCog(Cog):
             await ctx.error('Raid command disabled in current channel.')
         elif isinstance(error, TrainDisabled):
             await ctx.error('Train command disabled in current channel.')
+        elif isinstance(error, MeetupDisabled):
+            await ctx.error('Meetup command disabled in current channel.')
         elif isinstance(error, InvalidTime):
             await ctx.error(f'Invalid time for {ctx.prefix}{ctx.invoked_with}')
         elif isinstance(error, GroupTooBig):
@@ -187,6 +189,24 @@ class RaidCog(Cog):
                         return await raid.list_groups(ctx.channel)
             except NotRaidChannel:
                 pass
+        
+    @Cog.listener()
+    async def on_guild_channel_delete(self, channel):
+        meetup = Meetup.by_channel.get(channel.id)
+        if not meetup:
+            return
+        meetup_table = self.bot.dbi.table('meetups')
+        query = meetup_table.query
+        query.where(id=meetup.id)
+        await query.delete()
+        rsvp_table = self.bot.dbi.table('meetup_rsvp')
+        query = rsvp_table.query
+        query.where(meetup_id=meetup.id)
+        await query.delete()
+        for msgid in meetup.message_ids:
+            del Meetup.by_message[msgid]
+        del Meetup.by_channel[channel.id]
+        del Meetup.instances[meetup.id]
         
     
     async def mark_for_archival(self, channel_id, user_id, reason=None):

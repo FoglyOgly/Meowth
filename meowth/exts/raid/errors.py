@@ -28,5 +28,9 @@ class RaidNotActive(CommandError):
     'Exception raised, raid not active'
     pass
 
+class MeetupDisabled(CommandError):
+    'Exception raised, meetup not enabled'
+    pass
+
 
 

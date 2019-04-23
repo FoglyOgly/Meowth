@@ -181,12 +181,10 @@ class SilphCard:
         data = self.get_connected_account('Discord')
         return data.get('username') if data else None
 
-    def joined(self, utc_offset=None):
+    def joined(self):
         if not self._joined:
             return None
         date = dateparser.parse(self._joined, settings={'TIMEZONE': 'UTC'})
-        if utc_offset:
-            date = date + datetime.timedelta(hours=utc_offset)
         return date.date().isoformat()
 
     def modified(self, utc_offset=None):
@@ -225,7 +223,7 @@ class SilphCard:
         embed.add_field(
             name="__Silph Stats__",
             value=(
-                f"**Joined:** {self.joined(utc_offset)}\n"
+                f"**Joined:** {self.joined()}\n"
                 f"**Badges:** {self.badge_count}\n"
                 f"**Check-ins:** {self.checkin_count}\n"
                 f"**Handshakes:** {self.handshakes}\n"

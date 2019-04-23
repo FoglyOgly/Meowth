@@ -71,7 +71,7 @@ class SilphCog(Cog):
             await insert.commit()
         else:
             update = meowthuser._update
-            update.values(silph=silph_id)
+            update.values(silph=silph_id.name)
             await update.commit()
         return await ctx.send(f'Silph ID set to {silph_id.name}')
     

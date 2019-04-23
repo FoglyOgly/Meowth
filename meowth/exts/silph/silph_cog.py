@@ -51,7 +51,8 @@ class SilphCog(Cog):
                 return await ctx.error(f"You haven't setup a silphcard!")
             silph_user = SilphTrainer.load_trainer_data(silph_id)
         card = silph_user.card
-        await ctx.send(embed=card.embed())
+        if card:
+            await ctx.send(embed=card.embed())
         else:
             await ctx.error(f'Silph Card for {silph_user} not found.')
 

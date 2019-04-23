@@ -1,5 +1,5 @@
 from meowth import Cog, command, bot, checks
-from meowth.exts.users import MeowthUser
+from meowth.exts.users import MeowthUser, users_checks
 
 import asyncio
 import aiohttp
@@ -9,6 +9,7 @@ from dateparser import parse
 
 from . import silph_info
 from .objects import SilphTrainer
+from .errors import *
 
 class SilphCog(Cog):
 
@@ -39,6 +40,40 @@ class SilphCog(Cog):
                 if meowthid not in raid_lists[new_level]:
                     raid_lists[new_level].append(meowthid)
         return verified
+
+    @Cog.listener()
+    async def on_command_error(self, ctx, error):
+        if isinstance(error, InvalidAPIKey):
+            return await ctx.error("Invalid Silph API Key")
+        elif isinstance(error, SilphCardNotFound):
+            return await ctx.error("Silph Card Not Found")
+        elif isinstance(error, SilphCardPrivate):
+            return await ctx.error("Silph Card Private")
+        elif isinstance(error, SilphCardAlreadyLinked):
+            return await ctx.error("Silph Card Linked to Another Discord")
+
+    @command()
+    @users_checks.users_enabled()
+    async def silph(self, ctx, silph_id: SilphTrainer):
+        """Link your Silph Road account."""
+
+        silph_card = silph_id.card
+        linked_discord = silph_card.discord_name
+        if not linked_discord == str(ctx.author):
+            raise SilphCardAlreadyLinked
+        user_table = ctx.bot.dbi.table('users')
+        meowthuser = MeowthUser(ctx.bot, ctx.author)
+        data = await meowthuser._data.get()
+        if len(data) == 0:
+            insert = meowthuser._insert
+            d = {'id': ctx.author.id, 'silph': silph_id}
+            insert.row(**d)
+            await insert.commit()
+        else:
+            update = meowthuser._update
+            update.values(silph=silph_id)
+            await update.commit()
+        return await ctx.send(f'Silph ID set to {silph_id.name}')
     
     @command()
     async def silphcard(self, ctx, silph_user: SilphTrainer = None):

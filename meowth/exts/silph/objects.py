@@ -7,6 +7,7 @@ import discord
 from discord.ext import commands
 from meowth.utils import formatters, fuzzymatch
 from meowth.exts.users import MeowthUser
+from .errors import *
 
 class SilphBadge:
 
@@ -257,7 +258,13 @@ class SilphCard:
             async with sess.get(url) as resp:
                 data = await resp.json()
         if data.get('error', None):
-            return None
+            error = data['error']
+            if error == "Card not found":
+                raise SilphCardNotFound
+            elif error == "Private Travelers Card":
+                raise SilphCardPrivate
+            else:
+                return None
         return cls(silph_user, data)
 
 class SilphTrainer:

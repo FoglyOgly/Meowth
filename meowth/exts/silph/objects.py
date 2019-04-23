@@ -285,11 +285,6 @@ class SilphTrainer:
         except:
             meowth_user = None
         if not meowth_user:
-            user_table = ctx.bot.dbi.table('users')
-            user_query = user_table.query('silph')
-            silph_list = await user_query.get_values()
-            silph_match = fuzzymatch.get_match(silph_list, arg)
-            if silph_match[0]:
-                silph_id = silph_match[0]
+            silph_id = arg
         return await cls.load_trainer_data(silph_id)
         

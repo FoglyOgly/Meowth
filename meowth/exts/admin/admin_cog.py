@@ -223,8 +223,8 @@ class AdminCog(Cog):
         if 'meetup' in enabled_commands:
             column = 'category_meetup'
             content = ('How do you want Meetup channels created from this channel '
-            'to be categorized? You can type the name or ID of the category you want 
-            'the channel to appear in.')
+                'to be categorized? You can type the name or ID of the category you want 
+                'the channel to appear in.')
             await ctx.send(content)
             def check(m):
                 return m.author == ctx.message.author and m.channel == ctx.channel

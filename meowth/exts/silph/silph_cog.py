@@ -45,7 +45,7 @@ class SilphCog(Cog):
         """Displays a user's Silph Road Trainer Card."""
         if not silph_user:
             user_id = ctx.author.id
-            meowth_user = MeowthUser(ctx.bot, user_id)
+            meowth_user = MeowthUser.from_id(ctx.bot, user_id)
             silph_id = await meowth_user.silph()
             if not silph_id:
                 return await ctx.error(f"You haven't setup a silphcard!")

@@ -66,7 +66,7 @@ class SilphCog(Cog):
         data = await meowthuser._data.get()
         if len(data) == 0:
             insert = meowthuser._insert
-            d = {'id': ctx.author.id, 'silph': silph_id}
+            d = {'id': ctx.author.id, 'silph': silph_id.name}
             insert.row(**d)
             await insert.commit()
         else:

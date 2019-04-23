@@ -84,7 +84,7 @@ class SilphCog(Cog):
             silph_id = await meowth_user.silph()
             if not silph_id:
                 return await ctx.error(f"You haven't setup a silphcard!")
-            silph_user = SilphTrainer.load_trainer_data(silph_id)
+            silph_user = await SilphTrainer.load_trainer_data(silph_id)
         card = silph_user.card
         if card:
             await ctx.send(embed=card.embed())

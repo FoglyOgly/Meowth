@@ -19,6 +19,8 @@ class Tutorial(Cog):
             await self.bot.dbi.pool.release(self.bot.dbi.tutorial_listener)
         self.bot.dbi.tutorial_listener = await self.bot.dbi.pool.acquire()
         rsvp_listener = ('rsvp', self._rsvp)
+        await self.bot.dbi.tutorial_listener.add_listener(*rsvp_listener)
+
     
     def _rsvp(self, connection, pid, channel, payload):
         print(0)

@@ -323,7 +323,7 @@ class Tutorial(Cog):
                     "so I'm going to go ahead and set the hatch time to right now. "
                     "I'll wait a bit for you to report a boss."
                 )
-                await raid.update_time(time.time())
+                raid.update_time(time.time())
                 await asyncio.sleep(10)
                 continue
             elif raid.status == 'hatched':

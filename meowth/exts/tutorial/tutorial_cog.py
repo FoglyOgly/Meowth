@@ -42,12 +42,16 @@ class Tutorial(Cog):
     async def wait_for_rsvp(self, raid, newbie, status):
 
         def check(raid_id, user_id, status_str):
+            print(4)
             if not raid_id == raid.id:
                 return False
+            print(5)
             if not user_id == newbie.id:
                 return False
+            print(6)
             if not status_str == status:
                 return False
+            print(7)
             return True
         
         rsvp_args = await self.bot.wait_for('tutorial_rsvp', check=check, timeout=300)

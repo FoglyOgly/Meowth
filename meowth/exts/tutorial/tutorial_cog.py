@@ -9,7 +9,7 @@ from discord.ext import commands
 
 from meowth.utils import formatters
 
-class Tutorial:
+class Tutorial(Cog):
     def __init__(self, bot):
         self.bot = bot
 

@@ -12,6 +12,7 @@ from meowth.utils import formatters
 class Tutorial(Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.bot.loop.create_task(self.add_listeners())
 
     async def add_listeners(self):
         if self.bot.dbi.tutorial_listener:

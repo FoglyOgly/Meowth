@@ -548,7 +548,6 @@ class Tutorial:
             await ctx.tutorial_channel.delete()
 
     @tutorial.command()
-    @checks.feature_enabled('want')
     async def want(self, ctx):
         """Launches a tutorial session for the want feature.
         Meowth will create a private channel and initiate a
@@ -594,7 +593,6 @@ class Tutorial:
             await ctx.tutorial_channel.delete()
 
     @tutorial.command()
-    @checks.feature_enabled('wild')
     async def wild(self, ctx):
         """Launches an tutorial session for the wild feature.
         Meowth will create a private channel and initiate a
@@ -639,7 +637,6 @@ class Tutorial:
             await ctx.tutorial_channel.delete()
 
     @tutorial.command()
-    @checks.feature_enabled('raid')
     async def raid(self, ctx):
         """Launches an tutorial session for the raid feature.
         Meowth will create a private channel and initiate a
@@ -684,7 +681,6 @@ class Tutorial:
             await ctx.tutorial_channel.delete()
 
     @tutorial.command()
-    @checks.feature_enabled('research')
     async def research(self, ctx):
         """Launches an tutorial session for the research feature.
         Meowth will create a private channel and initiate a
@@ -726,7 +722,6 @@ class Tutorial:
             await ctx.tutorial_channel.delete()
 
     @tutorial.command()
-    @checks.feature_enabled('team')
     async def team(self, ctx):
         """Launches an tutorial session for the team feature.
         Meowth will create a private channel and initiate a

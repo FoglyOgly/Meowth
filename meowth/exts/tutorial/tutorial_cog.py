@@ -21,14 +21,18 @@ class Tutorial(Cog):
         rsvp_listener = ('rsvp', self._rsvp)
     
     def _rsvp(self, connection, pid, channel, payload):
+        print(0)
         if channel != 'rsvp':
             return
+        print(1)
         payload_args = payload.split('/')
         if len(payload_args) != 3:
             return
+        print(2)
         raid_id = int(payload_args[0])
         if not payload_args[1].isdigit():
             return
+        print(3)
         user_id = int(payload_args[1])
         status = payload_args[2]
         self.bot.dispatch('tutorial_rsvp', raid_id, user_id, status)

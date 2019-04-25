@@ -481,7 +481,7 @@ class Tutorial(Cog):
             delete_after=20.0)
 
         # get tutorial settings
-        d = await self.get_tutorial_settings(guild)
+        d = await self.guild_tutorial_settings(guild)
         d['channelid'] = ctx.tutorial_channel.id
         d['clean'] = False
         d['meetup'] = False

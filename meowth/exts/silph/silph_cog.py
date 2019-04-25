@@ -73,7 +73,7 @@ class SilphCog(Cog):
             update = meowthuser._update
             update.values(silph=silph_id.name)
             await update.commit()
-        return await ctx.send(f'Silph ID set to {silph_id.name}')
+        return await ctx.success(f'Silph ID set to {silph_id.name}')
     
     @command()
     async def silphcard(self, ctx, silph_user: SilphTrainer = None):

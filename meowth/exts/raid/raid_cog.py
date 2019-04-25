@@ -416,6 +416,7 @@ class RaidCog(Cog):
         zone = await ctx.tz()
         raid_id = next(snowflake.create())
         new_raid = Raid(raid_id, ctx.bot, ctx.guild.id, ctx.channel.id, gym, level=level, pkmn=boss, hatch=hatch, end=end, tz=zone)
+        ctx.raid = new_raid
         return await self.setup_raid(ctx, new_raid)
 
     

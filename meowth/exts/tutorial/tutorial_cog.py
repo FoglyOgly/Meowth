@@ -239,7 +239,7 @@ class Tutorial(Cog):
         # wait for interested status update
         try:
             await self.wait_for_rsvp(
-                raid, ctx.author, 'interested')
+                raid, ctx.author, 'maybe')
 
         # if no response for 5 minutes, close tutorial
         except asyncio.TimeoutError:

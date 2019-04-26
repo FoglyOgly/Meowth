@@ -427,6 +427,7 @@ class Raid:
         else:
             return None
         react_list = react_list + grp_reacts
+        react_list.append('\u2754')
         return react_list
 
     @property
@@ -663,6 +664,8 @@ class Raid:
                     if emoji == group['emoji']:
                         await message.remove_reaction(emoji, user)
                         return await self.join_grp(payload.user_id, group)
+        if emoji == '\u2754':
+            return await formatters.get_raid_help('!', self.bot.user.avatar_url, user)
         if self.status == 'egg':
             if len(self.boss_list) > 1:
                 if self.react_list.index(emoji) <= len(self.boss_list) - 1:

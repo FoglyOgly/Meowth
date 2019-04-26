@@ -734,13 +734,13 @@ class AdminCog(Cog):
                 city = chans[chan]
                 d['city'] = city
                 if catsort == 'region':
-                    cat = str(cat_dict.get(chan))
+                    cat = cat_dict.get(chan)
                     d['category_meetup'] = cat
                 elif catsort == 'same':
-                    cat = str(channel_exists.category.id)
+                    cat = channel_exists.category.id
                     d['category_meetup'] = cat
                 else:
-                    d['category_meetup'] = 'none'
+                    d['category_meetup'] = None
                 report_channels[chan] = d
         data = report_channels.values()
         location_channel_ids = []

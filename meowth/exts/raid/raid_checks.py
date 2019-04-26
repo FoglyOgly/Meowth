@@ -174,5 +174,8 @@ def meetup_enabled():
 
 async def meetup_category(ctx):
     catid = await raid_category(ctx, 'meetup')
-    category = ctx.bot.get_channel(catid)
-    return category
+    if catid:
+        category = ctx.bot.get_channel(catid)
+        return category
+    else:
+        return None

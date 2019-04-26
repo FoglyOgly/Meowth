@@ -107,7 +107,7 @@ class SilphCog(Cog):
         while True:
             async with aiohttp.ClientSession() as sess:
                 async with sess.get(url, headers=headers) as resp:
-                    data = await resp.json()
+                    data = await resp.json(content_type=None)
                     data = data['data']
                     verified = self.parse_info_from_silph(data)
                     if not verified or i < 60:
@@ -144,7 +144,7 @@ class SilphCog(Cog):
         headers = {'Authorization': f'Silph {silph_info.api_key}'}
         async with aiohttp.ClientSession() as sess:
             async with sess.get(url, headers=headers) as resp:
-                data = await resp.json()
+                data = await resp.json(content_type=None)
                 data = data['data']
                 self.parse_info_from_silph(data)
         with open(self.bot.ext_dir + '/raid/raid_info.py', 'a') as f:

@@ -536,6 +536,8 @@ class AdminCog(Cog):
         welcome_dict = old_config.get('welcome', {})
         if welcome_dict.get('enabled'):
             welcome_chan = welcome_dict.get('welcomechan')
+            if isinstance(welcome_chan, int):
+                welcome_chan = str(welcome_chan)
             welcomemsg = welcome_dict.get('welcomemsg')
             d = {
                 'guild_id': guild_id,

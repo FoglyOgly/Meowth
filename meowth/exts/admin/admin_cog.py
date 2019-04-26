@@ -170,7 +170,7 @@ class AdminCog(Cog):
         insert = table.insert
         insert.row(**d)
         await insert.commit(do_update=True)
-        await ctx.success(f'{await team.emoji()} assigned to {role.name}')
+        await ctx.success('Team Configuration Successful', details=f'{await team.emoji()} assigned to {role.name}')
 
 
 

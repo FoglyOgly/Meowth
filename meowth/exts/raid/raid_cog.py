@@ -556,8 +556,11 @@ class RaidCog(Cog):
             catid = int(raid_mode)
             if catid:
                 category = ctx.guild.get_channel(catid)
-            else:
-                category = None
+        elif raid_mode == 'none':
+            category = None
+        else:
+            return await ctx.error(f'Level {level} Raid reports not permitted in this channel')
+        if raid_mode != 'message':
             raid_channel_name = await new_raid.channel_name()
             if len(report_channels) > 1:
                 raid_channel_overwrites = formatters.perms_or(report_channels)

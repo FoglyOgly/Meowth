@@ -278,7 +278,7 @@ async def get_raid_help(prefix, avatar, user=None):
         value=(
             "`Sets in-game weather`\n"
             "`Sets hatch/raid timer`\n"
-            "`Creates a group`\n"
+            "`Creates a group`\n\n"
             "`interested/coming/here`\n"
             "`# of trainers`\n"
             "`# from each team (ex. 3m for 3 Mystic)`\n\n"

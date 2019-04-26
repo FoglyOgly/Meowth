@@ -4,6 +4,7 @@ from discord.ext import commands
 import discord
 from timezonefinder import TimezoneFinder
 import re
+import pickle
 
 def do_template(message, author, guild):
     not_found = []
@@ -183,7 +184,7 @@ class AdminCog(Cog):
 
         **Arguments**
         *features:* list of features to enable. Can include any of
-        `['raid', 'wild', 'research', 'users', 'train', 'trade', 'clean']`
+        `['raid', 'wild', 'users', 'train', 'trade', 'clean']`
 
         Raid, wild, research, and train require a defined location. Use `!setlocation`
         before enabling these.
@@ -196,18 +197,18 @@ class AdminCog(Cog):
             rcrd = dict(data[0])
         else:
             rcrd = {'channelid': channel_id}
-        possible_commands = ['raid', 'wild', 'research', 'users', 'train', 'trade',
+        possible_commands = ['raid', 'wild', 'users', 'train', 'trade',
             'clean', 'welcome', 'archive', 'meetup']
         features = [x for x in features if x in possible_commands]
         if not features:
-            return await ctx.send("The list of valid command groups to enable is `raid, train, wild, research, user, trade, clean, welcome, archive, meetup`.")
+            return await ctx.send("The list of valid command groups to enable is `raid, train, wild, users, trade, clean, welcome, archive, meetup`.")
         location_commands = ['raid', 'wild', 'research', 'train', 'meetup']
         enabled_commands = []
         required_perms = {}
         me = ctx.guild.me
         perms = ctx.channel.permissions_for(me)
         for x in features:
-            if x in ['raid', 'wild', 'trade', 'train', 'research', 'users', 'meetup']:
+            if x in ['raid', 'wild', 'trade', 'train', 'users', 'meetup']:
                 required_perms['Add Reactions'] = perms.add_reactions
                 required_perms['Manage Messages'] = perms.manage_messages
                 required_perms['Use External Emojis'] = perms.external_emojis
@@ -273,6 +274,9 @@ class AdminCog(Cog):
                         break
                     elif resp.content.lower() == 'disable':
                         rcrd[column] = None
+                        break
+                    elif resp.content.lower() == 'none':
+                        rcrd[column] = 'none'
                         break
                     else:
                         converter = commands.CategoryChannelConverter()
@@ -507,4 +511,244 @@ class AdminCog(Cog):
         insert.row(**rcrd)
         await insert.commit(do_update=True)
         return await ctx.send(f'The following commands have been disabled in this channel: `{", ".join(disabled_commands)}`')
-        
+
+    @command()
+    @commands.has_permissions(manage_guild=True)
+    async def importconfig(self, ctx):
+        guild_id = ctx.guild.id
+        old_shard_id = (guild_id >> 22) % 2
+        path = f'~/MeowthProject/MeowthProject/Shard{old_shard_id}/data/serverdict'
+        with open(path, 'rb') as fd:
+            old_gd = pickle.load(fd)
+        old_config = old_gd.get(ctx.guild.id, {}).get('configure_dict', {})
+        if not old_config:
+            return await ctx.error('No old configuration found!')
+        old_prefix = old_config.get('settings', {}).get('prefix')
+        if old_prefix:
+            table = ctx.bot.dbi.table('prefix')
+            insert = table.insert
+            d = {
+                'guild_id': guild_id,
+                'prefix': old_prefix
+            }
+            insert.row(**d)
+            await insert.commit(do_update=True)
+        welcome_dict = old_config.get('welcome', {})
+        if welcome_dict.get('enabled'):
+            welcome_chan = welcome_dict.get('welcomechan')
+            welcomemsg = welcome_dict.get('welcomemsg')
+            d = {
+                'guild_id': guild_id,
+                'channelid': welcome_chan,
+                'message': welcomemsg
+            }
+            table = ctx.bot.dbi.table('welcome')
+            insert = table.insert
+            insert.row(**d)
+            await insert.commit(do_update=True)
+        archive_dict = old_config.get('archive', {})
+        if archive_dict.get('enabled'):
+            archive_cat = archive_dict.get('category')
+            archive_list = archive_dict.get('list')
+            d = {
+                'guild_id': guild_id,
+                'category': archive_cat,
+                'phrase_list': archive_list
+            }
+            table = ctx.bot.dbi.table('archive')
+            insert = table.insert
+            insert.row(**d)
+            await insert.commit(do_update=True)
+        report_channels = {}
+        want_dict = old_config.get('want', {})
+        if want_dict.get('enabled'):
+            chans = want_dict.get('report_channels', [])
+            for chan in chans:
+                channel_exists = ctx.bot.get_channel(chan)
+                if not channel_exists:
+                    continue
+                d = {
+                    'guild_id': guild_id,
+                    'channelid': chan,
+                    'users': True
+                }
+                report_channels[chan] = d
+        raid_dict = old_config.get('raid', {})
+        if raid_dict.get('enabled'):
+            chans = raid_dict.get('report_channels', {})
+            catsort = raid_dict.get('categories')
+            cat_dict = raid_dict.get('category_dict')
+            for chan in chans:
+                channel_exists = ctx.bot.get_channel(chan)
+                if not channel_exists:
+                    continue
+                if chan in report_channels:
+                    d = report_channels[chan]
+                    d['raid'] = True
+                else:
+                    d = {
+                        'guild_id': guild_id,
+                        'channelid': chan,
+                        'raid': True
+                    }
+                city = chans[chan]
+                d['city'] = city
+                if catsort == 'region':
+                    cat = str(cat_dict.get(chan))
+                    d['category_1'] = cat
+                    d['category_2'] = cat
+                    d['category_3'] = cat
+                    d['category_4'] = cat
+                    d['category_5'] = cat
+                elif catsort == 'level':
+                    cat_1 = str(cat_dict.get('1'))
+                    cat_2 = str(cat_dict.get('2'))
+                    cat_3 = str(cat_dict.get('3'))
+                    cat_4 = str(cat_dict.get('4'))
+                    cat_5 = str(cat_dict.get('5'))
+                    d['category_1'] = cat_1
+                    d['category_2'] = cat_2
+                    d['category_3'] = cat_3
+                    d['category_4'] = cat_4
+                    d['category_5'] = cat_5
+                elif catsort == 'same':
+                    cat = str(channel_exists.category.id)
+                    d['category_1'] = cat
+                    d['category_2'] = cat
+                    d['category_3'] = cat
+                    d['category_4'] = cat
+                    d['category_5'] = cat
+                else:
+                    d['category_1'] = 'none'
+                    d['category_2'] = 'none'
+                    d['category_3'] = 'none'
+                    d['category_4'] = 'none'
+                    d['category_5'] = 'none'
+                report_channels[chan] = d
+        exraid_dict = old_config.get('exraid', {})
+        if exraid_dict.get('enabled'):
+            chans = exraid_dict.get('report_channels', {})
+            catsort = exraid_dict.get('categories')
+            cat_dict = exraid_dict.get('category_dict')
+            for chan in chans:
+                channel_exists = ctx.bot.get_channel(chan)
+                if not channel_exists:
+                    continue
+                if chan in report_channels:
+                    d = report_channels[chan]
+                    d['raid'] = True
+                else:
+                    d = {
+                        'guild_id': guild_id,
+                        'channelid': chan,
+                        'raid': True
+                    }
+                city = chans[chan]
+                d['city'] = city
+                if catsort == 'region':
+                    cat = str(cat_dict.get(chan))
+                    d['category_ex'] = cat
+                elif catsort == 'same':
+                    cat = str(channel_exists.category.id)
+                    d['category_ex'] = cat
+                else:
+                    d['category_ex'] = 'none'
+                report_channels[chan] = d
+        wild_dict = old_config.get('wild', {})
+        if wild_dict.get('enabled'):
+            chans = wild_dict.get('report_channels', {})
+            for chan in chans:
+                channel_exists = ctx.bot.get_channel(chan)
+                if not channel_exists:
+                    continue
+                if chan in report_channels:
+                    d = report_channels[chan]
+                    d['wild'] = True
+                else:
+                    d = {
+                        'guild_id': guild_id,
+                        'channelid': chan,
+                        'wild': True
+                    }
+                city = chans[chan]
+                d['city'] = city
+                report_channels[chan] = d
+        trade_dict = old_config.get('trade', {})
+        if trade_dict.get('enabled'):
+            chans = trade_dict.get('report_channels', [])
+            for chan in chans:
+                channel_exists = ctx.bot.get_channel(chan)
+                if not channel_exists:
+                    continue
+                if chan in report_channels:
+                    d = report_channels[chan]
+                    d['trade'] = True
+                else:
+                    d = {
+                        'guild_id': guild_id,
+                        'channelid': chan,
+                        'trade': True
+                    }
+                report_channels[chan] = d
+        research_dict = old_config.get('research', {})
+        if research_dict.get('enabled'):
+            chans = research_dict.get('report_channels', {})
+            for chan in chans:
+                channel_exists = ctx.bot.get_channel(chan)
+                if not channel_exists:
+                    continue
+                if chan in report_channels:
+                    d = report_channels[chan]
+                    d['research'] = True
+                else:
+                    d = {
+                        'guild_id': guild_id,
+                        'channelid': chan,
+                        'research': True
+                    }
+                city = chans[chan]
+                d['city'] = city
+                report_channels[chan] = d
+        meetup_dict = old_config.get('meetup', {})
+        if meetup_dict.get('enabled'):
+            chans = meetup_dict.get('report_channels', {})
+            catsort = meetup_dict.get('categories')
+            cat_dict = meetup_dict.get('category_dict')
+            for chan in chans:
+                channel_exists = ctx.bot.get_channel(chan)
+                if not channel_exists:
+                    continue
+                if chan in report_channels:
+                    d = report_channels[chan]
+                    d['meetup'] = True
+                else:
+                    d = {
+                        'guild_id': guild_id,
+                        'channelid': chan,
+                        'meetup': True
+                    }
+                city = chans[chan]
+                d['city'] = city
+                if catsort == 'region':
+                    cat = str(cat_dict.get(chan))
+                    d['category_meetup'] = cat
+                elif catsort == 'same':
+                    cat = str(channel_exists.category.id)
+                    d['category_meetup'] = cat
+                else:
+                    d['category_meetup'] = 'none'
+                report_channels[chan] = d
+        data = report_channels.values()
+        location_channel_ids = []
+        for x in data:
+            if x.get('city'):
+                location_channel_ids.append(x['channelid'])
+        location_channels = [ctx.bot.get_channel(x) for x in location_channel_ids]
+        location_channel_names = [x.mention for x in location_channels]
+        table = ctx.bot.dbi.table('report_channels')
+        insert = table.insert
+        insert.rows(data)
+        await insert.commit(do_update=True)
+        await ctx.send(f'Import successful, but you will need to use {old_prefix}setlocation in the following channels: {", ".join(location_channel_names)}')
+
+                

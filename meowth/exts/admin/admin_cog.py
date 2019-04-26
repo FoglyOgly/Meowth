@@ -753,6 +753,7 @@ class AdminCog(Cog):
         insert = table.insert
         insert.rows(data)
         await insert.commit(do_update=True)
-        await ctx.send(f'Import successful, but you will need to use {old_prefix}setlocation in the following channels: {", ".join(location_channel_names)}')
+        old_prefix = old_prefix or '!'
+        await ctx.send(f'Import successful, but you will need to use **{old_prefix}setlocation** in the following channels: {", ".join(location_channel_names)}')
 
                 

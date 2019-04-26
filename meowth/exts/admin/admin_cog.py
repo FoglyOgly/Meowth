@@ -1,5 +1,6 @@
 from meowth import checks, command, group, Cog
 from meowth.utils.formatters import ask
+from meowth.exts.users import Team
 from discord.ext import commands
 import discord
 from timezonefinder import TimezoneFinder
@@ -145,6 +146,34 @@ class AdminCog(Cog):
         cat = self.bot.get_channel(catid)
         phrase_list = data.get('phrase_list', [])
         return cat, phrase_list
+    
+    @command()
+    @commands.has_permissions(manage_guild=True)
+    async def teamrole(self, ctx, team: Team, role: discord.Role):
+        """Assign a role to a Pokemon Go team in your server."""
+
+        table = ctx.bot.dbi.table('team_roles')
+        query = table.query.where(guild_id=ctx.guild.id)
+        data = await query.get()
+        if not data:
+            d = {
+                'guild_id': ctx.guild.id
+            }
+        else:
+            d = dict(data[0])
+        if team.id == 1:
+            d['blue_role_id'] = role.id
+        elif team.id == 2:
+            d['yellow_role_id'] = role.id
+        elif team.id == 3:
+            d['red_role_id'] = role.id
+        insert = table.insert
+        insert.row(**d)
+        await insert.commit(do_update=True)
+        await ctx.success(f'{await team.emoji()} assigned to {role.name}')
+
+
+
 
     @command()
     @commands.has_permissions(manage_guild=True)

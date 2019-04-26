@@ -345,7 +345,7 @@ class Users(Cog):
             await insert.commit()
         else:
             update = meowthuser._update
-            update.values(team=team.id)
+            update.values(team=chosen_team.id)
             await update.commit()
         role = await chosen_team.role()
         if role:

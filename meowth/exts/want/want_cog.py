@@ -188,4 +188,15 @@ class WantCog(Cog):
                 continue
             removed_wants.append(want.want)
         await ctx.success(title="Wants Removed", details="\n".join(removed_wants))
+    
+    @command()
+    async def listwants(self, ctx):
+        user_id = ctx.author.id
+        table = ctx.bot.dbi.table('wants')
+        query = table.query('want')
+        query.where(guild=ctx.guild.id)
+        query.where(table['users'].contains_(user_id))
+        want_list = await query.get_values()
+        await ctx.send(f'Current want list for {ctx.author.display_name}:\n\n'
+            f'{'\n'.join(want_list)}')
 

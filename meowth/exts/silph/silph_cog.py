@@ -131,15 +131,6 @@ class SilphCog(Cog):
     @command()
     @checks.is_co_owner()
     async def replace(self, ctx):
-        self.bot.raid_info.raid_lists = {
-            '1': [],
-            '2': [],
-            '3': [],
-            '4': [],
-            '5': [],
-            '6': [],
-            'EX': []
-        }
         url = 'https://api.thesilphroad.com/v0/raids'
         headers = {'Authorization': f'Silph {silph_info.api_key}'}
         async with aiohttp.ClientSession() as sess:
@@ -148,6 +139,16 @@ class SilphCog(Cog):
                     data = await resp.json(content_type=None)
                 except:
                     print(await resp.text())
+                    return
+                self.bot.raid_info.raid_lists = {
+                    '1': [],
+                    '2': [],
+                    '3': [],
+                    '4': [],
+                    '5': [],
+                    '6': [],
+                    'EX': []
+                }
                 data = data['data']
                 self.parse_info_from_silph(data)
         with open(self.bot.ext_dir + '/raid/raid_info.py', 'a') as f:

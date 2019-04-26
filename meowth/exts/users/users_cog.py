@@ -303,7 +303,8 @@ class Team:
         query = team_table.query('emoji')
         query.where(team_id=self.id)
         result = await query.get_value()
-        return result
+        emoji = self.bot.get_emoji(result)
+        return emoji
 
     @classmethod
     async def convert(cls, ctx, argument):

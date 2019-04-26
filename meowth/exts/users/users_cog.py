@@ -279,7 +279,7 @@ class Team:
         self.id = team_id
         
     async def role(self):
-        settings_table = self.bot.dbi.table('TeamSettings')
+        settings_table = self.bot.dbi.table('team_roles')
         query = settings_table.query()
         if self.id == 1:
             query.select('blue_role_id')
@@ -289,9 +289,14 @@ class Team:
             query.select('yellow_role_id')
         query.where(guild_id=self.guild)
         result = await query.get_value()
+        if not result:
+            return None
         guild = self.bot.get_guild(self.guild)
         role = discord.utils.get(guild.roles, id=result)
-        return role
+        if role:
+            return role
+        else:
+            return None
     
     async def emoji(self):
         team_table = self.bot.dbi.table('teams')
@@ -323,19 +328,34 @@ class Team:
 class Users(Cog):
 
     @command()
-    @users_checks.team_not_set()
     @users_checks.users_enabled()
     async def team(self, ctx, *, chosen_team: Team):
         """Set your Pokemon Go team."""
 
+        user_table = ctx.bot.dbi.table('users')
+        meowthuser = MeowthUser(ctx.bot, ctx.author)
+        data = await meowthuser._data.get()
+        if len(data) == 0:
+            insert = meowthuser._insert
+            d = {
+                'id': ctx.author.id,
+                'team': team.id
+            }
+            insert.row(**d)
+            await insert.commit()
+        else:
+            update = meowthuser._update
+            update.values(team=team.id)
+            await update.commit()
         role = await chosen_team.role()
-        try:
-            await ctx.author.add_roles(role)
-            await ctx.send("Adding role succeeded")
-        except discord.Forbidden:
-            await ctx.send("Missing permissions")
-        except discord.HTTPException:
-            await ctx.send("Adding roles failed")
+        if role:
+            try:
+                await ctx.author.add_roles(role)
+                await ctx.success("Adding role succeeded")
+            except discord.Forbidden:
+                await ctx.error("Missing permissions")
+            except discord.HTTPException:
+                await ctx.error("Adding roles failed")
     
     @command()
     @users_checks.users_enabled()

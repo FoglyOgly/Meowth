@@ -551,6 +551,8 @@ class AdminCog(Cog):
         archive_dict = old_config.get('archive', {})
         if archive_dict.get('enabled'):
             archive_cat = archive_dict.get('category')
+            if archive_cat == 'same':
+                archive_cat = None
             archive_list = archive_dict.get('list')
             d = {
                 'guild_id': guild_id,

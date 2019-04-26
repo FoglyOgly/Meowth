@@ -225,9 +225,9 @@ def perms_or(channel_list: list):
     overwrite_dict = {}
     pair_dict = {}
     for channel in channel_list:
-        for overwrite in channel.channel.overwrites:
-            key = overwrite[0]
-            a, d = overwrite[1].pair()
+        for key in channel.channel.overwrites:
+            key = overwrite
+            a, d = channel.channel.overwrites[key].pair()
             x, y = pair_dict.get(key, (0,2146958591))
             x |= a.value
             y &= d.value

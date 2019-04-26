@@ -517,7 +517,7 @@ class AdminCog(Cog):
     async def importconfig(self, ctx):
         guild_id = ctx.guild.id
         old_shard_id = (guild_id >> 22) % 2
-        path = f'~/MeowthProject/MeowthProject/Shard{old_shard_id}/data/serverdict'
+        path = f'home/foglyogly1/MeowthProject/MeowthProject/Shard{old_shard_id}/data/serverdict'
         with open(path, 'rb') as fd:
             old_gd = pickle.load(fd)
         old_config = old_gd.get(ctx.guild.id, {}).get('configure_dict', {})

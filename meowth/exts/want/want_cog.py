@@ -198,5 +198,5 @@ class WantCog(Cog):
         query.where(table['users'].contains_(user_id))
         want_list = await query.get_values()
         await ctx.send(f'Current want list for {ctx.author.display_name}:\n\n'
-            f'{'\n'.join(want_list)}')
+            f"{'\n'.join(want_list)}")
 

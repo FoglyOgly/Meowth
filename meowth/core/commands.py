@@ -232,7 +232,7 @@ class Core(Cog):
             f"**Servers:** {server_count}",
             f"**Members:** {member_count}"]
 
-        embed_colour = await url_color(bot.avatar_small)
+        # embed_colour = await url_color(bot.avatar_small)
         embed = make_embed(
             icon=bot.avatar_small, title=f"{bot.user}",
             content='\n'.join(about), msg_colour=embed_colour)

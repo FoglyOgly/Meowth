@@ -152,6 +152,23 @@ class AdminCog(Cog):
     async def teamrole(self, ctx, team: Team, role: discord.Role):
         """Assign a role to a Pokemon Go team in your server."""
 
+        user_data = []
+        table = ctx.bot.dbi.table('users')
+        for member in role.members:
+            user_id = member.id
+            data = await query.get()
+            query = table.query.where(id=user_id)
+            if not data:
+                d = {
+                    'id': user_id,
+                    'team': team.id
+                }
+            else:
+                d = dict(data[0])
+                d['team'] = team.id
+            user_data.append(d)
+        insert = table.insert.rows(user_data)
+        await insert.commit(do_update=True)
         table = ctx.bot.dbi.table('team_roles')
         query = table.query.where(guild_id=ctx.guild.id)
         data = await query.get()

@@ -20,7 +20,7 @@ async def check_is_guildowner(ctx):
 async def check_is_admin(ctx):
     if await check_is_guildowner(ctx):
         return True
-    if ctx.author.guild_permissions.manage_server:
+    if ctx.author.guild_permissions.manage_guild:
         return True
     return False
 

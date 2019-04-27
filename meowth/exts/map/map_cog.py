@@ -180,6 +180,8 @@ class S2_L10():
         col = "current_weather"
         weather_query.select(col).where(cellid=self.cellid)
         weather = await weather_query.get_value()
+        if not weather:
+            return "NO_WEATHER"
         return weather
     
     async def correct_weather(self, weather):

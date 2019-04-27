@@ -488,6 +488,7 @@ class Mapper(Cog):
         reader = csv.DictReader(codecs.iterdecode(file.readlines(), 'utf-8'))
         rows = []
         for row in reader:
+            print(row)
             valid_data = {}
             valid_data['guild'] = guildid
             if isinstance(row.get('name'), str):

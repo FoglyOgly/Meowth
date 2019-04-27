@@ -606,10 +606,7 @@ class Mapper(Cog):
         bot = ctx.bot
         f = io.BytesIO()
         await attachment.save(f)
-        try:
-            await self.gyms_from_csv(guildid, f)
-        except:
-            raise MapCSVImportError
+        await self.gyms_from_csv(guildid, f)
         await ctx.send("Import successful")
 
     @command()

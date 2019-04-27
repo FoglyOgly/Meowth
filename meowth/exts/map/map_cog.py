@@ -513,9 +513,9 @@ class Mapper(Cog):
                 elif row['exraid'].lower() == 'true':
                     valid_data['exraid'] = True
             rows.append(valid_data)
-            print(valid_data)
+            bot.logger.debug(valid_data)
         insert.rows(rows)
-        print(rows)
+        bot.logger.debug(rows)
         await insert.commit(do_update=True)
 
     async def stops_from_csv(self, guildid, file):

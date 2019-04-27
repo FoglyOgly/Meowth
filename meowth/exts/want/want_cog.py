@@ -49,7 +49,7 @@ class Want():
         users = await self._users()
         if not users:
             insert = self._insert
-            await insert.commit()
+            await insert.commit(do_update=True)
             users = []
         if user_id not in users:
             users.append(user_id)

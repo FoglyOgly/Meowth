@@ -34,6 +34,8 @@ async def raid_category(ctx, level):
     query = report_table.query(f'category_{level}')
     query.where(channelid=ctx.channel.id)
     cat = await query.get_value()
+    if not cat:
+        return None
     if isinstance(cat, int):
         return cat
     if cat.isdigit():

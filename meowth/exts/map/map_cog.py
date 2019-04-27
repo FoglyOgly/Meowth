@@ -36,7 +36,7 @@ class ReportChannel():
     async def center_coords(self):
         data = self._data
         record = (await data.get())[0]
-        return (record['lat'], record['lon'])
+        return (float(record['lat']), float(record['lon'])
 
     async def radius(self):
         data = self._data

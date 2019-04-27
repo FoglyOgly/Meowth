@@ -156,8 +156,8 @@ class AdminCog(Cog):
         table = ctx.bot.dbi.table('users')
         for member in role.members:
             user_id = member.id
-            data = await query.get()
             query = table.query.where(id=user_id)
+            data = await query.get()
             if not data:
                 d = {
                     'id': user_id,

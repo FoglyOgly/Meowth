@@ -488,7 +488,6 @@ class Mapper(Cog):
         reader = csv.DictReader(codecs.iterdecode(file.readlines(), 'utf-8'))
         rows = []
         for row in reader:
-            print(row)
             valid_data = {}
             valid_data['guild'] = guildid
             if isinstance(row.get('name'), str):
@@ -514,9 +513,7 @@ class Mapper(Cog):
                 elif row['exraid'].lower() == 'true':
                     valid_data['exraid'] = True
             rows.append(valid_data)
-            print(valid_data)
         insert.rows(rows)
-        print(rows)
         await insert.commit(do_update=True)
 
     async def stops_from_csv(self, guildid, file):

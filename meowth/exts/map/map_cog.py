@@ -309,9 +309,9 @@ class POI():
             query.where(raid=True)
         elif cmd == 'wild':
             query.where(wild=True)
-        query.where(report_table['lat'].isnot_(None))
-        query.where(report_table['lon'].isnot_(None))
-        query.where(report_table['radius'].isnot_(None))
+        query.where(report_table['lat'].notnull_())
+        query.where(report_table['lon'].notnull_())
+        query.where(report_table['radius'].notnull_())
         channelid_list = await query.get_values()
         channel_list = [ReportChannel(self.bot, self.bot.get_channel(x)) for x in channelid_list]
         gym_channels = [y for y in channel_list if await y.point_in_channel(coords)]

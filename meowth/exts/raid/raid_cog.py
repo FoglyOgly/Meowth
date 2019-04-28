@@ -21,6 +21,7 @@ import aiohttp
 import time
 from datetime import datetime
 from dateparser import parse
+from pytz import timezone
 import typing
 
 emoji_letters = ['🇦','🇧','🇨','🇩','🇪','🇫','🇬','🇭','🇮','🇯','🇰','🇱',
@@ -31,6 +32,10 @@ class time_converter(commands.Converter):
     async def convert(self, ctx, argument):
         zone = await ctx.tz()
         hatch_dt = parse(argument, settings={'TIMEZONE': zone, 'RETURN_AS_TIMEZONE_AWARE': True})
+        tz = timezone(zone)
+        now_dt = datetime.now(tz=tz)
+        if hatch_dt < now_dt:
+            hatch_dt.replace(hour=hatch_dt.hour+12)
         return hatch_dt.timestamp()
 
 
@@ -365,7 +370,18 @@ class RaidCog(Cog):
         until expiry.
         """
         gym_split = gym_and_time.split()
-        if gym_split[-1].isdigit():
+        zone = await ctx.tz()
+        if ':' in gym_split[-1]:
+            converter = time_converter
+            stamp = await converter.convert(ctx, gym_split[-1])
+            dt = stamp - time.time()
+            if dt > 0:
+                endtime = dt/60
+            else:
+                endtime = None
+            del gym_split[-1]
+            gymstr = " ".join(gym_split)
+        elif gym_split[-1].isdigit():
             endtime = int(gym_split.pop(-1))
             if endtime == 0:
                 endtime = 1
@@ -413,7 +429,6 @@ class RaidCog(Cog):
             else:
                 end = time.time() + 60*endtime
             hatch = None
-        zone = await ctx.tz()
         raid_id = next(snowflake.create())
         new_raid = Raid(raid_id, ctx.bot, ctx.guild.id, ctx.channel.id, gym, level=level, pkmn=boss, hatch=hatch, end=end, tz=zone)
         ctx.raid = new_raid

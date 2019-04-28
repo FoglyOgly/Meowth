@@ -80,6 +80,8 @@ class ReportChannel():
     
     async def s2_cap(self):
         coords = await self.center_coords()
+        if not coords:
+            return None
         point = s2.S2LatLng.FromDegrees(*coords).ToPoint()
         radius = await self.radius()
         angle = radius/6371.0
@@ -89,11 +91,15 @@ class ReportChannel():
     async def point_in_channel(self, coords):
         cell = S2_L10.from_coords(self.bot, coords)
         covering = await self.level_10_covering()
+        if not covering:
+            return False
         return cell.cellid in covering
 
     
     async def level_10_covering(self):
         cap = await self.s2_cap()
+        if not cap:
+            return None
         coverer = s2.S2RegionCoverer()
         coverer.set_fixed_level(10)
         covering = coverer.GetCovering(cap)
@@ -309,9 +315,6 @@ class POI():
             query.where(raid=True)
         elif cmd == 'wild':
             query.where(wild=True)
-        query.where(report_table['lat'].notnull_())
-        query.where(report_table['lon'].notnull_())
-        query.where(report_table['radius'].notnull_())
         channelid_list = await query.get_values()
         channel_list = [ReportChannel(self.bot, self.bot.get_channel(x)) for x in channelid_list]
         gym_channels = [y for y in channel_list if await y.point_in_channel(coords)]

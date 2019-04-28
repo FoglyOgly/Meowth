@@ -309,6 +309,9 @@ class POI():
             query.where(raid=True)
         elif cmd == 'wild':
             query.where(wild=True)
+        query.where(lat!=None)
+        query.where(lon!=None)
+        query.where(radius!=None)
         channelid_list = await query.get_values()
         channel_list = [ReportChannel(self.bot, self.bot.get_channel(x)) for x in channelid_list]
         gym_channels = [y for y in channel_list if await y.point_in_channel(coords)]
@@ -684,6 +687,14 @@ class Mapper(Cog):
         """
         guild_id = ctx.guild.id
         await self.add_gym(guild_id, name, lat, lon, exraid=True, nickname=nickname)
+
+    @command()
+    @commands.has_permissions(manage_guild=True)
+    async def listgyms(self, ctx):
+        guild_id = ctx.guild.id
+        table = ctx.bot.dbi.table('gyms')
+        query = table.query
+        query.where(guild=guild_id)
 
     @staticmethod
     async def get_travel_times(bot, origins: List[int], dests: List[int]):

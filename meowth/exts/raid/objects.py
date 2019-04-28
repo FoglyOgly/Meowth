@@ -2371,7 +2371,7 @@ class Train:
             pass
         archive_table = self.bot.dbi.table('to_archive')
         query = archive_table.query
-        query.where(channel_id=int(chanid))
+        query.where(channel_id=self.channel_id)
         data = await query.get()
         if data:
             d = data[0]

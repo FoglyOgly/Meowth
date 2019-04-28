@@ -585,7 +585,10 @@ class RaidCog(Cog):
                     for want in dm_wants:
                         dms = await want.notify_users(dm_content, embed)
                         new_raid.message_ids.extend(dms)
-                reportmsg = await channel.channel.send(reportcontent, embed=reportembed)
+                try:
+                    reportmsg = await channel.channel.send(reportcontent, embed=reportembed)
+                except:
+                    continue
                 for react in react_list:
                     if isinstance(react, int):
                         react = self.bot.get_emoji(react)

@@ -186,11 +186,32 @@ class S2_L10():
     
     async def correct_weather(self, weather):
         weather_table = self.bot.dbi.table('weather_forecasts')
-        update = weather_table.update()
-        update.where(cellid=self.cellid)
-        current_hour = datetime.datetime.utcnow().hour % 12
-        update.values(current_weather=weather)
-        await update.commit()
+        query = weather_table.query
+        query.where(cellid=self.cellid)
+        data = await query.get()
+        if not data:
+            d = {
+                'cellid': self.cellid,
+                'forecast_0': "NO_WEATHER",
+                'forecast_1': "NO_WEATHER",
+                'forecast_2': "NO_WEATHER",
+                'forecast_3': "NO_WEATHER",
+                'forecast_4': "NO_WEATHER",
+                'forecast_5': "NO_WEATHER",
+                'forecast_6': "NO_WEATHER",
+                'forecast_7': "NO_WEATHER",
+                'forecast_8': "NO_WEATHER",
+                'forecast_9': "NO_WEATHER",
+                'forecast_10': "NO_WEATHER",
+                'forecast_11': "NO_WEATHER",
+                'current_weather': weather
+            }
+        else:
+            d = dict(data[0])
+            d['current_weather'] = weather
+        insert = weather_table.insert
+        insert.row(**d)
+        await insert.commit(do_update=True)
 
     async def get_all_gyms(self):
         gyms_table = self.bot.dbi.table('gyms')

@@ -867,7 +867,7 @@ class Raid:
                     raid_embed.set_weather(weather_str, cp_str, ctrs_str, rec_str)
                     embed = raid_embed.embed
                     has_embed = True
-                elif self.status == 'egg':
+                elif self.status == 'egg' or self.status == 'hatched':
                     egg_embed = EggEmbed(msg.embeds[0])
                     egg_embed.set_weather(weather_str, boss_str)
                     embed = egg_embed.embed

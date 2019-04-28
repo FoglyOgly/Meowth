@@ -2190,6 +2190,8 @@ class Train:
 
     async def select_first_raid(self, author):
         raids = await self.possible_raids()
+        if not raids:
+            return await self.report_channel.channel.send("No raids reported! Report a raid before starting a train!")
         react_list = formatters.mc_emoji(len(raids))
         content = "Select your first raid from the list below!"
         async for embed in self.display_choices(raids, react_list):

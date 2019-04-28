@@ -2496,11 +2496,13 @@ class ReportEmbed():
             "Status List": status_str,
             "Team List": team_str
         }
+        footer = 'Ending'
         if raid.status == 'egg':
             boss_str = await raid.boss_list_str()
             fields['Boss Interest'] = boss_str
+            footer = 'Hatching'
         embed = formatters.make_embed(icon=RaidEmbed.raid_icon, title="Raid Report", # msg_colour=color,
-            thumbnail=img_url, fields=fields, footer="Ending", footer_icon=RaidEmbed.footer_icon)
+            thumbnail=img_url, fields=fields, footer=footer, footer_icon=RaidEmbed.footer_icon)
         embed.timestamp = enddt
         return cls(embed)
 

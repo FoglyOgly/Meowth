@@ -1079,8 +1079,6 @@ class RaidCog(Cog):
         ask for the first raid. If used in a raid channel,
         Meowth will assume the current raid to be the first raid.
         """
-        print(ctx.raid_id)
-        print(ctx.channel.name)
         report_channel = ReportChannel(self.bot, ctx.channel)
         city = await report_channel.city()
         city = city.split()[0]
@@ -1094,7 +1092,6 @@ class RaidCog(Cog):
         train_id = next(snowflake.create())
         new_train = Train(train_id, self.bot, ctx.guild.id, train_channel.id, ctx.channel.id)
         if ctx.raid_id:
-            print(ctx.raid_id)
             first_raid = Raid.instances.get(ctx.raid_id)
             if first_raid:
                 await new_train.select_raid(first_raid)

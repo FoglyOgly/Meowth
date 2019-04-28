@@ -79,6 +79,10 @@ class SQLOperator:
     @classmethod
     def isnot_(cls):
         return cls('IS NOT', 'is not', cls.default_template)
+    
+    @classmethod
+    def notnull_(cls):
+        return cls('IS NOT NULL', 'is not None', '{column} {operator}')
 
 
 class SQLComparison:
@@ -204,6 +208,10 @@ class Column:
     def isnot_(self, value):
         return SQLComparison(
             SQLOperator.isnot_(), self.aggregate, self.full_name, value)
+    
+    def notnull_(self):
+        return SQLComparison(
+            SQLOperator.notnull_(), self.aggregate, self.full_name)
 
     @classmethod
     def from_dict(cls, data):

@@ -284,7 +284,10 @@ class POI():
     
     async def address(self):
         lat, lon = await self._coords()
-        result = gmaps.reverse_geocode((lat, lon))
+        try:
+            result = gmaps.reverse_geocode((lat, lon))
+        except:
+            return ''
         if result:
             address = result[0].get('formatted_address', '')
         else:

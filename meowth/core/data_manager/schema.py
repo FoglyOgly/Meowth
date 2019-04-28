@@ -75,6 +75,10 @@ class SQLOperator:
     @classmethod
     def is_(cls):
         return cls('IS', 'is', cls.default_template)
+    
+    @classmethod
+    def isnot_(cls):
+        return cls('IS NOT', 'is not', cls.default_template)
 
 
 class SQLComparison:
@@ -196,6 +200,10 @@ class Column:
     def is_(self, value):
         return SQLComparison(
             SQLOperator.is_(), self.aggregate, self.full_name, value)
+    
+    def isnot_(self, value):
+        return SQLComparison(
+            SQLOperator.isnot_(), self.aggregate, self.full_name, value)
 
     @classmethod
     def from_dict(cls, data):

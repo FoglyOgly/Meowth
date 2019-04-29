@@ -1114,7 +1114,11 @@ class Raid:
         return est
 
     async def user_counters_data(self, user: MeowthUser):
-        pkmnid = self.pkmn.id
+        pkmn = self.pkmn
+        if not pkmn:
+            if len(self.boss_list) == 1:
+                    pkmn = RaidBoss(Pokemon(self.bot, self.boss_list[0]))
+        pkmnid = pkmn.id
         level = self.level
         if level == 'EX':
             url_level = 5
@@ -1134,8 +1138,8 @@ class Raid:
                     data = data['attackers'][0]
                 except KeyError:
                     pass
-        boss_fast = self.pkmn.quickMoveid
-        boss_charge = self.pkmn.chargeMoveid
+        boss_fast = pkmn.quickMoveid
+        boss_charge = pkmn.chargeMoveid
         if not (boss_fast and boss_charge):
             ctrs = data['randomMove']['defenders'][-6:]
             estimator = data['randomMove']['total']['estimator']

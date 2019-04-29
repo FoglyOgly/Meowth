@@ -1036,6 +1036,9 @@ class Raid:
         if not weather:
             weather = await self.weather()
         boss = self.pkmn
+        if not boss:
+            if len(self.boss_list) == 1:
+                boss = RaidBoss(Pokemon(self.bot, self.boss_list[0]))
         boss_id = boss.id
         level = self.level
         query = data_table.query().select().where(

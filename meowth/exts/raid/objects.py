@@ -1589,6 +1589,8 @@ class Raid:
         d = {x: 0 for x in boss_list}
         trainer_dict = self.trainer_dict
         for trainer in trainer_dict:
+            if not trainer_dict[trainer].get('status'):
+                continue
             total = sum(trainer_dict[trainer]['party'])
             bosses = trainer_dict[trainer]['bosses']
             for boss in bosses:

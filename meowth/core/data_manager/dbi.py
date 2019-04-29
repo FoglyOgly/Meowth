@@ -56,7 +56,7 @@ class DatabaseInterface:
 
         # guild prefix callable statement
         self.prefix_conn = await self.pool.acquire()
-        prefix_sql = 'SELECT prefix FROM prefix WHERE guild_id=$1;'
+        prefix_sql = 'SELECT prefix FROM prefixes WHERE guild_id=$1;'
         self.prefix_stmt = await self.prefix_conn.prepare(prefix_sql)
 
         # guild settings statement

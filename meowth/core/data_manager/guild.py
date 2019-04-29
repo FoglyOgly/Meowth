@@ -35,7 +35,7 @@ class GuildDM:
         Set new prefix by calling with the new prefix as an arg.
         Reset prefix to default by calling 'reset' as an arg.
         """
-        pfx_tbl = self.dbi.table('prefix')
+        pfx_tbl = self.dbi.table('prefixes')
         pfx_tbl.query.where(guild_id=self.guild_id)
         if new_prefix:
             if new_prefix.lower() == "reset":

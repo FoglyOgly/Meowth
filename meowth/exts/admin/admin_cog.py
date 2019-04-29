@@ -571,7 +571,7 @@ class AdminCog(Cog):
             return await ctx.error('No old configuration found!')
         old_prefix = old_config.get('settings', {}).get('prefix')
         if old_prefix:
-            table = ctx.bot.dbi.table('prefix')
+            table = ctx.bot.dbi.table('prefixes')
             insert = table.insert
             d = {
                 'guild_id': guild_id,

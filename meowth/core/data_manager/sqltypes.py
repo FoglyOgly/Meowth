@@ -185,3 +185,8 @@ class ArraySQL(SQLType):
         if self.size:
             return f"{self.type.to_sql()}[{self.size}]"
         return f"{self.type.to_sql()}[]"
+
+class NullSQL(SQLType):
+    python = type(None)
+
+    def __init__(self)

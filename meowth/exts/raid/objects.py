@@ -670,7 +670,9 @@ class Raid:
             for group in self.group_list:
                 if emoji == group['emoji']:
                     await message.remove_reaction(emoji, user)
-                    return await self.join_grp(payload.user_id, group)
+                    await self.join_grp(payload.user_id, group)
+                    if not old_status:
+                        new_status = 'maybe'
         if emoji == '\u2754':
             return await formatters.get_raid_help('!', self.bot.user.avatar_url, user)
         if self.status == 'egg':
@@ -719,7 +721,10 @@ class Raid:
             return
         if isinstance(emoji, int):
             emoji = self.bot.get_emoji(emoji)
-        await message.remove_reaction(emoji, user)
+        try:
+            await message.remove_reaction(emoji, user)
+        except:
+            pass
         if new_bosses != old_bosses or new_status != old_status:
             await meowthuser.rsvp(self.id, new_status, bosses=new_bosses, party=party)
     

@@ -284,9 +284,9 @@ class Team:
         if self.id == 1:
             query.select('blue_role_id')
         elif self.id == 2:
-            query.select('red_role_id')
-        elif self.id == 3:
             query.select('yellow_role_id')
+        elif self.id == 3:
+            query.select('red_role_id')
         query.where(guild_id=self.guild)
         result = await query.get_value()
         if not result:

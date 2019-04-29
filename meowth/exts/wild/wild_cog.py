@@ -176,6 +176,9 @@ class Wild():
             new_embed = (await WildEmbed.from_wild(self)).embed
             try:
                 await reply.delete()
+            except:
+                pass
+            try:
                 await msg.delete()
             except:
                 pass

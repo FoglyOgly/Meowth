@@ -832,20 +832,23 @@ class RaidCog(Cog):
                 raise InvalidTime
             elif raid.hatch and stamp < raid.hatch:
                 raise InvalidTime
-            d = {
-                'raid_id': raid.id,
-                'emoji': emoji,
-                'starttime': stamp,
-                'users': [],
-                'est_power': 0
-            }
-            insert.row(**d)
-            await insert.commit()
-            raid.group_list.append(d)
-            for idstring in raid.message_ids:
-                chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
-                await msg.add_reaction(emoji)
-            return await raid.join_grp(ctx.author.id, d)
+        else:
+            converter = time_converter()
+            stamp = await converter.convert(ctx, group_time)
+        d = {
+            'raid_id': raid.id,
+            'emoji': emoji,
+            'starttime': stamp,
+            'users': [],
+            'est_power': 0
+        }
+        insert.row(**d)
+        await insert.commit()
+        raid.group_list.append(d)
+        for idstring in raid.message_ids:
+            chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+            await msg.add_reaction(emoji)
+        return await raid.join_grp(ctx.author.id, d)
     
     @command(aliases=['start'], category="Raid RSVP")
     @raid_checks.raid_channel()
@@ -924,10 +927,12 @@ class RaidCog(Cog):
         **Examples:** `!timerset 12:00 PM`
         `!timerset 5`
         """
-        raid = Raid.by_channel.get(str(ctx.channel.id))
-        if not raid:
-            return
-        zone = raid.tz
+        raid_or_meetup = Raid.by_channel.get(str(ctx.channel.id))
+        if not raid_or_meetup:
+            raid_or_meetup = Meetup.by_channel.get(ctx.channel.id)
+            if not raid_or_meetup:
+                return
+        zone = raid_or_meetup.tz
         if newtime.isdigit():
             stamp = time.time() + 60*int(newtime)
         else:
@@ -937,31 +942,41 @@ class RaidCog(Cog):
             except:
                 raise
         try:
-            raid.update_time(stamp)
+            raid_or_meetup.update_time(stamp)
         except:
             raise
-        if raid.status == 'egg' or raid.status == 'hatched':
-            dt = datetime.fromtimestamp(raid.hatch)
-            local = raid.local_datetime(raid.hatch)
+        if isinstance(raid_or_meetup, Raid):
+            raid = raid_or_meetup
+            if raid.status == 'egg' or raid.status == 'hatched':
+                dt = datetime.fromtimestamp(raid.hatch)
+                local = raid.local_datetime(raid.hatch)
+                timestr = local.strftime('%I:%M %p')
+                datestr = local.strftime('%b %d')
+                title = "Hatch Time Updated"
+                if raid.level == 'EX':
+                    details = f"This EX Raid Egg will hatch on {datestr} at {timestr}"
+                else:
+                    details = f"This Raid Egg will hatch at {timestr}"
+            elif raid.status == 'active' or raid.status == 'expired':
+                title = "Expire Time Updated"
+                dt = datetime.fromtimestamp(raid.end)
+                localdt = raid.local_datetime(raid.end)
+                timestr = localdt.strftime('%I:%M %p')
+                datestr = localdt.strftime('%b %d')
+                if raid.level == 'EX':
+                    details = f"This EX Raid will end at {timestr}"
+                else:
+                    details = f"This Raid will end at {timestr}"
+        elif isinstance(raid_or_meetup, Meetup):
+            meetup = raid_or_meetup
+            dt = datetime.fromtimestamp(meetup.start)
+            local = meetup.local_datetime(meetup.start)
             timestr = local.strftime('%I:%M %p')
             datestr = local.strftime('%b %d')
-            title = "Hatch Time Updated"
-            if raid.level == 'EX':
-                details = f"This EX Raid Egg will hatch on {datestr} at {timestr}"
-            else:
-                details = f"This Raid Egg will hatch at {timestr}"
-        elif raid.status == 'active' or raid.status == 'expired':
-            title = "Expire Time Updated"
-            dt = datetime.fromtimestamp(raid.end)
-            localdt = raid.local_datetime(raid.end)
-            timestr = localdt.strftime('%I:%M %p')
-            datestr = localdt.strftime('%b %d')
-            if raid.level == 'EX':
-                details = f"This EX Raid will end at {timestr}"
-            else:
-                details = f"This Raid will end at {timestr}"
+            title = "Start Time Updated"
+            details = f"This Meetup will start on {datestr} at {timestr}"
         has_embed = False
-        for idstring in raid.message_ids:
+        for idstring in raid_or_meetup.message_ids:
             try:
                 chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
             except:

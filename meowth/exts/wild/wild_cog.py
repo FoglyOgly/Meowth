@@ -372,7 +372,7 @@ class WildEmbed():
     pkmn_index = 0
     weather_index = 1
     cp_index = 2
-    iv_index = 3
+    lvl_iv_index = 3
     moveset_index = 4
     gender_index = 5
 
@@ -390,7 +390,7 @@ class WildEmbed():
     
     @iv_str.setter
     def iv_str(self, iv_str):
-        self.embed.set_field_at(WildEmbed.iv_index, name="IVs: Atk/Def/Sta", value=iv_str)
+        self.embed.set_field_at(WildEmbed.iv_index, name="Level/IVs: Lvl/Atk/Def/Sta", value=iv_str)
     
     @property
     def moveset_str(self):
@@ -439,10 +439,11 @@ class WildEmbed():
         if is_boosted:
             cp_str += " (Boosted)"
         img_url = await wild.pkmn.sprite_url()
+        lvlstr = str(wild.pkmn.lvl) if wild.pkmn.lvl else "?"
         attiv = str(wild.pkmn.attiv) if wild.pkmn.attiv else "?"
         defiv = str(wild.pkmn.defiv) if wild.pkmn.defiv else "?"
         staiv = str(wild.pkmn.staiv) if wild.pkmn.staiv else "?"
-        iv_str = f'{attiv}/{defiv}/{staiv}'
+        iv_str = f'{lvlstr}/{attiv}/{defiv}/{staiv}'
         if isinstance(wild.location, POI):
             directions_url = await wild.location.url()
             directions_text = await wild.location._name()
@@ -453,7 +454,7 @@ class WildEmbed():
             'Pokemon': f'{name} {type_emoji}',
             'Weather': f'{weather_name} {weather_emoji}'.strip(),
             'CP': cp_str,
-            "IVs: Atk/Def/Sta": iv_str,
+            "Level/IVs: Lvl/Atk/Def/Sta": iv_str,
             'Moveset': moveset.strip(),
             'Gender': wild.pkmn.gender.title() if wild.pkmn.gender else "Unknown"
         }

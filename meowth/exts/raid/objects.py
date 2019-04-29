@@ -349,6 +349,7 @@ class Raid:
         self.hatch_task = None
         self.expire_task = None
         self.train_msgs = []
+        self._weather = "NO_WEATHER"
     
     def __eq__(self, other):
         if isinstance(other, Raid):
@@ -989,8 +990,10 @@ class Raid:
     
     async def weather(self):
         gym = self.gym
-        weather = await gym.weather()
-        return weather
+        if isinstance(gym, Gym):
+            weather = await gym.weather()
+            self._weather = weather
+        return self._weather
     
     async def is_boosted(self, weather=None):
         if not weather:

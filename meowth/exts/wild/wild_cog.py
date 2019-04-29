@@ -174,8 +174,11 @@ class Wild():
             pkmn = await self.pkmn.validate('wild',weather=weather)
             self.pkmn = pkmn
             new_embed = (await WildEmbed.from_wild(self)).embed
-            await reply.delete()
-            await msg.delete()
+            try:
+                await reply.delete()
+                await msg.delete()
+            except:
+                pass
             for idstring in self.message_ids:
                 chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
                 old_embed = msg.embeds[0]
@@ -386,11 +389,11 @@ class WildEmbed():
     
     @property
     def iv_str(self):
-        return self.embed.fields[WildEmbed.iv_index].value
+        return self.embed.fields[WildEmbed.lvl_iv_index].value
     
     @iv_str.setter
     def iv_str(self, iv_str):
-        self.embed.set_field_at(WildEmbed.iv_index, name="Level/IVs: Lvl/Atk/Def/Sta", value=iv_str)
+        self.embed.set_field_at(WildEmbed.lvl_iv_index, name="Level/IVs: Lvl/Atk/Def/Sta", value=iv_str)
     
     @property
     def moveset_str(self):

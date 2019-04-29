@@ -659,7 +659,7 @@ class Raid:
         if emoji not in self.react_list:
             return
         if isinstance(emoji, str):
-            if emoji in emoji_letters:
+            if 'u20e3' in emoji:
                 for group in self.group_list:
                     if emoji == group['emoji']:
                         await message.remove_reaction(emoji, user)

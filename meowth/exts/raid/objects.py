@@ -659,11 +659,10 @@ class Raid:
         if emoji not in self.react_list:
             return
         if isinstance(emoji, str):
-            if 'u20e3' in emoji:
-                for group in self.group_list:
-                    if emoji == group['emoji']:
-                        await message.remove_reaction(emoji, user)
-                        return await self.join_grp(payload.user_id, group)
+            for group in self.group_list:
+                if emoji == group['emoji']:
+                    await message.remove_reaction(emoji, user)
+                    return await self.join_grp(payload.user_id, group)
         if emoji == '\u2754':
             return await formatters.get_raid_help('!', self.bot.user.avatar_url, user)
         if self.status == 'egg':

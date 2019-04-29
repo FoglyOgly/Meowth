@@ -1080,6 +1080,9 @@ class RaidCog(Cog):
         Meowth will assume the current raid to be the first raid.
         """
         report_channel = ReportChannel(self.bot, ctx.channel)
+        data = await report_channel.get_all_raids()
+        if not data:
+            return await ctx.send('No raids reported!')
         city = await report_channel.city()
         city = city.split()[0]
         name = f'{city}-raid-train'

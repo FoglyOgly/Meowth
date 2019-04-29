@@ -2980,7 +2980,10 @@ class TrainEmbed():
     @classmethod
     async def from_train(cls, train: Train):
         title = cls.title
-        current_raid_str = await train.current_raid.train_summary()
+        if train.current_raid:
+            current_raid_str = await train.current_raid.train_summary()
+        else:
+            current_raid_str = "None"
         channel_str = train.channel.mention
         team_str = train.team_str
         fields = {

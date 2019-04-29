@@ -801,7 +801,7 @@ class RaidCog(Cog):
         if not raid:
             return
         if raid.status != 'active':
-            if len(self.boss_list) > 1:
+            if len(raid.boss_list) > 1:
                 raise RaidNotActive
         meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
         embed = await raid.counters_embed(meowthuser)

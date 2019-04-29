@@ -1606,7 +1606,8 @@ class Raid:
         for trainer in trainer_dict:
             total = sum(trainer_dict[trainer]['party'])
             status = trainer_dict[trainer]['status']
-            d[status] += total
+            if status:
+                d[status] += total
         return d
     
     @property
@@ -1631,6 +1632,8 @@ class Raid:
             'unknown': 0
         }
         for trainer in trainer_dict:
+            if not trainer_dict[trainer].get('status'):
+                continue
             bluecount = trainer_dict[trainer]['party'][0]
             yellowcount = trainer_dict[trainer]['party'][1]
             redcount = trainer_dict[trainer]['party'][2]

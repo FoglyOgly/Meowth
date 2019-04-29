@@ -1006,22 +1006,29 @@ class Raid:
         if not weather:
             weather = await self.weather()
         pkmn = self.pkmn
+        if not pkmn:
+            if len(self.boss_list) == 1:
+                pkmn = RaidBoss(Pokemon(self.bot, self.boss_list[0]))
         return await pkmn.is_boosted(weather)
     
     async def cp_range(self, weather=None):
         boost = await self.is_boosted(weather=weather)
+        pkmn = self.pkmn
+        if not pkmn:
+            if len(self.boss_list) == 1:
+                pkmn = RaidBoss(Pokemon(self.bot, self.boss_list[0]))
         if boost:
-            self.pkmn.lvl = 25
+            pkmn.lvl = 25
         else:
-            self.pkmn.lvl = 20
-        self.pkmn.attiv = 10
-        self.pkmn.defiv = 10
-        self.pkmn.staiv = 10
-        low_cp = await self.pkmn.calculate_cp()
-        self.pkmn.attiv = 15
-        self.pkmn.defiv = 15
-        self.pkmn.staiv = 15
-        high_cp = await self.pkmn.calculate_cp()
+            pkmn.lvl = 20
+        pkmn.attiv = 10
+        pkmn.defiv = 10
+        pkmn.staiv = 10
+        low_cp = await pkmn.calculate_cp()
+        pkmn.attiv = 15
+        pkmn.defiv = 15
+        pkmn.staiv = 15
+        high_cp = await pkmn.calculate_cp()
         return [low_cp, high_cp]
     
     async def pb_data(self, weather=None):

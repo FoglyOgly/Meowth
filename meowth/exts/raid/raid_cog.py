@@ -805,8 +805,6 @@ class RaidCog(Cog):
                 raise RaidNotActive
         meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
         embed = await raid.counters_embed(meowthuser)
-        if not embed:
-            return await ctx.author.send("You likely have better counters than the ones in your Pokebattler Pokebox! Please update your Pokebox!")
         await ctx.author.send(embed=embed)
         await raid.update_rsvp()
         

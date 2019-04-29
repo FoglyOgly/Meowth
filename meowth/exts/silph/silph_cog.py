@@ -109,6 +109,7 @@ class SilphCog(Cog):
                 async with sess.get(url, headers=headers) as resp:
                     data = await resp.json(content_type=None)
                     data = data['data']
+                    print(data)
                     verified = self.parse_info_from_silph(data)
                     if not verified or i < 60:
                         await asyncio.sleep(60)

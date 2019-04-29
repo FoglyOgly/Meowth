@@ -288,6 +288,13 @@ class Meetup:
     @property
     def start_datetime(self):
         return self.local_datetime(self.start)
+    
+    def update_time(self, new_time: float):
+        meetup_table = self.bot.dbi.table('meetups')
+        update = meetup_table.update
+        update.where(id=self.id)
+        update.values(start=new_time)
+        self.bot.loop.create_task(update.commit())
 
     @classmethod
     async def from_data(cls, bot, data):
@@ -2889,6 +2896,9 @@ class CountersEmbed():
     @classmethod
     async def from_raid(cls, user: MeowthUser, raid: Raid):
         boss = raid.pkmn
+        if not boss:
+            if len(raid.boss_list) == 1:
+                boss = RaidBoss(Pokemon(raid.bot, raid.boss_list[0]))
         bot = raid.bot
         name = await boss.name()
         type_emoji = await boss.type_emoji()

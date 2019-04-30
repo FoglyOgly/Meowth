@@ -321,7 +321,7 @@ class POI():
         elif cmd == 'wild':
             query.where(wild=True)
         channelid_list = await query.get_values()
-        channel_list = [ReportChannel(self.bot, self.bot.get_channel(x)) for x in channelid_list]
+        channel_list = [ReportChannel(self.bot, self.bot.get_channel(x)) for x in channelid_list if self.bot.get_channel(x)]
         gym_channels = [y for y in channel_list if await y.point_in_channel(coords)]
         return gym_channels
     

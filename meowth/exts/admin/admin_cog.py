@@ -242,7 +242,7 @@ class AdminCog(Cog):
         if data:
             rcrd = dict(data[0])
         else:
-            rcrd = {'channelid': channel_id}
+            rcrd = {'channelid': channel_id, 'guild_id': ctx.guild.id}
         possible_commands = ['raid', 'wild', 'users', 'train', 'trade',
             'clean', 'welcome', 'archive', 'meetup']
         features = [x for x in features if x in possible_commands]

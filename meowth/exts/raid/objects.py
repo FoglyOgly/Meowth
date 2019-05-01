@@ -1528,8 +1528,8 @@ class Raid:
                         continue
                     try:
                         await channel.delete()
-                    except discord.Forbidden:
-                        raise commands.BotMissingPermissions(['Manage Channels'])
+                    except:
+                        pass
             raid_table = self.bot.dbi.table('raids')
             query = raid_table.query().where(id=self.id)
             self.bot.loop.create_task(query.delete())
@@ -2041,7 +2041,10 @@ class Train:
         
     async def clear_reports(self):
         async for msg in self.report_msgs():
-            await msg.delete()
+            try:
+                await msg.delete()
+            except:
+                pass
         self.report_msg_ids = []
     
     async def multi_msgs(self):
@@ -2055,7 +2058,10 @@ class Train:
     
     async def clear_multis(self):
         async for msg in self.multi_msgs():
-            await msg.delete()
+            try:
+                await msg.delete()
+            except:
+                pass
         self.multi_msg_ids = []
     
     async def reported_raids(self):
@@ -2414,7 +2420,10 @@ class Train:
             reason = d.get('reason')
             await self.archive_train(channel, user_id, reason)
         else:
-            await self.channel.delete()
+            try:
+                await self.channel.delete()
+            except:
+                pass
         async for msg in self.messages():
             await msg.clear_reactions()
             embed = formatters.make_embed(content="This raid train has ended!")

@@ -175,7 +175,7 @@ class Trade():
         return await query.delete()
 
     async def reject_offer(self, trader, listed, offer, msg):
-        c, m = await ChannelMessage.from_id_string(msg)
+        c, m = await ChannelMessage.from_id_string(self.bot, msg)
         try:
             await m.delete()
         except:

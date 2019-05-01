@@ -114,6 +114,8 @@ class RaidCog(Cog):
     @Cog.listener()
     async def on_message(self, message):
         channel = message.channel
+        if not hasattr(channel, 'guild'):
+            return
         guild = channel.guild
         raid = Raid.by_channel.get(str(channel.id))
         train = Train.by_channel.get(channel.id)

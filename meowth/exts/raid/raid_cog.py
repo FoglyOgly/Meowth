@@ -554,7 +554,7 @@ class RaidCog(Cog):
         if isinstance(gym, Gym):
             channel_list = await gym.get_all_channels('raid')
             report_channels.extend(channel_list)
-        else:
+        if report_channel not in report_channels:
             report_channels.append(report_channel)
         if raid_mode == 'message':
             reportcontent += "Coordinate this raid here using the reactions below!"

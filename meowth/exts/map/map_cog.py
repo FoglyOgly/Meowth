@@ -27,6 +27,9 @@ class ReportChannel():
         self.bot = bot
         self.channel = channel
 
+    def __eq__(self, other):
+        return self.channel.id == other.channel.id
+
     @property
     def _data(self):
         channel_query = self.bot.dbi.table('report_channels').query()

@@ -340,7 +340,7 @@ class Users(Cog):
             insert = meowthuser._insert
             d = {
                 'id': ctx.author.id,
-                'team': team.id
+                'team': chosen_team.id
             }
             insert.row(**d)
             await insert.commit()

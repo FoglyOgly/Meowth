@@ -189,12 +189,16 @@ class RaidCog(Cog):
             try:
                 if await raid_checks.is_raid_channel(ctx):
                     raid = Raid.by_channel[str(ctx.channel.id)]
+                    tags = False
+                    if 'tags' in ctx.args:
+                        tags = True
+                        ctx.args.remove('tags')
                     if len(ctx.args) == 2 or 'rsvp' in ctx.args:
-                        return await raid.list_rsvp(ctx.channel)
+                        return await raid.list_rsvp(ctx.channel, tags=tags)
                     if 'teams' in ctx.args:
-                        return await raid.list_teams(ctx.channel)
+                        return await raid.list_teams(ctx.channel, tags=tags)
                     if 'groups' in ctx.args:
-                        return await raid.list_groups(ctx.channel)
+                        return await raid.list_groups(ctx.channel, tags=tags)
             except NotRaidChannel:
                 pass
         

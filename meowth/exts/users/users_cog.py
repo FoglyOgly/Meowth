@@ -345,6 +345,7 @@ class Users(Cog):
             insert.row(**d)
             await insert.commit()
         else:
+            data = data[0]
             old_team_id = data.get('team')
             if old_team_id:
                 old_team = Team(ctx.bot, ctx.guild.id, old_team_id)

@@ -285,6 +285,8 @@ class Context(commands.Context):
                 await msg.delete()
     
     async def tz(ctx):
+        if hasattr(ctx, '_tz'):
+            return ctx._tz
         report_table = ctx.bot.dbi.table('report_channels')
         query = report_table.query('timezone')
         query.where(channelid=ctx.channel.id)

@@ -543,8 +543,7 @@ class RaidCog(Cog):
         if trains:
             train_content = "Use the reaction below to vote for this raid next!"
             for t in trains:
-                train_channel_exists = ctx.bot.get_channel(t.channel.id)
-                if train_channel_exists:
+                if t.channel:
                     train_embed = await t.train_embed()
                     msg = await t.channel.send(train_content, embed=train_embed.embed)
                     await msg.add_reaction('\u2b06')

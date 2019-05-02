@@ -792,7 +792,8 @@ class Raid:
                         continue
                     grp['users'].append(user_id)
                     meowthuser = MeowthUser.from_id(self.bot, user_id)
-                    await meowthuser.rsvp(self.id, "lobby")
+                    party = await meowthuser.party()
+                    await meowthuser.rsvp(self.id, "lobby", party=party)
                     await react_channel.send(f'{meowthuser.user.display_name} has entered the lobby!')
                     await self.update_rsvp()
                     continue
@@ -807,7 +808,8 @@ class Raid:
                     if backoutload and str(backoutload.emoji) == '✅':
                         for user in grp['users']:
                             meowthuser = MeowthUser.from_id(self.bot, user)
-                            await meowthuser.rsvp(self.id, "here")
+                            party = await meowthuser.party()
+                            await meowthuser.rsvp(self.id, "here", party=party)
                         for chn in self.channel_ids:
                             chan = self.bot.get_channel(int(chn))
                             await chan.send(f"Group {grp['emoji']} has backed out! Be sure to thank them!")

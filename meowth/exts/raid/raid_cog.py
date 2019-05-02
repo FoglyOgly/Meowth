@@ -824,6 +824,7 @@ class RaidCog(Cog):
         raid = Raid.by_channel.get(str(ctx.channel.id))
         if not raid:
             raise NotRaidChannel
+        ctx._tz = raid.tz
         old_rsvp = raid.trainer_dict.get(ctx.author.id, {})
         old_status = old_rsvp.get('status')
         if not old_status:

@@ -345,6 +345,11 @@ class Users(Cog):
             insert.row(**d)
             await insert.commit()
         else:
+            old_team_id = data.get('team')
+            if old_team_id:
+                old_team = Team(ctx.bot, ctx.guild.id, old_team_id)
+                old_role = await old_team.role()
+                await ctx.author.remove_roles(old_role)
             update = meowthuser._update
             update.values(team=chosen_team.id)
             await update.commit()

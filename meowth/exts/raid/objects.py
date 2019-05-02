@@ -746,7 +746,7 @@ class Raid:
                 query = user_table.query().where(user_table['user_id'].in_(grp['users']))
                 query.where(raid_id=self.id)
                 await query.delete()
-                if grp in group_list:
+                if grp in self.group_list:
                     self.group_list.remove(grp)
                 return await self.update_rsvp()
             grp_est = self.grp_est_power(grp)
@@ -820,7 +820,7 @@ class Raid:
             query = user_table.query.where(user_table['user_id'].in_(grp['users']))
             query.where(raid_id=self.id)
             await query.delete()
-            if grp in group_list:
+            if grp in self.group_list:
                 self.group_list.remove(grp)
             await self.update_rsvp()
             return                

@@ -416,7 +416,7 @@ class Dev(Cog):
         tables = await ctx.bot.dbi.tables()
         tables = [x['table_name'] for x in tables]
         valid_tables = ['pokemon', 'pokedex', 'moves', 'movesets', 'move_names',
-            'form_names', 'item_names', 'forms']
+            'form_names', 'item_names', 'forms', 'regional_raids']
         if table not in tables:
             return await ctx.send("Table does not exist.")
         elif table not in valid_tables:

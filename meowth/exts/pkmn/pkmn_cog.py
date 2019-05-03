@@ -1,6 +1,7 @@
 from meowth import Cog, command, bot, checks
 from meowth.utils import formatters, fuzzymatch
 from meowth.exts.weather import Weather
+from meowth.exts.map import ReportChannel
 from math import log, floor
 import aiohttp
 
@@ -715,7 +716,7 @@ class Pokemon():
             self.lvl = valid_level
 
     @classmethod
-    async def from_arg(cls, bot, command_name, chn, user_id, arg):
+    async def from_arg(cls, bot, command_name, chn, user_id, arg, coords=None):
         pokemon = bot.dbi.table('pokemon')
         pokedex = bot.dbi.table('pokedex')
         form_names = bot.dbi.table('form_names')
@@ -811,7 +812,7 @@ class Pokemon():
         else:
             mons = [(cls(bot, x)) for x in possible_ids]
             if command_name == 'raid':
-                possible_mons = [x for x in mons if x._raid_available()]
+                possible_mons = [x for x in mons if x._raid_available(coords)]
             elif command_name == 'wild':
                 possible_mons = [x for x in mons if await x._wild_available()]
             else:
@@ -848,7 +849,9 @@ class Pokemon():
 
     @classmethod    
     async def convert(cls, ctx, arg):
-        return await cls.from_arg(ctx.bot, ctx.command.name, ctx.channel, ctx.author.id, arg)
+        report_channel = ReportChannel(ctx.bot, ctx.channel)
+        coords = await report_channel.center_coords()
+        return await cls.from_arg(ctx.bot, ctx.command.name, ctx.channel, ctx.author.id, arg, coords)
 
 
 

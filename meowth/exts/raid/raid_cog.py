@@ -522,6 +522,7 @@ class RaidCog(Cog):
         level = new_raid.level
         hatch = new_raid.hatch
         end = new_raid.end
+        await new_raid.get_boss_list()
         raid_table = ctx.bot.dbi.table('raids')
         wants = await new_raid.get_wants()
         role_wants = [wants.get(x) for x in wants if wants.get(x)]

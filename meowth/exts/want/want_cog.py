@@ -144,8 +144,8 @@ class Want():
                     name = await name_query.get_value()
                     role = await guild.create_role(name=name, mentionable=True)
                 insert = self._update
-                insert.row(role=role.id)
-                await insert.commit(do_update=True)
+                insert.values(role=role.id)
+                await insert.commit()
                 for member in members:
                     await member.add_roles(role)
             return role

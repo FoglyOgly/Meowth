@@ -159,7 +159,7 @@ class ReportChannel():
         }
         table = self.bot.dbi.table('raid_bosses')
         query = table.query
-        data = await query.get()
+        rows = await query.get()
         def data(rcrd):
             d = {
                 'verified': rcrd.get('verified', False),
@@ -172,7 +172,7 @@ class ReportChannel():
             boss_id = rcrd.get('pokemon_id')
             level = rcrd.get('level')
             return level, boss_id, d
-        for rcrd in data:
+        for rcrd in rows:
             level, boss_id, d = data(rcrd)
             if d['is_regional']:
                 table = self.bot.dbi.table('regional_raids')

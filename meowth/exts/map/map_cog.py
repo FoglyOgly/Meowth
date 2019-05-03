@@ -178,10 +178,10 @@ class ReportChannel():
                 table = self.bot.dbi.table('regional_raids')
                 query = table.query
                 query.where(boss=boss_id)
-                query.where(table['min_lat'].le(lat))
-                query.where(table['max_lat'].ge(lat))
-                query.where(table['min_lon'].le(lon))
-                query.where(table['max_lon'].ge(lon))
+                query.where(table['min_lat'] <= (lat))
+                query.where(table['max_lat'] >= (lat))
+                query.where(table['min_lon'] <= (lon))
+                query.where(table['max_lon'] >= (lon))
                 regiondata = await query.get()
                 if not regiondata:
                     continue

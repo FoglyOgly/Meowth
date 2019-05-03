@@ -498,7 +498,7 @@ class Raid:
         level = self.level
         report_channel = ReportChannel(self.bot, self.report_channel)
         boss_lists = await report_channel.get_raid_lists()
-        boss_list = boss_lists[level].keys()
+        boss_list = list(boss_lists[level].keys())
         self.boss_list = boss_list
         return boss_list
     
@@ -1344,6 +1344,7 @@ class Raid:
     
     async def update_messages(self, content=''):
         msg_list = []
+        await self.get_boss_list()
         react_list = self.react_list
         message_ids = self.message_ids
         train_msgs = self.train_msgs

@@ -454,6 +454,10 @@ class Raid:
     def guild(self):
         return self.bot.get_guild(self.guild_id)
     
+    @property
+    def report_channel(self):
+        return self.bot.get_channel(self.report_channel_id)
+    
     def update_time(self, new_time: float):
         if self.monitor_task:
             self.monitor_task.cancel()
@@ -490,15 +494,17 @@ class Raid:
         self.bot.loop.create_task(update.commit())
         self.monitor_task = self.bot.loop.create_task(self.monitor_status())
     
-    @property
-    def boss_list(self):
+    async def get_boss_list(self):
         level = self.level
-        boss_list = self.bot.raid_info.raid_lists[level]
+        report_channel = ReportChannel(self.bot, self.report_channel)
+        boss_lists = await report_channel.get_raid_lists()
+        boss_list = boss_lists[level].keys()
+        self.boss_list = boss_list
         return boss_list
     
     async def boss_list_str(self, weather=None):
         boss_names = []
-        boss_list = self.boss_list
+        boss_list = await self.get_boss_list()
         boss_interest_dict = await self.boss_interest_dict()
         emoji = formatters.mc_emoji(len(boss_list))
         if not weather:
@@ -678,11 +684,12 @@ class Raid:
             await message.remove_reaction(emoji, user)
             return await formatters.get_raid_help('!', self.bot.user.avatar_url, user)
         if self.status == 'egg':
-            if len(self.boss_list) > 1:
-                if self.react_list.index(emoji) <= len(self.boss_list) - 1:
+            boss_list = self.boss_list
+            if len(boss_list) > 1:
+                if self.react_list.index(emoji) <= len(boss_list) - 1:
                     new_status = 'maybe'
                     i = self.react_list.index(emoji)
-                    bossid = self.boss_list[i]
+                    bossid = boss_list[i]
                     if bossid not in old_bosses:
                         new_bosses = old_bosses + [bossid]
                     else:
@@ -694,7 +701,7 @@ class Raid:
                     if old_bosses:
                         new_bosses = old_bosses
                     else:
-                        new_bosses = self.boss_list
+                        new_bosses = boss_list
             else:
                 for k, v in self.bot.config.emoji.items():
                     if v == emoji:
@@ -702,7 +709,7 @@ class Raid:
                 if old_bosses:
                     new_bosses = old_bosses
                 else:
-                    new_bosses = self.boss_list
+                    new_bosses = boss_list
         elif self.status == 'active':
             if emoji == '\u25b6':
                 if self.trainer_dict[payload.user_id]['status'] == 'here':
@@ -1020,16 +1027,18 @@ class Raid:
             weather = await self.weather()
         pkmn = self.pkmn
         if not pkmn:
-            if len(self.boss_list) == 1:
-                pkmn = RaidBoss(Pokemon(self.bot, self.boss_list[0]))
+            boss_list = self.boss_list
+            if len(boss_list) == 1:
+                pkmn = RaidBoss(Pokemon(self.bot, boss_list[0]))
         return await pkmn.is_boosted(weather)
     
     async def cp_range(self, weather=None):
         boost = await self.is_boosted(weather=weather)
         pkmn = self.pkmn
         if not pkmn:
-            if len(self.boss_list) == 1:
-                pkmn = RaidBoss(Pokemon(self.bot, self.boss_list[0]))
+            boss_list = self.boss_list
+            if len(boss_list) == 1:
+                pkmn = RaidBoss(Pokemon(self.bot, boss_list[0]))
         if boost:
             pkmn.lvl = 25
         else:
@@ -1050,8 +1059,9 @@ class Raid:
             weather = await self.weather()
         boss = self.pkmn
         if not boss:
-            if len(self.boss_list) == 1:
-                boss = RaidBoss(Pokemon(self.bot, self.boss_list[0]))
+            boss_list = self.boss_list
+            if len(boss_list) == 1:
+                boss = RaidBoss(Pokemon(self.bot, boss_list[0]))
         boss_id = boss.id
         level = self.level
         query = data_table.query().select().where(
@@ -1132,8 +1142,9 @@ class Raid:
     async def user_counters_data(self, user: MeowthUser):
         pkmn = self.pkmn
         if not pkmn:
-            if len(self.boss_list) == 1:
-                    pkmn = RaidBoss(Pokemon(self.bot, self.boss_list[0]))
+            boss_list = self.boss_list
+            if len(boss_list) == 1:
+                    pkmn = RaidBoss(Pokemon(self.bot, boss_list[0]))
         pkmnid = pkmn.id
         level = self.level
         if level == 'EX':
@@ -1400,7 +1411,7 @@ class Raid:
                 return
             content = "This raid egg has hatched! React below to report the boss!"
             msg_list = []
-            boss_list = self.boss_list
+            boss_list = await self.get_boss_list()
             length = len(boss_list)
             if length == 1:
                 return await self.report_hatch(boss_list[0])
@@ -1593,8 +1604,9 @@ class Raid:
             family = await self.pkmn._familyId()
             wants.append(family)
         else:
-            if len(self.boss_list) == 1:
-                pkmn = Pokemon(self.bot, self.boss_list[0])
+            boss_list = self.boss_list
+            if len(boss_list) == 1:
+                pkmn = Pokemon(self.bot, boss_list[0])
                 family = await pkmn._familyId()
                 wants.append(family)
         if isinstance(self.gym, Gym):
@@ -2969,8 +2981,11 @@ class CountersEmbed():
     async def from_raid(cls, user: MeowthUser, raid: Raid):
         boss = raid.pkmn
         if not boss:
-            if len(raid.boss_list) == 1:
-                boss = RaidBoss(Pokemon(raid.bot, raid.boss_list[0]))
+            boss_list = raid.boss_list
+            if len(boss_list) == 1:
+                boss = RaidBoss(Pokemon(raid.bot, boss_list[0]))
+            else:
+                return
         bot = raid.bot
         name = await boss.name()
         type_emoji = await boss.type_emoji()

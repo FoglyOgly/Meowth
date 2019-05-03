@@ -146,6 +146,49 @@ class ReportChannel():
         data = await self.bot.dbi.execute_query(query, *query_args)
         return [next(row.values()) for row in data]
     
+    async def get_raid_lists(self):
+        lat, lon = await self.center_coords()
+        raid_lists = {
+            "1": {},
+            "2": {},
+            "3": {},
+            "4": {},
+            "5": {},
+            "6": {},
+            "EX": {}
+        }
+        table = self.bot.dbi.table('raid_bosses')
+        query = table.query
+        data = await query.get()
+        def data(rcrd):
+            d = {
+                'verified': rcrd.get('verified', False),
+                'available': rcrd.get('available', False),
+                'shiny': rcrd.get('shiny', False),
+                'is_regional': rcrd.get('is_regional', False),
+                'start_time': rcrd.get('start_time'),
+                'end_time': rcrd.get('end_time')
+            }
+            boss_id = rcrd.get('pokemon_id')
+            level = rcrd.get('level')
+            return level, boss_id, d
+        for rcrd in data:
+            level, boss_id, d = data(rcrd)
+            if d['is_regional']:
+                table = self.bot.dbi.table('regional_raids')
+                query = table.query
+                query.where(boss=boss_id)
+                query.where(table['min_lat'].le(lat))
+                query.where(table['max_lat'].ge(lat))
+                query.where(table['min_lon'].le(lon))
+                query.where(table['max_lon'].ge(lon))
+                regiondata = await query.get()
+                if not regiondata:
+                    continue
+            raid_lists[level][boss_id] = d
+        return raid_lists
+
+    
 
 
         

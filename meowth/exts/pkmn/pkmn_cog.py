@@ -227,12 +227,28 @@ class Pokemon():
         data = self._data
         return await data.select('wild_available').get_value()
     
-    def _raid_available(self):
-        raid_lists = self.bot.raid_info.raid_lists
-        for level in raid_lists:
-            if self.id in raid_lists[level]:
+    async def _raid_available(self, coords):
+        table = self.bot.dbi.table('raid_bosses')
+        query = table.query
+        query.where(pokemon_id=self.id)
+        data = await query.get()
+        if not data:
+            return False
+        data = data[0]
+        if data.get('is_regional'):
+            lat, lon = coords
+            table = self.bot.dbi.table('regional_raids')
+            query = table.query
+            query.where(boss=self.id)
+            query.where(table['min_lat'].le(lat))
+            query.where(table['max_lat'].ge(lat))
+            query.where(table['min_lon'].le(lon))
+            query.where(table['max_lon'].ge(lon))
+            data = await query.get()
+            if data:
                 return True
-        return False
+            return False
+        return True
 
     async def _trade_available(self):
         data = self._data

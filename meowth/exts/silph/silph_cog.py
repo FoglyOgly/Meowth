@@ -17,8 +17,8 @@ class SilphCog(Cog):
         self.bot = bot
 
     def parse_info_from_silph(self, data):
-        verified = True
-        raid_lists = self.bot.raid_info.raid_lists
+        rows = []
+        all_verified = True
         for level in data:
             if level == 'LEVEL_6':
                 new_level = 'EX'
@@ -26,10 +26,11 @@ class SilphCog(Cog):
                 new_level = level[-1]
             for boss in data[level]['boss']:
                 silphid = boss['id']
-                if not boss['available']:
-                    continue
-                if not boss['verified']:
-                    verified = False
+                available = boss['available']
+                verified = boss['verified']
+                if not verified:
+                    all_verified = False
+                shiny = boss['shiny']
                 meowthid = silphid.upper().replace('-', '_')
                 if meowthid == 'GIRATINA_ALTERED':
                     meowthid = 'GIRATINA'
@@ -37,9 +38,15 @@ class SilphCog(Cog):
                 for form in forms:
                     if meowthid.endswith(form):
                         meowthid += "_FORM"
-                if meowthid not in raid_lists[new_level]:
-                    raid_lists[new_level].append(meowthid)
-        return verified
+                d = {
+                    'level': new_level,
+                    'pokemon_id': meowthid,
+                    'verified': verified,
+                    'available': available,
+                    'shiny': shiny
+                }
+                rows.append(d)
+        return rows, all_verified
 
     @Cog.listener()
     async def on_command_error(self, ctx, error):
@@ -98,7 +105,7 @@ class SilphCog(Cog):
         if shaketime:
             newdt = parse(shaketime, settings={'TIMEZONE': 'America/Chicago', 'RETURN_AS_TIMEZONE_AWARE': True})
             stamp = newdt.timestamp()
-            sleeptime = time.time() - stamp
+            sleeptime = stamp - time.time()
         else:
             sleeptime = 0
         await asyncio.sleep(sleeptime)
@@ -109,24 +116,19 @@ class SilphCog(Cog):
                 async with sess.get(url, headers=headers) as resp:
                     data = await resp.json(content_type=None)
                     data = data['data']
-                    verified = self.parse_info_from_silph(data)
+                    rows, verified = self.parse_info_from_silph(data)
+                    table = ctx.bot.dbi.table('raid_bosses')
+                    if verified and i >= 60:
+                        query = table.query
+                        await query.delete()
+                    insert = table.insert
+                    insert.rows(rows)
+                    await insert.commit(do_update=True)
                     if not verified or i < 60:
                         await asyncio.sleep(60)
                         i += 1
                         continue
-                    self.bot.raid_info.raid_lists = {
-                        '1': [],
-                        '2': [],
-                        '3': [],
-                        '4': [],
-                        '5': [],
-                        '6': [],
-                        'EX': []
-                    }
-                    self.parse_info_from_silph(data)
                     break
-        with open(self.bot.ext_dir + '/raid/raid_info.py', 'a') as f:
-            print('\nraid_lists = ' + str(self.bot.raid_info.raid_lists), file=f)
         
     @command()
     @checks.is_co_owner()
@@ -139,16 +141,11 @@ class SilphCog(Cog):
                     data = await resp.json(content_type=None)
                 except:
                     return
-                self.bot.raid_info.raid_lists = {
-                    '1': [],
-                    '2': [],
-                    '3': [],
-                    '4': [],
-                    '5': [],
-                    '6': [],
-                    'EX': []
-                }
+                table = ctx.bot.dbi.table('raid_bosses')
+                query = table.query
+                await query.delete()
                 data = data['data']
-                self.parse_info_from_silph(data)
-        with open(self.bot.ext_dir + '/raid/raid_info.py', 'a') as f:
-            print('\nraid_lists = ' + str(self.bot.raid_info.raid_lists), file=f)
+                rows, verified = self.parse_info_from_silph(data)
+                insert = table.insert
+                insert.rows(rows)
+                await insert.commit(do_update=True)

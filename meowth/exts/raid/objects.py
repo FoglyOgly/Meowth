@@ -659,6 +659,7 @@ class Raid:
         trainer_data = trainer_dict.get(payload.user_id, {})
         old_bosses = trainer_data.get('bosses', [])
         old_status = trainer_data.get('status')
+        new_status = None
         party = await meowthuser.party()
         if payload.emoji.is_custom_emoji():
             emoji = payload.emoji.id
@@ -726,6 +727,8 @@ class Raid:
             await message.remove_reaction(emoji, user)
         except:
             pass
+        if not new_status:
+            return
         if new_bosses != old_bosses or new_status != old_status:
             await meowthuser.rsvp(self.id, new_status, bosses=new_bosses, party=party)
     
@@ -1509,12 +1512,21 @@ class Raid:
         try:
             self.bot.loop.create_task(self.update_messages())
             await asyncio.sleep(60)
-            del Raid.instances[self.id]
+            try:
+                del Raid.instances[self.id]
+            except:
+                pass
             for message_id in self.message_ids:
-                del Raid.by_message[message_id]
+                try:
+                    del Raid.by_message[message_id]
+                except:
+                    pass
             if self.channel_ids:
                 for chanid in self.channel_ids:
-                    del Raid.by_channel[chanid]
+                    try:
+                        del Raid.by_channel[chanid]
+                    except:
+                        pass
                     channel = self.bot.get_channel(int(chanid))
                     if not channel:
                         continue
@@ -2414,7 +2426,10 @@ class Train:
 
     
     async def end_train(self):
-        await self.channel.send('This train is now empty! This channel will be deleted in one minute.')
+        try:
+            await self.channel.send('This train is now empty! This channel will be deleted in one minute.')
+        except:
+            pass
         await asyncio.sleep(60)
         await self._data.delete()
         train_rsvp_table = self.bot.dbi.table('train_rsvp')
@@ -2538,7 +2553,7 @@ class ReportEmbed():
             name += f" {type_emoji}"
             img_url = await boss.sprite_url()
             enddt = datetime.fromtimestamp(raid.end)
-        elif raid.status == 'egg':
+        else:
             bossfield = "Level"
             name = raid.level
             img_url = raid.bot.raid_info.egg_images[name]

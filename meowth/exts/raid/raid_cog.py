@@ -32,6 +32,8 @@ class time_converter(commands.Converter):
     async def convert(self, ctx, argument):
         zone = await ctx.tz()
         hatch_dt = parse(argument, settings={'TIMEZONE': zone, 'RETURN_AS_TIMEZONE_AWARE': True})
+        if not hatch_dt:
+            return None
         tz = timezone(zone)
         now_dt = datetime.now(tz=tz)
         if hatch_dt < now_dt:
@@ -413,9 +415,12 @@ class RaidCog(Cog):
                     mentions = []
                     for channelid in old_raid.channel_ids:
                         channel = ctx.guild.get_channel(int(channelid))
+                        if not channel:
+                            continue
                         mention = channel.mention
                         mentions.append(mention)
-                    return await ctx.send(f"""There is already a raid reported at this gym! Coordinate here: {", ".join(mentions)}""", embed=embed)
+                    if mentions:
+                        return await ctx.send(f"""There is already a raid reported at this gym! Coordinate here: {", ".join(mentions)}""", embed=embed)
                 else:
                     msg = await ctx.send(f"""There is already a raid reported at this gym! Coordinate here!""", embed=embed)
                     old_raid.message_ids.append(f"{msg.channel.id}/{msg.id}")

@@ -351,7 +351,6 @@ class Pagination:
                 name = f"{name} Only".title()
                 requirements.append(name)
             elif '<locals>' in name:
-                print('yes')
                 name = name.split('.',1)[0]
                 name = name.replace("_", " ").title()
                 requirements.append(name)

@@ -109,7 +109,6 @@ class SilphCog(Cog):
                 async with sess.get(url, headers=headers) as resp:
                     data = await resp.json(content_type=None)
                     data = data['data']
-                    print(data)
                     verified = self.parse_info_from_silph(data)
                     if not verified or i < 60:
                         await asyncio.sleep(60)
@@ -139,7 +138,6 @@ class SilphCog(Cog):
                 try:
                     data = await resp.json(content_type=None)
                 except:
-                    print(await resp.text())
                     return
                 self.bot.raid_info.raid_lists = {
                     '1': [],

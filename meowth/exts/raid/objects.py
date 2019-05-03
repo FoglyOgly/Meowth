@@ -1604,7 +1604,7 @@ class Raid:
             family = await self.pkmn._familyId()
             wants.append(family)
         else:
-            boss_list = self.boss_list
+            boss_list = await self.get_boss_list()
             if len(boss_list) == 1:
                 pkmn = Pokemon(self.bot, boss_list[0])
                 family = await pkmn._familyId()

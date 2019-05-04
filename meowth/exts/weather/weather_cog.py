@@ -53,6 +53,7 @@ class Weather():
         day_names = await weather_names.query('name').get_values()
         night_names = await weather_names.query('night_name').get_values()
         names = day_names + night_names
+        names = [x for x in names if x]
         match = fuzzymatch.get_match(names, arg)
         if match[0]:
             if match[0] in day_names:

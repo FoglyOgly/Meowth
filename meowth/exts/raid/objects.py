@@ -1629,7 +1629,8 @@ class Raid:
             total = sum(trainer_dict[trainer]['party'])
             bosses = trainer_dict[trainer]['bosses']
             for boss in bosses:
-                d[boss] += total
+                if boss in boss_list:
+                    d[boss] += total
         return d
 
     @staticmethod

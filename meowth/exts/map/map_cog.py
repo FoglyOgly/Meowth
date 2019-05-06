@@ -94,8 +94,8 @@ class ReportChannel():
         return cap
 
     async def point_in_channel(self, coords):
-        cell = S2_L10.from_coords(self.bot, coords)
-        covering = await self.level_10_covering()
+        cell = S2_L12.from_coords(self.bot, coords)
+        covering = await self.level_12_covering()
         if not covering:
             return False
         return cell.cellid in covering
@@ -107,6 +107,16 @@ class ReportChannel():
             return None
         coverer = s2.S2RegionCoverer()
         coverer.set_fixed_level(10)
+        covering = coverer.GetCovering(cap)
+        id_list = [hex(x.id()) for x in covering]
+        return id_list
+    
+    async def level_12_covering(self):
+        cap = await self.s2_cap()
+        if not cap:
+            return None
+        coverer = s2.S2RegionCoverer()
+        coverer.set_fixed_level(12)
         covering = coverer.GetCovering(cap)
         id_list = [hex(x.id()) for x in covering]
         return id_list
@@ -283,6 +293,24 @@ class S2_L10():
         raids = await query.get_values()
         return raids
 
+class S2_L12():
+    def __init__(self, bot, cellid):
+        self.bot = bot
+        self.cellid = cellid
+        
+    @classmethod
+    def from_coords(cls, bot, coords):
+        cellid = hex(s2.S2CellId(
+            s2.S2LatLng.FromDegrees(*coords)
+        ).parent(12).id())
+        return cls(bot, cellid)
+    
+    @property
+    def center_coords(self):
+        cellid = int(self.cellid, base=16)
+        center_coords = s2.S2LatLng(s2.S2CellId(cellid).ToPoint())
+        return center_coords
+
 
 
 class POI():
@@ -300,6 +328,10 @@ class POI():
         data = self._data
         L10 = await data.select('l10').get_value()
         return L10
+    
+    async def _L12(self):
+        coords = await self._coords()
+        return await S2_L12.from_coords(self.bot, coords)
     
     async def _name(self):
         data = self._data

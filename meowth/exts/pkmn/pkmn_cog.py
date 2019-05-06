@@ -812,7 +812,7 @@ class Pokemon():
         else:
             mons = [(cls(bot, x)) for x in possible_ids]
             if command_name == 'raid':
-                possible_mons = [x for x in mons if x._raid_available(coords)]
+                possible_mons = [x for x in mons if await x._raid_available(coords)]
             elif command_name == 'wild':
                 possible_mons = [x for x in mons if await x._wild_available()]
             else:

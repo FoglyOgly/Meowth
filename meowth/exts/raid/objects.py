@@ -1644,7 +1644,7 @@ class Raid:
         for trainer in trainer_dict:
             total = sum(trainer_dict[trainer]['party'])
             status = trainer_dict[trainer]['status']
-            if status:
+            if status and status != 'cancel':
                 d[status] += total
         return d
     

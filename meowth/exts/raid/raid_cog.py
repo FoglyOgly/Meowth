@@ -747,8 +747,8 @@ class RaidCog(Cog):
         if meetup:
             print(0)
             return await self.mrsvp(ctx, "maybe", total, *teamcounts)
-        print(1)
-        print(bosses)
+        if bosses:
+            await ctx.send(f'{bosses}')
         await self.rsvp(ctx, "maybe", bosses, total, *teamcounts)
         
     @command(aliases=['c', 'omw'], category="RSVP")

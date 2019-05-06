@@ -744,6 +744,7 @@ class Raid:
             if channel:
                 return await channel.send('Please wait until your whole group is here!')
         else:
+            mention_str = ""
             if self.grp_total(grp) > 20:
                 raise GroupTooBig
             if not channel:
@@ -783,13 +784,15 @@ class Raid:
                         return await channel.send('Thank you for waiting!')
             for user in grp['users']:
                 meowthuser = MeowthUser.from_id(self.bot, user)
+                mention = meowthuser.user.mention + " "
+                mention_str += mention
                 party = await meowthuser.party()
                 await meowthuser.rsvp(self.id, "lobby", party=party)
             await self.update_rsvp()
             msg_list = []
             for chn in self.channel_ids:
                 chan = self.bot.get_channel(int(chn))
-                lobbymsg = await chan.send(f"Group {grp['emoji']} has entered the lobby! You can join them by reacting with ▶, or ask them to backout with ⏸")
+                lobbymsg = await chan.send(f"{mention_str}: Group {grp['emoji']} is entering the lobby! Other trainers: you can join them by reacting with ▶, or ask them to backout with ⏸")
                 msg_list.append(lobbymsg)
             starttime = time.time() + 120
             while time.time() < starttime:
@@ -808,12 +811,9 @@ class Raid:
                     await self.update_rsvp()
                     continue
                 elif payload and str(payload.emoji) == '⏸':
-                    mention_str = ""
                     for user in grp['users']:
                         meowthuser = MeowthUser.from_id(self.bot, user)
-                        mention = meowthuser.user.mention + " "
-                        mention_str += mention
-                    backoutmsg = await channel.send(f'{mention_str}A backout has been requested! Please confirm by reacting with ✅')
+                    backoutmsg = await channel.send(f'{mention_str}: A backout has been requested! Please confirm by reacting with ✅')
                     backoutload = await formatters.ask(self.bot, [backoutmsg], timeout=starttime-time.time())
                     if backoutload and str(backoutload.emoji) == '✅':
                         for user in grp['users']:

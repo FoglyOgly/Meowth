@@ -849,10 +849,8 @@ class Pokemon():
 
     @classmethod    
     async def convert(cls, ctx, arg):
-        print(0)
         report_channel = ReportChannel(ctx.bot, ctx.channel)
         coords = await report_channel.center_coords()
-        print(1)
         return await cls.from_arg(ctx.bot, ctx.command.name, ctx.channel, ctx.author.id, arg, coords)
 
 

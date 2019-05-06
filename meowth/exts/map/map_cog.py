@@ -38,7 +38,9 @@ class ReportChannel():
     
     async def center_coords(self):
         data = self._data
-        record = (await data.get())[0]
+        record = await data.get()
+        if record:
+            record = record[0]
         if not record['lat'] or not record['lon']:
             return None
         return (float(record['lat']), float(record['lon']))

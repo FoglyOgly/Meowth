@@ -17,6 +17,7 @@ import csv
 from urllib.parse import quote_plus
 import googlemaps
 from typing import List
+import tempfile
 
 from .map_info import gmaps_api_key
 from .errors import *
@@ -642,7 +643,7 @@ class Mapper(Cog):
         if not data:
             return
         fields = ['name', 'nickname', 'lat', 'lon', 'exraid']
-        f = open(f'gyms_{guildid}.csv', 'r+')
+        f = tempfile.TemporaryFile()
         writer = csv.DictWriter(f, fieldnames=fields)
         writer.writeheader()
         for row in data:

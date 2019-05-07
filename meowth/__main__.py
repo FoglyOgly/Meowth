@@ -39,6 +39,7 @@ def run_bot(debug=False, launcher=None, from_restart=False):
     description = "Meowth v3 - Beta"
     bot = Bot(
         description=description, launcher=launcher,
+        activity=discord.Game(name="Pokemon GO"))
         debug=debug, from_restart=from_restart)
 
     # setup logging

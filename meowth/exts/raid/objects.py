@@ -294,6 +294,7 @@ class Meetup:
         update = meetup_table.update
         update.where(id=self.id)
         update.values(start=new_time)
+        self.start = new_time
         self.bot.loop.create_task(update.commit())
 
     @classmethod

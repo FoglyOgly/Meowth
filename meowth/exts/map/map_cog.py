@@ -647,10 +647,11 @@ class Mapper(Cog):
         writer = csv.DictWriter(f, fieldnames=fields)
         writer.writeheader()
         for row in data:
+            row = dict(row)
             del row['guild']
             del row['id']
             del row['l10']
-            writer.writerow(dict(row))
+            writer.writerow(row)
         return f
         
 

@@ -647,6 +647,9 @@ class Mapper(Cog):
         writer = csv.DictWriter(f, fieldnames=fields)
         writer.writeheader()
         for row in data:
+            del row['guild']
+            del row['id']
+            del row['l10']
             writer.writerow(dict(row))
         return f
         

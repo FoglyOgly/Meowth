@@ -643,7 +643,7 @@ class Mapper(Cog):
         if not data:
             return
         fields = ['name', 'nickname', 'lat', 'lon', 'exraid']
-        f = tempfile.TemporaryFile()
+        f = tempfile.TemporaryFile(mode='w+')
         writer = csv.DictWriter(f, fieldnames=fields)
         writer.writeheader()
         for row in data:

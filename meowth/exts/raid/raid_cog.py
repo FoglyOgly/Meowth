@@ -934,7 +934,7 @@ class RaidCog(Cog):
                 return await raid.set_moveset(move2)
     
     @command(aliases=['timer'], category="Raid Info")
-    @raid_checks.raid_channel()
+    @raid_checks.raid_or_meetup()
     @raid_checks.bot_has_permissions()
     async def timerset(self, ctx, *, newtime):
         """Set the raid's hatch time or expire time.

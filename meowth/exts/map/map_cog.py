@@ -1,5 +1,6 @@
 from meowth import Cog, command, bot
 from discord.ext import commands
+import discord
 from meowth.utils.fuzzymatch import get_match, get_matches
 from meowth.utils import formatters
 import pywraps2 as s2
@@ -631,6 +632,23 @@ class Mapper(Cog):
             rows.append(valid_data)
         insert.rows(rows)
         await insert.commit(do_update=True)
+    
+    async def csv_from_gyms(self, guildid):
+        bot = self.bot
+        gyms_table = bot.dbi.table('gyms')
+        query = gyms_table.query
+        query.where(guild=guildid)
+        data = await query.get()
+        if not data:
+            return
+        fields = ['name', 'nickname', 'lat', 'lon', 'exraid']
+        f = open(f'gyms_{guildid}.csv', 'r+')
+        writer = csv.DictWriter(f, fieldnames=fields)
+        writer.writeheader()
+        for row in data:
+            writer.writerow(dict(row))
+        return f
+        
 
     async def stops_from_csv(self, guildid, file):
         bot = self.bot
@@ -780,11 +798,11 @@ class Mapper(Cog):
 
     @command()
     @commands.has_permissions(manage_guild=True)
-    async def listgyms(self, ctx):
+    async def exportgyms(self, ctx):
         guild_id = ctx.guild.id
-        table = ctx.bot.dbi.table('gyms')
-        query = table.query
-        query.where(guild=guild_id)
+        f = await self.csv_from_gyms(guild_id)
+        to_send = discord.File(f, filename=f'{ctx.guild.name}_gyms.csv')
+        await ctx.send(file=to_send)
 
     @staticmethod
     async def get_travel_times(bot, origins: List[int], dests: List[int]):

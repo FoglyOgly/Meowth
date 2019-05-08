@@ -315,7 +315,7 @@ class WildCog(Cog):
                 loc_id = 'gym/' + str(location.id)
             elif isinstance(location, Pokestop):
                 loc_id = 'pokestop/' + str(location.id)
-            channel_list = await location.get_all_channels()
+            channel_list = await location.get_all_channels('wild')
             report_channels.extend(channel_list)
         else:
             loc_id = f'{location.city}/{location.arg}'

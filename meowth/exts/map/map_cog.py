@@ -643,14 +643,12 @@ class Mapper(Cog):
         if not data:
             return
         fields = ['name', 'nickname', 'lat', 'lon', 'exraid']
-        f = io.StringIO()
-        writer = csv.DictWriter(f, fieldnames=fields)
+        fields = [x.encode() for x in fields]
+        f = io.BytesIO()
+        writer = csv.DictWriter(f, fieldnames=fields, extrasaction='ignore')
         writer.writeheader()
         for row in data:
             row = dict(row)
-            del row['guild']
-            del row['id']
-            del row['l10']
             writer.writerow(row)
         return f
         

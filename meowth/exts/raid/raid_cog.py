@@ -435,7 +435,7 @@ class RaidCog(Cog):
             end = hatch + 60*ctx.bot.raid_info.raid_times[level][1]
         else:
             boss = await RaidBoss.convert(ctx, level_or_boss)
-            level = boss.raid_level
+            level = await boss.raid_level()
             if not endtime or endtime > ctx.bot.raid_info.raid_times[level][1]:
                 end = time.time() + 60*ctx.bot.raid_info.raid_times[level][1]
             else:

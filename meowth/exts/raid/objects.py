@@ -33,13 +33,18 @@ class RaidBoss(Pokemon):
         self.chargeMoveid = pkmn.chargeMoveid
         self.chargeMove2id = None
 
-    
+    async def boss_data(self):
+        table = self.bot.dbi.table('raid_bosses')
+        query = table.query
+        query.where(pokemon_id=self.id)
+        return await query.get()
 
-    @property
-    def raid_level(self):
-        for level in self.bot.raid_info.raid_lists:
-            if self.id in self.bot.raid_info.raid_lists[level]:
-                return level
+    async def raid_level(self):
+        boss_data = await self.boss_data()
+        if not boss_data:
+            return None
+        level = boss_data['level']
+        return level
 
     async def _shiny_available(self):
         if not await super()._shiny_available():

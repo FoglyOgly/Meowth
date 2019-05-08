@@ -803,10 +803,22 @@ class Mapper(Cog):
     @command()
     @commands.has_permissions(manage_guild=True)
     async def exportgyms(self, ctx):
+        """Exports the current server's gyms to a CSV file."""
         guild_id = ctx.guild.id
         f = await self.csv_from_gyms(guild_id)
         to_send = discord.File(f, filename=f'{ctx.guild.name}_gyms.csv')
         await ctx.send(file=to_send)
+    
+    @command()
+    @commands.has_permissions(manage_guild=True)
+    async def cleargyms(self, ctx):
+        """Deletes all the current server's gyms from the database."""
+        guild_id = ctx.guild.id
+        table = ctx.bot.dbi.table('gyms')
+        query = table.query
+        query.where(guild=guild_id)
+        await query.delete()
+        return await ctx.send("Gyms deleted")
 
     @staticmethod
     async def get_travel_times(bot, origins: List[int], dests: List[int]):

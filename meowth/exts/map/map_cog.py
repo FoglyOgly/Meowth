@@ -643,13 +643,13 @@ class Mapper(Cog):
         if not data:
             return
         fields = ['name', 'nickname', 'lat', 'lon', 'exraid']
-        fields = [x.encode() for x in fields]
-        f = io.BytesIO()
+        infile = io.StringIO()
         writer = csv.DictWriter(f, fieldnames=fields, extrasaction='ignore')
         writer.writeheader()
         for row in data:
             row = dict(row)
             writer.writerow(row)
+        f = infile.encode()
         return f
         
 

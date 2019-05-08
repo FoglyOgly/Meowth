@@ -43,6 +43,7 @@ class RaidBoss(Pokemon):
         boss_data = await self.boss_data()
         if not boss_data:
             return None
+        boss_data = boss_data[0]
         level = boss_data['level']
         return level
 

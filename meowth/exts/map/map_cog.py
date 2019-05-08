@@ -649,7 +649,8 @@ class Mapper(Cog):
         for row in data:
             row = dict(row)
             writer.writerow(row)
-        f = infile.encode()
+        outstr = infile.read().encode()
+        f = io.BytesIO(outstr)
         return f
         
 

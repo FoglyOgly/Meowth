@@ -644,7 +644,7 @@ class Mapper(Cog):
             return
         fields = ['name', 'nickname', 'lat', 'lon', 'exraid']
         infile = io.StringIO()
-        writer = csv.DictWriter(f, fieldnames=fields, extrasaction='ignore')
+        writer = csv.DictWriter(infile, fieldnames=fields, extrasaction='ignore')
         writer.writeheader()
         for row in data:
             row = dict(row)

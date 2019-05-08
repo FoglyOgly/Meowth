@@ -806,6 +806,8 @@ class Mapper(Cog):
         """Exports the current server's gyms to a CSV file."""
         guild_id = ctx.guild.id
         f = await self.csv_from_gyms(guild_id)
+        if not f:
+            return await ctx.send('No gyms found')
         to_send = discord.File(f, filename=f'{ctx.guild.name}_gyms.csv')
         await ctx.send(file=to_send)
     

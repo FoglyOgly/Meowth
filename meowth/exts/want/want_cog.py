@@ -90,8 +90,11 @@ class Want():
         for member in members:
             # if member == author:
             #     continue
-            msg = await member.send(content, embed=embed)
-            msgs.append(f"{msg.channel.id}/{msg.id}")
+            try:
+                msg = await member.send(content, embed=embed)
+                msgs.append(f"{msg.channel.id}/{msg.id}")
+            except:
+                pass
         return msgs
 
     async def is_role(self):

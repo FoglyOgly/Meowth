@@ -547,7 +547,7 @@ class Raid:
                 dt = self.local_datetime(group['starttime'])
                 time = dt.strftime('%I:%M %p')
                 est = str(round(group['est_power']*100))
-                if est != 0:
+                if est != '0':
                     grp_str = f"{emoji}: Starting {time} ({est}%)"
                 else:
                     grp_str = f"{emoji}: Starting {time}"

@@ -527,10 +527,10 @@ class Tutorial(Cog):
                     return
 
             # start research
-            if 'research' in enabled:
-                completed = await self.research_tutorial(ctx)
-                if not completed:
-                    return
+            # if 'research' in enabled:
+            #     completed = await self.research_tutorial(ctx)
+            #     if not completed:
+            #         return
 
             # start team
             if 'users' in enabled:

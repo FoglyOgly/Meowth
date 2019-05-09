@@ -2853,12 +2853,12 @@ class RSVPEmbed():
 
         status_str = raid.status_str
         team_str = raid.team_str
-
         fields = {
             "Status List": status_str,
             "Team List": team_str
         }
-
+        grps_str = raid.grps_str + "\u200b"
+        fields['Groups'] = (False, grps_str)
         embed = formatters.make_embed(icon=RSVPEmbed.raid_icon, title="Current RSVP Totals",
             fields=fields, footer="Ending", footer_icon=RSVPEmbed.footer_icon)
         embed.timestamp = enddt

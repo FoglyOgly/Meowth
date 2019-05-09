@@ -958,7 +958,7 @@ class Raid:
                     egg_embed.status_str = self.status_str
                     egg_embed.team_str = self.team_str
                     egg_embed.boss_str = await self.boss_list_str()
-                    egg_embed.grps_str = self.grps_str
+                    egg_embed.grps_str = "Groups", self.grps_str
                     embed = egg_embed.embed
                     has_embed = True
                 else:
@@ -2902,6 +2902,7 @@ class EggEmbed():
     team_index = 3
     boss_list_index = 4
     weather_index = 1
+    group_index = 5
 
     def set_weather(self, weather_str, boss_list_str):
         self.embed.set_field_at(EggEmbed.weather_index, name="Weather", value=weather_str)
@@ -2931,6 +2932,14 @@ class EggEmbed():
     @boss_str.setter
     def boss_str(self, boss_str):
         self.embed.set_field_at(EggEmbed.boss_list_index, name="Boss Interest", value=boss_str)
+    
+    @property
+    def grps_str(self):
+        return self.embed.fields[EggEmbed.group_index].value
+    
+    @grps_str.setter
+    def grps_str(self, grps_tuple):
+        self.embed.set_field_at(EggEmbed.group_index, name=grps_tuple[0], value=grps_tuple[1])
 
     
 
@@ -2967,6 +2976,8 @@ class EggEmbed():
             "Team List": team_str,
             "Boss Interest:": boss_str,
         }
+        grps_str = raid.grps_str + "\u200b"
+        fields['Groups'] = (False, grps_str)
         footer_text = "Hatching"
         embed = formatters.make_embed(icon=EggEmbed.raid_icon, title=directions_text,
             thumbnail=egg_img_url, title_url=directions_url, # msg_colour=color,

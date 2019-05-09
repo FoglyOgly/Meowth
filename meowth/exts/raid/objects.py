@@ -2694,7 +2694,7 @@ class RaidEmbed():
     
     @grps_str.setter
     def grps_str(self, grps_tuple):
-        self.embed.set_field_at(RaidEmbed.group_index, name=grps_tuple[0], value=grps_tuple[1])
+        self.embed.set_field_at(RaidEmbed.group_index, name=grps_tuple[0], value=grps_tuple[1], inline=False)
 
 
 
@@ -2939,7 +2939,7 @@ class EggEmbed():
     
     @grps_str.setter
     def grps_str(self, grps_tuple):
-        self.embed.set_field_at(EggEmbed.group_index, name=grps_tuple[0], value=grps_tuple[1])
+        self.embed.set_field_at(EggEmbed.group_index, name=grps_tuple[0], value=grps_tuple[1], inline=False)
 
     
 

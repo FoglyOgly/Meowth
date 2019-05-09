@@ -554,7 +554,7 @@ class Raid:
                 grps_str.append(grp_str)
         if ungrp_est != '0':
             grps_str.append(f"Ungrouped: ({ungrp_est}%)")
-        return "\n".join(grps_str)
+        return "\n".join(grps_str) + '\u200b'
     
     @property
     def grpd_users(self):

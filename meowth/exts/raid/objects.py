@@ -552,7 +552,7 @@ class Raid:
                 else:
                     grp_str = f"{emoji}: Starting {time}"
                 grps_str.append(grp_str)
-        if ungrp_est:
+        if ungrp_est != '0':
             grps_str.append(f"Ungrouped: ({ungrp_est}%)")
         return "\n".join(grps_str)
     

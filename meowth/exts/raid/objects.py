@@ -1944,6 +1944,8 @@ class Raid:
         end = data['endtime']
         raid_id = data['id']
         raid = cls(raid_id, bot, guild_id, report_channel_id, gym, level=level, pkmn=boss, hatch=hatch, end=end)
+        if not pkmnid:
+            await raid.get_boss_list()
         raid.channel_ids = data.get('channels')
         raid.message_ids = data.get('messages')
         raid.train_msgs = data.get('train_msgs')

@@ -2148,6 +2148,7 @@ class Train:
     async def possible_raids(self):
         idlist = await self.report_channel.get_all_raids()
         raid_list = [Raid.instances.get(x) for x in idlist if Raid.instances.get(x)]
+        raid_list = [x for x in raid_list if x.level != 'EX']
         return raid_list
     
     async def select_raid(self, raid):
@@ -3135,7 +3136,6 @@ class TrainEmbed():
             'Current Raid': current_raid_str,
             'Team List': team_str
         }
-        print(fields)
         embed = formatters.make_embed(title=title, fields=fields)
         return cls(embed)
 

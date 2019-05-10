@@ -686,7 +686,7 @@ class Raid:
                     await message.remove_reaction(emoji, user)
                     await self.join_grp(payload.user_id, group)
                     if not old_status:
-                        new_status = 'maybe'
+                        new_status = 'coming'
         if emoji == '\u2754':
             await message.remove_reaction(emoji, user)
             return await formatters.get_raid_help('!', self.bot.user.avatar_url, user)

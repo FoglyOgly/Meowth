@@ -327,7 +327,10 @@ class POI():
     
     async def _coords(self):
         data = self._data
-        record = (await data.get())[0]
+        data = await data.get()
+        if not data:
+            return None
+        record = data[0]
         return (record['lat'], record['lon'])
 
     async def _L10(self):
@@ -361,6 +364,8 @@ class POI():
     
     async def url(self):
         lat, lon = await self._coords()
+        if not lat:
+            return ''
         prefix = "https://www.google.com/maps/dir/?api=1&"
         prefix += f"destination={lat},{lon}"
         prefix += "&dir_action=navigate"

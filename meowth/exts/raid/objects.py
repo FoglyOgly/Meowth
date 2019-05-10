@@ -1993,7 +1993,8 @@ class Raid:
         if self.channel_ids:
             channel = self.bot.get_channel(int(self.channel_ids[0]))
             if not channel:
-                return await self.expire_raid()
+                self.bot.loop.create_task(self.expire_raid())
+                return None
             channel_str = channel.mention
             summary_str += f' | {channel_str}'
         summary_str += f"\n{post_str}"
@@ -2371,7 +2372,10 @@ class Train:
         for i in range(len(raids)):
             x = raids[i]
             e = react_list[i]
-            summary = f'{e} {await x.summary_str()}'
+            summary_str = await x.summary_str()
+            if not summary_str:
+                continue
+            summary = f'{e} {summary_str}'
             if x.gym.id in dest_dict:
                 travel = f'Travel Time: {dest_dict[x.gym.id]//60} mins'
             else:

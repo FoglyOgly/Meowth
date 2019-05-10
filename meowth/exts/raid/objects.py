@@ -2188,7 +2188,8 @@ class Train:
     async def finish_current_raid(self):
         raid = self.current_raid
         self.done_raids.append(raid)
-        raid.channel_ids.remove(str(self.channel_id))
+        if str(self.channel_id) in raid.channel_ids:
+            raid.channel_ids.remove(str(self.channel_id))
         for msgid in raid.message_ids:
             if msgid.startswith(str(self.channel_id)):
                 try:

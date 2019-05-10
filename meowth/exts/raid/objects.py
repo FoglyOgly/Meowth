@@ -2355,7 +2355,7 @@ class Train:
             choice_dict = dict(zip(react_list, raids))
             return choice_dict[str(emoji)]
         else:
-            return 
+            return
     
     async def display_choices(self, raids, react_list):
         dest_dict = {}
@@ -3135,6 +3135,7 @@ class TrainEmbed():
             'Current Raid': current_raid_str,
             'Team List': team_str
         }
+        print(fields)
         embed = formatters.make_embed(title=title, fields=fields)
         return cls(embed)
 

@@ -2300,6 +2300,7 @@ class Train:
             return await self.report_channel.channel.send("No raids reported! Report a raid before starting a train!")
         react_list = formatters.mc_emoji(len(raids))
         content = "Select your first raid from the list below!"
+        multi = None
         async for embed in self.display_choices(raids, react_list):
             multi = await self.report_channel.channel.send(content, embed=embed)
             content = ""
@@ -2318,6 +2319,7 @@ class Train:
         raids = [x for x in raids if x not in self.done_raids and x.status != 'expired']
         react_list = formatters.mc_emoji(len(raids))
         content = "Vote on the next raid from the list below!"
+        multi = None
         async for embed in self.display_choices(raids, react_list):
             multi = await self.channel.send(content, embed=embed)
             content = ""
@@ -2326,13 +2328,15 @@ class Train:
         self.poll_task = self.bot.loop.create_task(self.get_poll_results(multi, raids, react_list))
         
     async def get_poll_results(self, multi, raids, react_list):
-        multitask = self.bot.loop.create_task(formatters.poll(self.bot, [multi],
-            react_list=react_list))
-        try:
-            results = await multitask
-        except asyncio.CancelledError:
-            multitask.cancel()
-            results = await multitask
+        results = None
+        if multi:
+            multitask = self.bot.loop.create_task(formatters.poll(self.bot, [multi],
+                react_list=react_list))
+            try:
+                results = await multitask
+            except asyncio.CancelledError:
+                multitask.cancel()
+                results = await multitask
         if results:
             emoji = results[0][0]
             count = results[0][1]

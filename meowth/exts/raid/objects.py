@@ -1992,6 +1992,8 @@ class Raid:
         summary_str = f'{pre_str} {gym_str}**\nRSVPs: {status_str}'
         if self.channel_ids:
             channel = self.bot.get_channel(int(self.channel_ids[0]))
+            if not channel:
+                return await self.expire_raid()
             channel_str = channel.mention
             summary_str += f' | {channel_str}'
         summary_str += f"\n{post_str}"

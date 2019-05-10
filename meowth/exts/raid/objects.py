@@ -656,8 +656,13 @@ class Raid:
         return datetime.now(tz=localzone)
     
     def local_datetime(self, stamp):
+        if not stamp:
+            return None
         zone = self.tz
-        localzone = timezone(zone)
+        if not zone:
+            localzone = None
+        else:
+            localzone = timezone(zone)
         return datetime.fromtimestamp(stamp, tz=localzone)
     
     async def process_reactions(self, payload):

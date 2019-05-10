@@ -2424,7 +2424,11 @@ class Train:
         embed = await TRaidEmbed.from_raid(self, raid)
         content = "Use the reaction below to vote for this raid next!"
         msg = await self.channel.send(content, embed=embed.embed)
+        self.report_msg_ids.append(msg.id)
+        Raid.by_trainreport[msg.id] = new_raid
+        new_raid.train_msgs.append(f'{msg.channel.id}/{msg.id}')
         await msg.add_reaction('\u2b06')
+        await self.upsert()
         
     async def update_rsvp(self, user_id, status):
         self.trainer_dict = await self.get_trainer_dict()

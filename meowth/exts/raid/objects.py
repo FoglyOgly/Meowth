@@ -2425,8 +2425,8 @@ class Train:
         content = "Use the reaction below to vote for this raid next!"
         msg = await self.channel.send(content, embed=embed.embed)
         self.report_msg_ids.append(msg.id)
-        Raid.by_trainreport[msg.id] = new_raid
-        new_raid.train_msgs.append(f'{msg.channel.id}/{msg.id}')
+        Raid.by_trainreport[msg.id] = raid
+        raid.train_msgs.append(f'{msg.channel.id}/{msg.id}')
         await msg.add_reaction('\u2b06')
         await self.upsert()
         

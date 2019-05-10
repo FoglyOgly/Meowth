@@ -833,7 +833,7 @@ class RaidCog(Cog):
         ctx._tz = raid.tz
         old_rsvp = raid.trainer_dict.get(ctx.author.id, {})
         old_status = old_rsvp.get('status')
-        if not old_status:
+        if not old_status or old_status == 'maybe':
             await self.rsvp(ctx, "coming")
         group_table = ctx.bot.dbi.table('raid_groups')
         insert = group_table.insert()

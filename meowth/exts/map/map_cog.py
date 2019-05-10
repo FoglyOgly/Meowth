@@ -329,7 +329,7 @@ class POI():
         data = self._data
         data = await data.get()
         if not data:
-            return None
+            return None, None
         record = data[0]
         return (record['lat'], record['lon'])
 

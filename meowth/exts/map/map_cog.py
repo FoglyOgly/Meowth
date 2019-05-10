@@ -862,6 +862,8 @@ class Mapper(Cog):
             d_gyms = [Gym(bot, x) for x in d_list]
             o_coords = [await x._coords() for x in o_gyms]
             d_coords = [await x._coords() for x in d_gyms]
+            o_coords = [x for x in o_coords if x]
+            d_coords = [x for x in d_coords if x]
             matrix = bot.gmaps.distance_matrix(o_coords, d_coords)
             insert = table.insert
             for i in range(len(o_list)):

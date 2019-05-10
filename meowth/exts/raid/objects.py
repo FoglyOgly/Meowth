@@ -2553,14 +2553,17 @@ class Train:
         cls.by_channel[channel_id] = train
         for msgid in message_ids:
             cls.by_message[msgid] = train
-        idstring = multi_msg_ids[-1]
-        chn, multi = await ChannelMessage.from_id_string(bot, idstring)
-        raids = await train.possible_raids()
-        if train.current_raid:
-            raids.remove(train.current_raid)
-        raids = [x for x in raids if x not in train.done_raids and x.status != 'expired']
-        react_list = formatters.mc_emoji(len(raids))
-        train.poll_task = bot.loop.create_task(train.get_poll_results(multi, raids, react_list))
+        if multi_msg_ids:
+            idstring = multi_msg_ids[-1]
+            chn, multi = await ChannelMessage.from_id_string(bot, idstring)
+            raids = await train.possible_raids()
+            if train.current_raid:
+                raids.remove(train.current_raid)
+            raids = [x for x in raids if x not in train.done_raids and x.status != 'expired']
+            react_list = formatters.mc_emoji(len(raids))
+            train.poll_task = bot.loop.create_task(train.get_poll_results(multi, raids, react_list))
+        else:
+            bot.loop.create_task(train.poll_next_raid())
         return train
 
 class ReportEmbed():

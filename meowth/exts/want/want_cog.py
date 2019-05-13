@@ -1,6 +1,8 @@
 from meowth import Cog, command, bot, checks
 from meowth.exts.pkmn import Pokemon
 from meowth.utils import fuzzymatch
+from . import want_checks
+from .errors import *
 
 import discord
 from discord.ext import commands
@@ -166,13 +168,23 @@ class Want():
         if pkmn:
             family = await pkmn._familyId()
             return cls(ctx.bot, family, ctx.guild.id)
+        else:
+            raise InvalidWant
 
 class WantCog(Cog):
 
     def __init__(self, bot):
         self.bot = bot
     
+    @Cog.listener()
+    async def on_command_error(self, ctx, error):
+        if isinstance(error, WantDisabled):
+            return await ctx.error('Want commands disabled in current channel.')
+        elif isinstance(error, InvalidWant):
+            return await ctx.error('Invalid Want')
+    
     @command()
+    @want_checks.want_enabled()
     async def want(self, ctx, wants: commands.Greedy[Want]):
         added_wants = []
         for want in wants:
@@ -183,6 +195,7 @@ class WantCog(Cog):
         await ctx.success(title="Wants Added", details="\n".join(added_wants))
     
     @command()
+    @want_checks.want_enabled()
     async def unwant(self, ctx, wants: commands.Greedy[Want]):
         removed_wants = []
         for want in wants:
@@ -193,6 +206,7 @@ class WantCog(Cog):
         await ctx.success(title="Wants Removed", details="\n".join(removed_wants))
     
     @command()
+    @want_checks.want_enabled()
     async def listwants(self, ctx):
         user_id = ctx.author.id
         table = ctx.bot.dbi.table('wants')

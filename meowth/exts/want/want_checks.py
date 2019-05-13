@@ -1,4 +1,5 @@
 from discord.ext import commands
+from .errors import *
 
 async def check_bot_permissions(ctx):
     me = ctx.guild.me
@@ -24,6 +25,8 @@ async def is_want_enabled(ctx):
     query = report_table.query('users')
     query.where(channelid=ctx.channel.id)
     want = await query.get_value()
+    if not want:
+        raise WantDisabled
     return want
 
 def want_enabled():

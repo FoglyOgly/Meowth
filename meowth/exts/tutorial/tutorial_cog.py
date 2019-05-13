@@ -374,23 +374,7 @@ class Tutorial(Cog):
             f"**{prefix}counters**  command will DM you your own counters "
             "pulled from your Pokebox.")
 
-        await asyncio.sleep(1)
-        await tutorial_channel.send(
-            "Last thing: if you need to update the expiry time, use "
-            f"**{prefix}timerset <minutes left>**\n\n"
-            "Feel free to play around with the commands here for a while. "
-            f"When you're finished, type `{prefix}timerset 0` and the "
-            "raid will expire.")
-
-        # wait for timerset command completion
-        try:
-            await self.wait_for_cmd(
-                tutorial_channel, ctx.author, 'timerset')
-
-        # if no response for 5 minutes, close tutorial
-        except asyncio.TimeoutError:
-            await timeout_raid('timerset', raid=raid)
-            return False
+        await asyncio.sleep(15)
 
         return True
 

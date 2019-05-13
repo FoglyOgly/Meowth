@@ -217,7 +217,8 @@ class Bot(commands.AutoShardedBot):
         ctx = await self.get_context(message, cls=Context)
         if not ctx.command:
             return
-        await self.invoke(ctx)
+        async with ctx.typing():
+            await self.invoke(ctx)
 
     def match(self, data_list, item):
         result = fuzzymatch.get_match(data_list, item)[0]
@@ -278,7 +279,7 @@ class Bot(commands.AutoShardedBot):
         await self.change_presence(status=discord.Status.idle)
 
     async def on_shard_ready(self, shard_id):
-        await self.change_presence(status=discord.Status.online, shard_id=shard_id)
+        await self.change_presence(status=discord.Status.online, shard_id=shard_id, activity=discord.Game(name="Pokemon Go"))
         print(f'Shard {shard_id} is ready.')
 
     async def on_ready(self):

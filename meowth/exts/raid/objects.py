@@ -1604,6 +1604,15 @@ class Raid:
         for row in data:
             embed = formatters.deleted_message_embed(self.bot, row)
             await channel.send(embed=embed)
+        raid_table = self.bot.dbi.table('raids')
+        query = raid_table.query().where(id=self.id)
+        self.bot.loop.create_task(query.delete())
+        rsvp_table = self.bot.dbi.table('raid_rsvp')
+        rsvp = rsvp_table.query().where(raid_id=self.id)
+        self.bot.loop.create_task(rsvp.delete())
+        grp_table = self.bot.dbi.table('raid_groups')
+        grps = grp_table.query().where(raid_id=self.id)
+        self.bot.loop.create_task(grps.delete())
 
 
 

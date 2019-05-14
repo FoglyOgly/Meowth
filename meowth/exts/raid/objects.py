@@ -2809,12 +2809,12 @@ class RaidEmbed():
             ctrs_str = []
             for ctr in ctrs_list:
                 name = await ctr.name()
-                fast = Move(self.bot, ctr.quickMoveid)
+                fast = Move(raid.bot, ctr.quickMoveid)
                 fast_name = await fast.name()
                 if await fast.is_legacy(ctr.id):
                     fast_name += " (Legacy)"
                 fast_emoji = await fast.emoji()
-                charge = Move(self.bot, ctr.chargeMoveid)
+                charge = Move(raid.bot, ctr.chargeMoveid)
                 charge_name = await charge.name()
                 if await charge.is_legacy(ctr.id):
                     charge_name += " (Legacy)"

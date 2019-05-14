@@ -28,8 +28,6 @@ class DatabaseInterface:
         self.dsn = "postgres://{}:{}@{}:{}/{}".format(
             username, password, hostname, port, database)
         self.pool = None
-        self.prefix_conn = None
-        self.prefix_stmt = None
         self.settings_conn = None
         self.settings_stmt = None
         self.raid_listener = None
@@ -44,6 +42,7 @@ class DatabaseInterface:
         self.pool = await asyncpg.create_pool(
             self.dsn, loop=loop, init=init_conn)
         await self.prepare()
+        
 
     async def recreate_pool(self):
         logger.warning(f'Re-creating closed database pool.')
@@ -53,11 +52,6 @@ class DatabaseInterface:
     async def prepare(self):
         # ensure tables exists
         await self.core_tables_exist()
-
-        # guild prefix callable statement
-        self.prefix_conn = await self.pool.acquire()
-        prefix_sql = 'SELECT prefix FROM prefixes WHERE guild_id=$1;'
-        self.prefix_stmt = await self.prefix_conn.prepare(prefix_sql)
 
         # guild settings statement
         self.settings_conn = await self.pool.acquire()
@@ -78,7 +72,7 @@ class DatabaseInterface:
                 logger.warning(f'Core table {k} created.')
 
     async def stop(self):
-        conns = (self.prefix_conn, self.settings_conn, self.listener_conn)
+        conns = (self.settings_conn, self.listener_conn)
         for c in conns:
             if c:
                 await self.pool.release(c)
@@ -91,16 +85,8 @@ class DatabaseInterface:
 
         Returns a guild-specific prefix if it has been set. If not,
         returns the default prefix.
-
-        Uses a prepared statement to ensure caching.
         """
-        default_prefix = bot.default_prefix
-        if message.guild:
-            g_prefix = await self.prefix_stmt.fetchval(message.guild.id)
-            prefix = g_prefix if g_prefix else default_prefix
-        else:
-            prefix = default_prefix
-
+        prefix = bot.prefixes.get(message.guild.id, bot.default_prefix)
         return when_mentioned_or(prefix)(bot, message)
 
     async def execute_query(self, query, *query_args):

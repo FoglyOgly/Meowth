@@ -97,6 +97,9 @@ class Bot(commands.AutoShardedBot):
                 f"The database '{db_name}' was not found. "
                 "Please fix the config file and try again.")
             sys.exit(0)
+        prefix_table = self.dbi.table('prefix')
+        results = await prefix_table.query.get()
+        self.prefixes = dict(results)
 
     async def send_cmd_help(self, ctx, **kwargs):
         """Function to invoke help output for a command.

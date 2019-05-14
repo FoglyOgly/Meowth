@@ -859,7 +859,10 @@ class RaidCog(Cog):
         await insert.commit()
         raid.group_list.append(d)
         for idstring in raid.message_ids:
-            chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+            try:
+                chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+            except:
+                continue
             await msg.add_reaction(emoji)
         return await raid.join_grp(ctx.author.id, d)
     

@@ -96,12 +96,16 @@ class Pokemon():
         charge2_move = Move(self.bot, charge2) if charge2 else None
         if quick_move:
             quick_name = await quick_move.name()
+            if await quick_move.is_legacy(self.id):
+                quick_name += " (Legacy)"
             quick_emoji = await quick_move.emoji()
         else:
             quick_name = "Unknown"
             quick_emoji = ""
         if charge_move:
             charge_name = await charge_move.name()
+            if await charge_move.is_legacy(self.id):
+                charge_name += " (Legacy)"
             charge_emoji = await charge_move.emoji()
         else:
             charge_name = "Unknown"
@@ -109,6 +113,8 @@ class Pokemon():
         moveset_str = f"{quick_name} {quick_emoji}| {charge_name} {charge_emoji}"
         if charge2_move:
             charge2_name = await charge2_move.name()
+            if await charge2_move.is_legacy(self.id):
+                charge2_name += " (Legacy)"
             charge2_emoji = await charge2_move.emoji()
             moveset_str += f'| {charge2_name} {charge2_emoji}'
         return moveset_str
@@ -469,7 +475,11 @@ class Pokemon():
         for movedoc in movesets_query:
             moves.append(movedoc['moveid'])
         return moves
-    
+
+    async def legacy_moves(self):
+        moves = await self.bot.dbi.table('movesets').query('moveid').where(
+            pokemonid=self.id).where(legacy=True).get_values()
+        return moves
     
     async def fast_moves(self):
         moves = await self.moves()
@@ -507,20 +517,30 @@ class Pokemon():
         # color = await self.color()
         fast_moves = await self.fast_moves()
         fast_move_names = []
+        legacy_fast_move_names = []
         for x in fast_moves:
             move = Move(self.bot, x)
             name = await move.name()
             emoji = await move.emoji()
-            fast_move_names.append(name+' '+emoji)
+            if await move.is_legacy(self.id):
+                legacy_fast_move_names.append(name+'* '+emoji)
+            else:
+                fast_move_names.append(name+' '+emoji)
         fast_moves_str = "\n".join(fast_move_names)
+        fast_moves_str += "\n".join(legacy_fast_move_names)
         charge_moves = await self.charge_moves()
         charge_move_names = []
+        legacy_charge_move_names = []
         for x in charge_moves:
             move = Move(self.bot, x)
             name = await move.name()
             emoji = await move.emoji()
-            charge_move_names.append(name+' '+emoji)
+            if await move.is_legacy(self.id):
+                legacy_charge_move_names.append(name+'* '+emoji)
+            else:
+                charge_move_names.append(name+' '+emoji)
         charge_moves_str = "\n".join(charge_move_names)
+        charge_moves_str += "\n".join(legacy_charge_move_names)
         embed_desc = f"#{num} {pkmn_name} - {category}\n```{description}```"
         weather_str = await self.weather_str()
         # author_icon = type icon TODO
@@ -538,7 +558,8 @@ class Pokemon():
             content=embed_desc,
             # msg_colour = color,
             thumbnail = sprite_url,
-            fields = fields
+            fields = fields,
+            footer = '* denotes legacy move'
         )
         return embed
     
@@ -655,6 +676,15 @@ class Pokemon():
                     self.cp = calc_cp
             if self.chargeMove2id:
                 self.chargeMove2id = None
+        if context == 'wild' or context == 'raid':
+            if self.quickMoveid or self.chargeMoveid:
+                legacy_moves = await self.legacy_moves()
+            if self.quickMoveid in legacy_moves:
+                raise MoveInvalidLegacy(self, self.quickMoveid)
+            elif self.chargeMoveid in legacy_moves:
+                raise MoveInvalidLegacy(self, self.chargeMoveid)
+            elif self.chargeMove2id in legacy_moves:
+                raise MoveInvalidLegacy(self, self.chargeMove2id)
         return self
     
     async def get_info_from_arg(self, bot, arg):
@@ -876,6 +906,12 @@ class Move:
         is_fast = await data.select('fast').get_value()
         return is_fast
     
+    async def is_legacy(self, pkmn_id):
+        movesets_table = self.bot.dbi.table('movesets')
+        query = movesets_table.query('legacy')
+        query.where(pokemonid=pkmn_id)
+        query.where(moveid=self.id)
+        return await query.get_value()    
     
     async def _type(self):
         data = self._data
@@ -1010,6 +1046,11 @@ class Pokedex(Cog):
             move_name = await move.name()
             pokemon_name = await error.pokemon.name()
             await ctx.error(f'{pokemon_name} does not learn {move_name}.')
+        elif isinstance(error, MoveInvalidLegacy):
+            move = Move(self.bot, error.move)
+            move_name = await move.name()
+            pokemon_name = await error.pokemon.name()
+            await ctx.error(f'Legacy move {move_name} invalid in current context.')
 
     @command()
     async def pokedex(self, ctx, *, pokemon: Pokemon):

@@ -220,8 +220,7 @@ class Bot(commands.AutoShardedBot):
         ctx = await self.get_context(message, cls=Context)
         if not ctx.command:
             return
-        async with ctx.typing():
-            await self.invoke(ctx)
+        await self.invoke(ctx)
 
     def match(self, data_list, item):
         result = fuzzymatch.get_match(data_list, item)[0]

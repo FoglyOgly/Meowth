@@ -212,9 +212,9 @@ class Core(Cog):
         invite_str = "[Invite Me!]({})".format(bot.invite_url)
 
         if ctx.guild:
-            prefix = await ctx.bot.dbi.prefix_stmt.fetchval(ctx.guild.id)
-        if not prefix:
-            prefix = ctx.bot.default_prefix
+            prefix = bot.prefixes.get(ctx.guild.id, bot.default_prefix)
+        else:
+            prefix = bot.default_prefix
 
         member_count = 0
         server_count = 0

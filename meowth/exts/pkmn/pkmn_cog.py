@@ -526,8 +526,8 @@ class Pokemon():
                 legacy_fast_move_names.append(name+'* '+emoji)
             else:
                 fast_move_names.append(name+' '+emoji)
+        fast_move_names.extend(legacy_fast_move_names)
         fast_moves_str = "\n".join(fast_move_names)
-        fast_moves_str += "\n".join(legacy_fast_move_names)
         charge_moves = await self.charge_moves()
         charge_move_names = []
         legacy_charge_move_names = []
@@ -539,8 +539,8 @@ class Pokemon():
                 legacy_charge_move_names.append(name+'* '+emoji)
             else:
                 charge_move_names.append(name+' '+emoji)
+        charge_move_names.extend(legacy_charge_move_names)
         charge_moves_str = "\n".join(charge_move_names)
-        charge_moves_str += "\n".join(legacy_charge_move_names)
         embed_desc = f"#{num} {pkmn_name} - {category}\n```{description}```"
         weather_str = await self.weather_str()
         # author_icon = type icon TODO

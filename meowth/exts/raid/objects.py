@@ -1260,9 +1260,13 @@ class Raid:
             name = await ctr.name()
             fast = Move(self.bot, ctr.quickMoveid)
             fast_name = await fast.name()
+            if await fast.is_legacy(ctr.id):
+                fast_name += " (Legacy)"
             fast_emoji = await fast.emoji()
             charge = Move(self.bot, ctr.chargeMoveid)
             charge_name = await charge.name()
+            if await charge.is_legacy(ctr.id):
+                charge_name += " (Legacy)"
             charge_emoji = await charge.emoji()
             ctr_str = f"**{name}**: {fast_name} {fast_emoji} | {charge_name} {charge_emoji}"
             ctrs_str.append(ctr_str)
@@ -2805,18 +2809,16 @@ class RaidEmbed():
             ctrs_str = []
             for ctr in ctrs_list:
                 name = await ctr.name()
-                fast = Move(bot, ctr.quickMoveid)
+                fast = Move(self.bot, ctr.quickMoveid)
                 fast_name = await fast.name()
-                try:
-                    fast_emoji = await fast.emoji()
-                except:
-                    pass
-                charge = Move(bot, ctr.chargeMoveid)
+                if await fast.is_legacy(ctr.id):
+                    fast_name += " (Legacy)"
+                fast_emoji = await fast.emoji()
+                charge = Move(self.bot, ctr.chargeMoveid)
                 charge_name = await charge.name()
-                try:
-                    charge_emoji = await charge.emoji()
-                except:
-                    pass
+                if await charge.is_legacy(ctr.id):
+                    charge_name += " (Legacy)"
+                charge_emoji = await charge.emoji()
                 ctr_str = f"**{name}**: {fast_name} {fast_emoji} | {charge_name} {charge_emoji}"
                 ctrs_str.append(ctr_str)
                 i += 1

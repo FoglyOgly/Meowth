@@ -308,7 +308,7 @@ class Meetup:
         if data['location'].isdigit():
             location = POI(bot, int(data['location']))
         else:
-            city, arg = data['location'].split('/')
+            city, arg = data['location'].split('/', 1)
             location = PartialPOI(bot, city, arg)
         meetup_id = data['id']
         guild_id = data['guild_id']
@@ -1943,7 +1943,7 @@ class Raid:
         if data['gym'].isdigit():
             gym = Gym(bot, int(data['gym']))
         else:
-            city, arg = data['gym'].split('/')
+            city, arg = data['gym'].split('/', 1)
             gym = PartialPOI(bot, city, arg)
         level = data['level']
         guild_id = data['guild']

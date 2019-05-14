@@ -130,14 +130,14 @@ class ReportChannel():
     async def get_all_gyms(self):
         covering = await self.level_10_covering()
         gyms = self.bot.dbi.table('gyms')
-        gyms_query = gyms.query().where(gyms['l10'].in_(covering))
+        gyms_query = gyms.query.where(gyms['l10'].in_(covering))
         gyms_query.where(guild=self.channel.guild.id)
         return gyms_query
     
     async def get_all_stops(self):
         covering = await self.level_10_covering()
         stops = self.bot.dbi.table('pokestops')
-        stops_query = stops.query().where(stops['l10'].in_(covering))
+        stops_query = stops.query.where(stops['l10'].in_(covering))
         stops_query.where(guild=self.channel.guild.id)
         return stops_query
     

@@ -219,13 +219,13 @@ class Wild():
     @classmethod
     async def from_data(cls, bot, data):
         if data['location'].startswith('gym/'):
-            loc_id = data['location'].split('/')[1]
+            loc_id = data['location'].split('/', maxsplit=1)[1]
             location = Gym(bot, int(loc_id))
         elif data['location'].startswith('pokestop/'):
-            loc_id = data['location'].split('/')[1]
+            loc_id = data['location'].split('/', maxsplit=1)[1]
             location = Pokestop(bot, int(loc_id))
         else:
-            city, arg = data['location'].split('/')
+            city, arg = data['location'].split('/', maxsplit=1)
             location = PartialPOI(bot, city, arg)
         guild_id = data['guild']
         pkmn_id = data['pkmn']

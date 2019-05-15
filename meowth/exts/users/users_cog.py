@@ -410,6 +410,7 @@ class Users(Cog):
         user_table = ctx.bot.dbi.table('users')
         query = user_table.query('ign')
         ign_list = await query.get_values()
+        print(ign_list)
         if not ign_list:
             return await ctx.send(f"No match for {ign}")
         match = get_match(ign_list, ign)[0]

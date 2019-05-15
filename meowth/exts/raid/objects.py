@@ -1411,7 +1411,7 @@ class Raid:
             chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
             if not msg:
                 continue
-            if self.channel_ids and str(chn.id) not in self.channel_ids:
+            if self.channel_ids and str(chn.id) not in self.channel_ids and self.status != 'expired':
                 embed = await self.report_embed()
                 try:
                     await msg.edit(content=content, embed=embed)

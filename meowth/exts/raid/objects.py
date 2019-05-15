@@ -650,6 +650,26 @@ class Raid:
                 return f"{self.level}-{gym_name}"
     
     @property
+    def channel_topic(self):
+        topic_str = ""
+        if self.status == 'egg':
+            hatchlocal = self.local_datetime(self.hatch)
+            hatchtimestr = hatchlocal.strftime('%I:%M %p')
+            hatchdatestr = hatchlocal.strftime('%b %d')
+            if self.level == 'EX':
+                topic_str += f"Hatches on {hatchdatestr} at {hatchtimestr} | "
+            else:
+                topic_str += f"Hatches at {hatchtimestr} | "
+        endlocal = self.local_datetime(self.end)
+        endtimestr = endlocal.strftime('%I:%M %p')
+        enddatestr = endlocal.strftime('%b %d')
+        if self.level == 'EX':
+            topic_str += f"Ends on {enddatestr} at {endtimestr}"
+        else:
+            topic_str += f"Ends at {endtimestr}"
+        return topic_str
+    
+    @property
     def current_local_datetime(self):
         zone = self.tz
         localzone = timezone(zone)

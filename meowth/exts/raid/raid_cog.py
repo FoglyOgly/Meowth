@@ -586,17 +586,19 @@ class RaidCog(Cog):
             return await ctx.error(f'Level {level} Raid reports not permitted in this channel')
         if raid_mode != 'message':
             raid_channel_name = await new_raid.channel_name()
+            raid_channel_topic = new_raid.channel_topic
             if len(report_channels) > 1:
                 raid_channel_overwrites = formatters.perms_or(report_channels)
             else:
                 raid_channel_overwrites = dict(ctx.channel.overwrites)
             try:
                 raid_channel = await ctx.guild.create_text_channel(raid_channel_name,
-                    category=category, overwrites=raid_channel_overwrites)
+                    category=category, overwrites=raid_channel_overwrites, topic=raid_channel_topic)
             except discord.Forbidden:
                 raise commands.BotMissingPermissions(['Manage Channels'])
             new_raid.channel_ids.append(str(raid_channel.id))
             raidmsg = await raid_channel.send(reportcontent, embed=embed)
+            await raidmsg.pin()
             for react in react_list:
                 if isinstance(react, int):
                     react = self.bot.get_emoji(react)

@@ -68,7 +68,12 @@ class ChannelMessage:
         channelid = int(ids[0])
         messageid = int(ids[1])
         channel = bot.get_channel(channelid)
-        message = await channel.fetch_message(messageid)
+        if not channel:
+            return None, None
+        try:    
+            message = await channel.fetch_message(messageid)
+        except:
+            return channel, None
         return (channel, message)
 
 

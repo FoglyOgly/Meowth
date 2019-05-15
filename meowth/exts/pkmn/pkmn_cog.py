@@ -679,12 +679,12 @@ class Pokemon():
         if context == 'wild' or context == 'raid':
             if self.quickMoveid or self.chargeMoveid:
                 legacy_moves = await self.legacy_moves()
-            if self.quickMoveid in legacy_moves:
-                raise MoveInvalidLegacy(self, self.quickMoveid)
-            elif self.chargeMoveid in legacy_moves:
-                raise MoveInvalidLegacy(self, self.chargeMoveid)
-            elif self.chargeMove2id in legacy_moves:
-                raise MoveInvalidLegacy(self, self.chargeMove2id)
+                if self.quickMoveid in legacy_moves:
+                    raise MoveInvalidLegacy(self, self.quickMoveid)
+                elif self.chargeMoveid in legacy_moves:
+                    raise MoveInvalidLegacy(self, self.chargeMoveid)
+                elif self.chargeMove2id in legacy_moves:
+                    raise MoveInvalidLegacy(self, self.chargeMove2id)
         return self
     
     async def get_info_from_arg(self, bot, arg):

@@ -925,6 +925,8 @@ class Raid:
             chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
             if not msg:
                 continue
+            if not str(chn.id) in self.channel_ids:
+                continue
             if not has_embed:
                 if self.status == 'active':
                     raid_embed = RaidEmbed(msg.embeds[0])
@@ -967,9 +969,16 @@ class Raid:
         else:
             estimator_20 = None
         has_embed = False
+        has_report_embed = False
         for idstring in self.message_ids:
             chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
             if not msg:
+                continue
+            if str(chn.id) not in self.channel_ids:
+                if not has_report_embed:
+                    report_embed = await self.report_embed()
+                    has_report_embed = True
+                await msg.edit(embed=report_embed)
                 continue
             if not has_embed:
                 if self.status == 'active':
@@ -1300,6 +1309,8 @@ class Raid:
             chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
             if not msg:
                 continue
+            if str(chn.id) not in self.channel_ids:
+                continue
             if not has_embed:
                 raid_embed = RaidEmbed(msg.embeds[0])
                 raid_embed.set_moveset(moveset_str, ctrs_str, rec_str)
@@ -1400,6 +1411,14 @@ class Raid:
             chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
             if not msg:
                 continue
+            if str(chn.id) not in self.channel_ids:
+                embed = await self.report_embed()
+                try:
+                    await msg.edit(content=content, embed=embed)
+                except:
+                    pass
+                msg_list.append(msg)
+                continue
             try:
                 await msg.edit(content=content, embed=embed)
             except:
@@ -1433,9 +1452,10 @@ class Raid:
                 if t:
                     continue
                 new_name = await self.channel_name()
+                new_topic = self.channel_topic
                 if new_name != channel.name:
                     try:
-                        await channel.edit(name=new_name)
+                        await channel.edit(name=new_name, topic=new_topic)
                     except discord.Forbidden:
                         raise commands.BotMissingPermissions(['Manage Channels'])
         if react_list:

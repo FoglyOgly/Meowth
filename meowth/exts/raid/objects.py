@@ -974,7 +974,7 @@ class Raid:
             chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
             if not msg:
                 continue
-            if str(chn.id) not in self.channel_ids:
+            if self.channel_ids and str(chn.id) not in self.channel_ids:
                 if not has_report_embed:
                     report_embed = await self.report_embed()
                     has_report_embed = True
@@ -1309,7 +1309,7 @@ class Raid:
             chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
             if not msg:
                 continue
-            if str(chn.id) not in self.channel_ids:
+            if self.channel_ids and str(chn.id) not in self.channel_ids:
                 continue
             if not has_embed:
                 raid_embed = RaidEmbed(msg.embeds[0])
@@ -1411,7 +1411,7 @@ class Raid:
             chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
             if not msg:
                 continue
-            if str(chn.id) not in self.channel_ids:
+            if self.channel_ids and str(chn.id) not in self.channel_ids:
                 embed = await self.report_embed()
                 try:
                     await msg.edit(content=content, embed=embed)

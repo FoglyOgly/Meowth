@@ -201,6 +201,8 @@ class RaidCog(Cog):
                         return await raid.list_teams(ctx.channel, tags=tags)
                     if 'groups' in ctx.args:
                         return await raid.list_groups(ctx.channel, tags=tags)
+                    if 'bosses' in ctx.args:
+                        return await raid.list_bosses(ctx.channel, tags=tags)
             except NotRaidChannel:
                 pass
         

@@ -1952,6 +1952,37 @@ class Raid:
             return await channel.send(f'Current Raid Groups\n\n{liststr}')
         embed = formatters.make_embed(title="Current Raid Groups", content=liststr)
         return await channel.send(embed=embed)
+    
+    async def list_bosses(self, channel, tags=False):
+        trainer_dict = self.trainer_dict
+        boss_list = self.boss_list
+        boss_dict = {x: [] for x in boss_list
+        for trainer in trainer_dict:
+            member = self.guild.get_member(trainer)
+            if not member:
+                continue
+            if tags:
+                name = member.mention
+            else:
+                name = member.display_name
+            bosses = trainer_dict[trainer]['bosses']
+            party = trainer_dict[trainer]['party']
+            total = sum(party)
+            sumstr = name
+            if total != 1:
+                sumstr += f' ({total})'
+            for x in bosses:
+                boss_dict[x].append(sumstr)
+        boss_str = []
+        for x in boss_dict:
+            pkmn = Pokemon(self.bot, x)
+            pkmn_name = await pkmn.name()
+            boss_str.append(f"{pkmn_name}: {', '.join(boss_dict[x])}")
+        liststr = "\n\n".join(boss_str)
+        if tags:
+            return await channel.send(f'Current Raid Boss Totals\n\n{liststr}')
+        embed = formatters.make_embed(title="Current Raid Boss Totals", content=liststr)
+        return await channel.send(embed=embed)
 
     async def get_trainer_dict(self):
         def data(rcrd):

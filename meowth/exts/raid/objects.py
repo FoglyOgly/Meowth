@@ -2227,24 +2227,25 @@ class Train:
     
     async def finish_current_raid(self):
         raid = self.current_raid
-        self.done_raids.append(raid)
-        if str(self.channel_id) in raid.channel_ids:
-            raid.channel_ids.remove(str(self.channel_id))
-        for msgid in raid.message_ids:
-            if msgid.startswith(str(self.channel_id)):
-                chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
-                if not msg:
-                    continue
-                try:
-                    await msg.delete()
-                except:
-                    pass
-                try:
-                    raid.message_ids.remove(msgid)
-                    del Raid.by_message[msgid]
-                except:
-                    pass
-        await raid.upsert()
+        if raid:
+            self.done_raids.append(raid)
+            if str(self.channel_id) in raid.channel_ids:
+                raid.channel_ids.remove(str(self.channel_id))
+            for msgid in raid.message_ids:
+                if msgid.startswith(str(self.channel_id)):
+                    chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
+                    if not msg:
+                        continue
+                    try:
+                        await msg.delete()
+                    except:
+                        pass
+                    try:
+                        raid.message_ids.remove(msgid)
+                        del Raid.by_message[msgid]
+                    except:
+                        pass
+            await raid.upsert()
         if not self.poll_task.done():
             self.poll_task.cancel()
             self.next_raid = await self.poll_task

@@ -156,9 +156,8 @@ class Meetup:
         self.trainer_dict = await self.get_trainer_dict()
         has_embed = False
         for idstring in self.message_ids:
-            try:
-                chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
-            except:
+            chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+            if not msg:
                 continue
             if not has_embed:
                 meetup_embed = MeetupEmbed(msg.embeds[0])
@@ -924,6 +923,8 @@ class Raid:
         has_embed = False
         for idstring in self.message_ids:
             chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+            if not msg:
+                continue
             if not has_embed:
                 if self.status == 'active':
                     raid_embed = RaidEmbed(msg.embeds[0])
@@ -967,9 +968,8 @@ class Raid:
             estimator_20 = None
         has_embed = False
         for idstring in self.message_ids:
-            try:
-                chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
-            except:
+            chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+            if not msg:
                 continue
             if not has_embed:
                 if self.status == 'active':
@@ -1298,6 +1298,8 @@ class Raid:
         has_embed = False
         for idstring in self.message_ids:
             chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+            if not msg:
+                continue
             if not has_embed:
                 raid_embed = RaidEmbed(msg.embeds[0])
                 raid_embed.set_moveset(moveset_str, ctrs_str, rec_str)
@@ -1395,20 +1397,21 @@ class Raid:
         else:
             embed = self.expired_embed()
         for messageid in message_ids:
-            try:
-                chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
-            except AttributeError:
+            chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
+            if not msg:
                 continue
-            await msg.edit(content=content, embed=embed)
+            try:
+                await msg.edit(content=content, embed=embed)
+            except:
+                continue
             try:
                 await msg.clear_reactions()
             except discord.Forbidden:
                 continue
             msg_list.append(msg)
         for msgid in train_msgs:
-            try:
-                chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
-            except AttributeError:
+            chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
+            if not msg:
                 continue
             t = Train.by_channel.get(chn.id)
             if not t:
@@ -1478,9 +1481,8 @@ class Raid:
                     newmsg = await channel.send(content, embed=embed)
                     msg_list.append(newmsg)
             for messageid in self.message_ids:
-                try:
-                    chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
-                except AttributeError:
+                chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
+                if not msg:
                     continue
                 if chn in channel_list:
                     continue
@@ -1491,9 +1493,8 @@ class Raid:
                     pass
                 msg_list.append(msg)
             for msgid in self.train_msgs:
-                try:
-                    chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
-                except AttributeError:
+                chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
+                if not msg:
                     continue
                 if chn in channel_list:
                     continue
@@ -1515,11 +1516,12 @@ class Raid:
                 for m in msg_list:
                     idstring = f'{m.channel.id}/{m.id}'
                     if idstring not in self.message_ids:
-                        try:
-                            chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
-                            await msg.delete()
-                        except:
-                            pass
+                        chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+                        if msg:
+                            try:
+                                await msg.delete()
+                            except:
+                                pass
                 pkmn = boss_dict[emoji]
                 return await self.report_hatch(pkmn)
             else:
@@ -1528,8 +1530,10 @@ class Raid:
             for m in msg_list:
                 idstring = f'{m.channel.id}/{m.id}'
                 if idstring not in self.message_ids:
+                    chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+                    if not msg:
+                        continue
                     try:
-                        chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
                         await msg.delete()
                     except:
                         pass
@@ -2121,11 +2125,10 @@ class Train:
     
     async def messages(self):
         for msgid in self.message_ids:
-            try:
-                chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
-                if msg:
-                    yield msg
-            except:
+            chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
+            if msg:
+                yield msg
+            else:
                 continue
     
     @property
@@ -2152,11 +2155,10 @@ class Train:
     
     async def multi_msgs(self):
         for msgid in self.multi_msg_ids:
-            try:
-                chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
-                if msg:
-                    yield msg
-            except:
+            chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
+            if msg:
+                yield msg
+            else:
                 continue
     
     async def clear_multis(self):
@@ -2230,8 +2232,10 @@ class Train:
             raid.channel_ids.remove(str(self.channel_id))
         for msgid in raid.message_ids:
             if msgid.startswith(str(self.channel_id)):
+                chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
+                if not msg:
+                    continue
                 try:
-                    chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
                     await msg.delete()
                 except:
                     pass
@@ -2602,12 +2606,15 @@ class Train:
         if multi_msg_ids:
             idstring = multi_msg_ids[-1]
             chn, multi = await ChannelMessage.from_id_string(bot, idstring)
-            raids = await train.possible_raids()
-            if train.current_raid:
-                raids.remove(train.current_raid)
-            raids = [x for x in raids if x not in train.done_raids and x.status != 'expired']
-            react_list = formatters.mc_emoji(len(raids))
-            train.poll_task = bot.loop.create_task(train.get_poll_results(multi, raids, react_list))
+            if not multi:
+                bot.loop.create_task(train.poll_next_raid())
+            else:
+                raids = await train.possible_raids()
+                if train.current_raid:
+                    raids.remove(train.current_raid)
+                raids = [x for x in raids if x not in train.done_raids and x.status != 'expired']
+                react_list = formatters.mc_emoji(len(raids))
+                train.poll_task = bot.loop.create_task(train.get_poll_results(multi, raids, react_list))
         else:
             bot.loop.create_task(train.poll_next_raid())
         return train

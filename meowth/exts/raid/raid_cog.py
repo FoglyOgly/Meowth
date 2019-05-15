@@ -861,9 +861,8 @@ class RaidCog(Cog):
         await insert.commit()
         raid.group_list.append(d)
         for idstring in raid.message_ids:
-            try:
-                chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
-            except:
+            chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+            if not msg:
                 continue
             await msg.add_reaction(emoji)
         return await raid.join_grp(ctx.author.id, d)
@@ -995,9 +994,8 @@ class RaidCog(Cog):
             details = f"This Meetup will start on {datestr} at {timestr}"
         has_embed = False
         for idstring in raid_or_meetup.message_ids:
-            try:
-                chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
-            except:
+            chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+            if not msg:
                 continue
             if not has_embed:
                 embed = msg.embeds[0]

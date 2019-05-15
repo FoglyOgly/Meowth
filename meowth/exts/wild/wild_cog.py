@@ -76,6 +76,8 @@ class Wild():
         message_list = []
         for idstring in self.message_ids:
             chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+            if not msg:
+                continue
             channels_users[chn] = []
             message_list.append(msg)
             for react in msg.reactions:
@@ -184,6 +186,8 @@ class Wild():
                 pass
             for idstring in self.message_ids:
                 chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+                if not msg:
+                    continue
                 old_embed = msg.embeds[0]
                 old_fields = old_embed.to_dict()['fields']
                 new_fields = new_embed.to_dict()['fields']

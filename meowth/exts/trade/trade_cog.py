@@ -170,8 +170,9 @@ class Trade():
         trade_table = self.bot.dbi.table('trades')
         query = trade_table.query.where(id=self.id)
         chn, msg = await self.listing_chnmsg()
-        await msg.edit(content=f'{self.lister_name} has accepted an offer!')
-        await msg.clear_reactions()
+        if msg:
+            await msg.edit(content=f'{self.lister_name} has accepted an offer!')
+            await msg.clear_reactions()
         return await query.delete()
 
     async def reject_offer(self, trader, listed, offer, msg):

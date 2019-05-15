@@ -1956,7 +1956,7 @@ class Raid:
     async def list_bosses(self, channel, tags=False):
         trainer_dict = self.trainer_dict
         boss_list = self.boss_list
-        boss_dict = {x: [] for x in boss_list
+        boss_dict = {x: [] for x in boss_list}
         for trainer in trainer_dict:
             member = self.guild.get_member(trainer)
             if not member:

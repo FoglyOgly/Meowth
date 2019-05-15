@@ -36,7 +36,7 @@ async def raid_category(ctx, level):
     cat = await query.get_value()
     if not cat:
         return None
-    if isinstance(cat, int):
+    if not isinstance(cat, str):
         return cat
     if cat.isdigit():
         me = ctx.guild.me

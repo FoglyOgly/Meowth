@@ -2191,6 +2191,8 @@ class Train:
         return raid_list
     
     async def select_raid(self, raid):
+        if not raid:
+            await self.end_train()
         self.current_raid = raid
         train_embed = await self.train_embed()
         content = "A raid train is coming to this raid! React to this message to join the train!"

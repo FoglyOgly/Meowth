@@ -1044,9 +1044,14 @@ class RaidCog(Cog):
                                 data_min = data_min['attackers'][0]
                             except KeyError:
                                 pass
-                    random_move_ctrs = data_20['randomMove']['defenders'][-6:]
-                    estimator_20 = data_20['randomMove']['total']['estimator']
-                    estimator_min = data_min['randomMove']['defenders'][-1]['total']['estimator']
+                    try:
+                        random_move_ctrs = data_20['randomMove']['defenders'][-6:]
+                        estimator_20 = data_20['randomMove']['total']['estimator']
+                        estimator_min = data_min['randomMove']['defenders'][-1]['total']['estimator']
+                    except KeyError:
+                        print(pkmnid)
+                        print(weather)
+                        continue
                     random_move_dict = {
                         'boss_id': pkmnid,
                         'level': level,

@@ -1,4 +1,5 @@
 from meowth import Cog, command, bot, checks
+from meowth.exts.raid import Raid
 
 import asyncio
 import time
@@ -204,6 +205,7 @@ class Tutorial(Cog):
 
             # acknowledge and redirect to new raid channel
             raid.channel_ids.append(str(tutorial_channel.id))
+            Raid.by_channel[str(tutorial_channel.id)] = raid
             await raid.upsert()
             await tutorial_channel.send("Great job!")
             await asyncio.sleep(1)

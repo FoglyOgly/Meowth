@@ -909,7 +909,9 @@ class RaidCog(Cog):
         listed as 'here' is starting the raid.
         A backout can be requested via reaction for two minutes
         after this command is sent."""
-
+        raid = Raid.by_channel.get(str(ctx.channel.id))
+        if not raid:
+            return
         if raid.status != 'active':
             raise RaidNotActive
         grp = raid.user_grp(ctx.author.id)

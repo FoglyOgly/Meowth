@@ -246,7 +246,7 @@ def deleted_message_embed(bot, data):
     content = data['content']
     embed = make_embed(title=author.display_name, content=content, icon=author.avatar_url)
     sent = data['sent']
-    sentdt = datetime.from_timestamp(sent)
+    sentdt = datetime.fromtimestamp(sent)
     embed.timestamp = sentdt
     return embed
 

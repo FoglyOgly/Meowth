@@ -976,7 +976,7 @@ class RaidCog(Cog):
         """Correct the raid gym in an existing raid channel.
 
         Usable only by mods."""
-        raid = Raid.by_channel.get(str(ctx.channel.id))
+        raid = Raid.instances.get(ctx.raid_id)
         raid.gym = gym
         await raid.upsert()
         await raid.update_messages(content="The raid gym has been corrected!")

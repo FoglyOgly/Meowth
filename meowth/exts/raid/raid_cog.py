@@ -933,6 +933,23 @@ class RaidCog(Cog):
             return
         return await raid.correct_weather(weather)
     
+    @command(category="Raid Info")
+    @raid_checks.raid_channel()
+    @raid_checks.bot_has_permissions()
+    @checks.is_mod()
+    async def boss(self, ctx, *, boss: RaidBoss):
+        """Correct the boss in an existing raid channel.
+
+        Usable only by mods."""
+        raid = Raid.by_channel.get(str(ctx.channel.id))
+        if raid.status == 'egg':
+            raise RaidNotActive
+        elif raid.status == 'hatched':
+            return await raid.report_hatch(boss.id)
+        raid.pkmn = boss
+        await raid.upsert()
+        await raid.update_messages()
+    
     @command(aliases=['move'], category="Raid Info")
     @raid_checks.raid_channel()
     @raid_checks.bot_has_permissions()

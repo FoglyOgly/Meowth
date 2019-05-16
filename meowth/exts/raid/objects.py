@@ -1561,9 +1561,24 @@ class Raid:
         
 
     async def report_hatch(self, pkmn):
+        trainer_dict = self.trainer_dict
+        int_list = []
+        cancel_list = []
+        for trainer in trainer_dict:
+            bosses = trainer_dict[trainer]['bosses']
+            if pkmn in bosses:
+                int_list.append(trainer)
+            else:
+                meowthuser = MeowthUser.from_id(self.bot, trainer)
+                cancel_list.append(meowthuser)
+        mention_list = []
+        for user_id in int_list:
+            member = self.guild.get_member(user_id)
+            mention = member.mention
+            mention_list.append(mention)
         self.pkmn = RaidBoss(Pokemon(self.bot, pkmn))
         name = await self.pkmn.name()
-        content = f"The egg has hatched into a {name} raid! RSVP using commands or reactions!" 
+        content = f"Trainers {' '.join(mention_list)}: The egg has hatched into a {name} raid! RSVP using commands or reactions!" 
         raid_table = self.bot.dbi.table('raids')
         update = raid_table.update()
         update.where(id=self.id)
@@ -1573,6 +1588,8 @@ class Raid:
         update.values(**d)
         await update.commit()
         await self.update_messages(content=content)
+        for user in cancel_list:
+            await user.rsvp(self.id, "cancel")
         self.bot.loop.create_task(self.monitor_status())
 
     async def correct_weather(self, weather):

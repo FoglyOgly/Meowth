@@ -964,6 +964,8 @@ class RaidCog(Cog):
         raid = Raid.by_channel.get(str(ctx.channel.id))
         if raid.status == 'active':
             raid.pkmn = None
+            raid.hatch = raid.end
+            raid.end = raid.hatch + 60*ctx.bot.raid_info.raid_times[level][1]
         raid.level = level
         await raid.upsert()
         await raid.update_messages(content="The raid level has been corrected!")

@@ -535,7 +535,10 @@ class Tutorial(Cog):
             query = report_channel_table.query
             query.where(channelid=ctx.tutorial_channel.id)
             await query.delete()
-            await ctx.tutorial_channel.delete()
+            try:
+                await ctx.tutorial_channel.delete()
+            except:
+                pass
 
     @tutorial.command()
     async def want(self, ctx):

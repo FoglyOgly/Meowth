@@ -948,7 +948,38 @@ class RaidCog(Cog):
             return await raid.report_hatch(boss.id)
         raid.pkmn = boss
         await raid.upsert()
-        await raid.update_messages()
+        await raid.update_messages(content="The raid boss has been corrected!")
+    
+    @command(category="Raid Info")
+    @raid_checks.raid_channel()
+    @raid_checks.bot_has_permissions()
+    @checks.is_mod()
+    async def level(self, ctx, *, level):
+        """Correct the raid level in an existing raid channel.
+
+        Usable only by mods."""
+        possible_levels = ['1', '2', '3', '4', '5', 'EX']
+        if level not in possible_levels:
+            return
+        raid = Raid.by_channel.get(str(ctx.channel.id))
+        if raid.status == 'active':
+            raid.pkmn = None
+        raid.level = level
+        await raid.upsert()
+        await raid.update_messages(content="The raid level has been corrected!")
+    
+    @command(category="Raid Info")
+    @raid_checks.raid_channel()
+    @raid_checks.bot_has_permissions()
+    @checks.is_mod()
+    async def gym(self, ctx, *, gym: Gym):
+        """Correct the raid gym in an existing raid channel.
+
+        Usable only by mods."""
+        raid = Raid.by_channel.get(str(ctx.channel.id))
+        raid.gym = gym
+        await raid.upsert()
+        await raid.update_messages(content="The raid gym has been corrected!")
     
     @command(aliases=['move'], category="Raid Info")
     @raid_checks.raid_channel()

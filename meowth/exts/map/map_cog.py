@@ -773,7 +773,7 @@ class Mapper(Cog):
     
     @command()
     @commands.has_permissions(manage_guild=True)
-    async def gym(self, ctx, name: str, lat: float, lon: float, *, nickname: str=None):
+    async def addgym(self, ctx, name: str, lat: float, lon: float, *, nickname: str=None):
         """Add a single Gym.
 
         **Arguments**
@@ -790,7 +790,7 @@ class Mapper(Cog):
     
     @command()
     @commands.has_permissions(manage_guild=True)
-    async def exraidgym(self, ctx, name: str, lat: float, lon: float, *, nickname: str=None):
+    async def addexraidgym(self, ctx, name: str, lat: float, lon: float, *, nickname: str=None):
         """Add a single EX Raid Gym.
 
         **Arguments**

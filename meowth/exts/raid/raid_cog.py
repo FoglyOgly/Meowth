@@ -99,6 +99,36 @@ class RaidCog(Cog):
 
     async def pickup_train(self, rcrd):
         train = await Train.from_data(self.bot, rcrd)
+    
+    async def get_raid_lists(self):
+        raid_lists = {
+            "1": {},
+            "2": {},
+            "3": {},
+            "4": {},
+            "5": {},
+            "6": {},
+            "EX": {}
+        }
+        table = self.bot.dbi.table('raid_bosses')
+        query = table.query
+        rows = await query.get()
+        def data(rcrd):
+            d = {
+                'verified': rcrd.get('verified', False),
+                'available': rcrd.get('available', False),
+                'shiny': rcrd.get('shiny', False),
+                'is_regional': rcrd.get('is_regional', False),
+                'start_time': rcrd.get('start_time'),
+                'end_time': rcrd.get('end_time')
+            }
+            boss_id = rcrd.get('pokemon_id')
+            level = rcrd.get('level')
+            return level, boss_id, d
+        for rcrd in rows:
+            level, boss_id, d = data(rcrd)
+            raid_lists[level][boss_id] = d
+        return raid_lists
 
     async def archive_cat_phrases(self, guild):
         table = self.bot.dbi.table('archive')
@@ -1014,7 +1044,7 @@ class RaidCog(Cog):
 
         Must be bot co-owner to use."""
         data_table = ctx.bot.dbi.table('counters_data')
-        raid_lists = ctx.bot.raid_info.raid_lists
+        raid_lists = await self.get_raid_lists()
         weather_list = ['CLEAR', 'PARTLY_CLOUDY', 'OVERCAST', 'RAINY', 'SNOW', 'FOG', 'WINDY', 'NO_WEATHER']
         ctrs_data_list = []
         for level in raid_lists:

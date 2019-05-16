@@ -1458,6 +1458,7 @@ class Raid:
                         await channel.edit(name=new_name, topic=new_topic)
                     except discord.Forbidden:
                         raise commands.BotMissingPermissions(['Manage Channels'])
+                await channel.send(content, embed=embed)
         if react_list:
             for msg in msg_list:
                 for react in react_list:

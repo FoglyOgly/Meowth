@@ -416,6 +416,8 @@ class POI():
     
     @classmethod
     async def convert(cls, ctx, arg):
+        if ctx.report_channel_id:
+            ctx.channel = ctx.bot.get_channel(ctx.report_channel_id)
         stop_convert = await Pokestop.convert(ctx, arg)
         if isinstance(stop_convert, Pokestop):
             return stop_convert

@@ -1421,7 +1421,8 @@ class Raid:
                 continue
             try:
                 await msg.edit(content=content, embed=embed)
-            except:
+            except Exception as e:
+                print(e)
                 continue
             try:
                 await msg.clear_reactions()

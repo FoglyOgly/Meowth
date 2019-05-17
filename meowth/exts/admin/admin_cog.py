@@ -69,7 +69,7 @@ class AdminCog(Cog):
                 await after.send(content)
             except:
                 guild = before.guild
-                async for entry in guild.audit_logs(action=discord.AuditLogAction.channel_update):
+                async for entry in guild.audit_logs(action=discord.AuditLogAction.overwrite_update):
                     if entry.target.id == before.id:
                         user = entry.user
                         content = f'I have lost the following required permissions in {after.name}!\n\n'

@@ -222,7 +222,7 @@ class MeowthUser:
     async def cancel_mrsvp(self, meetup):
         meetup_rsvp_table = self.bot.dbi.table('meetup_rsvp')
         query = meetup_rsvp_table.query
-        query.where(user_id=self.user.id, meetup_id=meetup.id)
+        query.where(user_id=self.user.id, meetup_id=meetup)
         await query.delete()
     
     async def cancel_train(self):

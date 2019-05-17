@@ -86,7 +86,10 @@ class DatabaseInterface:
         Returns a guild-specific prefix if it has been set. If not,
         returns the default prefix.
         """
-        prefix = bot.prefixes.get(message.guild.id, bot.default_prefix)
+        if not message.guild:
+            prefix = bot.default_prefix
+        else:
+            prefix = bot.prefixes.get(message.guild.id, bot.default_prefix)
         return when_mentioned_or(prefix)(bot, message)
 
     async def execute_query(self, query, *query_args):

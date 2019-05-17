@@ -184,7 +184,10 @@ async def ask(bot, message_list, user_list=None, timeout=60, *, react_list=['✅
         return payload
     except asyncio.TimeoutError:
         for message in message_list:
-            await message.clear_reactions()
+            try:
+                await message.clear_reactions()
+            except:
+                pass
         return
 
 async def poll(bot, message_list, timeout=3600, *, react_list=['✅', '❎']):

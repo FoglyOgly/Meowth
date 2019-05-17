@@ -568,8 +568,6 @@ class Tutorial(Cog):
              f"you! Continue in {ctx.tutorial_channel.mention}"),
             delete_after=20.0)
 
-        # get tutorial settings
-        cfg = self.bot.guild_dict[guild.id]['configure_dict']
 
         await ctx.tutorial_channel.send(
             f"Hi {ctx.author.mention}! I'm Meowth, a Discord helper bot for "
@@ -579,7 +577,7 @@ class Tutorial(Cog):
             "Let's get started!")
 
         try:
-            await self.want_tutorial(ctx, cfg)
+            await self.want_tutorial(ctx)
             await ctx.tutorial_channel.send(
                 f"This concludes the Meowth tutorial! "
                 "This channel will be deleted in ten seconds.")
@@ -615,8 +613,6 @@ class Tutorial(Cog):
              f"you! Continue in {ctx.tutorial_channel.mention}"),
             delete_after=20.0)
 
-        # get tutorial settings
-        cfg = self.bot.guild_dict[guild.id]['configure_dict']
 
         await ctx.tutorial_channel.send(
             f"Hi {ctx.author.mention}! I'm Meowth, a Discord helper bot for "
@@ -626,7 +622,7 @@ class Tutorial(Cog):
             "Let's get started!")
 
         try:
-            await self.wild_tutorial(ctx, cfg)
+            await self.wild_tutorial(ctx)
             await ctx.tutorial_channel.send(
                 f"This concludes the Meowth tutorial! "
                 "This channel will be deleted in ten seconds.")
@@ -662,8 +658,6 @@ class Tutorial(Cog):
              f"you! Continue in {ctx.tutorial_channel.mention}"),
             delete_after=20.0)
 
-        # get tutorial settings
-        cfg = self.bot.guild_dict[guild.id]['configure_dict']
 
         await ctx.tutorial_channel.send(
             f"Hi {ctx.author.mention}! I'm Meowth, a Discord helper bot for "
@@ -673,7 +667,7 @@ class Tutorial(Cog):
             "Let's get started!")
 
         try:
-            await self.raid_tutorial(ctx, cfg)
+            await self.raid_tutorial(ctx)
             await ctx.tutorial_channel.send(
                 f"This concludes the Meowth tutorial! "
                 "This channel will be deleted in ten seconds.")
@@ -709,8 +703,6 @@ class Tutorial(Cog):
              f"you! Continue in {ctx.tutorial_channel.mention}"),
             delete_after=20.0)
 
-        # get tutorial settings
-        cfg = self.bot.guild_dict[guild.id]['configure_dict']
 
         await ctx.tutorial_channel.send(
             f"Hi {ctx.author.mention}! I'm Meowth, a Discord helper bot for "
@@ -720,7 +712,7 @@ class Tutorial(Cog):
             "Let's get started!")
 
         try:
-            await self.research_tutorial(ctx, cfg)
+            await self.research_tutorial(ctx)
             await ctx.tutorial_channel.send(
                 f"This concludes the Meowth tutorial! "
                 "This channel will be deleted in ten seconds.")

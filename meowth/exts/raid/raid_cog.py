@@ -674,6 +674,8 @@ class RaidCog(Cog):
         **Example:** `!exraid "city park" April 9 1:00 PM`
         Reports an EX Raid at City Park beginning on April 9 at 1:00 PM.
         """
+        if not hatch_time:
+            raise InvalidTime
         zone = await ctx.tz()
         raid_id = next(snowflake.create())
         new_exraid = Raid(raid_id, ctx.bot, ctx.guild.id, ctx.channel.id, gym, level="EX", hatch=hatch_time, tz=zone)

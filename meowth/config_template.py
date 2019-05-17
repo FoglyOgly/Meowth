@@ -10,7 +10,7 @@ bot_coowners = [132314336914833409, 263607303096369152]
 preload_extensions = []
 
 # minimum required permissions for bot user
-bot_permissions = 268822608
+bot_permissions = 268822736
 
 # postgresql database credentials
 db_details = {

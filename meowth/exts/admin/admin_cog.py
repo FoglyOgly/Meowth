@@ -65,7 +65,23 @@ class AdminCog(Cog):
         if missing_perms:
             content = 'I have lost the following required permissions in this channel!\n\n'
             content += "\n".join(missing_perms)
-            return await after.send(content)
+            try:
+                await after.send(content)
+            except:
+                guild = before.guild
+                async for entry in guild.audit_logs(action=discord.AuditLogAction.channel_update):
+                    if entry.target.id == before.id:
+                        user = entry.user
+                        content = f'I have lost the following required permissions in {after.name}!\n\n'
+                        content += "\n".join(missing_perms)
+                        try:
+                            await user.send(content)
+                        except:
+                            owner = guild.owner
+                            try:
+                                await owner.send(content)
+                            except:
+                                pass
     
     @Cog.listener()
     async def on_member_join(self, member):

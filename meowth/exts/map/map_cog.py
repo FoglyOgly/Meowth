@@ -130,8 +130,11 @@ class ReportChannel():
     async def get_all_gyms(self):
         covering = await self.level_10_covering()
         gyms = self.bot.dbi.table('gyms')
-        gyms_query = gyms.query.where(gyms['l10'].in_(covering))
-        gyms_query.where(guild=self.channel.guild.id)
+        try:
+            gyms_query = gyms.query.where(gyms['l10'].in_(covering))
+            gyms_query.where(guild=self.channel.guild.id)
+        except:
+            return None
         return gyms_query
     
     async def get_all_stops(self):
@@ -416,7 +419,7 @@ class POI():
     
     @classmethod
     async def convert(cls, ctx, arg):
-        if ctx.report_channel_id:
+        if hasattr(ctx, 'report_channel_id'):
             ctx.channel = ctx.bot.get_channel(ctx.report_channel_id)
         stop_convert = await Pokestop.convert(ctx, arg)
         if isinstance(stop_convert, Pokestop):
@@ -445,6 +448,9 @@ class Gym(POI):
             ctx.channel = ctx.bot.get_channel(ctx.report_channel_id)
         report_channel = ReportChannel(ctx.bot, ctx.channel)
         gyms_query = await report_channel.get_all_gyms()
+        if not gyms_query:
+            city = await report_channel.city()
+            return PartialPOI(ctx.bot, city, arg)
         gyms_query.select('id', 'name', 'nickname')
         data = await gyms_query.get()
         if not data:

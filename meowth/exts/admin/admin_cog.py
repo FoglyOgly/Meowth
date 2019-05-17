@@ -71,10 +71,12 @@ class AdminCog(Cog):
                 return
             except:
                 guild = before.guild
-                actions = Union[discord.AuditLogAction.overwrite_update,
+                actions = [discord.AuditLogAction.overwrite_update,
                     discord.AuditLogAction.overwrite_create,
                     discord.AuditLogAction.overwrite_delete]
-                async for entry in guild.audit_logs(action=actions):
+                async for entry in guild.audit_logs():
+                    if entry.action not in actions:
+                        continue
                     if entry.target.id == before.id:
                         user = entry.user
                         content = f'I have lost the following required permissions in {after.name}!\n\n'

@@ -6,6 +6,7 @@ import discord
 from timezonefinder import TimezoneFinder
 import re
 import pickle
+from typing import Union
 
 def do_template(message, author, guild):
     not_found = []
@@ -67,19 +68,25 @@ class AdminCog(Cog):
             content += "\n".join(missing_perms)
             try:
                 await after.send(content)
+                return
             except:
                 guild = before.guild
-                async for entry in guild.audit_logs(action=discord.AuditLogAction.overwrite_update):
+                actions = Union[discord.AuditLogAction.overwrite_update,
+                    discord.AuditLogAction.overwrite_create,
+                    discord.AuditLogAction.overwrite_delete]
+                async for entry in guild.audit_logs(action=actions):
                     if entry.target.id == before.id:
                         user = entry.user
                         content = f'I have lost the following required permissions in {after.name}!\n\n'
                         content += "\n".join(missing_perms)
                         try:
                             await user.send(content)
+                            return
                         except:
                             owner = guild.owner
                             try:
                                 await owner.send(content)
+                                return
                             except:
                                 pass
     

@@ -35,6 +35,20 @@ class Pokemon():
             form = 7
         elif 'ORIGIN' in pokemonId:
             form = 53
+        elif 'PLANT' in pokemonId:
+            form = 54
+        elif 'SANDY' in pokemonId:
+            form = 55
+        elif 'TRASH' in pokemonId:
+            form = 56
+        elif 'OVERCAST' in pokemonId:
+            form = 57
+        elif 'SUNSHINE' in pokemonId:
+            form = 58
+        elif 'EAST_SEA' in pokemonId:
+            form = 59
+        elif 'WEST_SEA' in pokemonId:
+            form = 60
         self.form = form
         self.gender = gender
         self.shiny = shiny

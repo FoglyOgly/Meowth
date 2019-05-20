@@ -217,7 +217,10 @@ class AdminCog(Cog):
     @command()
     @checks.is_admin()
     async def addcustomroles(self, ctx, roles: commands.Greedy[discord.Role]):
+        if not roles:
+            return await ctx.error('No roles found')
         table = ctx.bot.dbi.table('custom_roles')
+        role_names = [x.name for x in roles]
         insert = table.insert
         rows = []
         for role in roles:
@@ -228,18 +231,21 @@ class AdminCog(Cog):
             rows.append(d)
         insert.rows(rows)
         await insert.commit(do_update=True)
-        await ctx.success('Custom roles added')
+        await ctx.success('Custom roles added', details="\n".join(role_names))
     
     @command()
     @checks.is_admin()
     async def removecustomroles(self, ctx, roles: commands.Greedy[discord.Role]):
+        if not roles:
+            return await ctx.error('No roles found')
         role_ids = [x.id for x in roles]
+        role_names = [x.name for x in roles]
         table = ctx.bot.dbi.table('custom_roles')
         query = table.query
         query.where(guild_id=ctx.guild.id)
         query.where(table['role_id'].in_(role_ids))
         await query.delete()
-        await ctx.success('Custom roles removed')
+        await ctx.success('Custom roles removed', details="\n".join(role_names))
 
     @command()
     @commands.has_permissions(manage_guild=True)

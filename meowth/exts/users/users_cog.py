@@ -444,6 +444,26 @@ class Users(Cog):
             await ctx.author.add_roles(*valid_roles)
             return await ctx.success('Roles Added', details="\n".join(role_names))
         return await ctx.error('No valid roles found')
+    
+    @command()
+    @users_checks.users_enabled()
+    async def iamnot(self, ctx, roles: commands.Greedy[discord.Role]):
+        if not roles:
+            return await ctx.error('No roles found')
+        valid_roles = []
+        table = ctx.bot.dbi.table('custom_roles')
+        for role in roles:
+            query = table.query
+            query.where(guild_id=ctx.guild.id)
+            query.where(role_id=role.id)
+            data = await query.get()
+            if data:
+                valid_roles.append(role)
+        if valid_roles:
+            role_names = [x.name for x in valid_roles]
+            await ctx.author.remove_roles(*valid_roles)
+            return await ctx.success('Roles Removed', details="\n".join(role_names))
+        return await ctx.error('No valid roles found')
         
 
 

@@ -902,7 +902,6 @@ class RaidCog(Cog):
         return await raid.join_grp(ctx.author.id, d)
     
     @command(aliases=['start'], category="Raid RSVP")
-    @raid_checks.raid_channel()
     @raid_checks.bot_has_permissions()
     async def starting(self, ctx):
         """Notify Meowth that your group is entering the raid lobby.

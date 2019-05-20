@@ -714,6 +714,9 @@ class Raid:
         if emoji == '\u2754':
             await message.remove_reaction(emoji, user)
             return await formatters.get_raid_help('!', self.bot.user.avatar_url, user)
+        if emoji == '❌':
+            await message.remove_reaction(emoji, user)
+            return await meowthuser.cancel_rsvp(self.id)
         if self.status == 'egg':
             boss_list = self.boss_list
             if len(boss_list) > 1:

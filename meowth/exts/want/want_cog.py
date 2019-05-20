@@ -63,6 +63,8 @@ class Want():
                 member = self.guild.get_member(user_id)
                 if role not in member.roles:
                     await member.add_roles(role)
+            else:
+                return 'dm'
             return 'success'
         else:
             return 'already done'
@@ -106,6 +108,16 @@ class Want():
         if len(users) > 10:
             return True
         else:
+            _data = self._data
+            _data.select('role')
+            roleid = await _data.get_value()
+            if roleid:
+                role = self.guild.get_role(roleid)
+                if role:
+                    try:
+                        await role.delete()
+                    except:
+                        pass
             return False
         
     async def role(self):
@@ -132,10 +144,16 @@ class Want():
                     name_query = pokedex.query('name')
                     name_query.where(pokemonid=pokemonid, language_id=9)
                     name = await name_query.get_value()
-                    role = await guild.create_role(name=name, mentionable=True)
+                    try:
+                        role = await guild.create_role(name=name, mentionable=True)
+                    except:
+                        return None
                 elif self.want in raid_tiers:
                     name = "Tier " + self.want
-                    role = await guild.create_role(name=name, mentionable=True)
+                    try:
+                        role = await guild.create_role(name=name, mentionable=True)
+                    except:
+                        return None
                 # elif self.want.startswith('POKEMON_TYPE'):
                 #     types_table = self.bot.dbi.table('type_names')
                 #     name_query = types_table.query('name')
@@ -147,7 +165,10 @@ class Want():
                     name_query = items_table.query('name')
                     name_query.where(itemid=self.want, language_id=9)
                     name = await name_query.get_value()
-                    role = await guild.create_role(name=name, mentionable=True)
+                    try:
+                        role = await guild.create_role(name=name, mentionable=True)
+                    except:
+                        return None
                 insert = self._update
                 insert.values(role=role.id)
                 await insert.commit()
@@ -187,11 +208,22 @@ class WantCog(Cog):
     @want_checks.want_enabled()
     async def want(self, ctx, wants: commands.Greedy[Want]):
         added_wants = []
+        dm_subs = []
         for want in wants:
             status = await want.add_user(ctx.author.id)
             if status == 'already done':
                 continue
+            elif status == 'dm':
+                dm_subs.append(want.want)
             added_wants.append(want.want)
+        if dm_subs:
+            try:
+                content = 'I will notify you about these wants via direct message for the time being, so please make sure you can receive DMs from me!'
+                content += "\n"
+                content += "\n".join(dm_subs)
+                await ctx.author.send(content+"\n"+"\n".join(dm_subs))
+            except:
+                await ctx.warning('DM Test Failed', details=content)
         await ctx.success(title="Wants Added", details="\n".join(added_wants))
     
     @command()

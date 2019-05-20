@@ -221,7 +221,7 @@ class WantCog(Cog):
                 content = 'I will notify you about these wants via direct message for the time being, so please make sure you can receive DMs from me!'
                 content += "\n"
                 content += "\n".join(dm_subs)
-                await ctx.author.send(content+"\n"+"\n".join(dm_subs))
+                await ctx.author.send(content)
             except:
                 await ctx.warning('DM Test Failed', details=content)
         await ctx.success(title="Wants Added", details="\n".join(added_wants))

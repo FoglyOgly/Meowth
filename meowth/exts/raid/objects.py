@@ -1451,9 +1451,9 @@ class Raid:
             if not msg:
                 continue
             if self.channel_ids and str(chn.id) not in self.channel_ids and self.status != 'expired':
-                embed = await self.report_embed()
+                report_embed = await self.report_embed()
                 try:
-                    await msg.edit(content=content, embed=embed)
+                    await msg.edit(content=content, embed=report_embed)
                 except:
                     pass
                 msg_list.append(msg)

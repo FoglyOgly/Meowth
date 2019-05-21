@@ -993,19 +993,15 @@ class Raid:
         if old_grp:
             old_grp = dict(old_grp[0])
             if old_grp['grp_id'] == group['grp_id']:
-                print(1)
                 return
             old_grp['users'].remove(user_id)
-            print(2)
             old_grp['est_power'] = self.grp_est_power(old_grp)
             if len(old_grp['users']) == 0:
-                print(3)
                 del_query = group_table.query
                 del_query.where(raid_id=self.id)
                 del_query.where(grp_id=old_grp['grp_id'])
                 await del_query.delete()
             else:
-                print(4)
                 insert.row(**old_grp)
         group['users'].append(user_id)
         group['est_power'] = self.grp_est_power(group)
@@ -1018,7 +1014,6 @@ class Raid:
         }
         insert.row(**d)
         await insert.commit(do_update=True)
-        print(5)
         await self.update_rsvp(user_id=user_id, group=group)
     
     async def leave_grp(self, user_id):
@@ -1062,7 +1057,7 @@ class Raid:
             msg_emojis = [x.emoji for x in msg_reactions]
             for reaction in msg_reactions:
                 emoji = reaction.emoji
-                if 'u20e3' not in str(emoji):
+                if '\u20e3' not in str(emoji):
                     continue
                 if emoji not in group_emojis:
                     try:

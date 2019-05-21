@@ -567,6 +567,8 @@ class Raid:
             emoji = payload.emoji.id
         else:
             emoji = str(payload.emoji)
+        if emoji == '\u2754':
+            await self.leave_grp(payload.user_id)
         for group in self.group_list:
             if emoji == group['emoji']:
                 await self.join_grp(payload.user_id, group)
@@ -980,6 +982,22 @@ class Raid:
         insert.row(**group)
         await insert.commit(do_update=True)
         await self.update_rsvp(user_id=user_id, group=group)
+    
+    async def leave_grp(self, user_id):
+        group_table = self.bot.dbi.table('raid_groups')
+        insert = group_table.insert
+        old_query = group_table.query
+        old_query.where(raid_id=self.id)
+        old_query.where(group_table['users'].contains_(user_id))
+        old_grp = await old_query.get()
+        if not old_grp:
+            return
+        old_grp = dict(old_grp[0])
+        old_grp['users'].remove(user_id)
+        old_grp['est_power'] = self.grp_est_power(old_grp)
+        insert.row(**old_grp)
+        await insert.commit(do_update=True)
+        await self.update_rsvp()
     
 
     async def update_rsvp(self, user_id=None, status=None, group=None):

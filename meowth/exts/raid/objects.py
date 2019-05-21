@@ -999,7 +999,7 @@ class Raid:
         d = {
             'raid_id': self.id,
             'grp_id': group['grp_id'],
-            'starttime': group['starttime']
+            'starttime': group['starttime'],
             'users': group['users'],
             'est_power': group['est_power']
         }

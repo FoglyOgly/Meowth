@@ -869,10 +869,6 @@ class RaidCog(Cog):
         if not group_time:
             return await raid.raidgroup_ask(ctx.channel, ctx.author.id)
         ctx._tz = raid.tz
-        old_rsvp = raid.trainer_dict.get(ctx.author.id, {})
-        old_status = old_rsvp.get('status')
-        if not old_status or old_status == 'maybe':
-            await self.rsvp(ctx, "coming")
         group_table = ctx.bot.dbi.table('raid_groups')
         insert = group_table.insert()
         i = len(raid.group_list)
@@ -897,7 +893,11 @@ class RaidCog(Cog):
         raid.group_list = await raid.get_grp_list()
         for grp in raid.group_list:
             if grp['grp_id'] == grp_id:
-                return await raid.join_grp(ctx.author.id, grp)
+                await raid.join_grp(ctx.author.id, grp)
+        old_rsvp = raid.trainer_dict.get(ctx.author.id, {})
+        old_status = old_rsvp.get('status')
+        if not old_status or old_status == 'maybe':
+            await self.rsvp(ctx, "coming")
     
     @command(aliases=['start'], category="Raid RSVP")
     @raid_checks.bot_has_permissions()

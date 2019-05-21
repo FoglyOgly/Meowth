@@ -552,8 +552,26 @@ class Raid:
                     grp_str = f"{emoji}: Starting {time}"
                 grps_str.append(grp_str)
         if ungrp_est != '0':
-            grps_str.append(f"Ungrouped: ({ungrp_est}%)")
+            grps_str.append(f"'\u2754': ({ungrp_est}%)")
         return "\n".join(grps_str) + '\u200b'
+    
+    async def raidgroup_ask(self, channel, user):
+        grps_str = self.grps_str
+        embed = formatters.make_embed(content=grps_str)
+        msg = await channel.send(embed=embed)
+        groups = self.group_list
+        emoji_list = [x['emoji'] for x in groups]
+        emoji_list += '\u2754'
+        payload = await formatters.ask(self.bot, [msg], [user], react_list=emoji_list)
+        if payload.emoji.is_custom_emoji():
+            emoji = payload.emoji.id
+        else:
+            emoji = str(payload.emoji)
+        for group in self.group_list:
+            if emoji == group['emoji']:
+                await self.join_grp(payload.user_id, group)
+
+        
     
     @property
     def grpd_users(self):

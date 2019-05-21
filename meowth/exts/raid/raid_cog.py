@@ -856,7 +856,7 @@ class RaidCog(Cog):
     @command(category="Raid RSVP")
     @raid_checks.raid_channel()
     @raid_checks.bot_has_permissions()
-    async def group(self, ctx, group_time):
+    async def group(self, ctx, *, group_time=None):
         """Create a group for the current raid.
 
         **Arguments**
@@ -866,6 +866,8 @@ class RaidCog(Cog):
         raid = Raid.by_channel.get(str(ctx.channel.id))
         if not raid:
             raise NotRaidChannel
+        if not group_time:
+            return await raid.raidgroup_ask(ctx.channel, ctx.author.id)
         ctx._tz = raid.tz
         old_rsvp = raid.trainer_dict.get(ctx.author.id, {})
         old_status = old_rsvp.get('status')

@@ -996,7 +996,14 @@ class Raid:
                 insert.row(**old_grp)
         group['users'].append(user_id)
         group['est_power'] = self.grp_est_power(group)
-        insert.row(**group)
+        d = {
+            'raid_id': self.id,
+            'grp_id': group['grp_id'],
+            'starttime': group['starttime']
+            'users': group['users'],
+            'est_power': group['est_power']
+        }
+        insert.row(**d)
         await insert.commit(do_update=True)
         await self.update_rsvp(user_id=user_id, group=group)
     

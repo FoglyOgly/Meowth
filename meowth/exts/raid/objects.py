@@ -982,7 +982,6 @@ class Raid:
         old_query.where(group_table['users'].contains_(user_id))
         old_grp = await old_query.get()
         if old_grp:
-            print(0)
             old_grp = dict(old_grp[0])
             if old_grp['grp_id'] == group['grp_id']:
                 print(1)

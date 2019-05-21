@@ -890,6 +890,7 @@ class RaidCog(Cog):
         insert.row(**d)
         insert.returning('grp_id')
         grp_id = await insert.commit()
+        print(grp_id)
         raid.group_list = await raid.get_grp_list()
         for grp in raid.group_list:
             if grp['grp_id'] == grp_id:

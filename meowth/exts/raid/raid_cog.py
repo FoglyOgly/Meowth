@@ -884,7 +884,7 @@ class RaidCog(Cog):
         grp_id = next(snowflake.create())
         d = {
             'raid_id': raid.id,
-            'grp_id': grp_id
+            'grp_id': grp_id,
             'starttime': stamp,
             'users': [],
             'est_power': 0

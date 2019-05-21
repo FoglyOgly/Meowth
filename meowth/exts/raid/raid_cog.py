@@ -876,7 +876,6 @@ class RaidCog(Cog):
         group_table = ctx.bot.dbi.table('raid_groups')
         insert = group_table.insert()
         i = len(raid.group_list)
-        emoji = f'{i+1}\u20e3'
         if group_time.isdigit():
             stamp = time.time() + int(group_time)*60
             if stamp > raid.end:
@@ -888,7 +887,6 @@ class RaidCog(Cog):
             stamp = await converter.convert(ctx, group_time)
         d = {
             'raid_id': raid.id,
-            'emoji': emoji,
             'starttime': stamp,
             'users': [],
             'est_power': 0
@@ -896,11 +894,6 @@ class RaidCog(Cog):
         insert.row(**d)
         await insert.commit()
         raid.group_list.append(d)
-        for idstring in raid.message_ids:
-            chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
-            if not msg:
-                continue
-            await msg.add_reaction(emoji)
         return await raid.join_grp(ctx.author.id, d)
     
     @command(aliases=['start'], category="Raid RSVP")

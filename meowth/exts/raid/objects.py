@@ -815,6 +815,11 @@ class Raid:
                 await query.delete()
                 if grp in self.group_list:
                     self.group_list.remove(grp)
+                    grp_table = self.bot.dbi.table('raid_groups')
+                    grp_query = grp_table.query
+                    grp_query.where(raid_id=self.id)
+                    grp_query.where(starttime=grp['starttime'])
+                    await grp_query.delete()
                 return await self.update_rsvp()
             grp_est = self.grp_est_power(grp)
             if grp_est < 1:
@@ -890,6 +895,11 @@ class Raid:
             await query.delete()
             if grp in self.group_list:
                 self.group_list.remove(grp)
+                grp_table = self.bot.dbi.table('raid_groups')
+                grp_query = grp_table.query
+                grp_query.where(raid_id=self.id)
+                grp_query.where(starttime=grp['starttime'])
+                await grp_query.delete()
             await self.update_rsvp()
             return                
 
@@ -973,11 +983,17 @@ class Raid:
         old_grp = await old_query.get()
         if old_grp:
             old_grp = dict(old_grp[0])
-            if old_grp['emoji'] == group['emoji']:
+            if old_grp['grp_id'] == group['grp_id']:
                 return
             old_grp['users'].remove(user_id)
             old_grp['est_power'] = self.grp_est_power(old_grp)
-            insert.row(**old_grp)
+            if len(old_grp['users']) == 0:
+                del_query = group_table.query
+                del_query.where(raid_id=self.id)
+                del_query.where(grp_id=old_grp['grp_id'])
+                await del_query.delete()
+            else:
+                insert.row(**old_grp)
         group['users'].append(user_id)
         group['est_power'] = self.grp_est_power(group)
         insert.row(**group)
@@ -996,8 +1012,14 @@ class Raid:
         old_grp = dict(old_grp[0])
         old_grp['users'].remove(user_id)
         old_grp['est_power'] = self.grp_est_power(old_grp)
-        insert.row(**old_grp)
-        await insert.commit(do_update=True)
+        if len(old_grp['users']) == 0:
+            del_query = group_table.query
+            del_query.where(raid_id=self.id)
+            del_query.where(grp_id=old_grp['grp_id'])
+            await del_query.delete()
+        else:
+            insert.row(**old_grp)
+            await insert.commit(do_update=True)
         await self.update_rsvp()
     
 
@@ -1014,6 +1036,19 @@ class Raid:
             chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
             if not msg:
                 continue
+            group_emojis = [x['emoji'] for x in self.group_list]
+            msg_reactions = msg.reactions
+            msg_emojis = [x.emoji for x in msg_reactions]
+            for reaction in msg_reactions:
+                emoji = reaction.emoji
+                if emoji not in group_emojis:
+                    try:
+                        await reaction.remove(self.guild.me)
+                    except:
+                        pass
+            for emoji in group_emojis:
+                if emoji not in msg_emojis:
+                    await msg.add_reaction(emoji)
             if self.channel_ids and str(chn.id) not in self.channel_ids:
                 if not has_report_embed:
                     report_embed = await self.report_embed()
@@ -1889,13 +1924,16 @@ class Raid:
     async def get_grp_list(self):
         group_list = []
         group_table = self.bot.dbi.table('raid_groups')
-        query = group_table.query()
+        query = group_table.query
         query.where(raid_id=self.id)
+        query.order_by(group_table['starttime'], asc=True)
         grp_data = await query.get()
-        for rcrd in grp_data:
+        for i in range(len(grp_data)):
+            rcrd = grp_data[i]
             grp = {
                 'raid_id': self.id,
-                'emoji': rcrd['emoji'],
+                'grp_id': rcrd['grp_id']
+                'emoji': f'{i+1}\u20e3',
                 'starttime': rcrd.get('starttime'),
                 'users': rcrd.get('users', []),
             }

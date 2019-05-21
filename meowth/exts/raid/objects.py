@@ -983,7 +983,7 @@ class Raid:
             bosses = old_rsvp.get('bosses')
             if not bosses:
                 bosses = await self.get_boss_list()
-            await meowthuser.rsvp(ctx, "coming", bosses=bosses, party=party)
+            await meowthuser.rsvp(self.id, "coming", bosses=bosses, party=party)
         group_table = self.bot.dbi.table('raid_groups')
         insert = group_table.insert()
         old_query = group_table.query()

@@ -881,19 +881,20 @@ class RaidCog(Cog):
         else:
             converter = time_converter()
             stamp = await converter.convert(ctx, group_time)
+        grp_id = next(snowflake.create())
         d = {
             'raid_id': raid.id,
+            'grp_id': grp_id
             'starttime': stamp,
             'users': [],
             'est_power': 0
         }
         insert.row(**d)
-        insert.returning('grp_id')
-        grp_id = await insert.commit()
-        print(grp_id)
+        await insert.commit()
         raid.group_list = await raid.get_grp_list()
         for grp in raid.group_list:
             if grp['grp_id'] == grp_id:
+                print(0)
                 await raid.join_grp(ctx.author.id, grp)
         old_rsvp = raid.trainer_dict.get(ctx.author.id, {})
         old_status = old_rsvp.get('status')

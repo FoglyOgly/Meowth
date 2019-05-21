@@ -892,9 +892,12 @@ class RaidCog(Cog):
             'est_power': 0
         }
         insert.row(**d)
-        await insert.commit()
-        raid.group_list.append(d)
-        return await raid.join_grp(ctx.author.id, d)
+        insert.returning('grp_id')
+        grp_id = await insert.commit()
+        raid.group_list = await raid.get_grp_list()
+        for grp in raid.group_list:
+            if grp['grp_id'] == grp_id:
+                return await raid.join_grp(ctx.author.id, grp)
     
     @command(aliases=['start'], category="Raid RSVP")
     @raid_checks.bot_has_permissions()

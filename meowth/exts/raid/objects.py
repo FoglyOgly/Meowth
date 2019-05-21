@@ -1041,6 +1041,8 @@ class Raid:
             msg_emojis = [x.emoji for x in msg_reactions]
             for reaction in msg_reactions:
                 emoji = reaction.emoji
+                if 'u20e3' not in str(emoji):
+                    continue
                 if emoji not in group_emojis:
                     try:
                         await reaction.remove(self.guild.me)

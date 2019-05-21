@@ -552,13 +552,13 @@ class Raid:
                     grp_str = f"{emoji}: Starting {time}"
                 grps_str.append(grp_str)
         if ungrp_est != '0':
-            grps_str.append(f"'\u2754': ({ungrp_est}%)")
+            grps_str.append(f"\u2754: ({ungrp_est}%)")
         return "\n".join(grps_str) + '\u200b'
     
     async def raidgroup_ask(self, channel, user):
         grps_str = self.grps_str
-        embed = formatters.make_embed(content=grps_str)
-        msg = await channel.send(embed=embed)
+        embed = formatters.make_embed(title='Groups (Boss Damage Estimate)', content=grps_str)
+        msg = await channel.send("Select a group from the list below!", embed=embed)
         groups = self.group_list
         emoji_list = [x['emoji'] for x in groups]
         emoji_list += '\u2754'
@@ -1062,6 +1062,10 @@ class Raid:
                         break
                     content = f"{member.display_name} {display_status}!"
                     newmsg = await chn.send(content, embed=rsvpembed)
+                    if self.group_list:
+                        grp = self.user_grp(member.id)
+                        if not grp and status in ('coming', 'here'):
+                            return await self.raidgroup_ask(chn, member.id)
         elif user_id and group:
             if self.channel_ids:
                 for chnid in self.channel_ids:

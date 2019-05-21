@@ -1932,7 +1932,7 @@ class Raid:
             rcrd = grp_data[i]
             grp = {
                 'raid_id': self.id,
-                'grp_id': rcrd['grp_id']
+                'grp_id': rcrd['grp_id'],
                 'emoji': f'{i+1}\u20e3',
                 'starttime': rcrd.get('starttime'),
                 'users': rcrd.get('users', []),

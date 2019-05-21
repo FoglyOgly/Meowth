@@ -975,6 +975,15 @@ class Raid:
             await msg.edit(embed=embed)
     
     async def join_grp(self, user_id, group):
+        old_rsvp = self.trainer_dict.get(user_id, {})
+        old_status = old_rsvp.get('status')
+        if not old_status or old_status == 'maybe':
+            meowthuser = MeowthUser.from_id(self.bot, user_id)
+            party = await meowthuser.party()
+            bosses = old_rsvp.get('bosses')
+            if not bosses:
+                bosses = await self.get_boss_list()
+            await meowthuser.rsvp(ctx, "coming", bosses=bosses, party=party)
         group_table = self.bot.dbi.table('raid_groups')
         insert = group_table.insert()
         old_query = group_table.query()

@@ -556,9 +556,10 @@ class Raid:
         return "\n".join(grps_str) + '\u200b'
     
     async def raidgroup_ask(self, channel, user):
+        member = self.guild.get_member(user)
         grps_str = self.grps_str
         embed = formatters.make_embed(title='Groups (Boss Damage Estimate)', content=grps_str)
-        msg = await channel.send("Select a group from the list below!", embed=embed)
+        msg = await channel.send(f"{member.mention}: select a group from the list below!, or use \u2754 to remain ungrouped!", embed=embed)
         groups = self.group_list
         emoji_list = [x['emoji'] for x in groups]
         emoji_list += '\u2754'

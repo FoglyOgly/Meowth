@@ -1758,7 +1758,11 @@ class Raid:
         new_name = 'archived-' + old_name
         category = await archive_category(bot, guild)
         await channel.send(f'Category is {str(category)}')
-        await channel.edit(name=new_name, category=category, sync_permissions=True)
+        if category:
+            sync = True
+        else:
+            sync = False
+        await channel.edit(name=new_name, category=category, sync_permissions=sync)
         member = guild.get_member(user_id)
         content = f"Channel archive initiated by {member.display_name}."
         if reason:

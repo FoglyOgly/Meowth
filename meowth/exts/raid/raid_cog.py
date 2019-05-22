@@ -333,7 +333,7 @@ class RaidCog(Cog):
     @command()
     @checks.is_mod()
     @raid_checks.meetup_enabled()
-    async def meetup(self, ctx, location: POI, start_time: time_converter):
+    async def meetup(self, ctx, location: POI, *, start_time: time_converter):
         """Create a Meetup channel.
         
         **Arguments**
@@ -896,10 +896,6 @@ class RaidCog(Cog):
             if grp['grp_id'] == grp_id:
                 print(0)
                 await raid.join_grp(ctx.author.id, grp)
-        old_rsvp = raid.trainer_dict.get(ctx.author.id, {})
-        old_status = old_rsvp.get('status')
-        if not old_status or old_status == 'maybe':
-            await self.rsvp(ctx, "coming")
     
     @command(aliases=['start'], category="Raid RSVP")
     @raid_checks.bot_has_permissions()

@@ -1751,13 +1751,11 @@ class Raid:
             raise
     
     async def archive_raid(self, channel, user_id, reason=None):
-        await channel.send('Archiving...')
         guild = channel.guild
         bot = self.bot
         old_name = channel.name
         new_name = 'archived-' + old_name
         category = await archive_category(bot, guild)
-        await channel.send(f'Category is {str(category)}')
         if category:
             sync = True
         else:

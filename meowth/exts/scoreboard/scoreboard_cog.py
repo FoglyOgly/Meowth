@@ -27,6 +27,7 @@ class ScoreCog(Cog):
             fields['Users'] = "All"
         score_table = self.bot.dbi.table('scoreboard')
         update = score_table.update
+        update.where(guild_id=ctx.guild.id)
         if user_ids:
             update.where(score_table['user_id'].in_(user_ids))
         d = {x: 0 for x in to_update}

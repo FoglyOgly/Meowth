@@ -125,7 +125,7 @@ class ScoreCog(Cog):
             'Name': '\n'.join(names),
             'Score': '\n'.join(scores)
         }
-        desktop_embed = await ctx.info(f'{category.title()} Leaderboard', fields=fields, inline=True, send=False)
+        desktop_embed = await ctx.info(f'{category.title()} Leaderboard', fields=desktop_fields, inline=True, send=False)
         mobile_embed = await ctx.info(f'{category.title()} Leaderboard', details="\n".join(mobile_field), send=False)
         if ctx.author.is_on_mobile():
             embed = mobile_embed

@@ -28,16 +28,60 @@ class Wild():
         cls.instances[wild_id] = instance
         return instance
 
-    def __init__(self, wild_id, bot, guild_id, location, pkmn: Pokemon):
+    def __init__(self, wild_id, bot, guild_id, reporter_id, location, pkmn: Pokemon, caught_by=[]):
         self.id = wild_id
         self.bot = bot
         self.guild_id = guild_id
+        self.reporter_id = reporter_id
         self.location = location
         self.pkmn = pkmn
         self.created = time.time()
         self.message_ids = []
         self.react_list = bot.wild_info.emoji
+        self.caught_by = caught_by
         self.monitor_task = None
+    
+    def to_dict(self):
+        location = self.location
+        if isinstance(location, POI):
+            if isinstance(location, Gym):
+                loc_id = 'gym/' + str(location.id)
+            elif isinstance(location, Pokestop):
+                loc_id = 'pokestop/' + str(location.id)
+        else:
+            loc_id = f'{location.city}/{location.arg}'
+        d = {
+            'id': self.id,
+            'guild': self.guild_id,
+            'location': loc_id,
+            'reporter_id': self.reporter_id,
+            'pkmn': self.pkmn.id,
+            'created': self.created,
+            'messages': self.message_ids,
+            'caught_by': self.caught_by
+        }
+    
+    @property
+    def _data(self):
+        table = self.bot.dbi.table('wilds')
+        query = table.query.where(id=self.id)
+        return query
+    
+    @property
+    def _insert(self):
+        table = self.bot.dbi.table('wilds')
+        insert = table.insert
+        d = self.to_dict()
+        insert.row(**d)
+        return insert
+    
+    async def upsert(self):
+        insert = self._insert
+        await insert.commit(do_update=True)
+
+    @property
+    def guild(self):
+        return self.bot.get_guild(self.guild_id)
 
     async def summary_str(self, tz):
         name = await self.pkmn.name()
@@ -131,6 +175,28 @@ class Wild():
             if len(mentions) > 0:
                 content = f"{' '.join(mentions)} - The {name} has despawned!"
                 await channel.send(content)
+        score_table = self.bot.dbi.table('scoreboard')
+        wild_score = 1 + len(self.caught_by)
+        query = score_table.query
+        query.where(guild_id=self.guild_id)
+        query.where(user_id=self.reporter_id)
+        old_data = await query.get()
+        if not old_data:
+            d = {
+                'guild_id': self.guild_id,
+                'user_id': self.reporter_id,
+                'raid': 0,
+                'wild': 0,
+                'trade': 0,
+                'research': 0,
+                'service': 0
+            }
+        else:
+            d = dict(old_data[0])
+        d['wild'] += wild_score
+        insert = score_table.insert
+        insert.row(**d)
+        await insert.commit(do_update=True)
         wild_table = self.bot.dbi.table('wilds')
         query = wild_table.query
         query.where(id=self.id)
@@ -219,6 +285,11 @@ class Wild():
         elif emoji == self.react_list['info']:
             await message.remove_reaction(emoji, user)
             return await self.get_additional_info(channel, user)
+        elif emoji == self.react_list['caught']:
+            if user.id not in self.caught_by:
+                self.caught_by.append(user.id)
+            await message.remove_reaction(emoji, user)
+            return await self.upsert()
     
     @classmethod
     async def from_data(cls, bot, data):
@@ -235,7 +306,9 @@ class Wild():
         pkmn_id = data['pkmn']
         pkmn = Pokemon(bot, pkmn_id)
         wild_id = data['id']
-        wild = cls(wild_id, bot, guild_id, location, pkmn)
+        caught_by = data.get('caught_by', [])
+        reporter_id = data.get('reporter_id')
+        wild = cls(wild_id, bot, guild_id, reporter_id, location, pkmn, caught_by=caught_by)
         wild.message_ids = data['messages']
         for idstring in wild.message_ids:
             Wild.by_message[idstring] = wild
@@ -339,9 +412,11 @@ class WildCog(Cog):
             'id': wild_id,
             'guild': ctx.guild.id,
             'location': loc_id,
+            'reporter_id': ctx.author.id,
             'pkmn': pkmn.id,
             'created': new_wild.created,
-            'messages': new_wild.message_ids
+            'messages': new_wild.message_ids,
+            'caught_by': []
         }
         for idstring in new_wild.message_ids:
             Wild.by_message[idstring] = new_wild
@@ -468,9 +543,11 @@ class WildEmbed():
             'Moveset': moveset.strip(),
             'Gender': wild.pkmn.gender.title() if wild.pkmn.gender else "Unknown"
         }
+        reporter = self.guild.get_member(self.reporter_id).display_name
+        footer = f"Reported by {reporter}"
         reportdt = datetime.fromtimestamp(wild.created)
         embed = formatters.make_embed(title=directions_text, # msg_colour=color,
-            title_url=directions_url, thumbnail=img_url, fields=fields, footer="Reported")
+            title_url=directions_url, thumbnail=img_url, fields=fields, footer=footer)
         embed.timestamp = reportdt
         return cls(embed)
 

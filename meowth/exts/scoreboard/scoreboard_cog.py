@@ -83,20 +83,20 @@ class ScoreCog(Cog):
         data = await query.get()
         if not data:
             fields = {
-                'Raid': 0,
-                'Wild': 0,
-                'Trade': 0,
-                'Research': 0,
-                'Service': 0
+                'Raid': '0',
+                'Wild': '0',
+                'Trade': '0',
+                'Research': '0',
+                'Service': '0'
             }
         else:
             d = dict(data[0])
             fields = {
-                'Raid': d['raid'],
-                'Wild': d['wild'],
-                'Trade': d['trade'],
-                'Research': d['research'],
-                'Service': d['service']
+                'Raid': str(d['raid']),
+                'Wild': str(d['wild']),
+                'Trade': str(d['trade']),
+                'Research': str(d['research']),
+                'Service': str(d['service'])
             }
         return await ctx.info(f'Scorecard for {user.display_name}', fields=fields)
         

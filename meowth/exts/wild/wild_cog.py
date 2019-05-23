@@ -288,7 +288,7 @@ class Wild():
         elif emoji == self.react_list['caught']:
             if user.id not in self.caught_by:
                 self.caught_by.append(user.id)
-            await message.remove_reaction(emoji, user)
+            await message.remove_reaction(payload.emoji, user)
             return await self.upsert()
     
     @classmethod

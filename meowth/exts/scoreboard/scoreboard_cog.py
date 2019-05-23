@@ -113,14 +113,22 @@ class ScoreCog(Cog):
         data = await query.get()
         names = []
         scores = []
+        mobile_field = []
         for i in range(len(data)):
             row = data[i]
             name = ctx.guild.get_member(row['user_id']).display_name
             names.append(name)
             score = row[category]
             scores.append(str(score))
-        fields = {
+            mobile_field.append(f'{i+1}. {name}: {score}')
+        desktop_fields = {
             'Name': '\n'.join(names),
             'Score': '\n'.join(scores)
         }
-        return await ctx.info(f'{category.title()} Leaderboard', fields=fields, inline=True)
+        desktop_embed = await ctx.info(f'{category.title()} Leaderboard', fields=fields, inline=True, send=False)
+        mobile_embed = await ctx.info(f'{category.title()} Leaderboard', details="\n".join(mobile_field), send=False)
+        if ctx.author.is_on_mobile():
+            embed = mobile_embed
+        else:
+            embed = desktop_embed
+        return await ctx.send(embed=embed)

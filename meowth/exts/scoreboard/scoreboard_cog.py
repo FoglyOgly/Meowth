@@ -98,5 +98,5 @@ class ScoreCog(Cog):
                 'Research': str(d['research']),
                 'Service': str(d['service'])
             }
-        return await ctx.info(f'Scorecard for {user.display_name}', fields=fields)
+        return await ctx.info(f'Scorecard for {user.display_name}', fields=fields, inline=True)
         

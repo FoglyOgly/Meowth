@@ -111,10 +111,20 @@ class ScoreCog(Cog):
         query.order_by(score_table[category], asc=False)
         query.limit(10)
         data = await query.get()
-        l = []
+        ranks = []
+        names = []
+        scores = []
         for i in range(len(data)):
             row = data[i]
+            ranks.append(f'{i+1}')
             name = ctx.guild.get_member(row['user_id']).display_name
+            names.append(name)
             score = row[category]
-            l.append(f'**{i}**: {name} ({score})')
-        return await ctx.info(f'Leaderboard for {category.title()}', details="\n".join(l))
+            scores.append(str(score))
+            l.append(f'**{i+1}**: {name} ({score})')
+        fields = {
+            'Rank': '\n'.join(ranks),
+            'Name': '\n'.join(names),
+            'Score': '\n'.join(scores)
+        }
+        return await ctx.info(f'Leaderboard for {category.title()}', fields=fields)

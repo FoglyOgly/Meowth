@@ -100,3 +100,21 @@ class ScoreCog(Cog):
             }
         return await ctx.info(f'Scorecard for {user.display_name}', fields=fields, thumbnail=user.avatar_url)
         
+    @command()
+    async def leaderboard(self, ctx, category):
+        possible_categories = ['raid', 'wild', 'trade', 'research', 'service']
+        if category not in possible_categories:
+            return await ctx.error('No valid category found')
+        score_table = ctx.bot.dbi.table('scoreboard')
+        query = score_table.query('user_id', category)
+        query.where(guild_id=ctx.guild.id)
+        query.order_by(score_table[category], asc=False)
+        query.limit(10)
+        data = await query.get()
+        l = []
+        for i in range(len(data)):
+            row = data[i]
+            name = ctx.guild.get_member(row['user_id']).display_name
+            score = row[category]
+            l.append(f'**{i}**: {name} ({score})')
+        return await ctx.info(f'Leaderboard for {category.title()}', details="\n".join(l))

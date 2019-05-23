@@ -121,7 +121,6 @@ class ScoreCog(Cog):
             names.append(name)
             score = row[category]
             scores.append(str(score))
-            l.append(f'**{i+1}**: {name} ({score})')
         fields = {
             'Rank': '\n'.join(ranks),
             'Name': '\n'.join(names),

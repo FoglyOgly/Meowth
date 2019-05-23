@@ -1748,11 +1748,26 @@ class Raid:
                         pass
             raid_score = 1 + len(self.completed_by)
             score_table = self.bot.dbi.table('scoreboard')
-            update = score_table.update
-            update.where(guild_id=self.guild_id)
-            update.where(user_id=self.reporter_id)
-            update.values(score_table['raid']=f'raid + {raid_score}')
-            await update.commit()
+            query = score_table.query
+            query.where(guild_id=self.guild_id)
+            query.where(user_id=self.reporter_id)
+            old_data = await query.get()
+            if not old_data:
+                d = {
+                    'guild_id': self.guild_id,
+                    'user_id': self.reporter_id,
+                    'raid': 0,
+                    'wild': 0,
+                    'trade': 0,
+                    'research': 0,
+                    'service': 0
+                }
+            else:
+                d = dict(old_data[0])
+            d['raid'] += raid_score
+            insert = score_table.insert
+            insert.row(**d)
+            await insert.commit(do_update=True)
             raid_table = self.bot.dbi.table('raids')
             query = raid_table.query().where(id=self.id)
             self.bot.loop.create_task(query.delete())

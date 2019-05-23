@@ -2,6 +2,7 @@ from meowth import Cog, command, bot, checks
 
 import discord
 from discord.ext import commands
+from typing import Optional
 
 class ScoreCog(Cog):
 
@@ -70,4 +71,32 @@ class ScoreCog(Cog):
             'New Score': str(new_score)
         }
         return await ctx.success('Scoreboard adjusted', fields=fields)
+    
+    @command()
+    async def scorecard(self, ctx, user: Optional[discord.Member]):
+        if not user:
+            user = ctx.author
+        score_table = ctx.bot.dbi.table('scoreboard')
+        query = score_table.query
+        query.where(guild_id=ctx.guild.id)
+        query.where(user_id=user.id)
+        data = await query.get()
+        if not data:
+            fields = {
+                'Raid': 0,
+                'Wild': 0,
+                'Trade': 0,
+                'Research': 0,
+                'Service': 0
+            }
+        else:
+            d = dict(data[0])
+            fields = {
+                'Raid': d['raid'],
+                'Wild': d['wild'],
+                'Trade': d['trade'],
+                'Research': d['research'],
+                'Service': d['service']
+            }
+        return await ctx.info(f'Scorecard for {user.display_name}', fields=fields)
         

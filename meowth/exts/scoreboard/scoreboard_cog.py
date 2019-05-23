@@ -29,7 +29,7 @@ class ScoreCog(Cog):
         update = score_table.update
         if user_ids:
             update.where(score_table['user_id'].in_(user_ids))
-        for column in to_update:
-            update.values(score_table[column]=0)
+        d = {x: 0 for x in to_update}
+        update.values(**d)
         await update.commit()
         await ctx.success('Scoreboard reset', fields=fields)

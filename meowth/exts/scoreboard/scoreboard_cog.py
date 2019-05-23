@@ -1,7 +1,7 @@
 from meowth import Cog, command, bot, checks
 
 import discord
-from discord import commands
+from discord.ext import commands
 
 class ScoreCog(Cog):
 

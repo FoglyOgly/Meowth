@@ -897,6 +897,10 @@ class Raid:
                         continue
                 else:
                     await lobbymsg.edit(content=f"Group {grp['emoji']} has entered the raid!")
+            for user in grp['users']:
+                    if user not in self.completed_by:
+                        self.completed_by.append(user)
+            await self.upsert()
             user_table = self.bot.dbi.table('raid_rsvp')
             query = user_table.query.where(user_table['user_id'].in_(grp['users']))
             query.where(raid_id=self.id)
@@ -2192,7 +2196,9 @@ class Raid:
         hatch = data.get('hatch')
         end = data['endtime']
         raid_id = data['id']
-        raid = cls(raid_id, bot, guild_id, report_channel_id, gym, level=level, pkmn=boss, hatch=hatch, end=end)
+        reporter_id = data['reporter_id']
+        completed_by = data.get('completed_by', [])
+        raid = cls(raid_id, bot, guild_id, report_channel_id, reporter_id, gym, level=level, pkmn=boss, hatch=hatch, end=end, completed_by=completed_by)
         raid.channel_ids = data.get('channels')
         raid.message_ids = data.get('messages')
         raid.train_msgs = data.get('train_msgs')
@@ -3076,7 +3082,7 @@ class RaidEmbed():
         reporter = raid.guild.get_member(raid.reporter_id).display_name
         footer = f"Reported by {reporter} ∙ Ending"
         embed = formatters.make_embed(icon=RaidEmbed.raid_icon, title=directions_text, # msg_colour=color,
-            title_url=directions_url, thumbnail=img_url, fields=fields, footer="Ending",
+            title_url=directions_url, thumbnail=img_url, fields=fields, footer=footer,
             footer_icon=RaidEmbed.footer_icon)
         embed.timestamp = enddt
         return cls(embed)
@@ -3260,7 +3266,7 @@ class EggEmbed():
         }
         grps_str = raid.grps_str + "\u200b"
         fields['Groups'] = (False, grps_str)
-        reporter = raid.guild.get_memeber(raid.reporter_id).display_name
+        reporter = raid.guild.get_member(raid.reporter_id).display_name
         footer_text = f"Reported by {reporter} ∙ Hatching"
         embed = formatters.make_embed(icon=EggEmbed.raid_icon, title=directions_text,
             thumbnail=egg_img_url, title_url=directions_url, # msg_colour=color,

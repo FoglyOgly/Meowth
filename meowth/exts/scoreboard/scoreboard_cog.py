@@ -34,3 +34,40 @@ class ScoreCog(Cog):
         update.values(**d)
         await update.commit()
         await ctx.success('Scoreboard reset', fields=fields)
+    
+    @command()
+    @checks.is_admin()
+    async def adjust(self, ctx, user: discord.Member, category, amount: int):
+        possible_categories = ['raid', 'wild', 'trade', 'research', 'service']
+        if category not in possible_categories:
+            return await ctx.error('No valid category found')
+        score_table = ctx.bot.dbi.table('scoreboard')
+        query = score_table.query
+        query.where(guild_id=ctx.guild.id)
+        query.where(user_id=user.id)
+        old_data = await query.get()
+        if not old_data:
+            d = {
+                'guild_id': ctx.guild.id,
+                'user_id': user.id,
+                'raid': 0,
+                'wild': 0,
+                'trade': 0,
+                'research': 0,
+                'service': 0
+            }
+        else:
+            d = dict(old_data[0])
+        old_score = d.get(category, 0)
+        new_score = old_score + amount
+        d[category] = new_score
+        insert = score_table.insert
+        insert.row(**d)
+        await insert.commit(do_update=True)
+        fields = {
+            'User': user.display_name,
+            'Category': category,
+            'New Score': str(new_score)
+        }
+        return await ctx.success('Scoreboard adjusted', fields=fields)
+        

@@ -543,7 +543,7 @@ class WildEmbed():
             'Moveset': moveset.strip(),
             'Gender': wild.pkmn.gender.title() if wild.pkmn.gender else "Unknown"
         }
-        reporter = self.guild.get_member(self.reporter_id).display_name
+        reporter = wild.guild.get_member(self.reporter_id).display_name
         footer = f"Reported by {reporter}"
         reportdt = datetime.fromtimestamp(wild.created)
         embed = formatters.make_embed(title=directions_text, # msg_colour=color,

@@ -3,7 +3,7 @@ from meowth import Cog, command, bot, checks
 import discord
 from discord import commands
 
-class ScoreCog():
+class ScoreCog(Cog):
 
     def __init__(self, bot):
         self.bot = bot

@@ -173,7 +173,46 @@ class Trade():
         if msg:
             await msg.edit(content=f'{self.lister_name} has accepted an offer!')
             await msg.clear_reactions()
-        return await query.delete()
+        await query.delete()
+        score_table = self.bot.dbi.table('scoreboard')
+        query = score_table.query
+        query.where(guild_id=self.guild_id)
+        query.where(user_id=self.lister_id)
+        old_data = await query.get()
+        if not old_data:
+            d = {
+                'guild_id': self.guild_id,
+                'user_id': self.lister_id,
+                'raid': 0,
+                'wild': 0,
+                'trade': 0,
+                'research': 0,
+                'service': 0
+            }
+        else:
+            d = dict(old_data[0])
+        d['trade'] += 1
+        insert = score_table.insert
+        insert.row(**d)
+        query = score_table.query
+        query.where(guild_id=self.guild_id)
+        query.where(user_id=trader.id)
+        old_data = await query.get()
+        if not old_data:
+            d = {
+                'guild_id': self.guild_id,
+                'user_id': trader.id,
+                'raid': 0,
+                'wild': 0,
+                'trade': 0,
+                'research': 0,
+                'service': 0
+            }
+        else:
+            d = dict(old_data[0])
+        d['trade'] += 1
+        insert.row(**d)
+        await insert.commit(do_update=True)
 
     async def reject_offer(self, trader, listed, offer, msg):
         c, m = await ChannelMessage.from_id_string(self.bot, msg)

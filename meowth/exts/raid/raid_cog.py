@@ -474,7 +474,7 @@ class RaidCog(Cog):
                 end = time.time() + 60*endtime
             hatch = None
         raid_id = next(snowflake.create())
-        new_raid = Raid(raid_id, ctx.bot, ctx.guild.id, ctx.channel.id, gym, level=level, pkmn=boss, hatch=hatch, end=end, tz=zone)
+        new_raid = Raid(raid_id, ctx.bot, ctx.guild.id, ctx.channel.id, ctx.author.id, gym, level=level, pkmn=boss, hatch=hatch, end=end, tz=zone)
         ctx.raid = new_raid
         return await self.setup_raid(ctx, new_raid)
 
@@ -678,7 +678,7 @@ class RaidCog(Cog):
             raise InvalidTime
         zone = await ctx.tz()
         raid_id = next(snowflake.create())
-        new_exraid = Raid(raid_id, ctx.bot, ctx.guild.id, ctx.channel.id, gym, level="EX", hatch=hatch_time, tz=zone)
+        new_exraid = Raid(raid_id, ctx.bot, ctx.guild.id, ctx.channel.id, ctx.author.id, gym, level="EX", hatch=hatch_time, tz=zone)
         return await self.setup_raid(ctx, new_exraid)
 
     

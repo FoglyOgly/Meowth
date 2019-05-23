@@ -339,8 +339,8 @@ class Raid:
         cls.instances[raid_id] = instance
         return instance
 
-    def __init__(self, raid_id, bot, guild_id, report_channel_id, gym=None, level=None,
-        pkmn: RaidBoss=None, hatch: float=None, end: float=None, tz: str=None):
+    def __init__(self, raid_id, bot, guild_id, report_channel_id, reporter_id, gym=None, level=None,
+        pkmn: RaidBoss=None, hatch: float=None, end: float=None, tz: str=None, completed_by=[]):
         self.id = raid_id
         self.bot = bot
         self.guild_id = guild_id
@@ -358,11 +358,13 @@ class Raid:
         self.group_list = []
         self.tz = tz
         self.created = time.time()
+        self.reporter_id = reporter_id
         self.monitor_task = None
         self.hatch_task = None
         self.expire_task = None
         self.train_msgs = []
         self._weather = "NO_WEATHER"
+        self.completed_by = completed_by
     
     def __eq__(self, other):
         if isinstance(other, Raid):
@@ -383,6 +385,7 @@ class Raid:
             'gym': gymid,
             'guild': self.guild_id,
             'report_channel': self.report_channel_id,
+            'reporter_id': self.reporter_id,
             'level': self.level,
             'pkmn': (self.pkmn.id, self.pkmn.quickMoveid or None, self.pkmn.chargeMoveid or None) if self.pkmn else (None, None, None),
             'hatch': self.hatch,
@@ -390,7 +393,8 @@ class Raid:
             'messages': self.message_ids,
             'channels': self.channel_ids,
             'tz': self.tz,
-            'train_msgs': self.train_msgs
+            'train_msgs': self.train_msgs,
+            'completed_by': self.completed_by
         }
         return d
     
@@ -820,6 +824,10 @@ class Raid:
                     grp_query.where(raid_id=self.id)
                     grp_query.where(starttime=grp['starttime'])
                     await grp_query.delete()
+                for user in grp['users']:
+                    if user not in self.completed_by:
+                        self.completed_by.append(user)
+                await self.upsert()
                 return await self.update_rsvp()
             grp_est = self.grp_est_power(grp)
             if grp_est < 1:
@@ -1738,6 +1746,13 @@ class Raid:
                         await channel.delete()
                     except:
                         pass
+            raid_score = 1 + len(self.completed_by)
+            score_table = self.bot.dbi.table('scoreboard')
+            update = score_table.update
+            update.where(guild_id=self.guild_id)
+            update.where(user_id=self.reporter_id)
+            update.values(score_table['raid']=f'raid + {raid_score}')
+            await update.commit()
             raid_table = self.bot.dbi.table('raids')
             query = raid_table.query().where(id=self.id)
             self.bot.loop.create_task(query.delete())
@@ -3043,6 +3058,8 @@ class RaidEmbed():
             fields['Recommended Group Size'] = str(rec)
         else:
             fields['Groups'] = (False, grps_str)
+        reporter = raid.guild.get_member(raid.reporter_id).display_name
+        footer = f"Reported by {reporter} ∙ Ending"
         embed = formatters.make_embed(icon=RaidEmbed.raid_icon, title=directions_text, # msg_colour=color,
             title_url=directions_url, thumbnail=img_url, fields=fields, footer="Ending",
             footer_icon=RaidEmbed.footer_icon)
@@ -3228,7 +3245,8 @@ class EggEmbed():
         }
         grps_str = raid.grps_str + "\u200b"
         fields['Groups'] = (False, grps_str)
-        footer_text = "Hatching"
+        reporter = raid.guild.get_memeber(raid.reporter_id).display_name
+        footer_text = f"Reported by {reporter} ∙ Hatching"
         embed = formatters.make_embed(icon=EggEmbed.raid_icon, title=directions_text,
             thumbnail=egg_img_url, title_url=directions_url, # msg_colour=color,
             fields=fields, footer=footer_text, footer_icon=EggEmbed.footer_icon)

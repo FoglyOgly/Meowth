@@ -126,4 +126,4 @@ class ScoreCog(Cog):
             'Name': '\n'.join(names),
             'Score': '\n'.join(scores)
         }
-        return await ctx.info(f'Leaderboard for {category.title()}', fields=fields)
+        return await ctx.info(f'Leaderboard for {category.title()}', fields=fields, inline=True)

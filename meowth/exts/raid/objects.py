@@ -3080,7 +3080,7 @@ class RaidEmbed():
         else:
             fields['Groups'] = (False, grps_str)
         reporter = raid.guild.get_member(raid.reporter_id).display_name
-        footer = f"Reported by {reporter} ∙ Ending"
+        footer = f"Reported by {reporter} • Ending"
         embed = formatters.make_embed(icon=RaidEmbed.raid_icon, title=directions_text, # msg_colour=color,
             title_url=directions_url, thumbnail=img_url, fields=fields, footer=footer,
             footer_icon=RaidEmbed.footer_icon)
@@ -3267,7 +3267,7 @@ class EggEmbed():
         grps_str = raid.grps_str + "\u200b"
         fields['Groups'] = (False, grps_str)
         reporter = raid.guild.get_member(raid.reporter_id).display_name
-        footer_text = f"Reported by {reporter} ∙ Hatching"
+        footer_text = f"Reported by {reporter} • Hatching"
         embed = formatters.make_embed(icon=EggEmbed.raid_icon, title=directions_text,
             thumbnail=egg_img_url, title_url=directions_url, # msg_colour=color,
             fields=fields, footer=footer_text, footer_icon=EggEmbed.footer_icon)

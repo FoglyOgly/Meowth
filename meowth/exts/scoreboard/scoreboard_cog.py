@@ -1,5 +1,4 @@
 from meowth import Cog, command, bot, checks
-from typing import Optional
 
 import discord
 from discord import commands

@@ -373,7 +373,7 @@ class WildCog(Cog):
         pkmn = await pokemon.validate('wild', weather=weather)
         wild_table = self.bot.dbi.table('wilds')
         wild_id = next(snowflake.create())
-        new_wild = Wild(wild_id, self.bot, ctx.guild.id, location, pkmn)
+        new_wild = Wild(wild_id, self.bot, ctx.guild.id, ctx.author.id, location, pkmn)
         react_list = list(new_wild.react_list.values())
         name = await pkmn.name()
         family = await pkmn._familyId()

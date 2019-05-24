@@ -1306,7 +1306,10 @@ class RaidCog(Cog):
         update = rsvp_table.update
         update.where(raid_id=raid.id)
         update.values(raid_id=old_raid.id)
-        await update.commit()
+        try:
+            await update.commit()
+        except:
+            pass
         groups_table = ctx.bot.dbi.table('raid_groups')
         update = groups_table.update
         update.where(raid_id=raid.id)
@@ -1319,6 +1322,11 @@ class RaidCog(Cog):
         for message_id in raid.message_ids:
             try:
                 del Raid.by_message[message_id]
+            except:
+                pass
+            chn, msg = await ChannelMessage.from_id_string(self.bot, message_id)
+            try:
+                await msg.delete()
             except:
                 pass
         if raid.channel_ids:

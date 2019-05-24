@@ -1291,5 +1291,47 @@ class RaidCog(Cog):
         rchan = raid.report_channel
         report_channel = ReportChannel(ctx.bot, rchan)
         raid_ids = await report_channel.get_possible_duplicates(raid)
-        await ctx.send(str(raid_ids))
+        raids = [Raid.instances.get(x) for x in raid_ids if Raid.instances.get(x)]
+        summaries = [await x.summary_str() for x in raids]
+        react_list = formatters.mc_emoji(length)
+        choice_dict = dict(zip(react_list, raids))
+        display_dict = dict(zip(react_list, summaries))
+        embed = formatters.mc_embed(display_dict)
+        dupask = await ctx.send('Which existing raid is this a duplicate of? Use the reactions to select from the choices below.', embed=embed)
+        payload = await formatters.ask(ctx.bot, [dupask], user_list=[ctx.author.id],
+            react_list=react_list)
+        old_raid = choice_dict[str(payload.emoji)]
+        await dupask.delete()
+        rsvp_table = ctx.bot.dbi.table('raid_rsvp')
+        update = rsvp_table.update
+        update.where(raid_id=raid.id)
+        update.values(raid_id=old_raid.id)
+        await update.commit()
+        groups_table = ctx.bot.dbi.table('raid_groups')
+        update = groups_table.update
+        update.where(raid_id=raid.id)
+        update.values(raid_id=old_raid.id)
+        await update.commit()
+        try:
+            del Raid.instances[raid.id]
+        except:
+            pass
+        for message_id in raid.message_ids:
+            try:
+                del Raid.by_message[message_id]
+            except:
+                pass
+        if raid.channel_ids:
+            for chanid in raid.channel_ids:
+                try:
+                    del Raid.by_channel[chanid]
+                except:
+                    pass
+                channel = self.bot.get_channel(int(chanid))
+                if not channel:
+                    continue
+                t = Train.by_channel.get(int(chanid))
+                if t:
+                    continue
+                await channel.delete()
 

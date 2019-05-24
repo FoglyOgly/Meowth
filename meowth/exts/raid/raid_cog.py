@@ -1288,7 +1288,8 @@ class RaidCog(Cog):
         raid = Raid.by_channel.get(str(ctx.channel.id))
         if not raid:
             return
-        report_channel = ReportChannel(ctx.bot, raid.report_channnel)
+        rchan = raid.report_channel
+        report_channel = ReportChannel(ctx.bot, rchan)
         raid_ids = await report_channel.get_possible_duplicates(raid)
         await ctx.send(str(raid_ids))
 

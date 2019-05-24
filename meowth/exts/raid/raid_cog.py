@@ -1293,7 +1293,7 @@ class RaidCog(Cog):
         raid_ids = await report_channel.get_possible_duplicates(raid)
         raids = [Raid.instances.get(x) for x in raid_ids if Raid.instances.get(x)]
         summaries = [await x.summary_str() for x in raids]
-        react_list = formatters.mc_emoji(length)
+        react_list = formatters.mc_emoji(len(raids))
         choice_dict = dict(zip(react_list, raids))
         display_dict = dict(zip(react_list, summaries))
         embed = formatters.mc_embed(display_dict)

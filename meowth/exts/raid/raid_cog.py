@@ -1346,4 +1346,31 @@ class RaidCog(Cog):
         raid_table = self.bot.dbi.table('raids')
         query = raid_table.query.where(id=raid.id)
         self.bot.loop.create_task(query.delete())
+    
+    @command()
+    @raid_checks.raid_or_meetup()
+    @checks.is_mod()
+    async def setstatus(self, ctx, user: discord.Member, status, 
+        bosses: commands.Greedy[Pokemon], total: typing.Optional[int]=1, *teamcounts):
+        if total < 1:
+            return
+        possible_status = ['i', 'interested', 'maybe', 'c', 'coming', 'omw', 'h', 'here', 'x', 'cancel']
+        if status not in possible_status:
+            return
+        if status in ['i', 'interested', 'maybe']:
+            status = 'maybe'
+        elif status in ['c', 'coming', 'omw']:
+            status = 'coming'
+        elif status in ['h', 'here']:
+            status = 'here'
+        elif status in ['x', 'cancel']:
+            status = 'cancel'
+        meetup = Meetup.by_channel.get(ctx.channel.id)
+        if meetup:
+            if status == 'cancel':
+                return await self.mrsvp(ctx, status)
+            return await self.mrsvp(ctx, status, total, *teamcounts)
+        if status == 'cancel':
+            return await self.rsvp(ctx, status)
+        await self.rsvp(ctx, status, bosses, total, *teamcounts)
 

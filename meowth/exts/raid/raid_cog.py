@@ -924,6 +924,8 @@ class RaidCog(Cog):
 
         If the raid is at a known gym, this command will update
         the weather at all other known gyms in the cell.
+        Possible weather: sunny, clear, rainy, cloudy, partlycloudy, fog, snow, windy
+        Use 'unknown' to remove the weather.
         """
         raid = Raid.by_channel.get(str(ctx.channel.id))
         if not raid:

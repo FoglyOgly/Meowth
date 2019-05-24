@@ -1,4 +1,5 @@
 from meowth import Cog, command, bot, checks
+from . import score_checks
 
 import discord
 from discord.ext import commands
@@ -12,6 +13,11 @@ class ScoreCog(Cog):
     @command()
     @checks.is_admin()
     async def reset_board(self, ctx, users: commands.Greedy[discord.Member], *categories):
+        """Reset scores to 0 for a user or the whole server in one or more categories.
+        If no users found, all server scores will be reset. If no categories are found,
+        all categories will be reset.
+        
+        Possible categories are: raid, wild, trade, research, service."""
         possible_categories = ['raid', 'wild', 'trade', 'research', 'service']
         fields = {}
         if categories:
@@ -39,6 +45,8 @@ class ScoreCog(Cog):
     @command()
     @checks.is_admin()
     async def adjust(self, ctx, user: discord.Member, category, amount: int):
+        """Manually adjust a user's score in a category up or down. Use negative values
+        to deduct points."""
         possible_categories = ['raid', 'wild', 'trade', 'research', 'service']
         if category not in possible_categories:
             return await ctx.error('No valid category found')
@@ -73,7 +81,9 @@ class ScoreCog(Cog):
         return await ctx.success('Scoreboard adjusted', fields=fields)
     
     @command()
+    @score_checks.users_enabled()
     async def scorecard(self, ctx, user: Optional[discord.Member]):
+        """Display a user's scorecard."""
         if not user:
             user = ctx.author
         score_table = ctx.bot.dbi.table('scoreboard')
@@ -101,7 +111,11 @@ class ScoreCog(Cog):
         return await ctx.info(f'Scorecard for {user.display_name}', fields=fields, thumbnail=user.avatar_url)
         
     @command()
+    @score_checks.users_enabled()
     async def leaderboard(self, ctx, category):
+        """Display the top ten in points for a category.
+
+        Categories are: raid, wild, trade, research, service"""
         possible_categories = ['raid', 'wild', 'trade', 'research', 'service']
         if category not in possible_categories:
             return await ctx.error('No valid category found')

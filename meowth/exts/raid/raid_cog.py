@@ -1285,6 +1285,10 @@ class RaidCog(Cog):
     @command()
     @raid_checks.raid_channel()
     async def duplicate(self, ctx):
+        """Report the current raid channel as a duplicate.
+        Meowth will ask you to select from a list of raids of the same
+        level or boss. Then Meowth will copy the RSVPs and raid groups 
+        from the duplicate to the original."""
         raid = Raid.by_channel.get(str(ctx.channel.id))
         if not raid:
             return
@@ -1293,15 +1297,18 @@ class RaidCog(Cog):
         raid_ids = await report_channel.get_possible_duplicates(raid)
         raids = [Raid.instances.get(x) for x in raid_ids if Raid.instances.get(x)]
         summaries = [await x.summary_str() for x in raids]
-        react_list = formatters.mc_emoji(len(raids))
-        choice_dict = dict(zip(react_list, raids))
-        display_dict = dict(zip(react_list, summaries))
-        embed = formatters.mc_embed(display_dict)
-        dupask = await ctx.send('Which existing raid is this a duplicate of? Use the reactions to select from the choices below.', embed=embed)
-        payload = await formatters.ask(ctx.bot, [dupask], user_list=[ctx.author.id],
-            react_list=react_list)
-        old_raid = choice_dict[str(payload.emoji)]
-        await dupask.delete()
+        if len(raids) == 1:
+            old_raid = raids[0]
+        else:
+            react_list = formatters.mc_emoji(len(raids))
+            choice_dict = dict(zip(react_list, raids))
+            display_dict = dict(zip(react_list, summaries))
+            embed = formatters.mc_embed(display_dict)
+            dupask = await ctx.send('Which existing raid is this a duplicate of? Use the reactions to select from the choices below.', embed=embed)
+            payload = await formatters.ask(ctx.bot, [dupask], user_list=[ctx.author.id],
+                react_list=react_list)
+            old_raid = choice_dict[str(payload.emoji)]
+            await dupask.delete()
         rsvp_table = ctx.bot.dbi.table('raid_rsvp')
         update = rsvp_table.update
         update.where(raid_id=raid.id)
@@ -1352,6 +1359,9 @@ class RaidCog(Cog):
     @checks.is_mod()
     async def setstatus(self, ctx, user: discord.Member, status, 
         bosses: commands.Greedy[Pokemon], total: typing.Optional[int]=1, *teamcounts):
+        """RSVP to a raid on behalf of another user. 
+        
+        Usable only by mods."""
         if total < 1:
             return
         possible_status = ['i', 'interested', 'maybe', 'c', 'coming', 'omw', 'h', 'here', 'x', 'cancel']

@@ -1343,4 +1343,7 @@ class RaidCog(Cog):
                 if t:
                     continue
                 await channel.delete()
+        raid_table = self.bot.dbi.table('raids')
+        query = raid_table.query.where(id=raid.id)
+        self.bot.loop.create_task(query.delete())
 

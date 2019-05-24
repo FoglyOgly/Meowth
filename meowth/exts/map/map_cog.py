@@ -151,6 +151,19 @@ class ReportChannel():
         data = await self.bot.dbi.execute_query(query, *query_args)
         return [next(row.values()) for row in data]
     
+    async def get_possible_duplicates(self, raid):
+        if raid.status == 'active':
+            pkmn_id = raid.pkmn.id
+            condition = f"AND {pkmn_id} in pkmn"
+        else:
+            level = raid.level
+            condition = f"AND level={level}"
+        channel_id = self.channel.id
+        query = f"SELECT id FROM raids WHERE exists (SELECT * FROM (SELECT unnest(messages)) x(message) WHERE x.message LIKE $1) {condition} ORDER BY endtime ASC;"
+        query_args = [f'{channel_id}%']
+        data = await self.bot.dbi.execute_query(query, *query_args)
+        return [next(row.values()) for row in data]
+    
     async def get_all_trains(self):
         channel_id = self.channel.id
         table = self.bot.dbi.table('trains')

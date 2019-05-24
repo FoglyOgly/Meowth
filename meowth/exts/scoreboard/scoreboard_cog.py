@@ -120,15 +120,12 @@ class ScoreCog(Cog):
             names.append(name)
             score = row[category]
             scores.append(str(score))
-            mobile_field.append(f'{i+1}. {name}: {score}')
+            mobile_field.append(f'**{i+1}.** {name}: {score}')
         desktop_fields = {
             'Name': '\n'.join(names),
             'Score': '\n'.join(scores)
         }
-        desktop_embed = await ctx.info(f'{category.title()} Leaderboard', fields=desktop_fields, inline=True, send=False)
-        mobile_embed = await ctx.info(f'{category.title()} Leaderboard', details="\n".join(mobile_field), send=False)
         if ctx.author.is_on_mobile():
-            embed = mobile_embed
+            await ctx.info(f'{category.title()} Leaderboard', details="\n".join(mobile_field))
         else:
-            embed = desktop_embed
-        return await ctx.send(embed=embed)
+            await ctx.info(f'{category.title()} Leaderboard', fields=desktop_fields, inline=True)

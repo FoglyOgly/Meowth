@@ -1281,4 +1281,14 @@ class RaidCog(Cog):
     
     async def _leave(self, user, train):
         await user.leave_train(train)
+    
+    @command()
+    @raid_checks.raid_channel()
+    async def duplicate(self, ctx):
+        raid = Raid.by_channel.get(str(ctx.channel.id))
+        if not raid:
+            return
+        report_channel = ReportChannel(ctx.bot, raid.report_channnel)
+        raid_ids = await report_channel.get_possible_duplicates(raid)
+        await ctx.send(str(raid_ids))
 

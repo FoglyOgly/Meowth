@@ -1357,6 +1357,7 @@ class RaidCog(Cog):
         possible_status = ['i', 'interested', 'maybe', 'c', 'coming', 'omw', 'h', 'here', 'x', 'cancel']
         if status not in possible_status:
             return
+        ctx.author = user
         if status in ['i', 'interested', 'maybe']:
             status = 'maybe'
         elif status in ['c', 'coming', 'omw']:

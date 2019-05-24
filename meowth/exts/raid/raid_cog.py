@@ -1315,6 +1315,7 @@ class RaidCog(Cog):
         update.where(raid_id=raid.id)
         update.values(raid_id=old_raid.id)
         await update.commit()
+        await old_raid.update_rsvp()
         try:
             del Raid.instances[raid.id]
         except:

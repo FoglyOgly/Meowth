@@ -158,6 +158,7 @@ class ReportChannel():
         else:
             level = raid.level
             condition = f"level='{level}'"
+        condition += f" AND id <> '{raid.id}'"
         channel_id = self.channel.id
         query = f"SELECT id FROM raids WHERE {condition} AND exists (SELECT * FROM (SELECT unnest(messages)) x(message) WHERE x.message LIKE $1) ORDER BY endtime ASC;"
         query_args = [f'{channel_id}%']

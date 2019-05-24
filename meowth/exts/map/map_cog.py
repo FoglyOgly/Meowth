@@ -154,7 +154,7 @@ class ReportChannel():
     async def get_possible_duplicates(self, raid):
         if raid.status == 'active':
             pkmn_id = raid.pkmn.id
-            condition = f"AND {pkmn_id} in pkmn"
+            condition = f"AND {pkmn_id} in (SELECT unnest(pkmn))"
         else:
             level = raid.level
             condition = f"AND level={level}"

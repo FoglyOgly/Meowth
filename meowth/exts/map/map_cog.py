@@ -154,7 +154,7 @@ class ReportChannel():
     async def get_possible_duplicates(self, raid):
         if raid.status == 'active':
             pkmn_id = raid.pkmn.id
-            condition = f"pkmn[0] = '{pkmn_id}'"
+            condition = f"pkmn[1] = '{pkmn_id}'"
         else:
             level = raid.level
             condition = f"level='{level}'"

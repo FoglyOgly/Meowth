@@ -213,5 +213,3 @@ class SilphCog(Cog):
                         continue
                     break
         await ctx.success('New tasks verified')
-                    
-# TEST

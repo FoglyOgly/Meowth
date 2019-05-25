@@ -16,6 +16,42 @@ class SilphCog(Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    def parse_tasks_from_silph(self, data):
+        rows = []
+        all_verified = True
+        for r in data:
+            task = r['title']
+            verified = r['verified']
+            if not verified:
+                all_verified = False
+            rewards = r['rewards']
+            pkmn_rewards = rewards.get('pokemon', [])
+            item_rewards = rewards.get('items', {})
+            for pkmn in pkmn_rewards:
+                slug = pkmn['pokemon']['slug']
+                meowthid = slug.upper().replace('-', '_')
+                if meowthid == 'GIRATINA_ALTERED':
+                    meowthid = 'GIRATINA'
+                forms = ['ALOLA', 'ATTACK', 'DEFENSE', 'SPEED', 'RAINY', 'SNOWY', 'SUNNY', 'ORIGIN']
+                for form in forms:
+                    if meowthid.endswith(form):
+                        meowthid += "_FORM"
+                row = {
+                    'task': task,
+                    'reward': meowthid
+                }
+                rows.append(row)
+            for item in item_rewards:
+                amount = item_rewards[item]
+                itemstr = f"{item}/{amount}"
+                row = {
+                    'task': task,
+                    'reward': itemstr
+                }
+                rows.append(row)
+        return rows, all_verified
+
+
     def parse_info_from_silph(self, data):
         rows = []
         all_verified = True
@@ -68,7 +104,6 @@ class SilphCog(Cog):
         linked_discord = silph_card.discord_name
         if not linked_discord == str(ctx.author):
             raise SilphCardAlreadyLinked
-        user_table = ctx.bot.dbi.table('users')
         meowthuser = MeowthUser(ctx.bot, ctx.author)
         data = await meowthuser._data.get()
         if len(data) == 0:
@@ -129,6 +164,7 @@ class SilphCog(Cog):
                         i += 1
                         continue
                     break
+        await ctx.success('Boss shakeup complete')
         
     @command()
     @checks.is_co_owner()
@@ -149,3 +185,32 @@ class SilphCog(Cog):
                 insert = table.insert
                 insert.rows(rows)
                 await insert.commit(do_update=True)
+                await ctx.success('Bosses replaced')
+    
+    @command()
+    @checks.is_co_owner()
+    async def tasksupdate(self, ctx):
+        url = 'https://api.thesilphroad.com/v0/research/tasks'
+        headers = {'Authorization': f'Silph {silph_info.api_key}'}
+        while True:
+            async with aiohttp.ClientSession() as sess:
+                async with sess.get(url, headers=headers) as resp:
+                    try:
+                        data = await resp.json()
+                    except:
+                        return await ctx.send('Failed')
+                    table = ctx.bot.dbi.table('research_tasks')
+                    insert = table.insert
+                    query = table.query
+                    data = data['data']
+                    rows, verified = self.parse_tasks_from_silph(data)
+                    if verified:
+                        await query.delete()
+                    insert.rows(rows)
+                    await insert.commit(do_update=True)
+                    if not verified:
+                        await asyncio.sleep(300)
+                        continue
+                    break
+        await ctx.success('New tasks verified')
+                    

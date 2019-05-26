@@ -568,6 +568,8 @@ class Raid:
         emoji_list = [x['emoji'] for x in groups]
         emoji_list += '\u2754'
         payload = await formatters.ask(self.bot, [msg], [user], react_list=emoji_list)
+        if not payload:
+            return await msg.delete()
         if payload.emoji.is_custom_emoji():
             emoji = payload.emoji.id
         else:

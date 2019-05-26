@@ -187,6 +187,8 @@ class ResearchCog(Cog):
                 return m.author == ctx.author and m.channel == ctx.channel
             reply = await ctx.bot.wait_for('message', check=check)
             reward = f"partial/{reply.content}"
+            await reply.delete()
+            await msg.delete()
         research_id = next(snowflake.create())
         research = Research(ctx.bot, research_id, task, location, reward, tz)
 

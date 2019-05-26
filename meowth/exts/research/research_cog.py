@@ -201,11 +201,11 @@ class ResearchEmbed:
     task_index = 1
     reward_index = 2
 
-    @classmethod
-    async def from_research(cls, research):
-        task = research.task
-        location = research.location
-        reward = research.reward
+    # @classmethod
+    # async def from_research(cls, research):
+    #     task = research.task
+    #     location = research.location
+    #     reward = research.reward
 
-        task_desc = await task.description()
-        if isinstance(location, POI):   
+    #     task_desc = await task.description()
+    #     if isinstance(location, POI):   

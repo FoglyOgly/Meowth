@@ -87,6 +87,7 @@ class Task:
         table = ctx.bot.dbi.table('research_tasks')
         query = table.query('task')
         tasks = await query.get_values()
+        tasks = list(set(tasks))
         matches = get_matches(tasks, arg)
         if matches:
             task_matches = [x[0] for x in matches]
@@ -159,8 +160,8 @@ class ResearchCog(Cog):
                 reward = possible_rewards[0]
             else:
                 react_list = formatters.mc_emoji(len(possible_rewards))
-                item_dict = []
-                pkmn_dict = []
+                item_dict = {}
+                pkmn_dict = {}
                 for reward in possible_rewards:
                     if '/' in reward:
                         obj = ItemReward(ctx.bot, reward)

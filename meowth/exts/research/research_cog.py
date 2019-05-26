@@ -2,6 +2,8 @@ from meowth import Cog, command, bot, checks
 from meowth.exts.map import ReportChannel, Pokestop, PartialPOI, POI
 from meowth.exts.pkmn import Pokemon
 from meowth.utils import formatters, snowflake
+from meowth.utils.fuzzymatch import get_match, get_matches
+
 
 
 from . import research_checks
@@ -74,7 +76,59 @@ class Task:
     
     # async def description(self):
 
-    # async def possible_rewards(self):
+    async def possible_rewards(self):
+        table = self.bot.dbi.table('research_tasks')
+        query = table.query('reward')
+        query.where(task=self.id)
+        return await query.get_values()
+
+    @classmethod
+    async def convert(cls, ctx, arg):
+        table = ctx.bot.dbi.table('research_tasks')
+        query = table.query('task')
+        tasks = await query.get_values()
+        matches = get_matches(tasks, arg)
+        if matches:
+            task_matches = [x[0] for x in matches]
+        else:
+            task_matches = []
+        if len(task_matches) > 1:
+            react_list = formatters.mc_emoji(len(task_matches))
+            display_dict = dict(zip(react_list, task_matches))
+            embed = formatters.mc_embed(display_dict)
+            multi = await ctx.send('Multiple possible Tasks found! Please select from the following list.',
+                embed=embed)
+            payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
+                react_list=react_list)
+            task = display_dict[str(payload.emoji)]
+            await multi.delete()
+        elif len(task_matches) == 1:
+            task = task_matches[0]
+        else:
+            return PartialTask(ctx.bot, arg)
+        return cls(ctx.bot, task)
+
+class PartialTask:
+
+    def __init__(self, bot, arg):
+        self.bot = bot
+        self.id = f"partial/{arg}"
+
+
+
+        
+
+class ItemReward:
+
+    def __init__(self, bot, reward_id):
+        self.bot = bot
+        self.id = reward_id
+    
+    async def description(self):
+        item_id, amount = self.id.split('/')
+        item = Item(self.bot, item_id)
+        item_name = await item.name()
+        return f"{amount} {item_name}"
 
 class Item:
 
@@ -82,7 +136,12 @@ class Item:
         self.bot = bot
         self.id = item_id
     
-    # async def name(self):
+    async def name(self):
+        table = self.bot.dbi.table('item_names')
+        query = table.query('name')
+        query.where(language_id=9)
+        query.where(item_id=self.id)
+        return await query.get_value()
 
 
 class ResearchCog(Cog):
@@ -92,8 +151,41 @@ class ResearchCog(Cog):
 
     @command(aliases=['res'])
     @research_checks.research_enabled()
-    async def research(self, ctx, task, *, location: Pokestop):
+    async def research(self, ctx, task: Task, *, location: Pokestop):
         tz = await ctx.tz()
+        if isinstance(task, Task):
+            possible_rewards = await task.possible_rewards()
+            if len(possible_rewards) == 1:
+                reward = possible_rewards[0]
+            else:
+                react_list = formatters.mc_emoji(len(possible_rewards))
+                item_dict = []
+                pkmn_dict = []
+                for reward in possible_rewards:
+                    if '/' in reward:
+                        obj = ItemReward(ctx.bot, reward)
+                        desc = await obj.description()
+                        item_dict[desc] = reward
+                    else:
+                        pkmn = Pokemon(ctx.bot, reward)
+                        name = await pkmn.name()
+                        pkmn_dict[name] = reward
+                reward_dict = dict(pkmn_dict, **item_dict)
+                choice_dict = dict(zip(react_list, reward_dict.values()))
+                display_dict = dict(zip(react_list, reward_dict.keys()))
+                embed = formatters.mc_embed(display_dict)
+                multi = await ctx.send('What is the reward for this task? Please select from the options below.',
+                    embed=embed)
+                payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
+                    react_list=react_list)
+                reward = choice_dict[str(payload.emoji)]
+                await multi.delete()
+        else:
+            msg = await ctx.send('What is the reward for this task? Please type your response below.')
+            def check(m):
+                return m.author == ctx.author and m.channel == ctx.channel
+            reply = await ctx.bot.wait_for('message', check=check)
+            reward = f"partial/{reply.content}"
         research_id = next(snowflake.create())
         research = Research(ctx.bot, research_id, task, location, reward, tz)
 
@@ -116,7 +208,4 @@ class ResearchEmbed:
         reward = research.reward
 
         task_desc = await task.description()
-        if isinstance(location, POI):
-            
-
-    
+        if isinstance(location, POI):   

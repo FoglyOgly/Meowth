@@ -125,11 +125,19 @@ class ItemReward:
         self.bot = bot
         self.id = reward_id
     
+    @property
+    def item(self):
+        item_id = self.id.split('/')[0]
+        return Item(self.bot, item_id)
+    
     async def description(self):
         item_id, amount = self.id.split('/')
         item = Item(self.bot, item_id)
         item_name = await item.name()
         return f"{amount} {item_name}"
+    
+    async def img_url(self):
+        return await self.item.img_url()
 
 class Item:
 
@@ -143,6 +151,9 @@ class Item:
         query.where(language_id=9)
         query.where(item_id=self.id)
         return await query.get_value()
+    
+    async def img_url(self):
+        pass
 
 
 class ResearchCog(Cog):
@@ -179,6 +190,8 @@ class ResearchCog(Cog):
                     embed=embed)
                 payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
                     react_list=react_list)
+                if not payload:
+                    return await multi.delete()
                 reward = choice_dict[str(payload.emoji)]
                 await multi.delete()
         else:
@@ -204,11 +217,32 @@ class ResearchEmbed:
     task_index = 1
     reward_index = 2
 
-    # @classmethod
-    # async def from_research(cls, research):
-    #     task = research.task
-    #     location = research.location
-    #     reward = research.reward
+    @classmethod
+    async def from_research(cls, research):
+        bot = research.bot
+        task = research.task
+        location = research.location
+        reward = research.reward
 
-    #     task_desc = await task.description()
-    #     if isinstance(location, POI):   
+        if isinstance(task, Task):
+            task = task.id
+        else:
+            task = task.id.split('/', 1)[1]
+
+        if '/' in reward:
+            if reward.startswith('partial'):
+                reward = reward.split('/', 1)[1]
+            else:
+                reward = ItemReward(bot, reward)
+                reward = await reward.description()
+        else:
+            pkmn = Pokemon(bot, reward)
+            reward = await pkmn.name()
+            thumbnail = await pkmn.sprite_url()
+
+        if isinstance(location, POI):
+            directions_url = await location.url()
+            directions_text = await location._name()
+        else:
+            directions_url = location.url
+            directions_text = location._name + " (Unknown Pokestop)"

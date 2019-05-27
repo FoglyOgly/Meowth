@@ -281,7 +281,12 @@ class ResearchCog(Cog):
             def check(m):
                 return m.author == ctx.author and m.channel == ctx.channel
             reply = await ctx.bot.wait_for('message', check=check)
-            reward = await ItemReward.convert(ctx, reply.content)
+            try:
+                reward = await Pokemon.convert(ctx, reply.content)
+            except:
+                reward = None
+            if not reward:
+                reward = await ItemReward.convert(ctx, reply.content)
             reward = reward.id
             await reply.delete()
             await msg.delete()

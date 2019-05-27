@@ -65,7 +65,7 @@ class Research:
     
     @property
     def guild(self):
-        self.bot.get_guild(self.guild_id)
+        return self.bot.get_guild(self.guild_id)
     
     @property
     def _data(self):

@@ -155,7 +155,7 @@ class ItemReward:
 
     @classmethod
     async def convert(cls, ctx, arg):
-        args = args.split()
+        args = arg.split()
         item_args = [x for x in args if not x.isdigit()]
         amount = 1
         for arg in args:

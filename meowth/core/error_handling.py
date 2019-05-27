@@ -57,7 +57,7 @@ class ErrorHandler(Cog):
                 details="Reply to this message with the missing arguments!", fields=fields)
             def check(m):
                 return m.author == ctx.author and m.channel == ctx.channel
-            reply = await ctx.bot.wait_for('message')
+            reply = await ctx.bot.wait_for('message', check=check)
             ctx.message.content += f' {reply.content}'
             ctx.view = StringView(ctx.message.content)
             ctx.view.get_word()

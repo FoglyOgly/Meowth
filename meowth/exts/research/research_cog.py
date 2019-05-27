@@ -368,5 +368,5 @@ class ResearchEmbed:
         footer = f"Reported by {reporter} • Expires"
         embed = formatters.make_embed(title=title, thumbnail=thumbnail,
             fields=fields, footer=footer)
-        embed.timestamp = datetime.fromtimestamp(research.expires_at)
+        embed.timestamp = datetime.utcfromtimestamp(research.expires_at)
         return cls(embed)

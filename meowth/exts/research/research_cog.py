@@ -61,7 +61,7 @@ class Research:
         created_dt = datetime.fromtimestamp(self.reported_at, tz=tz)
         expire_dt = created_dt + timedelta(days=1)
         expire_dt = expire_dt.replace(hour=0,minute=0,second=0)
-        return expire_dt
+        return expire_dt.timestamp()
     
     @property
     def guild(self):
@@ -368,5 +368,5 @@ class ResearchEmbed:
         footer = f"Reported by {reporter} • Expires"
         embed = formatters.make_embed(title=title, thumbnail=thumbnail,
             fields=fields, footer=footer)
-        embed.timestamp = research.expires_at
+        embed.timestamp = datetime.fromtimestamp(research.expires_at)
         return cls(embed)

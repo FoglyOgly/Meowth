@@ -4,6 +4,10 @@ from meowth.exts.pkmn import Pokemon
 from meowth.utils import formatters, snowflake
 from meowth.utils.fuzzymatch import get_match, get_matches
 
+import time
+from pytz import timezone
+from datetime import datetime, timedelta
+
 
 
 from . import research_checks
@@ -20,13 +24,16 @@ class Research:
         cls.instances[research_id] = instance
         return instance
 
-    def __init__(self, bot, research_id, task, location, reward, tz):
+    def __init__(self, bot, research_id, guild_id, reporter_id, task, location, reward, tz):
         self.bot = bot
         self.id = research_id
+        self.guild_id = guild_id
+        self.reporter_id = reporter_id
         self.task = task
         self.reward = reward
         self.location = location
         self.tz = tz
+        self.reported_at = time.time()
         self.message_ids = []
     
     def to_dict(self):
@@ -36,14 +43,29 @@ class Research:
             locid = f'{self.location.city}/{self.location.arg}'
         d = {
             'id': self.id,
+            'guild_id': self.guild_id,
+            'reporter_id': self.reporter_id,
             'task': self.task.id,
             'reward': self.reward.id,
             'location': locid,
             'tz': self.tz,
+            'reported_at': self.reported_at,
             'message_ids': self.message_ids
         }
 
         return d
+    
+    @property
+    def expires_at(self):
+        tz = timezone(self.tz)
+        created_dt = datetime.fromtimestamp(self.reported_at, tz=tz)
+        expire_dt = created_dt + timedelta(days=1)
+        expire_dt.replace(hour=0,minute=0,second=0)
+        return expire_dt
+    
+    @property
+    def guild(self):
+        self.bot.get_guild(self.guild_id)
     
     @property
     def _data(self):
@@ -291,7 +313,7 @@ class ResearchCog(Cog):
             await reply.delete()
             await msg.delete()
         research_id = next(snowflake.create())
-        research = Research(ctx.bot, research_id, task, location, reward, tz)
+        research = Research(ctx.bot, research_id, ctx.guild.id, ctx.author.id, task, location, reward, tz)
         embed = await ResearchEmbed.from_research(research)
         embed = embed.embed
         await ctx.send(embed=embed)
@@ -342,6 +364,9 @@ class ResearchEmbed:
             'Task': task,
             'Reward': desc
         }
+        reporter = research.guild.get_member(research.reporter_id).display_name
+        footer = f"Reported by {reporter} • Expires"
         embed = formatters.make_embed(title=title, thumbnail=thumbnail,
-            fields=fields)
+            fields=fields, footer=footer)
+        embed.timestamp = research.expires_at
         return cls(embed)

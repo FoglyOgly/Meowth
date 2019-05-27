@@ -60,7 +60,7 @@ class Research:
         tz = timezone(self.tz)
         created_dt = datetime.fromtimestamp(self.reported_at, tz=tz)
         expire_dt = created_dt + timedelta(days=1)
-        expire_dt.replace(hour=0,minute=0,second=0)
+        expire_dt = expire_dt.replace(hour=0,minute=0,second=0)
         return expire_dt
     
     @property

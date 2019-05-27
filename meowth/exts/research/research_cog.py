@@ -288,6 +288,7 @@ class ResearchCog(Cog):
         research_id = next(snowflake.create())
         research = Research(ctx.bot, research_id, task, location, reward, tz)
         embed = await ResearchEmbed.from_research(research)
+        embed = embed.embed
         await ctx.send(embed=embed)
 
 

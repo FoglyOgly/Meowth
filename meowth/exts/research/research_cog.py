@@ -127,17 +127,46 @@ class ItemReward:
     
     @property
     def item(self):
+        if self.id.startswith('partial'):
+            item_id = self.id.split('/',2)[1]
+            return PartialItem(self.bot, item_id)
         item_id = self.id.split('/')[0]
         return Item(self.bot, item_id)
     
+    @property
+    def amount(self):
+        if self.id.startswith('partial'):
+            return self.id.split('/', 2)[-1]
+        return self.id.split('/', 1)[-1]
+    
     async def description(self):
-        item_id, amount = self.id.split('/')
-        item = Item(self.bot, item_id)
-        item_name = await item.name()
+        item = self.item
+        if isinstance(item, PartialItem):
+            item_name = item.name
+        elif isinstance(item, Item):
+            item_name = await item.name()
+        amount = self.amount
         return f"{amount} {item_name}"
     
-    async def img_url(self):
-        return await self.item.img_url()
+    @property
+    def img_url(self):
+        return self.item.img_url
+
+
+    @classmethod
+    async def convert(cls, ctx, arg):
+        args = args.split()
+        item_args = [x for x in args if not x.isdigit()]
+        amount = 1
+        for arg in args:
+            if arg.isdigit():
+                amount = arg
+        item_name_arg = " ".join(item_args)
+        item = await Item.convert(ctx, item_name_arg)
+        return cls(ctx.bot, f'{item.id}/{amount}')
+        
+
+        
 
 class Item:
 
@@ -152,8 +181,61 @@ class Item:
         query.where(item_id=self.id)
         return await query.get_value()
     
-    async def img_url(self):
-        pass
+    @property
+    def img_url(self):
+        url = ("https://raw.githubusercontent.com/"
+            "FoglyOgly/Meowth/new-core/meowth/images/misc/")
+        url += self.id
+        url += '.png'
+        return url
+    
+    @classmethod
+    async def convert(cls, ctx, arg):
+        table = ctx.bot.dbi.table('item_names')
+        query = table.query
+        data = await query.get()
+        name_dict = {x['name']: x['item_id'] for x in data}
+        matches = get_matches(name_dict.keys(), arg)
+        if matches:
+            item_matches = [name_dict[x[0]] for x in matches]
+            name_matches = [x[0] for x in matches]
+        else:
+            item_matches = []
+            name_matches = []
+        if len(item_matches) > 1:
+            react_list = formatters.mc_emoji(len(item_matches))
+            choice_dict = dict(zip(react_list, item_matches))
+            display_dict = dict(zip(react_list, name_matches))
+            embed = formatters.mc_embed(display_dict)
+            multi = await ctx.send('Multiple possible Items found! Please select from the following list.',
+                embed=embed)
+            payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
+                react_list=react_list)
+            item = choice_dict[str(payload.emoji)]
+            await multi.delete()
+        elif len(item_matches) == 1:
+            item = item_matches[0]
+        else:
+            return PartialItem(ctx.bot, arg)
+        return cls(ctx.bot, item)
+
+class PartialItem:
+
+    def __init__(self, bot, arg):
+        self.bot = bot
+        self.id = f"partial/{arg}"
+    
+    @property
+    def item(self):
+        return self.id.split('/', 1)[1]
+    
+    @property
+    def name(self):
+        return self.item.title()
+    
+    @property
+    def img_url(self):
+        return ""
 
 
 class ResearchCog(Cog):
@@ -199,11 +281,14 @@ class ResearchCog(Cog):
             def check(m):
                 return m.author == ctx.author and m.channel == ctx.channel
             reply = await ctx.bot.wait_for('message', check=check)
-            reward = f"partial/{reply.content}"
+            reward = await ItemReward.convert(ctx, reply.content)
+            reward = reward.id
             await reply.delete()
             await msg.delete()
         research_id = next(snowflake.create())
         research = Research(ctx.bot, research_id, task, location, reward, tz)
+        embed = await ResearchEmbed.from_research(research)
+        await ctx.send(embed=embed)
 
 
 
@@ -230,14 +315,12 @@ class ResearchEmbed:
             task = task.id.split('/', 1)[1]
 
         if '/' in reward:
-            if reward.startswith('partial'):
-                reward = reward.split('/', 1)[1]
-            else:
-                reward = ItemReward(bot, reward)
-                reward = await reward.description()
+            reward = ItemReward(research.bot, reward)
+            desc = await reward.description()
+            thumbnail = reward.img_url
         else:
             pkmn = Pokemon(bot, reward)
-            reward = await pkmn.name()
+            desc = await pkmn.name()
             thumbnail = await pkmn.sprite_url()
 
         if isinstance(location, POI):
@@ -246,3 +329,13 @@ class ResearchEmbed:
         else:
             directions_url = location.url
             directions_text = location._name + " (Unknown Pokestop)"
+        
+        title = "Field Research Report"
+        fields = {
+            'Pokestop': f"[{directions_text}]({directions_url})",
+            'Task': task,
+            'Reward': desc
+        }
+        embed = formatters.make_embed(title=title, thumbnail=thumbnail,
+            fields=fields)
+        return cls(embed)

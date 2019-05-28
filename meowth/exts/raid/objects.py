@@ -2200,6 +2200,8 @@ class Raid:
         raid_id = data['id']
         reporter_id = data['reporter_id']
         completed_by = data.get('completed_by', [])
+        if not completed_by:
+            completed_by = []
         raid = cls(raid_id, bot, guild_id, report_channel_id, reporter_id, gym, level=level, pkmn=boss, hatch=hatch, end=end, completed_by=completed_by)
         raid.channel_ids = data.get('channels')
         raid.message_ids = data.get('messages')

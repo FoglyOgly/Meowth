@@ -3081,7 +3081,9 @@ class RaidEmbed():
             fields['Recommended Group Size'] = str(rec)
         else:
             fields['Groups'] = (False, grps_str)
-        reporter = raid.guild.get_member(raid.reporter_id).display_name
+        reporter = raid.guild.get_member(raid.reporter_id)
+        if reporter:
+            reporter = reporter.display_name
         footer = f"Reported by {reporter} • Ending"
         embed = formatters.make_embed(icon=RaidEmbed.raid_icon, title=directions_text, # msg_colour=color,
             title_url=directions_url, thumbnail=img_url, fields=fields, footer=footer,

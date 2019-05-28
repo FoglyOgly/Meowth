@@ -1752,7 +1752,10 @@ class Raid:
                         await channel.delete()
                     except:
                         pass
-            raid_score = 1 + len(self.completed_by)
+            if self.completed_by:
+                raid_score = 1 + len(self.completed_by)
+            else:
+                raid_score = 1
             score_table = self.bot.dbi.table('scoreboard')
             query = score_table.query
             query.where(guild_id=self.guild_id)
@@ -3272,7 +3275,9 @@ class EggEmbed():
         }
         grps_str = raid.grps_str + "\u200b"
         fields['Groups'] = (False, grps_str)
-        reporter = raid.guild.get_member(raid.reporter_id).display_name
+        reporter = raid.guild.get_member(raid.reporter_id)
+        if reporter:
+            reporter = reporter.display_name
         footer_text = f"Reported by {reporter} • Hatching"
         embed = formatters.make_embed(icon=EggEmbed.raid_icon, title=directions_text,
             thumbnail=egg_img_url, title_url=directions_url, # msg_colour=color,

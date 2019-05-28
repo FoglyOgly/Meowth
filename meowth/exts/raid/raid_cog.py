@@ -725,6 +725,9 @@ class RaidCog(Cog):
     
     async def rsvp(self, ctx, status, bosses=[], total: int=0, *teamcounts):
         raid_id = await self.get_raidid(ctx)
+        report_channel = ctx.bot.get_channel(ctx.report_channel_id)
+        report_channel = ReportChannel(ctx.bot, report_channel)
+        raid_lists = await report_channel.get_raid_lists()
         meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
         if status == 'cancel':
             return await meowthuser.cancel_rsvp(raid_id)
@@ -734,7 +737,7 @@ class RaidCog(Cog):
                 boss_ids.append(boss.id)
         else:
             level = await self.get_raidlevel(ctx)
-            boss_list = self.bot.raid_info.raid_lists[level]
+            boss_list = list(raid_lists[level].keys())
             boss_ids = boss_list
         if total or teamcounts:
             party = await meowthuser.party_list(total, *teamcounts)

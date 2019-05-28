@@ -292,6 +292,7 @@ class ResearchCog(Cog):
                 choice_dict = dict(zip(react_list, reward_dict.values()))
                 display_dict = dict(zip(react_list, reward_dict.keys()))
                 embed = formatters.mc_embed(display_dict)
+                embed.fields[0].value = embed.fields[0].value + "\n<:silph:548259248442703895>Research tasks and rewards provided by [The Silph Road](https://thesilphroad.com/research-tasks)"
                 multi = await ctx.send('What is the reward for this task? Please select from the options below.',
                     embed=embed)
                 payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
@@ -364,7 +365,7 @@ class ResearchEmbed:
         fields = {
             'Pokestop': f"[{directions_text}]({directions_url})",
             'Task': task,
-            'Reward': desc
+            'Reward': desc + "\n<:silph:548259248442703895>Research tasks and rewards provided by [The Silph Road](https://thesilphroad.com/research-tasks)"
         }
         reporter = research.guild.get_member(research.reporter_id).display_name
         footer = f"Reported by {reporter} • Expires"

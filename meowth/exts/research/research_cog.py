@@ -289,6 +289,9 @@ class ResearchCog(Cog):
                         name = await pkmn.name()
                         pkmn_dict[name] = reward
                 reward_dict = dict(pkmn_dict, **item_dict)
+                if pkmn_dict:
+                    react_list = formatters.mc_emoji(len(possible_rewards)+1)
+                    reward_dict['Unknown Encounter'] = 'unknown_encounter'
                 choice_dict = dict(zip(react_list, reward_dict.values()))
                 display_dict = dict(zip(react_list, reward_dict.keys()))
                 embed = formatters.mc_embed(display_dict)
@@ -349,9 +352,17 @@ class ResearchEmbed:
             reward = ItemReward(research.bot, reward)
             desc = await reward.description()
             thumbnail = reward.img_url
+        elif reward == 'unknown_encounter':
+            desc = "Unknown Encounter"
+            thumbnail = ("https://raw.githubusercontent.com/"
+                "FoglyOgly/Meowth/new-core/meowth/images/misc/unknown_encounter.png")
         else:
             pkmn = Pokemon(bot, reward)
             desc = await pkmn.name()
+            if await pkmn._shiny_available():
+                desc += " :sparkles:"
+            type_emoji = await pkmn.type_emoji()
+            desc += f" {type_emoji}"
             thumbnail = await pkmn.sprite_url()
 
         if isinstance(location, POI):

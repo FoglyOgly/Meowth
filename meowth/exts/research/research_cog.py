@@ -289,7 +289,7 @@ class ResearchCog(Cog):
                         name = await pkmn.name()
                         pkmn_dict[name] = reward
                 reward_dict = dict(pkmn_dict, **item_dict)
-                if pkmn_dict:
+                if len(pkmn_dict) > 1:
                     react_list = formatters.mc_emoji(len(possible_rewards)+1)
                     reward_dict['Unknown Encounter'] = 'unknown_encounter'
                 choice_dict = dict(zip(react_list, reward_dict.values()))

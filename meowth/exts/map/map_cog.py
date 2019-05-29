@@ -459,8 +459,10 @@ class Gym(POI):
     @classmethod
     async def convert(cls, ctx, arg):
         if hasattr(ctx, 'report_channel_id'):
-            ctx.channel = ctx.bot.get_channel(ctx.report_channel_id)
-        report_channel = ReportChannel(ctx.bot, ctx.channel)
+            rchan = ctx.bot.get_channel(ctx.report_channel_id)
+            report_channel = ReportChannel(ctx.bot, rchan)
+        else:
+            report_channel = ReportChannel(ctx.bot, ctx.channel)
         gyms_query = await report_channel.get_all_gyms()
         if not gyms_query:
             city = await report_channel.city()

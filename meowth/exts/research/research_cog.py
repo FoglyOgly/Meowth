@@ -153,8 +153,18 @@ class Research:
         else:
             city, arg = locid.split('/', 1)
             location = PartialPOI(bot, city, arg)
-        
-        return cls(bot, task=task, location=location, **d)
+        Research()
+        research_id = d['id']
+        guild_id = d['guild_id']
+        reporter_id = d['reporter_id']
+        reward = d['reward']
+        tz = d['tz']
+        reported_at = d['reported_at']
+        message_ids = d['message_ids']
+        completed_by = d['completed_by']
+        res = cls(bot, research_id, guild_id, reporter_id, task, location, reward, tz, reported_at)
+        res.completed_by = completed_by
+        return res
 
 class Task:
 

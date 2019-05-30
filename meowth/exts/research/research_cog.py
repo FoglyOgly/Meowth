@@ -157,7 +157,7 @@ class Research:
         elif reward == 'unknown_encounter':
             return wants
         else:
-            pkmn = Pokemon(bot, reward)
+            pkmn = Pokemon(self.bot, reward)
             family = await pkmn._familyId()
             wants.append(family)
         wants = [Want(self.bot, x, self.guild_id) for x in wants]

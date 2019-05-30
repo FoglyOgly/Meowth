@@ -382,7 +382,7 @@ class ResearchCog(Cog):
                     embed = await ResearchEmbed.from_research(research)
                     for msgid in research.message_ids:
                         chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
-                        await msg.edit(embed=embed)
+                        await msg.edit(embed=embed.embed)
             return await research.upsert()
     
     async def pickup_researchdata(self):

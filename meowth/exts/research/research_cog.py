@@ -504,6 +504,6 @@ class ResearchEmbed:
         icon_url = ("https://raw.githubusercontent.com/"
                 "FoglyOgly/Meowth/new-core/meowth/images/misc/field-research.png")
         embed = formatters.make_embed(title=title, thumbnail=thumbnail,
-            fields=fields, footer=footer, footer_icon=reporter_avy)
+            fields=fields, footer=footer, footer_icon=reporter_avy, icon=icon_url)
         embed.timestamp = datetime.utcfromtimestamp(research.expires_at)
         return cls(embed)

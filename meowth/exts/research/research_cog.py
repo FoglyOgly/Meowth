@@ -151,7 +151,7 @@ class Research:
         if reward.startswith('partial'):
             return wants
         elif '/' in reward:
-            reward = ItemReward(selffi.bot, reward)
+            reward = ItemReward(self.bot, reward)
             item = reward.item
             wants.append(item.id)
         elif reward == 'unknown_encounter':

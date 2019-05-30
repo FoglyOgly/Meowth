@@ -336,13 +336,16 @@ class ResearchCog(Cog):
         idstring = f"{payload.channel_id}/{payload.message_id}"
         chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
         research = Research.by_message.get(idstring)
-        if not research:
+        if not research or payload.user_id == self.bot.user.id:
             return
         user = chn.guild.get_member(payload.user_id)
         if payload.emoji.is_custom_emoji():
             emoji = payload.emoji.id
         else:
             emoji = str(payload.emoji)
+        if isinstance(emoji, int):
+            emoji = self.bot.get_emoji(emoji)
+        if payload.user_id 
         await msg.remove_reaction(emoji, user)
         if emoji == 583375171847585823:
             if payload.user_id not in research.completed_by:

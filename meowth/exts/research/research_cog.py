@@ -371,7 +371,7 @@ class ResearchCog(Cog):
                     await multi.delete()
                     research.reward = reward
                     embed = await ResearchEmbed.from_research(research)
-                    for msgid = research.message_ids:
+                    for msgid in research.message_ids:
                         chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
                         await msg.edit(embed=embed)
             return await research.upsert()

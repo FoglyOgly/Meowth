@@ -1,11 +1,81 @@
 from meowth import Cog, command, bot, checks
 from meowth.exts.pkmn import Pokemon
-from meowth.utils import fuzzymatch
+from meowth.utils.fuzzymatch import get_matches
+from meowth.utils import formatters
 from . import want_checks
 from .errors import *
 
 import discord
 from discord.ext import commands
+
+class Item:
+
+    def __init__(self, bot, item_id):
+        self.bot = bot
+        self.id = item_id
+    
+    async def name(self):
+        table = self.bot.dbi.table('item_names')
+        query = table.query('name')
+        query.where(language_id=9)
+        query.where(item_id=self.id)
+        return await query.get_value()
+    
+    @property
+    def img_url(self):
+        url = ("https://raw.githubusercontent.com/"
+            "FoglyOgly/Meowth/new-core/meowth/images/misc/")
+        url += self.id
+        url += '.png'
+        return url
+    
+    @classmethod
+    async def convert(cls, ctx, arg):
+        table = ctx.bot.dbi.table('item_names')
+        query = table.query
+        data = await query.get()
+        name_dict = {x['name']: x['item_id'] for x in data}
+        matches = get_matches(name_dict.keys(), arg)
+        if matches:
+            item_matches = [name_dict[x[0]] for x in matches]
+            name_matches = [x[0] for x in matches]
+        else:
+            item_matches = []
+            name_matches = []
+        if len(item_matches) > 1:
+            react_list = formatters.mc_emoji(len(item_matches))
+            choice_dict = dict(zip(react_list, item_matches))
+            display_dict = dict(zip(react_list, name_matches))
+            embed = formatters.mc_embed(display_dict)
+            multi = await ctx.send('Multiple possible Items found! Please select from the following list.',
+                embed=embed)
+            payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
+                react_list=react_list)
+            item = choice_dict[str(payload.emoji)]
+            await multi.delete()
+        elif len(item_matches) == 1:
+            item = item_matches[0]
+        else:
+            return PartialItem(ctx.bot, arg)
+        return cls(ctx.bot, item)
+
+class PartialItem:
+
+    def __init__(self, bot, arg):
+        self.bot = bot
+        self.id = f"partial/{arg}"
+    
+    @property
+    def item(self):
+        return self.id.split('/', 1)[1]
+    
+    @property
+    def name(self):
+        return self.item.title()
+    
+    @property
+    def img_url(self):
+        return ""
 
 class Want():
 
@@ -190,7 +260,12 @@ class Want():
             family = await pkmn._familyId()
             return cls(ctx.bot, family, ctx.guild.id)
         else:
-            raise InvalidWant
+            item = await Item.convert(ctx, arg)
+            if isinstance(item, Item):
+                return cls(ctx.bot, item.id, ctx.guild.id)
+            else:
+                raise InvalidWant
+            
 
 class WantCog(Cog):
 

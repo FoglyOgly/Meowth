@@ -1,6 +1,7 @@
 from meowth import Cog, command, bot, checks
 from meowth.exts.map import ReportChannel, Pokestop, PartialPOI, POI
 from meowth.exts.pkmn import Pokemon
+from meowth.exts.want import Want, Item, PartialItem
 from meowth.utils import formatters, snowflake
 from meowth.utils.fuzzymatch import get_match, get_matches
 from meowth.utils.converters import ChannelMessage
@@ -128,7 +129,11 @@ class Research:
         expire_embed = formatters.make_embed(title='This Research Task has expired!')
         for msgid in self.message_ids:
             chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
-            await msg.edit(embed=expire_embed)
+            try:
+                await msg.edit(embed=expire_embed)
+                await msg.clear_reactions()
+            except:
+                pass
             try:
                 del Research.by_message[msgid]
             except:
@@ -139,6 +144,26 @@ class Research:
             del Research.instances[self.id]
         except:
             pass
+    
+    async def get_wants(self):
+        wants = []
+        reward = self.reward
+        if reward.startswith('partial'):
+            return wants
+        elif '/' in reward:
+            reward = ItemReward(research.bot, reward)
+            item = reward.item
+            wants.append(item.id)
+        elif reward == 'unknown_encounter':
+            return wants
+        else:
+            pkmn = Pokemon(bot, reward)
+            family = await pkmn._familyId()
+            wants.append(family)
+        wants = [Want(self.bot, x, self.guild_id) for x in wants]
+        want_dict = {x: await x.role() for x in wants}
+        return want_dict
+
     
     @classmethod
     async def from_data(cls, bot, data):
@@ -165,6 +190,9 @@ class Research:
         completed_by = d['completed_by']
         res = cls(bot, research_id, guild_id, reporter_id, task, location, reward, tz, reported_at)
         res.completed_by = completed_by
+        res.message_ids = message_ids
+        for msgid in message_ids:
+            cls.by_message[msgid] = res
         return res
 
 class Task:
@@ -263,78 +291,7 @@ class ItemReward:
         item_name_arg = " ".join(item_args)
         item = await Item.convert(ctx, item_name_arg)
         return cls(ctx.bot, f'{item.id}/{amount}')
-        
-
-        
-
-class Item:
-
-    def __init__(self, bot, item_id):
-        self.bot = bot
-        self.id = item_id
     
-    async def name(self):
-        table = self.bot.dbi.table('item_names')
-        query = table.query('name')
-        query.where(language_id=9)
-        query.where(item_id=self.id)
-        return await query.get_value()
-    
-    @property
-    def img_url(self):
-        url = ("https://raw.githubusercontent.com/"
-            "FoglyOgly/Meowth/new-core/meowth/images/misc/")
-        url += self.id
-        url += '.png'
-        return url
-    
-    @classmethod
-    async def convert(cls, ctx, arg):
-        table = ctx.bot.dbi.table('item_names')
-        query = table.query
-        data = await query.get()
-        name_dict = {x['name']: x['item_id'] for x in data}
-        matches = get_matches(name_dict.keys(), arg)
-        if matches:
-            item_matches = [name_dict[x[0]] for x in matches]
-            name_matches = [x[0] for x in matches]
-        else:
-            item_matches = []
-            name_matches = []
-        if len(item_matches) > 1:
-            react_list = formatters.mc_emoji(len(item_matches))
-            choice_dict = dict(zip(react_list, item_matches))
-            display_dict = dict(zip(react_list, name_matches))
-            embed = formatters.mc_embed(display_dict)
-            multi = await ctx.send('Multiple possible Items found! Please select from the following list.',
-                embed=embed)
-            payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
-                react_list=react_list)
-            item = choice_dict[str(payload.emoji)]
-            await multi.delete()
-        elif len(item_matches) == 1:
-            item = item_matches[0]
-        else:
-            return PartialItem(ctx.bot, arg)
-        return cls(ctx.bot, item)
-
-class PartialItem:
-
-    def __init__(self, bot, arg):
-        self.bot = bot
-        self.id = f"partial/{arg}"
-    
-    @property
-    def item(self):
-        return self.id.split('/', 1)[1]
-    
-    @property
-    def name(self):
-        return self.item.title()
-    
-    @property
-    def img_url(self):
-        return ""
 
 
 class ResearchCog(Cog):
@@ -453,17 +410,30 @@ class ResearchCog(Cog):
         research = Research(ctx.bot, research_id, ctx.guild.id, ctx.author.id, task, location, reward, tz, time.time())
         embed = await ResearchEmbed.from_research(research)
         embed = embed.embed
+        wants = await research.get_wants()
+        role_wants = [wants.get(x) for x in wants if wants.get(x)]
+        dm_wants = [x for x in wants if not wants.get(x)]
+        role_mentions = "\u200b".join([x.mention for x in role_wants])
+        if role_mentions:
+            reportcontent = role_mentions + " - "
+        else:
+            reportcontent = ""
         report_channels = []
         report_channel = ReportChannel(ctx.bot, ctx.channel)
+        msgs = []
+        if dm_wants:
+            dm_content = ""
+            for want in dm_wants:
+                dms = await want.notify_users(dm_content, embed)
+                msgs.extend(dms)
         if isinstance(location, Pokestop):
             channel_list = await location.get_all_channels('research')
             report_channels.extend(channel_list)
         if report_channel not in report_channels:
             report_channels.append(report_channel)
-        msgs = []
         stamp = ctx.bot.get_emoji(583375171847585823)
         for channel in report_channels:
-            msg = await channel.channel.send(embed=embed)
+            msg = await channel.channel.send(reportcontent, embed=embed)
             await msg.add_reaction(stamp)
             idstring = f'{msg.channel.id}/{msg.id}'
             msgs.append(idstring)

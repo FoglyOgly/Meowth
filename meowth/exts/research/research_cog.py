@@ -335,15 +335,15 @@ class ResearchCog(Cog):
     async def on_raw_reaction_add(self, payload):
         idstring = f"{payload.channel_id}/{payload.message_id}"
         chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+        research = Research.by_message.get(idstring)
+        if not research:
+            return
         user = chn.guild.get_member(payload.user_id)
         if payload.emoji.is_custom_emoji():
             emoji = payload.emoji.id
         else:
             emoji = str(payload.emoji)
         await msg.remove_reaction(emoji, user)
-        research = Research.by_message.get(idstring)
-        if not research:
-            return
         if emoji == 583375171847585823:
             if payload.user_id not in research.completed_by:
                 research.completed_by.append(payload.user_id)

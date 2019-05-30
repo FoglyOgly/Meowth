@@ -443,9 +443,10 @@ class ResearchCog(Cog):
         if report_channel not in report_channels:
             report_channels.append(report_channel)
         msgs = []
+        stamp = ctx.bot.get_emoji(583375171847585823)
         for channel in report_channels:
             msg = await channel.channel.send(embed=embed)
-            await msg.add_reaction(583375171847585823)
+            await msg.add_reaction(stamp)
             idstring = f'{msg.channel.id}/{msg.id}'
             msgs.append(idstring)
             Research.by_message[idstring] = research

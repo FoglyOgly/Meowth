@@ -49,7 +49,7 @@ class Research:
             'guild_id': self.guild_id,
             'reporter_id': self.reporter_id,
             'task': self.task.id,
-            'reward': self.reward.id,
+            'reward': self.reward,
             'location': locid,
             'tz': self.tz,
             'reported_at': self.reported_at,

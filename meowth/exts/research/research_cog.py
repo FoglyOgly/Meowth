@@ -32,7 +32,7 @@ class Research:
         cls.instances[research_id] = instance
         return instance
 
-    def __init__(self, bot, research_id, guild_id, reporter_id, task, location, reward, tz, reported_at):
+    def __init__(self, research_id, bot, guild_id, reporter_id, task, location, reward, tz, reported_at):
         self.bot = bot
         self.id = research_id
         self.guild_id = guild_id
@@ -191,7 +191,7 @@ class Research:
         reported_at = d['reported_at']
         message_ids = d['message_ids']
         completed_by = d['completed_by']
-        res = cls(bot, research_id, guild_id, reporter_id, task, location, reward, tz, reported_at)
+        res = cls(research_id, bot, guild_id, reporter_id, task, location, reward, tz, reported_at)
         res.completed_by = completed_by
         res.message_ids = message_ids
         for msgid in message_ids:
@@ -427,7 +427,7 @@ class ResearchCog(Cog):
             await reply.delete()
             await msg.delete()
         research_id = next(snowflake.create())
-        research = Research(ctx.bot, research_id, ctx.guild.id, ctx.author.id, task, location, reward, tz, time.time())
+        research = Research(research_id, ctx.bot, ctx.guild.id, ctx.author.id, task, location, reward, tz, time.time())
         embed = await ResearchEmbed.from_research(research)
         embed = embed.embed
         wants = await research.get_wants()

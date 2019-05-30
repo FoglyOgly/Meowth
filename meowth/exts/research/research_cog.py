@@ -370,7 +370,8 @@ class ResearchCog(Cog):
                 await asyncio.sleep(sleeptime)
         else:
             stamp = time.time()
-        for research in Research.instances.values():
+        active_research = Research.instances.values()
+        for research in active_research:
             if research.reported_at < stamp:
                 await research.expire_research()
 

@@ -497,9 +497,13 @@ class ResearchEmbed:
             'Task': task,
             'Reward': desc + "\n<:silph:548259248442703895>Research tasks and rewards provided by [The Silph Road](https://thesilphroad.com/research-tasks)"
         }
-        reporter = research.guild.get_member(research.reporter_id).display_name
-        footer = f"Reported by {reporter} • Expires"
+        reporter = research.guild.get_member(research.reporter_id)
+        reporter_name = reporter.display_name
+        reporter_avy = reporter.avatar_url
+        footer = f"Reported by {reporter_name} • Expires"
+        icon_url = ("https://raw.githubusercontent.com/"
+                "FoglyOgly/Meowth/new-core/meowth/images/misc/field-research.png")
         embed = formatters.make_embed(title=title, thumbnail=thumbnail,
-            fields=fields, footer=footer)
+            fields=fields, footer=footer, footer_icon=reporter_avy)
         embed.timestamp = datetime.utcfromtimestamp(research.expires_at)
         return cls(embed)

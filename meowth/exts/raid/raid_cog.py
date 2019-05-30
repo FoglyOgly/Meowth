@@ -89,6 +89,7 @@ class RaidCog(Cog):
     
     async def pickup_meetup(self, rcrd):
         meetup = await Meetup.from_data(self.bot, rcrd)
+        return meetup
     
     async def pickup_traindata(self):
         train_table = self.bot.dbi.table('trains')

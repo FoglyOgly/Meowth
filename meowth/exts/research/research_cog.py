@@ -10,6 +10,9 @@ import time
 import pytz
 from pytz import timezone
 from datetime import datetime, timedelta
+from dateparser import parse
+
+from discord.ext import commands
 
 import asyncio
 
@@ -357,9 +360,19 @@ class ResearchCog(Cog):
     
     @command()
     @checks.is_co_owner()
-    async def cleartasks(self, ctx):
+    async def cleartasks(self, ctx, *, cleartime=None):
+        if cleartime:
+            cleardt = parse(cleartime, settings={'TIMEZONE': 'America/Chicago', 'RETURN_AS_TIMEZONE_AWARE': True})
+            cleardt = cleardt.astimezone(pytz.utc)
+            stamp = cleardt.timestamp()
+            if stamp > time.time():
+                sleeptime = stamp - time.time()
+                await asyncio.sleep(sleeptime)
+        else:
+            stamp = time.time()
         for research in Research.instances.values():
-            await research.expire_research()
+            if research.reported_at < stamp:
+                await research.expire_research()
 
     @command(aliases=['res'])
     @research_checks.research_enabled()

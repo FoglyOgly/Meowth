@@ -346,7 +346,7 @@ class ResearchCog(Cog):
         if isinstance(emoji, int):
             emoji = self.bot.get_emoji(emoji)
         await msg.remove_reaction(emoji, user)
-        if emoji == 583375171847585823:
+        if emoji.id == 583375171847585823:
             if payload.user_id not in research.completed_by:
                 research.completed_by.append(payload.user_id)
             if research.reward == 'unknown_encounter':

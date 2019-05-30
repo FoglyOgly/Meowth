@@ -140,27 +140,21 @@ class Research:
     
     @classmethod
     async def from_data(cls, bot, data):
-        d = {
-            'id': self.id,
-            'guild_id': self.guild_id,
-            'reporter_id': self.reporter_id,
-            'task': self.task.id,
-            'reward': self.reward.id,
-            'location': locid,
-            'tz': self.tz,
-            'reported_at': self.reported_at,
-            'message_ids': self.message_ids,
-            'completed_by': self.completed_by
-        }
         d = dict(data)
         locid = d.pop('location')
+        task_id = d.pop('task')
+        if task_id.startswith('partial'):
+            task_id = task_id.split('/',1)[1]
+            task = PartialTask(bot, task_id)
+        else:
+            task = Task(bot, task_id)
         if locid.isdigit():
             location = Pokestop(bot, int(locid))
         else:
             city, arg = locid.split('/', 1)
             location = PartialPOI(bot, city, arg)
         
-        return cls(bot, location=location, **d)
+        return cls(bot, task=task, location=location, **d)
 
 class Task:
 
@@ -451,6 +445,7 @@ class ResearchCog(Cog):
         msgs = []
         for channel in report_channels:
             msg = await channel.channel.send(embed=embed)
+            await msg.add_reaction(583375171847585823)
             idstring = f'{msg.channel.id}/{msg.id}'
             msgs.append(idstring)
             Research.by_message[idstring] = research

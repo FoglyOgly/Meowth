@@ -330,6 +330,7 @@ class ResearchCog(Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        bot.loop.create_task(self.pickup_researchdata())
     
     @Cog.listener()
     async def on_raw_reaction_add(self, payload):
@@ -369,6 +370,10 @@ class ResearchCog(Cog):
                     reward = choice_dict[str(payload.emoji)]
                     await multi.delete()
                     research.reward = reward
+                    embed = await ResearchEmbed.from_research(research)
+                    for msgid = research.message_ids:
+                        chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
+                        await msg.edit(embed=embed)
             return await research.upsert()
     
     async def pickup_researchdata(self):

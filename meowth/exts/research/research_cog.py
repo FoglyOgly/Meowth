@@ -343,7 +343,6 @@ class ResearchCog(Cog):
         await msg.remove_reaction(emoji, user)
         research = Research.by_message.get(idstring)
         if not research:
-            await chn.send('research not found')
             return
         if emoji == 583375171847585823:
             if payload.user_id not in research.completed_by:

@@ -10,6 +10,8 @@ import pytz
 from pytz import timezone
 from datetime import datetime, timedelta
 
+import asyncio
+
 
 
 from . import research_checks
@@ -468,6 +470,7 @@ class ResearchCog(Cog):
             Research.by_message[idstring] = research
         research.message_ids = msgs
         await research.upsert()
+        ctx.bot.loop.create_task(research.monitor_status())
 
 
 

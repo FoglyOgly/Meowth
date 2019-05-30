@@ -354,6 +354,12 @@ class ResearchCog(Cog):
     async def pickup_research(self, rcrd):
         research = await Research.from_data(self.bot, rcrd)
         self.bot.loop.create_task(research.monitor_status())
+    
+    @command()
+    @checks.is_co_owner()
+    async def cleartasks(self, ctx):
+        for research in Research.instances.values():
+            await research.expire_research()
 
     @command(aliases=['res'])
     @research_checks.research_enabled()

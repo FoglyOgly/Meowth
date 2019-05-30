@@ -153,7 +153,6 @@ class Research:
         else:
             city, arg = locid.split('/', 1)
             location = PartialPOI(bot, city, arg)
-        Research()
         research_id = d['id']
         guild_id = d['guild_id']
         reporter_id = d['reporter_id']

@@ -578,6 +578,8 @@ class RaidCog(Cog):
                 if await gym._exraid():
                     exgymcat = await raid_checks.raid_category(ctx, 'ex_gyms')
         raid_mode = exgymcat if exgymcat else await raid_checks.raid_category(ctx, level)
+        if not raid_mode:
+            return await ctx.error(f'Level {level} Raid reports not permitted in this channel')
         report_channels = []
         report_channel = ReportChannel(ctx.bot, ctx.channel)
         train_ids = await report_channel.get_all_trains()
@@ -614,8 +616,6 @@ class RaidCog(Cog):
                 category = ctx.guild.get_channel(catid)
         elif raid_mode == 'none':
             category = None
-        else:
-            return await ctx.error(f'Level {level} Raid reports not permitted in this channel')
         if raid_mode != 'message':
             raid_channel_name = await new_raid.channel_name()
             raid_channel_topic = new_raid.channel_topic

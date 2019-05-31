@@ -162,8 +162,8 @@ class Want():
         guild = self.guild
         members = [guild.get_member(x) for x in users]
         for member in members:
-            # if member == author:
-            #     continue
+            if member == author:
+                continue
             try:
                 msg = await member.send(content, embed=embed)
                 msgs.append(f"{msg.channel.id}/{msg.id}")

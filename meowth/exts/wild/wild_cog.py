@@ -400,7 +400,7 @@ class WildCog(Cog):
         for channel in report_channels:
             if not role:
                 dm_content = f"Wild {name} reported in {ctx.channel.name}!"
-                dms = await want.notify_users(dm_content, embed)
+                dms = await want.notify_users(dm_content, embed, author=ctx.author)
                 new_wild.message_ids.extend(dms)
             reportmsg = await channel.channel.send(reportcontent, embed=embed)
             for react in react_list:

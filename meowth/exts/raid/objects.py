@@ -463,6 +463,10 @@ class Raid:
     @property
     def guild(self):
         return self.bot.get_guild(self.guild_id)
+
+    @property
+    def reporter(self):
+        return self.guild.get_member(self.reporter_id)
     
     @property
     def report_channel(self):

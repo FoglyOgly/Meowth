@@ -555,6 +555,7 @@ class RaidCog(Cog):
         level = new_raid.level
         hatch = new_raid.hatch
         end = new_raid.end
+        reporter = new_raid.reporter
         await new_raid.get_boss_list()
         raid_table = ctx.bot.dbi.table('raids')
         wants = await new_raid.get_wants()
@@ -602,7 +603,7 @@ class RaidCog(Cog):
             if dm_wants:
                 dm_content = f"Coordinate this raid in {ctx.channel.name}!"
                 for want in dm_wants:
-                    dms = await want.notify_users(dm_content, embed)
+                    dms = await want.notify_users(dm_content, embed, author=reporter)
                     new_raid.message_ids.extend(dms)
             for channel in report_channels:
                 reportmsg = await channel.channel.send(reportcontent, embed=embed)
@@ -642,7 +643,7 @@ class RaidCog(Cog):
                 if dm_wants:
                     dm_content = f"Coordinate this raid in {raid_channel.name}!"
                     for want in dm_wants:
-                        dms = await want.notify_users(dm_content, embed)
+                        dms = await want.notify_users(dm_content, embed, author=reporter)
                         new_raid.message_ids.extend(dms)
                 try:
                     reportmsg = await channel.channel.send(reportcontent, embed=reportembed)

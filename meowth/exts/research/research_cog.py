@@ -444,7 +444,7 @@ class ResearchCog(Cog):
         if dm_wants:
             dm_content = ""
             for want in dm_wants:
-                dms = await want.notify_users(dm_content, embed)
+                dms = await want.notify_users(dm_content, embed, author=ctx.author)
                 msgs.extend(dms)
         if isinstance(location, Pokestop):
             channel_list = await location.get_all_channels('research')

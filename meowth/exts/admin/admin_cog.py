@@ -285,7 +285,7 @@ class AdminCog(Cog):
 
         **Arguments**
         *features:* list of features to enable. Can include any of
-        `['raid', 'wild', 'users', 'train', 'trade', 'clean']`
+        `['raid', 'wild', 'research', 'users', 'train', 'trade', 'clean']`
 
         Raid, wild, research, and train require a defined location. Use `!setlocation`
         before enabling these.
@@ -299,17 +299,17 @@ class AdminCog(Cog):
         else:
             rcrd = {'channelid': channel_id, 'guild_id': ctx.guild.id}
         possible_commands = ['raid', 'wild', 'users', 'train', 'trade',
-            'clean', 'welcome', 'archive', 'meetup']
+            'clean', 'welcome', 'archive', 'meetup', 'research']
         features = [x for x in features if x in possible_commands]
         if not features:
-            return await ctx.send("The list of valid command groups to enable is `raid, train, wild, users, trade, clean, welcome, archive, meetup`.")
+            return await ctx.send("The list of valid command groups to enable is `raid, train, wild, users, trade, clean, welcome, archive, meetup, research`.")
         location_commands = ['raid', 'wild', 'research', 'train', 'meetup']
         enabled_commands = []
         required_perms = {}
         me = ctx.guild.me
         perms = ctx.channel.permissions_for(me)
         for x in features:
-            if x in ['raid', 'wild', 'trade', 'train', 'users', 'meetup']:
+            if x in ['raid', 'wild', 'trade', 'train', 'users', 'meetup', 'research']:
                 required_perms['Add Reactions'] = perms.add_reactions
                 required_perms['Manage Messages'] = perms.manage_messages
                 required_perms['Use External Emojis'] = perms.external_emojis
@@ -596,7 +596,7 @@ class AdminCog(Cog):
             'clean', 'welcome']
         features = [x for x in features if x in possible_commands]
         if not features:
-            return await ctx.send("The list of valid command groups to disable is `raid, wild, research, user, train, trade, clean, welcome`.")
+            return await ctx.send("The list of valid command groups to disable is `raid, wild, research, users, train, trade, clean, welcome`.")
         disabled_commands = []
         if 'welcome' in features:
             table = ctx.bot.dbi.table('welcome')

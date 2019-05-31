@@ -263,10 +263,12 @@ class S2_L10():
 
     async def weather(self):
         weather_query = self.bot.dbi.table('weather_forecasts').query()
-        current_hour = datetime.datetime.utcnow().hour % 12
         col = "current_weather"
-        weather_query.select(col).where(cellid=self.cellid)
-        weather = await weather_query.get_value()
+        try:
+            weather_query.select(col).where(cellid=self.cellid)
+            weather = await weather_query.get_value()
+        except:
+            return "NO_WEATHER"
         if not weather:
             return "NO_WEATHER"
         return weather
@@ -892,7 +894,10 @@ class Mapper(Cog):
             d_coords = [await x._coords() for x in d_gyms]
             o_coords = [x for x in o_coords if x]
             d_coords = [x for x in d_coords if x]
-            matrix = bot.gmaps.distance_matrix(o_coords, d_coords)
+            try:
+                matrix = bot.gmaps.distance_matrix(o_coords, d_coords)
+            except:
+                return times
             insert = table.insert
             for i in range(len(o_list)):
                 for j in range(len(d_list)):

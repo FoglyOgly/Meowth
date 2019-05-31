@@ -2306,7 +2306,7 @@ class Train:
             'report_channel_id': self.report_channel_id,
             'current_raid_id': self.current_raid.id if self.current_raid else None,
             'next_raid_id': self.next_raid.id if self.next_raid else None,
-            'done_raid_ids': [x.id for x in self.done_raids],
+            'done_raid_ids': [x.id for x in self.done_raids if x],
             'report_msg_ids': self.report_msg_ids,
             'multi_msg_ids': self.multi_msg_ids,
             'message_ids': self.message_ids

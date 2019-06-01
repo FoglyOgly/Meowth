@@ -214,15 +214,21 @@ class Task:
 
     @classmethod
     async def convert(cls, ctx, arg):
-        table = ctx.bot.dbi.table('research_tasks')
-        query = table.query('task')
-        tasks = await query.get_values()
-        tasks = list(set(tasks))
-        matches = get_matches(tasks, arg)
-        if matches:
-            task_matches = [x[0] for x in matches]
+        table = ctx.bot.dbi.table('task_names')
+        query = table.query('task_desc', 'category')
+        data = await query.get()
+        categories = [x.get('category') for x in data]
+        if arg in categories:
+            query = table.query('task_desc')
+            query.where(category=arg)
+            task_matches = await query.get_values()
         else:
-            task_matches = []
+            tasks = [x.get('task_desc') for x in data]
+            matches = get_matches(tasks, arg)
+            if matches:
+                task_matches = [x[0] for x in matches]
+            else:
+                task_matches = []
         if len(task_matches) > 1:
             react_list = formatters.mc_emoji(len(task_matches))
             display_dict = dict(zip(react_list, task_matches))

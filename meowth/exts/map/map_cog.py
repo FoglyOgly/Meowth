@@ -566,7 +566,7 @@ class Pokestop(POI):
     @property
     def _data(self):
         data = self.bot.dbi.table('pokestops').query()
-        data = data.where(stop_id=self.id)
+        data = data.where(id=self.id)
         return data
 
     @classmethod

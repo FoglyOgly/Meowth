@@ -5,6 +5,7 @@ import textwrap
 import traceback
 import unicodedata
 import json
+import csv
 import logging
 import aiohttp
 from datetime import datetime
@@ -464,4 +465,30 @@ class Dev(Cog):
         await insert.commit(do_update=True)
         await ctx.send('Table update successful.')
 
+    async def csv_from_table(self, table_name):    
+        bot = self.bot
+        table = bot.dbi.table(table_name)
+        query = table.query
+        data = await query.get()
+        if not data:
+            return
+        fields = await table.columns.get_names()
+        infile = io.StringIO()
+        writer = csv.DictWriter(infile, fieldnames=fields, extrasaction='ignore')
+        writer.writeheader()
+        for row in data:
+            row = dict(row)
+            writer.writerow(row)
+        outstr = infile.getvalue().encode()
+        f = io.BytesIO(outstr)
+        return f
 
+    @command()
+    @checks.is_co_owner()
+    async def exporttable(self, ctx, table_name):
+        """Exports the current server's gyms to a CSV file."""
+        f = await self.csv_from_table(table_name)
+        if not f:
+            return await ctx.send('Table not found')
+        to_send = discord.File(f, filename=f'{table_name}.csv')
+        await ctx.send(file=to_send)

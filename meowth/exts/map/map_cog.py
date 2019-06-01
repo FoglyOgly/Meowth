@@ -140,8 +140,11 @@ class ReportChannel():
     async def get_all_stops(self):
         covering = await self.level_10_covering()
         stops = self.bot.dbi.table('pokestops')
-        stops_query = stops.query.where(stops['l10'].in_(covering))
-        stops_query.where(guild=self.channel.guild.id)
+        try:
+            stops_query = stops.query.where(stops['l10'].in_(covering))
+            stops_query.where(guild=self.channel.guild.id)
+        except:
+            return None
         return stops_query
     
     async def get_all_raids(self):

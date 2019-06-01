@@ -617,7 +617,7 @@ class Pokestop(POI):
                 react_list=react_list)
             stop_id = choice_dict[str(payload.emoji)]
             await multi.delete()
-        elif id_list == 1:
+        elif len(id_list) == 1:
             stop_id = id_list[0]
         else:
             city = await report_channel.city()

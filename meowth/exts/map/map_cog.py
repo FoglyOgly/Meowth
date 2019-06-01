@@ -573,6 +573,7 @@ class Pokestop(POI):
         stops_query.select('id', 'name', 'nickname')
         data = await stops_query.get()
         if not data:
+            print(0)
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
         nick_dict = {}
@@ -614,6 +615,7 @@ class Pokestop(POI):
         elif id_list == 1:
             stop_id = id_list[0]
         else:
+            print(1)
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
         return cls(ctx.bot, stop_id)

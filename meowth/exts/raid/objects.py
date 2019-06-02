@@ -2079,7 +2079,7 @@ class Raid:
         if instinct_list:
             liststr += f"\n\n{self.bot.config.team_emoji['instinct']}: {', '.join(instinct_list)}"
         if valor_list:
-            liststr += f"\n\n{self.bot.config.team_emoji['valor']}: {', '.join(valor_users)}"
+            liststr += f"\n\n{self.bot.config.team_emoji['valor']}: {', '.join(valor_list)}"
         if other_list:
             liststr += f"\n\nOther: {', '.join(other_list)}"
         if tags:

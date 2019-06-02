@@ -214,6 +214,7 @@ class Task:
 
     @classmethod
     async def convert(cls, ctx, arg):
+        arg = arg.lower()
         table = ctx.bot.dbi.table('task_names')
         query = table.query('task_desc', 'category')
         data = await query.get()

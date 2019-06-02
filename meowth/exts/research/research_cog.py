@@ -532,6 +532,7 @@ class ResearchCog(Cog):
                 continue
             research_list.append(await research.summary_str())
         title = "Current Research"
+        await channel.send(str(research_list))
         embed = formatters.make_embed(title=title, content=("\n\n".join(research_list) + "\u200b"))
         await channel.send(embed=embed)
 

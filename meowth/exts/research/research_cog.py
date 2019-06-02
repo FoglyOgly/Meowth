@@ -350,9 +350,7 @@ class ResearchCog(Cog):
         if ctx.command.name == 'list':
             try:
                 if await research_checks.is_research_enabled(ctx):
-                    await ctx.send('check passed')
                     if len(ctx.args) == 2 or 'research' in ctx.args:
-                        await ctx.send('if passed')
                         return await self.list_research(ctx.channel)
             except:
                 pass

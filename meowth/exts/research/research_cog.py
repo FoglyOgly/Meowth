@@ -97,6 +97,41 @@ class Research:
         insert = self._insert
         await insert.commit(do_update=True)
     
+    async def summary_str(self):
+        task = self.task
+        reward = self.reward
+        location = self.location
+        if '/' in reward:
+            reward = ItemReward(research.bot, reward)
+            desc = await reward.description()
+        elif reward == 'unknown_encounter':
+            desc = "Unknown Encounter"
+        else:
+            pkmn = Pokemon(bot, reward)
+            desc = await pkmn.name()
+            if await pkmn._shiny_available():
+                desc += " :sparkles:"
+            type_emoji = await pkmn.type_emoji()
+            desc += f" {type_emoji}"
+        
+        if isinstance(task, Task):
+            task = task.id
+        else:
+            task = task.id.split('/', 1)[1]
+        
+        if isinstance(location, POI):
+            directions_url = await location.url()
+            directions_text = await location._name()
+        else:
+            directions_url = location.url
+            directions_text = location._name + " (Unknown Pokestop)"
+
+        summary_str = f"• Reward: {desc} • Task: {task} • Location: [{directions_text}]({directions_url})"
+        return summary_str
+
+        
+        
+    
     async def monitor_status(self):
         expires_at = self.expires_at
         sleeptime = expires_at - time.time()
@@ -471,6 +506,21 @@ class ResearchCog(Cog):
         research.message_ids = msgs
         await research.upsert()
         ctx.bot.loop.create_task(research.monitor_status())
+    
+    async def list_research(self, channel):
+        report_channel = ReportChannel(self.bot, channel)
+        data = await report_channel.get_all_research()
+        research_list = []
+        if not data:
+            return await channel.send('No research reported!')
+        for research_id in data:
+            research = Research.instances.get(research_id)
+            if not research:
+                continue
+            research_list.append(await research.summary_str())
+        title = "Current Research"
+        embed = formatters.make_embed(title=title, content="\n\n".join(research_list) + "\u200b")
+        await channel.send(embed=embed)
 
 
 

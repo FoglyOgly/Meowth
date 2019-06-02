@@ -154,6 +154,13 @@ class ReportChannel():
         data = await self.bot.dbi.execute_query(query, *query_args)
         return [next(row.values()) for row in data]
     
+    async def get_all_research(self):
+        channel_id = self.channel.id
+        query = f"SELECT id FROM research WHERE exists (SELECT * FROM (SELECT unnest(message_ids)) x(message) WHERE x.message LIKE $1);"
+        query_args = [f'{channel_id}%']
+        data = await self.bot.dbi.execute_query(query, *query_args)
+        return [next(row.values()) for row in data]
+    
     async def get_possible_duplicates(self, raid):
         if raid.status == 'active':
             pkmn_id = raid.pkmn.id

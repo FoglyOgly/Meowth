@@ -102,7 +102,7 @@ class Research:
         reward = self.reward
         location = self.location
         if '/' in reward:
-            reward = ItemReward(research.bot, reward)
+            reward = ItemReward(self.bot, reward)
             desc = await reward.description()
         elif reward == 'unknown_encounter':
             desc = "Unknown Encounter"

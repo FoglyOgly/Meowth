@@ -346,6 +346,16 @@ class ResearchCog(Cog):
         bot.loop.create_task(self.pickup_researchdata())
     
     @Cog.listener()
+    async def on_command_completion(self, ctx):
+        if ctx.command.name == 'list':
+            try:
+                if await research_checks.is_research_enabled(ctx):
+                    if len(ctx.args) == 2 or 'research' in ctx.args:
+                        return await self.list_research(ctx.channel)
+            except:
+                pass
+    
+    @Cog.listener()
     async def on_raw_reaction_add(self, payload):
         idstring = f"{payload.channel_id}/{payload.message_id}"
         chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)

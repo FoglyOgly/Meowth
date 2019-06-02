@@ -522,7 +522,6 @@ class ResearchCog(Cog):
     async def list_research(self, channel):
         report_channel = ReportChannel(self.bot, channel)
         data = await report_channel.get_all_research()
-        await channel.send(str(data))
         research_list = []
         if not data:
             return await channel.send('No research reported!')
@@ -530,10 +529,8 @@ class ResearchCog(Cog):
             research = Research.instances.get(research_id)
             if not research:
                 continue
-            await channel.send(str(research_list))
             research_list.append(await research.summary_str())
         title = "Current Research"
-        await channel.send(str(research_list))
         embed = formatters.make_embed(title=title, content=("\n\n".join(research_list) + "\u200b"))
         await channel.send(embed=embed)
 

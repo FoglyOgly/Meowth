@@ -522,6 +522,7 @@ class ResearchCog(Cog):
     async def list_research(self, channel):
         report_channel = ReportChannel(self.bot, channel)
         data = await report_channel.get_all_research()
+        await channel.send(str(data))
         research_list = []
         if not data:
             return await channel.send('No research reported!')

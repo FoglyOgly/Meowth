@@ -107,7 +107,7 @@ class Research:
         elif reward == 'unknown_encounter':
             desc = "Unknown Encounter"
         else:
-            pkmn = Pokemon(bot, reward)
+            pkmn = Pokemon(self.bot, reward)
             desc = await pkmn.name()
             if await pkmn._shiny_available():
                 desc += " :sparkles:"

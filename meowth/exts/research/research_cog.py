@@ -530,6 +530,7 @@ class ResearchCog(Cog):
             research = Research.instances.get(research_id)
             if not research:
                 continue
+            await channel.send(str(research_list))
             research_list.append(await research.summary_str())
         title = "Current Research"
         await channel.send(str(research_list))

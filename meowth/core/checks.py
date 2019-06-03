@@ -74,11 +74,10 @@ def is_report_channel():
 async def check_location_set(ctx):
     table = ctx.bot.dbi.table('report_channels')
     query = table.query.where(channelid=ctx.channel.id)
-    query.select('lat', 'lon', 'radius')
     data = await query.get()
     if data:
-        data = data[0]
-    values = dict(data).values()
+        data = dict(data[0])
+    values = [data.get('lat'), data.get('lon'), data.get('radius')]
     if not all(values):
         raise LocationNotSet
     return True

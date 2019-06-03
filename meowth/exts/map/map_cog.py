@@ -436,7 +436,7 @@ class POI():
         query.where(guild_id=guild_id)
         if cmd == 'raid':
             query.where(raid=True)
-            query.where(report_table[f'category_{level}'].notnull_())
+            query.where(report_table[f'category_{level}'].isnot_(None))
         elif cmd == 'wild':
             query.where(wild=True)
         elif cmd == 'research':

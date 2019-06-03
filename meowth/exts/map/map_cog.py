@@ -428,7 +428,7 @@ class POI():
         L10 = S2_L10(self.bot, L10id)
         await L10.correct_weather(weather)
     
-    async def get_all_channels(self, cmd):
+    async def get_all_channels(self, cmd, level=None):
         report_table = self.bot.dbi.table('report_channels')
         guild_id = await self._guildid()
         coords = await self._coords()
@@ -436,6 +436,7 @@ class POI():
         query.where(guild_id=guild_id)
         if cmd == 'raid':
             query.where(raid=True)
+            query.where(report_table[f'category_{level}'].notnull_())
         elif cmd == 'wild':
             query.where(wild=True)
         elif cmd == 'research':

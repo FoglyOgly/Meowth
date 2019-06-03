@@ -596,7 +596,7 @@ class RaidCog(Cog):
                 else:
                     ctx.bot.loop.create_task(t.end_train())
         if isinstance(gym, Gym):
-            channel_list = await gym.get_all_channels('raid')
+            channel_list = await gym.get_all_channels('raid', level=level)
             report_channels.extend(channel_list)
         if report_channel not in report_channels:
             report_channels.append(report_channel)

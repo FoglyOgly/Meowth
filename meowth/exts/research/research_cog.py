@@ -441,7 +441,7 @@ class ResearchCog(Cog):
     async def research(self, ctx, task: Optional[Task], *, location: Pokestop):
         tz = await ctx.tz()
         if not task:
-            cats = await self.cats()
+            cats = await self.task_categories()
             content = "What category of Research Task is this? Select from the options below."
             react_list = formatters.mc_emoji(len(cats))
             cat_dict = dict(zip(react_list, cats))

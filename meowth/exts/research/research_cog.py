@@ -525,7 +525,8 @@ class ResearchCog(Cog):
             reportcontent = role_mentions + " - "
         else:
             reportcontent = ""
-        reportcontent += "Field Research reported! Use :stamp: to indicate that you picked up this task!"
+        stamp = ctx.bot.get_emoji(583375171847585823)
+        reportcontent += f"Field Research reported! Use {str(stamp)} to indicate that you picked up this task!"
         report_channels = []
         report_channel = ReportChannel(ctx.bot, ctx.channel)
         msgs = []

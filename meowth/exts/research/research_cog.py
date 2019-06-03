@@ -439,6 +439,18 @@ class ResearchCog(Cog):
     @command(aliases=['res'])
     @research_checks.research_enabled()
     async def research(self, ctx, task: Optional[Task], *, location: Pokestop):
+        """Report a Field Research task.
+        
+        **Arguments**
+        *task (optional):* Either the text of the research task itself or
+            the research category (e.g. `raid`). If a conversion to a Task cannot
+            be made, Meowth asks you to select a category, then to select the
+            specific task.
+        *location:* Name of the Pokestop where the Field Research can be found.
+        
+        Meowth will automatically expire the research at midnight local time.
+        The reporter will be awarded points for the number of users that obtain
+        the task."""
         tz = await ctx.tz()
         if not task:
             cats = await self.task_categories()
@@ -512,6 +524,7 @@ class ResearchCog(Cog):
             reportcontent = role_mentions + " - "
         else:
             reportcontent = ""
+        reportcontent += "Field Research reported! Use :stamp: to indicate that you picked up this task!"
         report_channels = []
         report_channel = ReportChannel(ctx.bot, ctx.channel)
         msgs = []

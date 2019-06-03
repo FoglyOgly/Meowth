@@ -11,6 +11,7 @@ import pytz
 from pytz import timezone
 from datetime import datetime, timedelta
 from dateparser import parse
+from math import ceil
 
 from discord.ext import commands
 
@@ -528,9 +529,20 @@ class ResearchCog(Cog):
             if not research:
                 continue
             research_list.append(await research.summary_str())
-        title = "Current Research"
-        embed = formatters.make_embed(title=title, content=("\n\n".join(research_list) + "\u200b"))
-        await channel.send(embed=embed)
+        number = len(research_list)
+        pages = ceil(number/8)
+        for i in range(pages):
+            if pages == 1:
+                title = "Current Research"
+            else:
+                title = f'Current Research (Page {i+1} of {pages})'
+            if len(research_list) > 8:
+                content = "\n\n".join(research_list[:8])
+                research_list = research_list[8:]
+            else:
+                content = "\n\n".join(research_list)
+            embed = formatters.make_embed(title=title, content=content)
+            await channel.send(embed=embed)
 
 
 

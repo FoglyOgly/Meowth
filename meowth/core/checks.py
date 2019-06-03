@@ -1,4 +1,5 @@
 from discord.ext import commands
+from .errors import LocationNotSet
 
 async def check_is_owner(ctx):
     return await ctx.bot.is_owner(ctx.author)

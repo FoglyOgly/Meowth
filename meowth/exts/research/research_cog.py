@@ -12,6 +12,7 @@ from pytz import timezone
 from datetime import datetime, timedelta
 from dateparser import parse
 from math import ceil
+from typing import Optional
 
 from discord.ext import commands
 
@@ -411,6 +412,13 @@ class ResearchCog(Cog):
         research = await Research.from_data(self.bot, rcrd)
         self.bot.loop.create_task(research.monitor_status())
     
+    async def task_categories(self):
+        table = self.bot.dbi.table('task_names')
+        query = table.query('category')
+        cats = await query.get_values()
+        cats = list(set(cats))
+        return cats
+    
     @command()
     @checks.is_co_owner()
     async def cleartasks(self, ctx, *, cleartime=None):
@@ -430,8 +438,21 @@ class ResearchCog(Cog):
 
     @command(aliases=['res'])
     @research_checks.research_enabled()
-    async def research(self, ctx, task: Task, *, location: Pokestop):
+    async def research(self, ctx, task: Optional[Task], *, location: Pokestop):
         tz = await ctx.tz()
+        if not task:
+            cats = await self.cats()
+            content = "What category of Research Task is this? Select from the options below."
+            react_list = formatters.mc_emoji(len(cats))
+            cat_dict = dict(zip(react_list, cats))
+            embed = formatters.mc_embed(cat_dict)
+            multi = await ctx.send(content, embed=embed)
+            payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id], react_list=react_list)
+            if not payload:
+                return await multi.delete()
+            cat = cat_dict[str(payload.emoji)]
+            await multi.delete()
+            task = await Task.convert(ctx, cat)
         if isinstance(task, Task):
             possible_rewards = await task.possible_rewards()
             if len(possible_rewards) == 1:

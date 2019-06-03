@@ -280,7 +280,7 @@ class Task:
         elif len(task_matches) == 1:
             task = task_matches[0]
         else:
-            return None
+            raise ValueError
         return cls(ctx.bot, task)
 
 class PartialTask:

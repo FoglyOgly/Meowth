@@ -1,6 +1,10 @@
 from discord.ext.commands import CommandError
 from meowth.core.data_manager.errors import *
 
+class LocationNotSet(CommandError):
+    'Exception raised checks.location_set fails'
+    pass
+
 class MissingSubcommand(CommandError):
     pass
 

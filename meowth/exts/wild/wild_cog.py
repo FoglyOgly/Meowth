@@ -350,6 +350,7 @@ class WildCog(Cog):
     
     @command(aliases=['w'])
     @wild_checks.wild_enabled()
+    @checks.location_set()
     async def wild(self, ctx, pokemon: Pokemon, *, location: POI):
         """Report a wild Pokemon.
 

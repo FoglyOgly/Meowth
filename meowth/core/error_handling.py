@@ -111,6 +111,12 @@ class ErrorHandler(Cog):
             await ctx.send("This command is on cooldown. "
                            "Try again in {:.2f}s"
                            "".format(error.retry_after))
+    
+        elif isinstance(error, errors.LocationNotSet):
+            msg = _('Location has not been set for this channel. Use **{prefix}setlocation** to fix.').format(prefix=prefix)
+            error = await ctx.error('Location not set', details=msg)
+            await asyncio.sleep(10)
+            await delete_error(ctx.message, error)
 
         elif isinstance(error, errors.TeamSetCheckFail):
             msg = _('Meowth! Team Management is not enabled on this server. **{prefix}{cmd_name}** is unable to be used.').format(cmd_name=ctx.invoked_with, prefix=prefix)

@@ -334,6 +334,7 @@ class RaidCog(Cog):
     @command()
     @checks.is_mod()
     @raid_checks.meetup_enabled()
+    @checks.location_set()
     async def meetup(self, ctx, location: POI, *, start_time: time_converter):
         """Create a Meetup channel.
         
@@ -395,6 +396,7 @@ class RaidCog(Cog):
 
     @command(aliases=['r'], category='Raid')
     @raid_checks.raid_enabled()
+    @checks.location_set()
     @raid_checks.bot_has_permissions()
     async def raid(self, ctx, level_or_boss, *, gym_and_time):
         """Report a raid or raid egg.
@@ -663,6 +665,7 @@ class RaidCog(Cog):
     
     @command(aliases=['ex'], category='Raid')
     @raid_checks.raid_enabled()
+    @checks.location_set()
     @raid_checks.bot_has_permissions()
     async def exraid(self, ctx, gym: Gym, *, hatch_time: time_converter):
         """Report an EX Raid.
@@ -1198,6 +1201,7 @@ class RaidCog(Cog):
 
     @command(category="Raid Train")
     @raid_checks.train_enabled()
+    @checks.location_set()
     @raid_checks.bot_has_permissions()
     async def train(self, ctx):
         """Reports a raid train.

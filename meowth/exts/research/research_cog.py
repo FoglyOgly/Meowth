@@ -438,6 +438,7 @@ class ResearchCog(Cog):
 
     @command(aliases=['res'])
     @research_checks.research_enabled()
+    @checks.location_set()
     async def research(self, ctx, task: Optional[Task], *, location: Pokestop):
         """Report a Field Research task.
         

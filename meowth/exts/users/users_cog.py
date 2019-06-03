@@ -87,7 +87,12 @@ class MeowthUser:
         data.select('party')
         party = await data.get_value()
         if not party:
-            party = [0,0,0,1]
+            team = await self.team()
+            if not team:
+                party = [0,0,0,1]
+            else:
+                party = [0, 0, 0, 0]
+                party[team-1] = 1
         return party
     
     async def set_party(self, party: list = [0,0,0,1]):

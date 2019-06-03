@@ -725,7 +725,7 @@ class RaidCog(Cog):
         level = await level_query.get_value()
         return level
     
-    async def rsvp(self, ctx, status, bosses=[], total: int=0, *teamcounts):
+    async def rsvp(self, ctx, status, bosses=[], total=None, *teamcounts):
         raid_id = await self.get_raidid(ctx)
         report_channel = ctx.bot.get_channel(ctx.report_channel_id)
         report_channel = ReportChannel(ctx.bot, report_channel)
@@ -748,7 +748,7 @@ class RaidCog(Cog):
             party = await meowthuser.party()
         await meowthuser.rsvp(raid_id, status, bosses=boss_ids, party=party)
     
-    async def mrsvp(self, ctx, status, total: int=0, *teamcounts):
+    async def mrsvp(self, ctx, status, total=None, *teamcounts):
         meetup = Meetup.by_channel[ctx.channel.id]
         meetup_id = meetup.id
         meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
@@ -764,7 +764,7 @@ class RaidCog(Cog):
     @command(aliases=['i', 'maybe'], category="RSVP")
     @raid_checks.raid_or_meetup()
     @raid_checks.bot_has_permissions()
-    async def interested(self, ctx, bosses: commands.Greedy[Pokemon], total: typing.Optional[int]=1, *teamcounts):
+    async def interested(self, ctx, bosses: commands.Greedy[Pokemon], total: typing.Optional[int]=None, *teamcounts):
         """RSVP as interested to the current raid or meetup.
 
         **Arguments**
@@ -776,7 +776,7 @@ class RaidCog(Cog):
         *teamcounts (optional):* Counts of each team in your group. Format:
             `3m 2v 1i` means 3 Mystic, 2 Valor, 1 Instinct.
         """
-        if total < 1:
+        if total and total < 1:
             return
         meetup = Meetup.by_channel.get(ctx.channel.id)
         if meetup:
@@ -786,7 +786,7 @@ class RaidCog(Cog):
     @command(aliases=['c', 'omw'], category="RSVP")
     @raid_checks.raid_or_meetup()
     @raid_checks.bot_has_permissions()
-    async def coming(self, ctx, bosses: commands.Greedy[Pokemon], total: typing.Optional[int]=1, *teamcounts):
+    async def coming(self, ctx, bosses: commands.Greedy[Pokemon], total: typing.Optional[int]=None, *teamcounts):
         """RSVP as on your way to the current raid or meetup.
 
        **Arguments**
@@ -798,7 +798,7 @@ class RaidCog(Cog):
         *teamcounts (optional):* Counts of each team in your group. Format:
             `3m 2v 1i` means 3 Mystic, 2 Valor, 1 Instinct.
         """
-        if total < 1:
+        if total and total < 1:
             return
         meetup = Meetup.by_channel.get(ctx.channel.id)
         if meetup:
@@ -808,7 +808,7 @@ class RaidCog(Cog):
     @command(aliases=['h'], category="RSVP")
     @raid_checks.raid_or_meetup()
     @raid_checks.bot_has_permissions()
-    async def here(self, ctx, bosses: commands.Greedy[Pokemon], total: typing.Optional[int]=1, *teamcounts):
+    async def here(self, ctx, bosses: commands.Greedy[Pokemon], total: typing.Optional[int]=None, *teamcounts):
         """RSVP as being at the current raid or meetup.
 
         **Arguments**
@@ -820,7 +820,7 @@ class RaidCog(Cog):
         *teamcounts (optional):* Counts of each team in your group. Format:
             `3m 2v 1i` means 3 Mystic, 2 Valor, 1 Instinct.
         """
-        if total < 1:
+        if total and total < 1:
             return
         meetup = Meetup.by_channel.get(ctx.channel.id)
         if meetup:

@@ -808,13 +808,17 @@ class Mapper(Cog):
         url = await location.url()
         content = f"{display_str}\n[Directions]({url})"
         if isinstance(location, Gym):
+            thumbnail = ("https://raw.githubusercontent.com/"
+                "FoglyOgly/Meowth/new-core/meowth/images/misc/gym.png")
             if await location._exraid():
                 title = "EX Raid Gym"
             else:
                 title = "Gym"
         elif isinstance(location, Pokestop):
             title = "Pokestop"
-        embed = formatters.make_embed(title=title, content=content)
+            thumbnail = ("https://raw.githubusercontent.com/"
+                "FoglyOgly/Meowth/new-core/meowth/images/misc/pokestop.png")
+        embed = formatters.make_embed(title=title, content=content, thumbnail=thumbnail)
         await ctx.send(embed=embed)
 
     

@@ -385,7 +385,10 @@ class WildCog(Cog):
             reportcontent = role.mention + " - "
         else:
             reportcontent = ""
-        reportcontent += f'Wild {name} reported!'
+        coming = '🚗'
+        caught = ctx.bot.get_emoji(581146003177078784)
+        despawned = '💨'
+        reportcontent += f'Wild {name} reported! Use {coming} if you are on the way, {str(caught)} if you catch the Pokemon, and {despawned} if the Pokemon despawns.'
         report_channels = []
         report_channel = ReportChannel(ctx.bot, ctx.channel)
         if isinstance(location, POI):

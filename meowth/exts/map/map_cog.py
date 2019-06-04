@@ -1,4 +1,4 @@
-from meowth import Cog, command, bot
+from meowth import Cog, command, bot, checks
 from discord.ext import commands
 import discord
 from meowth.utils.fuzzymatch import get_match, get_matches
@@ -733,6 +733,25 @@ class Mapper(Cog):
         insert.rows(rows)
         await insert.commit(do_update=True)
     
+    async def csv_from_stops(self, guildid):
+        bot = self.bot
+        stops_table = bot.dbi.table('pokestops')
+        query = stops_table.query
+        query.where(guild=guildid)
+        data = await query.get()
+        if not data:
+            return
+        fields = ['name', 'nickname', 'lat', 'lon']
+        infile = io.StringIO()
+        writer = csv.DictWriter(infile, fieldnames=fields, extrasaction='ignore')
+        writer.writeheader()
+        for row in data:
+            row = dict(row)
+            writer.writerow(row)
+        outstr = infile.getvalue().encode()
+        f = io.BytesIO(outstr)
+        return f
+    
     async def add_gym(self, guild_id, name, lat, lon, exraid=False, nickname=None):
         valid_loc = (
             lat <= 90,
@@ -781,6 +800,25 @@ class Mapper(Cog):
         await insert.commit()
     
     @command()
+    @checks.location_set()
+    async def whereis(self, ctx, location: POI):
+        if not isinstance(location, POI):
+            return await ctx.error('Location not found')
+        display_str = await location.display_str()
+        url = await location.url()
+        content = f"{display_str}\n[Directions]({url})"
+        if isinstance(location, Gym):
+            if await location._exraid():
+                title = "EX Raid Gym"
+            else:
+                title = "Gym"
+        elif isinstance(location, Pokestop):
+            title = "Pokestop"
+        embed = formatters.make_embed(title=title, content=content)
+        await ctx.send(embed=embed)
+
+    
+    @command()
     @commands.has_permissions(manage_guild=True)
     async def importgyms(self, ctx):
         """Import list of Gyms from a CSV attachment.
@@ -790,7 +828,6 @@ class Mapper(Cog):
         """
         attachment = ctx.message.attachments[0]
         guildid = ctx.guild.id
-        bot = ctx.bot
         f = io.BytesIO()
         await attachment.save(f)
         await self.gyms_from_csv(guildid, f)
@@ -806,13 +843,9 @@ class Mapper(Cog):
         """
         attachment = ctx.message.attachments[0]
         guildid = ctx.guild.id
-        bot = ctx.bot
         f = io.BytesIO()
         await attachment.save(f)
-        try:
-            await self.stops_from_csv(guildid, f)
-        except:
-            raise MapCSVImportError
+        await self.stops_from_csv(guildid, f)
         await ctx.send("Import successful")
     
     @command()
@@ -831,6 +864,7 @@ class Mapper(Cog):
         """
         guild_id = ctx.guild.id
         await self.add_gym(guild_id, name, lat, lon, nickname=nickname)
+        return await ctx.success('Gym added')
     
     @command()
     @commands.has_permissions(manage_guild=True)
@@ -848,6 +882,24 @@ class Mapper(Cog):
         """
         guild_id = ctx.guild.id
         await self.add_gym(guild_id, name, lat, lon, exraid=True, nickname=nickname)
+        return await ctx.success('EX Raid Gym added')
+    
+    @command()
+    @commands.has_permissions(manage_guild=True)
+    async def addstop(self, ctx, name: str, lat: float, lon: float, *, nickname: str=None):
+        """Add a single Pokestop.
+        
+        **Arguments**
+        *name:* name of the Pokestop, wrapped in quotes.
+        *lat:* latitude of the Pokestop.
+        *lon:* longitude of the Pokestop.
+        *nickname (optional):* nickname of the Pokestop.
+
+        To add multiple Pokestops, use `!importstops`
+        """
+        guild_id = ctx.guild.id
+        await self.add_stop(guild_id, name, lat, lon, nickname=nickname)
+        return await ctx.success('Pokestop added')
 
     @command()
     @commands.has_permissions(manage_guild=True)
@@ -862,6 +914,17 @@ class Mapper(Cog):
     
     @command()
     @commands.has_permissions(manage_guild=True)
+    async def exportstops(self, ctx):
+        """Exports the current server's Pokestops to a CSV file."""
+        guild_id = ctx.guild.id
+        f = await self.csv_from_stops(guild_id)
+        if not f:
+            return await ctx.send('No Pokestops found')
+        to_send = discord.File(f, filename=f'{ctx.guild.name}_stops.csv')
+        await ctx.send(field=to_send)
+
+    @command()
+    @commands.has_permissions(manage_guild=True)
     async def cleargyms(self, ctx):
         """Deletes all the current server's gyms from the database."""
         guild_id = ctx.guild.id
@@ -870,6 +933,17 @@ class Mapper(Cog):
         query.where(guild=guild_id)
         await query.delete()
         return await ctx.send("Gyms deleted")
+    
+    @command()
+    @commands.has_permissions(manage_guild=True)
+    async def clearstops(self, ctx):
+        """Deletes all the current server's Pokestops from the database."""
+        guild_id = ctx.guild.id
+        table = ctx.bot.dbi.table('pokestops')
+        query = table.query
+        query.where(guild=guild_id)
+        await query.delete()
+        return await ctx.send("Pokestops deleted")
 
     @staticmethod
     async def get_travel_times(bot, origins: List[int], dests: List[int]):

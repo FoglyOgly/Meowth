@@ -381,18 +381,20 @@ class Tutorial(Cog):
         return True
 
     async def research_tutorial(self, ctx):
-        report_channels = config['research']['report_channels']
-        report_channels[ctx.tutorial_channel.id] = 'test'
 
         await ctx.tutorial_channel.send(
             f"This server utilizes the **{ctx.prefix}research** command to "
-            "report field research tasks! There are two ways to use this "
-            f"command: **{ctx.prefix}research** will start an interactive "
-            "session where I will prompt you for the task, location, and "
+            "report field research tasks! There are three ways to use this "
+            f"command: **{ctx.prefix}research <location>** will start an interactive "
+            "session where I will prompt you for the task category, specific task, and "
             "reward of the research task. You can also use "
-            f"**{ctx.prefix}research <pokestop>, <task>, <reward>** to "
-            "submit the report all at once.\n\n"
-            f"Try it out by typing `{ctx.prefix}research`")
+            f"**{ctx.prefix}research <task_category> <location>** to "
+            "skip the first prompt. Finally, you can use "
+            f"**{ctx.prefix}research <task> <location> to skip to the reward prompt. "
+            "At each step, I will try to match your task and reward input with known "
+            "Field Research tasks, Pokemon, or items. To input the task category as "
+            "a shortcut, use single words like `raid` or `catch`.\n\n"
+            f"Try it out by typing `{ctx.prefix}research starbucks`")
 
         # wait for research command completion
         try:
@@ -412,11 +414,6 @@ class Tutorial(Cog):
             await ctx.tutorial_channel.delete()
             return False
 
-        # clean up by removing tutorial from report channel config
-        finally:
-            del report_channels[ctx.tutorial_channel.id]
-
-        return True
 
     async def team_tutorial(self, ctx):
         await ctx.tutorial_channel.send(
@@ -516,10 +513,10 @@ class Tutorial(Cog):
                     return
 
             # start research
-            # if 'research' in enabled:
-            #     completed = await self.research_tutorial(ctx)
-            #     if not completed:
-            #         return
+            if 'research' in enabled:
+                completed = await self.research_tutorial(ctx)
+                if not completed:
+                    return
 
             # start team
             if 'users' in enabled:

@@ -276,7 +276,10 @@ class Task:
             payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
                 react_list=react_list)
             task = display_dict[str(payload.emoji)]
-            await multi.delete()
+            try:
+                await multi.delete()
+            except:
+                pass
         elif len(task_matches) == 1:
             task = task_matches[0]
         else:
@@ -393,7 +396,10 @@ class ResearchCog(Cog):
                     if not payload:
                         return await multi.delete()
                     reward = choice_dict[str(payload.emoji)]
-                    await multi.delete()
+                    try:
+                        await multi.delete()
+                    except:
+                        pass
                     research.reward = reward
                     embed = await ResearchEmbed.from_research(research)
                     for msgid in research.message_ids:
@@ -462,9 +468,15 @@ class ResearchCog(Cog):
             multi = await ctx.send(content, embed=embed)
             payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id], react_list=react_list)
             if not payload:
-                return await multi.delete()
+                try:
+                    return await multi.delete()
+                except:
+                    return
             cat = cat_dict[str(payload.emoji)]
-            await multi.delete()
+            try:
+                await multi.delete()
+            except:
+                pass
             task = await Task.convert(ctx, cat)
         if isinstance(task, Task):
             possible_rewards = await task.possible_rewards()
@@ -496,9 +508,15 @@ class ResearchCog(Cog):
                 payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
                     react_list=react_list)
                 if not payload:
-                    return await multi.delete()
+                    try:
+                        return await multi.delete()
+                    except:
+                        return
                 reward = choice_dict[str(payload.emoji)]
-                await multi.delete()
+                try:
+                    await multi.delete()
+                except:
+                    pass
         else:
             msg = await ctx.send('What is the reward for this task? Please type your response below.')
             def check(m):
@@ -511,8 +529,11 @@ class ResearchCog(Cog):
             if not reward:
                 reward = await ItemReward.convert(ctx, reply.content)
             reward = reward.id
-            await reply.delete()
-            await msg.delete()
+            try:
+                await reply.delete()
+                await msg.delete()
+            except:
+                pass
         research_id = next(snowflake.create())
         research = Research(research_id, ctx.bot, ctx.guild.id, ctx.author.id, task, location, reward, tz, time.time())
         embed = await ResearchEmbed.from_research(research)

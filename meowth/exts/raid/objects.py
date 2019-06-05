@@ -3471,7 +3471,10 @@ class TRaidEmbed():
                 current_gym = train.current_raid.gym
                 if isinstance(current_gym, Gym):
                     times = await Mapper.get_travel_times(bot, [current_gym.id], [gym.id])
-                    travel_time = times[0]['travel_time']
+                    if not times:
+                        travel_time = "Unknown"
+                    else:
+                        travel_time = times[0]['travel_time']
         else:
             directions_url = gym.url
             directions_text = gym._name + " (Unknown Gym)"

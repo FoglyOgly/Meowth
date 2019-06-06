@@ -67,6 +67,7 @@ class Bot(commands.AutoShardedBot):
         self.ext_dir = os.path.join(self.bot_dir, "exts")
         self.config = config
         self.token = config.bot_token
+        self.version = config.version
         self.req_perms = discord.Permissions(config.bot_permissions)
         self.co_owners = config.bot_coowners
         self.language = config.lang_bot
@@ -220,7 +221,9 @@ class Bot(commands.AutoShardedBot):
         ctx = await self.get_context(message, cls=Context)
         if not ctx.command:
             return
-        await self.invoke(ctx)
+        guild_version = await ctx.version()
+        if guild_version == self.version:
+            await self.invoke(ctx)
 
     def match(self, data_list, item):
         result = fuzzymatch.get_match(data_list, item)[0]

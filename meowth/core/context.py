@@ -284,14 +284,25 @@ class Context(commands.Context):
             if autodelete:
                 await msg.delete()
     
-    async def tz(ctx):
-        if hasattr(ctx, '_tz'):
-            return ctx._tz
-        report_table = ctx.bot.dbi.table('report_channels')
+    async def tz(self):
+        if hasattr(self, '_tz'):
+            return self._tz
+        report_table = self.bot.dbi.table('report_channels')
         query = report_table.query('timezone')
-        query.where(channelid=ctx.channel.id)
+        query.where(channelid=self.channel.id)
         zone = await query.get_value()
         return zone
+    
+    async def version(self):
+        if not self.guild:
+            return None
+        table = self.bot.dbi.table('guild_settings')
+        query = table.query('version')
+        try:
+            query.where(guild_id=self.guild.id)
+        except:
+            return None
+        return await query.get_value()
 
 class GetTools:
     """Tools to easily get discord objects via Context."""

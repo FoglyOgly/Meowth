@@ -8,6 +8,7 @@ bot_prefix = '!'
 bot_master = 12345678903216549878
 bot_coowners = [132314336914833409, 263607303096369152]
 preload_extensions = []
+version = '3'
 
 # minimum required permissions for bot user
 bot_permissions = 268822736

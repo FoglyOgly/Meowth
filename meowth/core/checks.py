@@ -77,6 +77,8 @@ async def check_location_set(ctx):
     data = await query.get()
     if data:
         data = dict(data[0])
+    else:
+        raise LocationNotSet
     values = [data.get('lat'), data.get('lon'), data.get('radius')]
     if not all(values):
         raise LocationNotSet

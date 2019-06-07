@@ -406,12 +406,15 @@ class WildCog(Cog):
                 dm_content = f"Wild {name} reported in {ctx.channel.name}!"
                 dms = await want.notify_users(dm_content, embed, author=ctx.author)
                 new_wild.message_ids.extend(dms)
-            reportmsg = await channel.channel.send(reportcontent, embed=embed)
-            for react in react_list:
-                if isinstance(react, int):
-                    react = self.bot.get_emoji(react)
-                await reportmsg.add_reaction(react)
-            new_wild.message_ids.append(f"{reportmsg.channel.id}/{reportmsg.id}")
+            try:
+                reportmsg = await channel.channel.send(reportcontent, embed=embed)
+                for react in react_list:
+                    if isinstance(react, int):
+                        react = self.bot.get_emoji(react)
+                    await reportmsg.add_reaction(react)
+                new_wild.message_ids.append(f"{reportmsg.channel.id}/{reportmsg.id}")
+            except:
+                continue
         d = {
             'id': wild_id,
             'guild': ctx.guild.id,

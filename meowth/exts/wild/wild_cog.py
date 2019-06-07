@@ -400,6 +400,7 @@ class WildCog(Cog):
             report_channels.extend(channel_list)
         else:
             loc_id = f'{location.city}/{location.arg}'
+        if report_channel not in report_channels:
             report_channels.append(report_channel)
         for channel in report_channels:
             if not role:

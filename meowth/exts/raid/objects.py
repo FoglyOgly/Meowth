@@ -3474,7 +3474,7 @@ class TRaidEmbed():
         bot = raid.bot
         end = raid.end
         enddt = datetime.fromtimestamp(end)
-        color = await raid.guild.me.color
+        color = raid.guild.me.color
         gym = raid.gym
         travel_time = "Unknown"
         if isinstance(gym, Gym):

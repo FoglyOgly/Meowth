@@ -111,6 +111,10 @@ class Trade():
     def offer_msgs(self):
         return [x['msg'] for x in self.offer_list]
 
+    @property
+    def guild(self):
+        return self.bot.get_guild(self.guild_id)
+
     async def listing_chnmsg(self):
         chn, msg = await ChannelMessage.from_id_string(self.bot, self.listing_id)
         return chn, msg
@@ -147,6 +151,7 @@ class Trade():
             'offered': offered_pokemon,
         }
         embed = await self.make_offer_embed(trader, listed_pokemon, offered_pokemon)
+        embed.color = self.guild.me.color
         offermsg = await self.lister.send(
             f"{trader.display_name} has made an offer on your trade! Use the reactions to accept or reject the offer.",
             embed=embed
@@ -166,6 +171,7 @@ class Trade():
     async def accept_offer(self, trader, listed, offer):
         content = f'{self.lister_name} has accepted your trade offer! Please DM them to coordinate the trade.'
         embed = await self.make_offer_embed(self.lister, offer, listed)
+        embed.color = self.guild.me.color
         await trader.send(content, embed=embed)
         trade_table = self.bot.dbi.table('trades')
         query = trade_table.query.where(id=self.id)
@@ -222,6 +228,7 @@ class Trade():
             pass
         content = f'{self.lister_name} has rejected your trade offer.'
         embed = await self.make_offer_embed(self.lister, offer, listed)
+        embed.color = self.guild.me.color
         await trader.send(content, embed=embed)
         offer_dict = {
             'trader': trader.id,
@@ -461,8 +468,9 @@ class TradeEmbed():
             thumbnail = await trade.offered_pkmn[0].sprite_url()
         else:
             thumbnail = None
+        color = trade.guild.me.color
         embed = formatters.make_embed(title=title, footer=footer, footer_icon=footer_url,
-            icon=Trade.icon_url, fields=fields, thumbnail=thumbnail)
+            icon=Trade.icon_url, fields=fields, thumbnail=thumbnail, msg_colour=color)
         return cls(embed)
 
         

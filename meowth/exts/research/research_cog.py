@@ -576,6 +576,7 @@ class ResearchCog(Cog):
         ctx.bot.loop.create_task(research.monitor_status())
     
     async def list_research(self, channel):
+        color = channel.guild.me.color
         report_channel = ReportChannel(self.bot, channel)
         data = await report_channel.get_all_research()
         research_list = []
@@ -598,7 +599,7 @@ class ResearchCog(Cog):
                 research_list = research_list[8:]
             else:
                 content = "\n\n".join(research_list)
-            embed = formatters.make_embed(title=title, content=content)
+            embed = formatters.make_embed(title=title, content=content, msg_colour=color)
             await channel.send(embed=embed)
 
 
@@ -657,12 +658,13 @@ class ResearchEmbed:
             'Reward': desc + "\n<:silph:548259248442703895>Research tasks and rewards provided by [The Silph Road](https://thesilphroad.com/research-tasks)"
         }
         reporter = research.guild.get_member(research.reporter_id)
+        color = research.guild.me.color
         reporter_name = reporter.display_name
         reporter_avy = reporter.avatar_url
         footer = f"Reported by {reporter_name} • Expires"
         icon_url = ("https://raw.githubusercontent.com/"
                 "FoglyOgly/Meowth/new-core/meowth/images/misc/field-research.png")
         embed = formatters.make_embed(title=title, thumbnail=thumbnail,
-            fields=fields, footer=footer, footer_icon=reporter_avy, icon=icon_url)
+            fields=fields, footer=footer, footer_icon=reporter_avy, icon=icon_url, msg_colour=color)
         embed.timestamp = datetime.utcfromtimestamp(research.expires_at)
         return cls(embed)

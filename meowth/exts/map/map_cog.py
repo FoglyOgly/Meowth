@@ -818,7 +818,8 @@ class Mapper(Cog):
             title = "Pokestop"
             thumbnail = ("https://raw.githubusercontent.com/"
                 "FoglyOgly/Meowth/new-core/meowth/images/misc/pokestop.png")
-        embed = formatters.make_embed(title=title, content=content, thumbnail=thumbnail)
+        color = ctx.guild.me.color
+        embed = formatters.make_embed(title=title, content=content, thumbnail=thumbnail, msg_colour=color)
         await ctx.send(embed=embed)
 
     

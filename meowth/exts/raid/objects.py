@@ -564,9 +564,10 @@ class Raid:
         return "\n".join(grps_str) + '\u200b'
     
     async def raidgroup_ask(self, channel, user):
+        color = self.guild.me.color
         member = self.guild.get_member(user)
         grps_str = self.grps_str
-        embed = formatters.make_embed(title='Groups (Boss Damage Estimate)', content=grps_str)
+        embed = formatters.make_embed(title='Groups (Boss Damage Estimate)', content=grps_str, msg_colour=color)
         msg = await channel.send(f"{member.mention}: select a group from the list below!, or use \u2754 to remain ungrouped!", embed=embed)
         groups = self.group_list
         emoji_list = [x['emoji'] for x in groups]
@@ -1451,7 +1452,7 @@ class Raid:
         footer_icon = 'https://media.discordapp.net/attachments/346766728132427777/512699022822080512/imageedit_10_6071805149.png'
         level = self.level
         egg_img_url = self.bot.raid_info.egg_images[level]
-        # color = await formatters.url_color(egg_img_url)
+        color = self.guild.me.color
         boss_list = self.boss_list
         end = self.end
         enddt = datetime.fromtimestamp(end)
@@ -1493,7 +1494,7 @@ class Raid:
         }
         footer_text = "Ending"
         embed = formatters.make_embed(icon=raid_icon, title=directions_text,
-            thumbnail=egg_img_url, title_url=directions_url, # msg_colour=color,
+            thumbnail=egg_img_url, title_url=directions_url, msg_colour=color,
             fields=fields, footer=footer_text, footer_icon=footer_icon)
         embed.timestamp = enddt
         return embed
@@ -2007,6 +2008,7 @@ class Raid:
         return group_list
     
     async def list_rsvp(self, channel, tags=False):
+        color = self.guild.me.color
         trainer_dict = self.trainer_dict
         interested_users = []
         coming_users = []
@@ -2043,10 +2045,11 @@ class Raid:
             liststr += f"\n\nLobby: {', '.join(lobby_users)}"
         if tags:
             return await channel.send(f'Current Raid RSVP Totals\n\n{liststr}')
-        embed = formatters.make_embed(title="Current Raid RSVP Totals", content=liststr)
+        embed = formatters.make_embed(title="Current Raid RSVP Totals", content=liststr, msg_colour=color)
         return await channel.send(embed=embed)
     
     async def list_teams(self, channel, tags=False):
+        color = self.guild.me.color
         trainer_dict = self.trainer_dict
         mystic_list = []
         instinct_list = []
@@ -2084,10 +2087,11 @@ class Raid:
             liststr += f"\n\nOther: {', '.join(other_list)}"
         if tags:
             return await channel.send(f'Current Raid Team Totals\n\n{liststr}')
-        embed = formatters.make_embed(title="Current Raid Team Totals", content=liststr)
+        embed = formatters.make_embed(title="Current Raid Team Totals", content=liststr, msg_colour=color)
         return await channel.send(embed=embed)
     
     async def list_groups(self, channel, tags=False):
+        color = self.guild.me.color
         liststr = ""
         group_list = self.group_list
         trainer_dict = self.trainer_dict
@@ -2115,10 +2119,11 @@ class Raid:
             liststr += f"\nStarting at {time}"
         if tags:
             return await channel.send(f'Current Raid Groups\n\n{liststr}')
-        embed = formatters.make_embed(title="Current Raid Groups", content=liststr)
+        embed = formatters.make_embed(title="Current Raid Groups", content=liststr, msg_colour=color)
         return await channel.send(embed=embed)
     
     async def list_bosses(self, channel, tags=False):
+        color = self.guild.me.color
         trainer_dict = self.trainer_dict
         boss_list = self.boss_list
         boss_dict = {x: [] for x in boss_list}
@@ -2146,7 +2151,7 @@ class Raid:
         liststr = "\n\n".join(boss_str)
         if tags:
             return await channel.send(f'Current Raid Boss Totals\n\n{liststr}')
-        embed = formatters.make_embed(title="Current Raid Boss Totals", content=liststr)
+        embed = formatters.make_embed(title="Current Raid Boss Totals", content=liststr, msg_colour=color)
         return await channel.send(embed=embed)
 
     async def get_trainer_dict(self):
@@ -2526,6 +2531,7 @@ class Train:
         return team_str
 
     async def list_teams(self, channel, tags=False):
+        color = self.guild.me.color
         trainer_dict = self.trainer_dict
         mystic_list = []
         instinct_list = []
@@ -2553,10 +2559,10 @@ class Train:
         if instinct_list:
             liststr += f"\n\n{self.bot.config.team_emoji['instinct']}: {', '.join(instinct_list)}"
         if valor_list:
-            liststr += f"\n\n{self.bot.config.team_emoji['valor']}: {', '.join(valor_users)}"
+            liststr += f"\n\n{self.bot.config.team_emoji['valor']}: {', '.join(valor_list)}"
         if other_list:
             liststr += f"\n\nOther: {', '.join(other_list)}"
-        embed = formatters.make_embed(title="Current Train Team Totals", content=liststr)
+        embed = formatters.make_embed(title="Current Train Team Totals", content=liststr, msg_colour=color)
         return await channel.send(embed=embed)
 
     async def select_first_raid(self, author):
@@ -2623,6 +2629,7 @@ class Train:
             return
     
     async def display_choices(self, raids, react_list):
+        color = self.guild.me.color
         dest_dict = {}
         eggs_list = []
         hatched_list = []
@@ -2671,7 +2678,7 @@ class Train:
             if len(active_list) > left:
                 fields['Active'] = "\n\n".join(active_list[:3])
                 active_list = active_list[3:]
-                embed = formatters.make_embed(title=title, fields=fields)
+                embed = formatters.make_embed(title=title, fields=fields, msg_colour=color)
                 yield embed
                 continue
             elif active_list:
@@ -2679,22 +2686,22 @@ class Train:
                 left -= len(active_list)
                 active_list = []
             if not left:
-                embed = formatters.make_embed(title=title, fields=fields)
+                embed = formatters.make_embed(title=title, fields=fields, msg_colour=color)
                 yield embed
                 continue
             if not left:
-                embed = formatters.make_embed(title=title, fields=fields)
+                embed = formatters.make_embed(title=title, fields=fields, msg_colour=color)
                 yield embed
                 continue
             if len(eggs_list) > left:
                 fields['Eggs'] = "\n\n".join(eggs_list[:left])
                 eggs_list = eggs_list[left:]
-                embed = formatters.make_embed(title=title, fields=fields)
+                embed = formatters.make_embed(title=title, fields=fields, msg_colour=color)
                 yield embed
                 continue
             elif eggs_list:
                 fields['Eggs'] = "\n\n".join(eggs_list)
-            embed = formatters.make_embed(title=title, fields=fields)
+            embed = formatters.make_embed(title=title, fields=fields, msg_colour=color)
             yield embed
 
     async def route_url(self, next_raid):
@@ -2900,7 +2907,8 @@ class ReportEmbed():
             boss_str = await raid.boss_list_str()
             fields['Boss Interest'] = boss_str
             footer = 'Hatching'
-        embed = formatters.make_embed(icon=RaidEmbed.raid_icon, title="Raid Report", # msg_colour=color,
+        color = raid.guild.me.color
+        embed = formatters.make_embed(icon=RaidEmbed.raid_icon, title="Raid Report", msg_colour=color,
             thumbnail=img_url, fields=fields, footer=footer, footer_icon=RaidEmbed.footer_icon)
         embed.timestamp = enddt
         return cls(embed)
@@ -3094,7 +3102,8 @@ class RaidEmbed():
         if reporter:
             reporter = reporter.display_name
         footer = f"Reported by {reporter} • Ending"
-        embed = formatters.make_embed(icon=RaidEmbed.raid_icon, title=directions_text, # msg_colour=color,
+        color = raid.guild.me.color
+        embed = formatters.make_embed(icon=RaidEmbed.raid_icon, title=directions_text, msg_colour=color,
             title_url=directions_url, thumbnail=img_url, fields=fields, footer=footer,
             footer_icon=RaidEmbed.footer_icon)
         embed.timestamp = enddt
@@ -3140,14 +3149,14 @@ class RSVPEmbed():
             "Status List": status_str,
             "Team List": team_str
         }
+        color = meetup.guild.me.color
 
-        embed = formatters.make_embed(title="Current RSVP Totals", fields=fields, footer="Starting")
+        embed = formatters.make_embed(title="Current RSVP Totals", fields=fields, footer="Starting", msg_colour=color)
         embed.timestamp = start_dt
         return cls(embed)
     
     @classmethod
     def from_raid(cls, raid: Raid):
-        bot = raid.bot
 
         end = raid.end
         enddt = datetime.fromtimestamp(end)
@@ -3160,14 +3169,14 @@ class RSVPEmbed():
         }
         grps_str = raid.grps_str + "\u200b"
         fields['Groups'] = (False, grps_str)
+        color = raid.guild.me.color
         embed = formatters.make_embed(icon=RSVPEmbed.raid_icon, title="Current RSVP Totals",
-            fields=fields, footer="Ending", footer_icon=RSVPEmbed.footer_icon)
+            fields=fields, footer="Ending", footer_icon=RSVPEmbed.footer_icon, msg_colour=color)
         embed.timestamp = enddt
         return cls(embed)
     
     @classmethod
     def from_raidgroup(cls, raid: Raid, group):
-        bot = raid.bot
         end = raid.end
         enddt = datetime.fromtimestamp(end)
 
@@ -3181,8 +3190,9 @@ class RSVPEmbed():
             "Status List": status_str,
             "Team List": team_str
         }
+        color = raid.guild.me.color
         embed = formatters.make_embed(icon=RSVPEmbed.raid_icon, title="Current Group RSVP Totals",
-            fields=fields, footer="Ending", footer_icon=RSVPEmbed.footer_icon)
+            fields=fields, footer="Ending", footer_icon=RSVPEmbed.footer_icon, msg_colour=color)
         if est:
             embed.add_field(name='Starting (Boss Damage Estimate)', value=f'{time} ({str(round(est*100)) + "%"})', inline=False)
         else:
@@ -3283,8 +3293,9 @@ class EggEmbed():
         if reporter:
             reporter = reporter.display_name
         footer_text = f"Reported by {reporter} • Hatching"
+        color = raid.guild.me.color
         embed = formatters.make_embed(icon=EggEmbed.raid_icon, title=directions_text,
-            thumbnail=egg_img_url, title_url=directions_url, # msg_colour=color,
+            thumbnail=egg_img_url, title_url=directions_url, msg_colour=color,
             fields=fields, footer=footer_text, footer_icon=EggEmbed.footer_icon)
         embed.timestamp = hatchdt
         return cls(embed)
@@ -3377,7 +3388,8 @@ class CountersEmbed():
         ctrs_str.append(f'[Results courtesy of Pokebattler](https://www.pokebattler.com/raids/{boss.id})')
         fields['<:pkbtlr:512707623812857871> Counters'] = "\n".join(ctrs_str)
         footer_text = "Ending"
-        embed = formatters.make_embed(icon=CountersEmbed.raid_icon, thumbnail=img_url, # msg_colour=color,
+        color = raid.guild.me.color
+        embed = formatters.make_embed(icon=CountersEmbed.raid_icon, thumbnail=img_url, msg_colour=color,
             fields=fields, footer=footer_text, footer_icon=CountersEmbed.footer_icon)
         embed.timestamp = enddt
         return cls(embed)
@@ -3414,7 +3426,8 @@ class TrainEmbed():
             'Current Raid': current_raid_str,
             'Team List': team_str
         }
-        embed = formatters.make_embed(title=title, fields=fields)
+        color = train.guild.me.color
+        embed = formatters.make_embed(title=title, fields=fields, msg_colour=color)
         return cls(embed)
 
 class TRSVPEmbed():
@@ -3431,7 +3444,8 @@ class TRSVPEmbed():
         fields = {
             'Team List': team_str
         }
-        embed = formatters.make_embed(title=title, fields=fields)
+        color = train.guild.me.color
+        embed = formatters.make_embed(title=title, fields=fields, msg_colour=color)
         return cls(embed)
 
 
@@ -3460,7 +3474,7 @@ class TRaidEmbed():
         bot = raid.bot
         end = raid.end
         enddt = datetime.fromtimestamp(end)
-        # color = await boss.color()
+        color = await raid.guild.me.color
         gym = raid.gym
         travel_time = "Unknown"
         if isinstance(gym, Gym):
@@ -3486,7 +3500,7 @@ class TRaidEmbed():
             "Gym": f"[{directions_text}]({directions_url})",
             "Travel Time": travel_time
         }
-        embed = formatters.make_embed(title="Raid Report", # msg_colour=color,
+        embed = formatters.make_embed(title="Raid Report", msg_colour=color,
             thumbnail=img_url, fields=fields, footer="Ending")
         embed.timestamp = enddt
         return cls(embed)
@@ -3532,8 +3546,9 @@ class MeetupEmbed:
             "Team List": team_str
         }
         footer_text = "Starting"
+        color = meetup.guild.me.color
         embed = formatters.make_embed(title=directions_text,
-            thumbnail='', title_url=directions_url, # msg_colour=color,
+            thumbnail='', title_url=directions_url, msg_colour=color,
             fields=fields, footer=footer_text)
         embed.timestamp = meetup.start_datetime
         return cls(embed)

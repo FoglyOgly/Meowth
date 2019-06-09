@@ -1069,7 +1069,9 @@ class Pokedex(Cog):
     @command()
     async def pokedex(self, ctx, *, pokemon: Pokemon):
         """Display a Pokedex entry."""
-        return await ctx.send(embed=await pokemon.dex_embed())
+        embed = await pokemon.dex_embed()
+        embed.color = ctx.guild.me.color
+        return await ctx.send(embed=embed)
     
     @command()
     @checks.is_co_owner()

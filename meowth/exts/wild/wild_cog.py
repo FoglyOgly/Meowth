@@ -447,13 +447,14 @@ class WildCog(Cog):
         number = len(wild_list)
         pages = ceil(number/20)
         ins = list(range(0, number, 20))
+        color = self.guild.me.color
         for i in range(pages):
             if pages == 1:
                 title = "Current Wild Spawns"
             else:
                 title = f"Current Wild Spawns (Page {i+1} of {pages})"
             content = "\n\n".join(wild_list[ins[i]:ins[i]+20])
-            embed = formatters.make_embed(title=title, content=content)
+            embed = formatters.make_embed(title=title, content=content, msg_colour=color)
             await channel.send(embed=embed)
         
 
@@ -554,7 +555,8 @@ class WildEmbed():
         reporter = wild.guild.get_member(wild.reporter_id).display_name
         footer = f"Reported by {reporter}"
         reportdt = datetime.fromtimestamp(wild.created)
-        embed = formatters.make_embed(title=directions_text, # msg_colour=color,
+        color = wild.guild.me.color
+        embed = formatters.make_embed(title=directions_text, msg_colour=color,
             title_url=directions_url, thumbnail=img_url, fields=fields, footer=footer)
         embed.timestamp = reportdt
         return cls(embed)

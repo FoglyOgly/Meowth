@@ -101,6 +101,7 @@ class Bot(commands.AutoShardedBot):
         prefix_table = self.dbi.table('prefixes')
         results = await prefix_table.query.get()
         self.prefixes = dict(results)
+        return True
 
     async def send_cmd_help(self, ctx, **kwargs):
         """Function to invoke help output for a command.

@@ -29,7 +29,7 @@ class CogManager(Cog):
         except Exception as e:
             await ctx.error(
                 f'Error when loading extension {name}',
-                f'{type(e).__name__}: {e}',
+                f'{type(e).__name__}: {e} - {e.original}',
                 log_level='critical')
         else:
             await ctx.success(

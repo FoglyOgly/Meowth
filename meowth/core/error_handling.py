@@ -113,7 +113,7 @@ class ErrorHandler(Cog):
                            "".format(error.retry_after))
     
         elif isinstance(error, errors.LocationNotSet):
-            msg = _('Location has not been set for this channel. Use **{prefix}setlocation** to fix.').format(prefix=prefix)
+            msg = ('Location has not been set for this channel. Use **{prefix}setlocation** to fix.').format(prefix=prefix)
             error = await ctx.error('Location not set', details=msg)
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)

@@ -2713,7 +2713,10 @@ class Train:
     async def new_raid(self, raid: Raid):
         embed = await TRaidEmbed.from_raid(self, raid)
         content = "Use the reaction below to vote for this raid next!"
-        msg = await self.channel.send(content, embed=embed.embed)
+        try:
+            msg = await self.channel.send(content, embed=embed.embed)
+        except:
+            return
         self.report_msg_ids.append(msg.id)
         Raid.by_trainreport[msg.id] = raid
         raid.train_msgs.append(f'{msg.channel.id}/{msg.id}')

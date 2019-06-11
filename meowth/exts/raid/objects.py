@@ -992,6 +992,15 @@ class Raid:
                     embed = egg_embed.embed
                     has_embed = True
             await msg.edit(embed=embed)
+        if self.channel_ids:
+            content = f'Weather changed to {weather_str}'
+            for chnid in self.channel_ids:
+                channel = self.bot.get_channel(int(chnid))
+                if channel:
+                    try:
+                        await channel.send(content)
+                    except:
+                        pass    
     
     async def join_grp(self, user_id, group):
         old_rsvp = self.trainer_dict.get(user_id, {})

@@ -286,7 +286,7 @@ class AdminCog(Cog):
 
         **Arguments**
         *features:* list of features to enable. Can include any of
-        `['raid', 'wild', 'research', 'users', 'train', 'trade', 'clean']`
+        `['raid', 'wild', 'research', 'users', 'train', 'trade', 'clean', 'archive', 'welcome']`
 
         Raid, wild, research, and train require a defined location. Use `!setlocation`
         before enabling these.
@@ -583,7 +583,7 @@ class AdminCog(Cog):
 
         **Arguments**
         *features:* list of features to disable. Can include any of
-        `['raid', 'wild', 'research', 'users', 'train', 'trade', 'clean', 'welcome']`
+        `['raid', 'wild', 'research', 'users', 'train', 'trade', 'clean', 'welcome', 'archive']`
         """
         channel_id = ctx.channel.id
         channel_table = self.bot.dbi.table('report_channels')
@@ -617,6 +617,9 @@ class AdminCog(Cog):
     @command()
     @commands.has_permissions(manage_guild=True)
     async def importconfig(self, ctx):
+        """Imports existing settings from Meowth 2.0, if they exist.
+
+        Usable only by server admins."""
         guild_id = ctx.guild.id
         settings = ctx.bot.dbi.table('guild_settings')
         insert = settings.insert
@@ -865,6 +868,9 @@ class AdminCog(Cog):
     @command()
     @checks.is_admin()
     async def cleanroles(self, ctx):
+        """Deletes all roles with no members in current server.
+
+        Usable only by server admins."""
         guild = ctx.guild
         roles = guild.roles
         empty_roles = [x for x in roles if len(x.members) == 0]
@@ -876,3 +882,16 @@ class AdminCog(Cog):
             except:
                 pass
         await ctx.send(f'Deleted {deleted_roles} empty roles')
+    
+    @command()
+    @checks.is_admin()
+    async def configure(self, ctx):
+        """Gives information about how to configure Meowth 3.0."""
+        await ctx.send('In order to set up or change your configuration for Meowth 3.0, '
+            f'you will need to use the **{ctx.prefix}enable**, **{ctx.prefix}disable',
+            f'and **{ctx.prefix}setlocation** commands. First, in any channel you want to use '
+            f'for reporting raids, wilds, or research, use the {ctx.prefix}setlocation '
+            'command. Then you can use enable in each of those channels.\n\n'
+            f'Most of the non-reporting commands (for example, the {ctx.prefix}team command) '
+            f'are enabled with `{ctx.prefix}enable users`. See `{ctx.prefix}help setlocation` '
+            f'and `{ctx.prefix}help enable` for more information.')

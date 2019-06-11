@@ -223,7 +223,7 @@ class Bot(commands.AutoShardedBot):
         if not ctx.command:
             return
         guild_version = await ctx.version()
-        if guild_version == self.version:
+        if guild_version == self.version or ctx.command.name == 'importconfig':
             await self.invoke(ctx)
 
     def match(self, data_list, item):
@@ -267,6 +267,16 @@ class Bot(commands.AutoShardedBot):
         return platform.platform()
 
     # events
+    async def on_guild_join(self, guild):
+        table = self.dbi.table('guild_settings')
+        insert = table.insert
+        d = {
+            'guild_id': guild.id,
+            'version': self.version
+        }
+        insert.row(**d)
+        await insert.commit(do_update=True)
+    
     async def on_message(self, message):
         self.counter["messages_read"] += 1
         await self.process_commands(message)

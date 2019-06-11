@@ -192,8 +192,9 @@ class AdminCog(Cog):
                 d = dict(data[0])
                 d['team'] = team.id
             user_data.append(d)
-        insert = table.insert.rows(user_data)
-        await insert.commit(do_update=True)
+        if user_data:
+            insert = table.insert.rows(user_data)
+            await insert.commit(do_update=True)
         table = ctx.bot.dbi.table('team_roles')
         query = table.query.where(guild_id=ctx.guild.id)
         data = await query.get()
@@ -617,6 +618,10 @@ class AdminCog(Cog):
     @commands.has_permissions(manage_guild=True)
     async def importconfig(self, ctx):
         guild_id = ctx.guild.id
+        settings = ctx.bot.dbi.table('guild_settings')
+        insert = settings.insert
+        insert.row(guild_id=guild_id, version=ctx.bot.version)
+        await insert.commit(do_update=True)
         old_shard_id = (guild_id >> 22) % 2
         path = f'/home/foglyogly1/MeowthProject/MeowthProject/Shard{old_shard_id}/data/serverdict'
         with open(path, 'rb') as fd:

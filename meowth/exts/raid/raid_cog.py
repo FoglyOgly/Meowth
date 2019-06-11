@@ -1202,7 +1202,6 @@ class RaidCog(Cog):
 
     @command(category="Raid Train")
     @raid_checks.train_enabled()
-    @checks.location_set()
     @raid_checks.bot_has_permissions()
     async def train(self, ctx):
         """Reports a raid train.

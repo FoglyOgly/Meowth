@@ -291,6 +291,11 @@ class AdminCog(Cog):
         Raid, wild, research, and train require a defined location. Use `!setlocation`
         before enabling these.
         """
+        guild_id = ctx.guild.id
+        settings = ctx.bot.dbi.table('guild_settings')
+        insert = settings.insert
+        insert.row(guild_id=guild_id, version=ctx.bot.version)
+        await insert.commit(do_update=True)
         channel_id = ctx.channel.id
         channel_table = self.bot.dbi.table('report_channels')
         query = channel_table.query.where(channelid=channel_id)
@@ -887,6 +892,11 @@ class AdminCog(Cog):
     @checks.is_admin()
     async def configure(self, ctx):
         """Gives information about how to configure Meowth 3.0."""
+        guild_id = ctx.guild.id
+        settings = ctx.bot.dbi.table('guild_settings')
+        insert = settings.insert
+        insert.row(guild_id=guild_id, version=ctx.bot.version)
+        await insert.commit(do_update=True)
         await ctx.send('In order to set up or change your configuration for Meowth 3.0, '
             f'you will need to use the **{ctx.prefix}enable**, **{ctx.prefix}disable, '
             f'and **{ctx.prefix}setlocation** commands. First, in any channel you want to use '

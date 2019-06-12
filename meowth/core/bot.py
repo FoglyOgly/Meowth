@@ -223,7 +223,7 @@ class Bot(commands.AutoShardedBot):
         if not ctx.command:
             return
         guild_version = await ctx.version()
-        if guild_version == self.version or ctx.command.name == 'importconfig':
+        if guild_version == self.version or ctx.command.name in ['importconfig', 'configure']:
             await self.invoke(ctx)
 
     def match(self, data_list, item):

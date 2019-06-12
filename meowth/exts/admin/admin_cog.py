@@ -888,7 +888,7 @@ class AdminCog(Cog):
     async def configure(self, ctx):
         """Gives information about how to configure Meowth 3.0."""
         await ctx.send('In order to set up or change your configuration for Meowth 3.0, '
-            f'you will need to use the **{ctx.prefix}enable**, **{ctx.prefix}disable',
+            f'you will need to use the **{ctx.prefix}enable**, **{ctx.prefix}disable, '
             f'and **{ctx.prefix}setlocation** commands. First, in any channel you want to use '
             f'for reporting raids, wilds, or research, use the {ctx.prefix}setlocation '
             'command. Then you can use enable in each of those channels.\n\n'

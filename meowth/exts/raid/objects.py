@@ -132,6 +132,89 @@ class Meetup:
     def report_channel(self):
         return self.bot.get_channel(self.report_channel_id)
     
+    async def list_rsvp(self, channel, tags=False):
+        color = self.guild.me.color
+        trainer_dict = self.trainer_dict
+        interested_users = []
+        coming_users = []
+        here_users = []
+        lobby_users = []
+        for trainer in trainer_dict:
+            member = self.guild.get_member(trainer)
+            if tags:
+                name = member.mention
+            else:
+                name = member.display_name
+            party = trainer_dict[trainer]['party']
+            total = sum(party)
+            status = trainer_dict[trainer]['status']
+            sumstr = name
+            if total != 1:
+                sumstr += f' ({total})'
+            if status == 'maybe':
+                interested_users.append(sumstr)
+            elif status == 'coming':
+                coming_users.append(sumstr)
+            elif status == 'here':
+                here_users.append(sumstr)
+            elif status == 'lobby':
+                lobby_users.append(sumstr)
+        liststr = ""
+        if interested_users:
+            liststr += f"\n\n{self.bot.config.emoji['maybe']}: {', '.join(interested_users)}"
+        if coming_users:
+            liststr += f"\n\n{self.bot.config.emoji['coming']}: {', '.join(coming_users)}"
+        if here_users:
+            liststr += f"\n\n{self.bot.get_emoji(self.bot.config.emoji['here'])}: {', '.join(here_users)}"
+        if lobby_users:
+            liststr += f"\n\nLobby: {', '.join(lobby_users)}"
+        if tags:
+            return await channel.send(f'Current Meetup RSVP Totals\n\n{liststr}')
+        embed = formatters.make_embed(title="Current Meetup RSVP Totals", content=liststr, msg_colour=color)
+        return await channel.send(embed=embed)
+    
+    async def list_teams(self, channel, tags=False):
+        color = self.guild.me.color
+        trainer_dict = self.trainer_dict
+        mystic_list = []
+        instinct_list = []
+        valor_list = []
+        other_list = []
+        for trainer in trainer_dict:
+            member = self.guild.get_member(trainer)
+            if not member:
+                continue
+            if tags:
+                name = member.mention
+            else:
+                name = member.display_name
+            party = trainer_dict[trainer]['party']
+            total = sum(party)
+            sumstr = name
+            if total != 1:
+                sumstr += f' ({total})'
+            if party[0] == total:
+                mystic_list.append(sumstr)
+            elif party[1] == total:
+                instinct_list.append(sumstr)
+            elif party[2] == total:
+                valor_list.append(sumstr)
+            else:
+                other_list.append(sumstr)
+        liststr = ""
+        if mystic_list:
+            liststr += f"\n\n{self.bot.config.team_emoji['mystic']}: {', '.join(mystic_list)}"
+        if instinct_list:
+            liststr += f"\n\n{self.bot.config.team_emoji['instinct']}: {', '.join(instinct_list)}"
+        if valor_list:
+            liststr += f"\n\n{self.bot.config.team_emoji['valor']}: {', '.join(valor_list)}"
+        if other_list:
+            liststr += f"\n\nOther: {', '.join(other_list)}"
+        if tags:
+            return await channel.send(f'Current Meetup Team Totals\n\n{liststr}')
+        embed = formatters.make_embed(title="Current Meetup Team Totals", content=liststr, msg_colour=color)
+        return await channel.send(embed=embed)
+    
     async def get_trainer_dict(self):
         def data(rcrd):
             trainer = rcrd['user_id']
@@ -1520,6 +1603,53 @@ class Raid:
         return (await ReportEmbed.from_raid(self)).embed
 
     
+    async def update_url(self, url):
+        gym = self.gym
+        if isinstance(gym, Gym):
+            directions_text = await gym._name()
+            exraid = await gym._exraid()
+            content = "This raid's location has been updated! This raid is at a known Gym, so please let a server administrator know if the original directions link was incorrect!"
+        else:
+            directions_text = gym._name + " (Unknown Gym)"
+            exraid = False
+            content = "This raid's location has been updated! This raid is at an unknown Gym, so please let a server administrator know if this gym should be added to the database!"
+        if exraid:
+            directions_text += " (EX Raid Gym)"
+        gym_str = f"[{directions_text}]({url})"
+        message_ids = self.message_ids
+        for messageid in message_ids:
+            chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
+            if self.channel_ids and str(chn.id) not in self.channel_ids and self.status != 'expired':
+                report_embed = await self.report_embed()
+                report_embed.fields[1].value = gym_str
+                try:
+                    await msg.edit(embed=report_embed)
+                    continue
+                except:
+                    pass
+            elif (self.channel_ids or str(chn.id) in self.channel_ids) and self.status != 'expired':
+                if self.hatch and self.hatch > time.time():        
+                    embed = await self.egg_embed()
+                elif self.end > time.time():
+                    embed = await self.raid_embed()
+                embed.author.url = url
+                try:
+                    await msg.edit(embed=embed)
+                except:
+                    pass
+        if self.channel_ids:
+            embed = formatters.make_embed(title='Gym Location Updated', content=gym_str)
+            for chnid in self.channel_ids:
+                chn = self.bot.get_channel(int(chnid))
+                if chn:
+                    try:
+                        await chn.send(content=content, embed=embed)
+                    except:
+                        pass
+                
+            
+
+
     async def update_messages(self, content=''):
         msg_list = []
         await self.get_boss_list()
@@ -1539,7 +1669,7 @@ class Raid:
             if self.channel_ids and str(chn.id) not in self.channel_ids and self.status != 'expired':
                 report_embed = await self.report_embed()
                 try:
-                    await msg.edit(content=content, embed=report_embed)
+                    await msg.edit(embed=report_embed)
                 except:
                     pass
                 msg_list.append(msg)
@@ -1554,7 +1684,7 @@ class Raid:
                 continue
             msg_list.append(msg)
         for msgid in train_msgs:
-            chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
+            chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
             if not msg:
                 continue
             t = Train.by_channel.get(chn.id)

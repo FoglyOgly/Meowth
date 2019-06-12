@@ -23,6 +23,7 @@ from datetime import datetime
 from dateparser import parse
 from pytz import timezone
 import typing
+import re
 
 emoji_letters = ['🇦','🇧','🇨','🇩','🇪','🇫','🇬','🇭','🇮','🇯','🇰','🇱',
     '🇲','🇳','🇴','🇵','🇶','🇷','🇸','🇹','🇺','🇻','🇼','🇽','🇾','🇿'
@@ -155,6 +156,12 @@ class RaidCog(Cog):
         train = Train.by_channel.get(channel.id)
         if not (raid or train):
             return
+        url_re = '(http(s?)://)?((maps\.google\./)|((www\.)?google\.com/maps/)|(goo.gl/maps/))\S*'
+        match = re.search(url_re, message.content)
+        if match:
+            url = match.group()
+            if raid:
+                return await raid.update_url(url)
         category, phrase_list = await self.archive_cat_phrases(guild)
         if not phrase_list:
             return
@@ -220,8 +227,10 @@ class RaidCog(Cog):
             except RaidDisabled:
                 pass
             try:
-                if await raid_checks.is_raid_channel(ctx):
-                    raid = Raid.by_channel[str(ctx.channel.id)]
+                if await raid_checks.is_raid_or_meetup(ctx):
+                    raid = Raid.by_channel.get(str(ctx.channel.id))
+                    if not raid:
+                        raid = Meetup.by_channel.get(ctx.channel.id)
                     tags = False
                     if 'tags' in ctx.args:
                         tags = True
@@ -231,9 +240,14 @@ class RaidCog(Cog):
                     if 'teams' in ctx.args:
                         return await raid.list_teams(ctx.channel, tags=tags)
                     if 'groups' in ctx.args:
+                        if isinstance(raid, Meetup):
+                            return await raid.list_rsvp(ctx.channel, tags=tags)
                         return await raid.list_groups(ctx.channel, tags=tags)
                     if 'bosses' in ctx.args:
+                        if isinstance(raid, Meetup):
+                            return await raid.list_rsvp(ctx.channel, tags=tags)
                         return await raid.list_bosses(ctx.channel, tags=tags)
+                    return await raid.list_rsvp(ctx.channel, tags=tags)
             except NotRaidChannel:
                 pass
         

@@ -904,7 +904,7 @@ class AdminCog(Cog):
             'command. Then you can use enable in each of those channels.\n\n'
             f'Most of the non-reporting commands (for example, the {ctx.prefix}team command) '
             f'are enabled with `{ctx.prefix}enable users`. See `{ctx.prefix}help setlocation` '
-            f'and `{ctx.prefix}help enable` for more information. If you have an existing '
-            f'Meowth 2.0 configuration, please use `{ctx.prefix}importconfig to attempt to '
+            f'and `{ctx.prefix}help enable` for more information. \n\n**NOTE:** If you have an existing '
+            f'Meowth 2.0 configuration, please use `{ctx.prefix}importconfig` to attempt to '
             'import your settings before attempting to configure Meowth 3.0. If this is not done, '
             'you may find that both Meowth versions attempt to respond to your commands.')

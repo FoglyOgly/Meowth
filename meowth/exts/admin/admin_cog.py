@@ -920,3 +920,4 @@ class AdminCog(Cog):
             f'Meowth 2.0 configuration, please use `{ctx.prefix}importconfig` to attempt to '
             'import your settings before attempting to configure Meowth 3.0. If this is not done, '
             'you may find that both Meowth versions attempt to respond to your commands.')
+    

@@ -492,3 +492,16 @@ class Dev(Cog):
             return await ctx.send('Table not found')
         to_send = discord.File(f, filename=f'{table_name}.csv')
         await ctx.send(file=to_send)
+    
+    @command()
+    @checks.is_owner()
+    async def announce(self, ctx, *, message):
+        success = 0
+        fail = 0
+        for guild in ctx.bot.guilds:
+            try:
+                await guild.owner.send(message)
+                success += 1
+            except:
+                fail += 1
+        return await ctx.send(f'Announcement sent. {success} successes, {fail} failures.')

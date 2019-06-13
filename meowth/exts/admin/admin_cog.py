@@ -296,6 +296,10 @@ class AdminCog(Cog):
         insert = settings.insert
         insert.row(guild_id=guild_id, version=ctx.bot.version)
         await insert.commit(do_update=True)
+        try:
+            await ctx.guild.me.edit(nick='Meowth 3.0')
+        except:
+            pass
         channel_id = ctx.channel.id
         channel_table = self.bot.dbi.table('report_channels')
         query = channel_table.query.where(channelid=channel_id)
@@ -630,6 +634,10 @@ class AdminCog(Cog):
         insert = settings.insert
         insert.row(guild_id=guild_id, version=ctx.bot.version)
         await insert.commit(do_update=True)
+        try:
+            await ctx.guild.me.edit(nick='Meowth 3.0')
+        except:
+            pass
         old_shard_id = (guild_id >> 22) % 2
         path = f'/home/foglyogly1/MeowthProject/MeowthProject/Shard{old_shard_id}/data/serverdict'
         with open(path, 'rb') as fd:
@@ -897,6 +905,10 @@ class AdminCog(Cog):
         insert = settings.insert
         insert.row(guild_id=guild_id, version=ctx.bot.version)
         await insert.commit(do_update=True)
+        try:
+            await ctx.guild.me.edit(nick='Meowth 3.0')
+        except:
+            pass
         await ctx.send('In order to set up or change your configuration for Meowth 3.0, '
             f'you will need to use the **{ctx.prefix}enable**, **{ctx.prefix}disable**, '
             f'and **{ctx.prefix}setlocation** commands. First, in any channel you want to use '

@@ -921,7 +921,6 @@ class RaidCog(Cog):
         raid.group_list = await raid.get_grp_list()
         for grp in raid.group_list:
             if grp['grp_id'] == grp_id:
-                print(0)
                 await raid.join_grp(ctx.author.id, grp)
     
     @command(aliases=['start'], category="Raid RSVP")

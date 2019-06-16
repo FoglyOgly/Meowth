@@ -49,10 +49,6 @@ def run_bot(debug=False, launcher=None, from_restart=False):
     bot.load_extension('meowth.core.commands')
     bot.load_extension('meowth.core.cog_manager')
 
-    # load extensions marked for preload in config
-    for ext in bot.preload_ext:
-        ext_name = ("meowth.exts."+ext)
-        bot.load_extension(ext_name)
 
     if bot.token is None or not bot.default_prefix:
         bot.logger.critical(

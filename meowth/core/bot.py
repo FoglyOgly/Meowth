@@ -323,6 +323,11 @@ class Bot(commands.AutoShardedBot):
             print("I'm not in any server yet, so be sure to invite me!")
         if self.invite_url:
             print(f"\nInvite URL: {self.invite_url}\n")
+        
+        # load extensions marked for preload in config
+        for ext in self.preload_ext:
+            ext_name = ("meowth.exts."+ext)
+            self.load_extension(ext_name)
 
         if self.from_restart:
             table = self.dbi.table('restart_savedata')

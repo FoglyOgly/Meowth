@@ -333,8 +333,15 @@ class Team:
 
 class Users(Cog):
 
+    @Cog.listener()
+    async def on_command_error(self, ctx, error):
+        if isinstance(error, commands.CommandOnCooldown):
+            if ctx.command.name == 'team':
+                return await ctx.send('Contact appropriate server personnel if you need to be manually added to a team role.')
+
     @command()
     @users_checks.users_enabled()
+    @commands.cooldown(1, 3600, commands.BucketType.member)
     async def team(self, ctx, *, chosen_team: Team):
         """Set your Pokemon Go team."""
 

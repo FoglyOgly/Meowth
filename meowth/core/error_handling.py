@@ -1,5 +1,6 @@
 import traceback
 import asyncio
+import time
 
 from inspect import signature, getfullargspec
 
@@ -80,17 +81,29 @@ class ErrorHandler(Cog):
             await ctx.send("That command is disabled.")
 
         elif isinstance(error, commands.CommandInvokeError):
+            error_table = ctx.bot.dbi.table('unhandled_errors')
             ctx.bot.logger.exception(
                 "Exception in command '{}'".format(ctx.command.qualified_name),
                 exc_info=error.original)
-            message = ("Error in command '{}'. Check your console or "
-                       "logs for details."
+            message = ("Error in command '{}'. This error has been logged "
+                       "and will be tracked. Contact support for more information."
                        "".format(ctx.command.qualified_name))
             exception_log = ("Exception in command '{}'\n"
                              "".format(ctx.command.qualified_name))
             exception_log += "".join(traceback.format_exception(
                 type(error), error, error.__traceback__))
             ctx.bot._last_exception = exception_log
+            d = {
+                'command_name': ctx.command.name,
+                'guild_id': ctx.guild.id,
+                'channel_id': ctx.channel.id,
+                'author_id': ctx.author.id,
+                'created': time.time(),
+                'full_traceback': exception_log
+            }
+            insert = error_table.insert
+            insert.row(**d)
+            await insert.commit()
             await ctx.send(message)
         
         elif isinstance(error, commands.MissingPermissions):

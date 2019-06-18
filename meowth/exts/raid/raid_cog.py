@@ -906,7 +906,7 @@ class RaidCog(Cog):
             stamp = await converter.convert(ctx, group_time)
         if stamp > raid.end:
             raise InvalidTime
-        elif raid.hatch and stamp < raid.hatch:
+        elif raid.hatch and stamp < raid.hatch - 1:
             raise InvalidTime
         grp_id = next(snowflake.create())
         d = {

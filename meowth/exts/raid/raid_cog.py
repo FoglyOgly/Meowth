@@ -862,7 +862,7 @@ class RaidCog(Cog):
     async def counters(self, ctx):
         """Request your optimal counters for the current box from Pokebattler.
 
-        Use `!set pokebattler` before using this command to link your
+        Use `!pokebattler` before using this command to link your
         Pokebattler account.
         """
         raid = Raid.by_channel.get(str(ctx.channel.id))

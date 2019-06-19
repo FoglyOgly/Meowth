@@ -9,7 +9,7 @@ class CogManager(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    def __local_check(self, ctx):
+    def cog_check(self, ctx):
         return checks.check_is_co_owner(ctx)
 
     @property

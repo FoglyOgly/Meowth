@@ -801,7 +801,7 @@ class Mapper(Cog):
     
     @command()
     @checks.location_set()
-    async def whereis(self, ctx, location: POI):
+    async def whereis(self, ctx, *, location: POI):
         if not isinstance(location, POI):
             return await ctx.error('Location not found')
         display_str = await location.display_str()

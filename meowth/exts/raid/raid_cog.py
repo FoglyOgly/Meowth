@@ -37,6 +37,8 @@ class time_converter(commands.Converter):
             return None
         tz = timezone(zone)
         now_dt = datetime.now(tz=tz)
+        if hatch_dt.day != now_dt.day:
+            hatch_dt.replace(day=now_dt.day)
         await ctx.send(str(hatch_dt))
         await ctx.send(str(now_dt))
         if hatch_dt < now_dt:

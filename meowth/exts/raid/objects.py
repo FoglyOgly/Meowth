@@ -1041,6 +1041,8 @@ class Raid:
             is_boosted = await self.pkmn.is_boosted(weather.value)
             cp_range = await self.cp_range(weather=weather.value)
             cp_str = f"{cp_range[0]}-{cp_range[1]}"
+            if is_boosted:
+                cp_str += " (Boosted)"
             ctrs_list = await self.generic_counters_data(weather=weather.value)
             ctrs_str = []
             if ctrs_list:

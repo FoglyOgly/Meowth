@@ -529,6 +529,8 @@ class Raid:
             return None
         react_list = react_list + grp_reacts
         react_list.append('\u2754')
+        if self.status == 'active' or len(self.boss_list) == 1:
+            react_list.append(512707623812857871)
         return react_list
 
     @property
@@ -875,6 +877,14 @@ class Raid:
                 if v == emoji:
                     new_status = k
             new_bosses = []
+            elif emoji == 512707623812857871:
+                if self.status != 'active':
+                    if len(self.boss_list) > 1:
+                        raise RaidNotActive
+                meowthuser = MeowthUser.from_id(self.bot, user.id)
+                embed = await self.counters_embed(meowthuser)
+                await user.send(embed=embed)
+                return await self.update_rsvp()
         else:
             return
         if isinstance(emoji, int):
@@ -3071,38 +3081,32 @@ class RaidEmbed():
     moveset_index = 5
     status_index = 6
     team_index = 7
-    ctrs_index = 8
     rec_index = 10
     group_index = 9
 
     def set_boss(self, boss_dict):
         name = boss_dict['name']
-        shiny_available = boss_dict['shiny_available']
         cp_str = boss_dict['cp_str']
         resists = boss_dict['resists']
         weaks = boss_dict['weaks']
-        ctrs_str = boss_dict['ctrs_str']
         moveset_str = "Unknown | Unknown"
 
         self.embed.set_field_at(RaidEmbed.boss_index, name="Boss", value=name)
         self.embed.set_field_at(RaidEmbed.weak_index, name="Weaknesses", value=weaks)
         self.embed.set_field_at(RaidEmbed.resist_index, name="Resistances", value=resists)
         self.embed.set_field_at(RaidEmbed.cp_index, name="CP Range", value=cp_str)
-        self.embed.set_field_at(RaidEmbed.ctrs_index, name="<:pkbtlr:512707623812857871> Counters", value=ctrs_str)
         self.embed.set_field_at(RaidEmbed.moveset_index, name="Moveset", value=moveset_str)
         return self
     
     def set_weather(self, weather_str, cp_str, ctrs_str, rec_str=None):
         self.embed.set_field_at(RaidEmbed.weather_index, name="Weather", value=weather_str)
         self.embed.set_field_at(RaidEmbed.cp_index, name="CP Range", value=cp_str)
-        self.embed.set_field_at(RaidEmbed.ctrs_index, name='<:pkbtlr:512707623812857871> Counters', value=ctrs_str)
         if rec_str:
             self.embed.set_field_at(RaidEmbed.rec_index, name="Recommended Group Size", value=rec_str)
         return self
     
     def set_moveset(self, moveset_str, ctrs_str, rec_str=None):
         self.embed.set_field_at(RaidEmbed.moveset_index, name="Moveset", value=moveset_str)
-        self.embed.set_field_at(RaidEmbed.ctrs_index, name='<:pkbtlr:512707623812857871> Counters', value=ctrs_str)
         if rec_str:
             self.embed.set_field_at(RaidEmbed.rec_index, name="Recommended Group Size", value=rec_str)
         return self
@@ -3203,36 +3207,7 @@ class RaidEmbed():
             "Status List": status_str,
             "Team List": team_str
         }
-        i = 1
         ctrs_list = await raid.generic_counters_data()
-        if ctrs_list:
-            ctrs_str = []
-            for ctr in ctrs_list:
-                name = await ctr.name()
-                fast = Move(raid.bot, ctr.quickMoveid)
-                fast_name = await fast.name()
-                if await fast.is_legacy(ctr.id):
-                    fast_name += " (Legacy)"
-                try:
-                    fast_emoji = await fast.emoji()
-                except:
-                    fast_emoji = ""
-                charge = Move(raid.bot, ctr.chargeMoveid)
-                charge_name = await charge.name()
-                if await charge.is_legacy(ctr.id):
-                    charge_name += " (Legacy)"
-                try:
-                    charge_emoji = await charge.emoji()
-                except:
-                    charge_emoji = ""
-                ctr_str = f"**{name}**: {fast_name} {fast_emoji} | {charge_name} {charge_emoji}"
-                ctrs_str.append(ctr_str)
-                i += 1
-            ctrs_str.append(f'[Results courtesy of Pokebattler](https://www.pokebattler.com/raids/{boss.id})')
-            fields['<:pkbtlr:512707623812857871> Counters'] = "\n".join(ctrs_str)
-        else:
-            ctrs_str = "Currently unavailable"
-            fields['<:pkbtlr:512707623812857871> Counters'] = (False, ctrs_str)
         grps_str = raid.grps_str + "\u200b"
         if ctrs_list:
             fields['Groups (Boss Damage Estimate)'] = grps_str
@@ -3300,8 +3275,15 @@ class RSVPEmbed():
     @classmethod
     def from_raid(cls, raid: Raid):
 
-        end = raid.end
-        enddt = datetime.fromtimestamp(end)
+        if raid.status == 'egg':
+            end = raid.hatch
+            enddt = datetime.fromtimestamp(end)
+            footer = "Hatching"
+        else:
+            end = raid.end
+            enddt = datetime.fromtimestamp(end)
+            footer = "Ending"
+
 
         status_str = raid.status_str
         team_str = raid.team_str
@@ -3313,7 +3295,7 @@ class RSVPEmbed():
         fields['Groups'] = (False, grps_str)
         color = raid.guild.me.color
         embed = formatters.make_embed(icon=RSVPEmbed.raid_icon, title="Current RSVP Totals",
-            fields=fields, footer="Ending", footer_icon=RSVPEmbed.footer_icon, msg_colour=color)
+            fields=fields, footer=footer, footer_icon=RSVPEmbed.footer_icon, msg_colour=color)
         embed.timestamp = enddt
         return cls(embed)
     

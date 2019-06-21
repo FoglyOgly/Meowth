@@ -834,6 +834,14 @@ class Raid:
         if emoji == '❌':
             await message.remove_reaction(emoji, user)
             return await meowthuser.cancel_rsvp(self.id)
+        if emoji == 512707623812857871:
+            if self.status != 'active':
+                if len(self.boss_list) > 1:
+                    raise RaidNotActive
+            meowthuser = MeowthUser.from_id(self.bot, user.id)
+            embed = await self.counters_embed(meowthuser)
+            await user.send(embed=embed)
+            await self.update_rsvp()
         if self.status == 'egg':
             boss_list = self.boss_list
             if len(boss_list) > 1:
@@ -877,14 +885,6 @@ class Raid:
                 if v == emoji:
                     new_status = k
             new_bosses = []
-            if emoji == 512707623812857871:
-                if self.status != 'active':
-                    if len(self.boss_list) > 1:
-                        raise RaidNotActive
-                meowthuser = MeowthUser.from_id(self.bot, user.id)
-                embed = await self.counters_embed(meowthuser)
-                await user.send(embed=embed)
-                return await self.update_rsvp()
         else:
             return
         if isinstance(emoji, int):

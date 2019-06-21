@@ -3141,7 +3141,7 @@ class RaidEmbed():
     
     @grps_str.setter
     def grps_str(self, grps_tuple):
-        self.embed.set_field_at(RaidEmbed.group_index, name=grps_tuple[0], value=grps_tuple[1])
+        self.embed.set_field_at(RaidEmbed.group_index, name=grps_tuple[0], value=grps_tuple[1], inline=False)
 
 
 
@@ -3210,7 +3210,7 @@ class RaidEmbed():
         ctrs_list = await raid.generic_counters_data()
         grps_str = raid.grps_str + "\u200b"
         if ctrs_list:
-            fields['Groups (Boss Damage Estimate)'] = grps_str
+            fields['Groups (Boss Damage Estimate)'] = (False, grps_str)
             rec = await raid.rec_group_size()
             fields['Recommended Group Size'] = str(rec)
         else:

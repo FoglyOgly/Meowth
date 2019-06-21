@@ -39,8 +39,6 @@ class time_converter(commands.Converter):
         now_dt = datetime.now(tz=tz)
         if hatch_dt.day != now_dt.day:
             hatch_dt = hatch_dt.replace(day=now_dt.day)
-        await ctx.send(str(hatch_dt))
-        await ctx.send(str(now_dt))
         if hatch_dt < now_dt:
             if hatch_dt.hour < 12:
                 hatch_dt = hatch_dt.replace(hour=hatch_dt.hour+12)
@@ -909,10 +907,8 @@ class RaidCog(Cog):
             converter = time_converter()
             stamp = await converter.convert(ctx, group_time)
         if stamp > raid.end:
-            await ctx.send('stamp > end')
             raise InvalidTime
         elif raid.hatch and stamp < raid.hatch:
-            await ctx.send('stamp < hatch')
             raise InvalidTime
         grp_id = next(snowflake.create())
         d = {

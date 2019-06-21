@@ -3081,8 +3081,8 @@ class RaidEmbed():
     moveset_index = 5
     status_index = 6
     team_index = 7
-    rec_index = 10
-    group_index = 9
+    rec_index = 9
+    group_index = 8
 
     def set_boss(self, boss_dict):
         name = boss_dict['name']

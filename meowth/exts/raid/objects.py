@@ -129,6 +129,14 @@ class Meetup:
         return self.bot.get_channel(self.channel_id)
     
     @property
+    def channel_topic(self):
+        hatchlocal = self.local_datetime(self.start)
+        hatchtimestr = hatchlocal.strftime('%I:%M %p')
+        hatchdatestr = hatchlocal.strftime('%b %d')
+        topic_str = f"Starts on {hatchdatestr} at {hatchtimestr} "
+        return topic_str
+    
+    @property
     def report_channel(self):
         return self.bot.get_channel(self.report_channel_id)
     

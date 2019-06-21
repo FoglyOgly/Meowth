@@ -376,6 +376,8 @@ class RaidCog(Cog):
         meetup_id = next(snowflake.create())
         tz = await ctx.tz()
         meetup = Meetup(meetup_id, ctx.bot, guild_id, meetup_channel.id, ctx.channel.id, location, start_time, tz)
+        topic = meetup.channel_topic
+        await meetup_channel.edit(topic=topic)
         reportcontent = f"Plan for this meetup in {meetup_channel.mention}!"
         embed = await meetup.meetup_embed()
         reportmsg = await ctx.send(reportcontent, embed=embed)

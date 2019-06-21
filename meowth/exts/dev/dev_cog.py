@@ -31,7 +31,7 @@ class Dev(Cog):
         self.bot = bot
         self._last_result = None
 
-    def __local_check(self, ctx):
+    def cog_check(self, ctx):
         return checks.check_is_co_owner(ctx)
 
     @command()

@@ -3141,7 +3141,7 @@ class RaidEmbed():
     
     @grps_str.setter
     def grps_str(self, grps_tuple):
-        self.embed.set_field_at(RaidEmbed.group_index, name=grps_tuple[0], value=grps_tuple[1], inline=False)
+        self.embed.set_field_at(RaidEmbed.group_index, name=grps_tuple[0], value=grps_tuple[1])
 
 
 

@@ -37,6 +37,8 @@ class time_converter(commands.Converter):
             return None
         tz = timezone(zone)
         now_dt = datetime.now(tz=tz)
+        await ctx.send(str(hatch_dt))
+        await ctx.send(str(now_dt))
         if hatch_dt < now_dt:
             if hatch_dt.hour < 12:
                 hatch_dt.replace(hour=hatch_dt.hour+12)

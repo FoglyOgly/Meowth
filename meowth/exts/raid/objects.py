@@ -877,7 +877,7 @@ class Raid:
                 if v == emoji:
                     new_status = k
             new_bosses = []
-            elif emoji == 512707623812857871:
+            if emoji == 512707623812857871:
                 if self.status != 'active':
                     if len(self.boss_list) > 1:
                         raise RaidNotActive

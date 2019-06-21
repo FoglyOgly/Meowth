@@ -3074,7 +3074,7 @@ class RaidEmbed():
     footer_icon = 'https://media.discordapp.net/attachments/346766728132427777/512699022822080512/imageedit_10_6071805149.png'
 
     boss_index = 0
-    weather_index = 1
+    gym_index = 1
     weak_index = 2
     resist_index = 3
     cp_index = 4
@@ -3099,7 +3099,6 @@ class RaidEmbed():
         return self
     
     def set_weather(self, weather_str, cp_str, ctrs_str, rec_str=None):
-        self.embed.set_field_at(RaidEmbed.weather_index, name="Weather", value=weather_str)
         self.embed.set_field_at(RaidEmbed.cp_index, name="CP Range", value=cp_str)
         if rec_str:
             self.embed.set_field_at(RaidEmbed.rec_index, name="Recommended Group Size", value=rec_str)
@@ -3199,7 +3198,7 @@ class RaidEmbed():
         team_str = raid.team_str
         fields = {
             "Boss": f"{name} {type_emoji}",
-            "Weather": f"{weather_name} {weather_emoji}",
+            "Gym": f"[{directions_text}]({directions_url})",
             "Weaknesses": weaks,
             "Resistances": resists,
             "CP Range": f"{cp_range[0]}-{cp_range[1]}",
@@ -3220,8 +3219,8 @@ class RaidEmbed():
             reporter = reporter.display_name
         footer = f"Reported by {reporter} • Ending"
         color = raid.guild.me.color
-        embed = formatters.make_embed(icon=RaidEmbed.raid_icon, title=directions_text, msg_colour=color,
-            title_url=directions_url, thumbnail=img_url, fields=fields, footer=footer,
+        embed = formatters.make_embed(icon=RaidEmbed.raid_icon, title="Raid Report", msg_colour=color,
+            thumbnail=img_url, fields=fields, footer=footer,
             footer_icon=RaidEmbed.footer_icon)
         embed.timestamp = enddt
         return cls(embed)
@@ -3336,11 +3335,10 @@ class EggEmbed():
     status_index = 2
     team_index = 3
     boss_list_index = 4
-    weather_index = 1
+    gym_index = 1
     group_index = 5
 
     def set_weather(self, weather_str, boss_list_str):
-        self.embed.set_field_at(EggEmbed.weather_index, name="Weather", value=weather_str)
         self.boss_str = boss_list_str
         return self
     
@@ -3406,7 +3404,7 @@ class EggEmbed():
         boss_str = await raid.boss_list_str()
         fields = {
             "Raid Level": level,
-            "Weather": f"{weather_name} {weather_emoji}",
+            "Gym": f"[{directions_text}]({directions_url})",
             "Status List": status_str,
             "Team List": team_str,
             "Boss Interest:": boss_str,
@@ -3418,8 +3416,8 @@ class EggEmbed():
             reporter = reporter.display_name
         footer_text = f"Reported by {reporter} • Hatching"
         color = raid.guild.me.color
-        embed = formatters.make_embed(icon=EggEmbed.raid_icon, title=directions_text,
-            thumbnail=egg_img_url, title_url=directions_url, msg_colour=color,
+        embed = formatters.make_embed(icon=EggEmbed.raid_icon, title="Raid Report",
+            thumbnail=egg_img_url, msg_colour=color,
             fields=fields, footer=footer_text, footer_icon=EggEmbed.footer_icon)
         embed.timestamp = hatchdt
         return cls(embed)

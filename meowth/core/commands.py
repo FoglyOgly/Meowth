@@ -510,7 +510,7 @@ class Core(Cog):
                     "\n").format(shard, latency * 1000, here)
         await ctx.embed('Latency', msg, msg_type='info')
 
-    @command(category='Owner')
+    @command()
     @checks.is_admin()
     async def purge(self, ctx, msg_number: int = 10):
         """Delete a number of messages from the channel.

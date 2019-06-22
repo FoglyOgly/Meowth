@@ -455,7 +455,7 @@ class Raid:
         self.expire_task = None
         self.train_msgs = []
         self._weather = "NO_WEATHER"
-        self.completed_by = completed_by
+        self.completed_by = []
     
     def __eq__(self, other):
         if isinstance(other, Raid):
@@ -1006,8 +1006,8 @@ class Raid:
                 else:
                     await lobbymsg.edit(content=f"Group {grp['emoji']} has entered the raid!")
             for user in grp['users']:
-                    if user not in self.completed_by:
-                        self.completed_by.append(user)
+                if user not in self.completed_by:
+                    self.completed_by.append(user)
             await self.upsert()
             user_table = self.bot.dbi.table('raid_rsvp')
             query = user_table.query.where(user_table['user_id'].in_(grp['users']))
@@ -2373,7 +2373,7 @@ class Raid:
         completed_by = data.get('completed_by', [])
         if not completed_by:
             completed_by = []
-        raid = cls(raid_id, bot, guild_id, report_channel_id, reporter_id, gym, level=level, pkmn=boss, hatch=hatch, end=end, completed_by=completed_by)
+        raid = cls(raid_id, bot, guild_id, report_channel_id, reporter_id, gym, level=level, pkmn=boss, hatch=hatch, end=end)
         raid.channel_ids = data.get('channels')
         raid.message_ids = data.get('messages')
         raid.train_msgs = data.get('train_msgs')
@@ -2387,6 +2387,7 @@ class Raid:
         raid.trainer_dict = await raid.get_trainer_dict()
         raid.group_list = await raid.get_grp_list()
         raid.tz = data['tz']
+        raid.completed_by = completed_by
         await raid.get_boss_list()
         return raid
     

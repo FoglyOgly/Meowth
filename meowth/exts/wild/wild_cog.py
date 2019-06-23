@@ -374,12 +374,17 @@ class WildCog(Cog):
             weather = None
         pkmn = await pokemon.validate('wild', weather=weather)
         if pkmn.id == 'DITTO':
-            await ctx.send('What Pokemon is this Ditto disguised as? Type your response below.')
+            disask = await ctx.send('What Pokemon is this Ditto disguised as? Type your response below.')
             def check(m):
                 return m.channel == ctx.channel and m.author == ctx.author
             try:
                 reply = await ctx.bot.wait_for('message', check=check)
                 disguised = await Pokemon.convert(ctx, reply.content)
+                await disask.delete()
+                try:
+                    await reply.delete()
+                except:
+                    pass
             except:
                 disguised = None
         else:
@@ -422,7 +427,7 @@ class WildCog(Cog):
                 dm_content = f"Wild {name} reported in {ctx.channel.name}!"
                 if disguised:
                     dis_name = await disguised.name()
-                    reportcontent += f'\nThis Ditto is disguised as a {dis_name}!'
+                    dm_content += f'\nThis Ditto is disguised as a {dis_name}!'
                 dms = await want.notify_users(dm_content, embed, author=ctx.author)
                 new_wild.message_ids.extend(dms)
             try:

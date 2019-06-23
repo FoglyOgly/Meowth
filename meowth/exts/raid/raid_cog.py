@@ -40,7 +40,7 @@ class time_converter(commands.Converter):
         if hatch_dt.day != now_dt.day and ctx.command.name not in ['exraid', 'meetup']:
             hatch_dt = hatch_dt.replace(day=now_dt.day)
         if ctx.command.name == 'group':
-            raid = Raid.by_channel(str(ctx.channel.id))
+            raid = Raid.by_channel.get(str(ctx.channel.id))
             end_dt = raid.local_datetime(raid.end)
             hatch_dt = hatch_dt.replace(day=end_dt.day)
         if hatch_dt < now_dt:

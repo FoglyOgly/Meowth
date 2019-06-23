@@ -12,6 +12,7 @@ from datetime import datetime
 import asyncio
 from pytz import timezone
 from math import ceil
+from discord.ext import commands
 
 from . import wild_info
 from . import wild_checks
@@ -372,6 +373,17 @@ class WildCog(Cog):
         if weather == 'NO_WEATHER':
             weather = None
         pkmn = await pokemon.validate('wild', weather=weather)
+        if pkmn.id == 'DITTO':
+            await ctx.send('What Pokemon is this Ditto disguised as? Type your response below.')
+            def check(m):
+                return m.channel == ctx.channel and m.author == ctx.author
+            try:
+                reply = await ctx.bot.wait_for('message', check=check)
+                disguised = await Pokemon.convert(ctx, reply.content)
+            except:
+                disguised = None
+        else:
+            disguised = None
         wild_table = self.bot.dbi.table('wilds')
         wild_id = next(snowflake.create())
         new_wild = Wild(wild_id, self.bot, ctx.guild.id, ctx.author.id, location, pkmn)
@@ -389,6 +401,9 @@ class WildCog(Cog):
         caught = ctx.bot.get_emoji(581146003177078784)
         despawned = '💨'
         reportcontent += f'Wild {name} reported! Use {coming} if you are on the way, {str(caught)} if you catch the Pokemon, and {despawned} if the Pokemon despawns.'
+        if disguised:
+            dis_name = await disguised.name()
+            reportcontent += f'\nThis Ditto is disguised as a {dis_name}!'
         report_channels = []
         report_channel = ReportChannel(ctx.bot, ctx.channel)
         if isinstance(location, POI):
@@ -405,6 +420,9 @@ class WildCog(Cog):
         for channel in report_channels:
             if not role:
                 dm_content = f"Wild {name} reported in {ctx.channel.name}!"
+                if disguised:
+                    dis_name = await disguised.name()
+                    reportcontent += f'\nThis Ditto is disguised as a {dis_name}!'
                 dms = await want.notify_users(dm_content, embed, author=ctx.author)
                 new_wild.message_ids.extend(dms)
             try:

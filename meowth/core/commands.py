@@ -570,14 +570,13 @@ class Core(Cog):
                     msg_type='info', title=f"Prefix is {default_prefix}")
                 await ctx.send(embed=embed)
         else:
-            if await ctx.is_co_owner():
-                if new_prefix:
-                    await ctx.guild_dm.prefix(new_prefix)
-                    if new_prefix.lower() == 'reset':
-                        new_prefix = bot.default_prefix
-                    embed = make_embed(
-                        msg_type='success', title=f"Prefix set to {new_prefix}")
-                    return await ctx.send(embed=embed)
+            if new_prefix:
+                await ctx.guild_dm.prefix(new_prefix)
+                if new_prefix.lower() == 'reset':
+                    new_prefix = bot.default_prefix
+                embed = make_embed(
+                    msg_type='success', title=f"Prefix set to {new_prefix}")
+                return await ctx.send(embed=embed)
             guild_prefix = await ctx.guild_dm.prefix(new_prefix)
             prefix = guild_prefix if guild_prefix else default_prefix
             embed = make_embed(

@@ -37,7 +37,7 @@ class time_converter(commands.Converter):
             return None
         tz = timezone(zone)
         now_dt = datetime.now(tz=tz)
-        if hatch_dt.day != now_dt.day:
+        if hatch_dt.day != now_dt.day and ctx.command.name != 'exraid':
             hatch_dt = hatch_dt.replace(day=now_dt.day)
         if hatch_dt < now_dt:
             if hatch_dt.hour < 12:

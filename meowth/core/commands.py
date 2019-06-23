@@ -576,6 +576,7 @@ class Core(Cog):
                     new_prefix = bot.default_prefix
                 embed = make_embed(
                     msg_type='success', title=f"Prefix set to {new_prefix}")
+                ctx.bot.prefixes[ctx.guild.id] = new_prefix
                 return await ctx.send(embed=embed)
             guild_prefix = await ctx.guild_dm.prefix(new_prefix)
             prefix = guild_prefix if guild_prefix else default_prefix

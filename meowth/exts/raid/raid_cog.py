@@ -37,8 +37,12 @@ class time_converter(commands.Converter):
             return None
         tz = timezone(zone)
         now_dt = datetime.now(tz=tz)
-        if hatch_dt.day != now_dt.day and ctx.command.name != 'exraid':
+        if hatch_dt.day != now_dt.day and ctx.command.name not in ['exraid', 'meetup']:
             hatch_dt = hatch_dt.replace(day=now_dt.day)
+        if ctx.command.name == 'group':
+            raid = Raid.by_channel(str(ctx.channel.id))
+            end_dt = raid.local_datetime(raid.end)
+            hatch_dt = hatch_dt.replace(day=end_dt.day)
         if hatch_dt < now_dt:
             if hatch_dt.hour < 12:
                 hatch_dt = hatch_dt.replace(hour=hatch_dt.hour+12)

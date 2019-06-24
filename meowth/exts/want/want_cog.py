@@ -234,7 +234,7 @@ class Want():
                 else:
                     items_table = self.bot.dbi.table('item_names')
                     name_query = items_table.query('name')
-                    name_query.where(itemid=self.want, language_id=9)
+                    name_query.where(item_id=self.want, language_id=9)
                     name = await name_query.get_value()
                     try:
                         role = await guild.create_role(name=name, mentionable=True)

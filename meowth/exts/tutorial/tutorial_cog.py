@@ -404,6 +404,7 @@ class Tutorial(Cog):
             # acknowledge and wait a second before continuing
             await ctx.tutorial_channel.send("Great job!")
             await asyncio.sleep(1)
+            return True
 
         # if no response for 5 minutes, close tutorial
         except asyncio.TimeoutError:

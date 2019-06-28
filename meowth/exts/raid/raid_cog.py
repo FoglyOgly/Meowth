@@ -352,7 +352,6 @@ class RaidCog(Cog):
             self.bot.loop.create_task(raid.change_weather(weather))
     
     @command()
-    @checks.is_mod()
     @raid_checks.meetup_enabled()
     @checks.location_set()
     async def meetup(self, ctx, location: POI, *, start_time: time_converter):
@@ -624,6 +623,10 @@ class RaidCog(Cog):
         if report_channel not in report_channels:
             report_channels.append(report_channel)
         if raid_mode == 'message':
+            if role_mentions:
+                reportcontent = role_mentions + " - "
+            else:
+                reportcontent = ""
             reportcontent += "Coordinate this raid here using the reactions below!"
             if dm_wants:
                 dm_content = f"Coordinate this raid in {ctx.channel.name}!"
@@ -644,6 +647,11 @@ class RaidCog(Cog):
         elif raid_mode == 'none':
             category = None
         if raid_mode != 'message':
+            if role_mentions:
+                raidcontent = role_mentions + " - "
+            else:
+                raidcontent = ""
+            raidcontent += f"Raid reported in {ctx.channel.mention}!"
             raid_channel_name = await new_raid.channel_name()
             raid_channel_topic = new_raid.channel_topic
             if len(report_channels) > 1:
@@ -656,14 +664,14 @@ class RaidCog(Cog):
             except discord.Forbidden:
                 raise commands.BotMissingPermissions(['Manage Channels'])
             new_raid.channel_ids.append(str(raid_channel.id))
-            raidmsg = await raid_channel.send(reportcontent, embed=embed)
+            raidmsg = await raid_channel.send(raidcontent, embed=embed)
             await raidmsg.pin()
             for react in react_list:
                 if isinstance(react, int):
                     react = self.bot.get_emoji(react)
                 await raidmsg.add_reaction(react)
             new_raid.message_ids.append(f"{raidmsg.channel.id}/{raidmsg.id}")
-            reportcontent += f"Coordinate this raid in {raid_channel.mention}!"
+            reportcontent = f"Coordinate this raid in {raid_channel.mention}!"
             for channel in report_channels:
                 if dm_wants:
                     dm_content = f"Coordinate this raid in {raid_channel.name}!"

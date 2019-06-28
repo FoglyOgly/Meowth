@@ -175,7 +175,7 @@ class Want():
         users = await self._users()
         if not users:
             return False
-        if len(users) > 10:
+        if len(users) > 5:
             return True
         else:
             _data = self._data
@@ -247,6 +247,20 @@ class Want():
                     await member.add_roles(role)
             return role
     
+    async def mention(self):
+        role = await self.role()
+        if role:
+            return role.mention
+        users = await self._users()
+        guild = self.guild
+        members = [guild.get_member(x) for x in users]
+        members = [x for x in members if x]
+        if not members:
+            return None
+        mentions = [x.mention for x in members]
+        mention_str = "".join(mentions)
+        return mention_str
+        
     @classmethod
     async def convert(cls, ctx, arg):
         arg = arg.lower()

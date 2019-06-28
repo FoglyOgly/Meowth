@@ -583,9 +583,8 @@ class RaidCog(Cog):
         await new_raid.get_boss_list()
         raid_table = ctx.bot.dbi.table('raids')
         wants = await new_raid.get_wants()
-        role_wants = [wants.get(x) for x in wants if wants.get(x)]
-        dm_wants = [x for x in wants if not wants.get(x)]
-        role_mentions = "\u200b".join([x.mention for x in role_wants])
+        mentions = [wants.get(x) for x in wants if wants.get(x)]
+        mention_str = "\u200b".join(mentions)
         new_raid.channel_ids = []
         new_raid.message_ids = []
         react_list = new_raid.react_list
@@ -594,10 +593,6 @@ class RaidCog(Cog):
         else:
             embed = await new_raid.raid_embed()
         reportembed = await new_raid.report_embed()
-        if role_mentions:
-            reportcontent = role_mentions + " - "
-        else:
-            reportcontent = ""
         exgymcat = None
         if isinstance(gym, Gym):
             if level != 'EX':
@@ -623,16 +618,11 @@ class RaidCog(Cog):
         if report_channel not in report_channels:
             report_channels.append(report_channel)
         if raid_mode == 'message':
-            if role_mentions:
-                reportcontent = role_mentions + " - "
+            if mention_str:
+                reportcontent = mention_str + " - "
             else:
                 reportcontent = ""
             reportcontent += "Coordinate this raid here using the reactions below!"
-            if dm_wants:
-                dm_content = f"Coordinate this raid in {ctx.channel.name}!"
-                for want in dm_wants:
-                    dms = await want.notify_users(dm_content, embed, author=reporter)
-                    new_raid.message_ids.extend(dms)
             for channel in report_channels:
                 reportmsg = await channel.channel.send(reportcontent, embed=embed)
                 for react in react_list:
@@ -647,8 +637,8 @@ class RaidCog(Cog):
         elif raid_mode == 'none':
             category = None
         if raid_mode != 'message':
-            if role_mentions:
-                raidcontent = role_mentions + " - "
+            if mention_str:
+                raidcontent = mention_str + " - "
             else:
                 raidcontent = ""
             raidcontent += f"Raid reported in {ctx.channel.mention}!"
@@ -673,11 +663,6 @@ class RaidCog(Cog):
             new_raid.message_ids.append(f"{raidmsg.channel.id}/{raidmsg.id}")
             reportcontent = f"Coordinate this raid in {raid_channel.mention}!"
             for channel in report_channels:
-                if dm_wants:
-                    dm_content = f"Coordinate this raid in {raid_channel.name}!"
-                    for want in dm_wants:
-                        dms = await want.notify_users(dm_content, embed, author=reporter)
-                        new_raid.message_ids.extend(dms)
                 try:
                     reportmsg = await channel.channel.send(reportcontent, embed=reportembed)
                 except:

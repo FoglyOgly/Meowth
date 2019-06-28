@@ -396,10 +396,10 @@ class WildCog(Cog):
         name = await pkmn.name()
         family = await pkmn._familyId()
         want = Want(ctx.bot, family, ctx.guild.id)
-        role = await want.role()
+        mention = await want.mention()
         embed = (await WildEmbed.from_wild(new_wild)).embed
-        if role:
-            reportcontent = role.mention + " - "
+        if mention:
+            reportcontent = mention + " - "
         else:
             reportcontent = ""
         coming = '🚗'
@@ -423,13 +423,6 @@ class WildCog(Cog):
         if report_channel not in report_channels:
             report_channels.append(report_channel)
         for channel in report_channels:
-            if not role:
-                dm_content = f"Wild {name} reported in {ctx.channel.name}!"
-                if disguised:
-                    dis_name = await disguised.name()
-                    dm_content += f'\nThis Ditto is disguised as a {dis_name}!'
-                dms = await want.notify_users(dm_content, embed, author=ctx.author)
-                new_wild.message_ids.extend(dms)
             try:
                 reportmsg = await channel.channel.send(reportcontent, embed=embed)
                 for react in react_list:

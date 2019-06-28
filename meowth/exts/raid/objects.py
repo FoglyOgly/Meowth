@@ -2009,7 +2009,7 @@ class Raid:
             if await self.gym._exraid():
                 wants.append('exgym')
         wants = [Want(self.bot, x, self.guild_id) for x in wants]
-        want_dict = {x: await x.role() for x in wants}
+        want_dict = {x: await x.mention() for x in wants}
         return want_dict
 
         

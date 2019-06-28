@@ -201,7 +201,7 @@ class Research:
             family = await pkmn._familyId()
             wants.append(family)
         wants = [Want(self.bot, x, self.guild_id) for x in wants]
-        want_dict = {x: await x.role() for x in wants}
+        want_dict = {x: await x.mention() for x in wants}
         return want_dict
 
     
@@ -539,11 +539,10 @@ class ResearchCog(Cog):
         embed = await ResearchEmbed.from_research(research)
         embed = embed.embed
         wants = await research.get_wants()
-        role_wants = [wants.get(x) for x in wants if wants.get(x)]
-        dm_wants = [x for x in wants if not wants.get(x)]
-        role_mentions = "\u200b".join([x.mention for x in role_wants])
-        if role_mentions:
-            reportcontent = role_mentions + " - "
+        mentions = [wants.get(x) for x in wants if wants.get(x)]
+        mention_str = "\u200b".join(mentions)
+        if mention_str:
+            reportcontent = mention_str + " - "
         else:
             reportcontent = ""
         stamp = ctx.bot.get_emoji(583375171847585823)
@@ -551,11 +550,6 @@ class ResearchCog(Cog):
         report_channels = []
         report_channel = ReportChannel(ctx.bot, ctx.channel)
         msgs = []
-        if dm_wants:
-            dm_content = ""
-            for want in dm_wants:
-                dms = await want.notify_users(dm_content, embed, author=ctx.author)
-                msgs.extend(dms)
         if isinstance(location, Pokestop):
             channel_list = await location.get_all_channels('research')
             report_channels.extend(channel_list)

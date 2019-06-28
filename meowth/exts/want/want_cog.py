@@ -258,7 +258,7 @@ class Want():
         if not members:
             return None
         mentions = [x.mention for x in members]
-        mention_str = "".join(mentions)
+        mention_str = " ".join(mentions)
         return mention_str
         
     @classmethod

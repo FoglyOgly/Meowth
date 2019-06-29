@@ -133,8 +133,6 @@ class Want():
                 member = self.guild.get_member(user_id)
                 if role not in member.roles:
                     await member.add_roles(role)
-            else:
-                return 'dm'
             return 'success'
         else:
             return 'already done'
@@ -298,22 +296,11 @@ class WantCog(Cog):
     @want_checks.want_enabled()
     async def want(self, ctx, wants: commands.Greedy[Want]):
         added_wants = []
-        dm_subs = []
         for want in wants:
             status = await want.add_user(ctx.author.id)
             if status == 'already done':
                 continue
-            elif status == 'dm':
-                dm_subs.append(want.want)
             added_wants.append(want.want)
-        if dm_subs:
-            try:
-                content = 'I will notify you about these wants via direct message for the time being, so please make sure you can receive DMs from me!'
-                content += "\n"
-                content += "\n".join(dm_subs)
-                await ctx.author.send(content)
-            except:
-                await ctx.warning('DM Test Failed', details=content)
         await ctx.success(title="Wants Added", details="\n".join(added_wants))
     
     @command()

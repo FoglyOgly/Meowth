@@ -800,9 +800,9 @@ class Pokemon():
             elif arg == 'shiny':
                 shiny = True
             elif arg == 'male':
-                gender = 'male'
+                gender = 'MALE'
             elif arg == 'female':
-                gender = 'female'
+                gender = 'FEMALE'
             elif arg.startswith('$iv'):
                 iv_arg = arg[3:]
                 attiv, defiv, staiv = iv_arg.split('/', maxsplit=2)

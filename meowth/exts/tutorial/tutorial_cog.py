@@ -480,6 +480,9 @@ class Tutorial(Cog):
         d['category_3'] = 'message'
         d['category_4'] = 'message'
         d['category_5'] = 'message'
+        d['lat'] = -90
+        d['lon'] = 0
+        d['radius'] = 1
         enabled = [x for x in d if d[x] is True]
         report_channel_table = ctx.bot.dbi.table('report_channels')
         insert = report_channel_table.insert

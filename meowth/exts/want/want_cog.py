@@ -217,8 +217,14 @@ class Want():
                         role = await guild.create_role(name=name, mentionable=True)
                     except:
                         return None
-                elif self.want in raid_tiers:
-                    name = "Tier " + self.want
+                elif self.want.upper() in raid_tiers:
+                    name = "Tier " + self.want.upper()
+                    try:
+                        role = await guild.create_role(name=name, mentionable=True)
+                    except:
+                        return None
+                elif self.want.lower() == 'exgym':
+                    name = 'EX Raid Gym'
                     try:
                         role = await guild.create_role(name=name, mentionable=True)
                     except:

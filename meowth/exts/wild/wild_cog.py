@@ -216,8 +216,8 @@ class Wild():
             """
         info_strings = """
             `cp####`
-            `$iv##/##/##`
-            `$lvl##`
+            `iv##/##/##`
+            `lvl##`
             `@movename`
             `male` or `female`
             """

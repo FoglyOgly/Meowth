@@ -533,6 +533,42 @@ class Users(Cog):
             await ctx.author.remove_roles(*valid_roles)
             return await ctx.success('Roles Removed', details="\n".join(role_names))
         return await ctx.error('No valid roles found')
+    
+    @command(name='party')
+    @users_checks.users_enabled()
+    async def default_party(self, ctx, total: typing.Optional[int]=None, *teamcounts):
+        """Set your default raiding party composition.
+
+        **Arguments**
+        *total (optional):* Number of trainers you are bringing. Defaults to
+            your last RSVP total, or 1.
+        
+        *teamcounts (optional):* Counts of each team in your group. Format:
+            `3m 2v 1i` means 3 Mystic, 2 Valor, 1 Instinct.
+        
+        Meowth resets your raid party to this value
+        at midnight local time."""
+
+        meowthuser = MeowthUser(ctx.bot, ctx.author)
+
+        if total or teamcounts:
+            party = await meowthuser.party_list(total, *teamcounts)
+        else:
+            party = await meowthuser.party()
+        
+        data = await meowthuser._data.get()
+        if len(data) == 0:
+            insert = meowthuser._insert
+            d = {'id': ctx.author.id, 'default_party': party}
+            insert.row(**d)
+            await insert.commit()
+        else:
+            update = meowthuser._update
+            update.values(default_party=party)
+            await update.commit()
+        return await ctx.send(f'Default party set to {party}')
+        
+
         
 
 

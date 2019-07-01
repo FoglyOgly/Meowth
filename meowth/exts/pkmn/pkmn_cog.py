@@ -728,7 +728,7 @@ class Pokemon():
         elif arg == 'female':
             self.gender = 'FEMALE'
         elif arg.startswith('iv'):
-            iv_arg = arg[3:]
+            iv_arg = arg[2:]
             attiv, defiv, staiv = iv_arg.split('/', maxsplit=2)
             attiv = int(attiv)
             defiv = int(defiv)
@@ -749,7 +749,7 @@ class Pokemon():
                 staiv = 0
             self.staiv = staiv
         elif arg.startswith('lvl'):
-            lvl = float(arg[4:])
+            lvl = float(arg[3:])
             double = lvl*2
             rounded = round(double)
             if rounded < 2:
@@ -804,7 +804,7 @@ class Pokemon():
             elif arg == 'female':
                 gender = 'FEMALE'
             elif arg.startswith('iv'):
-                iv_arg = arg[3:]
+                iv_arg = arg[2:]
                 attiv, defiv, staiv = iv_arg.split('/', maxsplit=2)
                 attiv = int(attiv)
                 defiv = int(defiv)
@@ -822,7 +822,7 @@ class Pokemon():
                 elif staiv < 0:
                     staiv = 0
             elif arg.startswith('lvl'):
-                lvl = float(arg[4:])
+                lvl = float(arg[3:])
                 double = lvl*2
                 rounded = round(double)
                 if rounded < 2:

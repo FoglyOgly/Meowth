@@ -100,6 +100,19 @@ class MeowthUser:
                 party = [0, 0, 0, 0]
                 party[team-1] = 1
         return party
+
+    async def default_party(self):
+        data = self._data
+        data.select('default_party')
+        party = await data.get_value()
+        if not party:
+            team = await self.team()
+            if not team:
+                party = [0,0,0,1]
+            else:
+                party = [0, 0, 0, 0]
+                party[team-1] = 1
+        return party
     
     async def set_party(self, party: list = [0,0,0,1]):
         data = await self._data.get()
@@ -113,12 +126,7 @@ class MeowthUser:
             await insert.commit()
     
     async def clear_party(self, clear_time):
-        team = await self.team()
-        if not team:
-            party = [0,0,0,1]
-        else:
-            party = [0,0,0,0]
-            party[team-1] = 1
+        party = await self.default_party()
         sleeptime = clear_time - time.time()
         await asyncio.sleep(sleeptime)
         await self.set_party(party)

@@ -886,6 +886,8 @@ class RaidCog(Cog):
         **Arguments**
         *group_time:* Number of minutes until the group
             will enter the raid.
+        If group_time is omitted, Meowth will list the
+        current groups and ask if the user would like to join one.
         """
         raid = Raid.by_channel.get(str(ctx.channel.id))
         if not raid:

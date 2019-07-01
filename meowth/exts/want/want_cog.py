@@ -203,7 +203,7 @@ class Want():
                 users = await self._users()
                 members = [guild.get_member(x) for x in users]
                 members = [x for x in members if x]
-                raid_tiers = ['1', '2', '3', '4', '5', 'EX']
+                raid_tiers = ['1', '2', '3', '4', '5', 'ex', 'exgym']
                 if self.want.startswith('FAMILY'):
                     pokemon_table = self.bot.dbi.table('pokemon')
                     pokemon_query = pokemon_table.query('pokemonid')

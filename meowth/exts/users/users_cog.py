@@ -4,6 +4,10 @@ import re
 
 import discord
 from discord.ext import commands
+import pytz
+from pytz import timezone
+from datetime import datetime, timedelta
+import time
 
 from . import users_checks
 
@@ -106,6 +110,18 @@ class MeowthUser:
             insert.row(id=self.user.id, party=party)
             await insert.commit()
     
+    async def clear_party(self, clear_time):
+        team = await self.team()
+        if not team:
+            party = [0,0,0,1]
+        else:
+            party = [0,0,0,0]
+            party[team-1] = 1
+        sleeptime = clear_time - time.time()
+        await asyncio.sleep(sleeptime)
+        await self.set_party(party)
+        
+    
     async def party_list(self, total=0, *teamcounts):
         if not teamcounts:
             if not total:
@@ -176,6 +192,19 @@ class MeowthUser:
         insert = rsvp_table.insert()
         insert.row(**d)
         await insert.commit(do_update=True)
+        raid_table = self.bot.dbi.table('raids')
+        query = raid_table.query('tz')
+        query.where(id=raid_id)
+        zone = await query.get_value()
+        tz = timezone(zone)
+        now_dt = datetime.now(tz=tz)
+        midnight_dt = now_dt + timedelta(days=1)
+        midnight_dt = midnight_dt.replace(hour=0, minute=0, second=0)
+        midnight_dt = midnight_dt.astimezone(pytz.utc)
+        stamp = midnight_dt.timestamp()
+        if hasattr(self, 'party_expire_task'):
+            self.party_expire_task.cancel()
+        self.party_expire_task = self.bot.loop.create_task(self.clear_party(stamp))
     
     async def train_rsvp(self, train, party=[0,0,0,1]):
         d = {
@@ -200,6 +229,19 @@ class MeowthUser:
                     insert = rsvp_table.insert
                     insert.row(**old_d)
                     await insert.commit(do_update=True)
+                    raid_table = self.bot.dbi.table('raids')
+                    query = raid_table.query('tz')
+                    query.where(id=raid_id)
+                    zone = await query.get_value()
+                    tz = timezone(zone)
+                    now_dt = datetime.now(tz=tz)
+                    midnight_dt = now_dt + timedelta(days=1)
+                    midnight_dt = midnight_dt.replace(hour=0, minute=0, second=0)
+                    midnight_dt = midnight_dt.astimezone(pytz.utc)
+                    stamp = midnight_dt.timestamp()
+                    if hasattr(self, 'party_expire_task'):
+                        self.party_expire_task.cancel()
+                    self.party_expire_task = self.bot.loop.create_task(self.clear_party(stamp))
     
     async def meetup_rsvp(self, meetup, status, party=[0,0,0,1]):
         d = {
@@ -212,6 +254,19 @@ class MeowthUser:
         insert = meetup_rsvp_table.insert
         insert.row(**d)
         await insert.commit(do_update=True)
+        meetup_table = self.bot.dbi.table('meetups')
+        query = raid_table.query('tz')
+        query.where(id=meetup.id)
+        zone = await query.get_value()
+        tz = timezone(zone)
+        now_dt = datetime.now(tz=tz)
+        midnight_dt = now_dt + timedelta(days=1)
+        midnight_dt = midnight_dt.replace(hour=0, minute=0, second=0)
+        midnight_dt = midnight_dt.astimezone(pytz.utc)
+        stamp = midnight_dt.timestamp()
+        if hasattr(self, 'party_expire_task'):
+            self.party_expire_task.cancel()
+        self.party_expire_task = self.bot.loop.create_task(self.clear_party(stamp))
     
     async def leave_train(self, train):
         train_rsvp_table = self.bot.dbi.table('train_rsvp')

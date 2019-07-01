@@ -45,7 +45,7 @@ class ReportChannel():
             record = record[0]
         else:
             return None
-        if not record['lat'] or not record['lon']:
+        if record['lat'] is None or record['lon'] is None:
             return None
         return (float(record['lat']), float(record['lon']))
 

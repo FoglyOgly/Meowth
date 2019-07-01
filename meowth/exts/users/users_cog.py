@@ -571,7 +571,7 @@ class Users(Cog):
         party_str += f"{ctx.bot.config.team_emoji['instinct']}: {party[1]} | "
         party_str += f"{ctx.bot.config.team_emoji['valor']}: {party[2]} | "
         party_str += f"{ctx.bot.config.team_emoji['unknown']}: {party[3]}"
-        return await ctx.success(f'Default party set to {party_str}')
+        return await ctx.send(f'Default party set to {party_str}')
         
 
         

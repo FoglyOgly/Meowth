@@ -177,9 +177,15 @@ class Meetup:
         if lobby_users:
             liststr += f"\n\nLobby: {', '.join(lobby_users)}"
         if tags:
-            return await channel.send(f'Current Meetup RSVP Totals\n\n{liststr}')
+            try:
+                return await channel.send(f'Current Meetup RSVP Totals\n\n{liststr}')
+            except:
+                return
         embed = formatters.make_embed(title="Current Meetup RSVP Totals", content=liststr, msg_colour=color)
-        return await channel.send(embed=embed)
+        try:
+            return await channel.send(embed=embed)
+        except:
+            return
     
     async def list_teams(self, channel, tags=False):
         color = self.guild.me.color
@@ -219,9 +225,15 @@ class Meetup:
         if other_list:
             liststr += f"\n\nOther: {', '.join(other_list)}"
         if tags:
-            return await channel.send(f'Current Meetup Team Totals\n\n{liststr}')
+            try:
+                return await channel.send(f'Current Meetup Team Totals\n\n{liststr}')
+            except:
+                return
         embed = formatters.make_embed(title="Current Meetup Team Totals", content=liststr, msg_colour=color)
-        return await channel.send(embed=embed)
+        try:
+            return await channel.send(embed=embed)
+        except:
+            return
     
     async def get_trainer_dict(self):
         def data(rcrd):
@@ -274,7 +286,10 @@ class Meetup:
                 else:
                     return
                 content = f"{member.display_name} {display_status}!"
-                newmsg = await chn.send(content, embed=rsvpembed)
+                try:
+                    return await chn.send(content, embed=rsvpembed)
+                except:
+                    return
     
     @property
     def react_list(self):
@@ -909,7 +924,10 @@ class Raid:
     async def start_grp(self, grp, author, channel=None):
         if not self.grp_is_here(grp):
             if channel:
-                return await channel.send('Please wait until your whole group is here!')
+                msg = await channel.send('Not everyone in your group is here! If you would like to go ahead anyway, react to this message with the check mark!')
+                payload = await formatters.ask(self.bot, [msg], user_list = author.id)
+                if not payload or str(payload.emoji) == '❎':
+                    return await channel.send('Thank you for waiting!')
         else:
             mention_str = ""
             if self.grp_total(grp) > 20:
@@ -922,7 +940,7 @@ class Raid:
                 await self.update_rsvp()
                 await asyncio.sleep(120)
                 rsvp_table = self.bot.dbi.table('raid_rsvp')
-                query = user_table.query().where(user_table['user_id'].in_(grp['users']))
+                query = rsvp_table.query().where(rsvp_table['user_id'].in_(grp['users']))
                 query.where(raid_id=self.id)
                 await query.delete()
                 if grp in self.group_list:

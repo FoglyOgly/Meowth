@@ -265,7 +265,7 @@ class MeowthUser:
         insert.row(**d)
         await insert.commit(do_update=True)
         meetup_table = self.bot.dbi.table('meetups')
-        query = raid_table.query('tz')
+        query = meetup_table.query('tz')
         query.where(id=meetup.id)
         zone = await query.get_value()
         tz = timezone(zone)

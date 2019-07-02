@@ -1327,7 +1327,7 @@ class RaidCog(Cog):
         report_channel = ReportChannel(ctx.bot, rchan)
         raid_ids = await report_channel.get_possible_duplicates(raid)
         raids = [Raid.instances.get(x) for x in raid_ids if Raid.instances.get(x)]
-        summaries = [await x.summary_str() for x in raids]
+        summaries = [await x.summary_str() for x in raids if await x.summary_str()]
         if len(raids) == 1:
             old_raid = raids[0]
         else:

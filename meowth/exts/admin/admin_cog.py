@@ -258,6 +258,8 @@ class AdminCog(Cog):
         *lat:* The latitude of the central point of the area.
         *lon:* The longitude of the central point of the area.
         *radius:* The radius in kilometers of the area.
+
+        Example: `!setlocation "Joplin MO" 37.084086 -94.513494 20`
         """
         report_channel_table = self.bot.dbi.table('report_channels')
         channel_id = ctx.channel.id

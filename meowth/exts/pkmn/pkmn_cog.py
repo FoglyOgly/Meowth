@@ -846,10 +846,12 @@ class Pokemon():
                         ids = await ref.get_values()
                     else:
                         raise PokemonNotFound
-        if id_list:
-            possible_ids = set(ids) & set(id_list)
-        else:
+        try:
             possible_ids = set(ids)
+        except NameError:
+            possible_ids = {}
+        if id_list:
+            possible_ids = possible_ids & set(id_list)
         length = len(possible_ids)
         if length == 0:
             raise PokemonNotFound

@@ -4,7 +4,9 @@ colorthief
 dateparser
 discord.py
 fuzzywuzzy
+googlemaps
 more_itertools
 psutil
 python-dateutil>=2.6
 python-Levenshtein>=0.12
+timezonefinder

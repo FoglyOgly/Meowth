@@ -1659,7 +1659,7 @@ class Raid:
             chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
             if self.channel_ids and str(chn.id) not in self.channel_ids and self.status != 'expired':
                 report_embed = await self.report_embed()
-                report_embed.set_field_at(1, value = gym_str)
+                report_embed.set_field_at(1, name="Gym", value = gym_str)
                 try:
                     await msg.edit(embed=report_embed)
                     continue
@@ -1670,7 +1670,7 @@ class Raid:
                     embed = await self.egg_embed()
                 elif self.end > time.time():
                     embed = await self.raid_embed()
-                embed.set_field_at(1, value = gym_str)
+                embed.set_field_at(1, name="Gym", value = gym_str)
                 try:
                     await msg.edit(embed=embed)
                 except:

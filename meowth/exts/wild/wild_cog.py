@@ -403,7 +403,8 @@ class WildCog(Cog):
         else:
             reportcontent = ""
         coming = '🚗'
-        caught = ctx.bot.get_emoji(581146003177078784)
+        caught_id = new_wild.react_list['caught']
+        caught = ctx.bot.get_emoji(caught_id)
         despawned = '💨'
         reportcontent += f'Wild {name} reported! Use {coming} if you are on the way, {str(caught)} if you catch the Pokemon, and {despawned} if the Pokemon despawns.'
         if disguised:

@@ -1670,7 +1670,7 @@ class Raid:
                     embed = await self.egg_embed()
                 elif self.end > time.time():
                     embed = await self.raid_embed()
-                embed.author.url = url
+                embed.fields[1].value = gym_str
                 try:
                     await msg.edit(embed=embed)
                 except:

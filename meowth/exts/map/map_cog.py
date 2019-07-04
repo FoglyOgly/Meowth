@@ -517,6 +517,7 @@ class Gym(POI):
             choice_dict = dict(zip(react_list, id_list))
             display_dict = dict(zip(react_list, names))
             display_dict["\u2754"] = "Other"
+            react_list.append("\u2754")
             embed = formatters.mc_embed(display_dict)
             multi = await ctx.send('Multiple possible Gyms found! Please select from the following list.',
                 embed=embed)
@@ -623,6 +624,7 @@ class Pokestop(POI):
             choice_dict = dict(zip(react_list, id_list))
             display_dict = dict(zip(react_list, names))
             display_dict["\u2754"] = "Other"
+            react_list.append("\u2754")
             embed = formatters.mc_embed(display_dict)
             multi = await ctx.send('Multiple possible Pokestops found! Please select from the following list.',
                 embed=embed)

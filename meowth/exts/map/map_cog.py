@@ -516,11 +516,15 @@ class Gym(POI):
             react_list = formatters.mc_emoji(len(id_list))
             choice_dict = dict(zip(react_list, id_list))
             display_dict = dict(zip(react_list, names))
+            display_dict["\u2754"] = "Other"
             embed = formatters.mc_embed(display_dict)
             multi = await ctx.send('Multiple possible Gyms found! Please select from the following list.',
                 embed=embed)
             payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
                 react_list=react_list)
+            if str(payload.emoji) == "\u2754":
+                city = await report_channel.city()
+                return PartialPOI(ctx.bot, city, arg)
             gym_id = choice_dict[str(payload.emoji)]
             await multi.delete()
         elif len(id_list) == 1:
@@ -618,11 +622,15 @@ class Pokestop(POI):
             react_list = formatters.mc_emoji(len(id_list))
             choice_dict = dict(zip(react_list, id_list))
             display_dict = dict(zip(react_list, names))
+            display_dict["\u2754"] = "Other"
             embed = formatters.mc_embed(display_dict)
             multi = await ctx.send('Multiple possible Pokestops found! Please select from the following list.',
                 embed=embed)
             payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
                 react_list=react_list)
+            if str(payload.emoji) == "\u2754":
+                city = await report_channel.city()
+                return PartialPOI(ctx.bot, city, arg)
             stop_id = choice_dict[str(payload.emoji)]
             await multi.delete()
         elif len(id_list) == 1:

@@ -1399,7 +1399,7 @@ class Raid:
         data = await self.pb_data(weather=weather)
         if not data:
             return None
-        estimator = query_dict['estimator_min']
+        estimator = data['estimator_min']
         return estimator
     
     async def rec_group_size(self, weather=None):

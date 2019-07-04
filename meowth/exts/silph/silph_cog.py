@@ -36,6 +36,10 @@ class SilphCog(Cog):
                 for form in forms:
                     if meowthid.endswith(form):
                         meowthid += "_FORM"
+                if meowthid.endswith('_M'):
+                    meowthid += "ALE"
+                elif meowthid.endswith('_F'):
+                    meowthid += "EMALE"
                 row = {
                     'task': task,
                     'reward': meowthid
@@ -74,6 +78,10 @@ class SilphCog(Cog):
                 for form in forms:
                     if meowthid.endswith(form):
                         meowthid += "_FORM"
+                if meowthid.endswith('_M'):
+                    meowthid += "ALE"
+                elif meowthid.endswith('_F'):
+                    meowthid += "EMALE"
                 d = {
                     'level': new_level,
                     'pokemon_id': meowthid,

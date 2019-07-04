@@ -804,7 +804,7 @@ class Pokemon():
                 gender = 'MALE'
             elif arg == 'female':
                 gender = 'FEMALE'
-            elif arg.startswith('iv'):
+            elif arg.startswith('iv') and arg[2].isdigit():
                 iv_arg = arg[2:]
                 attiv, defiv, staiv = iv_arg.split('/', maxsplit=2)
                 attiv = int(attiv)

@@ -2955,7 +2955,7 @@ class Train:
             d = data[0]
             user_id = d.get('user_id')
             reason = d.get('reason')
-            await self.archive_train(channel, user_id, reason)
+            await self.archive_train(self.channel, user_id, reason)
         else:
             try:
                 await self.channel.delete()

@@ -480,6 +480,7 @@ class Tutorial(Cog):
         d['category_3'] = 'message'
         d['category_4'] = 'message'
         d['category_5'] = 'message'
+        d['category_ex'] = 'message'
         d['lat'] = -90
         d['lon'] = 0
         d['radius'] = 1
@@ -569,6 +570,15 @@ class Tutorial(Cog):
              f"you! Continue in {ctx.tutorial_channel.mention}"),
             delete_after=20.0)
 
+        # set tutorial settings
+        d = {
+            'channelid': ctx.tutorial_channel.id,
+            'users': True
+        }
+        report_channel_table = ctx.bot.dbi.table('report_channels')
+        insert = report_channel_table.insert
+        insert.row(**d)
+        await insert.commit()
 
         await ctx.tutorial_channel.send(
             f"Hi {ctx.author.mention}! I'm Meowth, a Discord helper bot for "
@@ -614,6 +624,19 @@ class Tutorial(Cog):
              f"you! Continue in {ctx.tutorial_channel.mention}"),
             delete_after=20.0)
 
+        # set tutorial settings
+        d = {
+            'channelid': ctx.tutorial_channel.id,
+            'wild': True,
+            'city': 'Lapland',
+            'lat': 90,
+            'lon': 0,
+            'radius': 1
+        }
+        report_channel_table = ctx.bot.dbi.table('report_channels')
+        insert = report_channel_table.insert
+        insert.row(**d)
+        await insert.commit()
 
         await ctx.tutorial_channel.send(
             f"Hi {ctx.author.mention}! I'm Meowth, a Discord helper bot for "
@@ -659,6 +682,25 @@ class Tutorial(Cog):
              f"you! Continue in {ctx.tutorial_channel.mention}"),
             delete_after=20.0)
 
+        # set tutorial settings
+        d = {
+            'channelid': ctx.tutorial_channel.id,
+            'raid': True,
+            'city': 'Lapland',
+            'lat': 90,
+            'lon': 0,
+            'radius': 1,
+            'category_1': 'message',
+            'category_2': 'message',
+            'category_3': 'message',
+            'category_4': 'message',
+            'category_5': 'message',
+            'category_ex': 'message'
+        }
+        report_channel_table = ctx.bot.dbi.table('report_channels')
+        insert = report_channel_table.insert
+        insert.row(**d)
+        await insert.commit()
 
         await ctx.tutorial_channel.send(
             f"Hi {ctx.author.mention}! I'm Meowth, a Discord helper bot for "
@@ -704,6 +746,19 @@ class Tutorial(Cog):
              f"you! Continue in {ctx.tutorial_channel.mention}"),
             delete_after=20.0)
 
+        # set tutorial settings
+        d = {
+            'channelid': ctx.tutorial_channel.id,
+            'research': True,
+            'city': 'Lapland',
+            'lat': 90,
+            'lon': 0,
+            'radius': 1
+        }
+        report_channel_table = ctx.bot.dbi.table('report_channels')
+        insert = report_channel_table.insert
+        insert.row(**d)
+        await insert.commit()
 
         await ctx.tutorial_channel.send(
             f"Hi {ctx.author.mention}! I'm Meowth, a Discord helper bot for "
@@ -719,6 +774,9 @@ class Tutorial(Cog):
                 "This channel will be deleted in ten seconds.")
             await asyncio.sleep(10)
         finally:
+            query = report_channel_table.query
+            query.where(channelid=ctx.tutorial_channel.id)
+            await query.delete()
             await ctx.tutorial_channel.delete()
 
     @tutorial.command()
@@ -745,6 +803,16 @@ class Tutorial(Cog):
             ("Meowth! I've created a private tutorial channel for "
              f"you! Continue in {ctx.tutorial_channel.mention}"),
             delete_after=20.0)
+
+        # set tutorial settings
+        d = {
+            'channelid': ctx.tutorial_channel.id,
+            'users': True
+        }
+        report_channel_table = ctx.bot.dbi.table('report_channels')
+        insert = report_channel_table.insert
+        insert.row(**d)
+        await insert.commit()
 
         await ctx.tutorial_channel.send(
             f"Hi {ctx.author.mention}! I'm Meowth, a Discord helper bot for "

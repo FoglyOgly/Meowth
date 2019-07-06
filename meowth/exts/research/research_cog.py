@@ -270,12 +270,16 @@ class Task:
         if len(task_matches) > 1:
             react_list = formatters.mc_emoji(len(task_matches))
             display_dict = dict(zip(react_list, task_matches))
+            display_dict["\u2754"] = "Other"
+            react_list.append("\u2754")
             embed = formatters.mc_embed(display_dict)
             multi = await ctx.send('Multiple possible Tasks found! Please select from the following list.',
                 embed=embed)
             payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
                 react_list=react_list)
             task = display_dict[str(payload.emoji)]
+            if task == 'Other':
+                return PartialTask(ctx.bot, arg)
             try:
                 await multi.delete()
             except:

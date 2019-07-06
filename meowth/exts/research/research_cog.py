@@ -252,14 +252,18 @@ class Task:
     @classmethod
     async def convert(cls, ctx, arg):
         arg = arg.lower()
+        argsplit = arg.split()
         table = ctx.bot.dbi.table('task_names')
         query = table.query('task_desc', 'category')
         data = await query.get()
         categories = [x.get('category') for x in data]
-        if arg in categories:
-            query = table.query('task_desc')
-            query.where(category=arg)
-            task_matches = await query.get_values()
+        if len(argsplit) == 1:
+            if arg in categories:
+                query = table.query('task_desc')
+                query.where(category=arg)
+                task_matches = await query.get_values()
+            else:
+                raise ValueError
         else:
             tasks = [x.get('task_desc') for x in data]
             matches = get_matches(tasks, arg)
@@ -279,6 +283,12 @@ class Task:
                 react_list=react_list)
             task = display_dict[str(payload.emoji)]
             if task == 'Other':
+                if arg in categories:
+                    taskask = await ctx.send('What is the Task for this Research? Please type your answer below.')
+                    def check(m):
+                        return m.author == ctx.author and m.channel == ctx.channel
+                    reply = await ctx.bot.wait_for('message', check=check)
+                    arg = reply.content
                 return PartialTask(ctx.bot, arg)
             try:
                 await multi.delete()
@@ -287,7 +297,7 @@ class Task:
         elif len(task_matches) == 1:
             task = task_matches[0]
         else:
-            raise ValueError
+            return PartialTask(ctx.bot, arg)
         return cls(ctx.bot, task)
 
 class PartialTask:
@@ -522,7 +532,7 @@ class ResearchCog(Cog):
                 except:
                     pass
         else:
-            msg = await ctx.send('What is the reward for this task? Please type your response below.')
+            msg = await ctx.send('What is the reward for this Research? Please type your response below.')
             def check(m):
                 return m.author == ctx.author and m.channel == ctx.channel
             reply = await ctx.bot.wait_for('message', check=check)

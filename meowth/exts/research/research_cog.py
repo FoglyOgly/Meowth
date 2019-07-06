@@ -284,7 +284,7 @@ class Task:
             task = display_dict[str(payload.emoji)]
             if task == 'Other':
                 if arg in categories:
-                    taskask = await ctx.send('What is the Task for this Research? Please type your answer below.')
+                    await ctx.send('What is the Task for this Research? Please type your answer below.')
                     def check(m):
                         return m.author == ctx.author and m.channel == ctx.channel
                     reply = await ctx.bot.wait_for('message', check=check)
@@ -296,6 +296,10 @@ class Task:
                 pass
         elif len(task_matches) == 1:
             task = task_matches[0]
+            taskask = await ctx.send(f'Found a single match: {task}\n\nIs this correct?')
+            payload = await formatters.ask(ctx.bot, [taskask], user_list=[ctx.author.id])
+            if not payload or str(payload.emoji) == '❎':
+                raise ValueError
         else:
             return PartialTask(ctx.bot, arg)
         return cls(ctx.bot, task)

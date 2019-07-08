@@ -156,6 +156,24 @@ class Research:
         await asyncio.sleep(sleeptime)
         await self.expire_research()
     
+    async def delete(self):
+        for msgid in self.message_ids:
+            chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
+            try:
+                await msg.delete()
+            except:
+                pass
+            try:
+                del Research.by_message[msgid]
+            except:
+                pass
+        data = self._data
+        await data.delete()
+        try:
+            del Research.instances[self.id]
+        except:
+            pass  
+    
     async def expire_research(self):
         if self.completed_by:
             research_score = 1 + len(self.completed_by)
@@ -393,6 +411,16 @@ class ResearchCog(Cog):
                         return await self.list_research(ctx.channel)
             except:
                 pass
+    
+    @Cog.listener()
+    async def on_raw_message_delete(self, payload):
+        idstring = f"{payload.channel_id}/{payload.message_id}"
+        chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+        research = Research.by_message.get(idstring)
+        if not research:
+            return
+        return await research.delete()
+        
     
     @Cog.listener()
     async def on_raw_reaction_add(self, payload):

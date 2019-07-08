@@ -1999,18 +1999,6 @@ class Raid:
                 await channel.send(embed=embed)
         except:
             pass
-        raid_table = self.bot.dbi.table('raids')
-        query = raid_table.query.where(id=self.id)
-        await query.delete()
-        await channel.send('raid table delete success')
-        rsvp_table = self.bot.dbi.table('raid_rsvp')
-        rsvp = rsvp_table.query.where(raid_id=self.id)
-        await rsvp.delete()
-        await channel.send('rsvp table delete success')
-        grp_table = self.bot.dbi.table('raid_groups')
-        grps = grp_table.query.where(raid_id=self.id)
-        await grps.delete()
-        await channel.send('groups table delete success')
 
 
 

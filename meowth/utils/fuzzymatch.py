@@ -27,7 +27,7 @@ def get_match(word_list: list, word: str, score_cutoff: int = 80):
         return (None, None)
     return result
 
-def get_matches(word_list: list, word: str, score_cutoff: int = 80):
+def get_matches(word_list: list, word: str, score_cutoff: int = 90):
     """Uses fuzzywuzzy to see if word is close to entries in word_list
 
     Returns a list of tuples with (MATCH, SCORE)

@@ -487,25 +487,27 @@ class Gym(POI):
         if not data:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
-        nick_dict = {}
+        nick_list = []
         for x in data:
             if x.get('nickname'):
-                nick_dict[x['nickname']] = x['id']
+                nick_list.append((x['nickname'], x['id']))
             else:
                 continue
-        name_dict = {x['name'] : x['id'] for x in data}
-        if nick_dict:
-            nick_matches = get_matches(nick_dict.keys(), arg)
+        name_list = [(x['name'], x['id']) for x in data]
+        if nick_list:
+            nicks = [x[0] for x in nick_list]
+            nick_matches = get_matches(nicks, arg)
             if nick_matches:
-                nick_ids = [nick_dict[x[0]] for x in nick_matches]
+                nick_ids = [x[1] for x in nick_list if x[0] in nick_matches]
             else:
                 nick_ids = []
         else:
             nick_matches = []
             nick_ids = []
-        name_matches = get_matches(name_dict.keys(), arg)
+        names = [x[0] for x in name_list]
+        name_matches = get_matches(names, arg)
         if name_matches:
-            name_ids = [name_dict[x[0]] for x in name_matches]
+            name_ids = [x[1] for x in name_list if x[0] in name_matches]
         else:
             name_ids = []
         possible_ids = set(nick_ids) | set(name_ids)
@@ -594,25 +596,27 @@ class Pokestop(POI):
         if not data:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
-        nick_dict = {}
+        nick_list = []
         for x in data:
             if x.get('nickname'):
-                nick_dict[x['nickname']] = x['id']
+                nick_list.append((x['nickname'], x['id']))
             else:
                 continue
-        name_dict = {x['name'] : x['id'] for x in data}
-        if nick_dict:
-            nick_matches = get_matches(nick_dict.keys(), arg, score_cutoff=70)
+        name_list = [(x['name'], x['id']) for x in data]
+        if nick_list:
+            nicks = [x[0] for x in nick_list]
+            nick_matches = get_matches(nicks, arg)
             if nick_matches:
-                nick_ids = [nick_dict[x[0]] for x in nick_matches]
+                nick_ids = [x[1] for x in nick_list if x[0] in nick_matches]
             else:
                 nick_ids = []
         else:
             nick_matches = []
             nick_ids = []
-        name_matches = get_matches(name_dict.keys(), arg, score_cutoff=70)
+        names = [x[0] for x in name_list]
+        name_matches = get_matches(names, arg)
         if name_matches:
-            name_ids = [name_dict[x[0]] for x in name_matches]
+            name_ids = [x[1] for x in name_list if x[0] in name_matches]
         else:
             name_ids = []
         possible_ids = set(nick_ids) | set(name_ids)

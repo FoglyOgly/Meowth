@@ -2017,7 +2017,7 @@ class Raid:
                 family = await pkmn._familyId()
                 wants.append(family)
         if isinstance(self.gym, Gym):
-            if await self.gym._exraid():
+            if await self.gym._exraid() and self.level != 'EX':
                 wants.append('exgym')
         wants = [Want(self.bot, x, self.guild_id) for x in wants]
         want_dict = {x: await x.mention() for x in wants}

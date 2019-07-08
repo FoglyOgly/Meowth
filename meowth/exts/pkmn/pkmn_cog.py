@@ -839,9 +839,12 @@ class Pokemon():
                     form = await forms.get_value()
                     id_list = await forms_table.query('pokemonid').where(formid=form).get_values()
                 else:
+                    await chn.send(arg)
                     names = fuzzymatch.get_matches(name_list, arg)
+                    await chn.send(str(names))
                     if names:
                         names = [x[0] for x in names]
+                        await chn.send(str(names))
                         ref = pokedex.query('pokemonid').where(
                             pokedex['name'].in_(names))
                         ids = await ref.get_values()

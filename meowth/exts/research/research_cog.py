@@ -1,4 +1,5 @@
 from meowth import Cog, command, bot, checks
+from meowth.core.context import Context
 from meowth.exts.map import ReportChannel, Pokestop, PartialPOI, POI
 from meowth.exts.pkmn import Pokemon
 from meowth.exts.want import Want, Item, PartialItem
@@ -440,15 +441,32 @@ class ResearchCog(Cog):
                         await msg.edit(embed=embed.embed)
             return await research.upsert()
         elif emoji.id == 597185467217346602:
-            await chn.send(f"{user.mention}: Where is this Research located? Please type your response below. If you send a plain text response, I will check it against the Pokestops I know about. You can also send a Google Maps link!")
+            askmsg = await chn.send(f"{user.mention}: Where is this Research located? Please type your response below. If you send a plain text response, I will check it against the Pokestops I know about. You can also send a Google Maps link!")
             def check(m):
                 return m.author == user and m.channel == chn
             reply = await self.bot.wait_for('message', check=check)
+            try:
+                await askmsg.delete()
+                await reply.delete()
+            except:
+                pass
             url_re = '(http(s?)://)?((maps\.google\./)|((www\.)?google\.com/maps/)|(goo.gl/maps/))\S*'
             match = re.search(url_re, reply.content)
             if match:
                 url = match.group()
                 return await research.update_url(url)
+            else:
+                ctx = await self.bot.get_context(reply, cls=Context)
+                stop = await Pokestop.convert(ctx, reply.content)
+                research.location = stop
+                embed = await ResearchEmbed.from_research(research)
+                for msgid in research.message_ids:
+                    try:
+                        chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
+                        await msg.edit(embed=embed.embed)
+                    except:
+                        pass
+
             
     
     async def pickup_researchdata(self):
@@ -590,6 +608,7 @@ class ResearchCog(Cog):
         else:
             reportcontent = ""
         stamp = ctx.bot.get_emoji(583375171847585823)
+        location = ctx.bot.get_emoji(597185467217346602)
         reportcontent += f"Field Research reported! Use {str(stamp)} to indicate that you picked up this task!"
         report_channels = []
         report_channel = ReportChannel(ctx.bot, ctx.channel)
@@ -604,6 +623,7 @@ class ResearchCog(Cog):
             try:
                 msg = await channel.channel.send(reportcontent, embed=embed)
                 await msg.add_reaction(stamp)
+                await msg.add_reaction(location)
             except:
                 continue
             idstring = f'{msg.channel.id}/{msg.id}'

@@ -1988,14 +1988,17 @@ class Raid:
             content += f" Reason: {reason}"
         content += "\nDeleted messages from this channel will be posted below."
         await channel.send(content)
-        table = self.bot.dbi.table('discord_messages')
-        query = table.query
-        query.where(channel_id=channel.id)
-        query.where(deleted=True)
-        data = await query.get()
-        for row in data:
-            embed = formatters.deleted_message_embed(self.bot, row)
-            await channel.send(embed=embed)
+        try:
+            table = self.bot.dbi.table('discord_messages')
+            query = table.query
+            query.where(channel_id=channel.id)
+            query.where(deleted=True)
+            data = await query.get()
+            for row in data:
+                embed = formatters.deleted_message_embed(self.bot, row)
+                await channel.send(embed=embed)
+        except:
+            pass
         raid_table = self.bot.dbi.table('raids')
         query = raid_table.query().where(id=self.id)
         self.bot.loop.create_task(query.delete())

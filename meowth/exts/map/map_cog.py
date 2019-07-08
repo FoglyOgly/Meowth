@@ -609,6 +609,7 @@ class Pokestop(POI):
             nicks = [x[0] for x in nick_list]
             nick_matches = get_matches(nicks, arg)
             if nick_matches:
+                nick_matches = [x[0] for x in nick_matches]
                 nick_ids = [x[1] for x in nick_list if x[0] in nick_matches]
             else:
                 nick_ids = []
@@ -618,6 +619,7 @@ class Pokestop(POI):
         names = [x[0] for x in name_list]
         name_matches = get_matches(names, arg)
         if name_matches:
+            name_matches = [x[0] for x in name_matches]
             name_ids = [x[1] for x in name_list if x[0] in name_matches]
         else:
             name_ids = []

@@ -833,8 +833,10 @@ class Pokemon():
                 valid_level = rounded/2
                 lvl = valid_level
             else:
+                await chn.send(arg)
                 form_name = fuzzymatch.get_match(form_list, arg)
                 if form_name[0]:
+                    await chn.send(form_name[0])
                     forms = form_names.query('formid').where(name=form_name[0])
                     form = await forms.get_value()
                     id_list = await forms_table.query('pokemonid').where(formid=form).get_values()

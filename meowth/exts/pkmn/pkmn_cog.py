@@ -850,6 +850,8 @@ class Pokemon():
                         ids = await ref.get_values()
                     else:
                         raise PokemonNotFound
+        await chn.send(str(ids))
+        await chn.send(str(id_list))
         if id_list:
             possible_ids = set(ids) & set(id_list)
         else:

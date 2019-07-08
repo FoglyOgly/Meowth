@@ -484,7 +484,6 @@ class Gym(POI):
             return PartialPOI(ctx.bot, city, arg)
         gyms_query.select('id', 'name', 'nickname')
         data = await gyms_query.get()
-        await ctx.send(f'{len(data)} gyms found')
         if not data:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)

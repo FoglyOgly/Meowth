@@ -1065,6 +1065,14 @@ class RaidCog(Cog):
         else:
             try:
                 newdt = parse(newtime, settings={'TIMEZONE': zone, 'RETURN_AS_TIMEZONE_AWARE': True})
+                if isinstance(raid_or_meetup, Raid):
+                    oldstamp = raid_or_meetup.end
+                elif isinstance(raid_or_meetup, Meetup):
+                    oldstamp = raid_or_meetup.start
+                olddt = raid_or_meetup.local_datetime(oldstamp)
+                nowdt = raid_or_meetup.local_datetime(time.time())
+                if newdt.date() == nowdt.date():
+                    newdt = newdt.combine(olddt.date(), newdt.time())
                 stamp = newdt.timestamp()
             except:
                 raise

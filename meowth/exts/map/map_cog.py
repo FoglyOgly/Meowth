@@ -725,7 +725,7 @@ class Mapper(Cog):
         bot = self.bot
         stops_table = bot.dbi.table('pokestops')
         insert = stops_table.insert()
-        reader = csv.DictReader(codecs.iterdecode(file.readlines(), 'utf-8'))
+        reader = csv.DictReader(codecs.iterdecode(file.readlines(), 'utf-8-sig'))
         rows = []
         for row in reader:
             valid_data = {}

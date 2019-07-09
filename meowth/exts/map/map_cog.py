@@ -666,8 +666,9 @@ class Mapper(Cog):
         elif isinstance(error, InvalidGMapsKey):
             await ctx.error('Google Maps API Key invalid.')
     
-    async def gyms_from_csv(self, guildid, file):
+    async def gyms_from_csv(self, ctx, file):
         bot = self.bot
+        guildid = ctx.guild.id
         gyms_table = bot.dbi.table('gyms')
         insert = gyms_table.insert()
         reader = csv.DictReader(codecs.iterdecode(file.readlines(), 'utf-8-sig'))
@@ -678,7 +679,8 @@ class Mapper(Cog):
             if isinstance(row.get('name'), str):
                 valid_data['name'] = row['name']
             else:
-                continue
+                await ctx.send("Column 'name' not found. Please check the headers in your csv file.")
+                return False # The database commit will fail so might as well abort now.
             if isinstance(row.get('nickname'), str):
                 valid_data['nickname'] = row.get('nickname')
             else:
@@ -700,6 +702,7 @@ class Mapper(Cog):
             rows.append(valid_data)
         insert.rows(rows)
         await insert.commit(do_update=True)
+        return True
     
     async def csv_from_gyms(self, guildid):
         bot = self.bot
@@ -721,8 +724,9 @@ class Mapper(Cog):
         return f
         
 
-    async def stops_from_csv(self, guildid, file):
+    async def stops_from_csv(self, ctx, file):
         bot = self.bot
+        guildid = ctx.guild.id
         stops_table = bot.dbi.table('pokestops')
         insert = stops_table.insert()
         reader = csv.DictReader(codecs.iterdecode(file.readlines(), 'utf-8-sig'))
@@ -733,7 +737,8 @@ class Mapper(Cog):
             if isinstance(row.get('name'), str):
                 valid_data['name'] = row['name']
             else:
-                continue
+                await ctx.send("Column 'name' not found. Please check the headers in your csv file.")
+                return False # The database commit will fail so might as well abort now.
             if isinstance(row.get('nickname'), str):
                 valid_data['nickname'] = row.get('nickname')
             else:
@@ -750,6 +755,7 @@ class Mapper(Cog):
             rows.append(valid_data)
         insert.rows(rows)
         await insert.commit(do_update=True)
+        return True
     
     async def csv_from_stops(self, guildid):
         bot = self.bot
@@ -850,11 +856,10 @@ class Mapper(Cog):
         Gyms will only be usable by the server they were imported in.
         """
         attachment = ctx.message.attachments[0]
-        guildid = ctx.guild.id
         f = io.BytesIO()
         await attachment.save(f)
-        await self.gyms_from_csv(guildid, f)
-        await ctx.send("Import successful")
+        if await self.gyms_from_csv(ctx, f):
+            await ctx.send("Import successful")
 
     @command()
     @commands.has_permissions(manage_guild=True)
@@ -865,11 +870,10 @@ class Mapper(Cog):
         Pokestops will only be usable by the server they were imported in.
         """
         attachment = ctx.message.attachments[0]
-        guildid = ctx.guild.id
         f = io.BytesIO()
         await attachment.save(f)
-        await self.stops_from_csv(guildid, f)
-        await ctx.send("Import successful")
+        if await self.stops_from_csv(ctx, f):
+            await ctx.send("Import successful")
     
     @command()
     @commands.has_permissions(manage_guild=True)

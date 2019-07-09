@@ -689,7 +689,8 @@ class Mapper(Cog):
                 lat = float(row.get('lat'))
                 lon = float(row.get('lon'))
             except:
-                continue
+                await ctx.send(f"Failed to parse coordinates for gym '{row['name']}'.")
+                return False
             l10 = S2_L10.from_coords(bot, (lat, lon))
             valid_data['lat'] = lat
             valid_data['lon'] = lon
@@ -747,7 +748,8 @@ class Mapper(Cog):
                 lat = float(row.get('lat'))
                 lon = float(row.get('lon'))
             except:
-                continue
+                await ctx.send(f"Failed to parse coordinates for stop '{row['name']}'.")
+                return False
             l10 = S2_L10.from_coords(bot, (lat, lon))
             valid_data['lat'] = lat
             valid_data['lon'] = lon

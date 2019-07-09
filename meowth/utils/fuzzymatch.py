@@ -27,7 +27,7 @@ def get_match(word_list: list, word: str, score_cutoff: int = 80):
         return (None, None)
     return result
 
-def get_matches(word_list: list, word: str, score_cutoff: int = 90):
+def get_matches(word_list: list, word: str, score_cutoff: int = 90, limit: int = 10):
     """Uses fuzzywuzzy to see if word is close to entries in word_list
 
     Returns a list of tuples with (MATCH, SCORE)
@@ -35,7 +35,7 @@ def get_matches(word_list: list, word: str, score_cutoff: int = 90):
     if is_empty(word):
         return []
     return process.extractBests(
-        word, word_list, scorer=fuzz.WRatio, score_cutoff=score_cutoff)
+        word, word_list, scorer=fuzz.WRatio, score_cutoff=score_cutoff, limit=limit)
 
 class FuzzyEnum(Enum):
     """Enumeration with fuzzy-matching classmethods."""

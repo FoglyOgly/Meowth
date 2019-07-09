@@ -628,8 +628,8 @@ class Tutorial(Cog):
         d = {
             'channelid': ctx.tutorial_channel.id,
             'wild': True,
-            'city': 'Lapland',
-            'lat': 90,
+            'city': 'Antarctica',
+            'lat': -90,
             'lon': 0,
             'radius': 1
         }
@@ -686,8 +686,8 @@ class Tutorial(Cog):
         d = {
             'channelid': ctx.tutorial_channel.id,
             'raid': True,
-            'city': 'Lapland',
-            'lat': 90,
+            'city': 'Antarctica',
+            'lat': -90,
             'lon': 0,
             'radius': 1,
             'category_1': 'message',
@@ -750,8 +750,8 @@ class Tutorial(Cog):
         d = {
             'channelid': ctx.tutorial_channel.id,
             'research': True,
-            'city': 'Lapland',
-            'lat': 90,
+            'city': 'Antarctica',
+            'lat': -90,
             'lon': 0,
             'radius': 1
         }

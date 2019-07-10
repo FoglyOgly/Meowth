@@ -770,6 +770,7 @@ class Pokemon():
         id_list = []
         name_list = await pokedex.query('name').get_values()
         form_list = await form_names.query('name').get_values()
+        form_list = [x.strip('()') for x in form_list]
         args = arg.lower().split()
         shiny = False
         form = None
@@ -835,7 +836,7 @@ class Pokemon():
             else:
                 form_name = fuzzymatch.get_match(form_list, arg)
                 if form_name[0]:
-                    forms = form_names.query('formid').where(name=form_name[0])
+                    forms = form_names.query('formid').where(name=f"({form_name[0]})")
                     form = await forms.get_value()
                     id_list = await forms_table.query('pokemonid').where(formid=form).get_values()
                 else:

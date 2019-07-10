@@ -673,38 +673,43 @@ class Mapper(Cog):
         insert = gyms_table.insert()
         reader = csv.DictReader(codecs.iterdecode(file.readlines(), 'utf-8-sig'))
         rows = []
-        for row in reader:
-            valid_data = {}
-            valid_data['guild'] = guildid
-            if isinstance(row.get('name'), str):
-                valid_data['name'] = row['name']
-            else:
-                await ctx.send("Column 'name' not found. Please check the headers in your csv file.")
-                return False # The database commit will fail so might as well abort now.
-            if isinstance(row.get('nickname'), str):
-                valid_data['nickname'] = row.get('nickname')
-            else:
-                pass
-            try:
-                lat = float(row.get('lat'))
-                lon = float(row.get('lon'))
-            except:
-                await ctx.send(f"Failed to parse coordinates for gym '{row['name']}'.")
-                return False
-            l10 = S2_L10.from_coords(bot, (lat, lon))
-            valid_data['lat'] = lat
-            valid_data['lon'] = lon
-            valid_data['l10'] = l10.cellid
-            if isinstance(row.get('exraid'), str):
-                if row['exraid'].lower() == 'false':
-                    valid_data['exraid'] = False
-                elif row['exraid'].lower() == 'true':
-                    valid_data['exraid'] = True
-            rows.append(valid_data)
+        try:
+            for row in reader:
+                valid_data = {}
+                valid_data['guild'] = guildid
+                if isinstance(row.get('name'), str):
+                    valid_data['name'] = row['name']
+                else:
+                    await ctx.send("Column 'name' not found. Please check the headers in your csv file.")
+                    return False  # The database commit will fail so might as well abort now.
+                if isinstance(row.get('nickname'), str):
+                    valid_data['nickname'] = row.get('nickname')
+                else:
+                    pass
+                try:
+                    lat = float(row.get('lat'))
+                    lon = float(row.get('lon'))
+                except:
+                    await ctx.send(f"Failed to parse coordinates for gym '{row['name']}'.")
+                    return False
+                l10 = S2_L10.from_coords(bot, (lat, lon))
+                valid_data['lat'] = lat
+                valid_data['lon'] = lon
+                valid_data['l10'] = l10.cellid
+                if isinstance(row.get('exraid'), str):
+                    if row['exraid'].lower() == 'false':
+                        valid_data['exraid'] = False
+                    elif row['exraid'].lower() == 'true':
+                        valid_data['exraid'] = True
+                rows.append(valid_data)
+        except UnicodeDecodeError:
+            await ctx.send("Invalid character encountered. Please use utf-8 encoding for your file or restrict "
+                           "yourself to the ASCII character set.")
+            return False
         insert.rows(rows)
         await insert.commit(do_update=True)
         return True
-    
+
     async def csv_from_gyms(self, guildid):
         bot = self.bot
         gyms_table = bot.dbi.table('gyms')
@@ -723,7 +728,6 @@ class Mapper(Cog):
         outstr = infile.getvalue().encode()
         f = io.BytesIO(outstr)
         return f
-        
 
     async def stops_from_csv(self, ctx, file):
         bot = self.bot
@@ -732,29 +736,34 @@ class Mapper(Cog):
         insert = stops_table.insert()
         reader = csv.DictReader(codecs.iterdecode(file.readlines(), 'utf-8-sig'))
         rows = []
-        for row in reader:
-            valid_data = {}
-            valid_data['guild'] = guildid
-            if isinstance(row.get('name'), str):
-                valid_data['name'] = row['name']
-            else:
-                await ctx.send("Column 'name' not found. Please check the headers in your csv file.")
-                return False # The database commit will fail so might as well abort now.
-            if isinstance(row.get('nickname'), str):
-                valid_data['nickname'] = row.get('nickname')
-            else:
-                pass
-            try:
-                lat = float(row.get('lat'))
-                lon = float(row.get('lon'))
-            except:
-                await ctx.send(f"Failed to parse coordinates for stop '{row['name']}'.")
-                return False
-            l10 = S2_L10.from_coords(bot, (lat, lon))
-            valid_data['lat'] = lat
-            valid_data['lon'] = lon
-            valid_data['l10'] = l10.cellid
-            rows.append(valid_data)
+        try:
+            for row in reader:
+                valid_data = {}
+                valid_data['guild'] = guildid
+                if isinstance(row.get('name'), str):
+                    valid_data['name'] = row['name']
+                else:
+                    await ctx.send("Column 'name' not found. Please check the headers in your csv file.")
+                    return False  # The database commit will fail so might as well abort now.
+                if isinstance(row.get('nickname'), str):
+                    valid_data['nickname'] = row.get('nickname')
+                else:
+                    pass
+                try:
+                    lat = float(row.get('lat'))
+                    lon = float(row.get('lon'))
+                except:
+                    await ctx.send(f"Failed to parse coordinates for stop '{row['name']}'.")
+                    return False
+                l10 = S2_L10.from_coords(bot, (lat, lon))
+                valid_data['lat'] = lat
+                valid_data['lon'] = lon
+                valid_data['l10'] = l10.cellid
+                rows.append(valid_data)
+        except UnicodeDecodeError:
+            await ctx.send("Invalid character encountered. Please use utf-8 encoding for your file or restrict "
+                           "yourself to the ASCII character set.")
+            return False
         insert.rows(rows)
         await insert.commit(do_update=True)
         return True

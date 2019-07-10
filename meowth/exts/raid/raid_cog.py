@@ -894,8 +894,12 @@ class RaidCog(Cog):
         ctx._tz = raid.tz
         group_table = ctx.bot.dbi.table('raid_groups')
         insert = group_table.insert()
-        i = len(raid.group_list)
-        if group_time.isdigit():
+        if group_time.lower() == "hatch":
+            if raid.hatch:
+                stamp = raid.hatch
+            else:
+                raise InvalidTime
+        elif group_time.isdigit():
             stamp = time.time() + int(group_time)*60
             if stamp > raid.end:
                 raise InvalidTime

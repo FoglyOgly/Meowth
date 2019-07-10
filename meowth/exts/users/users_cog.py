@@ -406,7 +406,6 @@ class Users(Cog):
 
     @command()
     @users_checks.users_enabled()
-    @commands.cooldown(1, 3600, commands.BucketType.member)
     async def team(self, ctx, *, chosen_team: Team):
         """Set your Pokemon Go team."""
 

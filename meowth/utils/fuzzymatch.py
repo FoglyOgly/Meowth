@@ -4,6 +4,11 @@ from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 import re
 
+def pre(string: str):
+    s = string.lower()
+    s = s.strip()
+    return s
+
 def is_empty(word: str):
     s = re.sub(r'\W+', '', word)
     if s == '':
@@ -20,7 +25,7 @@ def get_match(word_list: list, word: str, score_cutoff: int = 80):
         return (None, None)
     try:
         result = process.extractOne(
-            word, word_list, scorer=fuzz.ratio, score_cutoff=score_cutoff)
+            word, word_list, processor=pre, scorer=fuzz.ratio, score_cutoff=score_cutoff)
     except:
         return (None, None)
     if not result:
@@ -35,7 +40,7 @@ def get_matches(word_list: list, word: str, score_cutoff: int = 90, limit: int =
     if is_empty(word):
         return []
     return process.extractBests(
-        word, word_list, scorer=fuzz.WRatio, score_cutoff=score_cutoff, limit=limit)
+        word, word_list, processor=pre, scorer=fuzz.WRatio, score_cutoff=score_cutoff, limit=limit)
 
 class FuzzyEnum(Enum):
     """Enumeration with fuzzy-matching classmethods."""

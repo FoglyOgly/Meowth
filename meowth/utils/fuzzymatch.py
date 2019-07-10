@@ -21,8 +21,6 @@ def get_match(word_list: list, word: str, score_cutoff: int = 80):
     Returns a tuple of (MATCH, SCORE)
     """
 
-    if is_empty(word):
-        return (None, None)
     try:
         result = process.extractOne(
             word, word_list, processor=pre, scorer=fuzz.ratio, score_cutoff=score_cutoff)
@@ -37,8 +35,7 @@ def get_matches(word_list: list, word: str, score_cutoff: int = 90, limit: int =
 
     Returns a list of tuples with (MATCH, SCORE)
     """
-    if is_empty(word):
-        return []
+
     return process.extractBests(
         word, word_list, processor=pre, scorer=fuzz.WRatio, score_cutoff=score_cutoff, limit=limit)
 

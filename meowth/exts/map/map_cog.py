@@ -866,7 +866,11 @@ class Mapper(Cog):
         Format must match the [template.](https://docs.google.com/spreadsheets/d/1W-VTAzlnDefgBIXoc7kuRcxJIlYo7iojqRRQ0uwTifc/edit?usp=sharing)
         Gyms will only be usable by the server they were imported in.
         """
-        attachment = ctx.message.attachments[0]
+        try:
+            attachment = ctx.message.attachments[0]
+        except IndexError:
+            await ctx.send("No file was attached. Please attach a csv file when using this command.")
+            return
         f = io.BytesIO()
         await attachment.save(f)
         if await self.gyms_from_csv(ctx, f):
@@ -880,7 +884,11 @@ class Mapper(Cog):
         Format must match the [template.](https://docs.google.com/spreadsheets/d/1W-VTAzlnDefgBIXoc7kuRcxJIlYo7iojqRRQ0uwTifc/edit?usp=sharing)
         Pokestops will only be usable by the server they were imported in.
         """
-        attachment = ctx.message.attachments[0]
+        try:
+            attachment = ctx.message.attachments[0]
+        except IndexError:
+            await ctx.send("No file was attached. Please attach a csv file when using this command.")
+            return
         f = io.BytesIO()
         await attachment.save(f)
         if await self.stops_from_csv(ctx, f):

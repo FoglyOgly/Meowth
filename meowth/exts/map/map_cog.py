@@ -950,7 +950,7 @@ class Mapper(Cog):
         if not f:
             return await ctx.send('No Pokestops found')
         to_send = discord.File(f, filename=f'{ctx.guild.name}_stops.csv')
-        await ctx.send(field=to_send)
+        await ctx.send(file=to_send)
 
     @command()
     @commands.has_permissions(manage_guild=True)

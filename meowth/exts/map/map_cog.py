@@ -835,9 +835,13 @@ class Mapper(Cog):
 
     @command()
     @checks.is_admin()
+    @checks.location_set()
     async def listgyms(self, ctx):
+        """List all Gyms in a reporting channel's defined area."""
         report_channel = ReportChannel(ctx.bot, ctx.channel)
         gyms_query = await report_channel.get_all_gyms()
+        if not gyms_query:
+            return await ctx.error('No gyms found')
         gyms_query.select('name', 'nickname', 'lat', 'lon', 'exraid')
         data = await gyms_query.get()
         entries = [(x['name'], x.get('nickname'), f"{x['lat']}, {x['lon']}", x['exraid']) for x in data]
@@ -847,6 +851,7 @@ class Mapper(Cog):
                 yield l[i: i+20]
     
         p = list(pages(entries))
+        await ctx.send('(Name, Nickname, Latitude, Longitude, EX Raid)')
         for x in p:
             await ctx.send("\n".join(x))
         
@@ -854,6 +859,7 @@ class Mapper(Cog):
     @command()
     @checks.location_set()
     async def whereis(self, ctx, *, location: POI):
+        """Returns a Google Maps link to a Gym or Pokestop."""
         if not isinstance(location, POI):
             return await ctx.error('Location not found')
         display_str = await location.display_str()

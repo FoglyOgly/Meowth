@@ -397,7 +397,6 @@ class POI():
             return ''
         prefix = "https://www.google.com/maps/dir/?api=1&"
         prefix += f"destination={lat},{lon}"
-        prefix += "&dir_action=navigate"
         return prefix
     
     async def address(self):

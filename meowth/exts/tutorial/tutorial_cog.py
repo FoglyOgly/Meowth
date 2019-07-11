@@ -390,7 +390,7 @@ class Tutorial(Cog):
             "reward of the research task. You can also use "
             f"**{ctx.prefix}research <task_category> <location>** to "
             "skip the first prompt. Finally, you can use "
-            f"**{ctx.prefix}research <task> <location> to skip to the reward prompt. "
+            f"**{ctx.prefix}research <task> <location>** to skip to the reward prompt. "
             "At each step, I will try to match your task and reward input with known "
             "Field Research tasks, Pokemon, or items. To input the task category as "
             "a shortcut, use single words like `raid` or `catch`.\n\n"
@@ -687,6 +687,7 @@ class Tutorial(Cog):
             'channelid': ctx.tutorial_channel.id,
             'raid': True,
             'city': 'Antarctica',
+            'timezone': 'Antarctica/McMurdo',
             'lat': -90,
             'lon': 0,
             'radius': 1,
@@ -751,6 +752,7 @@ class Tutorial(Cog):
             'channelid': ctx.tutorial_channel.id,
             'research': True,
             'city': 'Antarctica',
+            'timezone': 'Antarctica/McMurdo',
             'lat': -90,
             'lon': 0,
             'radius': 1

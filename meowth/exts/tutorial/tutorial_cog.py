@@ -682,12 +682,24 @@ class Tutorial(Cog):
              f"you! Continue in {ctx.tutorial_channel.mention}"),
             delete_after=20.0)
 
+        # Default timezone
+        timezone = 'Antarctica/McMurdo'
+        # Get the guild's timezone if it exists.
+        report_channel_table = self.bot.dbi.table('report_channels')
+        query = report_channel_table.query
+        query.where(guild_id=guild.id)
+        query.select('timezone')
+        data = await query.get()
+        for row in data:
+            if row['timezone']:
+                timezone = row['timezone']
+
         # set tutorial settings
         d = {
             'channelid': ctx.tutorial_channel.id,
             'raid': True,
             'city': 'Antarctica',
-            'timezone': 'Antarctica/McMurdo',
+            'timezone': timezone,
             'lat': -90,
             'lon': 0,
             'radius': 1,
@@ -747,12 +759,24 @@ class Tutorial(Cog):
              f"you! Continue in {ctx.tutorial_channel.mention}"),
             delete_after=20.0)
 
+        # Default timezone
+        timezone = 'Antarctica/McMurdo'
+        # Get the guild's timezone if it exists.
+        report_channel_table = self.bot.dbi.table('report_channels')
+        query = report_channel_table.query
+        query.where(guild_id=guild.id)
+        query.select('timezone')
+        data = await query.get()
+        for row in data:
+            if row['timezone']:
+                timezone = row['timezone']
+
         # set tutorial settings
         d = {
             'channelid': ctx.tutorial_channel.id,
             'research': True,
             'city': 'Antarctica',
-            'timezone': 'Antarctica/McMurdo',
+            'timezone': timezone,
             'lat': -90,
             'lon': 0,
             'radius': 1

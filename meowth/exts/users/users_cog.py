@@ -409,7 +409,6 @@ class Users(Cog):
     async def team(self, ctx, *, chosen_team: Team):
         """Set your Pokemon Go team."""
 
-        user_table = ctx.bot.dbi.table('users')
         meowthuser = MeowthUser(ctx.bot, ctx.author)
         data = await meowthuser._data.get()
         if len(data) == 0:
@@ -427,7 +426,10 @@ class Users(Cog):
                 old_team = Team(ctx.bot, ctx.guild.id, old_team_id)
                 old_role = await old_team.role()
                 if old_role:
-                    await ctx.author.remove_roles(old_role)
+                    try:
+                        await ctx.author.remove_roles(old_role)
+                    except discord.Forbidden:
+                        await ctx.error("Missing permissions")
             update = meowthuser._update
             update.values(team=chosen_team.id)
             await update.commit()
@@ -446,7 +448,6 @@ class Users(Cog):
     async def pokebattler(self, ctx, pb_id: int):
         """Set your Pokebattler ID."""
 
-        user_table = ctx.bot.dbi.table('users')
         meowthuser = MeowthUser(ctx.bot, ctx.author)
         data = await meowthuser._data.get()
         if len(data) == 0:

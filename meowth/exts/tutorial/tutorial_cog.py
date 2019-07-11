@@ -94,6 +94,20 @@ class Tutorial(Cog):
                     d[key] = row[key]
         return d
 
+    async def guild_timezone(self, guild):
+        # Default timezone
+        timezone = 'Etc/UTC'
+        # Get the guild's timezone if it exists.
+        report_channel_table = self.bot.dbi.table('report_channels')
+        query = report_channel_table.query
+        query.where(guild_id=guild.id)
+        query.select('timezone')
+        data = await query.get()
+        for row in data:
+            if row['timezone']:
+                timezone = row['timezone']
+        return timezone
+
     async def want_tutorial(self, ctx):
 
         await ctx.tutorial_channel.send(
@@ -682,19 +696,8 @@ class Tutorial(Cog):
              f"you! Continue in {ctx.tutorial_channel.mention}"),
             delete_after=20.0)
 
-        # Default timezone
-        timezone = 'Antarctica/McMurdo'
-        # Get the guild's timezone if it exists.
-        report_channel_table = self.bot.dbi.table('report_channels')
-        query = report_channel_table.query
-        query.where(guild_id=guild.id)
-        query.select('timezone')
-        data = await query.get()
-        for row in data:
-            if row['timezone']:
-                timezone = row['timezone']
-
         # set tutorial settings
+        timezone = await self.guild_timezone(guild)
         d = {
             'channelid': ctx.tutorial_channel.id,
             'raid': True,
@@ -759,19 +762,8 @@ class Tutorial(Cog):
              f"you! Continue in {ctx.tutorial_channel.mention}"),
             delete_after=20.0)
 
-        # Default timezone
-        timezone = 'Antarctica/McMurdo'
-        # Get the guild's timezone if it exists.
-        report_channel_table = self.bot.dbi.table('report_channels')
-        query = report_channel_table.query
-        query.where(guild_id=guild.id)
-        query.select('timezone')
-        data = await query.get()
-        for row in data:
-            if row['timezone']:
-                timezone = row['timezone']
-
         # set tutorial settings
+        timezone = await self.guild_timezone(guild)
         d = {
             'channelid': ctx.tutorial_channel.id,
             'research': True,

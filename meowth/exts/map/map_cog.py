@@ -841,6 +841,7 @@ class Mapper(Cog):
         gyms_query.select('name', 'nickname', 'lat', 'lon', 'exraid')
         data = await gyms_query.get()
         entries = [(x['name'], x.get('nickname'), f"{x['lat']}, {x['lon']}", x['exraid']) for x in data]
+        entries = [str(x) for x in entries]
         def pages(l):
             for i in range(0, len(l), 20):
                 yield l[i: i+20]

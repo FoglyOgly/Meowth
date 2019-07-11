@@ -832,7 +832,24 @@ class Mapper(Cog):
         }
         insert.row(**d)
         await insert.commit()
+
+    @command()
+    @checks.is_admin()
+    async def listgyms(self, ctx):
+        report_channel = ReportChannel(ctx.bot, ctx.channel)
+        gyms_query = await report_channel.get_all_gyms()
+        gyms_query.select('name', 'nickname', 'lat', 'lon', 'exraid')
+        data = await gyms_query.get()
+        entries = [(x['name'], x.get('nickname'), f"{x['lat']}, {x['lon']}", x['exraid']) for x in data]
+        def pages(l):
+            for i in range(0, len(l), 20):
+                yield l[i: i+20]
     
+        p = list(pages(entries))
+        for x in p:
+            await ctx.send("\n".join(x))
+        
+
     @command()
     @checks.location_set()
     async def whereis(self, ctx, *, location: POI):
@@ -1051,8 +1068,3 @@ class Mapper(Cog):
             await insert.commit(do_update=True)
         return times
 
-
-    
-    
-
-    

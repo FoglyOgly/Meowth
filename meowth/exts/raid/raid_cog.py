@@ -1,5 +1,5 @@
 from meowth import Cog, command, bot, checks
-from meowth.exts.map import Gym, ReportChannel, PartialPOI, S2_L10, POI
+from meowth.exts.map import Gym, Pokestop, ReportChannel, PartialPOI, S2_L10, POI
 from meowth.exts.pkmn import Pokemon, Move
 from meowth.exts.pkmn.errors import MoveInvalid
 from meowth.exts.weather import Weather
@@ -363,11 +363,10 @@ class RaidCog(Cog):
             no match is found.
         *start_time:* The date and time of the Meetup.
         
-        Usable only by moderators. Remember to wrap multi-word arguments in quotes."""
+        Remember to wrap multi-word arguments in quotes."""
 
         guild = ctx.guild
         guild_id = guild.id
-        report_channel_id = ctx.channel.id
         if isinstance(location, POI):
             loc_name = await location._name()
         else:
@@ -606,7 +605,6 @@ class RaidCog(Cog):
         train_ids = await report_channel.get_all_trains()
         trains = [Train.instances.get(x) for x in train_ids]
         if trains:
-            train_content = "Use the reaction below to vote for this raid next!"
             for t in trains:
                 if t.channel:
                     await t.new_raid(new_raid)
@@ -998,18 +996,28 @@ class RaidCog(Cog):
         await raid.upsert()
         await raid.update_messages(content="The raid level has been corrected!")
     
-    @command(category="Raid Info")
-    @raid_checks.raid_channel()
+    @command(aliases=['location'], category="Raid Info")
+    @raid_checks.raid_or_meetup()
     @raid_checks.bot_has_permissions()
     @checks.is_mod()
-    async def gym(self, ctx, *, gym: Gym):
+    async def gym(self, ctx, *, location):
         """Correct the raid gym in an existing raid channel.
 
         Usable only by mods."""
         raid = Raid.instances.get(ctx.raid_id)
-        raid.gym = gym
-        await raid.upsert()
-        await raid.update_messages(content="The raid gym has been corrected!")
+        if raid:
+            gym = await Gym.convert(ctx, location)
+            raid.gym = gym
+            await raid.upsert()
+            return await raid.update_messages(content="The raid gym has been corrected!")
+        else:
+            meetup = Meetup.by_channel.get(ctx.channel.id)
+            if meetup:
+                location = await POI.convert(ctx, location)
+                meetup.location = location
+                await meetup.upsert()
+                embed = await meetup.meetup_embed()
+                return await ctx.send('The meetup location has been updated!', embed=embed)
     
     @command(aliases=['move'], category="Raid Info")
     @raid_checks.raid_channel()

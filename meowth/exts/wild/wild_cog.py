@@ -481,7 +481,7 @@ class WildEmbed():
         self.embed = embed
     
     pkmn_index = 0
-    weather_index = 1
+    loc_index = 1
     cp_index = 2
     lvl_iv_index = 3
     moveset_index = 4
@@ -543,8 +543,6 @@ class WildEmbed():
         moveset = f"{quick_name} {quick_emoji}| {charge_name} {charge_emoji}"
         weather = await wild.weather()
         weather = Weather(wild.bot, weather)
-        weather_name = await weather.name()
-        weather_emoji = await weather.boosted_emoji_str()
         is_boosted = await wild.pkmn.is_boosted(weather.value)
         cp_str = str(wild.pkmn.cp) if wild.pkmn.cp else "Unknown"
         if is_boosted:
@@ -563,7 +561,7 @@ class WildEmbed():
             directions_text = wild.location._name + " (Unknown Location)"
         fields = {
             'Pokemon': f'{name} {type_emoji}',
-            'Weather': f'{weather_name} {weather_emoji}'.strip(),
+            'Weather': f'[{directions_text}]({directions_url})',
             'CP': cp_str,
             "Level/IVs: Lvl/Atk/Def/Sta": iv_str,
             'Moveset': moveset.strip(),
@@ -573,8 +571,8 @@ class WildEmbed():
         footer = f"Reported by {reporter}"
         reportdt = datetime.fromtimestamp(wild.created)
         color = wild.guild.me.color
-        embed = formatters.make_embed(title=directions_text, msg_colour=color,
-            title_url=directions_url, thumbnail=img_url, fields=fields, footer=footer)
+        embed = formatters.make_embed(title="Wild Spawn Report", msg_colour=color,
+            thumbnail=img_url, fields=fields, footer=footer)
         embed.timestamp = reportdt
         return cls(embed)
 

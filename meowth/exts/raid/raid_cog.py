@@ -875,7 +875,7 @@ class RaidCog(Cog):
         await ctx.author.send(embed=embed)
         await raid.update_rsvp()
         
-    @command(category="Raid RSVP")
+    @command(aliases=['starttime'], category="Raid RSVP")
     @raid_checks.raid_channel()
     @raid_checks.bot_has_permissions()
     async def group(self, ctx, *, group_time=None):

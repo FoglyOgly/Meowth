@@ -1,0 +1,6 @@
+
+trigger:
+- new-core
+
+pr:
+- new-core

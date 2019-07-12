@@ -1,0 +1,7 @@
+
+steps:
+- script: 
+    git remote add github https://github.com/FoglyOgly/Meowth.git
+    git push github
+
+

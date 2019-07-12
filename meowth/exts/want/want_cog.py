@@ -42,7 +42,6 @@ class Item:
         else:
             item_matches = []
             name_matches = []
-        await ctx.send(str(item_matches))
         if len(item_matches) > 1:
             react_list = formatters.mc_emoji(len(item_matches))
             choice_dict = dict(zip(react_list, item_matches))

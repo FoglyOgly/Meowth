@@ -13,7 +13,7 @@ from pytz import timezone
 from datetime import datetime, timedelta
 from dateparser import parse
 from math import ceil
-from typing import Optional
+from typing import Optional, Union
 import re
 
 from discord.ext import commands
@@ -535,10 +535,12 @@ class ResearchCog(Cog):
     @command(aliases=['res'])
     @research_checks.research_enabled()
     @checks.location_set()
-    async def research(self, ctx, task: Optional[Task], *, location: Pokestop):
+    async def research(self, ctx, reward: Optional[Union[Pokemon, ItemReward]], task: Optional[Task], *, location: Pokestop):
         """Report a Field Research task.
         
         **Arguments**
+        *reward (optional):* Description of the reward for the research. Either
+            a Pokemon or an item.
         *task (optional):* Either the text of the research task itself or
             the research category (e.g. `raid`). If a conversion to a Task cannot
             be made, Meowth asks you to select a category, then to select the
@@ -568,7 +570,7 @@ class ResearchCog(Cog):
             except:
                 pass
             task = await Task.convert(ctx, cat)
-        if isinstance(task, Task):
+        if isinstance(task, Task) and not reward:
             possible_rewards = await task.possible_rewards()
             if len(possible_rewards) == 1:
                 reward = possible_rewards[0]
@@ -607,7 +609,7 @@ class ResearchCog(Cog):
                     await multi.delete()
                 except:
                     pass
-        else:
+        elif not reward:
             msg = await ctx.send('What is the reward for this Research? Please type your response below.')
             def check(m):
                 return m.author == ctx.author and m.channel == ctx.channel

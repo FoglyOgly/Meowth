@@ -639,6 +639,7 @@ class ResearchCog(Cog):
                 await msg.delete()
             except:
                 pass
+        await ctx.send(str(reward))
         reward = reward.id
         research_id = next(snowflake.create())
         research = Research(research_id, ctx.bot, ctx.guild.id, ctx.author.id, task, location, reward, tz, time.time())

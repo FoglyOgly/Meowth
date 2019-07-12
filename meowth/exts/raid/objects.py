@@ -287,7 +287,8 @@ class Meetup:
                     return
                 content = f"{member.display_name} {display_status}!"
                 try:
-                    return await chn.send(content, embed=rsvpembed)
+                    await chn.send(content)
+                    await chn.send(embed=rsvpembed, delete_after=15)
                 except:
                     return
     
@@ -1231,7 +1232,8 @@ class Raid:
                     else:
                         break
                     content = f"{member.display_name} {display_status}!"
-                    newmsg = await chn.send(content, embed=rsvpembed)
+                    await chn.send(content)
+                    await chn.send(embed=rsvpembed, delete_after=15)
                     if self.group_list:
                         grp = self.user_grp(member.id)
                         if not grp and status in ('coming', 'here'):
@@ -1246,7 +1248,8 @@ class Raid:
                     guild = self.bot.get_guild(self.guild_id)
                     member = guild.get_member(user_id)
                     content = f"{member.display_name} has joined Group {group['emoji']}!"
-                    newmsg = await chn.send(content, embed=rsvpembed)
+                    await chn.send(content)
+                    await chn.send(embed=rsvpembed, delete_after=15)
         
     
     async def monitor_status(self):
@@ -2878,7 +2881,8 @@ class Train:
             status_str =' has left the train!'
         content = f'{member.display_name}{status_str}'
         embed = TRSVPEmbed.from_train(self).embed
-        await channel.send(content, embed=embed)
+        await channel.send(content)
+        await channel.send(embed=embed, delete_after=15)
         if not self.trainer_dict:
             await self.end_train()
 

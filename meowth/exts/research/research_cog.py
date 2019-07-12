@@ -402,7 +402,7 @@ class ItemReward:
         item_name_arg = " ".join(item_args)
         item = await Item.convert(ctx, item_name_arg)
         if not item:
-            return None
+            raise ValueError
         await ctx.send(f'{item.id}/{amount}')
         return cls(ctx.bot, f'{item.id}/{amount}')
     
@@ -631,16 +631,17 @@ class ResearchCog(Cog):
             except:
                 reward = None
             if not reward:
-                reward = await ItemReward.convert(ctx, reply.content)
-                if not reward:
+                try:
+                    reward = await ItemReward.convert(ctx, reply.content)
+                except:
                     reward = ItemReward(ctx.bot, f'partial/{reply.content}/1')
             try:
                 await reply.delete()
                 await msg.delete()
             except:
                 pass
-        await ctx.send(str(reward))
-        reward = reward.id
+        if not isinstance(reward, str):
+            reward = reward.id
         research_id = next(snowflake.create())
         research = Research(research_id, ctx.bot, ctx.guild.id, ctx.author.id, task, location, reward, tz, time.time())
         embed = await ResearchEmbed.from_research(research)

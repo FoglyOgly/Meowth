@@ -318,11 +318,16 @@ class Task:
             task = display_dict[str(payload.emoji)]
             if task == 'Other':
                 if arg in categories:
-                    await ctx.send('What is the Task for this Research? Please type your answer below.')
+                    otherask = await ctx.send('What is the Task for this Research? Please type your answer below.')
                     def check(m):
                         return m.author == ctx.author and m.channel == ctx.channel
                     reply = await ctx.bot.wait_for('message', check=check)
                     arg = reply.content
+                    try:
+                        await reply.delete()
+                        await otherask.delete()
+                    except:
+                        pass
                 return PartialTask(ctx.bot, arg)
             try:
                 await multi.delete()
@@ -334,6 +339,10 @@ class Task:
             payload = await formatters.ask(ctx.bot, [taskask], user_list=[ctx.author.id])
             if not payload or str(payload.emoji) == '❎':
                 raise ValueError
+            try:
+                await taskask.delete()
+            except:
+                pass
         else:
             return PartialTask(ctx.bot, arg)
         return cls(ctx.bot, task)
@@ -392,6 +401,8 @@ class ItemReward:
                 amount = arg
         item_name_arg = " ".join(item_args)
         item = await Item.convert(ctx, item_name_arg)
+        if not item:
+            return None
         return cls(ctx.bot, f'{item.id}/{amount}')
     
 
@@ -620,6 +631,8 @@ class ResearchCog(Cog):
                 reward = None
             if not reward:
                 reward = await ItemReward.convert(ctx, reply.content)
+                if not reward:
+                    reward = ItemReward(ctx.bot, f'partial/{reply.content}/1')
             try:
                 await reply.delete()
                 await msg.delete()

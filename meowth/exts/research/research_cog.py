@@ -620,12 +620,12 @@ class ResearchCog(Cog):
                 reward = None
             if not reward:
                 reward = await ItemReward.convert(ctx, reply.content)
-            reward = reward.id
             try:
                 await reply.delete()
                 await msg.delete()
             except:
                 pass
+        reward = reward.id
         research_id = next(snowflake.create())
         research = Research(research_id, ctx.bot, ctx.guild.id, ctx.author.id, task, location, reward, tz, time.time())
         embed = await ResearchEmbed.from_research(research)

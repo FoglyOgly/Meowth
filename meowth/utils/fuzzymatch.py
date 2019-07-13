@@ -78,7 +78,7 @@ def get_matches(word_list: list, word: str, score_cutoff: int = 80, limit: int =
 
     Returns a list of tuples with (MATCH, SCORE)
     """
-    sorted_list = process.extractBests(word, word_list, processor=pre, scorer=fuzz.WRatio, score_cutoff=score_cutoff,
+    sorted_list = process.extractBests(word, word_list, processor=pre, scorer=fp_ratio, score_cutoff=score_cutoff,
                                        limit=limit)
     great_matches = [x for x in sorted_list if x[1] >= 95]
     if great_matches:

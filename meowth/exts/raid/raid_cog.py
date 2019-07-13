@@ -160,7 +160,8 @@ class RaidCog(Cog):
         guild = channel.guild
         raid = Raid.by_channel.get(str(channel.id))
         train = Train.by_channel.get(channel.id)
-        if not (raid or train):
+        meetup = Meetup.by_channel.get(channel.id)
+        if not (raid or train or meetup):
             return
         url_re = '(http(s?)://)?((maps\.google\./)|((www\.)?google\.com/maps/)|(goo.gl/maps/))\S*'
         match = re.search(url_re, message.content)
@@ -168,6 +169,8 @@ class RaidCog(Cog):
             url = match.group()
             if raid:
                 return await raid.update_url(url)
+            elif meetup:
+                return await meetup.update_url(url)
         category, phrase_list = await self.archive_cat_phrases(guild)
         if not phrase_list:
             return

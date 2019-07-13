@@ -335,14 +335,6 @@ class Task:
                 pass
         elif len(task_matches) == 1:
             task = task_matches[0]
-            taskask = await ctx.send(f'Found a single match: {task}\n\nIs this correct?')
-            payload = await formatters.ask(ctx.bot, [taskask], user_list=[ctx.author.id])
-            if not payload or str(payload.emoji) == '❎':
-                raise ValueError
-            try:
-                await taskask.delete()
-            except:
-                pass
         else:
             return PartialTask(ctx.bot, arg)
         return cls(ctx.bot, task)
@@ -526,6 +518,17 @@ class ResearchCog(Cog):
         cats = await query.get_values()
         cats = list(set(cats))
         return cats
+
+    async def possible_tasks(self, reward):
+        if reward.startswith('partial'):
+            return []
+        table = self.bot.dbi.table('research_tasks')
+        query = table.query('task')
+        try:
+            query.where(reward=reward)
+        except:
+            return []
+        return await query.get_values()
     
     @command()
     @checks.is_co_owner()
@@ -563,6 +566,37 @@ class ResearchCog(Cog):
         The reporter will be awarded points for the number of users that obtain
         the task."""
         tz = await ctx.tz()
+        if reward and not task:
+            task_matches = await self.possible_tasks(reward.id)
+            if len(task_matches) == 1:
+                task = Task(ctx.bot, task_matches[0])
+            elif len(task_matches) > 1:
+                react_list = formatters.mc_emoji(len(task_matches))
+                display_dict = dict(zip(react_list, task_matches))
+                display_dict["\u2754"] = "Other"
+                react_list.append("\u2754")
+                embed = formatters.mc_embed(display_dict)
+                multi = await ctx.send('Multiple possible Tasks found! Please select from the following list.',
+                    embed=embed)
+                payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
+                    react_list=react_list)
+                task = display_dict[str(payload.emoji)]
+                if task == 'Other':
+                    otherask = await ctx.send('What is the Task for this Research? Please type your answer below.')
+                    def check(m):
+                        return m.author == ctx.author and m.channel == ctx.channel
+                    reply = await ctx.bot.wait_for('message', check=check)
+                    arg = reply.content
+                    try:
+                        await reply.delete()
+                        await otherask.delete()
+                    except:
+                        pass
+                    task = PartialTask(ctx.bot, arg)
+                try:
+                    await multi.delete()
+                except:
+                    pass
         if not task:
             cats = await self.task_categories()
             content = "What category of Research Task is this? Select from the options below."

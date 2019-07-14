@@ -1004,13 +1004,9 @@ class RaidCog(Cog):
         """Correct the raid gym in an existing raid channel.
 
         Usable only by mods."""
-        raid = Raid.instances.get(ctx.raid_id)
-        if raid:
-            gym = await Gym.convert(ctx, location)
-            raid.gym = gym
-            await raid.upsert()
-            return await raid.update_messages(content="The raid gym has been corrected!")
-        else:
+        try:
+            raid = Raid.instances.get(ctx.raid_id)
+        except AttributeError:
             meetup = Meetup.by_channel.get(ctx.channel.id)
             if meetup:
                 location = await POI.convert(ctx, location)
@@ -1018,6 +1014,12 @@ class RaidCog(Cog):
                 await meetup.upsert()
                 embed = await meetup.meetup_embed()
                 return await ctx.send('The meetup location has been updated!', embed=embed)
+        else:
+            if raid:
+                gym = await Gym.convert(ctx, location)
+                raid.gym = gym
+                await raid.upsert()
+                return await raid.update_messages(content="The raid gym has been corrected!")
     
     @command(aliases=['move'], category="Raid Info")
     @raid_checks.raid_channel()
@@ -1080,7 +1082,7 @@ class RaidCog(Cog):
                 olddt = raid_or_meetup.local_datetime(oldstamp)
                 nowdt = raid_or_meetup.local_datetime(time.time())
                 if newdt.date() == nowdt.date():
-                    newdt = newdt.combine(olddt.date(), newdt.time())
+                    newdt = newdt.combine(olddt.date(), newdt.timetz())
                 stamp = newdt.timestamp()
             except:
                 raise

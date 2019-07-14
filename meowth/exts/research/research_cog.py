@@ -290,6 +290,7 @@ class Task:
         table = ctx.bot.dbi.table('research_tasks')
         query = table.query('task')
         tasks = await query.get_values()
+        tasks = list(set(tasks))
         matches = get_matches(tasks, arg)
         if matches:
             task_matches = [x[0] for x in matches]

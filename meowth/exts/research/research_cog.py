@@ -287,24 +287,14 @@ class Task:
     async def convert(cls, ctx, arg):
         arg = arg.lower()
         argsplit = arg.split()
-        table = ctx.bot.dbi.table('task_names')
-        query = table.query('task_desc', 'category')
-        data = await query.get()
-        categories = [x.get('category') for x in data]
-        if len(argsplit) == 1:
-            if arg in categories:
-                query = table.query('task_desc')
-                query.where(category=arg)
-                task_matches = await query.get_values()
-            else:
-                raise ValueError
+        table = ctx.bot.dbi.table('research_tasks')
+        query = table.query('task')
+        tasks = await query.get_values()
+        matches = get_matches(tasks, arg)
+        if matches:
+            task_matches = [x[0] for x in matches]
         else:
-            tasks = [x.get('task_desc') for x in data]
-            matches = get_matches(tasks, arg)
-            if matches:
-                task_matches = [x[0] for x in matches]
-            else:
-                task_matches = []
+            task_matches = []
         if len(task_matches) > 1:
             react_list = formatters.mc_emoji(len(task_matches))
             display_dict = dict(zip(react_list, task_matches))
@@ -317,17 +307,7 @@ class Task:
                 react_list=react_list)
             task = display_dict[str(payload.emoji)]
             if task == 'Other':
-                if arg in categories:
-                    otherask = await ctx.send('What is the Task for this Research? Please type your answer below.')
-                    def check(m):
-                        return m.author == ctx.author and m.channel == ctx.channel
-                    reply = await ctx.bot.wait_for('message', check=check)
-                    arg = reply.content
-                    try:
-                        await reply.delete()
-                        await otherask.delete()
-                    except:
-                        pass
+                otherask = await ctx.send('What is the Task for this Research? Please type your answer below.')
                 return PartialTask(ctx.bot, arg)
             try:
                 await multi.delete()
@@ -336,7 +316,7 @@ class Task:
         elif len(task_matches) == 1:
             task = task_matches[0]
         else:
-            return PartialTask(ctx.bot, arg)
+            raise ValueError
         return cls(ctx.bot, task)
 
 class PartialTask:

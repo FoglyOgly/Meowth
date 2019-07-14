@@ -56,7 +56,7 @@ class Item:
         elif len(item_matches) == 1:
             item = item_matches[0]
         else:
-            return PartialItem(ctx.bot, arg)
+            return None
         return cls(ctx.bot, item)
 
 class PartialItem:

@@ -94,6 +94,20 @@ class Tutorial(Cog):
                     d[key] = row[key]
         return d
 
+    async def guild_timezone(self, guild):
+        # Default timezone
+        timezone = 'Etc/UTC'
+        # Get the guild's timezone if it exists.
+        report_channel_table = self.bot.dbi.table('report_channels')
+        query = report_channel_table.query
+        query.where(guild_id=guild.id)
+        query.select('timezone')
+        data = await query.get()
+        for row in data:
+            if row['timezone']:
+                timezone = row['timezone']
+        return timezone
+
     async def want_tutorial(self, ctx):
 
         await ctx.tutorial_channel.send(
@@ -390,7 +404,7 @@ class Tutorial(Cog):
             "reward of the research task. You can also use "
             f"**{ctx.prefix}research <task_category> <location>** to "
             "skip the first prompt. Finally, you can use "
-            f"**{ctx.prefix}research <task> <location> to skip to the reward prompt. "
+            f"**{ctx.prefix}research <task> <location>** to skip to the reward prompt. "
             "At each step, I will try to match your task and reward input with known "
             "Field Research tasks, Pokemon, or items. To input the task category as "
             "a shortcut, use single words like `raid` or `catch`.\n\n"
@@ -683,10 +697,12 @@ class Tutorial(Cog):
             delete_after=20.0)
 
         # set tutorial settings
+        timezone = await self.guild_timezone(guild)
         d = {
             'channelid': ctx.tutorial_channel.id,
             'raid': True,
             'city': 'Antarctica',
+            'timezone': timezone,
             'lat': -90,
             'lon': 0,
             'radius': 1,
@@ -747,10 +763,12 @@ class Tutorial(Cog):
             delete_after=20.0)
 
         # set tutorial settings
+        timezone = await self.guild_timezone(guild)
         d = {
             'channelid': ctx.tutorial_channel.id,
             'research': True,
             'city': 'Antarctica',
+            'timezone': timezone,
             'lat': -90,
             'lon': 0,
             'radius': 1

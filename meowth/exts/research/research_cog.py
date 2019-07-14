@@ -720,6 +720,7 @@ class ResearchCog(Cog):
                 content = "\n\n".join(research_list)
             embed = formatters.make_embed(title=title, content=content, msg_colour=color)
             await channel.send(embed=embed)
+            await asyncio.sleep(0.25)
 
 
 

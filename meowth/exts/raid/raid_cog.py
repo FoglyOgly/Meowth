@@ -1080,7 +1080,7 @@ class RaidCog(Cog):
                 olddt = raid_or_meetup.local_datetime(oldstamp)
                 nowdt = raid_or_meetup.local_datetime(time.time())
                 if newdt.date() == nowdt.date():
-                    newdt = newdt.combine(olddt.date(), newdt.time())
+                    newdt = newdt.combine(olddt.date(), newdt.timetz())
                 stamp = newdt.timestamp()
             except:
                 raise

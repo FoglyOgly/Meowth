@@ -524,7 +524,9 @@ class Core(Cog):
                 guild=ctx.guild)
             await ctx.send(embed=embed)
             return
-        deleted = await ctx.channel.purge(limit=msg_number)
+        def is_unpinned(m):
+            return not m.pinned
+        deleted = await ctx.channel.purge(limit=msg_number, check=is_unpinned)
         embed = make_embed(
             msg_type='success',
             title='Deleted {} message{}'.format(

@@ -73,6 +73,7 @@ def get_match(word_list: list, word: str, score_cutoff: int = 80):
     return result
 
 
+
 def get_matches(word_list: list, word: str, score_cutoff: int = 80, limit: int = 10):
     """Uses fuzzywuzzy to see if word is close to entries in word_list
 

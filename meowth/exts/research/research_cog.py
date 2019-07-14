@@ -13,7 +13,7 @@ from pytz import timezone
 from datetime import datetime, timedelta
 from dateparser import parse
 from math import ceil
-from typing import Optional
+from typing import Optional, Union
 import re
 
 from discord.ext import commands
@@ -318,11 +318,16 @@ class Task:
             task = display_dict[str(payload.emoji)]
             if task == 'Other':
                 if arg in categories:
-                    await ctx.send('What is the Task for this Research? Please type your answer below.')
+                    otherask = await ctx.send('What is the Task for this Research? Please type your answer below.')
                     def check(m):
                         return m.author == ctx.author and m.channel == ctx.channel
                     reply = await ctx.bot.wait_for('message', check=check)
                     arg = reply.content
+                    try:
+                        await reply.delete()
+                        await otherask.delete()
+                    except:
+                        pass
                 return PartialTask(ctx.bot, arg)
             try:
                 await multi.delete()
@@ -330,10 +335,6 @@ class Task:
                 pass
         elif len(task_matches) == 1:
             task = task_matches[0]
-            taskask = await ctx.send(f'Found a single match: {task}\n\nIs this correct?')
-            payload = await formatters.ask(ctx.bot, [taskask], user_list=[ctx.author.id])
-            if not payload or str(payload.emoji) == '❎':
-                raise ValueError
         else:
             return PartialTask(ctx.bot, arg)
         return cls(ctx.bot, task)
@@ -392,6 +393,9 @@ class ItemReward:
                 amount = arg
         item_name_arg = " ".join(item_args)
         item = await Item.convert(ctx, item_name_arg)
+        if not item:
+            raise ValueError
+        await ctx.send(f'{item.id}/{amount}')
         return cls(ctx.bot, f'{item.id}/{amount}')
     
 
@@ -514,6 +518,17 @@ class ResearchCog(Cog):
         cats = await query.get_values()
         cats = list(set(cats))
         return cats
+
+    async def possible_tasks(self, reward):
+        if reward.startswith('partial'):
+            return []
+        table = self.bot.dbi.table('research_tasks')
+        query = table.query('task')
+        try:
+            query.where(reward=reward)
+        except:
+            return []
+        return await query.get_values()
     
     @command()
     @checks.is_co_owner()
@@ -535,10 +550,12 @@ class ResearchCog(Cog):
     @command(aliases=['res'])
     @research_checks.research_enabled()
     @checks.location_set()
-    async def research(self, ctx, task: Optional[Task], *, location: Pokestop):
+    async def research(self, ctx, reward: Optional[Union[Pokemon, ItemReward]], task: Optional[Task], *, location: Pokestop):
         """Report a Field Research task.
         
         **Arguments**
+        *reward (optional):* Description of the reward for the research. Either
+            a Pokemon or an item.
         *task (optional):* Either the text of the research task itself or
             the research category (e.g. `raid`). If a conversion to a Task cannot
             be made, Meowth asks you to select a category, then to select the
@@ -549,6 +566,37 @@ class ResearchCog(Cog):
         The reporter will be awarded points for the number of users that obtain
         the task."""
         tz = await ctx.tz()
+        if reward and not task:
+            task_matches = await self.possible_tasks(reward.id)
+            if len(task_matches) == 1:
+                task = Task(ctx.bot, task_matches[0])
+            elif len(task_matches) > 1:
+                react_list = formatters.mc_emoji(len(task_matches))
+                display_dict = dict(zip(react_list, task_matches))
+                display_dict["\u2754"] = "Other"
+                react_list.append("\u2754")
+                embed = formatters.mc_embed(display_dict)
+                multi = await ctx.send('Multiple possible Tasks found! Please select from the following list.',
+                    embed=embed)
+                payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
+                    react_list=react_list)
+                task = display_dict[str(payload.emoji)]
+                if task == 'Other':
+                    otherask = await ctx.send('What is the Task for this Research? Please type your answer below.')
+                    def check(m):
+                        return m.author == ctx.author and m.channel == ctx.channel
+                    reply = await ctx.bot.wait_for('message', check=check)
+                    arg = reply.content
+                    try:
+                        await reply.delete()
+                        await otherask.delete()
+                    except:
+                        pass
+                    task = PartialTask(ctx.bot, arg)
+                try:
+                    await multi.delete()
+                except:
+                    pass
         if not task:
             cats = await self.task_categories()
             content = "What category of Research Task is this? Select from the options below."
@@ -568,7 +616,7 @@ class ResearchCog(Cog):
             except:
                 pass
             task = await Task.convert(ctx, cat)
-        if isinstance(task, Task):
+        if isinstance(task, Task) and not reward:
             possible_rewards = await task.possible_rewards()
             if len(possible_rewards) == 1:
                 reward = possible_rewards[0]
@@ -607,7 +655,7 @@ class ResearchCog(Cog):
                     await multi.delete()
                 except:
                     pass
-        else:
+        elif not reward:
             msg = await ctx.send('What is the reward for this Research? Please type your response below.')
             def check(m):
                 return m.author == ctx.author and m.channel == ctx.channel
@@ -617,13 +665,17 @@ class ResearchCog(Cog):
             except:
                 reward = None
             if not reward:
-                reward = await ItemReward.convert(ctx, reply.content)
-            reward = reward.id
+                try:
+                    reward = await ItemReward.convert(ctx, reply.content)
+                except:
+                    reward = ItemReward(ctx.bot, f'partial/{reply.content}/1')
             try:
                 await reply.delete()
                 await msg.delete()
             except:
                 pass
+        if not isinstance(reward, str):
+            reward = reward.id
         research_id = next(snowflake.create())
         research = Research(research_id, ctx.bot, ctx.guild.id, ctx.author.id, task, location, reward, tz, time.time())
         embed = await ResearchEmbed.from_research(research)

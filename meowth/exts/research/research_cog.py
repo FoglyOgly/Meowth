@@ -376,7 +376,6 @@ class ItemReward:
         item = await Item.convert(ctx, item_name_arg)
         if not item:
             raise ValueError
-        await ctx.send(f'{item.id}/{amount}')
         return cls(ctx.bot, f'{item.id}/{amount}')
     
 

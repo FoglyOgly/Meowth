@@ -427,11 +427,11 @@ class Meetup:
                 continue
             except:
                 pass
-            embed = formatters.make_embed(title='Meetup Location Updated', content=f'[{directions_text}]({url})')
-            try:
-                await chn.send(content=content, embed=embed)
-            except:
-                pass
+        embed = formatters.make_embed(title='Meetup Location Updated', content=f'[{directions_text}]({url})')
+        try:
+            await self.channel.send(content=content, embed=embed)
+        except:
+            pass
 
     @classmethod
     async def from_data(cls, bot, data):

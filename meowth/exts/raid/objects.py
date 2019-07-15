@@ -948,6 +948,9 @@ class Raid:
             await meowthuser.rsvp(self.id, new_status, bosses=new_bosses, party=party)
     
     async def start_grp(self, grp, author, channel=None):
+        if channel:
+            if not self.grp_is_here(grp):
+                await channel.send('WARNING: It looks like not everyone in your group is at the raid!')
         mention_str = ""
         for user in grp['users']:
             meowthuser = MeowthUser.from_id(self.bot, user)
@@ -959,8 +962,6 @@ class Raid:
         if not channel:
             await asyncio.sleep(120)
         elif channel:
-            if not self.grp_is_here(grp):
-                await channel.send('WARNING: It looks like not everyone in your group is at the raid!')
             if self.grp_total(grp) > 20:
                 await channel.send('WARNING: You will have to split into multiple groups for the raid!')
             grp_est = self.grp_est_power(grp)

@@ -1012,6 +1012,7 @@ class RaidCog(Cog):
         except AttributeError:
             meetup = Meetup.by_channel.get(ctx.channel.id)
             if meetup:
+                ctx.report_channel_id = meetup.report_channel_id
                 location = await POI.convert(ctx, location)
                 meetup.location = location
                 await meetup.upsert()

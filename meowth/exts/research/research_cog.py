@@ -573,6 +573,8 @@ class ResearchCog(Cog):
                     except:
                         pass
                     task = PartialTask(ctx.bot, arg)
+                else:
+                    task = Task(ctx.bot, task)
                 try:
                     await multi.delete()
                 except:

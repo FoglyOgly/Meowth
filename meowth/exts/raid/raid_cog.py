@@ -1017,7 +1017,7 @@ class RaidCog(Cog):
                 meetup.location = location
                 await meetup.upsert()
                 embed = await meetup.meetup_embed()
-                return await ctx.send('The meetup location has been updated!', embed=embed)
+                return await meetup.channel.send('The meetup location has been updated!', embed=embed)
         else:
             if raid:
                 gym = await Gym.convert(ctx, location)

@@ -416,19 +416,18 @@ class Meetup:
             content = "This meetup's location has been updated! This meetup is at a known location, so please let a server administrator know if the original directions link was incorrect!"
         else:
             directions_text = gym._name + " (Unknown Location)"
-            exraid = False
             content = "This meetup's location has been updated! This raid is at an unknown location, so please let a server administrator know if it should be added to the database!"
         message_ids = self.message_ids
         for messageid in message_ids:
             chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
             embed = await self.meetup_embed()
-            embed.set_author(name=directions_text, url=directions_url)
+            embed.set_author(name=directions_text, url=url)
             try:
                 await msg.edit(embed=embed)
                 continue
             except:
                 pass
-            embed = formatters.make_embed(title='Meetup Location Updated', content=f'[{directions_text}]({directions_url})')
+            embed = formatters.make_embed(title='Meetup Location Updated', content=f'[{directions_text}]({url})')
             try:
                 await chn.send(content=content, embed=embed)
             except:

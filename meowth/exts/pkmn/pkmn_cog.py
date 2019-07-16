@@ -784,7 +784,7 @@ class Pokemon():
         chargeMove2id = None
         cp = None
         for arg in args:
-            if arg.startswith('cp') and arg[2].isdigit():
+            if arg.startswith('cp') and len(arg) > 2 and arg[2].isdigit():
                 cp = int(arg[2:])
             elif arg.startswith('@'):
                 arg = arg[1:]
@@ -805,7 +805,7 @@ class Pokemon():
                 gender = 'MALE'
             elif arg == 'female':
                 gender = 'FEMALE'
-            elif arg.startswith('iv') and arg[2].isdigit():
+            elif arg.startswith('iv') and len(arg) > 2 and arg[2].isdigit():
                 iv_arg = arg[2:]
                 attiv, defiv, staiv = iv_arg.split('/', maxsplit=2)
                 attiv = int(attiv)
@@ -823,7 +823,7 @@ class Pokemon():
                     staiv = 15
                 elif staiv < 0:
                     staiv = 0
-            elif arg.startswith('lvl') and arg[3].isdigit():
+            elif arg.startswith('lvl') and len(arg) > 3 and arg[3].isdigit():
                 lvl = float(arg[3:])
                 double = lvl*2
                 rounded = round(double)

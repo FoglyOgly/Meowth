@@ -565,6 +565,11 @@ class ResearchCog(Cog):
                     embed=embed)
                 payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
                     react_list=react_list)
+                if not payload:
+                    try:
+                        return await multi.delete()
+                    except:
+                        return
                 task = display_dict[str(payload.emoji)]
                 if task == 'Other':
                     otherask = await ctx.send('What is the Task for this Research? Please type your answer below.')

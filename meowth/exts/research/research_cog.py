@@ -126,9 +126,14 @@ class Research:
         if isinstance(location, POI):
             directions_url = await location.url()
             directions_text = await location._name()
+            if len(directions_text) > 25:
+                directions_text = directions_text[:25] + "..."
         else:
             directions_url = location.url
-            directions_text = location._name + " (Unknown Pokestop)"
+            name = location._name
+            if len(name) > 25:
+                name = name[:25] + "..."
+            directions_text = name + " (Unknown Pokestop)"
 
         summary_str = f"• Reward: {desc} • Task: {task} • Location: [{directions_text}]({directions_url})"
         return summary_str

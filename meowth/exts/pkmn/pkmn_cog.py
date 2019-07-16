@@ -784,7 +784,7 @@ class Pokemon():
         chargeMove2id = None
         cp = None
         for arg in args:
-            if arg.startswith('cp'):
+            if arg.startswith('cp') and arg[2].isdigit():
                 cp = int(arg[2:])
             elif arg.startswith('@'):
                 arg = arg[1:]
@@ -823,7 +823,7 @@ class Pokemon():
                     staiv = 15
                 elif staiv < 0:
                     staiv = 0
-            elif arg.startswith('lvl'):
+            elif arg.startswith('lvl') and arg[3].isdigit():
                 lvl = float(arg[3:])
                 double = lvl*2
                 rounded = round(double)

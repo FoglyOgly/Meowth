@@ -48,7 +48,7 @@ def fp_ratio(s1, s2, force_ascii=True, full_process=True):
 
     # if one string is much much shorter than the other
     if len_ratio > 8:
-        partial_scale = .6
+        partial_scale = .8
 
     if try_partial:
         partial = fuzz.partial_ratio(p1, p2) * partial_scale

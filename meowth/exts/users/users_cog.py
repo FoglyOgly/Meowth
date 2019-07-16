@@ -581,6 +581,8 @@ class Users(Cog):
             update.where(user_id=ctx.author.id)
             update.values(party=party)
             await update.commit()
+        except:
+            pass
         party_str = f"{ctx.bot.config.team_emoji['mystic']}: {party[0]} | "
         party_str += f"{ctx.bot.config.team_emoji['instinct']}: {party[1]} | "
         party_str += f"{ctx.bot.config.team_emoji['valor']}: {party[2]} | "

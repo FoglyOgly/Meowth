@@ -568,12 +568,18 @@ class Users(Cog):
         data = await meowthuser._data.get()
         if len(data) == 0:
             insert = meowthuser._insert
-            d = {'id': ctx.author.id, 'default_party': party}
+            d = {'id': ctx.author.id, 'default_party': party, 'party': party}
             insert.row(**d)
             await insert.commit()
         else:
             update = meowthuser._update
-            update.values(default_party=party)
+            update.values(default_party=party, party=party)
+            await update.commit()
+        table = ctx.bot.dbi.table('raid_rsvp')
+        update = table.update
+        try:
+            update.where(user_id=ctx.author.id)
+            update.values(party=party)
             await update.commit()
         party_str = f"{ctx.bot.config.team_emoji['mystic']}: {party[0]} | "
         party_str += f"{ctx.bot.config.team_emoji['instinct']}: {party[1]} | "

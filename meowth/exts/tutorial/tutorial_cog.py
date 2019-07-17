@@ -351,9 +351,7 @@ class Tutorial(Cog):
             "than the recommended group size for the boss, or if your group is larger "
             "than 20 trainers, or if you are starting the raid when the trainers "
             "who are still on the way to the raid won't be able to take the boss on "
-            "their own, I will alert you to those circumstances and ask you to confirm "
-            "that you want to begin the raid. You can use a reaction to either cancel "
-            "the raid start or to go ahead.")
+            "their own, I will alert you to those circumstances.")
 
         # wait for starting command completion
         try:

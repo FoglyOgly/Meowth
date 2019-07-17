@@ -351,9 +351,7 @@ class Tutorial(Cog):
             "than the recommended group size for the boss, or if your group is larger "
             "than 20 trainers, or if you are starting the raid when the trainers "
             "who are still on the way to the raid won't be able to take the boss on "
-            "their own, I will alert you to those circumstances and ask you to confirm "
-            "that you want to begin the raid. You can use a reaction to either cancel "
-            "the raid start or to go ahead.")
+            "their own, I will alert you to those circumstances.")
 
         # wait for starting command completion
         try:
@@ -398,13 +396,17 @@ class Tutorial(Cog):
 
         await ctx.tutorial_channel.send(
             f"This server utilizes the **{ctx.prefix}research** command to "
-            "report field research tasks! There are three ways to use this "
+            "report field research tasks! There are multiple ways to use this "
             f"command: **{ctx.prefix}research <location>** will start an interactive "
             "session where I will prompt you for the task category, specific task, and "
             "reward of the research task. You can also use "
             f"**{ctx.prefix}research <task_category> <location>** to "
-            "skip the first prompt. Finally, you can use "
+            "skip the first prompt. Or you can use "
             f"**{ctx.prefix}research <task> <location>** to skip to the reward prompt. "
+            "Alternatively, you can use "
+            f"**{ctx.prefix}research <reward> <location>** to skip to the task prompt. "
+            "Finally, you can use "
+            f"**{ctx.prefix}research <reward> <task> <location>** to skip all prompts. "
             "At each step, I will try to match your task and reward input with known "
             "Field Research tasks, Pokemon, or items. To input the task category as "
             "a shortcut, use single words like `raid` or `catch`.\n\n"

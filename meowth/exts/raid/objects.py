@@ -634,19 +634,6 @@ class Raid:
                 self.end = new_time
             else:
                 raise InvalidTime
-        if self.channel_ids:
-            for chnid in self.channel_ids:
-                channel = self.bot.get_channel(int(chnid))
-                if not channel:
-                    continue
-                t = Train.by_channel.get(channel.id)
-                if t:
-                    continue
-                try:
-                    await channel.edit(position=int(self.end))
-                    break
-                except:
-                    pass
         raid_table = self.bot.dbi.table('raids')
         update = raid_table.update()
         update.where(id=self.id)

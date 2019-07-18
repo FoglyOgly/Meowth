@@ -25,7 +25,7 @@ dbdocid = 'google_sheet_id_here'
 
 emoji = {
     'maybe': '🙋',
-    'coming': '\U0001f697',
+    'coming': '🚗',
     'here': '<:here:350686955316445185>',
     'cancel': '❌'
 }

@@ -644,6 +644,7 @@ class RaidCog(Cog):
                 raidcontent = ""
             raidcontent += f"Raid reported in {ctx.channel.mention}!"
             raid_channel_name = await new_raid.channel_name()
+            raid_channel_position = int(new_raid.end)
             raid_channel_topic = new_raid.channel_topic
             if len(report_channels) > 1:
                 raid_channel_overwrites = formatters.perms_or(report_channels)
@@ -651,7 +652,8 @@ class RaidCog(Cog):
                 raid_channel_overwrites = dict(ctx.channel.overwrites)
             try:
                 raid_channel = await ctx.guild.create_text_channel(raid_channel_name,
-                    category=category, overwrites=raid_channel_overwrites, topic=raid_channel_topic)
+                    category=category, overwrites=raid_channel_overwrites,
+                    position=raid_channel_position, topic=raid_channel_topic)
             except discord.Forbidden:
                 raise commands.BotMissingPermissions(['Manage Channels'])
             new_raid.channel_ids.append(str(raid_channel.id))

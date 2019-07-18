@@ -1118,7 +1118,8 @@ class RaidCog(Cog):
                     details = f"This EX Raid will end at {timestr}"
                 else:
                     details = f"This Raid will end at {timestr}"
-            await ctx.channel.edit(topic=raid_or_meetup.channel_topic)
+            position = int(raid.end)
+            await ctx.channel.edit(topic=raid_or_meetup.channel_topic, position=position)
         elif isinstance(raid_or_meetup, Meetup):
             meetup = raid_or_meetup
             dt = datetime.fromtimestamp(meetup.start)

@@ -56,7 +56,7 @@ class Item:
         elif len(item_matches) == 1:
             item = item_matches[0]
         else:
-            return PartialItem(ctx.bot, arg)
+            return None
         return cls(ctx.bot, item)
 
 class PartialItem:
@@ -186,6 +186,7 @@ class Want():
                         await role.delete()
                     except:
                         pass
+                await _data.delete()
             return False
         
     async def role(self):
@@ -196,9 +197,10 @@ class Want():
             _data = self._data
             _data.select('role')
             roleid = await _data.get_value()
+            role = None
             if roleid:
                 role = self.guild.get_role(roleid)
-            else:
+            if not role:
                 guild = self.guild
                 users = await self._users()
                 members = [guild.get_member(x) for x in users]

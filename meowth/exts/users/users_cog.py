@@ -406,11 +406,9 @@ class Users(Cog):
 
     @command()
     @users_checks.users_enabled()
-    @commands.cooldown(1, 3600, commands.BucketType.member)
     async def team(self, ctx, *, chosen_team: Team):
         """Set your Pokemon Go team."""
 
-        user_table = ctx.bot.dbi.table('users')
         meowthuser = MeowthUser(ctx.bot, ctx.author)
         data = await meowthuser._data.get()
         if len(data) == 0:
@@ -428,7 +426,10 @@ class Users(Cog):
                 old_team = Team(ctx.bot, ctx.guild.id, old_team_id)
                 old_role = await old_team.role()
                 if old_role:
-                    await ctx.author.remove_roles(old_role)
+                    try:
+                        await ctx.author.remove_roles(old_role)
+                    except discord.Forbidden:
+                        await ctx.error("Missing permissions")
             update = meowthuser._update
             update.values(team=chosen_team.id)
             await update.commit()
@@ -447,7 +448,6 @@ class Users(Cog):
     async def pokebattler(self, ctx, pb_id: int):
         """Set your Pokebattler ID."""
 
-        user_table = ctx.bot.dbi.table('users')
         meowthuser = MeowthUser(ctx.bot, ctx.author)
         data = await meowthuser._data.get()
         if len(data) == 0:
@@ -568,13 +568,21 @@ class Users(Cog):
         data = await meowthuser._data.get()
         if len(data) == 0:
             insert = meowthuser._insert
-            d = {'id': ctx.author.id, 'default_party': party}
+            d = {'id': ctx.author.id, 'default_party': party, 'party': party}
             insert.row(**d)
             await insert.commit()
         else:
             update = meowthuser._update
-            update.values(default_party=party)
+            update.values(default_party=party, party=party)
             await update.commit()
+        table = ctx.bot.dbi.table('raid_rsvp')
+        update = table.update
+        try:
+            update.where(user_id=ctx.author.id)
+            update.values(party=party)
+            await update.commit()
+        except:
+            pass
         party_str = f"{ctx.bot.config.team_emoji['mystic']}: {party[0]} | "
         party_str += f"{ctx.bot.config.team_emoji['instinct']}: {party[1]} | "
         party_str += f"{ctx.bot.config.team_emoji['valor']}: {party[2]} | "

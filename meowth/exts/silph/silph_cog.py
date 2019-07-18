@@ -28,6 +28,8 @@ class SilphCog(Cog):
             pkmn_rewards = rewards.get('pokemon', [])
             item_rewards = rewards.get('items', {})
             for pkmn in pkmn_rewards:
+                if not pkmn['pokemon']:
+                    continue
                 slug = pkmn['pokemon']['slug']
                 meowthid = slug.upper().replace('-', '_')
                 if meowthid == 'GIRATINA_ALTERED':
@@ -36,6 +38,10 @@ class SilphCog(Cog):
                 for form in forms:
                     if meowthid.endswith(form):
                         meowthid += "_FORM"
+                if meowthid.endswith('_M'):
+                    meowthid += "ALE"
+                elif meowthid.endswith('_F'):
+                    meowthid += "EMALE"
                 row = {
                     'task': task,
                     'reward': meowthid
@@ -74,6 +80,10 @@ class SilphCog(Cog):
                 for form in forms:
                     if meowthid.endswith(form):
                         meowthid += "_FORM"
+                if meowthid.endswith('_M'):
+                    meowthid += "ALE"
+                elif meowthid.endswith('_F'):
+                    meowthid += "EMALE"
                 d = {
                     'level': new_level,
                     'pokemon_id': meowthid,

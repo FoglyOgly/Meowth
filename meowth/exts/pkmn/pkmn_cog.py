@@ -770,6 +770,7 @@ class Pokemon():
         id_list = []
         name_list = await pokedex.query('name').get_values()
         form_list = await form_names.query('name').get_values()
+        form_list = [x.strip('()') for x in form_list]
         args = arg.lower().split()
         shiny = False
         form = None
@@ -783,7 +784,7 @@ class Pokemon():
         chargeMove2id = None
         cp = None
         for arg in args:
-            if arg.startswith('cp'):
+            if arg.startswith('cp') and len(arg) > 2 and arg[2].isdigit():
                 cp = int(arg[2:])
             elif arg.startswith('@'):
                 arg = arg[1:]
@@ -804,7 +805,7 @@ class Pokemon():
                 gender = 'MALE'
             elif arg == 'female':
                 gender = 'FEMALE'
-            elif arg.startswith('iv'):
+            elif arg.startswith('iv') and len(arg) > 2 and arg[2].isdigit():
                 iv_arg = arg[2:]
                 attiv, defiv, staiv = iv_arg.split('/', maxsplit=2)
                 attiv = int(attiv)
@@ -822,7 +823,7 @@ class Pokemon():
                     staiv = 15
                 elif staiv < 0:
                     staiv = 0
-            elif arg.startswith('lvl'):
+            elif arg.startswith('lvl') and len(arg) > 3 and arg[3].isdigit():
                 lvl = float(arg[3:])
                 double = lvl*2
                 rounded = round(double)
@@ -835,11 +836,11 @@ class Pokemon():
             else:
                 form_name = fuzzymatch.get_match(form_list, arg)
                 if form_name[0]:
-                    forms = form_names.query('formid').where(name=form_name[0])
+                    forms = form_names.query('formid').where(name=f"({form_name[0]})")
                     form = await forms.get_value()
                     id_list = await forms_table.query('pokemonid').where(formid=form).get_values()
                 else:
-                    names = fuzzymatch.get_matches(name_list, arg)
+                    names = fuzzymatch.get_matches(name_list, arg, scorer='ratio')
                     if names:
                         names = [x[0] for x in names]
                         ref = pokedex.query('pokemonid').where(

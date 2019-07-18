@@ -397,7 +397,6 @@ class POI():
             return ''
         prefix = "https://www.google.com/maps/dir/?api=1&"
         prefix += f"destination={lat},{lon}"
-        prefix += "&dir_action=navigate"
         return prefix
     
     async def address(self):
@@ -487,25 +486,29 @@ class Gym(POI):
         if not data:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
-        nick_dict = {}
+        nick_list = []
         for x in data:
             if x.get('nickname'):
-                nick_dict[x['nickname']] = x['id']
+                nick_list.append((x['nickname'], x['id']))
             else:
                 continue
-        name_dict = {x['name'] : x['id'] for x in data}
-        if nick_dict:
-            nick_matches = get_matches(nick_dict.keys(), arg)
+        name_list = [(x['name'], x['id']) for x in data]
+        if nick_list:
+            nicks = [x[0] for x in nick_list]
+            nick_matches = get_matches(nicks, arg)
             if nick_matches:
-                nick_ids = [nick_dict[x[0]] for x in nick_matches]
+                nick_matches = [x[0] for x in nick_matches]
+                nick_ids = [x[1] for x in nick_list if x[0] in nick_matches]
             else:
                 nick_ids = []
         else:
             nick_matches = []
             nick_ids = []
-        name_matches = get_matches(name_dict.keys(), arg)
+        names = [x[0] for x in name_list]
+        name_matches = get_matches(names, arg)
         if name_matches:
-            name_ids = [name_dict[x[0]] for x in name_matches]
+            name_matches = [x[0] for x in name_matches]
+            name_ids = [x[1] for x in name_list if x[0] in name_matches]
         else:
             name_ids = []
         possible_ids = set(nick_ids) | set(name_ids)
@@ -516,11 +519,16 @@ class Gym(POI):
             react_list = formatters.mc_emoji(len(id_list))
             choice_dict = dict(zip(react_list, id_list))
             display_dict = dict(zip(react_list, names))
+            display_dict["\u2754"] = "Other"
+            react_list.append("\u2754")
             embed = formatters.mc_embed(display_dict)
             multi = await ctx.send('Multiple possible Gyms found! Please select from the following list.',
                 embed=embed)
             payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
                 react_list=react_list)
+            if str(payload.emoji) == "\u2754":
+                city = await report_channel.city()
+                return PartialPOI(ctx.bot, city, arg)
             gym_id = choice_dict[str(payload.emoji)]
             await multi.delete()
         elif len(id_list) == 1:
@@ -589,25 +597,29 @@ class Pokestop(POI):
         if not data:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
-        nick_dict = {}
+        nick_list = []
         for x in data:
             if x.get('nickname'):
-                nick_dict[x['nickname']] = x['id']
+                nick_list.append((x['nickname'], x['id']))
             else:
                 continue
-        name_dict = {x['name'] : x['id'] for x in data}
-        if nick_dict:
-            nick_matches = get_matches(nick_dict.keys(), arg, score_cutoff=70)
+        name_list = [(x['name'], x['id']) for x in data]
+        if nick_list:
+            nicks = [x[0] for x in nick_list]
+            nick_matches = get_matches(nicks, arg)
             if nick_matches:
-                nick_ids = [nick_dict[x[0]] for x in nick_matches]
+                nick_matches = [x[0] for x in nick_matches]
+                nick_ids = [x[1] for x in nick_list if x[0] in nick_matches]
             else:
                 nick_ids = []
         else:
             nick_matches = []
             nick_ids = []
-        name_matches = get_matches(name_dict.keys(), arg, score_cutoff=70)
+        names = [x[0] for x in name_list]
+        name_matches = get_matches(names, arg)
         if name_matches:
-            name_ids = [name_dict[x[0]] for x in name_matches]
+            name_matches = [x[0] for x in name_matches]
+            name_ids = [x[1] for x in name_list if x[0] in name_matches]
         else:
             name_ids = []
         possible_ids = set(nick_ids) | set(name_ids)
@@ -618,11 +630,16 @@ class Pokestop(POI):
             react_list = formatters.mc_emoji(len(id_list))
             choice_dict = dict(zip(react_list, id_list))
             display_dict = dict(zip(react_list, names))
+            display_dict["\u2754"] = "Other"
+            react_list.append("\u2754")
             embed = formatters.mc_embed(display_dict)
             multi = await ctx.send('Multiple possible Pokestops found! Please select from the following list.',
                 embed=embed)
             payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
                 react_list=react_list)
+            if str(payload.emoji) == "\u2754":
+                city = await report_channel.city()
+                return PartialPOI(ctx.bot, city, arg)
             stop_id = choice_dict[str(payload.emoji)]
             await multi.delete()
         elif len(id_list) == 1:
@@ -648,41 +665,50 @@ class Mapper(Cog):
         elif isinstance(error, InvalidGMapsKey):
             await ctx.error('Google Maps API Key invalid.')
     
-    async def gyms_from_csv(self, guildid, file):
+    async def gyms_from_csv(self, ctx, file):
         bot = self.bot
+        guildid = ctx.guild.id
         gyms_table = bot.dbi.table('gyms')
         insert = gyms_table.insert()
-        reader = csv.DictReader(codecs.iterdecode(file.readlines(), 'utf-8'))
+        reader = csv.DictReader(codecs.iterdecode(file.readlines(), 'utf-8-sig'))
         rows = []
-        for row in reader:
-            valid_data = {}
-            valid_data['guild'] = guildid
-            if isinstance(row.get('name'), str):
-                valid_data['name'] = row['name']
-            else:
-                continue
-            if isinstance(row.get('nickname'), str):
-                valid_data['nickname'] = row.get('nickname')
-            else:
-                pass
-            try:
-                lat = float(row.get('lat'))
-                lon = float(row.get('lon'))
-            except:
-                continue
-            l10 = S2_L10.from_coords(bot, (lat, lon))
-            valid_data['lat'] = lat
-            valid_data['lon'] = lon
-            valid_data['l10'] = l10.cellid
-            if isinstance(row.get('exraid'), str):
-                if row['exraid'].lower() == 'false':
-                    valid_data['exraid'] = False
-                elif row['exraid'].lower() == 'true':
-                    valid_data['exraid'] = True
-            rows.append(valid_data)
+        try:
+            for row in reader:
+                valid_data = {}
+                valid_data['guild'] = guildid
+                if isinstance(row.get('name'), str):
+                    valid_data['name'] = row['name']
+                else:
+                    await ctx.send("Column 'name' not found. Please check the headers in your csv file.")
+                    return False  # The database commit will fail so might as well abort now.
+                if isinstance(row.get('nickname'), str):
+                    valid_data['nickname'] = row.get('nickname')
+                else:
+                    pass
+                try:
+                    lat = float(row.get('lat'))
+                    lon = float(row.get('lon'))
+                except:
+                    await ctx.send(f"Failed to parse coordinates for gym '{row['name']}'.")
+                    return False
+                l10 = S2_L10.from_coords(bot, (lat, lon))
+                valid_data['lat'] = lat
+                valid_data['lon'] = lon
+                valid_data['l10'] = l10.cellid
+                if isinstance(row.get('exraid'), str):
+                    if row['exraid'].lower() == 'false':
+                        valid_data['exraid'] = False
+                    elif row['exraid'].lower() == 'true':
+                        valid_data['exraid'] = True
+                rows.append(valid_data)
+        except UnicodeDecodeError:
+            await ctx.send("Invalid character encountered. Please use utf-8 encoding for your file or restrict "
+                           "yourself to the ASCII character set.")
+            return False
         insert.rows(rows)
         await insert.commit(do_update=True)
-    
+        return True
+
     async def csv_from_gyms(self, guildid):
         bot = self.bot
         gyms_table = bot.dbi.table('gyms')
@@ -701,37 +727,45 @@ class Mapper(Cog):
         outstr = infile.getvalue().encode()
         f = io.BytesIO(outstr)
         return f
-        
 
-    async def stops_from_csv(self, guildid, file):
+    async def stops_from_csv(self, ctx, file):
         bot = self.bot
+        guildid = ctx.guild.id
         stops_table = bot.dbi.table('pokestops')
         insert = stops_table.insert()
-        reader = csv.DictReader(codecs.iterdecode(file.readlines(), 'utf-8'))
+        reader = csv.DictReader(codecs.iterdecode(file.readlines(), 'utf-8-sig'))
         rows = []
-        for row in reader:
-            valid_data = {}
-            valid_data['guild'] = guildid
-            if isinstance(row.get('name'), str):
-                valid_data['name'] = row['name']
-            else:
-                continue
-            if isinstance(row.get('nickname'), str):
-                valid_data['nickname'] = row.get('nickname')
-            else:
-                pass
-            try:
-                lat = float(row.get('lat'))
-                lon = float(row.get('lon'))
-            except:
-                continue
-            l10 = S2_L10.from_coords(bot, (lat, lon))
-            valid_data['lat'] = lat
-            valid_data['lon'] = lon
-            valid_data['l10'] = l10.cellid
-            rows.append(valid_data)
+        try:
+            for row in reader:
+                valid_data = {}
+                valid_data['guild'] = guildid
+                if isinstance(row.get('name'), str):
+                    valid_data['name'] = row['name']
+                else:
+                    await ctx.send("Column 'name' not found. Please check the headers in your csv file.")
+                    return False  # The database commit will fail so might as well abort now.
+                if isinstance(row.get('nickname'), str):
+                    valid_data['nickname'] = row.get('nickname')
+                else:
+                    pass
+                try:
+                    lat = float(row.get('lat'))
+                    lon = float(row.get('lon'))
+                except:
+                    await ctx.send(f"Failed to parse coordinates for stop '{row['name']}'.")
+                    return False
+                l10 = S2_L10.from_coords(bot, (lat, lon))
+                valid_data['lat'] = lat
+                valid_data['lon'] = lon
+                valid_data['l10'] = l10.cellid
+                rows.append(valid_data)
+        except UnicodeDecodeError:
+            await ctx.send("Invalid character encountered. Please use utf-8 encoding for your file or restrict "
+                           "yourself to the ASCII character set.")
+            return False
         insert.rows(rows)
         await insert.commit(do_update=True)
+        return True
     
     async def csv_from_stops(self, guildid):
         bot = self.bot
@@ -798,10 +832,34 @@ class Mapper(Cog):
         }
         insert.row(**d)
         await insert.commit()
+
+    @command()
+    @checks.is_admin()
+    @checks.location_set()
+    async def listgyms(self, ctx):
+        """List all Gyms in a reporting channel's defined area."""
+        report_channel = ReportChannel(ctx.bot, ctx.channel)
+        gyms_query = await report_channel.get_all_gyms()
+        if not gyms_query:
+            return await ctx.error('No gyms found')
+        gyms_query.select('name', 'nickname', 'lat', 'lon', 'exraid')
+        data = await gyms_query.get()
+        entries = [(x['name'], x.get('nickname'), f"{x['lat']}, {x['lon']}", x['exraid']) for x in data]
+        entries = [str(x) for x in entries]
+        def pages(l):
+            for i in range(0, len(l), 20):
+                yield l[i: i+20]
     
+        p = list(pages(entries))
+        await ctx.send('(Name, Nickname, Latitude, Longitude, EX Raid)')
+        for x in p:
+            await ctx.send("\n".join(x))
+        
+
     @command()
     @checks.location_set()
     async def whereis(self, ctx, *, location: POI):
+        """Returns a Google Maps link to a Gym or Pokestop."""
         if not isinstance(location, POI):
             return await ctx.error('Location not found')
         display_str = await location.display_str()
@@ -831,12 +889,15 @@ class Mapper(Cog):
         Format must match the [template.](https://docs.google.com/spreadsheets/d/1W-VTAzlnDefgBIXoc7kuRcxJIlYo7iojqRRQ0uwTifc/edit?usp=sharing)
         Gyms will only be usable by the server they were imported in.
         """
-        attachment = ctx.message.attachments[0]
-        guildid = ctx.guild.id
+        try:
+            attachment = ctx.message.attachments[0]
+        except IndexError:
+            await ctx.send("No file was attached. Please attach a csv file when using this command.")
+            return
         f = io.BytesIO()
         await attachment.save(f)
-        await self.gyms_from_csv(guildid, f)
-        await ctx.send("Import successful")
+        if await self.gyms_from_csv(ctx, f):
+            await ctx.send("Import successful")
 
     @command()
     @commands.has_permissions(manage_guild=True)
@@ -846,12 +907,15 @@ class Mapper(Cog):
         Format must match the [template.](https://docs.google.com/spreadsheets/d/1W-VTAzlnDefgBIXoc7kuRcxJIlYo7iojqRRQ0uwTifc/edit?usp=sharing)
         Pokestops will only be usable by the server they were imported in.
         """
-        attachment = ctx.message.attachments[0]
-        guildid = ctx.guild.id
+        try:
+            attachment = ctx.message.attachments[0]
+        except IndexError:
+            await ctx.send("No file was attached. Please attach a csv file when using this command.")
+            return
         f = io.BytesIO()
         await attachment.save(f)
-        await self.stops_from_csv(guildid, f)
-        await ctx.send("Import successful")
+        if await self.stops_from_csv(ctx, f):
+            await ctx.send("Import successful")
     
     @command()
     @commands.has_permissions(manage_guild=True)
@@ -926,7 +990,7 @@ class Mapper(Cog):
         if not f:
             return await ctx.send('No Pokestops found')
         to_send = discord.File(f, filename=f'{ctx.guild.name}_stops.csv')
-        await ctx.send(field=to_send)
+        await ctx.send(file=to_send)
 
     @command()
     @commands.has_permissions(manage_guild=True)
@@ -1011,8 +1075,3 @@ class Mapper(Cog):
             await insert.commit(do_update=True)
         return times
 
-
-    
-    
-
-    

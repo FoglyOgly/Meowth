@@ -1,5 +1,5 @@
 from meowth import Cog, command, bot, checks
-from meowth.exts.map import Gym, ReportChannel, PartialPOI, S2_L10, POI
+from meowth.exts.map import Gym, Pokestop, ReportChannel, PartialPOI, S2_L10, POI
 from meowth.exts.pkmn import Pokemon, Move
 from meowth.exts.pkmn.errors import MoveInvalid
 from meowth.exts.weather import Weather
@@ -160,7 +160,8 @@ class RaidCog(Cog):
         guild = channel.guild
         raid = Raid.by_channel.get(str(channel.id))
         train = Train.by_channel.get(channel.id)
-        if not (raid or train):
+        meetup = Meetup.by_channel.get(channel.id)
+        if not (raid or train or meetup):
             return
         url_re = '(http(s?)://)?((maps\.google\./)|((www\.)?google\.com/maps/)|(goo.gl/maps/))\S*'
         match = re.search(url_re, message.content)
@@ -168,6 +169,8 @@ class RaidCog(Cog):
             url = match.group()
             if raid:
                 return await raid.update_url(url)
+            elif meetup:
+                return await meetup.update_url(url)
         category, phrase_list = await self.archive_cat_phrases(guild)
         if not phrase_list:
             return
@@ -363,11 +366,10 @@ class RaidCog(Cog):
             no match is found.
         *start_time:* The date and time of the Meetup.
         
-        Usable only by moderators. Remember to wrap multi-word arguments in quotes."""
+        Remember to wrap multi-word arguments in quotes."""
 
         guild = ctx.guild
         guild_id = guild.id
-        report_channel_id = ctx.channel.id
         if isinstance(location, POI):
             loc_name = await location._name()
         else:
@@ -606,7 +608,6 @@ class RaidCog(Cog):
         train_ids = await report_channel.get_all_trains()
         trains = [Train.instances.get(x) for x in train_ids]
         if trains:
-            train_content = "Use the reaction below to vote for this raid next!"
             for t in trains:
                 if t.channel:
                     await t.new_raid(new_raid)
@@ -643,6 +644,7 @@ class RaidCog(Cog):
                 raidcontent = ""
             raidcontent += f"Raid reported in {ctx.channel.mention}!"
             raid_channel_name = await new_raid.channel_name()
+            raid_channel_position = int(new_raid.end)
             raid_channel_topic = new_raid.channel_topic
             if len(report_channels) > 1:
                 raid_channel_overwrites = formatters.perms_or(report_channels)
@@ -650,7 +652,8 @@ class RaidCog(Cog):
                 raid_channel_overwrites = dict(ctx.channel.overwrites)
             try:
                 raid_channel = await ctx.guild.create_text_channel(raid_channel_name,
-                    category=category, overwrites=raid_channel_overwrites, topic=raid_channel_topic)
+                    category=category, overwrites=raid_channel_overwrites,
+                    position=raid_channel_position, topic=raid_channel_topic)
             except discord.Forbidden:
                 raise commands.BotMissingPermissions(['Manage Channels'])
             new_raid.channel_ids.append(str(raid_channel.id))
@@ -877,7 +880,7 @@ class RaidCog(Cog):
         await ctx.author.send(embed=embed)
         await raid.update_rsvp()
         
-    @command(category="Raid RSVP")
+    @command(aliases=['starttime'], category="Raid RSVP")
     @raid_checks.raid_channel()
     @raid_checks.bot_has_permissions()
     async def group(self, ctx, *, group_time=None):
@@ -998,18 +1001,31 @@ class RaidCog(Cog):
         await raid.upsert()
         await raid.update_messages(content="The raid level has been corrected!")
     
-    @command(category="Raid Info")
-    @raid_checks.raid_channel()
+    @command(aliases=['location'], category="Raid Info")
+    @raid_checks.raid_or_meetup()
     @raid_checks.bot_has_permissions()
     @checks.is_mod()
-    async def gym(self, ctx, *, gym: Gym):
+    async def gym(self, ctx, *, location):
         """Correct the raid gym in an existing raid channel.
 
         Usable only by mods."""
-        raid = Raid.instances.get(ctx.raid_id)
-        raid.gym = gym
-        await raid.upsert()
-        await raid.update_messages(content="The raid gym has been corrected!")
+        try:
+            raid = Raid.instances.get(ctx.raid_id)
+        except AttributeError:
+            meetup = Meetup.by_channel.get(ctx.channel.id)
+            if meetup:
+                ctx.report_channel_id = meetup.report_channel_id
+                location = await POI.convert(ctx, location)
+                meetup.location = location
+                await meetup.upsert()
+                embed = await meetup.meetup_embed()
+                return await meetup.channel.send('The meetup location has been updated!', embed=embed)
+        else:
+            if raid:
+                gym = await Gym.convert(ctx, location)
+                raid.gym = gym
+                await raid.upsert()
+                return await raid.update_messages(content="The raid gym has been corrected!")
     
     @command(aliases=['move'], category="Raid Info")
     @raid_checks.raid_channel()
@@ -1065,6 +1081,14 @@ class RaidCog(Cog):
         else:
             try:
                 newdt = parse(newtime, settings={'TIMEZONE': zone, 'RETURN_AS_TIMEZONE_AWARE': True})
+                if isinstance(raid_or_meetup, Raid):
+                    oldstamp = raid_or_meetup.end
+                elif isinstance(raid_or_meetup, Meetup):
+                    oldstamp = raid_or_meetup.start
+                olddt = raid_or_meetup.local_datetime(oldstamp)
+                nowdt = raid_or_meetup.local_datetime(time.time())
+                if newdt.date() == nowdt.date():
+                    newdt = newdt.combine(olddt.date(), newdt.timetz())
                 stamp = newdt.timestamp()
             except:
                 raise
@@ -1094,7 +1118,8 @@ class RaidCog(Cog):
                     details = f"This EX Raid will end at {timestr}"
                 else:
                     details = f"This Raid will end at {timestr}"
-            await ctx.channel.edit(topic=raid_or_meetup.channel_topic)
+            position = int(raid.end)
+            await ctx.channel.edit(topic=raid_or_meetup.channel_topic, position=position)
         elif isinstance(raid_or_meetup, Meetup):
             meetup = raid_or_meetup
             dt = datetime.fromtimestamp(meetup.start)

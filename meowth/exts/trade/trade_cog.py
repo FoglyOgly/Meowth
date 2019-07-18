@@ -378,7 +378,7 @@ class TradeCog(Cog):
             fields={"Invalid Pokemon": "\n".join(invalid_names)}
             await ctx.warning('The following Pokemon cannot be traded!',
                 fields=fields)
-        listmsg = await ctx.send(f"{ctx.author.display_name} - what Pokemon are you willing to accept in exchange? Use 'any' if you will accept anything and 'OBO' if you want to allow other offers. Use commas to separate Pokemon.")
+        listmsg = await ctx.send(f"{ctx.author.display_name} - what Pokemon are you willing to accept in exchange? Use 'any' if you will accept anything and 'OBO' if you want to allow other offers. \n**NOTE: Use commas to separate Pokemon here. Do not wrap them in quotes.**")
         def check(m):
             return m.channel == ctx.channel and m.author == ctx.author
         wantmsg = await ctx.bot.wait_for('message', check=check)

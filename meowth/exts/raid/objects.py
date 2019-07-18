@@ -287,7 +287,8 @@ class Meetup:
                     return
                 content = f"{member.display_name} {display_status}!"
                 try:
-                    return await chn.send(content, embed=rsvpembed)
+                    await chn.send(content)
+                    await chn.send(embed=rsvpembed, delete_after=15)
                 except:
                     return
     
@@ -407,6 +408,30 @@ class Meetup:
         update.values(start=new_time)
         self.start = new_time
         self.bot.loop.create_task(update.commit())
+
+    async def update_url(self, url):
+        location = self.location
+        if isinstance(location, POI):
+            directions_text = await location._name()
+            content = "This meetup's location has been updated! This meetup is at a known location, so please let a server administrator know if the original directions link was incorrect!"
+        else:
+            directions_text = location._name + " (Unknown Location)"
+            content = "This meetup's location has been updated! This raid is at an unknown location, so please let a server administrator know if it should be added to the database!"
+        message_ids = self.message_ids
+        for messageid in message_ids:
+            chn, msg = await ChannelMessage.from_id_string(self.bot, messageid)
+            embed = await self.meetup_embed()
+            embed.set_author(name=directions_text, url=url)
+            try:
+                await msg.edit(embed=embed)
+                continue
+            except:
+                pass
+        embed = formatters.make_embed(title='Meetup Location Updated', content=f'[{directions_text}]({url})')
+        try:
+            await self.channel.send(content=content, embed=embed)
+        except:
+            pass
 
     @classmethod
     async def from_data(cls, bot, data):
@@ -922,66 +947,33 @@ class Raid:
             await meowthuser.rsvp(self.id, new_status, bosses=new_bosses, party=party)
     
     async def start_grp(self, grp, author, channel=None):
-        if not self.grp_is_here(grp):
-            if channel:
-                msg = await channel.send('Not everyone in your group is here! If you would like to go ahead anyway, react to this message with the check mark!')
-                payload = await formatters.ask(self.bot, [msg], user_list = author.id)
-                if not payload or str(payload.emoji) == '❎':
-                    return await channel.send('Thank you for waiting!')
-        else:
-            mention_str = ""
+        if channel:
+            if not self.grp_is_here(grp):
+                await channel.send('WARNING: It looks like not everyone in your group is at the raid!')
+        mention_str = ""
+        for user in grp['users']:
+            meowthuser = MeowthUser.from_id(self.bot, user)
+            party = await meowthuser.party()
+            await meowthuser.rsvp(self.id, "lobby", party=party)
+            mention = meowthuser.user.mention + " "
+            mention_str += mention
+        await self.update_rsvp()
+        if not channel:
+            await asyncio.sleep(120)
+        elif channel:
             if self.grp_total(grp) > 20:
-                raise GroupTooBig
-            if not channel:
-                for user in grp['users']:
-                    meowthuser = MeowthUser.from_id(self.bot, user)
-                    party = await meowthuser.party()
-                    await meowthuser.rsvp(self.id, "lobby", party=party)
-                await self.update_rsvp()
-                await asyncio.sleep(120)
-                rsvp_table = self.bot.dbi.table('raid_rsvp')
-                query = rsvp_table.query().where(rsvp_table['user_id'].in_(grp['users']))
-                query.where(raid_id=self.id)
-                await query.delete()
-                if grp in self.group_list:
-                    self.group_list.remove(grp)
-                    grp_table = self.bot.dbi.table('raid_groups')
-                    grp_query = grp_table.query
-                    grp_query.where(raid_id=self.id)
-                    grp_query.where(starttime=grp['starttime'])
-                    await grp_query.delete()
-                for user in grp['users']:
-                    if user not in self.completed_by:
-                        self.completed_by.append(user)
-                await self.upsert()
-                return await self.update_rsvp()
+                await channel.send('WARNING: You will have to split into multiple groups for the raid!')
             grp_est = self.grp_est_power(grp)
+            rec_size = await self.rec_group_size()
             if grp_est < 1:
-                msg = await channel.send('Your current group may not be able to win the raid on your own! If you want to go ahead anyway, react to this message with the check mark!')
-                payload = await formatters.ask(self.bot, [msg], user_list = author.id)
-                if not payload or str(payload.emoji) == '❎':
-                    rec_size = await self.rec_group_size()
-                    return await channel.send(f'The recommended group size for this raid is {rec_size}!')
-            elif grp_est > 3:
-                msg = await channel.send('Your current group could possibly split into smaller groups and still win the raid! If you want to go ahead anyway, react to this message with the check mark!')
-                payload = await formatters.ask(self.bot, [msg], user_list = author.id)
-                if not payload or str(payload.emoji) == '❎':
-                    rec_size = await self.rec_group_size()
-                    return await channel.send(f'The recommended group size for this raid is {rec_size}!')
+                await channel.send(f'WARNING: Your current group may not be able to win the raid on your own! The recommended group size for this raid is {rec_size}!')
+            elif grp_est > 2:
+                await channel.send(f'INFO: Your current group could possibly split into smaller groups and still win the raid! The recommended group size for this raid is {rec_size}!')
             grp_others = self.grp_others(grp)
             if grp_others:
                 others_est = self.grp_est_power(grp_others)
                 if others_est < 1:
-                    msg = await channel.send("The trainers not in this group may not be able to win the raid on their own! Please consider including them. If you want to go ahead anyway, react to this message with the check mark.")
-                    payload = await formatters.ask(self.bot, [msg], user_list = author.id)
-                    if not payload or str(payload.emoji) == '❎':
-                        return await channel.send('Thank you for waiting!')
-            for user in grp['users']:
-                meowthuser = MeowthUser.from_id(self.bot, user)
-                mention = meowthuser.user.mention + " "
-                mention_str += mention
-                party = await meowthuser.party()
-                await meowthuser.rsvp(self.id, "lobby", party=party)
+                    await channel.send("WARNING: The trainers not in this group may not be able to win the raid on their own! Please consider including them.")
             await self.update_rsvp()
             msg_list = []
             for chn in self.channel_ids:
@@ -994,9 +986,6 @@ class Raid:
                 if payload and str(payload.emoji) == '▶':
                     user_id = payload.user_id
                     react_channel = self.bot.get_channel(payload.channel_id)
-                    if self.trainer_dict[user_id]['status'] != 'here':
-                        await react_channel.send('You must be at the raid to join the lobby!')
-                        continue
                     grp['users'].append(user_id)
                     meowthuser = MeowthUser.from_id(self.bot, user_id)
                     party = await meowthuser.party()
@@ -1022,24 +1011,28 @@ class Raid:
                     else:
                         continue
                 else:
-                    await lobbymsg.edit(content=f"Group {grp['emoji']} has entered the raid!")
-            for user in grp['users']:
-                if user not in self.completed_by:
-                    self.completed_by.append(user)
-            await self.upsert()
-            user_table = self.bot.dbi.table('raid_rsvp')
-            query = user_table.query.where(user_table['user_id'].in_(grp['users']))
-            query.where(raid_id=self.id)
-            await query.delete()
-            if grp in self.group_list:
-                self.group_list.remove(grp)
-                grp_table = self.bot.dbi.table('raid_groups')
-                grp_query = grp_table.query
-                grp_query.where(raid_id=self.id)
-                grp_query.where(starttime=grp['starttime'])
-                await grp_query.delete()
-            await self.update_rsvp()
-            return                
+                    for msg in msg_list:
+                        try:
+                            await msg.edit(content=f"Group {grp['emoji']} has entered the raid!")
+                        except:
+                            pass
+        for user in grp['users']:
+            if user not in self.completed_by:
+                self.completed_by.append(user)
+        await self.upsert()
+        user_table = self.bot.dbi.table('raid_rsvp')
+        query = user_table.query.where(user_table['user_id'].in_(grp['users']))
+        query.where(raid_id=self.id)
+        await query.delete()
+        if grp in self.group_list:
+            self.group_list.remove(grp)
+            grp_table = self.bot.dbi.table('raid_groups')
+            grp_query = grp_table.query
+            grp_query.where(raid_id=self.id)
+            grp_query.where(starttime=grp['starttime'])
+            await grp_query.delete()
+        await self.update_rsvp()
+        return              
 
     def _rsvp(self, connection, pid, channel, payload):
         if channel != f'rsvp_{self.id}':
@@ -1264,7 +1257,8 @@ class Raid:
                     else:
                         break
                     content = f"{member.display_name} {display_status}!"
-                    newmsg = await chn.send(content, embed=rsvpembed)
+                    await chn.send(content)
+                    await chn.send(embed=rsvpembed, delete_after=15)
                     if self.group_list:
                         grp = self.user_grp(member.id)
                         if not grp and status in ('coming', 'here'):
@@ -1279,7 +1273,8 @@ class Raid:
                     guild = self.bot.get_guild(self.guild_id)
                     member = guild.get_member(user_id)
                     content = f"{member.display_name} has joined Group {group['emoji']}!"
-                    newmsg = await chn.send(content, embed=rsvpembed)
+                    await chn.send(content)
+                    await chn.send(embed=rsvpembed, delete_after=15)
         
     
     async def monitor_status(self):
@@ -1399,7 +1394,7 @@ class Raid:
         data = await self.pb_data(weather=weather)
         if not data:
             return None
-        estimator = query_dict['estimator_min']
+        estimator = data['estimator_min']
         return estimator
     
     async def rec_group_size(self, weather=None):
@@ -1988,24 +1983,17 @@ class Raid:
             content += f" Reason: {reason}"
         content += "\nDeleted messages from this channel will be posted below."
         await channel.send(content)
-        table = self.bot.dbi.table('discord_messages')
-        query = table.query
-        query.where(channel_id=channel.id)
-        query.where(deleted=True)
-        data = await query.get()
-        for row in data:
-            embed = formatters.deleted_message_embed(self.bot, row)
-            await channel.send(embed=embed)
-        raid_table = self.bot.dbi.table('raids')
-        query = raid_table.query().where(id=self.id)
-        self.bot.loop.create_task(query.delete())
-        rsvp_table = self.bot.dbi.table('raid_rsvp')
-        rsvp = rsvp_table.query().where(raid_id=self.id)
-        self.bot.loop.create_task(rsvp.delete())
-        grp_table = self.bot.dbi.table('raid_groups')
-        grps = grp_table.query().where(raid_id=self.id)
-        self.bot.loop.create_task(grps.delete())
-
+        try:
+            table = self.bot.dbi.table('discord_messages')
+            query = table.query
+            query.where(channel_id=channel.id)
+            query.where(deleted=True)
+            data = await query.get()
+            for row in data:
+                embed = formatters.deleted_message_embed(self.bot, row)
+                await channel.send(embed=embed)
+        except:
+            pass
 
 
 
@@ -2024,7 +2012,7 @@ class Raid:
                 family = await pkmn._familyId()
                 wants.append(family)
         if isinstance(self.gym, Gym):
-            if await self.gym._exraid():
+            if await self.gym._exraid() and self.level != 'EX':
                 wants.append('exgym')
         wants = [Want(self.bot, x, self.guild_id) for x in wants]
         want_dict = {x: await x.mention() for x in wants}
@@ -2918,7 +2906,8 @@ class Train:
             status_str =' has left the train!'
         content = f'{member.display_name}{status_str}'
         embed = TRSVPEmbed.from_train(self).embed
-        await channel.send(content, embed=embed)
+        await channel.send(content)
+        await channel.send(embed=embed, delete_after=15)
         if not self.trainer_dict:
             await self.end_train()
 
@@ -2955,7 +2944,7 @@ class Train:
             d = data[0]
             user_id = d.get('user_id')
             reason = d.get('reason')
-            await self.archive_train(channel, user_id, reason)
+            await self.archive_train(self.channel, user_id, reason)
         else:
             try:
                 await self.channel.delete()

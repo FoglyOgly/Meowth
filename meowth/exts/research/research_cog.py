@@ -1,4 +1,5 @@
 from meowth import Cog, command, bot, checks
+from meowth.core.context import Context
 from meowth.exts.map import ReportChannel, Pokestop, PartialPOI, POI
 from meowth.exts.pkmn import Pokemon
 from meowth.exts.want import Want, Item, PartialItem
@@ -12,7 +13,8 @@ from pytz import timezone
 from datetime import datetime, timedelta
 from dateparser import parse
 from math import ceil
-from typing import Optional
+from typing import Optional, Union
+import re
 
 from discord.ext import commands
 
@@ -124,21 +126,58 @@ class Research:
         if isinstance(location, POI):
             directions_url = await location.url()
             directions_text = await location._name()
+            if len(directions_text) > 25:
+                directions_text = directions_text[:25] + "..."
         else:
             directions_url = location.url
-            directions_text = location._name + " (Unknown Pokestop)"
+            name = location._name
+            if len(name) > 25:
+                name = name[:25] + "..."
+            directions_text = name + " (Unknown Pokestop)"
 
         summary_str = f"• Reward: {desc} • Task: {task} • Location: [{directions_text}]({directions_url})"
         return summary_str
 
-        
-        
+    async def update_url(self, url):
+        location = self.location
+        if isinstance(location, POI):
+            directions_text = await location._name()
+        else:
+            directions_text = location._name + " (Unknown Pokestop)"
+        dir_str = f"[{directions_text}]({url})"
+        embed = await ResearchEmbed.from_research(self)
+        embed = embed.embed.set_field_at(0, name="Pokestop", value=dir_str)
+        for msgid in self.message_ids:
+            chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
+            try:
+                await msg.edit(embed=embed)
+            except:
+                pass
+
     
     async def monitor_status(self):
         expires_at = self.expires_at
         sleeptime = expires_at - time.time()
         await asyncio.sleep(sleeptime)
         await self.expire_research()
+    
+    async def delete(self):
+        for msgid in self.message_ids:
+            chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
+            try:
+                await msg.delete()
+            except:
+                pass
+            try:
+                del Research.by_message[msgid]
+            except:
+                pass
+        data = self._data
+        await data.delete()
+        try:
+            del Research.instances[self.id]
+        except:
+            pass  
     
     async def expire_research(self):
         if self.completed_by:
@@ -252,30 +291,30 @@ class Task:
     @classmethod
     async def convert(cls, ctx, arg):
         arg = arg.lower()
-        table = ctx.bot.dbi.table('task_names')
-        query = table.query('task_desc', 'category')
-        data = await query.get()
-        categories = [x.get('category') for x in data]
-        if arg in categories:
-            query = table.query('task_desc')
-            query.where(category=arg)
-            task_matches = await query.get_values()
+        argsplit = arg.split()
+        table = ctx.bot.dbi.table('research_tasks')
+        query = table.query('task')
+        tasks = await query.get_values()
+        tasks = list(set(tasks))
+        matches = get_matches(tasks, arg, limit=25)
+        if matches:
+            task_matches = [x[0] for x in matches]
         else:
-            tasks = [x.get('task_desc') for x in data]
-            matches = get_matches(tasks, arg)
-            if matches:
-                task_matches = [x[0] for x in matches]
-            else:
-                task_matches = []
+            task_matches = []
         if len(task_matches) > 1:
             react_list = formatters.mc_emoji(len(task_matches))
             display_dict = dict(zip(react_list, task_matches))
+            display_dict["\u2754"] = "Other"
+            react_list.append("\u2754")
             embed = formatters.mc_embed(display_dict)
             multi = await ctx.send('Multiple possible Tasks found! Please select from the following list.',
                 embed=embed)
             payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
                 react_list=react_list)
             task = display_dict[str(payload.emoji)]
+            if task == 'Other':
+                otherask = await ctx.send('What is the Task for this Research? Please type your answer below.')
+                return PartialTask(ctx.bot, arg)
             try:
                 await multi.delete()
             except:
@@ -340,6 +379,8 @@ class ItemReward:
                 amount = arg
         item_name_arg = " ".join(item_args)
         item = await Item.convert(ctx, item_name_arg)
+        if not item:
+            raise ValueError
         return cls(ctx.bot, f'{item.id}/{amount}')
     
 
@@ -359,6 +400,16 @@ class ResearchCog(Cog):
                         return await self.list_research(ctx.channel)
             except:
                 pass
+    
+    @Cog.listener()
+    async def on_raw_message_delete(self, payload):
+        idstring = f"{payload.channel_id}/{payload.message_id}"
+        chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+        research = Research.by_message.get(idstring)
+        if not research:
+            return
+        return await research.delete()
+        
     
     @Cog.listener()
     async def on_raw_reaction_add(self, payload):
@@ -406,6 +457,34 @@ class ResearchCog(Cog):
                         chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
                         await msg.edit(embed=embed.embed)
             return await research.upsert()
+        elif emoji.id == 597185467217346602:
+            askmsg = await chn.send(f"{user.mention}: Where is this Research located? Please type your response below. If you send a plain text response, I will check it against the Pokestops I know about. You can also send a Google Maps link!")
+            def check(m):
+                return m.author == user and m.channel == chn
+            reply = await self.bot.wait_for('message', check=check)
+            try:
+                await askmsg.delete()
+                await reply.delete()
+            except:
+                pass
+            url_re = '(http(s?)://)?((maps\.google\./)|((www\.)?google\.com/maps/)|(goo.gl/maps/))\S*'
+            match = re.search(url_re, reply.content)
+            if match:
+                url = match.group()
+                return await research.update_url(url)
+            else:
+                ctx = await self.bot.get_context(reply, cls=Context)
+                stop = await Pokestop.convert(ctx, reply.content)
+                research.location = stop
+                embed = await ResearchEmbed.from_research(research)
+                for msgid in research.message_ids:
+                    try:
+                        chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
+                        await msg.edit(embed=embed.embed)
+                    except:
+                        pass
+
+            
     
     async def pickup_researchdata(self):
         research_table = self.bot.dbi.table('research')
@@ -424,6 +503,17 @@ class ResearchCog(Cog):
         cats = await query.get_values()
         cats = list(set(cats))
         return cats
+
+    async def possible_tasks(self, reward):
+        if reward.startswith('partial'):
+            return []
+        table = self.bot.dbi.table('research_tasks')
+        query = table.query('task')
+        try:
+            query.where(reward=reward)
+        except:
+            return []
+        return await query.get_values()
     
     @command()
     @checks.is_co_owner()
@@ -445,10 +535,12 @@ class ResearchCog(Cog):
     @command(aliases=['res'])
     @research_checks.research_enabled()
     @checks.location_set()
-    async def research(self, ctx, task: Optional[Task], *, location: Pokestop):
+    async def research(self, ctx, reward: Optional[Union[Pokemon, ItemReward]], task: Optional[Task], *, location: Pokestop):
         """Report a Field Research task.
         
         **Arguments**
+        *reward (optional):* Description of the reward for the research. Either
+            a Pokemon or an item.
         *task (optional):* Either the text of the research task itself or
             the research category (e.g. `raid`). If a conversion to a Task cannot
             be made, Meowth asks you to select a category, then to select the
@@ -459,6 +551,44 @@ class ResearchCog(Cog):
         The reporter will be awarded points for the number of users that obtain
         the task."""
         tz = await ctx.tz()
+        if reward and not task:
+            task_matches = await self.possible_tasks(reward.id)
+            if len(task_matches) == 1:
+                task = Task(ctx.bot, task_matches[0])
+            elif len(task_matches) > 1:
+                react_list = formatters.mc_emoji(len(task_matches))
+                display_dict = dict(zip(react_list, task_matches))
+                display_dict["\u2754"] = "Other"
+                react_list.append("\u2754")
+                embed = formatters.mc_embed(display_dict)
+                multi = await ctx.send('Multiple possible Tasks found! Please select from the following list.',
+                    embed=embed)
+                payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
+                    react_list=react_list)
+                if not payload:
+                    try:
+                        return await multi.delete()
+                    except:
+                        return
+                task = display_dict[str(payload.emoji)]
+                if task == 'Other':
+                    otherask = await ctx.send('What is the Task for this Research? Please type your answer below.')
+                    def check(m):
+                        return m.author == ctx.author and m.channel == ctx.channel
+                    reply = await ctx.bot.wait_for('message', check=check)
+                    arg = reply.content
+                    try:
+                        await reply.delete()
+                        await otherask.delete()
+                    except:
+                        pass
+                    task = PartialTask(ctx.bot, arg)
+                else:
+                    task = Task(ctx.bot, task)
+                try:
+                    await multi.delete()
+                except:
+                    pass
         if not task:
             cats = await self.task_categories()
             content = "What category of Research Task is this? Select from the options below."
@@ -478,7 +608,7 @@ class ResearchCog(Cog):
             except:
                 pass
             task = await Task.convert(ctx, cat)
-        if isinstance(task, Task):
+        if isinstance(task, Task) and not reward:
             possible_rewards = await task.possible_rewards()
             if len(possible_rewards) == 1:
                 reward = possible_rewards[0]
@@ -517,8 +647,8 @@ class ResearchCog(Cog):
                     await multi.delete()
                 except:
                     pass
-        else:
-            msg = await ctx.send('What is the reward for this task? Please type your response below.')
+        elif not reward:
+            msg = await ctx.send('What is the reward for this Research? Please type your response below.')
             def check(m):
                 return m.author == ctx.author and m.channel == ctx.channel
             reply = await ctx.bot.wait_for('message', check=check)
@@ -527,13 +657,17 @@ class ResearchCog(Cog):
             except:
                 reward = None
             if not reward:
-                reward = await ItemReward.convert(ctx, reply.content)
-            reward = reward.id
+                try:
+                    reward = await ItemReward.convert(ctx, reply.content)
+                except:
+                    reward = ItemReward(ctx.bot, f'partial/{reply.content}/1')
             try:
                 await reply.delete()
                 await msg.delete()
             except:
                 pass
+        if not isinstance(reward, str):
+            reward = reward.id
         research_id = next(snowflake.create())
         research = Research(research_id, ctx.bot, ctx.guild.id, ctx.author.id, task, location, reward, tz, time.time())
         embed = await ResearchEmbed.from_research(research)
@@ -546,6 +680,7 @@ class ResearchCog(Cog):
         else:
             reportcontent = ""
         stamp = ctx.bot.get_emoji(583375171847585823)
+        location = ctx.bot.get_emoji(597185467217346602)
         reportcontent += f"Field Research reported! Use {str(stamp)} to indicate that you picked up this task!"
         report_channels = []
         report_channel = ReportChannel(ctx.bot, ctx.channel)
@@ -560,6 +695,7 @@ class ResearchCog(Cog):
             try:
                 msg = await channel.channel.send(reportcontent, embed=embed)
                 await msg.add_reaction(stamp)
+                await msg.add_reaction(location)
             except:
                 continue
             idstring = f'{msg.channel.id}/{msg.id}'
@@ -595,6 +731,7 @@ class ResearchCog(Cog):
                 content = "\n\n".join(research_list)
             embed = formatters.make_embed(title=title, content=content, msg_colour=color)
             await channel.send(embed=embed)
+            await asyncio.sleep(0.25)
 
 
 

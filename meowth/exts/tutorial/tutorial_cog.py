@@ -241,7 +241,7 @@ class Tutorial(Cog):
             f"Try expressing interest in this raid!\n\n"
             f"Ex: `{prefix}interested 5 m3 i1 v1` would mean 5 trainers: "
             "3 Mystic, 1 Instinct, 1 Valor\n"
-            "Alternatively, you may use the :thinking: reaction to express interest. "
+            "Alternatively, you may use the 🙋 reaction to express interest. "
             "I will automatically use the party totals from your last RSVP if you use the reaction.")
 
         # wait for interested status update

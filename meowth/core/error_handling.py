@@ -194,7 +194,7 @@ class ErrorHandler(Cog):
         elif isinstance(error, errors.CityChannelCheckFail):
             guild = ctx.guild
             msg = _('Meowth! Please use **{prefix}{cmd_name}** in ').format(cmd_name=ctx.invoked_with, prefix=prefix)
-            city_channels = bot.guild_dict[guild.id]['configure_dict']['raid']['report_channels']
+            city_channels = ctx.bot.guild_dict[guild.id]['configure_dict']['raid']['report_channels']
             if len(city_channels) > 10:
                 msg += _('a Region report channel.')
             else:
@@ -212,7 +212,7 @@ class ErrorHandler(Cog):
         elif isinstance(error, errors.WantChannelCheckFail):
             guild = ctx.guild
             msg = _('Meowth! Please use **{prefix}{cmd_name}** in the following channel').format(cmd_name=ctx.invoked_with, prefix=prefix)
-            want_channels = bot.guild_dict[guild.id]['configure_dict']['want']['report_channels']
+            want_channels = ctx.bot.guild_dict[guild.id]['configure_dict']['want']['report_channels']
             if len(want_channels) > 1:
                 msg += _('s:\n')
             else:
@@ -234,7 +234,7 @@ class ErrorHandler(Cog):
         elif isinstance(error, errors.RaidChannelCheckFail):
             guild = ctx.guild
             msg = _('Meowth! Please use **{prefix}{cmd_name}** in a Raid channel. Use **{prefix}list** in any ').format(cmd_name=ctx.invoked_with, prefix=prefix)
-            city_channels = bot.guild_dict[guild.id]['configure_dict']['raid']['report_channels']
+            city_channels = ctx.bot.guild_dict[guild.id]['configure_dict']['raid']['report_channels']
             if len(city_channels) > 10:
                 msg += _('Region report channel to see active raids.')
             else:
@@ -252,7 +252,7 @@ class ErrorHandler(Cog):
         elif isinstance(error, errors.EggChannelCheckFail):
             guild = ctx.guild
             msg = _('Meowth! Please use **{prefix}{cmd_name}** in an Egg channel. Use **{prefix}list** in any ').format(cmd_name=ctx.invoked_with, prefix=prefix)
-            city_channels = bot.guild_dict[guild.id]['configure_dict']['raid']['report_channels']
+            city_channels = ctx.bot.guild_dict[guild.id]['configure_dict']['raid']['report_channels']
             if len(city_channels) > 10:
                 msg += _('Region report channel to see active raids.')
             else:
@@ -275,10 +275,10 @@ class ErrorHandler(Cog):
         elif isinstance(error, errors.ActiveRaidChannelCheckFail):
             guild = ctx.guild
             msg = _('Meowth! Please use **{prefix}{cmd_name}** in an Active Raid channel. Use **{prefix}list** in any ').format(cmd_name=ctx.invoked_with, prefix=prefix)
-            city_channels = bot.guild_dict[guild.id]['configure_dict']['raid']['report_channels']
+            city_channels = ctx.bot.guild_dict[guild.id]['configure_dict']['raid']['report_channels']
             try:
-                egg_check = bot.guild_dict[guild.id]['raidchannel_dict'][ctx.channel.id].get('type',None)
-                meetup = bot.guild_dict[guild.id]['raidchannel_dict'][ctx.channel.id].get('meetup',{})
+                egg_check = ctx.bot.guild_dict[guild.id]['raidchannel_dict'][ctx.channel.id].get('type',None)
+                meetup = ctx.bot.guild_dict[guild.id]['raidchannel_dict'][ctx.channel.id].get('meetup',{})
             except:
                 egg_check = ""
                 meetup = False
@@ -301,10 +301,10 @@ class ErrorHandler(Cog):
         elif isinstance(error, errors.ActiveChannelCheckFail):
             guild = ctx.guild
             msg = _('Meowth! Please use **{prefix}{cmd_name}** in an Active channel. Use **{prefix}list** in any ').format(cmd_name=ctx.invoked_with, prefix=prefix)
-            city_channels = bot.guild_dict[guild.id]['configure_dict']['raid']['report_channels']
+            city_channels = ctx.bot.guild_dict[guild.id]['configure_dict']['raid']['report_channels']
             try:
-                egg_check = bot.guild_dict[guild.id]['raidchannel_dict'][ctx.channel.id].get('type',None)
-                meetup = bot.guild_dict[guild.id]['raidchannel_dict'][ctx.channel.id].get('meetup',{})
+                egg_check = ctx.bot.guild_dict[guild.id]['raidchannel_dict'][ctx.channel.id].get('type',None)
+                meetup = ctx.bot.guild_dict[guild.id]['raidchannel_dict'][ctx.channel.id].get('meetup',{})
             except:
                 egg_check = ""
                 meetup = False
@@ -327,7 +327,7 @@ class ErrorHandler(Cog):
         elif isinstance(error, errors.CityRaidChannelCheckFail):
             guild = ctx.guild
             msg = _('Meowth! Please use **{prefix}{cmd_name}** in either a Raid channel or ').format(cmd_name=ctx.invoked_with, prefix=prefix)
-            city_channels = bot.guild_dict[guild.id]['configure_dict']['raid']['report_channels']
+            city_channels = ctx.bot.guild_dict[guild.id]['configure_dict']['raid']['report_channels']
             if len(city_channels) > 10:
                 msg += _('a Region report channel.')
             else:
@@ -345,7 +345,7 @@ class ErrorHandler(Cog):
         elif isinstance(error, errors.RegionEggChannelCheckFail):
             guild = ctx.guild
             msg = _('Meowth! Please use **{prefix}{cmd_name}** in either a Raid Egg channel or ').format(cmd_name=ctx.invoked_with, prefix=prefix)
-            city_channels = bot.guild_dict[guild.id]['configure_dict']['raid']['report_channels']
+            city_channels = ctx.bot.guild_dict[guild.id]['configure_dict']['raid']['report_channels']
             if len(city_channels) > 10:
                 msg += _('a Region report channel.')
             else:
@@ -363,7 +363,7 @@ class ErrorHandler(Cog):
         elif isinstance(error, errors.RegionExRaidChannelCheckFail):
             guild = ctx.guild
             msg = _('Meowth! Please use **{prefix}{cmd_name}** in either a EX Raid channel or one of the following region channels:').format(cmd_name=ctx.invoked_with, prefix=prefix)
-            city_channels = bot.guild_dict[guild.id]['configure_dict']['exraid']['report_channels']
+            city_channels = ctx.bot.guild_dict[guild.id]['configure_dict']['exraid']['report_channels']
             if len(city_channels) > 10:
                 msg += _('a Region report channel.')
             else:
@@ -381,7 +381,7 @@ class ErrorHandler(Cog):
         elif isinstance(error, errors.ExRaidChannelCheckFail):
             guild = ctx.guild
             msg = _('Meowth! Please use **{prefix}{cmd_name}** in a EX Raid channel. Use **{prefix}list** in any of the following region channels to see active raids:').format(cmd_name=ctx.invoked_with, prefix=prefix)
-            city_channels = bot.guild_dict[guild.id]['configure_dict']['exraid']['report_channels']
+            city_channels = ctx.bot.guild_dict[guild.id]['configure_dict']['exraid']['report_channels']
             if len(city_channels) > 10:
                 msg += _('a Region report channel.')
             else:
@@ -399,7 +399,7 @@ class ErrorHandler(Cog):
         elif isinstance(error, errors.ResearchReportChannelCheckFail):
             guild = ctx.guild
             msg = _('Meowth! Please use **{prefix}{cmd_name}** in ').format(cmd_name=ctx.invoked_with, prefix=prefix)
-            city_channels = bot.guild_dict[guild.id]['configure_dict']['research']['report_channels']
+            city_channels = ctx.bot.guild_dict[guild.id]['configure_dict']['research']['report_channels']
             if len(city_channels) > 10:
                 msg += _('a Region report channel.')
             else:
@@ -417,7 +417,7 @@ class ErrorHandler(Cog):
         elif isinstance(error, errors.MeetupReportChannelCheckFail):
             guild = ctx.guild
             msg = _('Meowth! Please use **{prefix}{cmd_name}** in ').format(cmd_name=ctx.invoked_with, prefix=prefix)
-            city_channels = bot.guild_dict[guild.id]['configure_dict']['meetup']['report_channels']
+            city_channels = ctx.bot.guild_dict[guild.id]['configure_dict']['meetup']['report_channels']
             if len(city_channels) > 10:
                 msg += _('a Region report channel.')
             else:
@@ -435,7 +435,7 @@ class ErrorHandler(Cog):
         elif isinstance(error, errors.WildReportChannelCheckFail):
             guild = ctx.guild
             msg = _('Meowth! Please use **{prefix}{cmd_name}** in ').format(cmd_name=ctx.invoked_with, prefix=prefix)
-            city_channels = bot.guild_dict[guild.id]['configure_dict']['wild']['report_channels']
+            city_channels = ctx.bot.guild_dict[guild.id]['configure_dict']['wild']['report_channels']
             if len(city_channels) > 10:
                 msg += _('a Region report channel.')
             else:

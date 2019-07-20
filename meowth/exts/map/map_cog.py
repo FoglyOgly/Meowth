@@ -440,7 +440,7 @@ class POI():
         return gym_channels
 
     @classmethod
-    async def get_location_match(cls, ctx, arg, data, report_channel, location_name):
+    async def get_location_match(cls, ctx, arg, data, location_name):
         nick_list = []
         for x in data:
             if x.get('nickname'):
@@ -468,8 +468,11 @@ class POI():
         possible_ids = set(nick_ids) | set(name_ids)
         id_list = list(possible_ids)
         if len(id_list) > 1:
-            possible_locs = [cls(ctx.bot, y) for y in id_list]
-            names = [await z.display_str() for z in possible_locs]
+            # Not guaranteed but there should be a good chance the intersection of gym and stop id is empty for a guild.
+            names = [x[0] for x in name_list if x[1] in id_list]
+            if len(names) != len(id_list):
+                print('Prepare for trouble!')  # This should raise an error.
+                return False
             react_list = formatters.mc_emoji(len(id_list))
             choice_dict = dict(zip(react_list, id_list))
             display_dict = dict(zip(react_list, names))
@@ -481,8 +484,7 @@ class POI():
             payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
                                            react_list=react_list)
             if str(payload.emoji) == "\u2754":
-                city = await report_channel.city()
-                return PartialPOI(ctx.bot, city, arg)
+                return False
             loc_id = choice_dict[str(payload.emoji)]
             await multi.delete()
             return loc_id
@@ -514,14 +516,14 @@ class POI():
         if not data:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
-        loc_id = await cls.get_location_match(ctx, arg, data, report_channel, 'locations')
+        loc_id = await cls.get_location_match(ctx, arg, data, 'locations')
         if not loc_id:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
         gym = ctx.bot.dbi.table('gyms').query()
         gym = gym.where(id=loc_id)
-        gym = gym.where(guild=ctx.guild)
-        # Not guaranteed but there should be a good chance the intersection of gym and stop ids is empty for a guild.
+        gym = gym.where(guild=ctx.guild.id)
+        gym = await gym.get()
         if gym:
             return Gym(ctx.bot, loc_id)
         else:
@@ -557,7 +559,7 @@ class Gym(POI):
         if not data:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
-        gym_id = await cls.get_location_match(ctx, arg, data, report_channel, 'Gyms')
+        gym_id = await cls.get_location_match(ctx, arg, data, 'Gyms')
         if not gym_id:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
@@ -621,7 +623,7 @@ class Pokestop(POI):
         if not data:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
-        stop_id = await cls.get_location_match(ctx, arg, data, report_channel, 'Pokéstops')
+        stop_id = await cls.get_location_match(ctx, arg, data, 'Pokéstops')
         if not stop_id:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)

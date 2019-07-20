@@ -438,6 +438,58 @@ class POI():
         channel_list = [ReportChannel(self.bot, self.bot.get_channel(x)) for x in channelid_list if self.bot.get_channel(x)]
         gym_channels = [y for y in channel_list if await y.point_in_channel(coords)]
         return gym_channels
+
+    @classmethod
+    async def get_location_match(cls, ctx, arg, data, report_channel, location_name):
+        nick_list = []
+        for x in data:
+            if x.get('nickname'):
+                nick_list.append((x['nickname'], x['id']))
+            else:
+                continue
+        name_list = [(x['name'], x['id']) for x in data]
+        if nick_list:
+            nicks = [x[0] for x in nick_list]
+            nick_matches = get_matches(nicks, arg)
+            if nick_matches:
+                nick_matches = [x[0] for x in nick_matches]
+                nick_ids = [x[1] for x in nick_list if x[0] in nick_matches]
+            else:
+                nick_ids = []
+        else:
+            nick_ids = []
+        names = [x[0] for x in name_list]
+        name_matches = get_matches(names, arg)
+        if name_matches:
+            name_matches = [x[0] for x in name_matches]
+            name_ids = [x[1] for x in name_list if x[0] in name_matches]
+        else:
+            name_ids = []
+        possible_ids = set(nick_ids) | set(name_ids)
+        id_list = list(possible_ids)
+        if len(id_list) > 1:
+            possible_locs = [cls(ctx.bot, y) for y in id_list]
+            names = [await z.display_str() for z in possible_locs]
+            react_list = formatters.mc_emoji(len(id_list))
+            choice_dict = dict(zip(react_list, id_list))
+            display_dict = dict(zip(react_list, names))
+            display_dict["\u2754"] = "Other"
+            react_list.append("\u2754")
+            embed = formatters.mc_embed(display_dict)
+            multi = await ctx.send(f'Multiple possible {location_name} found! Please select from the following list.',
+                                   embed=embed)
+            payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
+                                           react_list=react_list)
+            if str(payload.emoji) == "\u2754":
+                city = await report_channel.city()
+                return PartialPOI(ctx.bot, city, arg)
+            loc_id = choice_dict[str(payload.emoji)]
+            await multi.delete()
+            return loc_id
+        elif len(id_list) == 1:
+            loc_id = id_list[0]
+            return loc_id
+        return None
     
     @classmethod
     async def convert(cls, ctx, arg):
@@ -462,7 +514,7 @@ class POI():
         if not data:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
-        loc_id = await get_location_match(cls, ctx, arg, data, report_channel, 'locations')
+        loc_id = await cls.get_location_match(ctx, arg, data, report_channel, 'locations')
         if not loc_id:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
@@ -498,7 +550,7 @@ class Gym(POI):
         if not data:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
-        gym_id = await get_location_match(cls, ctx, arg, data, report_channel, 'Gyms')
+        gym_id = await cls.get_location_match(ctx, arg, data, report_channel, 'Gyms')
         if not gym_id:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
@@ -562,63 +614,11 @@ class Pokestop(POI):
         if not data:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
-        stop_id = await get_location_match(cls, ctx, arg, data, report_channel, 'Pokéstops')
+        stop_id = await cls.get_location_match(ctx, arg, data, report_channel, 'Pokéstops')
         if not stop_id:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
         return cls(ctx.bot, stop_id)
-
-
-async def get_location_match(cls, ctx, arg, data, report_channel, location_name):
-    nick_list = []
-    for x in data:
-        if x.get('nickname'):
-            nick_list.append((x['nickname'], x['id']))
-        else:
-            continue
-    name_list = [(x['name'], x['id']) for x in data]
-    if nick_list:
-        nicks = [x[0] for x in nick_list]
-        nick_matches = get_matches(nicks, arg)
-        if nick_matches:
-            nick_matches = [x[0] for x in nick_matches]
-            nick_ids = [x[1] for x in nick_list if x[0] in nick_matches]
-        else:
-            nick_ids = []
-    else:
-        nick_ids = []
-    names = [x[0] for x in name_list]
-    name_matches = get_matches(names, arg)
-    if name_matches:
-        name_matches = [x[0] for x in name_matches]
-        name_ids = [x[1] for x in name_list if x[0] in name_matches]
-    else:
-        name_ids = []
-    possible_ids = set(nick_ids) | set(name_ids)
-    id_list = list(possible_ids)
-    if len(id_list) > 1:
-        possible_locs = [cls(ctx.bot, y) for y in id_list]
-        names = [await z.display_str() for z in possible_locs]
-        react_list = formatters.mc_emoji(len(id_list))
-        choice_dict = dict(zip(react_list, id_list))
-        display_dict = dict(zip(react_list, names))
-        display_dict["\u2754"] = "Other"
-        react_list.append("\u2754")
-        embed = formatters.mc_embed(display_dict)
-        multi = await ctx.send(f'Multiple possible {location_name} found! Please select from the following list.',
-                               embed=embed)
-        payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
-                                       react_list=react_list)
-        if str(payload.emoji) == "\u2754":
-            city = await report_channel.city()
-            return PartialPOI(ctx.bot, city, arg)
-        loc_id = choice_dict[str(payload.emoji)]
-        await multi.delete()
-        return loc_id
-    elif len(id_list) == 1:
-        loc_id = id_list[0]
-        return loc_id
-    return None
 
 
 class Mapper(Cog):

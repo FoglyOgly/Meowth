@@ -518,7 +518,14 @@ class POI():
         if not loc_id:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
-        return cls(ctx.bot, loc_id)
+        gym = ctx.bot.dbi.table('gyms').query()
+        gym = gym.where(id=loc_id)
+        gym = gym.where(guild=ctx.guild)
+        # Not guaranteed but there should be a good chance the intersection of gym and stop ids is empty for a guild.
+        if gym:
+            return Gym(ctx.bot, loc_id)
+        else:
+            return Pokestop(ctx.bot, loc_id)
 
 
 class Gym(POI):

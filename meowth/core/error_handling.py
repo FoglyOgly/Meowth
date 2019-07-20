@@ -131,6 +131,12 @@ class ErrorHandler(Cog):
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)
 
+        elif isinstance(error, errors.UsersSetCheckFail):
+            msg = ('Meowth! Users Management is not enabled for this channel. **{prefix}{cmd_name}** is unable to be used.').format(cmd_name=ctx.invoked_with, prefix=prefix)
+            error = await ctx.channel.send(msg)
+            await asyncio.sleep(10)
+            await delete_error(ctx.message, error)
+
         elif isinstance(error, errors.TeamSetCheckFail):
             msg = _('Meowth! Team Management is not enabled on this server. **{prefix}{cmd_name}** is unable to be used.').format(cmd_name=ctx.invoked_with, prefix=prefix)
             error = await ctx.channel.send(msg)
@@ -144,7 +150,13 @@ class ErrorHandler(Cog):
             await delete_error(ctx.message, error)
 
         elif isinstance(error, errors.WildSetCheckFail):
-            msg = _('Meowth! Wild Reporting is not enabled on this server. **{prefix}{cmd_name}** is unable to be used.').format(cmd_name=ctx.invoked_with, prefix=prefix)
+            msg = ('Meowth! Wild Reporting is not enabled for this channel. **{prefix}{cmd_name}** is unable to be used.').format(cmd_name=ctx.invoked_with, prefix=prefix)
+            error = await ctx.channel.send(msg)
+            await asyncio.sleep(10)
+            await delete_error(ctx.message, error)
+
+        elif isinstance(error, errors.TradeSetCheckFail):
+            msg = ('Meowth! Trade is not enabled for this channel. **{prefix}{cmd_name}** is unable to be used.').format(cmd_name=ctx.invoked_with, prefix=prefix)
             error = await ctx.channel.send(msg)
             await asyncio.sleep(10)
             await delete_error(ctx.message, error)

@@ -8,6 +8,10 @@ class LocationNotSet(CommandError):
 class MissingSubcommand(CommandError):
     pass
 
+class UsersSetCheckFail(CommandError):
+    'Exception raised checks.usersset fails'
+    pass
+
 class TeamSetCheckFail(CommandError):
     'Exception raised checks.teamset fails'
     pass

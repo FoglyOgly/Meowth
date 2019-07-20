@@ -1,4 +1,5 @@
 from discord.ext import commands
+from meowth import errors
 
 async def check_bot_permissions(ctx):
     me = ctx.guild.me
@@ -24,7 +25,7 @@ async def is_wild_enabled(ctx):
     query.where(channelid=ctx.channel.id)
     wild = await query.get_value()
     if not wild:
-        return False
+        raise errors.WildSetCheckFail
     else:
         return True
     

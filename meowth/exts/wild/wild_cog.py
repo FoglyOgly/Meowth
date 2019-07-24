@@ -750,7 +750,7 @@ class WildCog(Cog):
             pkmn_str = ""
         react_list = list(new_mod.react_list.values())
         wants = await new_mod.get_wants()
-        mentions = [wants.get(x) for x in wants if wants.get(x)]
+        mentions = [await x.mention() for x in wants if await x.mention()]
         mention_str = "\u200b".join(mentions)
         embed = (await ModEmbed.from_mod(new_mod)).embed
         if mentions:

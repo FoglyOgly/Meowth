@@ -526,6 +526,7 @@ class Modifier():
                     invalid_name = await e.invalid_mons[0].name()
                     await channel.send(f'{invalid_name} cannot be a Shadow Pokemon!', delete_after=10)
                     return await reply.delete()
+                await reply.delete()
                 self.pokemon = pkmn.id
                 await self.upsert()
                 embed = (await ModEmbed.from_mod(self)).embed

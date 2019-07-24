@@ -453,7 +453,7 @@ class Modifier():
         wants = []
         if hasattr(self, 'pokemon'):
             pkmn = Pokemon(self.bot, self.pokemon)
-            family = await self.pkmn._familyId()
+            family = await pkmn._familyId()
             wants.append(Want(self.bot, family, self.guild_id))
         wants.append(Want(self.bot, self.kind, self.guild_id))
         return wants

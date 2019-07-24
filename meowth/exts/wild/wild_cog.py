@@ -1,6 +1,7 @@
 from meowth import Cog, command, bot, checks
 from meowth.exts.map import POI, Gym, Pokestop, ReportChannel, PartialPOI
 from meowth.exts.pkmn import Pokemon, Move
+from meowth.exts.pkmn.errors import PokemonInvalidContext
 from meowth.exts.weather import Weather
 from meowth.exts.want import Want
 from meowth.exts.users import MeowthUser
@@ -514,11 +515,17 @@ class Modifier():
             pass
         elif self.kind == 'rocket' and emoji == self.react_list['caught']:
             if not hasattr(self, 'pokemon'):
-                await channel.send(f'{user.mention} - what Shadow Pokemon was left behind? Reply below with its name.')
+                ask = await channel.send(f'{user.mention} - what Shadow Pokemon was left behind? Reply below with its name.')
                 def check(m):
                     return m.channel == channel and m.author == user
                 reply = await self.bot.wait_for('message', check=check)
-                pkmn = await Pokemon.from_arg(self.bot, 'rocket', channel, user.id, reply.content)
+                await ask.delete()
+                try:
+                    pkmn = await Pokemon.from_arg(self.bot, 'rocket', channel, user.id, reply.content)
+                except PokemonInvalidContext as e:
+                    invalid_name = await e.invalid_mons[0].name()
+                    await channel.send(f'{invalid_name} cannot be a Shadow Pokemon!', delete_after=10)
+                    return await reply.delete()
                 self.pokemon = pkmn.id
                 await self.upsert()
                 embed = (await ModEmbed.from_mod(self)).embed
@@ -551,6 +558,8 @@ class Modifier():
         for idstring in mod.message_ids:
             Modifier.by_message[idstring] = mod
         mod.created = data['created']
+        if data.get('pokemon'):
+            mod.pokemon = data['pokemon']
         mod.monitor_task = bot.loop.create_task(mod.monitor_status())
         return mod
 

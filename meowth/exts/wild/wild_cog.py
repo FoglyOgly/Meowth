@@ -812,6 +812,7 @@ class WildCog(Cog):
             raise commands.BadArgument()
         mod_id = next(snowflake.create())
         new_mod = Modifier(mod_id, self.bot, ctx.guild.id, ctx.author.id, location, kind)
+        name = new_mod.name
         react_list = list(new_mod.react_list.values())
         embed = (await ModEmbed.from_mod(new_mod)).embed
         want = Want(ctx.bot, kind, ctx.guild.id)

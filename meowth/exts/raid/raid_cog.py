@@ -644,7 +644,6 @@ class RaidCog(Cog):
                 raidcontent = ""
             raidcontent += f"Raid reported in {ctx.channel.mention}!"
             raid_channel_name = await new_raid.channel_name()
-            raid_channel_position = int(new_raid.end)
             raid_channel_topic = new_raid.channel_topic
             if len(report_channels) > 1:
                 raid_channel_overwrites = formatters.perms_or(report_channels)
@@ -653,7 +652,7 @@ class RaidCog(Cog):
             try:
                 raid_channel = await ctx.guild.create_text_channel(raid_channel_name,
                     category=category, overwrites=raid_channel_overwrites,
-                    position=raid_channel_position, topic=raid_channel_topic)
+                    topic=raid_channel_topic)
             except discord.Forbidden:
                 raise commands.BotMissingPermissions(['Manage Channels'])
             new_raid.channel_ids.append(str(raid_channel.id))
@@ -1081,6 +1080,8 @@ class RaidCog(Cog):
         else:
             try:
                 newdt = parse(newtime, settings={'TIMEZONE': zone, 'RETURN_AS_TIMEZONE_AWARE': True})
+                if not newdt:
+                    return await ctx.error(f'Could not convert {newtime} to a datetime object')
                 if isinstance(raid_or_meetup, Raid):
                     oldstamp = raid_or_meetup.end
                 elif isinstance(raid_or_meetup, Meetup):
@@ -1118,8 +1119,7 @@ class RaidCog(Cog):
                     details = f"This EX Raid will end at {timestr}"
                 else:
                     details = f"This Raid will end at {timestr}"
-            position = int(raid.end)
-            await ctx.channel.edit(topic=raid_or_meetup.channel_topic, position=position)
+            await ctx.channel.edit(topic=raid_or_meetup.channel_topic)
         elif isinstance(raid_or_meetup, Meetup):
             meetup = raid_or_meetup
             dt = datetime.fromtimestamp(meetup.start)

@@ -13,6 +13,7 @@ import asyncio
 from pytz import timezone
 from math import ceil
 from discord.ext import commands
+from typing import Optional
 
 from . import wild_info
 from . import wild_checks
@@ -61,6 +62,7 @@ class Wild():
             'messages': self.message_ids,
             'caught_by': self.caught_by
         }
+        return d
     
     @property
     def _data(self):
@@ -148,7 +150,6 @@ class Wild():
     
     async def probably_despawned(self):
         channels_users, message_list = await self.users_channels_messages()
-        has_embed = False
         name = await self.pkmn.name()
         for message in message_list:
             await message.edit(content=f"This {name} has probably despawned!")
@@ -266,11 +267,9 @@ class Wild():
 
     
     async def process_reactions(self, payload):
-        id_string = f"{payload.channel_id}/{payload.message_id}"
         user = self.bot.get_user(payload.user_id)
         channel = self.bot.get_channel(payload.channel_id)
         message = await channel.fetch_message(payload.message_id)
-        meowthuser = MeowthUser(self.bot, user)
         if payload.guild_id:
             guild = self.bot.get_guild(payload.guild_id)
             user = guild.get_member(user.id)
@@ -331,19 +330,21 @@ class Modifier():
         cls.instances[mod_id] = instance
         return instance
 
-    def __init__(self, mod_id, bot, guild_id, reporter_id, location, name):
+    def __init__(self, mod_id, bot, guild_id, reporter_id, location, kind):
         self.id = mod_id
         self.bot = bot
         self.guild_id = guild_id
         self.reporter_id = reporter_id
         self.location = location
-        self.name = name
+        self.kind = kind
         self.created = time.time()
         self.message_ids = []
         emoji = {
             'coming': '🚗',
             'despawn': '💨',
         }
+        if kind == 'rocket':
+            emoji['caught'] = 581146003177078784
         self.react_list = emoji
         self.monitor_task = None
 
@@ -358,10 +359,12 @@ class Modifier():
             'guild': self.guild_id,
             'location': loc_id,
             'reporter_id': self.reporter_id,
-            'name': self.name,
+            'kind': self.kind,
             'created': self.created,
             'messages': self.message_ids
         }
+        if hasattr(self, 'pokemon'):
+            d['pokemon'] = self.pokemon
         return d
 
     @property
@@ -386,9 +389,30 @@ class Modifier():
     def guild(self):
         return self.bot.get_guild(self.guild_id)
 
+    @property
+    def name(self):
+        if self.kind == 'rocket':
+            return 'Team GO Rocket Invasion'
+        if self.kind == 'glacial':
+            return 'Glacial Lure Module'
+        if self.kind == 'magnetic':
+            return 'Magnetic Lure Module'
+        if self.kind == 'mossy':
+            return 'Mossy Lure Module'
+    
+    async def img_url(self):
+        if hasattr(self, 'pokemon'):
+            pkmn = Pokemon(self.bot, self.pokemon)
+            return await pkmn.sprite_url()
+        else:
+            url = ("https://raw.githubusercontent.com/"
+            "FoglyOgly/Meowth/new-core/meowth/images/misc/")
+            url += f"{self.kind}.png"
+        return url
+
     async def summary_str(self, tz):
         name = self.name
-        if isinstance(self.location, POI):
+        if isinstance(self.location, Pokestop):
             locname = await self.location._name()
         else:
             locname = self.location._name
@@ -425,11 +449,14 @@ class Modifier():
                 continue
         return (channels_users, message_list)
 
-    # async def get_wants(self):  TODO
-    #     wants = []
-    #     family = await self.pkmn._familyId()
-    #     wants.append(Want(self.bot, family, self.guild_id))
-    #     return wants
+    async def get_wants(self):
+        wants = []
+        if hasattr(self, 'pokemon'):
+            pkmn = Pokemon(self.bot, self.pokemon)
+            family = await self.pkmn._familyId()
+            wants.append(Want(self.bot, family, self.guild_id))
+        wants.append(Want(self.bot, self.kind, self.guild_id))
+        return wants
 
     async def despawned_embed(self):
         name = self.name
@@ -484,7 +511,25 @@ class Modifier():
         if emoji == self.react_list['despawn']:
             return await self.despawn_mod()
         elif emoji == self.react_list['coming']:
-            pass  # Wild does not seem to do anything either? TODO
+            pass
+        elif self.kind == 'rocket' and emoji == self.react_list['caught']:
+            if not hasattr(self, 'pokemon'):
+                await channel.send(f'{user.mention} - what Shadow Pokemon was left behind? Reply below with its name.')
+                def check(m):
+                    return m.channel == channel and m.author == user
+                reply = await self.bot.wait_for('message', check=check)
+                pkmn = await Pokemon.from_arg(self.bot, 'rocket', channel, user.id, reply.content)
+                self.pokemon = pkmn.id
+                await self.upsert()
+                embed = (await ModEmbed.from_mod(self)).embed
+                for idstring in self.message_ids:
+                    try:
+                        chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+                        await msg.edit(embed=embed)
+                    except:
+                        continue
+                    
+
 
     @classmethod
     async def from_data(cls, bot, data):
@@ -516,6 +561,7 @@ class WildCog(Cog):
         bot.wild_info = wild_info
         self.bot = bot
         self.pickup_task = self.bot.loop.create_task(self.pickup_wilddata())
+        self.bot.loop.create_task(self.pickup_moddata())
     
     async def pickup_wilddata(self):
         wild_table = self.bot.dbi.table('wilds')
@@ -523,6 +569,13 @@ class WildCog(Cog):
         data = await query.get()
         for rcrd in data:
             self.bot.loop.create_task(Wild.from_data(self.bot, rcrd))
+    
+    async def pickup_moddata(self):
+        mod_table = self.bot.dbi.table('modifiers')
+        query = mod_table.query
+        data = await query.get()
+        for rcrd in data:
+            self.bot.loop.create_task(Modifier.from_data(self.bot, rcrd))
 
     @Cog.listener()
     async def on_raw_reaction_add(self, payload):
@@ -562,7 +615,7 @@ class WildCog(Cog):
         
         **Example:** `!wild "female combee" city park`"""
         if not await pokemon._wild_available():
-            raise 
+            raise
         weather = await location.weather()
         if weather == 'NO_WEATHER':
             weather = None
@@ -669,14 +722,15 @@ class WildCog(Cog):
             await channel.send(embed=embed)
 
 
-    @command()
+    @command(aliases=['tr'])
     @wild_checks.wild_enabled()
     @checks.location_set()
-    async def rocket(self, ctx, *, location: POI):
+    async def rocket(self, ctx, pokemon: Optional[Pokemon] = None, *, location: Pokestop):
 
         """Report a Team GO Rocket Pokestop invasion.
 
         **Arguments**
+        *pokemon (optional):* The name of the Pokemon the Grunt leaves behind.
         *location:* The location of the invasion.
 
         If *location* is the name of a known Pokestop,
@@ -685,22 +739,30 @@ class WildCog(Cog):
 
         **Example:** `!rocket city park`"""
 
-        mod_table = self.bot.dbi.table('modifiers')  # Table for lures, rocket, etc. All pokestop modifiers.
         mod_id = next(snowflake.create())
-        name = 'Team Rocket'
+        name = 'rocket'
         new_mod = Modifier(mod_id, self.bot, ctx.guild.id, ctx.author.id, location, name)
+        if pokemon:
+            new_mod.pokemon = pokemon.id
+            pkmn_name = await pokemon.name()
+            pkmn_str = f"The Grunt leaves behind a {pkmn_name}! "
+        else:
+            pkmn_str = ""
         react_list = list(new_mod.react_list.values())
-        #  want = Want(ctx.bot, family, ctx.guild.id) TODO
-        #  mention = await want.mention()
-        mention = False
+        wants = await new_mod.get_wants()
+        mentions = [wants.get(x) for x in wants if wants.get(x)]
+        mention_str = "\u200b".join(mentions)
         embed = (await ModEmbed.from_mod(new_mod)).embed
-        if mention:
-            reportcontent = mention + " - "
+        if mentions:
+            reportcontent = mention_str + " - "
         else:
             reportcontent = ""
         coming = '🚗'
+        caught_id = new_mod.react_list['caught']
+        caught = ctx.bot.get_emoji(caught_id)
         despawned = '💨'
-        reportcontent += f'Wild {name} reported! Use {coming} if you are on the way and {despawned} if it has ended.'
+        name = new_mod.name
+        reportcontent += f'{name} reported! {pkmn_str}Use {coming} if you are on the way, {str(caught)} if you catch the Shadow Pokemon, and {despawned} if it has ended.'
         report_channels = []
         report_channel = ReportChannel(ctx.bot, ctx.channel)
         if isinstance(location, Pokestop):
@@ -721,26 +783,15 @@ class WildCog(Cog):
                 new_mod.message_ids.append(f"{reportmsg.channel.id}/{reportmsg.id}")
             except:
                 continue
-        d = {
-            'id': mod_id,
-            'guild': ctx.guild.id,
-            'location': loc_id,
-            'reporter_id': ctx.author.id,
-            'name': name,
-            'created': new_mod.created,
-            'messages': new_mod.message_ids
-        }
         for idstring in new_mod.message_ids:
             Modifier.by_message[idstring] = new_mod
-        insert = mod_table.insert()
-        insert.row(**d)
+        await new_mod.upsert()
         self.bot.loop.create_task(new_mod.monitor_status())
-        await insert.commit()
 
     @command()
     @wild_checks.wild_enabled()
     @checks.location_set()
-    async def lure(self, ctx, type, *, location: POI):
+    async def lure(self, ctx, type, *, location: Pokestop):
 
         """Report a lured Pokestop.
 
@@ -754,29 +805,24 @@ class WildCog(Cog):
 
         **Example:** `!lure glacial city park`"""
 
-        word_list = ["normal", "glacial", "mossy", "magnetic"]
+        word_list = ["glacial", "mossy", "magnetic"]
         result = fuzzymatch.get_matches(word_list, type, scorer = 'ratio')
-        type = result[0][0]
+        kind = result[0][0]
         if not result:
             raise commands.BadArgument()
-            return
-        else:
-            name = type.capitalize() + " lure"
-        mod_table = self.bot.dbi.table('modifiers')  # Table for lures, rocket, etc. All pokestop modifiers.
         mod_id = next(snowflake.create())
-        new_mod = Modifier(mod_id, self.bot, ctx.guild.id, ctx.author.id, location, name)
+        new_mod = Modifier(mod_id, self.bot, ctx.guild.id, ctx.author.id, location, kind)
         react_list = list(new_mod.react_list.values())
-        #  want = Want(ctx.bot, family, ctx.guild.id) TODO
-        #  mention = await want.mention()
-        mention = False
         embed = (await ModEmbed.from_mod(new_mod)).embed
+        want = Want(ctx.bot, kind, ctx.guild.id)
+        mention = await want.mention()
         if mention:
             reportcontent = mention + " - "
         else:
             reportcontent = ""
         coming = '🚗'
         despawned = '💨'
-        reportcontent += f'Wild {name} reported! Use {coming} if you are on the way and {despawned} if it has ended.'
+        reportcontent += f'{name} reported! Use {coming} if you are on the way and {despawned} if it has ended.'
         report_channels = []
         report_channel = ReportChannel(ctx.bot, ctx.channel)
         if isinstance(location, Pokestop):
@@ -797,21 +843,10 @@ class WildCog(Cog):
                 new_mod.message_ids.append(f"{reportmsg.channel.id}/{reportmsg.id}")
             except:
                 continue
-        d = {
-            'id': mod_id,
-            'guild': ctx.guild.id,
-            'location': loc_id,
-            'reporter_id': ctx.author.id,
-            'name': name,
-            'created': new_mod.created,
-            'messages': new_mod.message_ids
-        }
         for idstring in new_mod.message_ids:
             Modifier.by_message[idstring] = new_mod
-        insert = mod_table.insert()
-        insert.row(**d)
+        await new_mod.upsert()
         self.bot.loop.create_task(new_mod.monitor_status())
-        await insert.commit()
         
 
 class WildEmbed():
@@ -921,8 +956,6 @@ class ModEmbed():
     def __init__(self, embed):
         self.embed = embed
 
-    pkmn_index = 0
-    loc_index = 1
 
     @classmethod
     async def from_mod(cls, mod: Modifier):
@@ -934,17 +967,19 @@ class ModEmbed():
             directions_url = mod.location.url
             directions_text = mod.location._name + " (Unknown Location)"
         fields = {
-            'Modifier': f'{name}',
             'Location': f'[{directions_text}]({directions_url})',
         }
+        if hasattr(mod, 'pokemon'):
+            pkmn = Pokemon(mod.bot, mod.pokemon)
+            pkmn_name = await pkmn.name()
+            fields['Pokemon'] = pkmn_name
+        img_url = await mod.img_url()
         reporter = mod.guild.get_member(mod.reporter_id).display_name
         footer = f"Reported by {reporter}"
         reportdt = datetime.fromtimestamp(mod.created)
         color = mod.guild.me.color
-        #  embed = formatters.make_embed(title="Pokestop Modifier Report", msg_colour=color,
-        #                              thumbnail=img_url, fields=fields, footer=footer) TODO
         embed = formatters.make_embed(title="Pokestop Modifier Report", msg_colour=color,
-                                      fields=fields, footer=footer)
+            thumbnail=img_url, fields=fields, footer=footer)
         embed.timestamp = reportdt
         return cls(embed)
 

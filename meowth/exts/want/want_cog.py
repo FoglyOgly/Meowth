@@ -270,6 +270,11 @@ class Want():
     @classmethod
     async def convert(cls, ctx, arg):
         arg = arg.lower()
+        if arg == 'rocket':
+            return cls(ctx.bot, arg, ctx.guild.id)
+        lures = ['glacial', 'mossy', 'magnetic']
+        if arg in lures:
+            return cls(ctx.bot, arg, ctx.guild.id)
         tiers = ['1', '2', '3', '4', '5', 'ex', 'exgym']
         if arg in tiers:
             return cls(ctx.bot, arg, ctx.guild.id)

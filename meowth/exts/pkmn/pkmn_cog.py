@@ -49,6 +49,12 @@ class Pokemon():
             form = 59
         elif 'WEST_SEA' in pokemonId:
             form = 60
+        elif 'A_FORM' in pokemonId:
+            form = 61
+        elif 'SHADOW' in pokemonId:
+            form = 63
+        elif 'PURIFIED' in pokemonId:
+            form = 64
         self.form = form
         self.gender = gender
         self.shiny = shiny
@@ -377,7 +383,13 @@ class Pokemon():
         dex_data = self._dex_data
         name = await dex_data.select('name').get_value()
         name = name.strip()
-        if self.form:
+        if self.form == 64:
+            pure_emoji = self.bot.get_emoji(603609730232877088)
+            pkmn_name += f" {str(pure_emoji)}"
+        elif self.form == 63:
+            shadow_emoji = self.bot.get_emoji(603609764882022440)
+            pkmn_name += f" {str(shadow_emoji)}"
+        elif self.form:
             name += " "
             form_names_table = self.bot.dbi.table('form_names')
             form_name_query = form_names_table.query('name')
@@ -861,6 +873,8 @@ class Pokemon():
                 possible_mons = [x for x in mons if await x._raid_available(coords)]
             elif command_name == 'wild':
                 possible_mons = [x for x in mons if await x._wild_available()]
+            elif command_name == 'rocket':
+                possible_mons = [x for x in mons if x.form == 63]
             else:
                 possible_mons = mons
             impossible_mons = [x for x in mons if x not in possible_mons]

@@ -385,10 +385,10 @@ class Pokemon():
         name = name.strip()
         if self.form == 64:
             pure_emoji = self.bot.get_emoji(603609730232877088)
-            pkmn_name += f" {str(pure_emoji)}"
+            name += f" {str(pure_emoji)}"
         elif self.form == 63:
             shadow_emoji = self.bot.get_emoji(603609764882022440)
-            pkmn_name += f" {str(shadow_emoji)}"
+            name += f" {str(shadow_emoji)}"
         elif self.form:
             name += " "
             form_names_table = self.bot.dbi.table('form_names')

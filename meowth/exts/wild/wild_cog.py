@@ -817,9 +817,9 @@ class WildCog(Cog):
 
         word_list = ["glacial", "mossy", "magnetic"]
         result = fuzzymatch.get_match(word_list, kind)
-        if not result:
-            raise commands.BadArgument()
         kind = result[0]
+        if not kind:
+            raise commands.BadArgument()
         mod_id = next(snowflake.create())
         new_mod = Modifier(mod_id, self.bot, ctx.guild.id, ctx.author.id, location, kind)
         name = new_mod.name

@@ -92,7 +92,10 @@ class Want():
     def _data(self):
         want_table = self.bot.dbi.table('wants')
         query = want_table.query()
-        query.where(guild=self.guildid, want=self.want)
+        try:
+            query.where(guild=self.guildid, want=self.want)
+        except:
+            return None
         return query
     
     @property
@@ -111,6 +114,8 @@ class Want():
     
     async def _users(self):
         _data = self._data
+        if not _data:
+            return []
         _data.select('users')
         users = await _data.get_value()
         if not users:

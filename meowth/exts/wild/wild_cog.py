@@ -816,7 +816,7 @@ class WildCog(Cog):
         **Example:** `!lure glacial city park`"""
 
         word_list = ["glacial", "mossy", "magnetic"]
-        result = fuzzymatch.get_match(word_list, kind, scorer = 'ratio')
+        result = fuzzymatch.get_match(word_list, kind)
         if not result:
             raise commands.BadArgument()
         kind = result[0]

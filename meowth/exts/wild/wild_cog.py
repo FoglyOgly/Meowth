@@ -801,12 +801,12 @@ class WildCog(Cog):
     @command()
     @wild_checks.wild_enabled()
     @checks.location_set()
-    async def lure(self, ctx, type, *, location: Pokestop):
+    async def lure(self, ctx, kind, *, location: Pokestop):
 
         """Report a lured Pokestop.
 
         **Arguments**
-        *type:* Normal, Glacial, Mossy or Magnetic
+        *kind:* Glacial, Mossy or Magnetic
         *location:* The location of the lure.
 
         If *location* is the name of a known Pokestop,
@@ -816,10 +816,10 @@ class WildCog(Cog):
         **Example:** `!lure glacial city park`"""
 
         word_list = ["glacial", "mossy", "magnetic"]
-        result = fuzzymatch.get_matches(word_list, type, scorer = 'ratio')
-        kind = result[0][0]
+        result = fuzzymatch.get_match(word_list, kind, scorer = 'ratio')
         if not result:
             raise commands.BadArgument()
+        kind = result[0]
         mod_id = next(snowflake.create())
         new_mod = Modifier(mod_id, self.bot, ctx.guild.id, ctx.author.id, location, kind)
         name = new_mod.name

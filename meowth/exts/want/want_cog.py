@@ -191,7 +191,9 @@ class Want():
                         await role.delete()
                     except:
                         pass
-                await _data.delete()
+                _update = self._update
+                _update.values(role=None)
+                await _update.commit()
             return False
         
     async def role(self):

@@ -510,10 +510,12 @@ class Modifier():
             await message.remove_reaction(emoji, user)
             return
         if emoji == self.react_list['despawn']:
+            await message.remove_reaction(emoji, user)
             return await self.despawn_mod()
         elif emoji == self.react_list['coming']:
             pass
         elif self.kind == 'rocket' and emoji == self.react_list['caught']:
+            await message.remove_reaction(payload.emoji, user)
             if not hasattr(self, 'pokemon'):
                 ask = await channel.send(f'{user.mention} - what Shadow Pokemon was left behind? Reply below with its name.')
                 def check(m):
@@ -989,7 +991,7 @@ class ModEmbed():
         footer = f"Reported by {reporter}"
         reportdt = datetime.fromtimestamp(mod.created)
         color = mod.guild.me.color
-        embed = formatters.make_embed(title="Pokestop Modifier Report", msg_colour=color,
+        embed = formatters.make_embed(title=f"{name} Report", msg_colour=color,
             thumbnail=img_url, fields=fields, footer=footer)
         embed.timestamp = reportdt
         return cls(embed)

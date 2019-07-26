@@ -936,9 +936,9 @@ class WildEmbed():
             cp_str += " (Boosted)"
         img_url = await wild.pkmn.sprite_url()
         lvlstr = str(wild.pkmn.lvl) if wild.pkmn.lvl else "?"
-        attiv = str(wild.pkmn.attiv) if wild.pkmn.attiv else "?"
-        defiv = str(wild.pkmn.defiv) if wild.pkmn.defiv else "?"
-        staiv = str(wild.pkmn.staiv) if wild.pkmn.staiv else "?"
+        attiv = str(wild.pkmn.attiv) if wild.pkmn.attiv is not None else "?"
+        defiv = str(wild.pkmn.defiv) if wild.pkmn.defiv is not None else "?"
+        staiv = str(wild.pkmn.staiv) if wild.pkmn.staiv is not None else "?"
         iv_str = f'{lvlstr}/{attiv}/{defiv}/{staiv}'
         if isinstance(wild.location, POI):
             directions_url = await wild.location.url()

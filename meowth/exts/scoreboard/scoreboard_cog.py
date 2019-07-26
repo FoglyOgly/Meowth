@@ -130,7 +130,10 @@ class ScoreCog(Cog):
         mobile_field = []
         for i in range(len(data)):
             row = data[i]
-            name = ctx.guild.get_member(row['user_id']).display_name
+            try:
+                name = ctx.guild.get_member(row['user_id']).display_name
+            except:
+                continue
             names.append(name)
             score = row[category]
             scores.append(str(score))

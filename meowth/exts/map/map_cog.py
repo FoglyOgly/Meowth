@@ -440,53 +440,68 @@ class POI():
         return gym_channels
 
     @classmethod
-    async def get_location_match(cls, ctx, arg, data, location_name):
+    async def get_location_match(cls, ctx, arg, gym_data, stop_data):
+        if gym_data and not stop_data:
+            locations_name = 'Gyms'
+        elif stop_data and not gym_data:
+            locations_name = 'Pokestops'
+        else:
+            locations_name = "locations"
+
         nick_list = []
-        for x in data:
+        for x in gym_data:
             if x.get('nickname'):
-                nick_list.append((x['nickname'], x['id']))
+                nick_list.append((x['nickname'], x['id'], True))  # third value is_gym
             else:
                 continue
-        name_list = [(x['name'], x['id']) for x in data]
+        for x in stop_data:
+            if x.get('nickname'):
+                nick_list.append((x['nickname'], x['id'], False))  # third value is_gym
+            else:
+                continue
         if nick_list:
             nicks = [x[0] for x in nick_list]
             nick_matches = get_matches(nicks, arg)
             if nick_matches:
                 nick_matches = [x[0] for x in nick_matches]
-                nick_ids = [x[1] for x in nick_list if x[0] in nick_matches]
+                nick_ids = [(x[1], x[2]) for x in nick_list if x[0] in nick_matches]
             else:
                 nick_ids = []
         else:
             nick_ids = []
+        name_list = [(x['name'], x['id'], True) for x in gym_data] + [(x['name'], x['id'], False) for x in stop_data]
         names = [x[0] for x in name_list]
         name_matches = get_matches(names, arg)
         if name_matches:
             name_matches = [x[0] for x in name_matches]
-            name_ids = [x[1] for x in name_list if x[0] in name_matches]
+            name_ids = [(x[1], x[2]) for x in name_list if x[0] in name_matches]
         else:
             name_ids = []
         possible_ids = set(nick_ids) | set(name_ids)
         id_list = list(possible_ids)
         if len(id_list) > 1:
-            # Not guaranteed but there should be a good chance the intersection of gym and stop id is empty for a guild.
-            names = [x[0] for x in name_list if x[1] in id_list]
-            if len(names) != len(id_list):
-                print('Prepare for trouble!')  # This should raise an error.
-                return False
+            names = []
+            # Loop through id_list to ensure names appear in same order as ids.
+            for id in id_list:
+                if id[1]:
+                    name = next(x['name'] for x in gym_data if x['id'] == id[0])
+                else:
+                    name = next(x['name'] for x in stop_data if x['id'] == id[0])
+                names.append(name)
             react_list = formatters.mc_emoji(len(id_list))
             choice_dict = dict(zip(react_list, id_list))
             display_dict = dict(zip(react_list, names))
             display_dict["\u2754"] = "Other"
             react_list.append("\u2754")
             embed = formatters.mc_embed(display_dict)
-            multi = await ctx.send(f'Multiple possible {location_name} found! Please select from the following list.',
+            multi = await ctx.send(f'Multiple possible {locations_name} found! Please select from the following list.',
                                    embed=embed)
             payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
                                            react_list=react_list)
-            if str(payload.emoji) == "\u2754":
+            await multi.delete()
+            if not payload or str(payload.emoji) == "\u2754":
                 return False
             loc_id = choice_dict[str(payload.emoji)]
-            await multi.delete()
             return loc_id
         elif len(id_list) == 1:
             loc_id = id_list[0]
@@ -500,31 +515,28 @@ class POI():
         else:
             channel = ctx.channel
         report_channel = ReportChannel(ctx.bot, channel)
-        stops_query = await report_channel.get_all_stops()
         gyms_query = await report_channel.get_all_gyms()
-        stop_data = []
+        stops_query = await report_channel.get_all_stops()
         gym_data = []
-
-        if stops_query:
-            stops_query.select('id', 'name', 'nickname')
-            stop_data = await stops_query.get()
+        stop_data = []
         if gyms_query:
             gyms_query.select('id', 'name', 'nickname')
             gym_data = await gyms_query.get()
-        data = stop_data + gym_data
+        if stops_query:
+            stops_query.select('id', 'name', 'nickname')
+            stop_data = await stops_query.get()
 
-        if not data:
+        if not (gym_data or stop_data):
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
-        loc_id = await cls.get_location_match(ctx, arg, data, 'locations')
-        if not loc_id:
+        loc_ids = await cls.get_location_match(ctx, arg, gym_data, stop_data)
+        if not loc_ids:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
-        gym = ctx.bot.dbi.table('gyms').query()
-        gym = gym.where(id=loc_id)
-        gym = gym.where(guild=ctx.guild.id)
-        gym = await gym.get()
-        if gym:
+        else:
+            loc_id = loc_ids[0]
+            is_gym = loc_ids[1]
+        if is_gym:
             return Gym(ctx.bot, loc_id)
         else:
             return Pokestop(ctx.bot, loc_id)
@@ -559,10 +571,12 @@ class Gym(POI):
         if not data:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
-        gym_id = await cls.get_location_match(ctx, arg, data, 'Gyms')
-        if not gym_id:
+        gym_ids = await cls.get_location_match(ctx, arg, data, [])
+        if not gym_ids:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
+        else:
+            gym_id = gym_ids[0]
         return cls(ctx.bot, gym_id)
     
     @classmethod
@@ -623,10 +637,12 @@ class Pokestop(POI):
         if not data:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
-        stop_id = await cls.get_location_match(ctx, arg, data, 'Pokéstops')
-        if not stop_id:
+        stop_ids = await cls.get_location_match(ctx, arg, [], data)
+        if not stop_ids:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
+        else:
+            stop_id = stop_ids[0]
         return cls(ctx.bot, stop_id)
 
 

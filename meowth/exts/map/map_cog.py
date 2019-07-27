@@ -24,6 +24,7 @@ from .errors import *
 
 gmaps = googlemaps.Client(key=gmaps_api_key)
 
+
 class ReportChannel():
     def __init__(self, bot, channel):
         self.bot = bot
@@ -106,7 +107,6 @@ class ReportChannel():
             return False
         return cell.cellid in covering
 
-    
     async def level_10_covering(self):
         cap = await self.s2_cap()
         if not cap:
@@ -231,11 +231,6 @@ class ReportChannel():
             raid_lists[level][boss_id] = d
         return raid_lists
 
-    
-
-
-        
-
 
 class S2_L10():
 
@@ -269,7 +264,6 @@ class S2_L10():
                 data = await resp.json()
                 place_id = data[0]['Key']
                 return place_id
-
 
     async def weather(self):
         weather_query = self.bot.dbi.table('weather_forecasts').query()
@@ -328,6 +322,7 @@ class S2_L10():
         raids = await query.get_values()
         return raids
 
+
 class S2_L12():
     def __init__(self, bot, cellid):
         self.bot = bot
@@ -345,7 +340,6 @@ class S2_L12():
         cellid = int(self.cellid, base=16)
         center_coords = s2.S2LatLng(s2.S2CellId(cellid).ToPoint())
         return center_coords
-
 
 
 class POI():
@@ -444,18 +438,109 @@ class POI():
         channel_list = [ReportChannel(self.bot, self.bot.get_channel(x)) for x in channelid_list if self.bot.get_channel(x)]
         gym_channels = [y for y in channel_list if await y.point_in_channel(coords)]
         return gym_channels
+
+    @classmethod
+    async def get_location_match(cls, ctx, arg, gym_data, stop_data):
+        if gym_data and not stop_data:
+            locations_name = 'Gyms'
+        elif stop_data and not gym_data:
+            locations_name = 'Pokestops'
+        else:
+            locations_name = "locations"
+
+        nick_list = []
+        for x in gym_data:
+            if x.get('nickname'):
+                nick_list.append((x['nickname'], x['id'], True))  # third value is_gym
+            else:
+                continue
+        for x in stop_data:
+            if x.get('nickname'):
+                nick_list.append((x['nickname'], x['id'], False))  # third value is_gym
+            else:
+                continue
+        if nick_list:
+            nicks = [x[0] for x in nick_list]
+            nick_matches = get_matches(nicks, arg)
+            if nick_matches:
+                nick_matches = [x[0] for x in nick_matches]
+                nick_ids = [(x[1], x[2]) for x in nick_list if x[0] in nick_matches]
+            else:
+                nick_ids = []
+        else:
+            nick_ids = []
+        name_list = [(x['name'], x['id'], True) for x in gym_data] + [(x['name'], x['id'], False) for x in stop_data]
+        names = [x[0] for x in name_list]
+        name_matches = get_matches(names, arg)
+        if name_matches:
+            name_matches = [x[0] for x in name_matches]
+            name_ids = [(x[1], x[2]) for x in name_list if x[0] in name_matches]
+        else:
+            name_ids = []
+        possible_ids = set(nick_ids) | set(name_ids)
+        id_list = list(possible_ids)
+        if len(id_list) > 1:
+            names = []
+            # Loop through id_list to ensure names appear in same order as ids.
+            for id in id_list:
+                if id[1]:
+                    name = next(x['name'] for x in gym_data if x['id'] == id[0])
+                else:
+                    name = next(x['name'] for x in stop_data if x['id'] == id[0])
+                names.append(name)
+            react_list = formatters.mc_emoji(len(id_list))
+            choice_dict = dict(zip(react_list, id_list))
+            display_dict = dict(zip(react_list, names))
+            display_dict["\u2754"] = "Other"
+            react_list.append("\u2754")
+            embed = formatters.mc_embed(display_dict)
+            multi = await ctx.send(f'Multiple possible {locations_name} found! Please select from the following list.',
+                                   embed=embed)
+            payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
+                                           react_list=react_list)
+            await multi.delete()
+            if not payload or str(payload.emoji) == "\u2754":
+                return False
+            loc_id = choice_dict[str(payload.emoji)]
+            return loc_id
+        elif len(id_list) == 1:
+            loc_id = id_list[0]
+            return loc_id
+        return None
     
     @classmethod
     async def convert(cls, ctx, arg):
         if hasattr(ctx, 'report_channel_id'):
-            ctx.channel = ctx.bot.get_channel(ctx.report_channel_id)
-        stop_convert = await Pokestop.convert(ctx, arg)
-        if isinstance(stop_convert, Pokestop):
-            return stop_convert
-        gym_convert = await Gym.convert(ctx, arg)
-        return gym_convert
+            channel = ctx.bot.get_channel(ctx.report_channel_id)
+        else:
+            channel = ctx.channel
+        report_channel = ReportChannel(ctx.bot, channel)
+        gyms_query = await report_channel.get_all_gyms()
+        stops_query = await report_channel.get_all_stops()
+        gym_data = []
+        stop_data = []
+        if gyms_query:
+            gyms_query.select('id', 'name', 'nickname')
+            gym_data = await gyms_query.get()
+        if stops_query:
+            stops_query.select('id', 'name', 'nickname')
+            stop_data = await stops_query.get()
 
-    
+        if not (gym_data or stop_data):
+            city = await report_channel.city()
+            return PartialPOI(ctx.bot, city, arg)
+        loc_ids = await cls.get_location_match(ctx, arg, gym_data, stop_data)
+        if not loc_ids:
+            city = await report_channel.city()
+            return PartialPOI(ctx.bot, city, arg)
+        else:
+            loc_id = loc_ids[0]
+            is_gym = loc_ids[1]
+        if is_gym:
+            return Gym(ctx.bot, loc_id)
+        else:
+            return Pokestop(ctx.bot, loc_id)
+
 
 class Gym(POI):
 
@@ -486,56 +571,12 @@ class Gym(POI):
         if not data:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
-        nick_list = []
-        for x in data:
-            if x.get('nickname'):
-                nick_list.append((x['nickname'], x['id']))
-            else:
-                continue
-        name_list = [(x['name'], x['id']) for x in data]
-        if nick_list:
-            nicks = [x[0] for x in nick_list]
-            nick_matches = get_matches(nicks, arg)
-            if nick_matches:
-                nick_matches = [x[0] for x in nick_matches]
-                nick_ids = [x[1] for x in nick_list if x[0] in nick_matches]
-            else:
-                nick_ids = []
-        else:
-            nick_matches = []
-            nick_ids = []
-        names = [x[0] for x in name_list]
-        name_matches = get_matches(names, arg)
-        if name_matches:
-            name_matches = [x[0] for x in name_matches]
-            name_ids = [x[1] for x in name_list if x[0] in name_matches]
-        else:
-            name_ids = []
-        possible_ids = set(nick_ids) | set(name_ids)
-        id_list = list(possible_ids)
-        if len(id_list) > 1:
-            possible_gyms = [cls(ctx.bot, y) for y in id_list]
-            names = [await z.display_str() for z in possible_gyms]
-            react_list = formatters.mc_emoji(len(id_list))
-            choice_dict = dict(zip(react_list, id_list))
-            display_dict = dict(zip(react_list, names))
-            display_dict["\u2754"] = "Other"
-            react_list.append("\u2754")
-            embed = formatters.mc_embed(display_dict)
-            multi = await ctx.send('Multiple possible Gyms found! Please select from the following list.',
-                embed=embed)
-            payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
-                react_list=react_list)
-            if str(payload.emoji) == "\u2754":
-                city = await report_channel.city()
-                return PartialPOI(ctx.bot, city, arg)
-            gym_id = choice_dict[str(payload.emoji)]
-            await multi.delete()
-        elif len(id_list) == 1:
-            gym_id = id_list[0]
-        else:
+        gym_ids = await cls.get_location_match(ctx, arg, data, [])
+        if not gym_ids:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
+        else:
+            gym_id = gym_ids[0]
         return cls(ctx.bot, gym_id)
     
     @classmethod
@@ -576,7 +617,6 @@ class PartialPOI():
         return "NO_WEATHER"
 
 
-
 class Pokestop(POI):
 
     @property
@@ -597,56 +637,12 @@ class Pokestop(POI):
         if not data:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
-        nick_list = []
-        for x in data:
-            if x.get('nickname'):
-                nick_list.append((x['nickname'], x['id']))
-            else:
-                continue
-        name_list = [(x['name'], x['id']) for x in data]
-        if nick_list:
-            nicks = [x[0] for x in nick_list]
-            nick_matches = get_matches(nicks, arg)
-            if nick_matches:
-                nick_matches = [x[0] for x in nick_matches]
-                nick_ids = [x[1] for x in nick_list if x[0] in nick_matches]
-            else:
-                nick_ids = []
-        else:
-            nick_matches = []
-            nick_ids = []
-        names = [x[0] for x in name_list]
-        name_matches = get_matches(names, arg)
-        if name_matches:
-            name_matches = [x[0] for x in name_matches]
-            name_ids = [x[1] for x in name_list if x[0] in name_matches]
-        else:
-            name_ids = []
-        possible_ids = set(nick_ids) | set(name_ids)
-        id_list = list(possible_ids)
-        if len(id_list) > 1:
-            possible_stops = [cls(ctx.bot, y) for y in id_list]
-            names = [await z.display_str() for z in possible_stops]
-            react_list = formatters.mc_emoji(len(id_list))
-            choice_dict = dict(zip(react_list, id_list))
-            display_dict = dict(zip(react_list, names))
-            display_dict["\u2754"] = "Other"
-            react_list.append("\u2754")
-            embed = formatters.mc_embed(display_dict)
-            multi = await ctx.send('Multiple possible Pokestops found! Please select from the following list.',
-                embed=embed)
-            payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
-                react_list=react_list)
-            if str(payload.emoji) == "\u2754":
-                city = await report_channel.city()
-                return PartialPOI(ctx.bot, city, arg)
-            stop_id = choice_dict[str(payload.emoji)]
-            await multi.delete()
-        elif len(id_list) == 1:
-            stop_id = id_list[0]
-        else:
+        stop_ids = await cls.get_location_match(ctx, arg, [], data)
+        if not stop_ids:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
+        else:
+            stop_id = stop_ids[0]
         return cls(ctx.bot, stop_id)
 
 

@@ -1018,6 +1018,11 @@ class RaidCog(Cog):
                 meetup.location = location
                 await meetup.upsert()
                 embed = await meetup.meetup_embed()
+                for idstring in meetup.message_ids:
+                    chn, msg = await ChannelMessage.from_id_string(ctx.bot, idstring)
+                    if not msg:
+                        continue
+                    await msg.edit(embed=embed)
                 return await meetup.channel.send('The meetup location has been updated!', embed=embed)
         else:
             if raid:

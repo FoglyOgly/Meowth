@@ -1866,6 +1866,11 @@ class Raid:
             mention = member.mention
             mention_list.append(mention)
         self.pkmn = RaidBoss(Pokemon(self.bot, pkmn))
+        family_id = await self.pkmn._familyId()
+        want = Want(self.bot, family_id, self.guild_id)
+        mention = await want.mention()
+        if mention:
+            mention_list.append(mention)
         name = await self.pkmn.name()
         content = f"Trainers {' '.join(mention_list)}: The egg has hatched into a {name} raid! RSVP using commands or reactions!" 
         raid_table = self.bot.dbi.table('raids')

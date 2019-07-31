@@ -14,6 +14,7 @@ import asyncio
 from pytz import timezone
 from math import ceil
 from discord.ext import commands
+from discord.ext.commands import Greedy
 from typing import Optional
 
 from . import wild_info
@@ -401,14 +402,10 @@ class Modifier():
         if self.kind == 'mossy':
             return 'Mossy Lure Module'
     
-    async def img_url(self):
-        if hasattr(self, 'pokemon'):
-            pkmn = Pokemon(self.bot, self.pokemon)
-            return await pkmn.sprite_url()
-        else:
-            url = ("https://raw.githubusercontent.com/"
+    def img_url(self):
+        url = ("https://raw.githubusercontent.com/"
             "FoglyOgly/Meowth/new-core/meowth/images/misc/")
-            url += f"{self.kind}.png"
+        url += f"{self.kind}.png"
         return url
 
     async def summary_str(self, tz):
@@ -453,9 +450,10 @@ class Modifier():
     async def get_wants(self):
         wants = []
         if hasattr(self, 'pokemon'):
-            pkmn = Pokemon(self.bot, self.pokemon)
-            family = await pkmn._familyId()
-            wants.append(Want(self.bot, family, self.guild_id))
+            pkmn = [Pokemon(self.bot, x) for x in self.pokemon]
+            families = [await x._familyId() for x in pkmn]
+            for f in families:
+                wants.append(Want(self.bot, f, self.guild_id))
         wants.append(Want(self.bot, self.kind, self.guild_id))
         return wants
 
@@ -517,19 +515,26 @@ class Modifier():
         elif self.kind == 'rocket' and emoji == self.react_list['caught']:
             await message.remove_reaction(payload.emoji, user)
             if not hasattr(self, 'pokemon'):
-                ask = await channel.send(f'{user.mention} - what Shadow Pokemon was left behind? Reply below with its name.')
+                ask = await channel.send(f'{user.mention} - what three Shadow Pokemon did the Grunt have? Reply below with their names, in the order the Grunt used them.')
                 def check(m):
                     return m.channel == channel and m.author == user
                 reply = await self.bot.wait_for('message', check=check)
                 await ask.delete()
-                try:
-                    pkmn = await Pokemon.from_arg(self.bot, 'rocket', channel, user.id, reply.content)
-                except PokemonInvalidContext as e:
-                    invalid_name = await e.invalid_mons[0].name()
-                    await channel.send(f'{invalid_name} cannot be a Shadow Pokemon!', delete_after=10)
-                    return await reply.delete()
+                args = reply.content.split()
+                pkmn_ids = []
+                if len(args) > 3:
+                    args = args[:3]
+                for arg in args:
+                    try:
+                        pkmn = await Pokemon.from_arg(self.bot, 'rocket', channel, user.id, arg)
+                        pkmn_ids.append(pkmn.id)
+                    except PokemonInvalidContext as e:
+                        invalid_name = await e.invalid_mons[0].name()
+                        await channel.send(f'{invalid_name} cannot be a Shadow Pokemon!', delete_after=10)
+                        await reply.delete()
+                        continue
                 await reply.delete()
-                self.pokemon = pkmn.id
+                self.pokemon = pkmn_ids
                 await self.upsert()
                 embed = (await ModEmbed.from_mod(self)).embed
                 for idstring in self.message_ids:
@@ -737,12 +742,13 @@ class WildCog(Cog):
     @command(aliases=['tr'])
     @wild_checks.wild_enabled()
     @checks.location_set()
-    async def rocket(self, ctx, pokemon: Optional[Pokemon] = None, *, location: Pokestop):
+    async def rocket(self, ctx, pokemon: Greedy[Pokemon] = [], *, location: Pokestop):
 
         """Report a Team GO Rocket Pokestop invasion.
 
         **Arguments**
-        *pokemon (optional):* The name of the Pokemon the Grunt leaves behind.
+        *pokemon (optional):* The names of the Pokemon the Grunt has, in order.
+        If you give more than three Pokemon, only the first three will be used.
         *location:* The location of the invasion.
 
         If *location* is the name of a known Pokestop,
@@ -755,9 +761,11 @@ class WildCog(Cog):
         name = 'rocket'
         new_mod = Modifier(mod_id, self.bot, ctx.guild.id, ctx.author.id, location, name)
         if pokemon:
-            new_mod.pokemon = pokemon.id
-            pkmn_name = await pokemon.name()
-            pkmn_str = f"The Grunt leaves behind a {pkmn_name}! "
+            if len(pokemon) > 3:
+                pokemon = pokemon[:3]
+            new_mod.pokemon = [x.id for x in pokemon]
+            pkmn_names = [await x.name() for x in pokemon]
+            pkmn_str = f"The Grunt's party: {', '.join(pkmn_names)}! "
         else:
             pkmn_str = ""
         react_list = list(new_mod.react_list.values())
@@ -778,11 +786,8 @@ class WildCog(Cog):
         report_channels = []
         report_channel = ReportChannel(ctx.bot, ctx.channel)
         if isinstance(location, Pokestop):
-            loc_id = 'pokestop/' + str(location.id)
             channel_list = await location.get_all_channels('wild')
             report_channels.extend(channel_list)
-        else:
-            loc_id = f'{location.city}/{location.arg}'
         if report_channel not in report_channels:
             report_channels.append(report_channel)
         for channel in report_channels:
@@ -936,9 +941,9 @@ class WildEmbed():
             cp_str += " (Boosted)"
         img_url = await wild.pkmn.sprite_url()
         lvlstr = str(wild.pkmn.lvl) if wild.pkmn.lvl else "?"
-        attiv = str(wild.pkmn.attiv) if wild.pkmn.attiv is not None else "?"
-        defiv = str(wild.pkmn.defiv) if wild.pkmn.defiv is not None else "?"
-        staiv = str(wild.pkmn.staiv) if wild.pkmn.staiv is not None else "?"
+        attiv = str(wild.pkmn.attiv) if wild.pkmn.attiv else "?"
+        defiv = str(wild.pkmn.defiv) if wild.pkmn.defiv else "?"
+        staiv = str(wild.pkmn.staiv) if wild.pkmn.staiv else "?"
         iv_str = f'{lvlstr}/{attiv}/{defiv}/{staiv}'
         if isinstance(wild.location, POI):
             directions_url = await wild.location.url()
@@ -979,14 +984,13 @@ class ModEmbed():
         else:
             directions_url = mod.location.url
             directions_text = mod.location._name + " (Unknown Location)"
-        fields = {
-            'Location': f'[{directions_text}]({directions_url})',
-        }
+        fields = {}
         if hasattr(mod, 'pokemon'):
-            pkmn = Pokemon(mod.bot, mod.pokemon)
-            pkmn_name = await pkmn.name()
-            fields['Pokemon'] = pkmn_name
-        img_url = await mod.img_url()
+            pkmn = [Pokemon(mod.bot, x) for x in mod.pokemon]
+            pkmn_names = [await x.name() for x in pkmn]
+            fields['Pokemon'] = "\n".join(pkmn_names)
+        fields['Location'] = f'[{directions_text}]({directions_url})'
+        img_url = mod.img_url()
         reporter = mod.guild.get_member(mod.reporter_id).display_name
         footer = f"Reported by {reporter}"
         reportdt = datetime.fromtimestamp(mod.created)

@@ -452,6 +452,7 @@ class Modifier():
         if hasattr(self, 'pokemon'):
             pkmn = [Pokemon(self.bot, x) for x in self.pokemon]
             families = [await x._familyId() for x in pkmn]
+            families = list(set(families))
             for f in families:
                 wants.append(Want(self.bot, f, self.guild_id))
         wants.append(Want(self.bot, self.kind, self.guild_id))

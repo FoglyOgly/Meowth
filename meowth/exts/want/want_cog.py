@@ -321,6 +321,8 @@ class WantCog(Cog):
             if status == 'already done':
                 continue
             added_wants.append(want.want)
+        if not added_wants:
+            return await ctx.error('No Valid Wants Found')
         await ctx.success(title="Wants Added", details="\n".join(added_wants))
     
     @command()

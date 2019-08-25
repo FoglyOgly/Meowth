@@ -368,6 +368,8 @@ class RaidCog(Cog):
         
         Remember to wrap multi-word arguments in quotes."""
 
+        if not start_time:
+            raise InvalidTime
         guild = ctx.guild
         guild_id = guild.id
         if isinstance(location, POI):
@@ -1124,7 +1126,6 @@ class RaidCog(Cog):
                     details = f"This EX Raid will end at {timestr}"
                 else:
                     details = f"This Raid will end at {timestr}"
-            await ctx.channel.edit(topic=raid_or_meetup.channel_topic)
         elif isinstance(raid_or_meetup, Meetup):
             meetup = raid_or_meetup
             dt = datetime.fromtimestamp(meetup.start)
@@ -1133,6 +1134,7 @@ class RaidCog(Cog):
             datestr = local.strftime('%b %d')
             title = "Start Time Updated"
             details = f"This Meetup will start on {datestr} at {timestr}"
+        await ctx.channel.edit(topic=raid_or_meetup.channel_topic)
         has_embed = False
         for idstring in raid_or_meetup.message_ids:
             chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)

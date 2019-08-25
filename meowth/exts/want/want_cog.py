@@ -316,14 +316,19 @@ class WantCog(Cog):
     @want_checks.want_enabled()
     async def want(self, ctx, wants: commands.Greedy[Want]):
         added_wants = []
+        already = []
         for want in wants:
             status = await want.add_user(ctx.author.id)
             if status == 'already done':
+                already.append(want.want)
                 continue
             added_wants.append(want.want)
         if not added_wants:
+            if already:
+                return await ctx.success('Already Added', details="\n".join(already))
             return await ctx.error('No Valid Wants Found')
         await ctx.success(title="Wants Added", details="\n".join(added_wants))
+        await ctx.success(title="Already Added", details="\n".join(already))
     
     @command()
     @want_checks.want_enabled()

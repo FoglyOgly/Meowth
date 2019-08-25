@@ -109,9 +109,10 @@ class SilphCog(Cog):
 
     @command()
     @users_checks.users_enabled()
-    async def silph(self, ctx, silph_id: SilphTrainer):
+    async def silph(self, ctx, silph_name: SilphTrainer):
         """Link your Silph Road account."""
 
+        silph_id = silph_name
         silph_card = silph_id.card
         linked_discord = silph_card.discord_name
         if not linked_discord == str(ctx.author):

@@ -296,7 +296,7 @@ class Task:
         query = table.query('task')
         tasks = await query.get_values()
         tasks = list(set(tasks))
-        matches = get_matches(tasks, arg, limit=25)
+        matches = get_matches(tasks, arg, limit=19)
         if matches:
             task_matches = [x[0] for x in matches]
         else:

@@ -32,7 +32,7 @@ class Wild():
         cls.instances[wild_id] = instance
         return instance
 
-    def __init__(self, wild_id, bot, guild_id, reporter_id, location, pkmn: Pokemon, caught_by=[]):
+    def __init__(self, wild_id, bot, guild_id, reporter_id, location, pkmn: Pokemon, caught_by=None):
         self.id = wild_id
         self.bot = bot
         self.guild_id = guild_id
@@ -42,7 +42,10 @@ class Wild():
         self.created = time.time()
         self.message_ids = []
         self.react_list = bot.wild_info.emoji
-        self.caught_by = caught_by
+        if caught_by is None:
+            self.caught_by = []
+        else:
+            self.caught_by = caught_by
         self.monitor_task = None
     
     def to_dict(self):

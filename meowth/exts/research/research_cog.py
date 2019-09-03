@@ -7,6 +7,7 @@ from meowth.utils import formatters, snowflake
 from meowth.utils.fuzzymatch import get_match, get_matches
 from meowth.utils.converters import ChannelMessage
 
+import discord
 import time
 import pytz
 from pytz import timezone
@@ -291,12 +292,11 @@ class Task:
     @classmethod
     async def convert(cls, ctx, arg):
         arg = arg.lower()
-        argsplit = arg.split()
         table = ctx.bot.dbi.table('research_tasks')
         query = table.query('task')
         tasks = await query.get_values()
         tasks = list(set(tasks))
-        matches = get_matches(tasks, arg, limit=25)
+        matches = get_matches(tasks, arg, limit=19)
         if matches:
             task_matches = [x[0] for x in matches]
         else:
@@ -312,13 +312,31 @@ class Task:
             payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
                 react_list=react_list)
             task = display_dict[str(payload.emoji)]
-            if task == 'Other':
-                otherask = await ctx.send('What is the Task for this Research? Please type your answer below.')
-                return PartialTask(ctx.bot, arg)
             try:
                 await multi.delete()
-            except:
+            except discord.NotFound:
                 pass
+            if task == 'Other':
+                other_ask = await ctx.send('What is the Task for this Research? Please type your answer below.')
+
+                def check(m):
+                    return m.author == ctx.author and m.channel == ctx.channel
+
+                try:
+                    other_reply = await ctx.bot.wait_for('message', check=check, timeout=300)
+                except asyncio.TimeoutError:
+                    return PartialTask(ctx.bot, arg)
+                else:
+                    try:
+                        await other_reply.delete()
+                    except (discord.Forbidden, discord.NotFound):
+                        pass
+                    return PartialTask(ctx.bot, other_reply.content)
+                finally:
+                    try:
+                        await other_ask.delete()
+                    except discord.NotFound:
+                        pass
         elif len(task_matches) == 1:
             task = task_matches[0]
         else:

@@ -328,7 +328,8 @@ class WantCog(Cog):
                 return await ctx.success('Already Added', details="\n".join(already))
             return await ctx.error('No Valid Wants Found')
         await ctx.success(title="Wants Added", details="\n".join(added_wants))
-        await ctx.success(title="Already Added", details="\n".join(already))
+        if already:
+            await ctx.success(title="Already Added", details="\n".join(already))
     
     @command()
     @want_checks.want_enabled()

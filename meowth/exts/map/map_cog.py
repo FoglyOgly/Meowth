@@ -265,11 +265,12 @@ class S2_L10():
                 place_id = data[0]['Key']
                 return place_id
 
-    async def weather(self):
-        weather_query = self.bot.dbi.table('weather_forecasts').query()
+    async def weather(self, guild_id):
+        weather_query = self.bot.dbi.table('current_weather').query()
         col = "current_weather"
         try:
             weather_query.select(col).where(cellid=self.cellid)
+            weather_query.where(guild_id=guild_id)
             weather = await weather_query.get_value()
         except:
             return "NO_WEATHER"
@@ -277,32 +278,47 @@ class S2_L10():
             return "NO_WEATHER"
         return weather
     
-    async def correct_weather(self, weather):
-        weather_table = self.bot.dbi.table('weather_forecasts')
-        query = weather_table.query
+    async def correct_weather(self, weather, guild_id):
+        table = self.bot.dbi.table('current_weather')
+        query = table.query
         query.where(cellid=self.cellid)
+        query.where(guild_id=guild_id)
         data = await query.get()
         if not data:
             d = {
                 'cellid': self.cellid,
-                'forecast_0': "NO_WEATHER",
-                'forecast_1': "NO_WEATHER",
-                'forecast_2': "NO_WEATHER",
-                'forecast_3': "NO_WEATHER",
-                'forecast_4': "NO_WEATHER",
-                'forecast_5': "NO_WEATHER",
-                'forecast_6': "NO_WEATHER",
-                'forecast_7': "NO_WEATHER",
-                'forecast_8': "NO_WEATHER",
-                'forecast_9': "NO_WEATHER",
-                'forecast_10': "NO_WEATHER",
-                'forecast_11': "NO_WEATHER",
-                'current_weather': weather
+                'guild_id': guild_id,
+                'current_weather': weather,
+                'forecast': False,
             }
         else:
             d = dict(data[0])
+            if d['current_weather'] == weather:
+                return
             d['current_weather'] = weather
-        insert = weather_table.insert
+            if d['forecast']:
+                forecast_table = self.bot.dbi.table('weather_forecasts')
+                query = forecast_table.query('pull_hour')
+                query.where(cellid=self.cellid)
+                query.where(current_weather=weather)
+                hour = await query.get_value()
+                d['pull_hour'] = hour
+                del_update = forecast_table.update
+                del_update.where(cellid=self.cellid)
+                del_update.where(forecast_table['current_weather']!=weather)
+                del_update.values(
+                    forecast_0=None,
+                    forecast_1=None,
+                    forecast_2=None,
+                    forecast_3=None,
+                    forecast_4=None,
+                    forecast_5=None,
+                    forecast_6=None,
+                    forecast_7=None,
+                    current_weather=None
+                )
+                await del_update.commit()
+        insert = table.insert
         insert.row(**d)
         await insert.commit(do_update=True)
 

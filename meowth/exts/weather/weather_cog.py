@@ -3,7 +3,7 @@ from meowth.exts.map import S2_L10
 from meowth.utils import fuzzymatch
 import aiohttp
 import asyncio
-from datetime import datetime
+from datetime import datetime, timedelta
 
 class Weather():
 
@@ -75,30 +75,43 @@ class WeatherCog(Cog):
         loop.create_task(self.update_weather())
     
     async def update_weather(self):
-        weather_query = self.bot.dbi.table('weather_forecasts').query()
-        weather_query.select('cellid')
-        cells = await weather_query.get_values()
-        for cell in cells:
-            s2cell = S2_L10(self.bot, cell)
-            place_id = await s2cell.weather_place()
-            insert = {'cellid': cell}
-            forecast_table = self.bot.dbi.table('weather_forecasts')
-            async with aiohttp.ClientSession() as session:
-                url = f"http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/{place_id}"
-                params = {
-                    'apikey' : self.bot.config.weatherapikey,
-                    'details': 'true',
-                    'metric': 'true'
-                }
-                async with session.get(url, params=params) as resp:
-                    data = await resp.json()
-                    for hour in data:
-                        weather = await Weather.from_data(self.bot, hour)
-                        time = datetime.utcfromtimestamp(hour['EpochDateTime']).hour % 12
-                        col = f"forecast_{time}"
-                        insert[col] = weather.value
-            forecast_table.insert(**insert)
-            await forecast_table.insert.commit(do_update=True)
+        while True:
+            now = datetime.utcnow()
+            if now.minute < 30:
+                then = now.replace(minute=30)
+            else:
+                then = (now + timedelta(hours=1)).replace(minute=30)
+            sleeptime = (then - now).total_seconds()
+            await asyncio.sleep(sleeptime)
+            weather_query = self.bot.dbi.table('current_weather').query()
+            weather_query.select('cellid')
+            weather_query.where(forecast=True)
+            cells = await weather_query.get_values()
+            cells = list(set(cells))
+            for cell in cells:
+                s2cell = S2_L10(self.bot, cell)
+                place_id = await s2cell.weather_place()
+                insert = {'cellid': cell}
+                insert['pull_hour'] = now.hour % 8
+                forecast_table = self.bot.dbi.table('weather_forecasts')
+                async with aiohttp.ClientSession() as session:
+                    url = f"http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/{place_id}"
+                    params = {
+                        'apikey' : self.bot.config.weatherapikey,
+                        'details': 'true',
+                        'metric': 'true'
+                    }
+                    async with session.get(url, params=params) as resp:
+                        data = await resp.json()
+                        data = data[:7]
+                        for hour in data:
+                            weather = await Weather.from_data(self.bot, hour)
+                            time = datetime.utcfromtimestamp(hour['EpochDateTime']).hour % 8
+                            col = f"forecast_{time}"
+                            insert[col] = weather.value
+                forecast_table.insert(**insert)
+                await forecast_table.insert.commit(do_update=True)
+            
         
 
                         

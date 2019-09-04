@@ -429,13 +429,15 @@ class POI():
     async def weather(self):
         L10id = await self._L10()
         L10 = S2_L10(self.bot, L10id)
-        weather = await L10.weather()
+        guild_id = await self._guildid()
+        weather = await L10.weather(guild_id)
         return weather
     
     async def correct_weather(self, weather):
         L10id = await self._L10()
         L10 = S2_L10(self.bot, L10id)
-        await L10.correct_weather(weather)
+        guild_id = await self._guildid()
+        await L10.correct_weather(weather, guild_id)
     
     async def get_all_channels(self, cmd, level=None):
         report_table = self.bot.dbi.table('report_channels')

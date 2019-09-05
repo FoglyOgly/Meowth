@@ -331,7 +331,7 @@ class Trade():
     
     async def get_wants(self):
         wants = []
-        for pkmn in self.offered_pokemon:
+        for pkmn in self.offered_pkmn:
             family = await pkmn._familyId()
             wants.append(family)
         wants = [Want(self.bot, x, self.guild_id) for x in wants]

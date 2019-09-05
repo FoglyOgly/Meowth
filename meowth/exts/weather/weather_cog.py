@@ -106,7 +106,7 @@ class WeatherCog(Cog):
                     async with session.get(url, params=params) as resp:
                         data = await resp.json()
                         try:
-                            data = data[:7]
+                            data = data[:8]
                         except TypeError:
                             print(data)
                             return

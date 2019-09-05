@@ -28,6 +28,10 @@ class Weather():
         query = types_table.query('emoji').where(weather=self.value)
         emoji_list = await query.get_values()
         return "".join(emoji_list)
+    
+    def icon_url(self):
+        url = ''
+        return url
 
 
     @classmethod

@@ -3335,7 +3335,6 @@ class EggEmbed():
         self.embed = embed
     
     raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png'
-    footer_icon = 'https://media.discordapp.net/attachments/346766728132427777/512699022822080512/imageedit_10_6071805149.png'
             
     level_index = 0
     status_index = 2
@@ -3390,7 +3389,6 @@ class EggEmbed():
         egg_img_url = raid.bot.raid_info.egg_images[level]
         # color = await formatters.url_color(egg_img_url)
         hatch = raid.hatch
-        hatchdt = datetime.fromtimestamp(hatch)
         gym = raid.gym
         if isinstance(gym, Gym):
             directions_url = await gym.url()
@@ -3404,8 +3402,7 @@ class EggEmbed():
             directions_text += " (EX Raid Gym)"
         weather = await raid.weather()
         weather = Weather(raid.bot, weather)
-        weather_name = await weather.name()
-        weather_emoji = await weather.boosted_emoji_str()
+        footer_icon = weather.icon_url
         status_str = raid.status_str
         team_str = raid.team_str
         boss_str = await raid.boss_list_str()
@@ -3425,7 +3422,7 @@ class EggEmbed():
         color = raid.guild.me.color
         embed = formatters.make_embed(icon=EggEmbed.raid_icon, title="Raid Report",
             thumbnail=egg_img_url, msg_colour=color,
-            fields=fields, footer=footer_text, footer_icon=EggEmbed.footer_icon)
+            fields=fields, footer=footer_text, footer_icon=footer_icon)
         return cls(embed)
 
 class CountersEmbed():

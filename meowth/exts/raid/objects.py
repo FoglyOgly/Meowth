@@ -3664,7 +3664,7 @@ class MeetupEmbed:
         status_str = meetup.status_str
         team_str = meetup.team_str
         fields = {
-            "Gym": f"[{directions_text}]({directions_url})",
+            "Gym": (False, f"[{directions_text}]({directions_url})"),
             "Status List": status_str,
             "Team List": team_str
         }

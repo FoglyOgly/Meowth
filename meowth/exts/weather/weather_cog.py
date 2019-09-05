@@ -30,7 +30,7 @@ class Weather():
         return "".join(emoji_list)
     
     def icon_url(self):
-        url = ''
+        url = f'https://github.com/FoglyOgly/Meowth/blob/new-core/meowth/images/weather/{self.value}.png?raw=true'
         return url
 
 

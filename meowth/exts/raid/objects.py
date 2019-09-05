@@ -1097,12 +1097,12 @@ class Raid:
             if not has_embed:
                 if self.status == 'active':
                     raid_embed = RaidEmbed(msg.embeds[0])
-                    raid_embed.set_weather(weather_str, cp_str, ctrs_str, rec_str)
+                    raid_embed.set_weather(weather, cp_str, ctrs_str, rec_str)
                     embed = raid_embed.embed
                     has_embed = True
                 elif self.status == 'egg' or self.status == 'hatched':
                     egg_embed = EggEmbed(msg.embeds[0])
-                    egg_embed.set_weather(weather_str, boss_str)
+                    egg_embed.set_weather(weather, boss_str)
                     embed = egg_embed.embed
                     has_embed = True
             await msg.edit(embed=embed)
@@ -3030,7 +3030,6 @@ class ReportEmbed():
         self.embed = embed
     
     raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png' #TODO
-    footer_icon = 'https://media.discordapp.net/attachments/346766728132427777/512699022822080512/imageedit_10_6071805149.png'
 
     boss_index = 0
     gym_index = 1
@@ -3050,13 +3049,11 @@ class ReportEmbed():
                 name += " :sparkles:"
             name += f" {type_emoji}"
             img_url = await boss.sprite_url()
-            enddt = datetime.fromtimestamp(raid.end)
         else:
             bossfield = "Level"
             name = raid.level
             img_url = raid.bot.raid_info.egg_images[name]
             enddt = datetime.fromtimestamp(raid.hatch)
-        bot = raid.bot
         # color = await boss.color()
         gym = raid.gym
         if isinstance(gym, Gym):
@@ -3078,12 +3075,15 @@ class ReportEmbed():
             "Team List": team_str
         }
         footer = raid.channel_topic
+        weather = await raid.weather()
+        weather = Weather(raid.bot, weather)
+        footer_icon = weather.icon_url
         if raid.status == 'egg':
             boss_str = await raid.boss_list_str()
             fields['Boss Interest'] = boss_str
         color = raid.guild.me.color
         embed = formatters.make_embed(icon=RaidEmbed.raid_icon, title="Raid Report", msg_colour=color,
-            thumbnail=img_url, fields=fields, footer=footer, footer_icon=RaidEmbed.footer_icon)
+            thumbnail=img_url, fields=fields, footer=footer, footer_icon=footer_icon)
         return cls(embed)
 
 class RaidEmbed():
@@ -3092,7 +3092,6 @@ class RaidEmbed():
         self.embed = embed
 
     raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png' #TODO
-    footer_icon = 'https://media.discordapp.net/attachments/346766728132427777/512699022822080512/imageedit_10_6071805149.png'
 
     boss_index = 0
     gym_index = 1
@@ -3119,10 +3118,11 @@ class RaidEmbed():
         self.embed.set_field_at(RaidEmbed.moveset_index, name="Moveset", value=moveset_str)
         return self
     
-    def set_weather(self, weather_str, cp_str, ctrs_str, rec_str=None):
+    def set_weather(self, weather, cp_str, ctrs_str, rec_str=None):
         self.embed.set_field_at(RaidEmbed.cp_index, name="CP Range", value=cp_str)
         if rec_str:
             self.embed.set_field_at(RaidEmbed.rec_index, name="Recommended Group Size", value=rec_str)
+        self.embed.set_footer(text=self.embed.footer.text, icon_url=weather.icon_url)
         return self
     
     def set_moveset(self, moveset_str, ctrs_str, rec_str=None):
@@ -3191,13 +3191,10 @@ class RaidEmbed():
         moveset = f"{quick_name} {quick_emoji}| {charge_name} {charge_emoji}"
         weather = await raid.weather()
         weather = Weather(bot, weather)
-        weather_name = await weather.name()
-        weather_emoji = await weather.boosted_emoji_str()
         is_boosted = await boss.is_boosted(weather.value)
         cp_range = await raid.cp_range()
         cp_str = f"{cp_range[0]}-{cp_range[1]}"
         end = raid.end
-        enddt = datetime.fromtimestamp(end)
         if is_boosted:
             cp_str += " (Boosted)"
         img_url = await boss.sprite_url()
@@ -3240,9 +3237,10 @@ class RaidEmbed():
             reporter = reporter.display_name
         footer = f"Reported by {reporter} • {raid.channel_topic}"
         color = raid.guild.me.color
+        footer_icon = weather.icon_url
         embed = formatters.make_embed(icon=RaidEmbed.raid_icon, title="Raid Report", msg_colour=color,
             thumbnail=img_url, fields=fields, footer=footer,
-            footer_icon=RaidEmbed.footer_icon)
+            footer_icon=footer_icon)
         return cls(embed)
 
 class RSVPEmbed():
@@ -3346,8 +3344,9 @@ class EggEmbed():
     gym_index = 1
     group_index = 5
 
-    def set_weather(self, weather_str, boss_list_str):
+    def set_weather(self, weather, boss_list_str):
         self.boss_str = boss_list_str
+        self.embed.set_footer(text=self.embed.footer.text, icon_url=weather.icon_url)
         return self
     
     @property

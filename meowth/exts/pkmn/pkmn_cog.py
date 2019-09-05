@@ -875,6 +875,10 @@ class Pokemon():
                 possible_mons = [x for x in mons if await x._wild_available()]
             elif command_name == 'rocket':
                 possible_mons = [x for x in mons if x.form == 63]
+            elif command_name == 'research':
+                possible_mons = [x for x in mons if x.form != 63 and x.form != 64]
+            elif command_name == 'trade':
+                possible_mons = [x for x in mons if await x._trade_available()]
             else:
                 possible_mons = mons
             impossible_mons = [x for x in mons if x not in possible_mons]

@@ -94,7 +94,7 @@ class WeatherCog(Cog):
                 if not place_id:
                     continue
                 insert = {'cellid': cell}
-                insert['pull_hour'] = now.hour % 8
+                insert['pull_hour'] = then.hour % 8
                 forecast_table = self.bot.dbi.table('weather_forecasts')
                 async with aiohttp.ClientSession() as session:
                     url = f"http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/{place_id}"

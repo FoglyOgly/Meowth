@@ -262,7 +262,11 @@ class S2_L10():
         async with aiohttp.ClientSession() as session:
             async with session.get(url, params=params) as resp:
                 data = await resp.json()
-                place_id = data[0]['Key']
+                try:
+                    place_id = data[0]['Key']
+                except KeyError:
+                    print(data)
+                    return None
                 return place_id
 
     async def weather(self, guild_id):

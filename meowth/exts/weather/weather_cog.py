@@ -72,7 +72,7 @@ class WeatherCog(Cog):
     def __init__(self, bot):
         self.bot = bot
         loop = asyncio.get_event_loop()
-        loop.create_task(self.update_weather())
+        # loop.create_task(self.update_weather())
     
     async def update_weather(self):
         while True:
@@ -91,6 +91,8 @@ class WeatherCog(Cog):
             for cell in cells:
                 s2cell = S2_L10(self.bot, cell)
                 place_id = await s2cell.weather_place()
+                if not place_id:
+                    continue
                 insert = {'cellid': cell}
                 insert['pull_hour'] = now.hour % 8
                 forecast_table = self.bot.dbi.table('weather_forecasts')
@@ -103,7 +105,11 @@ class WeatherCog(Cog):
                     }
                     async with session.get(url, params=params) as resp:
                         data = await resp.json()
-                        data = data[:7]
+                        try:
+                            data = data[:7]
+                        except TypeError:
+                            print(data)
+                            return
                         for hour in data:
                             weather = await Weather.from_data(self.bot, hour)
                             time = (datetime.utcfromtimestamp(hour['EpochDateTime']).hour) % 8

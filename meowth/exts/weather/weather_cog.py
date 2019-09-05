@@ -29,6 +29,7 @@ class Weather():
         emoji_list = await query.get_values()
         return "".join(emoji_list)
     
+    @property
     def icon_url(self):
         url = f'https://github.com/FoglyOgly/Meowth/blob/new-core/meowth/images/weather/{self.value}.png?raw=true'
         return url

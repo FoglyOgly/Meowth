@@ -418,6 +418,8 @@ class TradeCog(Cog):
         try:
             await listmsg.delete()
             await wantmsg.delete()
+        except:
+            pass
         trade_id = next(snowflake.create())
         new_trade = Trade(trade_id, self.bot, ctx.guild.id, ctx.author.id, None, valid_offers, wants)
         embed = await TradeEmbed.from_trade(new_trade)

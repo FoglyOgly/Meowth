@@ -328,6 +328,15 @@ class Trade():
                         offered = offer['offered']
                         msg = offer['msg']
                         return await self.reject_offer(trader, listed, offered, msg)
+    
+    async def get_wants(self):
+        wants = []
+        for pkmn in self.offered_pokemon:
+            family = await pkmn._familyId()
+            wants.append(family)
+        wants = [Want(self.bot, x, self.guild_id) for x in wants]
+        want_dict = {x: await x.mention() for x in wants}
+        return want_dict
             
         
 
@@ -406,16 +415,19 @@ class TradeCog(Cog):
             wants.append('any')
         if accept_other:
             wants.append('obo')
-        listing_id = f'{ctx.channel.id}/{listmsg.id}'
-        trade_id = next(snowflake.create())
-        new_trade = Trade(trade_id, self.bot, ctx.guild.id, ctx.author.id, listing_id, valid_offers, wants)
-        Trade.by_listing[listing_id] = new_trade
-        embed = await TradeEmbed.from_trade(new_trade)
         try:
+            await listmsg.delete()
             await wantmsg.delete()
-        except:
-            pass
-        await listmsg.edit(content="", embed=embed.embed)
+        trade_id = next(snowflake.create())
+        new_trade = Trade(trade_id, self.bot, ctx.guild.id, ctx.author.id, None, valid_offers, wants)
+        embed = await TradeEmbed.from_trade(new_trade)
+        wants = await new_trade.get_wants()
+        mentions = [wants.get(x) for x in wants]
+        mention_str = "\u200b".join(mentions)
+        listmsg = await ctx.send(mention_str, embed=embed.embed)
+        listing_id = f'{ctx.channel.id}/{listmsg.id}'
+        new_trade.listing_id = listing_id
+        Trade.by_listing[listing_id] = new_trade
         want_emoji = new_trade.react_list
         for emoji in want_emoji:
             await listmsg.add_reaction(emoji)

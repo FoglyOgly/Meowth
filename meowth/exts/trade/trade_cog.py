@@ -424,7 +424,7 @@ class TradeCog(Cog):
         new_trade = Trade(trade_id, self.bot, ctx.guild.id, ctx.author.id, None, valid_offers, wants)
         embed = await TradeEmbed.from_trade(new_trade)
         wants = await new_trade.get_wants()
-        mentions = [wants.get(x) for x in wants]
+        mentions = [wants.get(x) for x in wants if wants.get(x)]
         mention_str = "\u200b".join(mentions)
         listmsg = await ctx.send(mention_str, embed=embed.embed)
         listing_id = f'{ctx.channel.id}/{listmsg.id}'

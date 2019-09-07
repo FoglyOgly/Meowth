@@ -80,6 +80,7 @@ class WeatherCog(Cog):
         # loop.create_task(self.update_weather())
     
     async def update_weather(self):
+        channel = self.bot.get_channel(428016400368402442)
         while True:
             now = datetime.utcnow()
             if now.minute < 30:
@@ -87,19 +88,24 @@ class WeatherCog(Cog):
             else:
                 then = (now + timedelta(hours=1)).replace(minute=30)
             sleeptime = (then - now).total_seconds()
+            await channel.send(f'Sleeping until {then}')
             await asyncio.sleep(sleeptime)
             weather_query = self.bot.dbi.table('current_weather').query()
             weather_query.select('cellid')
             weather_query.where(forecast=True)
             cells = await weather_query.get_values()
             cells = list(set(cells))
+            pull_hour = then.hour % 8
+            await channel.send(f'Pulling: pull hour is {pull_hour}')
+            forecast_table = self.bot.dbi.table('weather_forecasts')
+            rows = []
             for cell in cells:
                 s2cell = S2_L10(self.bot, cell)
                 place_id = await s2cell.weather_place()
                 if not place_id:
                     continue
                 insert = {'cellid': cell}
-                insert['pull_hour'] = then.hour % 8
+                insert['pull_hour'] = pull_hour
                 forecast_table = self.bot.dbi.table('weather_forecasts')
                 async with aiohttp.ClientSession() as session:
                     url = f"http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/{place_id}"
@@ -113,15 +119,17 @@ class WeatherCog(Cog):
                         try:
                             data = data[:8]
                         except TypeError:
-                            print(data)
+                            await channel.send(f'```{data}```')
                             return
                         for hour in data:
                             weather = await Weather.from_data(self.bot, hour)
                             time = (datetime.utcfromtimestamp(hour['EpochDateTime']).hour) % 8
                             col = f"forecast_{time}"
                             insert[col] = weather.value
-                forecast_table.insert(**insert)
-                await forecast_table.insert.commit(do_update=True)
+                rows.append(insert)
+            insert = forecast_table.insert
+            insert.rows(rows)
+            await insert.commit(do_update=True)
             
         
 

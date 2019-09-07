@@ -88,7 +88,7 @@ class WeatherCog(Cog):
             else:
                 then = (now + timedelta(hours=1)).replace(minute=30)
             sleeptime = (then - now).total_seconds()
-            await channel.send(f'Sleeping until {then}')
+            await channel.send(f'Sleeping until {str(then)}')
             await asyncio.sleep(sleeptime)
             weather_query = self.bot.dbi.table('current_weather').query()
             weather_query.select('cellid')
@@ -96,7 +96,7 @@ class WeatherCog(Cog):
             cells = await weather_query.get_values()
             cells = list(set(cells))
             pull_hour = then.hour % 8
-            await channel.send(f'Pulling: pull hour is {pull_hour}')
+            await channel.send(f'Pulling: pull hour is {str(pull_hour)}')
             forecast_table = self.bot.dbi.table('weather_forecasts')
             rows = []
             for cell in cells:

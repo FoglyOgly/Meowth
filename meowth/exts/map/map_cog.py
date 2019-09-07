@@ -303,9 +303,12 @@ class S2_L10():
             if d['forecast']:
                 forecast_table = self.bot.dbi.table('weather_forecasts')
                 query = forecast_table.query('pull_hour')
-                query.where(cellid=self.cellid)
-                query.where(current_weather=weather)
-                hour = await query.get_value()
+                try:
+                    query.where(cellid=self.cellid)
+                    query.where(current_weather=weather)
+                    hour = await query.get_value()
+                except:
+                    hour = 0
                 d['pull_hour'] = hour
                 del_update = forecast_table.update
                 del_update.where(cellid=self.cellid)

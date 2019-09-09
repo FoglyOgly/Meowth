@@ -309,6 +309,8 @@ class S2_L10():
                     hour = await query.get_value()
                 except:
                     hour = 0
+                if not hour:
+                    hour = 0
                 d['pull_hour'] = hour
                 del_update = forecast_table.update
                 del_update.where(cellid=self.cellid)

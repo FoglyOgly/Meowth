@@ -1126,6 +1126,10 @@ class RaidCog(Cog):
                     details = f"This EX Raid will end at {timestr}"
                 else:
                     details = f"This Raid will end at {timestr}"
+            reporter = raid.guild.get_member(raid.reporter_id)
+            if reporter:
+                reporter = reporter.display_name
+            footer_text = f"Reported by {reporter} • {raid.channel_topic}"
         elif isinstance(raid_or_meetup, Meetup):
             meetup = raid_or_meetup
             dt = datetime.fromtimestamp(meetup.start)
@@ -1134,6 +1138,7 @@ class RaidCog(Cog):
             datestr = local.strftime('%b %d')
             title = "Start Time Updated"
             details = f"This Meetup will start on {datestr} at {timestr}"
+            footer_text = meetup.channel_topic
         await ctx.channel.edit(topic=raid_or_meetup.channel_topic)
         has_embed = False
         for idstring in raid_or_meetup.message_ids:
@@ -1142,7 +1147,7 @@ class RaidCog(Cog):
                 continue
             if not has_embed:
                 embed = msg.embeds[0]
-                embed.timestamp = dt
+                embed.set_footer(text=footer_text, icon_url=embed.footer.icon_url))
                 has_embed = True
             await msg.edit(embed=embed)
         return await ctx.success(title=title, details=details)

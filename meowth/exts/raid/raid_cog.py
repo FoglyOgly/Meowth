@@ -1147,7 +1147,7 @@ class RaidCog(Cog):
                 continue
             if not has_embed:
                 embed = msg.embeds[0]
-                embed.set_footer(text=footer_text, icon_url=embed.footer.icon_url))
+                embed.set_footer(text=footer_text, icon_url=embed.footer.icon_url)
                 has_embed = True
             await msg.edit(embed=embed)
         return await ctx.success(title=title, details=details)

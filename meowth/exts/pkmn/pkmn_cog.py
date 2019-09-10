@@ -874,7 +874,7 @@ class Pokemon():
                 possible_mons = [x for x in mons if await x._wild_available()]
             elif command_name == 'rocket':
                 possible_mons = [x for x in mons if x.form == 63]
-            elif command_name == 'research':
+            elif command_name in ['research', 'boss']:
                 possible_mons = [x for x in mons if x.form != 63 and x.form != 64]
             elif command_name == 'trade':
                 possible_mons = [x for x in mons if await x._trade_available()]

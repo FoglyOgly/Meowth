@@ -4,6 +4,7 @@ import discord
 from meowth.utils.fuzzymatch import get_match, get_matches
 from meowth.utils import formatters
 import pywraps2 as s2
+from staticmap import StaticMap, Line
 import aiohttp
 import asyncio
 import datetime
@@ -231,6 +232,17 @@ class ReportChannel():
             raid_lists[level][boss_id] = d
         return raid_lists
 
+    async def get_map(self):
+        covering = await self.level_10_covering()
+        cells = [S2_L10(self.bot, x) for x in covering]
+        lines = []
+        for x in cells:
+            lines.extend(x.get_border())
+        m = StaticMap(200, 200, 80)
+        for l in lines:
+            m.add_line(l)
+        return m
+
 
 class S2_L10():
 
@@ -346,6 +358,27 @@ class S2_L10():
         query.where(raid_table['gym'].in_(gyms))
         raids = await query.get_values()
         return raids
+    
+    def get_vertices(self):
+        cellid = int(self.cellid, base=16)
+        cell = s2.S2Cell(s2.S2CellId(cellid))
+        loop = s2.S2Loop(cell)
+        v0 = loop.GetS2LatLngVertex(0)
+        v1 = loop.GetS2LatLngVertex(1)
+        v2 = loop.GetS2LatLngVertex(2)
+        v3 = loop.GetS2LatLngVertex(3)
+        return [v0, v1, v2, v3]
+    
+    def get_border(self):
+        vs = self.get_vertices()
+        vs = [[x[1], x[0]] for x in vs]
+        l1 = Line([vs[0], vs[1]], 'blue', 3)
+        l2 = Line([vs[1], vs[2]], 'blue', 3)
+        l3 = Line([vs[2], vs[3]], 'blue', 3)
+        l4 = Line([vs[3], vs[0]], 'blue', 3)
+        return [l1, l2, l3, l4]
+    
+
 
 
 class S2_L12():

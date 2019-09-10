@@ -364,9 +364,13 @@ class S2_L10():
         cell = s2.S2Cell(s2.S2CellId(cellid))
         loop = s2.S2Loop(cell)
         v0 = loop.GetS2LatLngVertex(0)
+        v0 = [v0.lat(), v0.lng()]
         v1 = loop.GetS2LatLngVertex(1)
+        v1 = [v1.lat(), v1.lng()]
         v2 = loop.GetS2LatLngVertex(2)
+        v2 = [v2.lat(), v2.lng()]
         v3 = loop.GetS2LatLngVertex(3)
+        v3 = [v3.lat(), v3.lng()]
         return [v0, v1, v2, v3]
     
     def get_border(self):

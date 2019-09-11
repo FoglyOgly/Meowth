@@ -238,7 +238,7 @@ class ReportChannel():
         lines = []
         for x in cells:
             lines.extend(x.get_border())
-        m = StaticMap(200, 200, 80)
+        m = StaticMap(400, 400, 80)
         for l in lines:
             m.add_line(l)
         return m
@@ -376,10 +376,10 @@ class S2_L10():
     def get_border(self):
         vs = self.get_vertices()
         vs = [[x[1], x[0]] for x in vs]
-        l1 = Line([vs[0], vs[1]], 'blue', 3)
-        l2 = Line([vs[1], vs[2]], 'blue', 3)
-        l3 = Line([vs[2], vs[3]], 'blue', 3)
-        l4 = Line([vs[3], vs[0]], 'blue', 3)
+        l1 = Line([vs[0], vs[1]], 'black', 2)
+        l2 = Line([vs[1], vs[2]], 'black', 2)
+        l3 = Line([vs[2], vs[3]], 'black', 2)
+        l4 = Line([vs[3], vs[0]], 'black', 2)
         return [l1, l2, l3, l4]
     
 

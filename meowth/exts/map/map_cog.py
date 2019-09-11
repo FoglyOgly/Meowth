@@ -238,7 +238,7 @@ class ReportChannel():
         lines = []
         for x in cells:
             lines.extend(x.get_border())
-        m = StaticMap(600, 600, 40)
+        m = StaticMap(600, 600, 10)
         for l in lines:
             m.add_line(l)
         return m

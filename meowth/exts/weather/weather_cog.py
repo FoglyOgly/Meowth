@@ -172,8 +172,8 @@ class WeatherCog(Cog):
             frame = maps[hour]
             coords = m['coords']
             icon_path = m['icon_path']
-            marker = IconMarker(coords, icon_path, 15, 15)
-            marker.img = marker.img.resize((30, 30))
+            marker = IconMarker(coords, icon_path, 10, 10)
+            marker.img = marker.img.resize((20, 20))
             frame.add_marker(marker)
         f = io.BytesIO()
         images = [m.render() for m in maps]

@@ -169,8 +169,8 @@ class WeatherCog(Cog):
         for i in range(max_hour+1):
             maps.append(copy(base_map))
         await ctx.send(str(maps))
-        await ctx.send(str(markers))
         for m in markers:
+            await ctx.send(str(m))
             hour = m['hour']
             frame = maps[hour]
             coords = m['coords']

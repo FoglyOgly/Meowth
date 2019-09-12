@@ -176,7 +176,6 @@ class WeatherCog(Cog):
             frame.add_marker(marker)
         f = io.BytesIO()
         images = [m.render() for m in maps]
-        images = [imageio.imread(x.tobytes()) for x in images]
         imageio.mimwrite(f, images, format='GIF', duration=1)
         to_send = io.BytesIO(f.getvalue())
         return type(to_send)

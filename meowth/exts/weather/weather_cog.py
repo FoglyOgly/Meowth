@@ -178,7 +178,7 @@ class WeatherCog(Cog):
         images = [m.render() for m in maps]
         imageio.mimwrite(f, images, format='GIF', duration=1)
         to_send = io.BytesIO(f.getvalue())
-        return type(to_send)
+        await ctx.send(str(type(to_send)))
         await ctx.send(file=to_send)
 
 

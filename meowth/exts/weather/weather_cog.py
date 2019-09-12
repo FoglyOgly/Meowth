@@ -148,6 +148,8 @@ class WeatherCog(Cog):
         markers = []
         for cell in cells:
             forecast = await cell.forecast(ctx.guild.id)
+            if not forecast:
+                continue
             coords = cell.center_coords
             coords = (coords.lat().degrees(), coords.lng().degrees())
             for hour in forecast:

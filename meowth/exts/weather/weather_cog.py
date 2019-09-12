@@ -8,7 +8,6 @@ import os
 from staticmap import IconMarker
 from copy import copy
 import io
-import imageio
 import discord
 
 class Weather():
@@ -178,7 +177,7 @@ class WeatherCog(Cog):
             frame.add_marker(marker)
         f = io.BytesIO()
         images = [m.render() for m in maps]
-        imageio.mimwrite(f, images, format='GIF', duration=1)
+        images[0].save(f, save_all=True, append_images=images[1:], duration=1)
         to_send = discord.File(io.BytesIO(f.getvalue()), filename='forecast.gif')
         await ctx.send(file=to_send)
 

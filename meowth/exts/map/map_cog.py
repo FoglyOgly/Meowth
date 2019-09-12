@@ -238,10 +238,10 @@ class ReportChannel():
         lines = []
         for x in cells:
             lines.extend(x.get_border())
-        m = StaticMap(600, 600, 10)
+        m = StaticMap(600, 600, 10, 30)
         for l in lines:
             m.add_line(l)
-        return m
+        return m, cells
 
 
 class S2_L10():
@@ -293,6 +293,41 @@ class S2_L10():
         if not weather:
             return "NO_WEATHER"
         return weather
+    
+    async def pull_hour(self, guild_id):
+        query = self.bot.dbi.table('current_weather').query('pull_hour')
+        try:
+            query.where(cellid=self.cellid)
+            query.where(guild_id=guild_id)
+            pull_hour = await query.get_value()
+        except:
+            pull_hour = 0
+        if not pull_hour:
+            pull_hour = 0
+        return pull_hour
+    
+    async def forecast(self, guild_id):
+        pull_hour = await self.pull_hour(guild_id)
+        table = self.bot.dbi.table('weather_forecasts')
+        query = table.query
+        query.where(cellid=self.cellid)
+        query.where(pull_hour=pull_hour)
+        data = await query.get()
+        if not data:
+            return None
+        d = dict(data[0])
+        f = {}
+        current_hour = datetime.datetime.utcnow().hour % 8
+        if pull_hour < current_hour:
+            end = pull_hour + 8
+        else:
+            end = pull_hour
+        hours = list(range(current_hour, end+1))
+        hours = [x % 8 for x in hours]
+        for i in range(len(hours)):
+            f[i] = d[f'forecast_{hours[i]}']
+        return f
+
     
     async def correct_weather(self, weather, guild_id):
         table = self.bot.dbi.table('current_weather')

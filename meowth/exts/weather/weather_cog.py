@@ -1,9 +1,14 @@
 from meowth import Cog, command, bot
-from meowth.exts.map import S2_L10
+from meowth.exts.map import S2_L10, ReportChannel
 from meowth.utils import fuzzymatch
 import aiohttp
 import asyncio
 from datetime import datetime, timedelta
+import os
+from staticmap import IconMarker
+from copy import copy
+import io
+import imageio
 
 class Weather():
 
@@ -33,6 +38,12 @@ class Weather():
     def icon_url(self):
         url = f'https://github.com/FoglyOgly/Meowth/blob/new-core/meowth/images/weather/{self.value}.png?raw=true'
         return url
+    
+    @property
+    def icon_path(self):
+        bot_dir = self.bot.bot_dir
+        path = os.path.join(bot_dir, "images", "weather", f"{self.value}.png")
+        return path
 
 
     @classmethod
@@ -130,6 +141,42 @@ class WeatherCog(Cog):
             insert = forecast_table.insert
             insert.rows(rows)
             await insert.commit(do_update=True)
+    
+    async def forecast(self, ctx):
+        channel = ReportChannel(ctx.bot, ctx.channel)
+        base_map, cells = await channel.get_map()
+        markers = []
+        for cell in cells:
+            forecast = await cell.forecast(ctx.guild.id)
+            coords = cell.center_coords
+            coords = (coords.lat().degrees(), coords.lng().degrees())
+            for hour in forecast:
+                weather = Weather(ctx.bot, forecast[hour])
+                icon_path = weather.icon_path
+                m = {
+                    'hour': hour,
+                    'icon_path': icon_path,
+                    'coords': coords
+                }
+                markers.append(m)
+        max_hour = max([x['hour'] for x in markers])
+        maps = []
+        for i in range(max_hour+1):
+            maps.append(copy(base_map))
+        for m in markers:
+            hour = m['hour']
+            frame = maps[hour]
+            coords = m['coords']
+            icon_path = m['icon_path']
+            marker = IconMarker(coords, icon_path, 0, 0)
+            frame.add_marker(marker)
+        f = io.BytesIO()
+        images = [m.render() for m in maps]
+        imageio.mimwrite(f, images, format='GIF', duration=1)
+        to_send = io.BytesIO(f.getvalue())
+        await ctx.send(file=to_send)
+
+
             
         
 

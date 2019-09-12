@@ -44,7 +44,7 @@ class Weather():
     @property
     def icon_path(self):
         bot_dir = self.bot.bot_dir
-        path = os.path.join(bot_dir, "images", "weather", f"{self.value}.png")
+        path = os.path.join(bot_dir, "images", "weather", f"{self.value}_thumbnail.png")
         return path
 
 
@@ -173,7 +173,6 @@ class WeatherCog(Cog):
             coords = m['coords']
             icon_path = m['icon_path']
             marker = IconMarker(coords, icon_path, 10, 10)
-            marker.img = marker.img.resize((20, 20))
             frame.add_marker(marker)
         f = io.BytesIO()
         images = [m.render() for m in maps]

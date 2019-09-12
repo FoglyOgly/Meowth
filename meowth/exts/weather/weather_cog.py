@@ -177,7 +177,7 @@ class WeatherCog(Cog):
             frame.add_marker(marker)
         f = io.BytesIO()
         images = [m.render() for m in maps]
-        imageio.mimwrite(f, format='GIF-PIL', duration=1, subrectangles=True)
+        imageio.mimwrite(f, images, format='GIF-PIL', duration=1, subrectangles=True)
         to_send = discord.File(io.BytesIO(f.getvalue()), filename='forecast.gif')
         await ctx.send(file=to_send)
 

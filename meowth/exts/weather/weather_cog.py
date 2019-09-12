@@ -6,7 +6,7 @@ import asyncio
 from datetime import datetime, timedelta
 import os
 from staticmap import IconMarker
-from copy import copy
+from copy import deepcopy
 import io
 import discord
 
@@ -164,16 +164,16 @@ class WeatherCog(Cog):
                 }
                 markers.append(m)
         max_hour = max([x['hour'] for x in markers])
-        maps = []
+        maps = {}
         for i in range(max_hour+1):
-            maps.append(copy(base_map))
+            maps[i] = deepcopy(base_map)
         for m in markers:
             hour = m['hour']
             frame = maps[hour]
             coords = m['coords']
             icon_path = m['icon_path']
-            marker = IconMarker(coords, icon_path, 10, 10)
-            marker.img = marker.img.resize((20, 20))
+            marker = IconMarker(coords, icon_path, 15, 15)
+            marker.img = marker.img.resize((30, 30))
             frame.add_marker(marker)
         f = io.BytesIO()
         images = [m.render() for m in maps]

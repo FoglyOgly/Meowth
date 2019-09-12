@@ -14,6 +14,8 @@ class Weather():
 
     def __init__(self, bot, value):
         self.bot = bot
+        if not value:
+            value = "NO_WEATHER"
         self.value = value
 
     async def name(self):

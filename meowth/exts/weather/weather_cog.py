@@ -176,7 +176,7 @@ class WeatherCog(Cog):
             coords = m['coords']
             icon_path = m['icon_path']
             marker = IconMarker(coords, icon_path, 0, 0)
-            marker = marker.img.resize((10, 10))
+            marker.img = marker.img.resize((10, 10))
             frame.add_marker(marker)
         f = io.BytesIO()
         images = [m.render() for m in maps]

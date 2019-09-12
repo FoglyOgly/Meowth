@@ -164,9 +164,9 @@ class WeatherCog(Cog):
                 }
                 markers.append(m)
         max_hour = max([x['hour'] for x in markers])
-        maps = {}
+        maps = []
         for i in range(max_hour+1):
-            maps[i] = deepcopy(base_map)
+            maps.append(deepcopy(base_map))
         for m in markers:
             hour = m['hour']
             frame = maps[hour]

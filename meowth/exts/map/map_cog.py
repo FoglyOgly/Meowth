@@ -238,7 +238,7 @@ class ReportChannel():
         lines = []
         for x in cells:
             lines.extend(x.get_border())
-        url_template = 'https://a.basemaps.cartocdn.com/rastertiles/voyager_nolables/{z}/{x}/{y}.png'
+        url_template = 'https://a.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}.png'
         m = StaticMap(300, 300, 5, 15, url_template)
         for l in lines:
             m.add_line(l)

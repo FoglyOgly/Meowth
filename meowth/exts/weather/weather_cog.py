@@ -153,7 +153,7 @@ class WeatherCog(Cog):
         channel = ReportChannel(ctx.bot, ctx.channel)
         base_map, cells = await channel.get_map()
         W = base_map.width
-        font_size = ceil(base_map.padding_y * 0.6)
+        font_size = ceil(base_map.padding[1] * 0.6)
         font = ImageFont.truetype(
             font=os.path.join(ctx.bot.bot_dir, "fonts", "Poppins-Regular.ttf"),
             size=font_size

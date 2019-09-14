@@ -198,7 +198,7 @@ class WeatherCog(Cog):
             d = ImageDraw.Draw(im)
             w, h = d.textsize(timestr, font=font)
             x = (W - w) / 2
-            d.text((x, 5), timestr, font=font))
+            d.text((x, 5), timestr, font=font)
         imageio.mimwrite(f, images, format='GIF-PIL', duration=1, subrectangles=True)
         to_send = discord.File(io.BytesIO(f.getvalue()), filename='forecast.gif')
         await ctx.send(file=to_send)

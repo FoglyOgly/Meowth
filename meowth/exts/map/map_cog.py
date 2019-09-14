@@ -414,10 +414,10 @@ class S2_L10():
     def get_border(self):
         vs = self.get_vertices()
         vs = [[x[1], x[0]] for x in vs]
-        l1 = Line([vs[0], vs[1]], 'lightgray', 1)
-        l2 = Line([vs[1], vs[2]], 'lightgray', 1)
-        l3 = Line([vs[2], vs[3]], 'lightgray', 1)
-        l4 = Line([vs[3], vs[0]], 'lightgray', 1)
+        l1 = Line([vs[0], vs[1]], 'darkgray', 1)
+        l2 = Line([vs[1], vs[2]], 'darkgray', 1)
+        l3 = Line([vs[2], vs[3]], 'darkgray', 1)
+        l4 = Line([vs[3], vs[0]], 'darkgray', 1)
         return [l1, l2, l3, l4]
     
 

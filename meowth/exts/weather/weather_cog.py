@@ -153,7 +153,9 @@ class WeatherCog(Cog):
         channel = ReportChannel(ctx.bot, ctx.channel)
         base_map, cells = await channel.get_map()
         W = base_map.width
-        font_size = ceil(base_map.padding[1] * 0.6)
+        H = base_map.height
+        padding_y = ceil(base_map.padding[1])
+        font_size = padding_y * 0.6
         font = ImageFont.truetype(
             font=os.path.join(ctx.bot.bot_dir, "fonts", "Poppins-Regular.ttf"),
             size=font_size
@@ -193,6 +195,7 @@ class WeatherCog(Cog):
         initial_hr = now_dt.replace(minute=0)
         for i in range(len(images)):
             im = images[i]
+            im.crop((0,0,W,(H-padding_y)))
             hour = initial_hr + timedelta(hours=i)
             timestr = hour.strftime('%I:%M %p')
             d = ImageDraw.Draw(im)

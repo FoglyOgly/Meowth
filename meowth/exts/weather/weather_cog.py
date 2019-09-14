@@ -154,8 +154,8 @@ class WeatherCog(Cog):
         base_map, cells = await channel.get_map()
         W = base_map.width
         H = base_map.height
-        padding_y = ceil(base_map.padding[1])
-        font_size = padding_y * 0.6
+        padding_y = base_map.padding[1]
+        font_size = ceil(padding_y * 0.6)
         font = ImageFont.truetype(
             font=os.path.join(ctx.bot.bot_dir, "fonts", "Poppins-Regular.ttf"),
             size=font_size

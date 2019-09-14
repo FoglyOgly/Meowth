@@ -10,6 +10,10 @@ from copy import deepcopy
 import io
 import discord
 import imageio
+from PIL import ImageDraw, ImageFont
+from math import ceil
+from pytz import timezone
+
 
 class Weather():
 
@@ -148,6 +152,12 @@ class WeatherCog(Cog):
     async def forecast(self, ctx):
         channel = ReportChannel(ctx.bot, ctx.channel)
         base_map, cells = await channel.get_map()
+        W = base_map.width
+        font_size = ceil(base_map.padding_y * 0.6)
+        font = ImageFont.truetype(
+            font=os.path.join(ctx.bot.bot_dir, "fonts", "Poppins-Regular.ttf"),
+            size=font_size
+        )
         markers = []
         for cell in cells:
             forecast = await cell.forecast(ctx.guild.id)
@@ -177,6 +187,18 @@ class WeatherCog(Cog):
             frame.add_marker(marker)
         f = io.BytesIO()
         images = [m.render() for m in maps]
+        zone = await ctx.tz()
+        tz = timezone(zone)
+        now_dt = datetime.now(tz=tz)
+        initial_hr = now_dt.replace(minute=0)
+        for i in range(len(images)):
+            im = images[i]
+            hour = initial_hr + timedelta(hours=i)
+            timestr = hour.strftime('%I:%M %p')
+            d = ImageDraw.Draw(im)
+            w, h = d.textsize(timestr, font=font)
+            x = (W - w) / 2
+            d.text((x, 5), timestr, font=font))
         imageio.mimwrite(f, images, format='GIF-PIL', duration=1, subrectangles=True)
         to_send = discord.File(io.BytesIO(f.getvalue()), filename='forecast.gif')
         await ctx.send(file=to_send)

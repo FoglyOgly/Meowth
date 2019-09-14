@@ -195,7 +195,7 @@ class WeatherCog(Cog):
         initial_hr = now_dt.replace(minute=0)
         for i in range(len(images)):
             im = images[i]
-            im.crop((0,0,W,(H-padding_y)))
+            im = im.crop((0,0,W,(H-padding_y)))
             hour = initial_hr + timedelta(hours=i)
             timestr = hour.strftime('%I:%M %p')
             d = ImageDraw.Draw(im)

@@ -45,7 +45,7 @@ class Weather():
     @property
     def icon_path(self):
         bot_dir = self.bot.bot_dir
-        path = os.path.join(bot_dir, "images", "weather", f"{self.value}_small.png")
+        path = os.path.join(bot_dir, "images", "weather", f"{self.value}_small_white.png")
         return path
 
 

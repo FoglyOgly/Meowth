@@ -13,7 +13,7 @@ import pytz
 from pytz import timezone
 import io
 import codecs
-from math import radians, degrees
+from math import radians, degrees, sqrt, ceil
 import csv
 from urllib.parse import quote_plus
 import googlemaps
@@ -235,11 +235,13 @@ class ReportChannel():
     async def get_map(self):
         covering = await self.level_10_covering()
         cells = [S2_L10(self.bot, x) for x in covering]
+        approx_width = sqrt(len(cells))
+        px_dim = 100*ceil(approx_width)
         lines = []
         for x in cells:
             lines.extend(x.get_border())
-        url_template = 'https://a.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}.png'
-        m = StaticMap(300, 300, 5, 15, url_template)
+        url_template = 'https://a.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png'
+        m = StaticMap(px_dim, px_dim, 5, 15, url_template)
         for l in lines:
             m.add_line(l)
         return m, cells
@@ -412,10 +414,10 @@ class S2_L10():
     def get_border(self):
         vs = self.get_vertices()
         vs = [[x[1], x[0]] for x in vs]
-        l1 = Line([vs[0], vs[1]], 'black', 1)
-        l2 = Line([vs[1], vs[2]], 'black', 1)
-        l3 = Line([vs[2], vs[3]], 'black', 1)
-        l4 = Line([vs[3], vs[0]], 'black', 1)
+        l1 = Line([vs[0], vs[1]], 'lightgray', 1)
+        l2 = Line([vs[1], vs[2]], 'lightgray', 1)
+        l3 = Line([vs[2], vs[3]], 'lightgray', 1)
+        l4 = Line([vs[3], vs[0]], 'lightgray', 1)
         return [l1, l2, l3, l4]
     
 

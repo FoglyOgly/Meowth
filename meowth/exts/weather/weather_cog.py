@@ -163,7 +163,7 @@ class WeatherCog(Cog):
             return None
         font = ImageFont.truetype(
             font=os.path.join(ctx.bot.bot_dir, "fonts", "Poppins-Regular.ttf"),
-            size=32
+            size=48
         )
         tz = timezone(zone)
         now_dt = datetime.now(tz=tz)
@@ -180,11 +180,12 @@ class WeatherCog(Cog):
             icon_im = Image.open(icon_path)
             im.paste(icon_im, (0,44))
             x = (256-w) / 2
-            d.text((x, 5), timestr, font=font, fill=(119, 119, 119, 255))
+            d.text((x, 5), timestr, font=font, fill=(0, 255, 255, 255))
             ims.append(im)
         num_hours = len(ims)
         banner = Image.new('RGBA', (256*num_hours, 300), color=(0,0,0,0))
         for i in range(num_hours):
+            im = ims[i]
             banner.paste(im, (256*i, 0))
         f = io.BytesIO()
         banner.save(f, format='PNG')

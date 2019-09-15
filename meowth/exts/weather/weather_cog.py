@@ -56,6 +56,7 @@ class Weather():
     def icon_path_color(self):
         bot_dir = self.bot.bot_dir
         path = os.path.join(bot_dir, "images", "weather", f"{self.value}.png")
+        return path
 
 
     @classmethod

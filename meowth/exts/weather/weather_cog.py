@@ -10,7 +10,7 @@ from copy import deepcopy
 import io
 import discord
 import imageio
-from PIL import ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont
 from math import ceil
 from pytz import timezone
 
@@ -51,6 +51,11 @@ class Weather():
         bot_dir = self.bot.bot_dir
         path = os.path.join(bot_dir, "images", "weather", f"{self.value}_small_black.png")
         return path
+    
+    @property
+    def icon_path_color(self):
+        bot_dir = self.bot.bot_dir
+        path = os.path.join(bot_dir, "images", "weather", f"{self.value}.png")
 
 
     @classmethod
@@ -149,7 +154,44 @@ class WeatherCog(Cog):
             insert.rows(rows)
             await insert.commit(do_update=True)
     
-    async def forecast(self, ctx):
+    async def gym_forecast(self, ctx, gym):
+        cell_id = await gym._L10()
+        cell = S2_L10(ctx.bot, cell_id)
+        forecast = await cell.forecast(ctx.guild.id)
+        if not forecast:
+            return None
+        font = ImageFont.truetype(
+            font=os.path.join(ctx.bot.bot_dir, "fonts", "Poppins-Regular.ttf")
+            size=32
+        )
+        zone = await ctx.tz()
+        tz = timezone(zone)
+        now_dt = datetime.now(tz=tz)
+        initial_hr = now_dt.replace(minute=0)
+        ims = []
+        for hour in forecast:
+            weather = Weather(ctx.bot, forecast[hour])
+            icon_path = weather.icon_path_color
+            im = Image.new('RGBA', (256, 300), color=(0,0,0,0))
+            fchour = initial_hr + timedelta(hours=hour)
+            timestr = fchour.strftime('%I:%M %p')
+            d = ImageDraw.Draw(im)
+            w, h = d.textsize(timestr, font=font)
+            icon_im = Image.open(icon_path)
+            im.paste(icon_im, (0,44))
+            x = (256-w) / 2
+            d.text((x, 5), timestr, font=font, fill=(119, 119, 119, 255))
+            ims.append(im)
+        num_hours = len(ims)
+        banner = Image.new('RGBA', (256*num_hours, 300), color=(0,0,0,0))
+        for i in range(num_hours):
+            banner.paste(im, (256*i, 0))
+        to_send = discord.File(io.BytesIO(banner.tobytes()), filename='forecast.png')
+        await ctx.send(file=to_send)
+
+
+    
+    async def channel_forecast(self, ctx):
         channel = ReportChannel(ctx.bot, ctx.channel)
         base_map, cells = await channel.get_map()
         W = base_map.width

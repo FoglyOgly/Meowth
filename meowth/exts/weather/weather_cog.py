@@ -154,7 +154,7 @@ class WeatherCog(Cog):
             insert.rows(rows)
             await insert.commit(do_update=True)
     
-    async def gym_forecast(self, ctx, gym):
+    async def gym_forecast(self, ctx, gym, zone):
         cell_id = await gym._L10()
         cell = S2_L10(ctx.bot, cell_id)
         forecast = await cell.forecast(ctx.guild.id)
@@ -164,7 +164,6 @@ class WeatherCog(Cog):
             font=os.path.join(ctx.bot.bot_dir, "fonts", "Poppins-Regular.ttf"),
             size=32
         )
-        zone = await ctx.tz()
         tz = timezone(zone)
         now_dt = datetime.now(tz=tz)
         initial_hr = now_dt.replace(minute=0)

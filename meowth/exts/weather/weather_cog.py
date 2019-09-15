@@ -161,7 +161,7 @@ class WeatherCog(Cog):
         if not forecast:
             return None
         font = ImageFont.truetype(
-            font=os.path.join(ctx.bot.bot_dir, "fonts", "Poppins-Regular.ttf")
+            font=os.path.join(ctx.bot.bot_dir, "fonts", "Poppins-Regular.ttf"),
             size=32
         )
         zone = await ctx.tz()

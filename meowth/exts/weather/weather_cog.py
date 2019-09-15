@@ -186,7 +186,9 @@ class WeatherCog(Cog):
         banner = Image.new('RGBA', (256*num_hours, 300), color=(0,0,0,0))
         for i in range(num_hours):
             banner.paste(im, (256*i, 0))
-        to_send = discord.File(io.BytesIO(banner.tobytes()), filename='forecast.png')
+        f = io.BytesIO()
+        banner.save(f, format='PNG')
+        to_send = discord.File(io.BytesIO(f.getvalue()), filename='forecast.png')
         await ctx.send(file=to_send)
 
 

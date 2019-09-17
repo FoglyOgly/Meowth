@@ -263,10 +263,7 @@ class WeatherCog(Cog):
         to_send = discord.File(io.BytesIO(f.getvalue()), filename='forecast.gif')
         p = ctx.prefix
         title = 'Pokémon Go Weather Forecast'
-        desc = 'This forecast may be inaccurate if the game is pulling forecast data at a different hour!'
-        desc += f'\nYou can help Meowth determine the correct pull times by using **{p}weather** to correct the predicted weather in raid channels!'
-        desc += '\nDue to the cost of using the AccuWeather API, this feature is exclusive to servers with a Meowth Patreon Super Nerd member!'
-        desc += '\nBe sure to thank your local Super Nerd! Visit patreon.com/meowthbot if you are interested in supporting Meowth!'
+        desc = f'You can help Meowth determine the correct pull times by using **{p}weather** to correct the predicted weather in raid channels!'
         embed = discord.Embed(title=title, description=desc)
         embed.set_image(url='attachment://forecast.gif')
         await ctx.send(embed=embed, file=to_send)

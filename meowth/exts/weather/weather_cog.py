@@ -14,6 +14,8 @@ from PIL import Image, ImageDraw, ImageFont
 from math import ceil
 from pytz import timezone
 
+from . import weather_checks
+
 
 class Weather():
 
@@ -154,6 +156,15 @@ class WeatherCog(Cog):
             insert = forecast_table.insert
             insert.rows(rows)
             await insert.commit(do_update=True)
+
+    @command(name='forecast')
+    @weather_checks.forecast_enabled()
+    @weather_checks.channel_has_location()
+    async def forecast(self, ctx):
+        if ctx.location == 'channel':
+            return await self.channel_forecast(ctx)
+        else:
+            return await self.gym_forecast(ctx, ctx.location, ctx._tz)
     
     async def gym_forecast(self, ctx, gym, zone):
         cell_id = await gym._L10()
@@ -163,7 +174,7 @@ class WeatherCog(Cog):
             return None
         font = ImageFont.truetype(
             font=os.path.join(ctx.bot.bot_dir, "fonts", "Poppins-Regular.ttf"),
-            size=48
+            size=44
         )
         tz = timezone(zone)
         now_dt = datetime.now(tz=tz)

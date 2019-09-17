@@ -161,10 +161,11 @@ class WeatherCog(Cog):
     @weather_checks.forecast_enabled()
     @weather_checks.channel_has_location()
     async def forecast(self, ctx):
-        if ctx.location == 'channel':
-            return await self.channel_forecast(ctx)
-        else:
-            return await self.gym_forecast(ctx, ctx.location, ctx._tz)
+        async with ctx.typing():
+            if ctx.location == 'channel':
+                return await self.channel_forecast(ctx)
+            else:
+                return await self.gym_forecast(ctx, ctx.location, ctx._tz)
     
     async def gym_forecast(self, ctx, gym, zone):
         cell_id = await gym._L10()
@@ -201,7 +202,12 @@ class WeatherCog(Cog):
         f = io.BytesIO()
         banner.save(f, format='PNG')
         to_send = discord.File(io.BytesIO(f.getvalue()), filename='forecast.png')
-        await ctx.send(file=to_send)
+        p = ctx.prefix
+        title = 'Pokémon Go Weather Forecast: Current Region'
+        desc = f'You can help Meowth determine the correct pull times by using **{p}weather** to correct the predicted weather in raid channels!'
+        embed = discord.Embed(title=title, description=desc)
+        embed.set_image(url='attachment://forecast.png')
+        await ctx.send(file=to_send, embed=embed)
 
 
     
@@ -262,7 +268,7 @@ class WeatherCog(Cog):
         imageio.mimwrite(f, images, format='GIF-PIL', duration=1, subrectangles=True)
         to_send = discord.File(io.BytesIO(f.getvalue()), filename='forecast.gif')
         p = ctx.prefix
-        title = 'Pokémon Go Weather Forecast'
+        title = 'Pokémon Go Weather Forecast: Current Region'
         desc = f'You can help Meowth determine the correct pull times by using **{p}weather** to correct the predicted weather in raid channels!'
         embed = discord.Embed(title=title, description=desc)
         embed.set_image(url='attachment://forecast.gif')

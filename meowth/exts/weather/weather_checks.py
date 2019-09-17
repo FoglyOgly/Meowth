@@ -21,7 +21,7 @@ async def check_channel_has_location(ctx):
     report_query = report_table.query('lat', 'lon', 'radius')
     try:
         report_query.where(channelid=channel_id)
-        data = report_query.get()
+        data = await report_query.get()
         if data:
             ctx.location = 'channel'
             return True

@@ -9,6 +9,7 @@ from staticmap import IconMarker
 from copy import deepcopy
 import io
 import discord
+from discord.ext import commands
 import imageio
 from PIL import Image, ImageDraw, ImageFont
 from math import ceil
@@ -158,6 +159,7 @@ class WeatherCog(Cog):
             await insert.commit(do_update=True)
 
     @command(name='forecast')
+    @commands.cooldown(rate=1, per=3600, type=commands.BucketType.channel)
     @weather_checks.forecast_enabled()
     @weather_checks.channel_has_location()
     async def forecast(self, ctx):
@@ -203,7 +205,7 @@ class WeatherCog(Cog):
         banner.save(f, format='PNG')
         to_send = discord.File(io.BytesIO(f.getvalue()), filename='forecast.png')
         p = ctx.prefix
-        title = 'Pokémon Go Weather Forecast: Current Region'
+        title = 'Pokémon Go Weather Forecast: Current Location'
         desc = f'You can help Meowth determine the correct pull times by using **{p}weather** to correct the predicted weather in raid channels!'
         embed = discord.Embed(title=title, description=desc)
         embed.set_image(url='attachment://forecast.png')

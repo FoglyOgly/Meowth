@@ -1,6 +1,4 @@
 from discord.ext import commands
-from meowth.exts.raid import Raid, Meetup
-from meowth.exts.map import POI
 
 async def check_forecast_enabled(ctx):
     table = ctx.bot.dbi.table('forecast_config')
@@ -27,19 +25,6 @@ async def check_channel_has_location(ctx):
             return True
     except:
         pass
-    location = None
-    raid = Raid.by_channel.get(str(channel_id))
-    if raid:
-        location = raid.gym
-        ctx._tz = raid.tz
-    else:
-        meetup = Meetup.by_channel.get(channel_id)
-        if meetup:
-            location = meetup.location
-            ctx._tz = meetup.tz
-    if isinstance(location, POI):
-        ctx.location = location
-        return True
     return False
 
 def channel_has_location():

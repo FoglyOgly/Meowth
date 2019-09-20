@@ -15,7 +15,7 @@ from PIL import Image, ImageDraw, ImageFont
 from math import ceil
 from pytz import timezone
 
-# from . import weather_checks
+from . import weather_checks
 
 
 class Weather():
@@ -158,16 +158,16 @@ class WeatherCog(Cog):
             insert.rows(rows)
             await insert.commit(do_update=True)
 
-    # @command(name='forecast')
-    # @commands.cooldown(rate=1, per=3600, type=commands.BucketType.channel)
-    # @weather_checks.forecast_enabled()
-    # @weather_checks.channel_has_location()
-    # async def forecast(self, ctx):
-    #     async with ctx.typing():
-    #         if ctx.location == 'channel':
-    #             return await self.channel_forecast(ctx)
-    #         else:
-    #             return await self.gym_forecast(ctx, ctx.location, ctx._tz)
+    @command(name='forecast')
+    @commands.cooldown(rate=1, per=3600, type=commands.BucketType.channel)
+    @weather_checks.forecast_enabled()
+    @weather_checks.channel_has_location()
+    async def forecast(self, ctx):
+        async with ctx.typing():
+            if ctx.location == 'channel':
+                return await self.channel_forecast(ctx)
+            # else:
+            #     return await self.gym_forecast(ctx, ctx.location, ctx._tz)
     
     # async def gym_forecast(self, ctx, gym, zone):
     #     cell_id = await gym._L10()
@@ -213,68 +213,68 @@ class WeatherCog(Cog):
 
 
     
-    # async def channel_forecast(self, ctx):
-    #     channel = ReportChannel(ctx.bot, ctx.channel)
-    #     base_map, cells = await channel.get_map()
-    #     W = base_map.width
-    #     H = base_map.height
-    #     padding_y = base_map.padding[1]
-    #     font_size = ceil(padding_y * 1.2)
-    #     font = ImageFont.truetype(
-    #         font=os.path.join(ctx.bot.bot_dir, "fonts", "Poppins-Regular.ttf"),
-    #         size=font_size
-    #     )
-    #     markers = []
-    #     for cell in cells:
-    #         forecast = await cell.forecast(ctx.guild.id)
-    #         if not forecast:
-    #             continue
-    #         coords = cell.center_coords
-    #         coords = (coords.lng().degrees(), coords.lat().degrees())
-    #         for hour in forecast:
-    #             weather = Weather(ctx.bot, forecast[hour])
-    #             icon_path = weather.icon_path
-    #             m = {
-    #                 'hour': hour,
-    #                 'icon_path': icon_path,
-    #                 'coords': coords
-    #             }
-    #             markers.append(m)
-    #     max_hour = max([x['hour'] for x in markers])
-    #     maps = []
-    #     for i in range(max_hour+1):
-    #         maps.append(deepcopy(base_map))
-    #     for m in markers:
-    #         hour = m['hour']
-    #         frame = maps[hour]
-    #         coords = m['coords']
-    #         icon_path = m['icon_path']
-    #         marker = IconMarker(coords, icon_path, 32, 32)
-    #         frame.add_marker(marker)
-    #     f = io.BytesIO()
-    #     images = [m.render() for m in maps]
-    #     zone = await ctx.tz()
-    #     tz = timezone(zone)
-    #     now_dt = datetime.now(tz=tz)
-    #     initial_hr = now_dt.replace(minute=0)
-    #     for i in range(len(images)):
-    #         im = images[i]
-    #         im = im.crop((0,0,W,(H-padding_y)))
-    #         hour = initial_hr + timedelta(hours=i)
-    #         timestr = hour.strftime('%I:%M %p')
-    #         d = ImageDraw.Draw(im)
-    #         w, h = d.textsize(timestr, font=font)
-    #         x = (W - w) / 2
-    #         d.text((x, ceil(H*.01)), timestr, font=font, fill=(0,0,0,255))
-    #         images[i] = im
-    #     imageio.mimwrite(f, images, format='GIF-PIL', duration=1, subrectangles=True)
-    #     to_send = discord.File(io.BytesIO(f.getvalue()), filename='forecast.gif')
-    #     p = ctx.prefix
-    #     title = 'Pokémon Go Weather Forecast: Current Region'
-    #     desc = f'You can help Meowth determine the correct pull times by using **{p}weather** to correct the predicted weather in raid channels!'
-    #     embed = discord.Embed(title=title, description=desc)
-    #     embed.set_image(url='attachment://forecast.gif')
-    #     await ctx.send(embed=embed, file=to_send)
+    async def channel_forecast(self, ctx):
+        channel = ReportChannel(ctx.bot, ctx.channel)
+        base_map, cells = await channel.get_map()
+        W = base_map.width
+        H = base_map.height
+        padding_y = base_map.padding[1]
+        font_size = ceil(padding_y * 1.2)
+        font = ImageFont.truetype(
+            font=os.path.join(ctx.bot.bot_dir, "fonts", "Poppins-Regular.ttf"),
+            size=font_size
+        )
+        markers = []
+        for cell in cells:
+            forecast = await cell.forecast(ctx.guild.id)
+            if not forecast:
+                continue
+            coords = cell.center_coords
+            coords = (coords.lng().degrees(), coords.lat().degrees())
+            for hour in forecast:
+                weather = Weather(ctx.bot, forecast[hour])
+                icon_path = weather.icon_path
+                m = {
+                    'hour': hour,
+                    'icon_path': icon_path,
+                    'coords': coords
+                }
+                markers.append(m)
+        max_hour = max([x['hour'] for x in markers])
+        maps = []
+        for i in range(max_hour+1):
+            maps.append(deepcopy(base_map))
+        for m in markers:
+            hour = m['hour']
+            frame = maps[hour]
+            coords = m['coords']
+            icon_path = m['icon_path']
+            marker = IconMarker(coords, icon_path, 32, 32)
+            frame.add_marker(marker)
+        f = io.BytesIO()
+        images = [m.render() for m in maps]
+        zone = await ctx.tz()
+        tz = timezone(zone)
+        now_dt = datetime.now(tz=tz)
+        initial_hr = now_dt.replace(minute=0)
+        for i in range(len(images)):
+            im = images[i]
+            im = im.crop((0,0,W,(H-padding_y)))
+            hour = initial_hr + timedelta(hours=i)
+            timestr = hour.strftime('%I:%M %p')
+            d = ImageDraw.Draw(im)
+            w, h = d.textsize(timestr, font=font)
+            x = (W - w) / 2
+            d.text((x, ceil(H*.01)), timestr, font=font, fill=(0,0,0,255))
+            images[i] = im
+        imageio.mimwrite(f, images, format='GIF-PIL', duration=1, subrectangles=True)
+        to_send = discord.File(io.BytesIO(f.getvalue()), filename='forecast.gif')
+        p = ctx.prefix
+        title = 'Pokémon Go Weather Forecast: Current Region'
+        desc = f'You can help Meowth determine the correct pull times by using **{p}weather** to correct the predicted weather in raid channels!'
+        embed = discord.Embed(title=title, description=desc)
+        embed.set_image(url='attachment://forecast.gif')
+        await ctx.send(embed=embed, file=to_send)
 
 
             

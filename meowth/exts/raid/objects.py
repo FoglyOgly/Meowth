@@ -881,6 +881,7 @@ class Raid:
             return await formatters.get_raid_help('!', self.bot.user.avatar_url, user)
         if emoji == '❌':
             await message.remove_reaction(emoji, user)
+            await self.leave_grp(payload.user_id)
             return await meowthuser.cancel_rsvp(self.id)
         if emoji == 512707623812857871:
             if self.status != 'active':

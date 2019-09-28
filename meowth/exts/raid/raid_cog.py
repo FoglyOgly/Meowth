@@ -429,10 +429,11 @@ class RaidCog(Cog):
         """
         gym_split = gym_and_time.split()
         zone = await ctx.tz()
+        current_time = time.time()
         if ':' in gym_split[-1]:
             converter = time_converter()
             stamp = await converter.convert(ctx, gym_split[-1])
-            dt = stamp - time.time()
+            dt = stamp - current_time
             if dt > 0:
                 endtime = dt/60
             else:
@@ -478,17 +479,17 @@ class RaidCog(Cog):
             level = level_or_boss
             boss = None
             if not endtime or endtime > ctx.bot.raid_info.raid_times[level][0]:
-                hatch = time.time() + 60*ctx.bot.raid_info.raid_times[level][0]
+                hatch = current_time + 60*ctx.bot.raid_info.raid_times[level][0]
             else:
-                hatch = time.time() + 60*endtime
+                hatch = current_time + 60*endtime
             end = hatch + 60*ctx.bot.raid_info.raid_times[level][1]
         else:
             boss = await RaidBoss.convert(ctx, level_or_boss)
             level = await boss.raid_level()
             if not endtime or endtime > ctx.bot.raid_info.raid_times[level][1]:
-                end = time.time() + 60*ctx.bot.raid_info.raid_times[level][1]
+                end = current_time + 60*ctx.bot.raid_info.raid_times[level][1]
             else:
-                end = time.time() + 60*endtime
+                end = current_time + 60*endtime
             hatch = None
         raid_id = next(snowflake.create())
         new_raid = Raid(raid_id, ctx.bot, ctx.guild.id, ctx.channel.id, ctx.author.id, gym, level=level, pkmn=boss, hatch=hatch, end=end, tz=zone)
@@ -910,7 +911,7 @@ class RaidCog(Cog):
             stamp = await converter.convert(ctx, group_time)
         if stamp > raid.end:
             raise InvalidTime
-        elif raid.hatch and stamp < raid.hatch - 60:
+        elif raid.hatch and stamp < raid.hatch:
             raise InvalidTime
         grp_id = next(snowflake.create())
         d = {

@@ -3633,8 +3633,8 @@ class MeetupEmbed:
     def __init__(self, embed):
         self.embed = embed
     
-    status_index = 0
-    team_index = 1
+    status_index = 1
+    team_index = 2
 
     @property
     def status_str(self):

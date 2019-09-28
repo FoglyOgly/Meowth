@@ -864,8 +864,7 @@ class Pokemon():
             possible_ids = set(ids) & set(id_list)
         else:
             possible_ids = set(ids)
-        length = len(possible_ids)
-        if length == 0:
+        if not possible_ids:
             raise PokemonNotFound
         else:
             mons = [(cls(bot, x)) for x in possible_ids]
@@ -875,7 +874,7 @@ class Pokemon():
                 possible_mons = [x for x in mons if await x._wild_available()]
             elif command_name == 'rocket':
                 possible_mons = [x for x in mons if x.form == 63]
-            elif command_name == 'research':
+            elif command_name in ['research', 'boss']:
                 possible_mons = [x for x in mons if x.form != 63 and x.form != 64]
             elif command_name == 'trade':
                 possible_mons = [x for x in mons if await x._trade_available()]
@@ -887,6 +886,7 @@ class Pokemon():
             elif len(possible_mons) == 1:
                 pkmn = possible_mons[0]
             else:
+                length = len(possible_mons)
                 possible_names = [(await mon.name()) for mon in possible_mons]
                 react_list = formatters.mc_emoji(length)
                 choice_dict = dict(zip(react_list, possible_mons))

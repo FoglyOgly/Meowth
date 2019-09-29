@@ -1161,7 +1161,7 @@ class RaidCog(Cog):
         meetup = Meetup.by_channel.get(ctx.channel.id)
         zone = meetup.tz
         if end_time.isdigit():
-            stamp = time.time() + 60*int(newtime)
+            stamp = time.time() + 60*int(end_time)
         else:
             try:
                 newdt = parse(end_time, settings={'TIMEZONE': zone, 'RETURN_AS_TIMEZONE_AWARE': True})

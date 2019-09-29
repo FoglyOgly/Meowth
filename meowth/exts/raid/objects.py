@@ -436,7 +436,7 @@ class Meetup:
         start = self.start
         end = self.end
         now = time.time()
-        if start > now:
+        if start >= now:
             sleeptime = start - now
             await asyncio.sleep(sleeptime)
             if not end:

@@ -1179,6 +1179,23 @@ class RaidCog(Cog):
             meetup.update_end(stamp)
         except:
             raise
+        timestr = newdt.strftime('%I:%M %p')
+        datestr = newdt.strftime('%b %d')
+        title = "End Time Updated"
+        details = f"This Meetup will end on {datestr} at {timestr}"
+        footer_text = meetup.channel_topic
+        await ctx.channel.edit(topic=meetup.channel_topic)
+        has_embed = False
+        for idstring in meetup.message_ids:
+            chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
+            if not msg:
+                continue
+            if not has_embed:
+                embed = msg.embeds[0]
+                embed.set_footer(text=footer_text, icon_url=embed.footer.icon_url)
+                has_embed = True
+            await msg.edit(embed=embed)
+        return await ctx.success(title=title, details=details)
     
     @command()
     @checks.is_co_owner()

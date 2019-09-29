@@ -42,7 +42,7 @@ class time_converter(commands.Converter):
         if ctx.command.name == 'group':
             raid = Raid.by_channel.get(str(ctx.channel.id))
             end_dt = raid.local_datetime(raid.end)
-            hatch_dt = hatch_dt.replace(day=end_dt.day)
+            hatch_dt = hatch_dt.replace(end_dt.year, end_dt.month, end_dt.day)
         if hatch_dt < now_dt:
             if hatch_dt.hour < 12:
                 hatch_dt = hatch_dt.replace(hour=hatch_dt.hour+12)

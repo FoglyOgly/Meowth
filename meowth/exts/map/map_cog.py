@@ -1027,7 +1027,7 @@ class Mapper(Cog):
         *nickname (optional):* nickname of the Gym.
         
         To add multiple gyms, use `!importgyms`
-        To add an EX Raid Gym, use `!exraidgym`
+        To add an EX Raid Gym, use `!addexraidgym`
         """
         guild_id = ctx.guild.id
         await self.add_gym(guild_id, name, lat, lon, nickname=nickname)
@@ -1045,7 +1045,7 @@ class Mapper(Cog):
         *nickname (optional):* nickname of the Gym.
         
         To add multiple gyms, use `!importgyms`
-        To add a regular Gym, use `!gym`
+        To add a regular Gym, use `!addgym`
         """
         guild_id = ctx.guild.id
         await self.add_gym(guild_id, name, lat, lon, exraid=True, nickname=nickname)

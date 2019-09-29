@@ -96,7 +96,7 @@ class RaidCog(Cog):
     
     async def pickup_meetup(self, rcrd):
         meetup = await Meetup.from_data(self.bot, rcrd)
-        return meetup
+        meetup.monitor_task = self.bot.loop.create_task(meetup.monitor_status())
     
     async def pickup_traindata(self):
         train_table = self.bot.dbi.table('trains')
@@ -1169,7 +1169,7 @@ class RaidCog(Cog):
                     return await ctx.error(f'Could not convert {end_time} to a datetime object')
                 oldstamp = meetup.start
                 olddt = meetup.local_datetime(oldstamp)
-                nowdt = raid_or_meetup.local_datetime(time.time())
+                nowdt = meetup.local_datetime(time.time())
                 if newdt.date() == nowdt.date() and 'today' not in end_time:
                     newdt = newdt.combine(olddt.date(), newdt.timetz())
                 stamp = newdt.timestamp()

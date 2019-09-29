@@ -98,7 +98,7 @@ class Meetup:
             'channel_id': self.channel_id,
             'location': locid,
             'start': self.start,
-            'end': self.end,
+            'endtime': self.end,
             'tz': self.tz,
             'message_ids': self.message_ids
         }
@@ -493,9 +493,11 @@ class Meetup:
         guild_id = data['guild_id']
         report_channel_id = data['report_channel_id']
         start = data['start']
+        end = data.get('endtime')
         tz = data['tz']
         channel_id = data['channel_id']
         meetup = cls(meetup_id, bot, guild_id, channel_id, report_channel_id, location, start, tz)
+        meetup.end = end
         message_ids = data['message_ids']
         meetup.message_ids = message_ids
         meetup.trainer_dict = await meetup.get_trainer_dict()

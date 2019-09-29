@@ -288,7 +288,7 @@ class AdminCog(Cog):
 
         **Arguments**
         *features:* list of features to enable. Can include any of
-        `['raid', 'wild', 'research', 'users', 'train', 'trade', 'clean', 'archive', 'welcome']`
+        `['raid', 'wild', 'research', 'users', 'train', 'trade', 'clean', 'archive', 'welcome', 'forecast']`
 
         Raid, wild, research, and train require a defined location. Use `!setlocation`
         before enabling these.
@@ -550,6 +550,23 @@ class AdminCog(Cog):
             table = ctx.bot.dbi.table('archive')
             insert = table.insert.row(**d)
             await insert.commit(do_update=True)
+        if 'forecast' in enabled_commands:
+            g = ctx.bot.get_guild(344960572649111552)
+            gm = g.get_member(ctx.author.id)
+            r = g.get_role(616734835104546826)
+            if not r in gm.roles:
+                content = 'Unfortunately, because of the cost of using the AccuWeather API, you must be a Meowth Patreon Super Nerd to enable in-game weather forecasts. Visit www.patreon.com/meowthbot to become a Patron!'
+                await ctx.send(content)
+            else:
+                d = {
+                    'guild_id': ctx.guild.id,
+                    'enabled': True
+                }
+                table = ctx.bot.dbi.table('forecast_config')
+                insert = table.insert.row(**d)
+                await insert.commit(do_update=True)
+                content = f'Forecasts have been enabled in this server! Please note that it may take up to eight hours for this to take effect. You can use `{ctx.prefix}forecast` in any reporting channel to check the forecast, and you can use `{ctx.prefix}weather` in raid channels at known Gyms to improve the forecast.'
+                await ctx.send(content)
         if not all(required_perms.values()):
             missing_perms = [x for x in required_perms if not required_perms[x]]
             while True:

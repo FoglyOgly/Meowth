@@ -80,6 +80,7 @@ class Meetup:
         self.report_channel_id = report_channel_id
         self.location = location
         self.start = start
+        self.end = None
         self.tz = tz
         self.message_ids = []
         self.channel_id = channel_id
@@ -97,6 +98,7 @@ class Meetup:
             'channel_id': self.channel_id,
             'location': locid,
             'start': self.start,
+            'end': self.end,
             'tz': self.tz,
             'message_ids': self.message_ids
         }
@@ -134,6 +136,11 @@ class Meetup:
         hatchtimestr = hatchlocal.strftime('%I:%M %p')
         hatchdatestr = hatchlocal.strftime('%b %d')
         topic_str = f"Starts on {hatchdatestr} at {hatchtimestr} "
+        if self.end:
+            endlocal = self.local_datetime(self.end)
+            endtimestr = endlocal.strftime('%I:%M %p')
+            enddatestr = endlocal.strftime('%b %d')
+            topic_str += f"| Ends on {enddatestr} at {endtimestr}"
         return topic_str
     
     @property
@@ -402,12 +409,54 @@ class Meetup:
         return self.local_datetime(self.start)
     
     def update_time(self, new_time: float):
+        if self.monitor_task:
+            self.monitor_task.cancel()
         meetup_table = self.bot.dbi.table('meetups')
         update = meetup_table.update
         update.where(id=self.id)
         update.values(start=new_time)
         self.start = new_time
         self.bot.loop.create_task(update.commit())
+        self.monitor_task = self.bot.loop.create_task(self.monitor_status())
+    
+    def update_end(self, new_time: float):
+        if self.monitor_task:
+            self.monitor_task.cancel()
+        if new_time <= self.start:
+            raise InvalidTime
+        self.end = new_time
+        meetup_table = self.bot.dbi.table('meetups')
+        update = meetup_table.update
+        update.where(id=self.id)
+        update.values(end=new_time)
+        self.bot.loop.create_task(update.commit())
+        self.monitor_task = self.bot.loop.create_task(self.monitor_status())
+
+    async def monitor_status(self):
+        start = self.start
+        end = self.end
+        now = time.time()
+        if start > now:
+            sleeptime = start - now
+            await asyncio.sleep(sleeptime)
+            if not end:
+                return await self.channel.send('This Meetup has begun! Use the `endtime` command to set the end time for the channel!')
+            else:
+                endlocal = self.local_datetime(end)
+                endtimestr = endlocal.strftime('%I:%M %p')
+                enddatestr = endlocal.strftime('%b %d')
+                await self.channel.send(f'This Meetup has begun! It is scheduled to end on {enddatestr} at {endtimestr}!')
+        if end > now:
+            sleeptime = end - now
+            await asyncio.sleep(sleeptime)
+            await self.channel.send('This Meetup has ended! This channel will be deleted in one minute.')
+            await asyncio.sleep(60)
+            await self.channel.delete()
+
+
+
+
+
 
     async def update_url(self, url):
         location = self.location

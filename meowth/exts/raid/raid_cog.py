@@ -403,6 +403,7 @@ class RaidCog(Cog):
                 react = self.bot.get_emoji(react)
             await reportmsg.add_reaction(react)
             await chanmsg.add_reaction(react)
+        ctx.bot.loop.create_task(meetup.monitor_status())
 
         
 
@@ -755,6 +756,8 @@ class RaidCog(Cog):
         raid_lists = await report_channel.get_raid_lists()
         meowthuser = MeowthUser.from_id(ctx.bot, ctx.author.id)
         if status == 'cancel':
+            raid = Raid.instances.get(raid_id)
+            await raid.leave_grp(ctx.author.id)
             return await meowthuser.cancel_rsvp(raid_id)
         if bosses:
             boss_ids = []
@@ -1151,6 +1154,31 @@ class RaidCog(Cog):
                 has_embed = True
             await msg.edit(embed=embed)
         return await ctx.success(title=title, details=details)
+    
+    @command()
+    @raid_checks.meetup_channel()
+    async def endtime(self, ctx, *, end_time):
+        meetup = Meetup.by_channel.get(ctx.channel.id)
+        zone = meetup.tz
+        if end_time.isdigit():
+            stamp = time.time() + 60*int(newtime)
+        else:
+            try:
+                newdt = parse(end_time, settings={'TIMEZONE': zone, 'RETURN_AS_TIMEZONE_AWARE': True})
+                if not newdt:
+                    return await ctx.error(f'Could not convert {end_time} to a datetime object')
+                oldstamp = meetup.start
+                olddt = meetup.local_datetime(oldstamp)
+                nowdt = raid_or_meetup.local_datetime(time.time())
+                if newdt.date() == nowdt.date() and 'today' not in end_time:
+                    newdt = newdt.combine(olddt.date(), newdt.timetz())
+                stamp = newdt.timestamp()
+            except:
+                raise
+        try:
+            meetup.update_end(stamp)
+        except:
+            raise
     
     @command()
     @checks.is_co_owner()

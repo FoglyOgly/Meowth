@@ -288,9 +288,9 @@ class AdminCog(Cog):
 
         **Arguments**
         *features:* list of features to enable. Can include any of
-        `['raid', 'wild', 'research', 'users', 'train', 'trade', 'clean', 'archive', 'welcome', 'forecast']`
+        `['raid', 'wild', 'research', 'users', 'train', 'trade', 'clean', 'archive', 'welcome', 'meetup', 'forecast']`
 
-        Raid, wild, research, and train require a defined location. Use `!setlocation`
+        Raid, wild, research, train and meetup require a defined location. Use `!setlocation`
         before enabling these.
         """
         guild_id = ctx.guild.id

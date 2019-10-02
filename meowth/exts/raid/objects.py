@@ -81,6 +81,7 @@ class Meetup:
         self.location = location
         self.start = start
         self.end = None
+        self.monitor_task = None
         self.tz = tz
         self.message_ids = []
         self.channel_id = channel_id

@@ -81,6 +81,7 @@ class Meetup:
         self.location = location
         self.start = start
         self.end = None
+        self.monitor_task = None
         self.tz = tz
         self.message_ids = []
         self.channel_id = channel_id
@@ -418,7 +419,7 @@ class Meetup:
         self.start = new_time
         self.bot.loop.create_task(update.commit())
         self.monitor_task = self.bot.loop.create_task(self.monitor_status())
-    
+
     def update_end(self, new_time: float):
         if self.monitor_task:
             self.monitor_task.cancel()
@@ -446,7 +447,7 @@ class Meetup:
                 endtimestr = endlocal.strftime('%I:%M %p')
                 enddatestr = endlocal.strftime('%b %d')
                 await self.channel.send(f'This Meetup has begun! It is scheduled to end on {enddatestr} at {endtimestr}!')
-        if end > now:
+        if end and end > now:
             sleeptime = end - now
             await asyncio.sleep(sleeptime)
             await self.channel.send('This Meetup has ended! This channel will be deleted in one minute.')
@@ -3011,7 +3012,7 @@ class Train:
             await msg.clear_reactions()
             embed = formatters.make_embed(content="This raid train has ended!")
             await msg.edit(content="", embed=embed)
-    
+
     async def archive_train(self, channel, user_id, reason):
         guild = channel.guild
         bot = self.bot

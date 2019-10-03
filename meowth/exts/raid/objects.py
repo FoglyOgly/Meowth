@@ -3134,6 +3134,7 @@ class ReportEmbed():
         if raid.status == 'egg':
             boss_str = await raid.boss_list_str()
             fields['Boss Interest'] = boss_str
+        fields['Groups'] = raid.grps_str + "\u200b"
         color = raid.guild.me.color
         embed = formatters.make_embed(icon=RaidEmbed.raid_icon, title="Raid Report", msg_colour=color,
             thumbnail=img_url, fields=fields, footer=footer, footer_icon=footer_icon)

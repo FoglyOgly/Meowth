@@ -34,6 +34,21 @@ class Dev(Cog):
     def cog_check(self, ctx):
         return checks.check_is_co_owner(ctx)
 
+    @Cog.listnener()
+    async def on_member_update(self, before, after):
+        g = self.bot.get_guild(344960572649111552)
+        if after.guild != g:
+            return
+        r = g.get_role(616734835104546826)
+        if r in before.roles and r not in after.roles:
+            table = self.bot.dbi.table('forecast_config')
+            update = table.update
+            update.where(patron_id=after.id)
+            update.values(enabled=False)
+            return await update.commit()
+        
+
+
     @command()
     async def linecount(self, ctx):
         root = pathlib.Path(ctx.bot.core_dir, "..", "..")

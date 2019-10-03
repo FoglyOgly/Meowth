@@ -560,6 +560,7 @@ class AdminCog(Cog):
             else:
                 d = {
                     'guild_id': ctx.guild.id,
+                    'patron_id': ctx.author.id,
                     'enabled': True
                 }
                 table = ctx.bot.dbi.table('forecast_config')

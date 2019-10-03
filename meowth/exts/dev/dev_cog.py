@@ -34,7 +34,7 @@ class Dev(Cog):
     def cog_check(self, ctx):
         return checks.check_is_co_owner(ctx)
 
-    @Cog.listnener()
+    @Cog.listener()
     async def on_member_update(self, before, after):
         g = self.bot.get_guild(344960572649111552)
         if after.guild != g:

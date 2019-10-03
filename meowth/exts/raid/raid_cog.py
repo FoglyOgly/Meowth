@@ -1160,6 +1160,7 @@ class RaidCog(Cog):
     async def endtime(self, ctx, *, end_time):
         meetup = Meetup.by_channel.get(ctx.channel.id)
         zone = meetup.tz
+        newdt = None
         if end_time.isdigit():
             stamp = time.time() + 60*int(end_time)
         else:
@@ -1179,6 +1180,8 @@ class RaidCog(Cog):
             meetup.update_end(stamp)
         except:
             raise
+        if not newdt:
+            newdt = meetup.local_datetime(stamp)
         timestr = newdt.strftime('%I:%M %p')
         datestr = newdt.strftime('%b %d')
         title = "End Time Updated"

@@ -311,7 +311,7 @@ class AdminCog(Cog):
         else:
             rcrd = {'channelid': channel_id, 'guild_id': ctx.guild.id}
         possible_commands = ['raid', 'wild', 'users', 'train', 'trade',
-            'clean', 'welcome', 'archive', 'meetup', 'research']
+            'clean', 'welcome', 'archive', 'meetup', 'research', 'forecast']
         features = [x for x in features if x in possible_commands]
         if not features:
             return await ctx.send("The list of valid command groups to enable is `raid, train, wild, users, trade, clean, welcome, archive, meetup, research`.")

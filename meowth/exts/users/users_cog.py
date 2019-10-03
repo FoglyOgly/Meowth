@@ -506,10 +506,20 @@ class Users(Cog):
     @command()
     @users_checks.users_enabled()
     async def iam(self, ctx, roles: commands.Greedy[discord.Role]):
-        if not roles:
-            return await ctx.error('No roles found')
-        valid_roles = []
         table = ctx.bot.dbi.table('custom_roles')
+        if not roles:
+            query = table.query
+            query.where(guild_id=ctx.guild.id)
+            records = await query.get()
+            custom_roles = 'This server has the following custom roles: '
+            for row in records:
+                role_id = row['role_id']
+                role = discord.utils.get(ctx.guild.roles, id=role_id)
+                if role:
+                    custom_roles = custom_roles + '`' + role.name + '`, '
+            custom_roles = custom_roles[:-2] + '.'
+            return await ctx.send(custom_roles)
+        valid_roles = []
         for role in roles:
             query = table.query
             query.where(guild_id=ctx.guild.id)

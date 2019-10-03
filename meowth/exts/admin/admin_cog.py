@@ -288,9 +288,9 @@ class AdminCog(Cog):
 
         **Arguments**
         *features:* list of features to enable. Can include any of
-        `['raid', 'wild', 'research', 'users', 'train', 'trade', 'clean', 'archive', 'welcome', 'forecast']`
+        `['raid', 'wild', 'research', 'users', 'train', 'trade', 'clean', 'archive', 'welcome', 'meetup', 'forecast']`
 
-        Raid, wild, research, and train require a defined location. Use `!setlocation`
+        Raid, wild, research, train and meetup require a defined location. Use `!setlocation`
         before enabling these.
         """
         guild_id = ctx.guild.id
@@ -611,7 +611,7 @@ class AdminCog(Cog):
 
         **Arguments**
         *features:* list of features to disable. Can include any of
-        `['raid', 'wild', 'research', 'users', 'train', 'trade', 'clean', 'welcome', 'archive']`
+        `['raid', 'wild', 'research', 'users', 'train', 'trade', 'clean', 'welcome', 'meetup']`
         """
         channel_id = ctx.channel.id
         channel_table = self.bot.dbi.table('report_channels')
@@ -622,10 +622,10 @@ class AdminCog(Cog):
         else:
             rcrd = {'channelid': channel_id}
         possible_commands = ['raid', 'wild', 'research', 'users', 'train', 'trade',
-            'clean', 'welcome']
+            'clean', 'welcome', 'meetup']
         features = [x for x in features if x in possible_commands]
         if not features:
-            return await ctx.send("The list of valid command groups to disable is `raid, wild, research, users, train, trade, clean, welcome`.")
+            return await ctx.send("The list of valid command groups to disable is `raid, wild, research, users, train, trade, clean, welcome, meetup`.")
         disabled_commands = []
         if 'welcome' in features:
             table = ctx.bot.dbi.table('welcome')

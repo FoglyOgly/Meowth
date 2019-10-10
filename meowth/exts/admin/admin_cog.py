@@ -315,7 +315,7 @@ class AdminCog(Cog):
         features = [x for x in features if x in possible_commands]
         if not features:
             return await ctx.send("The list of valid command groups to enable is `raid, train, wild, users, trade, clean, welcome, archive, meetup, research`.")
-        location_commands = ['raid', 'wild', 'research', 'train', 'meetup']
+        location_commands = ['raid', 'wild', 'research', 'train', 'meetup', 'forecast']
         enabled_commands = []
         required_perms = {}
         me = ctx.guild.me

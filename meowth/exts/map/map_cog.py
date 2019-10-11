@@ -279,7 +279,7 @@ class S2_L10():
                 data = await resp.json()
                 try:
                     place_id = data[0]['Key']
-                except KeyError:
+                except:
                     print(data)
                     return None
                 return place_id

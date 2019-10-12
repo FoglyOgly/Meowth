@@ -300,7 +300,7 @@ class Trade():
                 def check(m):
                     return m.channel == chn and m.author == trader
                 offermsg = await self.bot.wait_for('message', check=check)
-                offer = await Pokemon.from_arg(self.bot, chn, trader.id, offermsg.content)
+                offer = await Pokemon.from_arg(self.bot, 'trade', chn, trader.id, offermsg.content)
                 if not await offer._trade_available():
                     return await chn.send(f'{await offer.name()} cannot be traded!')
                 await askmsg.delete()

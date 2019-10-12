@@ -9,6 +9,7 @@ from meowth.utils import formatters, snowflake
 from discord.ext import commands
 
 import asyncio
+import shlex
 from functools import partial
 
 from . import trade_checks
@@ -387,12 +388,11 @@ class TradeCog(Cog):
             fields={"Invalid Pokemon": "\n".join(invalid_names)}
             await ctx.warning('The following Pokemon cannot be traded!',
                 fields=fields)
-        listmsg = await ctx.send(f"{ctx.author.display_name} - what Pokemon are you willing to accept in exchange? Use 'any' if you will accept anything and 'OBO' if you want to allow other offers. \n**NOTE: Use commas to separate Pokemon here. Do not wrap them in quotes.**")
+        listmsg = await ctx.send(f"{ctx.author.display_name} - what Pokemon are you willing to accept in exchange? Use 'any' if you will accept anything and 'OBO' if you want to allow other offers. \n**NOTE: Remember to wrap multi-word Pokemon arguments in quotes.**")
         def check(m):
             return m.channel == ctx.channel and m.author == ctx.author
         wantmsg = await ctx.bot.wait_for('message', check=check)
-        wantargs = wantmsg.content.lower().split(',')
-        wantargs = list(map(str.strip, wantargs))
+        wantargs = shlex.split(wantmsg.content.lower())
         if 'any' in wantargs:
             wantargs.remove('any')
             accept_any = True

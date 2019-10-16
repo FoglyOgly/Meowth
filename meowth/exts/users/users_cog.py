@@ -390,7 +390,7 @@ class Team:
             query.where(team_name=match)
             team_id = await query.get_value()
         else:
-            return await ctx.send("Team not found!")
+            return
         
         return cls(ctx.bot, ctx.guild.id, team_id)
 
@@ -409,6 +409,8 @@ class Users(Cog):
     async def team(self, ctx, *, chosen_team: Team):
         """Set your Pokemon Go team."""
 
+        if not chosen_team:
+            return await ctx.send("Team not found!")
         meowthuser = MeowthUser(ctx.bot, ctx.author)
         data = await meowthuser._data.get()
         if len(data) == 0:

@@ -142,7 +142,10 @@ class WeatherCog(Cog):
                         'metric': 'true'
                     }
                     async with session.get(url, params=params) as resp:
-                        data = await resp.json()
+                        try:
+                            data = await resp.json()
+                        except aiohttp.client_exceptions.ContentTypeError:
+                            data = await resp.json(content_type='text/html')
                         try:
                             data = data[:8]
                         except TypeError:

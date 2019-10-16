@@ -392,7 +392,11 @@ class TradeCog(Cog):
         def check(m):
             return m.channel == ctx.channel and m.author == ctx.author
         wantmsg = await ctx.bot.wait_for('message', check=check)
-        wantargs = shlex.split(wantmsg.content.lower())
+        if ',' in wantmsg.content:
+            wantargs = wantmsg.content.lower().split(',')
+            wantargs = list(map(str.strip, wantargs))
+        else:
+            wantargs = shlex.split(wantmsg.content.lower())
         if 'any' in wantargs:
             wantargs.remove('any')
             accept_any = True

@@ -240,7 +240,7 @@ class WeatherCog(Cog):
                     'coords': coords
                 }
                 markers.append(m)
-        max_hour = max([x['hour'] for x in markers])
+        max_hour = max([x['hour'] for x in markers], default=0)
         maps = []
         for i in range(max_hour+1):
             maps.append(deepcopy(base_map))

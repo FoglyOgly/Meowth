@@ -409,7 +409,7 @@ class Users(Cog):
     async def team(self, ctx, *, chosen_team: Team):
         """Set your Pokemon Go team."""
 
-        if not chosen_team:
+        if chosen_team is None:
             return await ctx.send("Team not found!")
         meowthuser = MeowthUser(ctx.bot, ctx.author)
         data = await meowthuser._data.get()

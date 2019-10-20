@@ -1,7 +1,7 @@
 from meowth import Cog, command, bot, checks
 from meowth.utils.converters import ChannelMessage
 from meowth.exts.pkmn import Pokemon, Move
-from meowth.exts.pkmn.errors import PokemonInvalidContext
+from meowth.exts.pkmn.errors import PokemonInvalidContext, PokemonNotFound
 from meowth.exts.want import Want
 from meowth.exts.users import MeowthUser
 from meowth.utils import formatters, snowflake
@@ -392,11 +392,17 @@ class TradeCog(Cog):
         def check(m):
             return m.channel == ctx.channel and m.author == ctx.author
         wantmsg = await ctx.bot.wait_for('message', check=check)
-        if ',' in wantmsg.content:
-            wantargs = wantmsg.content.lower().split(',')
-            wantargs = list(map(str.strip, wantargs))
-        else:
-            wantargs = shlex.split(wantmsg.content.lower())
+        wantargs = wantmsg.content.lower().split(',')
+        wantargs = list(map(str.strip, wantargs))
+        pkmn_convert = partial(Pokemon.convert, ctx)
+        if len(wantargs) == 1:
+            # No commas have been used.
+            try:
+                # Check if a single pokemon was specified, e.g. shiny pidgey.
+                [await pkmn_convert(arg) for arg in wantargs]
+            except PokemonNotFound:
+                # Use new syntax instead.
+                wantargs = shlex.split(wantmsg.content.lower())
         if 'any' in wantargs:
             wantargs.remove('any')
             accept_any = True
@@ -407,7 +413,6 @@ class TradeCog(Cog):
             accept_other = True
         else:
             accept_other = False
-        pkmn_convert = partial(Pokemon.convert, ctx)
         wants = [await pkmn_convert(arg) for arg in wantargs]
         wants = [await Pokemon.validate(want, 'trade') for want in wants]
         if len(wants) == 1:

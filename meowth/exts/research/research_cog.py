@@ -735,23 +735,31 @@ class ResearchCog(Cog):
             if not research:
                 continue
             research_list.append(await research.summary_str())
-        number = len(research_list)
-        pages = ceil(number/8)
-        for i in range(pages):
-            if pages == 1:
-                title = "Current Research"
-            else:
-                title = f'Current Research (Page {i+1} of {pages})'
-            if len(research_list) > 8:
-                content = "\n\n".join(research_list[:8])
-                research_list = research_list[8:]
-            else:
-                content = "\n\n".join(research_list)
-            embed = formatters.make_embed(title=title, content=content, msg_colour=color)
+        research_list_embeds = make_research_list_embeds(research_list, color)
+        for embed in research_list_embeds:
             await channel.send(embed=embed)
             await asyncio.sleep(0.25)
 
 
+def make_research_list_embeds(research_list, color, page_size=8):
+    number = len(research_list)
+    pages = ceil(number/page_size)
+    embeds = []
+    for i in range(pages):
+        if pages == 1:
+            title = "Current Research"
+        else:
+            title = f'Current Research (Page {i+1} of {pages})'
+        if len(research_list) > page_size:
+            content = "\n\n".join(research_list[:page_size])
+            research_list = research_list[page_size:]
+        else:
+            content = "\n\n".join(research_list)
+        embed = formatters.make_embed(title=title, content=content, msg_colour=color)
+        embeds.append(embed)
+    if len(max(embeds, key=len)) > 2048 and page_size > 2:
+        embeds = make_research_list_embeds(research_list, color, page_size=page_size-2)
+    return embeds
 
 
 class ResearchEmbed:

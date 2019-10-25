@@ -674,13 +674,10 @@ class WildCog(Cog):
         caught_id = new_wild.react_list['caught']
         caught = ctx.bot.get_emoji(caught_id)
         despawned = '💨'
-        reportcontent += f'Wild {name} reported! Use {coming} if you are on the way, {str(caught)} if you catch the Pokemon, and {despawned} if the Pokemon despawns.'
-        if disguised:
-            dis_name = await disguised.name()
-            reportcontent += f'\nThis Ditto is disguised as a {dis_name}!'
         report_channels = []
         report_channel = ReportChannel(ctx.bot, ctx.channel)
         if isinstance(location, POI):
+            loc_name = await self.location._name()
             if isinstance(location, Gym):
                 loc_id = 'gym/' + str(location.id)
             elif isinstance(location, Pokestop):
@@ -688,7 +685,12 @@ class WildCog(Cog):
             channel_list = await location.get_all_channels('wild')
             report_channels.extend(channel_list)
         else:
+            loc_name = self.location._name
             loc_id = f'{location.city}/{location.arg}'
+        reportcontent += f'Wild {name} reported at {loc_name}! Use {coming} if you are on the way, {str(caught)} if you catch the Pokemon, and {despawned} if the Pokemon despawns.'
+        if disguised:
+            dis_name = await disguised.name()
+            reportcontent += f'\nThis Ditto is disguised as a {dis_name}!'
         if report_channel not in report_channels:
             report_channels.append(report_channel)
         for channel in report_channels:
@@ -781,12 +783,16 @@ class WildCog(Cog):
             reportcontent = mention_str + " - "
         else:
             reportcontent = ""
+        if isinstance(location, POI):
+            loc_name = await self.location._name()
+        else:
+            loc_name = self.location._name
         coming = '🚗'
         caught_id = new_mod.react_list['caught']
         caught = ctx.bot.get_emoji(caught_id)
         despawned = '💨'
         name = new_mod.name
-        reportcontent += f'{name} reported! {pkmn_str}Use {coming} if you are on the way, {str(caught)} if you catch the Shadow Pokemon, and {despawned} if it has ended.'
+        reportcontent += f'{name} reported at {loc_name}! {pkmn_str}Use {coming} if you are on the way, {str(caught)} if you catch the Shadow Pokemon, and {despawned} if it has ended.'
         report_channels = []
         report_channel = ReportChannel(ctx.bot, ctx.channel)
         if isinstance(location, Pokestop):
@@ -842,9 +848,13 @@ class WildCog(Cog):
             reportcontent = mention + " - "
         else:
             reportcontent = ""
+        if isinstance(location, POI):
+            loc_name = await self.location._name()
+        else:
+            loc_name = self.location._name
         coming = '🚗'
         despawned = '💨'
-        reportcontent += f'{name} reported! Use {coming} if you are on the way and {despawned} if it has ended.'
+        reportcontent += f'{name} reported at {loc_name}! Use {coming} if you are on the way and {despawned} if it has ended.'
         report_channels = []
         report_channel = ReportChannel(ctx.bot, ctx.channel)
         if isinstance(location, Pokestop):

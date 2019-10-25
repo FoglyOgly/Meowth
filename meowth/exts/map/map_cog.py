@@ -1080,7 +1080,7 @@ class Mapper(Cog):
         try:
             await ctx.send(file=to_send)
         except discord.Forbidden:
-            await ctx.send('Missing permission to send files!')
+            await ctx.error('Missing permission to send files!')
     
     @command()
     @commands.has_permissions(manage_guild=True)
@@ -1094,7 +1094,7 @@ class Mapper(Cog):
         try:
             await ctx.send(file=to_send)
         except discord.Forbidden:
-            await ctx.send('Missing permission to send files!')
+            await ctx.error('Missing permission to send files!')
 
     @command()
     @commands.has_permissions(manage_guild=True)

@@ -1,7 +1,7 @@
 from meowth import Cog, command, bot, checks
 from meowth.utils.converters import ChannelMessage
 from meowth.exts.pkmn import Pokemon, Move
-from meowth.exts.pkmn.errors import PokemonInvalidContext
+from meowth.exts.pkmn.errors import PokemonInvalidContext, PokemonNotFound
 from meowth.exts.want import Want
 from meowth.exts.users import MeowthUser
 from meowth.utils import formatters, snowflake
@@ -9,6 +9,7 @@ from meowth.utils import formatters, snowflake
 from discord.ext import commands
 
 import asyncio
+import shlex
 from functools import partial
 
 from . import trade_checks
@@ -300,7 +301,7 @@ class Trade():
                 def check(m):
                     return m.channel == chn and m.author == trader
                 offermsg = await self.bot.wait_for('message', check=check)
-                offer = await Pokemon.from_arg(self.bot, chn, trader.id, offermsg.content)
+                offer = await Pokemon.from_arg(self.bot, 'trade', chn, trader.id, offermsg.content)
                 if not await offer._trade_available():
                     return await chn.send(f'{await offer.name()} cannot be traded!')
                 await askmsg.delete()
@@ -387,12 +388,21 @@ class TradeCog(Cog):
             fields={"Invalid Pokemon": "\n".join(invalid_names)}
             await ctx.warning('The following Pokemon cannot be traded!',
                 fields=fields)
-        listmsg = await ctx.send(f"{ctx.author.display_name} - what Pokemon are you willing to accept in exchange? Use 'any' if you will accept anything and 'OBO' if you want to allow other offers. \n**NOTE: Use commas to separate Pokemon here. Do not wrap them in quotes.**")
+        listmsg = await ctx.send(f"{ctx.author.display_name} - what Pokemon are you willing to accept in exchange? Use 'any' if you will accept anything and 'OBO' if you want to allow other offers. \n**NOTE: Remember to wrap multi-word Pokemon arguments in quotes.**")
         def check(m):
             return m.channel == ctx.channel and m.author == ctx.author
         wantmsg = await ctx.bot.wait_for('message', check=check)
         wantargs = wantmsg.content.lower().split(',')
         wantargs = list(map(str.strip, wantargs))
+        pkmn_convert = partial(Pokemon.convert, ctx)
+        if len(wantargs) == 1:
+            # No commas have been used.
+            try:
+                # Check if a single pokemon was specified, e.g. shiny pidgey.
+                [await pkmn_convert(arg) for arg in wantargs]
+            except PokemonNotFound:
+                # Use new syntax instead.
+                wantargs = shlex.split(wantmsg.content.lower())
         if 'any' in wantargs:
             wantargs.remove('any')
             accept_any = True
@@ -403,7 +413,6 @@ class TradeCog(Cog):
             accept_other = True
         else:
             accept_other = False
-        pkmn_convert = partial(Pokemon.convert, ctx)
         wants = [await pkmn_convert(arg) for arg in wantargs]
         wants = [await Pokemon.validate(want, 'trade') for want in wants]
         if len(wants) == 1:

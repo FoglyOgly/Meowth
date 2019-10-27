@@ -614,8 +614,9 @@ class WildCog(Cog):
     async def on_command_completion(self, ctx):
         if ctx.command.name == 'list':
             if await wild_checks.is_wild_enabled(ctx):
-                tz = await ctx.tz()
-                return await self.list_wilds(ctx.channel, tz)
+                if len(ctx.args) == 2 or 'wilds' in ctx.args:
+                    tz = await ctx.tz()
+                    return await self.list_wilds(ctx.channel, tz)
     
     @command(aliases=['w'])
     @wild_checks.wild_enabled()

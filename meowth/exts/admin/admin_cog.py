@@ -612,7 +612,7 @@ class AdminCog(Cog):
 
         **Arguments**
         *features:* list of features to disable. Can include any of
-        `['raid', 'wild', 'research', 'users', 'train', 'trade', 'clean', 'welcome', 'meetup']`
+        `['raid', 'wild', 'research', 'users', 'train', 'trade', 'clean', 'welcome', 'meetup', 'forecast']`
         """
         channel_id = ctx.channel.id
         channel_table = self.bot.dbi.table('report_channels')
@@ -623,11 +623,23 @@ class AdminCog(Cog):
         else:
             rcrd = {'channelid': channel_id}
         possible_commands = ['raid', 'wild', 'research', 'users', 'train', 'trade',
-            'clean', 'welcome', 'meetup']
+            'clean', 'welcome', 'meetup', 'forecast']
         features = [x for x in features if x in possible_commands]
         if not features:
             return await ctx.send("The list of valid command groups to disable is `raid, wild, research, users, train, trade, clean, welcome, meetup`.")
         disabled_commands = []
+        if 'forecast' in features:
+            d = {
+                'guild_id': ctx.guild.id,
+                'patron_id': ctx.author.id,
+                'enabled': True
+            }
+            table = ctx.bot.dbi.table('forecast_config')
+            insert = table.insert.row(**d)
+            await insert.commit(do_update=True)
+            content = f'Forecasts have been disabled in this server. Please note that this does not delete your Patreon pledge. Visit Patreon if you wish to delete or alter your pledge.'
+            await ctx.send(content)
+            features.remove('forecast')
         if 'welcome' in features:
             table = ctx.bot.dbi.table('welcome')
             query = table.query

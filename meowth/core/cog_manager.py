@@ -19,7 +19,7 @@ class CogManager(Cog):
     async def load_extension(self, ctx, name, extension):
         ext_loc, ext = extension.rsplit('.', 1)
         if ext not in self.available_exts and ext_loc == 'meowth.exts':
-            return await ctx.error(f'Extention {name} not found')
+            return await ctx.error(f'Extension {name} not found')
         was_loaded = extension in ctx.bot.extensions
         try:
             if was_loaded:

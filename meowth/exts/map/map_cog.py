@@ -1077,7 +1077,10 @@ class Mapper(Cog):
         if not f:
             return await ctx.send('No gyms found')
         to_send = discord.File(f, filename=f'{ctx.guild.name}_gyms.csv')
-        await ctx.send(file=to_send)
+        try:
+            await ctx.send(file=to_send)
+        except discord.Forbidden:
+            await ctx.error('Missing permission to send files!')
     
     @command()
     @commands.has_permissions(manage_guild=True)
@@ -1088,7 +1091,10 @@ class Mapper(Cog):
         if not f:
             return await ctx.send('No Pokestops found')
         to_send = discord.File(f, filename=f'{ctx.guild.name}_stops.csv')
-        await ctx.send(file=to_send)
+        try:
+            await ctx.send(file=to_send)
+        except discord.Forbidden:
+            await ctx.error('Missing permission to send files!')
 
     @command()
     @commands.has_permissions(manage_guild=True)

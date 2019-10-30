@@ -944,15 +944,31 @@ class Mapper(Cog):
         data = await gyms_query.get()
         entries = [(x['name'], x.get('nickname'), f"{x['lat']}, {x['lon']}", x['exraid']) for x in data]
         entries = [str(x) for x in entries]
-        def pages(l):
-            for i in range(0, len(l), 20):
-                yield l[i: i+20]
-    
-        p = list(pages(entries))
         await ctx.send('(Name, Nickname, Latitude, Longitude, EX Raid)')
-        for x in p:
+        for x in self.pages(entries):
             await ctx.send("\n".join(x))
-        
+
+    @command()
+    @checks.is_admin()
+    @checks.location_set()
+    async def liststops(self, ctx):
+        """List all Pokéstops in a reporting channel's defined area."""
+        report_channel = ReportChannel(ctx.bot, ctx.channel)
+        stops_query = await report_channel.get_all_stops()
+        if not stops_query:
+            return await ctx.error('No pokéstops found')
+        stops_query.select('name', 'nickname', 'lat', 'lon')
+        data = await stops_query.get()
+        entries = [(x['name'], x.get('nickname'), f"{x['lat']}, {x['lon']}") for x in data]
+        entries = [str(x) for x in entries]
+        await ctx.send('(Name, Nickname, Latitude, Longitude)')
+        for x in self.pages(entries):
+            await ctx.send("\n".join(x))
+
+    @staticmethod
+    def pages(l):
+        for i in range(0, len(l), 20):
+            yield l[i: i + 20]
 
     @command()
     @checks.location_set()

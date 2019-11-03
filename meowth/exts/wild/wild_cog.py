@@ -678,7 +678,7 @@ class WildCog(Cog):
         report_channels = []
         report_channel = ReportChannel(ctx.bot, ctx.channel)
         if isinstance(location, POI):
-            loc_name = await self.location._name()
+            loc_name = await location._name()
             if isinstance(location, Gym):
                 loc_id = 'gym/' + str(location.id)
             elif isinstance(location, Pokestop):
@@ -686,7 +686,7 @@ class WildCog(Cog):
             channel_list = await location.get_all_channels('wild')
             report_channels.extend(channel_list)
         else:
-            loc_name = self.location._name
+            loc_name = location._name
             loc_id = f'{location.city}/{location.arg}'
         reportcontent += f'Wild {name} reported at {loc_name}! Use {coming} if you are on the way, {str(caught)} if you catch the Pokemon, and {despawned} if the Pokemon despawns.'
         if disguised:
@@ -792,11 +792,11 @@ class WildCog(Cog):
         report_channels = []
         report_channel = ReportChannel(ctx.bot, ctx.channel)
         if isinstance(location, Pokestop):
-            loc_name = await self.location._name()
+            loc_name = await location._name()
             channel_list = await location.get_all_channels('wild')
             report_channels.extend(channel_list)
         else:
-            loc_name = self.location._name
+            loc_name = location._name
         reportcontent += f'{name} reported at {loc_name}! {pkmn_str}Use {coming} if you are on the way, {str(caught)} if you catch the Shadow Pokemon, and {despawned} if it has ended.'
         if report_channel not in report_channels:
             report_channels.append(report_channel)
@@ -853,12 +853,12 @@ class WildCog(Cog):
         report_channels = []
         report_channel = ReportChannel(ctx.bot, ctx.channel)
         if isinstance(location, Pokestop):
-            loc_name = await self.location._name()
+            loc_name = await location._name()
             loc_id = 'pokestop/' + str(location.id)
             channel_list = await location.get_all_channels('wild')
             report_channels.extend(channel_list)
         else:
-            loc_name = self.location._name
+            loc_name = location._name
             loc_id = f'{location.city}/{location.arg}'
         reportcontent += f'{name} reported at {loc_name}! Use {coming} if you are on the way and {despawned} if it has ended.'
         if report_channel not in report_channels:

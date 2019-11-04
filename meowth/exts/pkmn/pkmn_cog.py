@@ -773,12 +773,8 @@ class Pokemon():
 
     @classmethod
     async def from_arg(cls, bot, command_name, chn, user_id, arg, coords=None):
-        pokemon = bot.dbi.table('pokemon')
         pokedex = bot.dbi.table('pokedex')
         form_names = bot.dbi.table('form_names')
-        forms_table = bot.dbi.table('forms')
-        movesets = bot.dbi.table('movesets')
-        ids = []
         id_list = []
         name_list = await pokedex.query('name').get_values()
         form_list = await form_names.query('name').get_values()
@@ -846,24 +842,25 @@ class Pokemon():
                 valid_level = rounded/2
                 lvl = valid_level
             else:
+                id_set = set()
                 form_name = fuzzymatch.get_match(form_list, arg)
                 if form_name[0]:
-                    forms = form_names.query('formid').where(name=f"({form_name[0]})")
+                    forms = bot.dbi.table('form_names').query('formid').where(name=f"({form_name[0]})")
                     form = await forms.get_value()
-                    id_list = await forms_table.query('pokemonid').where(formid=form).get_values()
+                    query = bot.dbi.table('forms').query('pokemonid').where(formid=form)
+                    ids = await query.get_values()
+                    id_set.update(ids)
+                names = fuzzymatch.get_matches(name_list, arg, scorer='ratio')
+                if names:
+                    names = [x[0] for x in names]
+                    query = bot.dbi.table('pokedex').query('pokemonid').where(pokedex['name'].in_(names))
+                    ids = await query.get_values()
+                    id_set.update(ids)
+                if not id_set:
+                    raise PokemonNotFound
                 else:
-                    names = fuzzymatch.get_matches(name_list, arg, scorer='ratio')
-                    if names:
-                        names = [x[0] for x in names]
-                        ref = pokedex.query('pokemonid').where(
-                            pokedex['name'].in_(names))
-                        ids = await ref.get_values()
-                    else:
-                        raise PokemonNotFound
-        if id_list:
-            possible_ids = set(ids) & set(id_list)
-        else:
-            possible_ids = set(ids)
+                    id_list.append(id_set)
+        possible_ids = set.intersection(*id_list)
         if not possible_ids:
             raise PokemonNotFound
         else:
@@ -898,8 +895,6 @@ class Pokemon():
                     react_list=react_list)
                 pkmn = choice_dict[str(payload.emoji)]
                 await multi.delete()
-        if form:
-            pkmn.form = form
         pkmn.shiny = shiny
         pkmn.attiv = attiv
         pkmn.defiv = defiv

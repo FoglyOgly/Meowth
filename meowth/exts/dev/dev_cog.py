@@ -534,7 +534,7 @@ class Dev(Cog):
         shadow_form = 63
         purified_form = 64
         pkmn_query = pkmn_table.query.where(pokemonid=pokemon.id)
-        pkmn_dict = (await pkmn_query.get())[0]
+        pkmn_dict = dict((await pkmn_query.get())[0])
         shadow_dict = deepcopy(pkmn_dict)
         shadow_dict['pokemonid'] = shadow_id
         shadow_dict['form'] = shadow_form
@@ -548,7 +548,7 @@ class Dev(Cog):
         pkmn.insert.row(**purified_dict)
         await pkmn_insert.commit()
         dex_query = dex_table.query.where(pokemonid=pokemon.id)
-        dex_dict = (await dex_query.get())[0]
+        dex_dict = dict((await dex_query.get())[0])
         shadow_dex = deepcopy(dex_dict)
         shadow_dex['pokemonid'] = shadow_id
         purified_dex = deepcopy(dex_dict)

@@ -545,7 +545,7 @@ class Dev(Cog):
         purified_dict['form'] = purified_form
         pkmn_insert = pkmn_table.insert
         pkmn_insert.row(**shadow_dict)
-        pkmn.insert.row(**purified_dict)
+        pkmn_insert.row(**purified_dict)
         await pkmn_insert.commit()
         dex_query = dex_table.query.where(pokemonid=pokemon.id)
         dex_dict = dict((await dex_query.get())[0])

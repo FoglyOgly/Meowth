@@ -537,12 +537,12 @@ class Dev(Cog):
         pkmn_dict = dict((await pkmn_query.get())[0])
         shadow_dict = deepcopy(pkmn_dict)
         shadow_dict['pokemonid'] = shadow_id
-        shadow_dict['form'] = shadow_form
+        shadow_dict['formid'] = shadow_form
         shadow_dict['shiny_available'] = False
         shadow_dict['trade_available'] = False
         purified_dict = deepcopy(pkmn_dict)
         purified_dict['pokemonid'] = purified_id
-        purified_dict['form'] = purified_form
+        purified_dict['formid'] = purified_form
         pkmn_insert = pkmn_table.insert
         pkmn_insert.row(**shadow_dict)
         pkmn_insert.row(**purified_dict)

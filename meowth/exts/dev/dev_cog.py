@@ -557,7 +557,7 @@ class Dev(Cog):
         dex_insert.row(**shadow_dex)
         dex_insert.row(**purified_dex)
         await dex_insert.commit()
-        form_insert = form_table.insert
+        form_insert = forms_table.insert
         form_insert.row(pokemonid=shadow_id, formid=shadow_form)
         form_insert.row(pokemonid=purified_id, formid=purified_form)
         await form_insert.commit()

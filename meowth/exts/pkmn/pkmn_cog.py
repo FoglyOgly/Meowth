@@ -55,6 +55,8 @@ class Pokemon():
             form = 63
         elif 'PURIFIED' in pokemonId:
             form = 64
+        elif 'GALAR' in pokemonId:
+            form = 107
         self.form = form
         self.gender = gender
         self.shiny = shiny

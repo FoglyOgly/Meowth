@@ -34,9 +34,11 @@ class SilphCog(Cog):
                 meowthid = slug.upper().replace('-', '_')
                 if meowthid == 'GIRATINA_ALTERED':
                     meowthid = 'GIRATINA'
-                forms = ['ALOLA', 'ATTACK', 'DEFENSE', 'SPEED', 'RAINY', 'SNOWY', 'SUNNY', 'ORIGIN', 'PLANT', 'SANDY', 'TRASH']
+                forms = ['ALOLA', 'ATTACK', 'DEFENSE', 'SPEED', 'RAINY', 'SNOWY', 'SUNNY', 'ORIGIN', 'PLANT', 'SANDY', 'TRASH', 'GALAR']
                 for form in forms:
                     if meowthid.endswith(form):
+                        if form == 'GALAR':
+                            meowthid += "IAN"
                         meowthid += "_FORM"
                 if meowthid.endswith('_M'):
                     meowthid += "ALE"
@@ -76,11 +78,13 @@ class SilphCog(Cog):
                 meowthid = silphid.upper().replace('-', '_')
                 if meowthid == 'GIRATINA_ALTERED':
                     meowthid = 'GIRATINA'
-                forms = ['ALOLA', 'ATTACK', 'DEFENSE', 'SPEED', 'RAINY', 'SNOWY', 'SUNNY', 'ORIGIN', 'PLANT', 'SANDY', 'TRASH', 'ARMOR']
+                forms = ['ALOLA', 'ATTACK', 'DEFENSE', 'SPEED', 'RAINY', 'SNOWY', 'SUNNY', 'ORIGIN', 'PLANT', 'SANDY', 'TRASH', 'ARMOR', 'GALAR']
                 for form in forms:
                     if meowthid.endswith(form):
                         if form == 'ARMOR':
                             meowthid = "MEWTWO_A"
+                        if form == 'GALAR':
+                            meowthid += "IAN"
                         meowthid += "_FORM"
                 if meowthid.endswith('_M'):
                     meowthid += "ALE"

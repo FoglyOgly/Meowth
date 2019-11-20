@@ -632,7 +632,10 @@ class RaidCog(Cog):
                 for react in react_list:
                     if isinstance(react, int):
                         react = self.bot.get_emoji(react)
-                    await reportmsg.add_reaction(react)
+                    try:
+                        await reportmsg.add_reaction(react)
+                    except discord.Forbidden:
+                        break
                 new_raid.message_ids.append(f"{reportmsg.channel.id}/{reportmsg.id}")
         elif raid_mode.isdigit():
             catid = int(raid_mode)
@@ -664,7 +667,10 @@ class RaidCog(Cog):
             for react in react_list:
                 if isinstance(react, int):
                     react = self.bot.get_emoji(react)
-                await raidmsg.add_reaction(react)
+                try:
+                    await raidmsg.add_reaction(react)
+                except discord.Forbidden:
+                    break
             new_raid.message_ids.append(f"{raidmsg.channel.id}/{raidmsg.id}")
             reportcontent = f"Coordinate this raid in {raid_channel.mention}!"
             for channel in report_channels:
@@ -675,7 +681,10 @@ class RaidCog(Cog):
                 for react in react_list:
                     if isinstance(react, int):
                         react = self.bot.get_emoji(react)
-                    await reportmsg.add_reaction(react)
+                    try:
+                        await reportmsg.add_reaction(react)
+                    except discord.Forbidden:
+                        break
                 new_raid.message_ids.append(f"{reportmsg.channel.id}/{reportmsg.id}")
         await new_raid.upsert()
         for message_id in new_raid.message_ids:

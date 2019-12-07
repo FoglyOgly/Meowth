@@ -21,9 +21,6 @@ class SilphCog(Cog):
         all_verified = True
         for r in data:
             task = r['title']
-            verified = r['verified']
-            if not verified:
-                all_verified = False
             rewards = r['rewards']
             pkmn_rewards = rewards.get('pokemon', [])
             item_rewards = rewards.get('items', {})

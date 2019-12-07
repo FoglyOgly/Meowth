@@ -312,7 +312,7 @@ class RocketCog(Cog):
         self.bot.loop.create_task(self.pickup_rocketdata())
     
     
-    async def pickup_moddata(self):
+    async def pickup_rocketdata(self):
         mod_table = self.bot.dbi.table('rockets')
         query = mod_table.query
         data = await query.get()

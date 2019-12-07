@@ -898,7 +898,10 @@ class Pokemon():
                 pkmn = choice_dict[str(payload.emoji)]
                 await multi.delete()
         if form:
-            pkmn.form = form
+            query = bot.dbi.table('forms').query('formid').where(pokemonid=pkmn.id)
+            possible_forms = await query.get_values()
+            if form in possible_forms:
+                pkmn.form = form
         pkmn.shiny = shiny
         pkmn.attiv = attiv
         pkmn.defiv = defiv

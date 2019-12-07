@@ -698,12 +698,18 @@ class ResearchCog(Cog):
         else:
             reportcontent = ""
         stamp = ctx.bot.get_emoji(583375171847585823)
-        location = ctx.bot.get_emoji(597185467217346602)
+        map_icon = ctx.bot.get_emoji(597185467217346602)
         reportcontent += f"Field Research reported! Use {str(stamp)} to indicate that you picked up this task!"
         report_channels = []
         report_channel = ReportChannel(ctx.bot, ctx.channel)
         msgs = []
         if isinstance(location, Pokestop):
+            research_table = ctx.bot.dbi.table('research')
+            query = research_table.query()
+            query.where(location=str(location.id), guild_id=ctx.guild.id)
+            old_research = await query.get()
+            if old_research:
+                return await ctx.send("There is already a research task reported at this pokéstop!", delete_after=20)
             channel_list = await location.get_all_channels('research')
             report_channels.extend(channel_list)
         if report_channel not in report_channels:
@@ -713,7 +719,7 @@ class ResearchCog(Cog):
             try:
                 msg = await channel.channel.send(reportcontent, embed=embed)
                 await msg.add_reaction(stamp)
-                await msg.add_reaction(location)
+                await msg.add_reaction(map_icon)
             except:
                 continue
             idstring = f'{msg.channel.id}/{msg.id}'

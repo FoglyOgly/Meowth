@@ -288,7 +288,7 @@ class AdminCog(Cog):
 
         **Arguments**
         *features:* list of features to enable. Can include any of
-        `['raid', 'wild', 'research', 'users', 'train', 'trade', 'clean', 'archive', 'welcome', 'meetup', 'forecast']`
+        `['raid', 'wild', 'research', 'users', 'train', 'trade', 'clean', 'archive', 'welcome', 'meetup', 'forecast', 'rocket']`
 
         Raid, wild, research, train and meetup require a defined location. Use `!setlocation`
         before enabling these.
@@ -311,17 +311,17 @@ class AdminCog(Cog):
         else:
             rcrd = {'channelid': channel_id, 'guild_id': ctx.guild.id}
         possible_commands = ['raid', 'wild', 'research', 'users', 'train', 'trade',
-            'clean', 'archive', 'welcome', 'meetup', 'forecast']
+            'clean', 'archive', 'welcome', 'meetup', 'forecast', 'rocket']
         features = [x for x in features if x in possible_commands]
         if not features:
-            return await ctx.send("The list of valid command groups to enable is `raid, train, wild, users, trade, clean, welcome, archive, meetup, research`.")
-        location_commands = ['raid', 'wild', 'research', 'train', 'meetup', 'forecast']
+            return await ctx.send("The list of valid command groups to enable is `raid, train, wild, users, trade, clean, welcome, archive, meetup, research, rocket`.")
+        location_commands = ['raid', 'wild', 'research', 'train', 'meetup', 'forecast', 'rocket']
         enabled_commands = []
         required_perms = {}
         me = ctx.guild.me
         perms = ctx.channel.permissions_for(me)
         for x in features:
-            if x in ['raid', 'wild', 'trade', 'train', 'users', 'meetup', 'research']:
+            if x in ['raid', 'wild', 'trade', 'train', 'users', 'meetup', 'research', 'rocket']:
                 required_perms['Add Reactions'] = perms.add_reactions
                 required_perms['Manage Messages'] = perms.manage_messages
                 required_perms['Use External Emojis'] = perms.external_emojis
@@ -612,7 +612,7 @@ class AdminCog(Cog):
 
         **Arguments**
         *features:* list of features to disable. Can include any of
-        `['raid', 'wild', 'research', 'users', 'train', 'trade', 'clean', 'welcome', 'meetup', 'forecast']`
+        `['raid', 'wild', 'research', 'users', 'train', 'trade', 'clean', 'welcome', 'meetup', 'forecast', 'rocket']`
         """
         channel_id = ctx.channel.id
         channel_table = self.bot.dbi.table('report_channels')
@@ -623,7 +623,7 @@ class AdminCog(Cog):
         else:
             rcrd = {'channelid': channel_id}
         possible_commands = ['raid', 'wild', 'research', 'users', 'train', 'trade',
-            'clean', 'welcome', 'meetup', 'forecast']
+            'clean', 'welcome', 'meetup', 'forecast', 'rocket']
         features = [x for x in features if x in possible_commands]
         if not features:
             return await ctx.send("The list of valid command groups to disable is `raid, wild, research, users, train, trade, clean, welcome, meetup`.")

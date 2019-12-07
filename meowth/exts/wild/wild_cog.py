@@ -348,8 +348,6 @@ class Modifier():
             'coming': '🚗',
             'despawn': '💨',
         }
-        if kind == 'rocket':
-            emoji['caught'] = 581146003177078784
         self.react_list = emoji
         self.monitor_task = None
 
@@ -368,8 +366,6 @@ class Modifier():
             'created': self.created,
             'messages': self.message_ids
         }
-        if hasattr(self, 'pokemon'):
-            d['pokemon'] = self.pokemon
         return d
 
     @property
@@ -396,8 +392,6 @@ class Modifier():
 
     @property
     def name(self):
-        if self.kind == 'rocket':
-            return 'Team GO Rocket Invasion'
         if self.kind == 'glacial':
             return 'Glacial Lure Module'
         if self.kind == 'magnetic':
@@ -516,37 +510,6 @@ class Modifier():
             return await self.despawn_mod()
         elif emoji == self.react_list['coming']:
             pass
-        elif self.kind == 'rocket' and emoji == self.react_list['caught']:
-            await message.remove_reaction(payload.emoji, user)
-            if not hasattr(self, 'pokemon'):
-                ask = await channel.send(f'{user.mention} - what three Shadow Pokemon did the Grunt have? Reply below with their names, in the order the Grunt used them.')
-                def check(m):
-                    return m.channel == channel and m.author == user
-                reply = await self.bot.wait_for('message', check=check)
-                await ask.delete()
-                args = reply.content.split()
-                pkmn_ids = []
-                if len(args) > 3:
-                    args = args[:3]
-                for arg in args:
-                    try:
-                        pkmn = await Pokemon.from_arg(self.bot, 'rocket', channel, user.id, arg)
-                        pkmn_ids.append(pkmn.id)
-                    except PokemonInvalidContext as e:
-                        invalid_name = await e.invalid_mons[0].name()
-                        await channel.send(f'{invalid_name} cannot be a Shadow Pokemon!', delete_after=10)
-                        await reply.delete()
-                        continue
-                await reply.delete()
-                self.pokemon = pkmn_ids
-                await self.upsert()
-                embed = (await ModEmbed.from_mod(self)).embed
-                for idstring in self.message_ids:
-                    try:
-                        chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
-                        await msg.edit(embed=embed)
-                    except:
-                        continue
                     
 
 
@@ -570,8 +533,6 @@ class Modifier():
         for idstring in mod.message_ids:
             Modifier.by_message[idstring] = mod
         mod.created = data['created']
-        if data.get('pokemon'):
-            mod.pokemon = data['pokemon']
         mod.monitor_task = bot.loop.create_task(mod.monitor_status())
         return mod
 
@@ -745,75 +706,6 @@ class WildCog(Cog):
             embed = formatters.make_embed(title=title, content=content, msg_colour=color)
             await channel.send(embed=embed)
 
-
-    @command(aliases=['tr'])
-    @wild_checks.wild_enabled()
-    @checks.location_set()
-    async def rocket(self, ctx, pokemon: Greedy[Pokemon] = [], *, location: Pokestop):
-
-        """Report a Team GO Rocket Pokestop invasion.
-
-        **Arguments**
-        *pokemon (optional):* The names of the Pokemon the Grunt has, in order.
-        If you give more than three Pokemon, only the first three will be used.
-        *location:* The location of the invasion.
-
-        If *location* is the name of a known Pokestop,
-        directions will be accurate. Otherwise Meowth just Googles
-        the supplied *location* plus the name of the city.
-
-        **Example:** `!rocket city park`"""
-
-        mod_id = next(snowflake.create())
-        name = 'rocket'
-        new_mod = Modifier(mod_id, self.bot, ctx.guild.id, ctx.author.id, location, name)
-        if pokemon:
-            if len(pokemon) > 3:
-                pokemon = pokemon[:3]
-            new_mod.pokemon = [x.id for x in pokemon]
-            pkmn_names = [await x.name() for x in pokemon]
-            pkmn_str = f"The Grunt's party: {', '.join(pkmn_names)}! "
-        else:
-            pkmn_str = ""
-        react_list = list(new_mod.react_list.values())
-        wants = await new_mod.get_wants()
-        mentions = [await x.mention() for x in wants if await x.mention()]
-        mention_str = "\u200b".join(mentions)
-        embed = (await ModEmbed.from_mod(new_mod)).embed
-        if mentions:
-            reportcontent = mention_str + " - "
-        else:
-            reportcontent = ""
-        coming = '🚗'
-        caught_id = new_mod.react_list['caught']
-        caught = ctx.bot.get_emoji(caught_id)
-        despawned = '💨'
-        name = new_mod.name
-        report_channels = []
-        report_channel = ReportChannel(ctx.bot, ctx.channel)
-        if isinstance(location, Pokestop):
-            loc_name = await location._name()
-            channel_list = await location.get_all_channels('wild')
-            report_channels.extend(channel_list)
-        else:
-            loc_name = location._name
-        reportcontent += f'{name} reported at {loc_name}! {pkmn_str}Use {coming} if you are on the way, {str(caught)} if you catch the Shadow Pokemon, and {despawned} if it has ended.'
-        if report_channel not in report_channels:
-            report_channels.append(report_channel)
-        for channel in report_channels:
-            try:
-                reportmsg = await channel.channel.send(reportcontent, embed=embed)
-                for react in react_list:
-                    if isinstance(react, int):
-                        react = self.bot.get_emoji(react)
-                    await reportmsg.add_reaction(react)
-                new_mod.message_ids.append(f"{reportmsg.channel.id}/{reportmsg.id}")
-            except:
-                continue
-        for idstring in new_mod.message_ids:
-            Modifier.by_message[idstring] = new_mod
-        await new_mod.upsert()
-        self.bot.loop.create_task(new_mod.monitor_status())
 
     @command()
     @wild_checks.wild_enabled()

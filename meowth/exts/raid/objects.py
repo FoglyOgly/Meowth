@@ -2242,9 +2242,13 @@ class Raid:
         color = self.guild.me.color
         trainer_dict = self.trainer_dict
         interested_users = []
+        interested_count = 0
         coming_users = []
+        coming_count = 0
         here_users = []
+        here_count = 0
         lobby_users = []
+        lobby_count = 0
         for trainer in trainer_dict:
             member = self.guild.get_member(trainer)
             if tags:
@@ -2259,21 +2263,25 @@ class Raid:
                 sumstr += f' ({total})'
             if status == 'maybe':
                 interested_users.append(sumstr)
+                interested_count += total
             elif status == 'coming':
                 coming_users.append(sumstr)
+                coming_count += total
             elif status == 'here':
                 here_users.append(sumstr)
+                here_count += total
             elif status == 'lobby':
                 lobby_users.append(sumstr)
+                lobby_count += total
         liststr = ""
         if interested_users:
-            liststr += f"\n\n{self.bot.config.emoji['maybe']}: {', '.join(interested_users)}"
+            liststr += f"\n\n{self.bot.config.emoji['maybe']} **({interested_count})**: {', '.join(interested_users)}"
         if coming_users:
-            liststr += f"\n\n{self.bot.config.emoji['coming']}: {', '.join(coming_users)}"
+            liststr += f"\n\n{self.bot.config.emoji['coming']} **({coming_count})**: {', '.join(coming_users)}"
         if here_users:
-            liststr += f"\n\n{self.bot.get_emoji(self.bot.config.emoji['here'])}: {', '.join(here_users)}"
+            liststr += f"\n\n{self.bot.get_emoji(self.bot.config.emoji['here'])} **({here_count})**: {', '.join(here_users)}"
         if lobby_users:
-            liststr += f"\n\nLobby: {', '.join(lobby_users)}"
+            liststr += f"\n\nLobby **({lobby_count})**: {', '.join(lobby_users)}"
         if tags:
             return await channel.send(f'Current Raid RSVP Totals\n\n{liststr}')
         embed = formatters.make_embed(title="Current Raid RSVP Totals", content=liststr, msg_colour=color)

@@ -392,7 +392,8 @@ class TradeCog(Cog):
         def check(m):
             return m.channel == ctx.channel and m.author == ctx.author
         wantmsg = await ctx.bot.wait_for('message', check=check)
-        wantargs = wantmsg.content.lower().split(',')
+        wantmsg = wantmsg.content.lower()
+        wantargs = wantmsg.split(',')
         wantargs = list(map(str.strip, wantargs))
         pkmn_convert = partial(Pokemon.convert, ctx)
         if len(wantargs) == 1:
@@ -401,8 +402,10 @@ class TradeCog(Cog):
                 # Check if a single pokemon was specified, e.g. shiny pidgey.
                 [await pkmn_convert(arg) for arg in wantargs]
             except PokemonNotFound:
-                # Use new syntax instead.
-                wantargs = shlex.split(wantmsg.content.lower())
+                # Use new syntax instead; account for smart quotes.
+                wantmsg = wantmsg.replace('“', '"')
+                wantmsg = wantmsg.replace('”', '"')
+                wantargs = shlex.split(wantmsg)
         if 'any' in wantargs:
             wantargs.remove('any')
             accept_any = True

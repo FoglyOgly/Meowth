@@ -187,7 +187,7 @@ class Rocket():
             families = list(set(families))
             for f in families:
                 wants.append(Want(self.bot, f, self.guild_id))
-        wants.append(Want(self.bot, self.kind, self.guild_id))
+        wants.append(Want(self.bot, self.kind.name.lower(), self.guild_id))
         wants.append(Want(self.bot, 'rocket', self.guild_id))
         return wants
 

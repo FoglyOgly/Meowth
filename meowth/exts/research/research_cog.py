@@ -439,82 +439,97 @@ class ResearchCog(Cog):
         user = chn.guild.get_member(payload.user_id)
         if payload.emoji.is_custom_emoji():
             emoji = payload.emoji.id
+            if isinstance(emoji, int):
+                emoji = self.bot.get_emoji(emoji)
+            await msg.remove_reaction(emoji, user)
+            if emoji.id == 583375171847585823:
+                if payload.user_id not in research.completed_by:
+                    research.completed_by.append(payload.user_id)
+                if research.reward == 'unknown_encounter':
+                    if isinstance(research.task, Task):
+                        possible_rewards = await research.task.possible_rewards()
+                        pkmn_rewards = [x for x in possible_rewards if '/' not in x]
+                        pkmn = [Pokemon(self.bot, x) for x in pkmn_rewards]
+                        pkmn_dict = {await x.name(): x.id for x in pkmn}
+                        react_list = formatters.mc_emoji(len(pkmn))
+                        choice_dict = dict(zip(react_list, pkmn_dict.values()))
+                        display_dict = dict(zip(react_list, pkmn_dict.keys()))
+                        embed = formatters.mc_embed(display_dict)
+                        embed.fields[0].value = embed.fields[0].value + "\n<:silph:548259248442703895>Research tasks and rewards provided by [The Silph Road](https://thesilphroad.com/research-tasks)"
+                        multi = await chn.send(f"{user.mention}: What is the reward for this task? Please select from the options below. If you don't know, just ignore this!",
+                            embed=embed)
+                        payload = await formatters.ask(self.bot, [multi], user_list=[user.id],
+                            react_list=react_list)
+                        if not payload:
+                            return await multi.delete()
+                        reward = choice_dict[str(payload.emoji)]
+                        try:
+                            await multi.delete()
+                        except:
+                            pass
+                        research.reward = reward
+            elif emoji.id == 597185467217346602:
+                askmsg = await chn.send(f"{user.mention}: Where is this Research located? Please type your response below. If you send a plain text response, I will check it against the Pokestops I know about. You can also send a Google Maps link!")
+
+                def check(m):
+                    return m.author == user and m.channel == chn
+                reply = await self.bot.wait_for('message', check=check)
+                try:
+                    await askmsg.delete()
+                    await reply.delete()
+                except discord.HTTPException:
+                    pass
+                url_re = '(http(s?)://)?((maps\.google\./)|((www\.)?google\.com/maps/)|(goo.gl/maps/))\S*'
+                match = re.search(url_re, reply.content)
+                if match:
+                    url = match.group()
+                    return await research.update_url(url)
+                else:
+                    ctx = await self.bot.get_context(reply, cls=Context)
+                    stop = await Pokestop.convert(ctx, reply.content)
+                    research.location = stop
         else:
             emoji = str(payload.emoji)
-        if isinstance(emoji, int):
-            emoji = self.bot.get_emoji(emoji)
-        await msg.remove_reaction(emoji, user)
-        if emoji.id == 583375171847585823:
-            if payload.user_id not in research.completed_by:
-                research.completed_by.append(payload.user_id)
-            if research.reward == 'unknown_encounter':
-                if isinstance(research.task, Task):
-                    possible_rewards = await research.task.possible_rewards()
-                    pkmn_rewards = [x for x in possible_rewards if '/' not in x]
-                    pkmn = [Pokemon(self.bot, x) for x in pkmn_rewards]
-                    pkmn_dict = {await x.name(): x.id for x in pkmn}
-                    react_list = formatters.mc_emoji(len(pkmn))
-                    choice_dict = dict(zip(react_list, pkmn_dict.values()))
-                    display_dict = dict(zip(react_list, pkmn_dict.keys()))
-                    embed = formatters.mc_embed(display_dict)
-                    embed.fields[0].value = embed.fields[0].value + "\n<:silph:548259248442703895>Research tasks and rewards provided by [The Silph Road](https://thesilphroad.com/research-tasks)"
-                    multi = await chn.send(f"{user.mention}: What is the reward for this task? Please select from the options below. If you don't know, just ignore this!",
-                        embed=embed)
-                    payload = await formatters.ask(self.bot, [multi], user_list=[user.id],
-                        react_list=react_list)
-                    if not payload:
-                        return await multi.delete()
-                    reward = choice_dict[str(payload.emoji)]
-                    try:
-                        await multi.delete()
-                    except:
-                        pass
-                    research.reward = reward
-                    embed = await ResearchEmbed.from_research(research)
-                    for msgid in research.message_ids:
-                        chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
-                        await msg.edit(embed=embed.embed)
-            return await research.upsert()
-        elif emoji.id == 597185467217346602:
-            askmsg = await chn.send(f"{user.mention}: Where is this Research located? Please type your response below. If you send a plain text response, I will check it against the Pokestops I know about. You can also send a Google Maps link!")
-            def check(m):
-                return m.author == user and m.channel == chn
-            reply = await self.bot.wait_for('message', check=check)
-            try:
-                await askmsg.delete()
-                await reply.delete()
-            except:
-                pass
-            url_re = '(http(s?)://)?((maps\.google\./)|((www\.)?google\.com/maps/)|(goo.gl/maps/))\S*'
-            match = re.search(url_re, reply.content)
-            if match:
-                url = match.group()
-                return await research.update_url(url)
-            else:
-                ctx = await self.bot.get_context(reply, cls=Context)
-                stop = await Pokestop.convert(ctx, reply.content)
-                research.location = stop
-                embed = await ResearchEmbed.from_research(research)
-                for msgid in research.message_ids:
-                    try:
-                        chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
-                        await msg.edit(embed=embed.embed)
-                    except:
-                        pass
+            await msg.remove_reaction(emoji, user)
+            if emoji == '\U0001F4DD':
+                print('hello')
+                askmsg = await chn.send(f"{user.mention}: What Research task is located here? Please type your response below.")
 
-            
-    
+                def check(m):
+                    return m.author == user and m.channel == chn
+                try:
+                    reply = await self.bot.wait_for('message', check=check, timeout=300)
+                except asyncio.TimeoutError:
+                    return
+                try:
+                    await askmsg.delete()
+                    await reply.delete()
+                except discord.HTTPException:
+                    pass
+                ctx = await self.bot.get_context(reply, cls=Context)
+                task = await Task.convert(ctx, reply.content)
+                research.task = task
+
+        embed = await ResearchEmbed.from_research(research)
+        for msgid in research.message_ids:
+            try:
+                chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
+                await msg.edit(embed=embed.embed)
+            except discord.HTTPException:
+                pass
+        return await research.upsert()
+
     async def pickup_researchdata(self):
         research_table = self.bot.dbi.table('research')
         query = research_table.query()
         data = await query.get()
         for rcrd in data:
             self.bot.loop.create_task(self.pickup_research(rcrd))
-    
+
     async def pickup_research(self, rcrd):
         research = await Research.from_data(self.bot, rcrd)
         self.bot.loop.create_task(research.monitor_status())
-    
+
     async def task_categories(self):
         table = self.bot.dbi.table('task_names')
         query = table.query('category')
@@ -718,8 +733,9 @@ class ResearchCog(Cog):
         for channel in report_channels:
             try:
                 msg = await channel.channel.send(reportcontent, embed=embed)
-                await msg.add_reaction(stamp)
+                await msg.add_reaction("\U0001F4DD")  # Task emoji
                 await msg.add_reaction(map_icon)
+                await msg.add_reaction(stamp)
             except:
                 continue
             idstring = f'{msg.channel.id}/{msg.id}'

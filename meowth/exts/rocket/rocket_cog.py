@@ -388,7 +388,7 @@ class RocketCog(Cog):
         mod_id = next(snowflake.create())
         name = rocket_type.name.lower()
         tz = await ctx.tz()
-        new_mod = Rocket(mod_id, self.bot, ctx.guild.id, ctx.author.id, location, name, tz)
+        new_mod = Rocket(mod_id, self.bot, ctx.guild.id, ctx.author.id, location, rocket_type, tz)
         if pokemon:
             if len(pokemon) > 3:
                 pokemon = pokemon[:3]

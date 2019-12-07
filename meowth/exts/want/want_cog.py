@@ -279,6 +279,9 @@ class Want():
         arg = arg.lower()
         if arg == 'rocket':
             return cls(ctx.bot, arg, ctx.guild.id)
+        leaders = ['arlo', 'cliff', 'sierra', 'giovanni']
+        if arg in leaders:
+            return cls(ctx.bot, arg, ctx.guild.id)
         lures = ['glacial', 'mossy', 'magnetic']
         if arg in lures:
             return cls(ctx.bot, arg, ctx.guild.id)

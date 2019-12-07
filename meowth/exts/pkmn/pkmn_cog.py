@@ -895,6 +895,8 @@ class Pokemon():
                     react_list=react_list)
                 pkmn = choice_dict[str(payload.emoji)]
                 await multi.delete()
+        if form:
+            pkmn.form = form
         pkmn.shiny = shiny
         pkmn.attiv = attiv
         pkmn.defiv = defiv

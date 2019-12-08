@@ -163,7 +163,7 @@ class Trade:
         return trade
 
     async def get_listmsg(self):
-        return await self.listing_channel.get_message(self.listing_id)
+        return await self.listing_channel.fetch_message(self.listing_id)
 
     async def offered_pokemon(self):
         listingmsg = await self.get_listmsg()

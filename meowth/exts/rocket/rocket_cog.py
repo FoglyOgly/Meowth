@@ -10,6 +10,7 @@ from meowth.utils.converters import ChannelMessage
 import time
 from datetime import datetime, timedelta
 import asyncio
+import pytz
 from pytz import timezone
 from math import ceil
 from discord.ext import commands

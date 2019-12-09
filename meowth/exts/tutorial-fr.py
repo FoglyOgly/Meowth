@@ -7,7 +7,7 @@ from discord.ext import commands
 from meowth import utils
 from meowth import checks
 
-class Tutorial:
+class Tutorial(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

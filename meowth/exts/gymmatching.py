@@ -5,7 +5,7 @@ from discord.ext import commands
 
 from meowth import utils
 
-class GymMatching:
+class GymMatching(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.gym_data = self.init_json()

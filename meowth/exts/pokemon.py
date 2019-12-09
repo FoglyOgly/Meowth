@@ -7,7 +7,7 @@ from discord.ext.commands import CommandError
 from meowth import utils
 
 
-class PokemonNotFound(CommandError):
+class PokemonNotFound(CommandError)(commands.Cog):
     """Exception raised when Pokemon given does not exist."""
     def __init__(self, pokemon, retry=True):
         self.pokemon = pokemon

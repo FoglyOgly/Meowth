@@ -6,7 +6,7 @@ import discord
 from discord.ext import commands
 from meowth import utils
 
-class SilphBadge:
+class SilphBadge(commands.Cog):
 
     __slots__ = ('count', '_awarded', 'slug', 'name', 'description', 'image_url')
 

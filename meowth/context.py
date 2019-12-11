@@ -145,7 +145,7 @@ class GetTools:
                 return None
         channel = channel or self.ctx.channel
         try:
-            return await channel.get_message(id)
+            return await channel.fetch_message(id)
         except discord.NotFound:
             return None
 

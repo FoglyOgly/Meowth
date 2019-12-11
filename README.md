@@ -15,6 +15,7 @@ Cette version est "iso" avec la version forked avec ces différences :
 * Ajout d'une version `Long running tasks` pour prévenir les redémarrages régulier de certains hébergeurs.
 * Ajout d'une nouvelle commande afin de mettre à jour la durée des raids et hatchtime `!raiddata hatchtime 1 15` or `!raiddata raidtime 1 90`
 * Ajout de la possibilité dans le fichier `config.json`de `submaster` afin de déléguer l'utilisation des command d'admin à plusisieurs personnes.
+* UPDATED 09/12/2019 : Afin de corriger un problème avec la commande `!timerset`, cette version à été modifiée pour utiliser la version `discord.py==1.2.5` et les méthodes `get_message` ont été replacées par `fetch_message`. Dans chanque Classes du package ext, ont été ajouté `ClassName(commands.Cog):`
 
 https://help.pythonanywhere.com/pages/LongRunningTasks/
 

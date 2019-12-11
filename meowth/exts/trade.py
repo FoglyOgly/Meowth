@@ -9,7 +9,7 @@ from meowth import utils, checks
 from meowth.exts import pokemon
 
 
-class Trade:
+class Trade(commands.Cog):
 
     icon_url = ("https://raw.githubusercontent.com/FoglyOgly/Meowth/"
                 "discordpy-v1/images/misc/trade_icon_small.png")
@@ -163,7 +163,7 @@ class Trade:
         return trade
 
     async def get_listmsg(self):
-        return await self.listing_channel.get_message(self.listing_id)
+        return await self.listing_channel.fetch_message(self.listing_id)
 
     async def offered_pokemon(self):
         listingmsg = await self.get_listmsg()

@@ -2,7 +2,7 @@ from discord.ext import commands
 
 from meowth import checks
 
-class Utilities:
+class Utilities(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -11,9 +11,9 @@ class Utilities:
     async def _embed(self, ctx, title, content=None, colour=None,
                      icon_url=None, image_url=None, thumbnail_url=None,
                      plain_msg=''):
-        """Build and post an embed in the current channel.
+        """Créez et publiez une intégration dans le canal actuel.
 
-        Note: Always use quotes to contain multiple words within one argument.
+         Remarque: Utilisez toujours des guillemets pour contenir plusieurs mots dans un argument.
         """
         await ctx.embed(title=title, description=content, colour=colour,
                         icon=icon_url, image=image_url,

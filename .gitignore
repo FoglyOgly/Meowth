@@ -9,5 +9,8 @@ __pychache__/
 *.py[cod]
 
 data/gym_data.json
+/meowth/meowth.pot
+/meowth/pygettext.py
+.DS_Store
 
 .vscode/

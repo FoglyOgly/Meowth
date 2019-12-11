@@ -153,40 +153,35 @@ async def get_raid_help(prefix, avatar, user=None):
     helpembed.set_author(name="Raid Coordination Help", icon_url=avatar)
     helpembed.add_field(
         name="Key",
-        value="<> denote required arguments, [] denote optional arguments",
+        value="<> indique un argument obligatoire, [] indique un argument optionel",
         inline=False)
     helpembed.add_field(
-        name="Raid MGMT Commands",
+        name="Raid MGMT Commands/Description",
         value=(
             f"`{prefix}raid <species>`\n"
+            "`-> Indique le PKM éclos`\n"
             f"`{prefix}weather <weather>`\n"
+            "`-> Indique la météo du jeu`\n"
             f"`{prefix}timerset <minutes>`\n"
+            "`-> Indique le temps avant éclosion/dépop (en MM)`\n"
             f"`{prefix}starttime <time>`\n"
-            "`<google maps link>`\n"
+            "`-> Indique l'heure de début (HH:MM)`\n"
+            "`<lien google maps>`\n"
+            "`-> Mets à jour l'emplacement`\n"
             "**RSVP**\n"
-            f"`{prefix}(i/c/h)...\n"
-            "[total]...\n"
-            "[team counts]`\n"
+            f"`{prefix}(i/c/h) [nb total] [nb par équipe]`\n"
+            "`-> (i/c/h) interested/coming/here`\n"
+            "`-> [nb total] de dresseurs présents`\n"
+            "`-> [nb par équipe] pour chaque équipe (ex. 3m for 3 Mystic)`\n"
             "**Lists**\n"
             f"`{prefix}list [status]`\n"
+            "`-> Liste les dresseurs par status`\n"
             f"`{prefix}list [status] tags`\n"
-            f"`{prefix}list teams`\n\n"
-            f"`{prefix}starting [team]`"))
-    helpembed.add_field(
-        name="Description",
-        value=(
-            "`Hatches Egg channel`\n"
-            "`Sets in-game weather`\n"
-            "`Sets hatch/raid timer`\n"
-            "`Sets start time`\n"
-            "`Updates raid location`\n\n"
-            "`interested/coming/here`\n"
-            "`# of trainers`\n"
-            "`# from each team (ex. 3m for 3 Mystic)`\n\n"
-            "`Lists trainers by status`\n"
-            "`@mentions trainers by status`\n"
-            "`Lists trainers by team`\n\n"
-            "`Moves trainers on 'here' list to a lobby.`"))
+            "`-> @mentions les dresseurs par status`\n"
+            f"`{prefix}list teams`\n"
+            "`-> Liste les dresseurs par équipe`\n\n"
+            f"`{prefix}starting [team]`\n"
+            "`-> Déplace les dresseurs de la liste 'here' à lobby.`"))
     if not user:
         return helpembed
     await user.send(embed=helpembed)

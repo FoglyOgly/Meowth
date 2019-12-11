@@ -6,7 +6,7 @@ import discord
 from discord.ext import commands
 from meowth import utils
 
-class SilphBadge:
+class SilphBadge(commands.Cog):
 
     __slots__ = ('count', '_awarded', 'slug', 'name', 'description', 'image_url')
 
@@ -291,7 +291,7 @@ class Silph:
 
     @commands.command()
     async def silphcard(self, ctx, silph_user: str = None):
-        """Displays a user's Silph Road Trainer Card."""
+        """Affiche la carte Silph Road Trainer d'un utilisateur."""
         guild_data = ctx.bot.guild_dict[ctx.guild.id]
         if not silph_user:
             silph_user = guild_data['trainers'].setdefault(ctx.author.id, {}).get('silphid', None)

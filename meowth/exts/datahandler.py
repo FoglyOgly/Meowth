@@ -5,7 +5,7 @@ from discord.ext import commands
 from meowth import utils
 from meowth import checks
 
-class DataHandler:
+class DataHandler(commands.Cog):
     """Data Loading and Saving Test Cog."""
 
     def __init__(self, bot):
@@ -34,7 +34,7 @@ class DataHandler:
 
     @commands.group(invoke_without_command=True)
     async def raiddata(self, ctx, level=None):
-        """Show all raid Pokemon, showing only the raid level if provided."""
+        """Afficher tous les raids Pokémon, ne montrant que le niveau de raid si fourni."""
         data = []
         title = None
         if level:
@@ -54,7 +54,8 @@ class DataHandler:
                 for pkmnno in vals["pokemon"]:
                     leveldata.append(f"#{pkmnno} - {self.get_name(pkmnno)}")
                 leveldata = '\n'.join(leveldata)
-                data.append(f"**Raid {pkmnlvl} Pokemon**\n{leveldata}\n")
+                #data.append(f"**Raid {pkmnlvl} Pokemon**\n{leveldata}\n")
+                data.append(f"**Raid {pkmnlvl} Pokemon (hatchtime: {vals['hatchtime']}, raidtime: {vals['raidtime']})**\n{leveldata}\n")
         data_str = '\n'.join(data)
         await ctx.send(f"**{title}**\n{data_str}")
 
@@ -66,10 +67,10 @@ class DataHandler:
 
     @raiddata.command(name='remove', aliases=['rm', 'del', 'delete'])
     async def remove_rd(self, ctx, *raid_pokemon):
-        """Removes all pokemon provided as arguments from the raid data.
+        """Supprime tous les pokemon fournis en tant qu'arguments des données du raid.
 
-        Note: If a multi-word pokemon name is used, wrap in quote marks:
-        Example: !raiddata remove "Mr Mime" Jynx
+         Remarque: Si un nom de pokemon de plusieurs mots est utilisé, retournez aux guillemets:
+         Exemple:!raiddata remove "Mr Mime" Jynx
         """
         results = []
         for pokemon in raid_pokemon:
@@ -89,7 +90,7 @@ class DataHandler:
         await ctx.send(f"**Pokemon removed from raid data**\n{results_st}")
 
     def add_raid_pkmn(self, level, *raid_pokemon):
-        """Add raid pokemon to relevant level."""
+        """Ajoutez raid pokemon au niveau approprié."""
         added = []
         failed = []
         raid_list = self.raid_info['raid_eggs'][level]['pokemon']
@@ -111,11 +112,11 @@ class DataHandler:
 
     @raiddata.command(name='add')
     async def add_rd(self, ctx, level, *raid_pokemon):
-        """Adds all pokemon provided as arguments to the specified raid
-        level in the raid data.
+        """Ajoute tous les pokemon fournis en tant qu'arguments au raid spécifié
+         niveau dans les données de raid.
 
-        Note: If a multi-word pokemon name is used, wrap in quote marks:
-        Example: !raiddata add "Mr Mime" Jynx
+         Remarque: Si un nom de pokemon de plusieurs mots est utilisé, retournez aux guillemets:
+         Exemple:!raiddata add "Mr Mime" Jynx
         """
 
         if level not in self.raid_info['raid_eggs'].keys():
@@ -139,11 +140,11 @@ class DataHandler:
 
     @raiddata.command(name='replace', aliases=['rp'])
     async def replace_rd(self, ctx, level, *raid_pokemon):
-        """All pokemon provided will replace the specified raid level
-        in the raid data.
+        """Tout pokemon fourni remplacera le niveau de raid spécifié
+         dans les données de raid.
 
-        Note: If a multi-word pokemon name is used, wrap in quote marks:
-        Example: !raiddata add "Mr Mime" Jynx
+         Remarque: Si un nom de pokemon de plusieurs mots est utilisé, retournez aux guillemets:
+         Exemple:!raiddata add "Mr Mime" Jynx
         """
         if level not in self.raid_info['raid_eggs'].keys():
             return await ctx.send("Invalid raid level specified.")
@@ -171,7 +172,7 @@ class DataHandler:
 
     @raiddata.command(name='save', aliases=['commit'])
     async def save_rd(self, ctx):
-        """Saves the current raid data state to the json file."""
+        """Enregistre l'état actuel des données du raid dans le fichier json."""
         for pkmn_lvl in self.raid_info['raid_eggs']:
             data = self.raid_info['raid_eggs'][pkmn_lvl]["pokemon"]
             pkmn_ints = [int(p) for p in data]
@@ -180,6 +181,19 @@ class DataHandler:
         with open(ctx.bot.raid_json_path, 'w') as fd:
             json.dump(self.raid_info, fd, indent=4)
         await ctx.message.add_reaction('\u2705')
+
+    @raiddata.command(name='hatchtime', aliases=['raidtime'])
+    async def change_time(self, ctx, level, duration):
+        """Mets à jour la durée des raids et hatchtime `!raiddata hatchtime 1 15` or `!raiddata raidtime 1 90`"""
+        timetype = ctx.invoked_with
+        if duration.isdigit():
+            try:
+                self.raid_info['raid_eggs'][level][timetype] = int(duration)
+                return await ctx.send(f"{timetype} of level {level} raid changed to {duration} minutes")
+            except KeyError:
+                return await ctx.send('Invalid raid level specified.')
+        else:
+            return await ctx.send(f"{duration} must be a number")
 
 def setup(bot):
     bot.add_cog(DataHandler(bot))

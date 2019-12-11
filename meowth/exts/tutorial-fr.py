@@ -46,26 +46,26 @@ class Tutorial(commands.Cog):
         report_channels.append(ctx.tutorial_channel.id)
 
         await ctx.tutorial_channel.send(
-            f"This server utilizes the **{ctx.prefix}want** command to help "
-            "members receive push notifications about Pokemon they want! "
-            "I create Discord roles for each Pokemon that people want, "
-            "and @mentioning these roles will send a notification to "
-            f"anyone who **{ctx.prefix}want**-ed that Pokemon!\n"
-            f"Try the {ctx.prefix}want command!\n"
-            f"Ex: `{ctx.prefix}want unown`")
+            f"Ce serveur utilise la commande **{ctx.prefix}want ** pour vous aider "
+            "les membres reçoivent des notifications push sur les Pokemon qu'ils veulent! "
+            "Je crée des rôles Discord pour chaque Pokemon que les gens veulent, "
+            "et @mentioning ces rôles enverra une notification à "
+            f"Quelqu'un qui **{ctx.prefix}veut**-drait ce Pokemon !\n"
+            f"Essayez la commande {ctx.prefix}want!\n"
+            f"Ex: `{ctx.prefix}want koygre`")
 
         try:
             await self.wait_for_cmd(ctx.tutorial_channel, ctx.author, 'want')
 
             # acknowledge and wait a second before continuing
-            await ctx.tutorial_channel.send("Great job!")
+            await ctx.tutorial_channel.send("Bon boulot !")
             await asyncio.sleep(1)
 
         # if no response for 5 minutes, close tutorial
         except asyncio.TimeoutError:
             await ctx.tutorial_channel.send(
-                f"You took too long to complete the **{ctx.prefix}want** "
-                "command! This channel will be deleted in ten seconds.")
+                "Vous avez pris trop de temps pour compléter la commande "
+                f"**{ctx.prefix}want** ! Cette chaîne sera supprimée dans dix secondes.")
             await asyncio.sleep(10)
             await ctx.tutorial_channel.delete()
 
@@ -82,28 +82,28 @@ class Tutorial(commands.Cog):
         report_channels[ctx.tutorial_channel.id] = 'test'
 
         await ctx.tutorial_channel.send(
-            f"This server utilizes the **{ctx.prefix}wild** command to "
-            "report wild spawns! When you use it, I will send a message "
-            "summarizing the report and containing a link to my best "
-            "guess of the spawn location. If the reported Pokemon has "
-            "an associated role on the server, I will @mention the role "
-            "in my message! Your report must contain the name of the "
-            "Pokemon followed by its location. "
-            "Try reporting a wild spawn!\n"
-            f"Ex: `{ctx.prefix}wild magikarp some park`")
+            f"Ce serveur utilise la commande **{ctx.prefix}wild** pour "
+            "signaler des spawns wild ! Quand vous l'utiliserez, j'enverrai un message "
+            "résummant la signalisation et contenant un lien vers ma meilleur "
+            "estimation de l'emplacement de réapparition. Si le Pokemon rapporté a un "
+            "rôle associé sur le serveur, je vais @mentionner le rôle "
+            "dans mon message! Votre signalement doit contenir le nom du "
+            "Pokémon suivi de son emplacement. "
+            "Essayez de signaler un spawn sauvage!\n"
+            f"Ex: `{ctx.prefix}wild magicarpe \"quelque part\"`")
 
         try:
             await self.wait_for_cmd(ctx.tutorial_channel, ctx.author, 'wild')
 
             # acknowledge and wait a second before continuing
-            await ctx.tutorial_channel.send("Great job!")
+            await ctx.tutorial_channel.send("Bon boulot !")
             await asyncio.sleep(1)
 
         # if no response for 5 minutes, close tutorial
         except asyncio.TimeoutError:
             await ctx.tutorial_channel.send(
-                f"You took too long to complete the **{ctx.prefix}wild** "
-                "command! This channel will be deleted in ten seconds.")
+                f"Vous avez pris trop de temps pour compléter la commande "
+                f"**{ctx.prefix}wild** ! Cette chaîne sera supprimée dans dix secondes.")
             await asyncio.sleep(10)
             await ctx.tutorial_channel.delete()
             return False
@@ -129,8 +129,8 @@ class Tutorial(commands.Cog):
 
         async def timeout_raid(cmd):
             await tutorial_channel.send(
-                f"You took too long to complete the **{prefix}{cmd}** "
-                "command! This channel will be deleted in ten seconds.")
+                "Vous avez pris trop de temps pour compléter la commande "
+                f"**{prefix}{cmd}** ! Cette chaîne sera supprimée dans dix secondes.")
             await asyncio.sleep(10)
             await tutorial_channel.delete()
             del report_channels[tutorial_channel.id]
@@ -141,19 +141,19 @@ class Tutorial(commands.Cog):
             return
 
         await tutorial_channel.send(
-            f"This server utilizes the **{prefix}raid** command to "
-            "report raids! When you use it, I will send a message "
-            "summarizing the report and create a text channel for "
+            f"Ce serveur utilise la commande **{prefix}raid** pour "
+            "signaler les raids! Quand vous l'utiliserez, j'enverrai un message "
+            "résumant le signalement et je créerai un canal de texte pour "
             "coordination. \n"
-            "The report must contain, in this order: The Pokemon (if an "
-            "active raid) or raid level (if an egg), and the location;\n"
-            "the report may optionally contain the weather (see "
-            f"**{prefix}help weather** for accepted options) and the "
-            "minutes remaining until hatch or expiry (at the end of the "
-            "report) \n\n"
-            "Try reporting a raid!\n"
-            f"Ex: `{prefix}raid magikarp local church cloudy 42`\n"
-            f"`{prefix}raid 3 local church sunny 27`")
+            "Le rapport doit contenir, dans cet ordre: Le Pokémon (si un "
+            "raid actif) ou niveau de raid (si un oeuf), et l'emplacement;\n"
+            "le rapport peut éventuellement contenir le temps (voir "
+            f"**{prefix}help weather** pour les options acceptées) et les "
+            "minutes restantes jusqu'à l'éclosion ou l'expiration (à la fin du "
+            "signalement) \n\n"
+            "Essayez de signaler un raid!\n"
+            f"Ex: `{prefix}raid magicarpe local church ensoleillé 42`\n"
+            f"`{prefix}raid 3 local church ensoleillé 27`")
 
         try:
             while True:
@@ -168,14 +168,14 @@ class Tutorial(commands.Cog):
 
                 # acknowledge failure and redo wait_for
                 await tutorial_channel.send(
-                    "Doesn't look like it worked. Make sure you're not "
-                    "missing any arguments from your raid command and "
-                    "try again.")
+                    "Ça n'a pas l'air de fonctionner. Assurez-vous de n'avoir oublié "
+                    "aucun parametres à votre commande raid "
+                    "et réessayez.")
 
             # acknowledge and redirect to new raid channel
             await tutorial_channel.send(
-                "Great job! Let's head into the new raid channel you just "
-                f"created: {raid_channel.mention}")
+                "Bon boulot! Retrouvons-nous dans la chaine que vous venez de "
+                f"créer: {raid_channel.mention}")
             await asyncio.sleep(1)
 
         # if no response for 5 minutes, close tutorial
@@ -188,12 +188,12 @@ class Tutorial(commands.Cog):
             ctx.prefix, ctx.bot.user.avatar_url)
 
         await raid_channel.send(
-            f"This is an example of a raid channel. Here is a list of "
-            "commands that can be used in here:", embed=helpembed)
+            f"Ceci est une chaine d'exemple pour les Raid. Voici une liste "
+            "de commandes que vous pouvez utiliser ici:", embed=helpembed)
 
         await raid_channel.send(
-            f"Try expressing interest in this raid!\n\n"
-            f"Ex: `{prefix}interested 5 m3 i1 v1` would mean 5 trainers: "
+            f"Essayez de montrer votre intéret pour ce raid!\n\n"
+            f"Ex: `{prefix}interested 5 m3 i1 v1` Veut dire 5 dresseurs: "
             "3 Mystic, 1 Instinct, 1 Valor")
 
         # wait for interested status update
@@ -209,12 +209,12 @@ class Tutorial(commands.Cog):
         # acknowledge and continue with pauses between
         await asyncio.sleep(1)
         await raid_channel.send(
-            f"Great job! To save time, you can also use **{prefix}i** "
-            f"as an alias for **{prefix}interested**.")
+            f"Super ! Pour aller plus vite, vous pouvez aussi utiliser **{prefix}i** "
+            f"c'est un alias pour la command **{prefix}interested**.")
 
         await asyncio.sleep(1)
         await raid_channel.send(
-            "Now try letting people know that you are on your way!\n\n"
+            "Maintenant, essayons d'informer les autres que vous arrivez!\n\n"
             f"Ex: `{prefix}coming`")
 
         # wait for coming status update
@@ -229,15 +229,15 @@ class Tutorial(commands.Cog):
 
         # acknowledge and continue with pauses between
         await asyncio.sleep(1)
-        await raid_channel.send(
-            "Great! Note that if you have already specified your party "
-            "in a previous command, you do not have to again for the "
-            "current raid unless you are changing it. Also, "
-            f"**{prefix}c** is an alias for **{prefix}coming**.")
+        await raid_channel.send(  
+            "Parfait! Notez que si vous avez déjà spécifié votre participation "
+            "dans une commande précédente, vous n'avez pas à nouveau pour "
+            "le raid en cours à moins que vous l'ayez modifié. De même, "
+            f"**{prefix}c** est un alias pour **{prefix}coming**.")
 
         await asyncio.sleep(1)
         await raid_channel.send(
-            "Now try letting people know that you have arrived at the "
+            "Maintenant, essayez de faire savoir aux gens que vous êtes arrivé au "
             "raid!\n\n"
             f"Ex: `{prefix}here`")
 
@@ -254,12 +254,12 @@ class Tutorial(commands.Cog):
         # acknowledge and continue with pauses between
         await asyncio.sleep(1)
         await raid_channel.send(
-            f"Good! Please note that **{prefix}h** is an alias for "
+            f"Good! Notez que  **{prefix}h** est un alias pour "
             f"**{prefix}here**")
 
         await asyncio.sleep(1)
         await raid_channel.send(
-            "Now try checking to see everyone's RSVP status for this "
+            "Maintenant voyons les réponses des autres joueurs pour ce "
             f"raid!\n\nEx: `{prefix}list`")
 
         # wait for list command completion
@@ -275,9 +275,9 @@ class Tutorial(commands.Cog):
         # acknowledge and continue with pauses between
         await asyncio.sleep(1)
         await raid_channel.send(
-            "Awesome! Since no one else is on their way, try using the "
-            f"**{prefix}starting** command to move everyone on the "
-            "'here' list to a lobby!")
+            "Génial! Puisque plus personne n'est en chemin, essayons "
+            f"la commande **{prefix}starting** pour faire entrer les gens "
+            " de la liste 'here' dans le lobby!")
 
         # wait for starting command completion
         try:
@@ -292,35 +292,35 @@ class Tutorial(commands.Cog):
         # acknowledge and continue with pauses between
         await asyncio.sleep(1)
         await raid_channel.send(
-            f"Great! You are now listed as being 'in the lobby', where "
-            "you will remain for two minutes until the raid begins. In "
-            "that time, anyone can request a backout with the "
-            f"**{prefix}backout** command. If the person requesting is "
-            "in the lobby, the backout is automatic. If it is someone "
-            "who arrived at the raid afterward, confirmation will be "
-            "requested from a lobby member. When a backout is confirmed, "
-            "all members will be returned to the 'here' list.")
+            f"Génial! Vous êtes maintenant listé comme étant 'dans le hall', où "
+            "vous resterez pendant deux minutes jusqu'à ce que le raid commence. "
+            "Pendantce temps, tout le monde peut demander un backout avec la "
+            f"commande **{prefix}backout**. Si la personne qui demande est "
+            "dans le hall, la sortie est automatique. Si c'est quelqu'un "
+            "qui est arrivé au raid par la suite, la confirmation sera "
+            "demandée à un membre du lobby. Lorsqu'un backout est confirmé, "
+            "tous les membres seront renvoyés à la liste 'here'.")
 
         await asyncio.sleep(1)
         await raid_channel.send(
-            "A couple of notes about raid channels. Meowth has "
-            "partnered with Pokebattler to give you the best counters "
-            "for each raid boss in every situation. You can set the "
-            "weather in the initial raid report, or with the "
-            f"**{prefix}weather** command. You can select the moveset "
-            "using the reactions in the initial counters message. If "
-            f"you have a Pokebattler account, you can use **{prefix}set "
-            "pokebattler <id>** to link them! After that, the "
-            f"**{prefix}counters**  command will DM you your own counters "
-            "pulled from your Pokebox.")
+            "Quelques notes sur les canaux de raid. Meowth a "
+            "établi un partenariat avec Pokebattler pour vous donner les meilleurs contres "
+            "pour chaque boss de raid dans toutes les situations. Vous pouvez définir la "
+            "météo dans le rapport de raid initial ou avec la "
+            f"commande **{prefix}weather**. Vous pouvez sélectionner le moveset "
+            "en utilisant les réactions dans le message des contres initiaux. Si "
+            f"vous avez un compte Pokebattler, vous pouvez utiliser **{prefix}set "
+            "pokebattler <id>** pour les lier! Après cela, la commande "
+            f"**{prefix}counters**  vous enverra en DM les meilleurs contres "
+            "venant de votre Pokebox.")
 
         await asyncio.sleep(1)
         await raid_channel.send(
-            "Last thing: if you need to update the expiry time, use "
+            "Dernière chose: si vous avez besoin de mettre à jour l'heure d'expiration, utilisez "
             f"**{prefix}timerset <minutes left>**\n\n"
-            "Feel free to play around with the commands here for a while. "
-            f"When you're finished, type `{prefix}timerset 0` and the "
-            "raid will expire.")
+            "N'hésitez pas à jouer avec les commandes ici pendant un moment. "
+            f"Lorsque vous avez terminé, tapez `{prefix}timerset 0` et le "
+            "raid expirera vous permettant de passer à la suite du Tutorial.")
 
         # wait for timerset command completion
         try:

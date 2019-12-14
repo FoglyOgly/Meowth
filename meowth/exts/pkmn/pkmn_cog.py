@@ -867,7 +867,7 @@ class Pokemon():
             raise PokemonNotFound
         else:
             mons = [(cls(bot, x)) for x in possible_ids]
-            if command_name == 'raid':
+            if command_name in ['raid', 'interested', 'coming', 'here']:
                 possible_mons = [x for x in mons if await x._raid_available(coords)]
             elif command_name == 'wild':
                 possible_mons = [x for x in mons if await x._wild_available()]

@@ -468,24 +468,25 @@ class RaidCog(Cog):
             if old_raid:
                 old_raid = old_raid[0]
                 old_raid = await Raid.from_data(ctx.bot, old_raid)
-                if old_raid.hatch:
-                    embed = await old_raid.egg_embed()
-                else:
-                    embed = await old_raid.raid_embed()
-                if old_raid.channel_ids:
-                    mentions = []
-                    for channelid in old_raid.channel_ids:
-                        channel = ctx.guild.get_channel(int(channelid))
-                        if not channel:
-                            continue
-                        mention = channel.mention
-                        mentions.append(mention)
-                    if mentions:
-                        return await ctx.send(f"""There is already a raid reported at this gym! Coordinate here: {", ".join(mentions)}""", embed=embed)
-                else:
-                    msg = await ctx.send(f"""There is already a raid reported at this gym! Coordinate here!""", embed=embed)
-                    old_raid.message_ids.append(f"{msg.channel.id}/{msg.id}")
-                    return msg
+                if old_raid.level != 'EX':
+                    if old_raid.hatch:
+                        embed = await old_raid.egg_embed()
+                    else:
+                        embed = await old_raid.raid_embed()
+                    if old_raid.channel_ids:
+                        mentions = []
+                        for channelid in old_raid.channel_ids:
+                            channel = ctx.guild.get_channel(int(channelid))
+                            if not channel:
+                                continue
+                            mention = channel.mention
+                            mentions.append(mention)
+                        if mentions:
+                            return await ctx.send(f"""There is already a raid reported at this gym! Coordinate here: {", ".join(mentions)}""", embed=embed)
+                    else:
+                        msg = await ctx.send(f"""There is already a raid reported at this gym! Coordinate here!""", embed=embed)
+                        old_raid.message_ids.append(f"{msg.channel.id}/{msg.id}")
+                        return msg
         if level_or_boss.isdigit():
             level = level_or_boss
             boss = None

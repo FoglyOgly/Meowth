@@ -1113,6 +1113,10 @@ class Raid:
         event_loop.create_task(self.change_weather(payload))
     
     async def change_weather(self, payload):
+        if self.hatch and (self.hatch - time.time() > 3600):
+            send = False
+        else:
+            send = True
         weather = Weather(self.bot, payload)
         weather_name = await weather.name()
         emoji = await weather.boosted_emoji_str()
@@ -1167,7 +1171,7 @@ class Raid:
                     embed = egg_embed.embed
                     has_embed = True
             await msg.edit(embed=embed)
-        if self.channel_ids:
+        if self.channel_ids and send:
             content = f'Weather changed to {weather_str}'
             for chnid in self.channel_ids:
                 channel = self.bot.get_channel(int(chnid))

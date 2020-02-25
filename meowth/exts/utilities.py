@@ -2,7 +2,7 @@ from discord.ext import commands
 
 from meowth import checks
 
-class Utilities:
+class Utilities(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

@@ -19,7 +19,8 @@ def is_owner():
 
 def is_dev_check(ctx):
     author = ctx.author.id
-    dev_list = [371998231300931584]
+    # Makonde, Witold, xzippedin28, foowcio
+    dev_list = [371998231300931584,169043579627503616,206732720984817664,448940194297806888]
     return author in dev_list
 
 def is_dev_or_owner():

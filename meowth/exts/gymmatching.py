@@ -11,7 +11,7 @@ from discord.ext import commands
 from unidecode import unidecode
 
 
-class GymMatching:
+class GymMatching(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.gym_data = self._init_json()

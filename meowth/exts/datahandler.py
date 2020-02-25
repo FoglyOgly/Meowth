@@ -5,7 +5,7 @@ from discord.ext import commands
 from meowth import utils
 from meowth import checks
 
-class DataHandler:
+class DataHandler(commands.Cog):
     """Data Loading and Saving Test Cog."""
 
     def __init__(self, bot):

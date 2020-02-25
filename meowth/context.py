@@ -107,7 +107,7 @@ class GetTools:
             if user:
                 return user
             try:
-                user = await bot.get_user_info(search_term)
+                user = await bot.fetch_user(search_term)
             except discord.NotFound:
                 return None
             else:
@@ -145,7 +145,7 @@ class GetTools:
                 return None
         channel = channel or self.ctx.channel
         try:
-            return await channel.get_message(id)
+            return await channel.fetch_message(id)
         except discord.NotFound:
             return None
 

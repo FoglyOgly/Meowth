@@ -382,7 +382,7 @@ class Trade:
         except (KeyError, discord.HTTPException):
             pass
 
-class Trading:
+class Trading(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         for guild_id in self.bot.guild_dict:

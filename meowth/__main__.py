@@ -4452,7 +4452,7 @@ def _is_raid_duplicate(guild, gym_name, gym_dict):
         channel_to_check = discord.utils.get(guild.text_channels, id=channel_id)
         if channel_to_check is None:
             continue
-        if gym_dict[channel_id]['type'] != 'egg' and gym_dict[channel_id]['type'] != 'raid':
+        if gym_dict[channel_id]['type'] != 'egg' and gym_dict[channel_id]['type'] != 'raid' and gym_dict[channel_id]['type'] != 'exraid':
             continue
         if gym_dict[channel_id]['egglevel'] == 'EX' and gym_dict[channel_id]['type'] == 'egg':
             continue

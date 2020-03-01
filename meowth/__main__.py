@@ -4454,7 +4454,7 @@ def _is_raid_duplicate(guild, gym_name, gym_dict):
             continue
         if gym_dict[channel_id]['type'] != 'egg' and gym_dict[channel_id]['type'] != 'raid':
             continue
-        if gym_dict[channel_id]['egglevel'] == 'EX' or gym_dict[channel_id]['type'] == 'exraid':
+        if gym_dict[channel_id]['egglevel'] == 'EX' and gym_dict[channel_id]['type'] == 'egg':
             continue
         if gym_dict[channel_id]['address'] == gym_name:
             return channel_to_check.mention

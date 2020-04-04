@@ -498,7 +498,6 @@ class ResearchCog(Cog):
             emoji = str(payload.emoji)
             await msg.remove_reaction(emoji, user)
             if emoji == '\U0001F4DD':
-                print('hello')
                 askmsg = await chn.send(f"{user.mention}: What Research task is located here? Please type your response below.")
 
                 def check(m):
@@ -513,7 +512,7 @@ class ResearchCog(Cog):
                 except discord.HTTPException:
                     pass
                 ctx = await self.bot.get_context(reply, cls=Context)
-                task = await Task.convert(ctx, reply.content)
+                task = await Task.convert(ctx, reply.content, require_task=True)
                 research.task = task
 
         embed = await ResearchEmbed.from_research(research)

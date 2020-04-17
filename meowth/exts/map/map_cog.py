@@ -17,6 +17,8 @@ from math import radians, degrees, sqrt, ceil
 import csv
 from urllib.parse import quote_plus
 import googlemaps
+import re
+import requests
 from typing import List
 import tempfile
 
@@ -1020,7 +1022,7 @@ class Mapper(Cog):
         f = io.BytesIO()
         await attachment.save(f)
         if await self.gyms_from_csv(ctx, f):
-            await ctx.send("Import successful")
+            await ctx.send("Import successful!")
 
     @command()
     @commands.has_permissions(manage_guild=True)
@@ -1038,7 +1040,7 @@ class Mapper(Cog):
         f = io.BytesIO()
         await attachment.save(f)
         if await self.stops_from_csv(ctx, f):
-            await ctx.send("Import successful")
+            await ctx.send("Import successful!")
     
     @command()
     @commands.has_permissions(manage_guild=True)
@@ -1142,6 +1144,111 @@ class Mapper(Cog):
         query.where(guild=guild_id)
         await query.delete()
         return await ctx.send("Pokestops deleted")
+
+    @command()
+    @commands.has_permissions(manage_guild=True)
+    async def importgymsheet(self, ctx, *args):
+        """Delete current Gyms and import the fresh list of Gyms from a Google spreadsheet.
+
+        Format must match the [template.](https://docs.google.com/spreadsheets/d/1W-VTAzlnDefgBIXoc7kuRcxJIlYo7iojqRRQ0uwTifc/edit?usp=sharing)
+        Gyms will only be usable by the server they were imported in.
+        """
+        if args:
+            url = args[0]
+            ids = self.spreadsheet_ids_from_url(url)
+            if not ids:
+                await ctx.send("Please provide a link to a Google spreadsheet.")
+                return
+            # TODO: Save ids to database
+            # await ctx.send("Saving spreadsheet link.")
+        else:
+            # TODO: Get ids from database
+            ids = None
+            if not ids:
+                await ctx.send("Please provide a link to a Google spreadsheet.")
+                return
+            await ctx.send("Using saved spreadsheet link.")
+        f = self.download_spreadsheet(*ids)
+        if not f:
+            await ctx.send("Failed to get data from Google.")
+            return
+        await ctx.send("Downloaded spreadsheet.")
+        # Delete old gyms.
+        guild_id = ctx.guild.id
+        table = ctx.bot.dbi.table('gyms')
+        query = table.query
+        query.where(guild=guild_id)
+        await query.delete()
+        await ctx.send("Deleted old Gyms, starting import...")
+        # Import new gyms.
+        if await self.gyms_from_csv(ctx, f):
+            await ctx.send("Import successful!")
+        else:
+            await ctx.send("Import failed.")
+
+    @command()
+    @commands.has_permissions(manage_guild=True)
+    async def importstopsheet(self, ctx, *args):
+        """Delete current Pokestops and import the fresh list of Pokestops from a Google spreadsheet.
+
+        Format must match the [template.](https://docs.google.com/spreadsheets/d/1W-VTAzlnDefgBIXoc7kuRcxJIlYo7iojqRRQ0uwTifc/edit?usp=sharing)
+        Pokestops will only be usable by the server they were imported in.
+        """
+        if args:
+            url = args[0]
+            ids = self.spreadsheet_ids_from_url(url)
+            if not ids:
+                await ctx.send("Please provide a link to a Google spreadsheet.")
+                return
+            # TODO: Save ids to database
+            # await ctx.send("Saving spreadsheet link.")
+        else:
+            # TODO: Get ids from database
+            ids = None
+            if not ids:
+                await ctx.send("Please provide a link to a Google spreadsheet.")
+                return
+            await ctx.send("Using saved spreadsheet link.")
+        f = self.download_spreadsheet(*ids)
+        if not f:
+            await ctx.send("Failed to get data from Google.")
+            return
+        await ctx.send("Downloaded spreadsheet.")
+        # Delete old stops.
+        guild_id = ctx.guild.id
+        table = ctx.bot.dbi.table('pokestops')
+        query = table.query
+        query.where(guild=guild_id)
+        await query.delete()
+        await ctx.send("Deleted old Pokestops, starting import...")
+        # Import new stops.
+        if await self.stops_from_csv(ctx, f):
+            await ctx.send("Import successful!")
+        else:
+            await ctx.send("Import failed.")
+
+    @staticmethod
+    def spreadsheet_ids_from_url(provided_url):
+        match = re.search('/spreadsheets/d/([a-zA-Z0-9-_]+)', provided_url)
+        if match:
+            spreadsheet_id = match.group(0)[16:]
+        else:
+            return
+        match = re.search('[#&]gid=([0-9]+)', provided_url)
+        if match:
+            sheet_id = match.group(0)[5:]
+        else:
+            return
+        return spreadsheet_id, sheet_id
+
+    @staticmethod
+    def download_spreadsheet(spreadsheet_id, sheet_id):
+        url = "https://docs.google.com/spreadsheets/d/" + spreadsheet_id + "/export?gid=" + sheet_id + "&format=csv"
+        r = requests.get(url)
+        if not r.ok:
+            return
+        f = io.BytesIO(r.content)
+        return f
 
     @staticmethod
     async def get_travel_times(bot, origins: List[int], dests: List[int]):

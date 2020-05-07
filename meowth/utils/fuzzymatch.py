@@ -40,10 +40,10 @@ def fp_ratio(s1, s2, force_ascii=True, full_process=True):
     partial_scale = .9
 
     base = fuzz.ratio(p1, p2)
-    len_ratio = float(max(len(p1), len(p2))) / min(len(p1), len(p2))
+    len_ratio = float(max(len(p1), len(p2))-1) / min(len(p1), len(p2))
 
     # if strings are similar length, don't use partials
-    if len_ratio < 1.5:
+    if len_ratio < 1.3:
         try_partial = False
 
     if try_partial:

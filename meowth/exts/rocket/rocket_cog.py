@@ -356,7 +356,7 @@ class RocketCog(Cog):
         number = len(wild_list)
         pages = ceil(number/20)
         ins = list(range(0, number, 20))
-        color = self.guild.me.color
+        color = channel.guild.me.color
         for i in range(pages):
             if pages == 1:
                 title = "Current Team GO Rocket Invasions"

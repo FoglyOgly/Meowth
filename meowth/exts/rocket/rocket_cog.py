@@ -133,14 +133,21 @@ class Rocket():
     async def summary_str(self, tz):
         name = self.name
         if isinstance(self.location, Pokestop):
-            locname = await self.location._name()
+            directions_url = await self.location.url()
+            directions_text = await self.location._name()
+            if len(directions_text) > 28:
+                directions_text = directions_text[:25] + "..."
         else:
-            locname = self.location._name
+            directions_url = self.location.url
+            directions_text = self.location._name
+            if len(directions_text) > 23:
+                directions_text = directions_text[:20] + "..."
+            directions_text = directions_text + " (Unknown Pokestop)"
         stamp = self.created
         localzone = timezone(tz)
         reported_dt = datetime.fromtimestamp(stamp, tz=localzone)
         reported_str = reported_dt.strftime('%I:%M %p')
-        summary = f'{name} at {locname} reported at {reported_str}'
+        summary = f'{name} at [{directions_text}]({directions_url}) reported at {reported_str}'
         return summary
     
     @property

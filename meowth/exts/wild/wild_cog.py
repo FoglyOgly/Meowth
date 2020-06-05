@@ -701,15 +701,16 @@ class WildCog(Cog):
                 continue
             wild_list.append(await wild.summary_str(tz))
         number = len(wild_list)
-        pages = ceil(number/20)
-        ins = list(range(0, number, 20))
+        page_size = 10
+        pages = ceil(number/page_size)
+        ins = list(range(0, number, page_size))
         color = channel.guild.me.color
         for i in range(pages):
             if pages == 1:
                 title = "Current Wild Spawns"
             else:
                 title = f"Current Wild Spawns (Page {i+1} of {pages})"
-            content = "\n\n".join(wild_list[ins[i]:ins[i]+20])
+            content = "\n\n".join(wild_list[ins[i]:ins[i]+page_size])
             embed = formatters.make_embed(title=title, content=content, msg_colour=color)
             await channel.send(embed=embed)
 

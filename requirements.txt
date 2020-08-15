@@ -5,9 +5,11 @@ dateparser
 discord.py
 fuzzywuzzy
 googlemaps
+imageio
 more_itertools
 psutil
 python-dateutil>=2.6
 python-Levenshtein>=0.12
 requests
+staticmap
 timezonefinder

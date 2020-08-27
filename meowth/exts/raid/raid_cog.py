@@ -997,7 +997,7 @@ class RaidCog(Cog):
         """Correct the raid level in an existing raid channel.
 
         Usable only by mods."""
-        possible_levels = ['1', '2', '3', '4', '5', 'EX']
+        possible_levels = ['1', '2', '3', '4', '5', 'EX', '7']
         if level not in possible_levels:
             return
         raid = Raid.by_channel.get(str(ctx.channel.id))

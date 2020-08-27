@@ -116,7 +116,8 @@ class RaidCog(Cog):
             "4": {},
             "5": {},
             "6": {},
-            "EX": {}
+            "EX": {},
+            "7": {}
         }
         table = self.bot.dbi.table('raid_bosses')
         query = table.query

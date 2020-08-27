@@ -130,9 +130,13 @@ class Meetup:
     @property
     def channel(self):
         return self.bot.get_channel(self.channel_id)
-    
+
     @property
     def channel_topic(self):
+        return "Use the ❔ button for help with commands you can use in this channel!"
+    
+    @property
+    def time_str(self):
         hatchlocal = self.local_datetime(self.start)
         hatchtimestr = hatchlocal.strftime('%I:%M %p')
         hatchdatestr = hatchlocal.strftime('%b %d')
@@ -876,9 +880,13 @@ class Raid:
                 return f"hatched-{self.level}-{gym_name}"
             else:
                 return f"{self.level}-{gym_name}"
-    
+
     @property
     def channel_topic(self):
+        return "Use the ❔ button for help with commands you can use in this channel!"
+    
+    @property
+    def time_str(self):
         topic_str = ""
         if self.status == 'egg':
             hatchlocal = self.local_datetime(self.hatch)
@@ -1809,10 +1817,9 @@ class Raid:
                 if t:
                     continue
                 new_name = await self.channel_name()
-                new_topic = self.channel_topic
                 if new_name != channel.name:
                     try:
-                        await channel.edit(name=new_name, topic=new_topic)
+                        await channel.edit(name=new_name)
                     except discord.Forbidden:
                         raise commands.BotMissingPermissions(['Manage Channels'])
                 await channel.send(content, embed=embed)
@@ -3151,7 +3158,7 @@ class ReportEmbed():
             "Status List": status_str,
             "Team List": team_str
         }
-        footer = raid.channel_topic
+        footer = raid.time_str
         weather = await raid.weather()
         weather = Weather(raid.bot, weather)
         footer_icon = weather.icon_url
@@ -3313,7 +3320,7 @@ class RaidEmbed():
         reporter = raid.guild.get_member(raid.reporter_id)
         if reporter:
             reporter = reporter.display_name
-        footer = f"Reported by {reporter} • {raid.channel_topic}"
+        footer = f"Reported by {reporter} • {raid.time_str}"
         color = raid.guild.me.color
         footer_icon = weather.icon_url
         embed = formatters.make_embed(icon=RaidEmbed.raid_icon, title="Raid Report", msg_colour=color,
@@ -3363,13 +3370,13 @@ class RSVPEmbed():
         }
         color = meetup.guild.me.color
 
-        embed = formatters.make_embed(title="Current RSVP Totals", fields=fields, footer=meetup.channel_topic, msg_colour=color)
+        embed = formatters.make_embed(title="Current RSVP Totals", fields=fields, footer=meetup.time_str, msg_colour=color)
         return cls(embed)
     
     @classmethod
     def from_raid(cls, raid: Raid):
 
-        footer = raid.channel_topic
+        footer = raid.time_str
 
 
         status_str = raid.status_str
@@ -3400,7 +3407,7 @@ class RSVPEmbed():
         }
         color = raid.guild.me.color
         embed = formatters.make_embed(icon=RSVPEmbed.raid_icon, title="Current Group RSVP Totals",
-            fields=fields, footer=raid.channel_topic, footer_icon=RSVPEmbed.footer_icon, msg_colour=color)
+            fields=fields, footer=raid.time_str, footer_icon=RSVPEmbed.footer_icon, msg_colour=color)
         if est:
             embed.add_field(name='Starting (Boss Damage Estimate)', value=f'{time} ({str(round(est*100)) + "%"})', inline=False)
         else:
@@ -3496,7 +3503,7 @@ class EggEmbed():
         reporter = raid.guild.get_member(raid.reporter_id)
         if reporter:
             reporter = reporter.display_name
-        footer_text = f"Reported by {reporter} • {raid.channel_topic}"
+        footer_text = f"Reported by {reporter} • {raid.time_str}"
         color = raid.guild.me.color
         embed = formatters.make_embed(icon=EggEmbed.raid_icon, title="Raid Report",
             thumbnail=egg_img_url, msg_colour=color,
@@ -3590,7 +3597,7 @@ class CountersEmbed():
             i += 1
         ctrs_str.append(f'[Results courtesy of Pokebattler](https://www.pokebattler.com/raids/{boss.id})')
         fields['<:pkbtlr:512707623812857871> Counters'] = "\n".join(ctrs_str)
-        footer_text = raid.channel_topic
+        footer_text = raid.time_str
         color = raid.guild.me.color
         embed = formatters.make_embed(icon=CountersEmbed.raid_icon, thumbnail=img_url, msg_colour=color,
             fields=fields, footer=footer_text, footer_icon=CountersEmbed.footer_icon)
@@ -3703,7 +3710,7 @@ class TRaidEmbed():
             "Travel Time": travel_time
         }
         embed = formatters.make_embed(title="Raid Report", msg_colour=color,
-            thumbnail=img_url, fields=fields, footer=raid.channel_topic)
+            thumbnail=img_url, fields=fields, footer=raid.time_str)
         return cls(embed)
 
 class MeetupEmbed:
@@ -3746,7 +3753,7 @@ class MeetupEmbed:
             "Status List": status_str,
             "Team List": team_str
         }
-        footer_text = meetup.channel_topic
+        footer_text = meetup.time_str
         color = meetup.guild.me.color
         embed = formatters.make_embed(title="Meetup Report",
             thumbnail='', msg_colour=color,

@@ -357,7 +357,7 @@ class AdminCog(Cog):
                     await ctx.send('I could not interpret your response. Try again!')
                     continue
         if 'raid' in enabled_commands:
-            raid_levels = ['1', '2', '3', '4', '5', 'EX', 'EX Raid Gyms']
+            raid_levels = ['1', '2', '3', '4', '5', '7', 'EX', 'EX Raid Gyms']
             for level in raid_levels:
                 column = f'category_{level.lower()}'
                 if level == 'EX Raid Gyms':
@@ -367,13 +367,19 @@ class AdminCog(Cog):
                         'You can type `disable` if you do not want this, or type the name or ID of '
                         'the category you want those raid channels to appear in.')
                 else:
-                    content = (f'How do you want Level {level} Raids reported in this ' 
+                    if level == '7':
+                        level_str = 'Mega'
+                    elif level == 'EX':
+                        level_str = "EX"
+                    else:
+                        level_str = f"Level {level}"
+                    content = (f'How do you want {level_str} Raids reported in this ' 
                         'channel to be displayed? You can type `message` if you want just '
                         'a message in this channel. If you want each raid to be given its own '
                         'channel for coordination, type the name or ID of the category you '
                         'want the channel to appear in, or type `none` for an uncategorized '
-                        'channel. You can also type `disable` to disallow reports of Level '
-                        f'{level} Raids in this channel.')
+                        'channel. You can also type `disable` to disallow reports of '
+                        f'{level_str} Raids in this channel.')
                 await ctx.send(content)
                 def check(m):
                     return m.author == ctx.message.author and m.channel == ctx.channel

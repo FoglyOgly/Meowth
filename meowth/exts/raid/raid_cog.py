@@ -488,7 +488,7 @@ class RaidCog(Cog):
                         msg = await ctx.send(f"""There is already a raid reported at this gym! Coordinate here!""", embed=embed)
                         old_raid.message_ids.append(f"{msg.channel.id}/{msg.id}")
                         return msg
-        if level_or_boss in ['m', 'mega']:
+        if level_or_boss in ['m', '7']:
             level_or_boss = '7'
         if level_or_boss.isdigit():
             level = level_or_boss
@@ -1136,7 +1136,7 @@ class RaidCog(Cog):
             reporter = raid.guild.get_member(raid.reporter_id)
             if reporter:
                 reporter = reporter.display_name
-            footer_text = f"Reported by {reporter} • {raid.channel_topic}"
+            footer_text = f"Reported by {reporter} • {raid.time_str}"
         elif isinstance(raid_or_meetup, Meetup):
             meetup = raid_or_meetup
             dt = datetime.fromtimestamp(meetup.start)
@@ -1145,8 +1145,7 @@ class RaidCog(Cog):
             datestr = local.strftime('%b %d')
             title = "Start Time Updated"
             details = f"This Meetup will start on {datestr} at {timestr}"
-            footer_text = meetup.channel_topic
-        await ctx.channel.edit(topic=raid_or_meetup.channel_topic)
+            footer_text = meetup.time_str
         has_embed = False
         for idstring in raid_or_meetup.message_ids:
             chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
@@ -1190,8 +1189,7 @@ class RaidCog(Cog):
         datestr = newdt.strftime('%b %d')
         title = "End Time Updated"
         details = f"This Meetup will end on {datestr} at {timestr}"
-        footer_text = meetup.channel_topic
-        await ctx.channel.edit(topic=meetup.channel_topic)
+        footer_text = meetup.time_str
         has_embed = False
         for idstring in meetup.message_ids:
             chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)

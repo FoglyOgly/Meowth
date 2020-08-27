@@ -2087,7 +2087,7 @@ class Raid:
     async def get_wants(self):
         wants = []
         if self.level == '7':
-            wants.append('Mega')
+            wants.append('mega')
         else:
             wants.append(self.level)
         if self.pkmn:

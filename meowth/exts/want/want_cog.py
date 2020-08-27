@@ -212,7 +212,7 @@ class Want():
                 users = await self._users()
                 members = [guild.get_member(x) for x in users]
                 members = [x for x in members if x]
-                raid_tiers = ['1', '2', '3', '4', '5', 'EX']
+                raid_tiers = ['1', '2', '3', '4', '5', 'EX', 'Mega']
                 if self.want.startswith('FAMILY'):
                     pokemon_table = self.bot.dbi.table('pokemon')
                     pokemon_query = pokemon_table.query('pokemonid')
@@ -227,7 +227,10 @@ class Want():
                     except:
                         return None
                 elif self.want.upper() in raid_tiers:
-                    name = "Tier " + self.want.upper()
+                    if self.want.lower() == 'mega':
+                        name = "Mega"
+                    else:
+                        name = "Tier " + self.want.upper()
                     try:
                         role = await guild.create_role(name=name, mentionable=True)
                     except:
@@ -285,7 +288,7 @@ class Want():
         lures = ['glacial', 'mossy', 'magnetic']
         if arg in lures:
             return cls(ctx.bot, arg, ctx.guild.id)
-        tiers = ['1', '2', '3', '4', '5', 'ex', 'exgym']
+        tiers = ['1', '2', '3', '4', '5', 'ex', 'exgym', 'mega']
         if arg in tiers:
             return cls(ctx.bot, arg, ctx.guild.id)
         try:

@@ -876,10 +876,14 @@ class Raid:
             boss_name = await self.pkmn.name()
             return f"{boss_name}-{gym_name}"
         else:
-            if self.status == 'hatched':
-                return f"hatched-{self.level}-{gym_name}"
+            if self.level == '7':
+                level_str = 'mega'
             else:
-                return f"{self.level}-{gym_name}"
+                level_str = self.level
+            if self.status == 'hatched':
+                return f"hatched-{level_str}-{gym_name}"
+            else:
+                return f"{level_str}-{gym_name}"
 
     @property
     def channel_topic(self):
@@ -2082,7 +2086,10 @@ class Raid:
 
     async def get_wants(self):
         wants = []
-        wants.append(self.level)
+        if self.level == '7':
+            wants.append('Mega')
+        else:
+            wants.append(self.level)
         if self.pkmn:
             family = await self.pkmn._familyId()
             wants.append(family)
@@ -3135,7 +3142,10 @@ class ReportEmbed():
             img_url = await boss.sprite_url()
         else:
             bossfield = "Level"
-            name = raid.level
+            if raid.level == '7':
+                name = 'Mega'
+            else:
+                name = raid.level
             img_url = raid.bot.raid_info.egg_images[name]
             enddt = datetime.fromtimestamp(raid.hatch)
         # color = await boss.color()
@@ -3491,8 +3501,12 @@ class EggEmbed():
         status_str = raid.status_str
         team_str = raid.team_str
         boss_str = await raid.boss_list_str()
+        if level == '7':
+            level_str = 'Mega'
+        else:
+            level_str = level
         fields = {
-            "Raid Level": level,
+            "Raid Level": level_str,
             "Gym": f"[{directions_text}]({directions_url})",
             "Status List": status_str,
             "Team List": team_str,

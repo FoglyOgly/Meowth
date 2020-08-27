@@ -5,7 +5,8 @@ raid_times = {
     '4': (60, 45),
     '5': (60, 45),
     '6': (60, 45),
-    "EX": (None, 45)
+    "EX": (None, 45),
+    '7': (60, 45)
 }
 
 egg_images = {
@@ -15,7 +16,8 @@ egg_images = {
     '4': 'https://raw.githubusercontent.com/ZeChrales/PogoAssets/master/static_assets/png/ic_raid_egg_rare.png',
     '5': 'https://raw.githubusercontent.com/ZeChrales/PogoAssets/master/static_assets/png/ic_raid_egg_legendary.png',
     '6': 'https://raw.githubusercontent.com/ZeChrales/PogoAssets/master/static_assets/png/ic_raid_egg_legendary.png',
-    'EX': 'https://github.com/ZeChrales/PogoAssets/blob/master/static_assets/png/Item_1403.png?raw=true'
+    'EX': 'https://github.com/ZeChrales/PogoAssets/blob/master/static_assets/png/Item_1403.png?raw=true',
+    '7': 'https://github.com/ZeChrales/PogoAssets/blob/master/decrypted_assets/png/raid_egg_3_icon.png?raw=true'
 
 }
 

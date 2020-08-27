@@ -487,6 +487,8 @@ class RaidCog(Cog):
                         msg = await ctx.send(f"""There is already a raid reported at this gym! Coordinate here!""", embed=embed)
                         old_raid.message_ids.append(f"{msg.channel.id}/{msg.id}")
                         return msg
+        if level_or_boss in ['m', 'mega']:
+            level_or_boss = '7'
         if level_or_boss.isdigit():
             level = level_or_boss
             boss = None

@@ -286,7 +286,10 @@ class Pokemon():
     async def _shiny_available(self):
         data = self._data
         return await data.select('shiny_available').get_value()
-    
+
+    async def _mega_available(self):
+        data = self._data
+        return await data.select('wild_available').get_value()
     
     async def _baseStamina(self):
         data = self._data
@@ -601,6 +604,13 @@ class Pokemon():
         new_query.where(num=num)
         ids = await query.get_values()
         return ids
+
+    async def get_megas(self):
+        table = bot.dbi.table('pokemon')
+        query = table.query('pokemonid')
+        query.where(evolves_from=self.id)
+        ids = await query.get_values()
+        return ids
     
     async def cpm(self):
         if not self.lvl:
@@ -867,6 +877,11 @@ class Pokemon():
             raise PokemonNotFound
         else:
             mons = [(cls(bot, x)) for x in possible_ids]
+            for x in mons:
+                if await x._mega_available():
+                    megas = await x.get_megas()
+                    mega_mons = [(cls(bot, x)) for x in megas]
+                    mons += mega_mons
             if command_name in ['raid', 'interested', 'coming', 'here']:
                 possible_mons = [x for x in mons if await x._raid_available(coords)]
             elif command_name == 'wild':

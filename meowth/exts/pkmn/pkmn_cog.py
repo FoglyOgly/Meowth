@@ -606,7 +606,7 @@ class Pokemon():
         return ids
 
     async def get_megas(self):
-        table = bot.dbi.table('pokemon')
+        table = self.bot.dbi.table('pokemon')
         query = table.query('pokemonid')
         query.where(evolves_from=self.id)
         ids = await query.get_values()

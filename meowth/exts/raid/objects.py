@@ -3146,7 +3146,7 @@ class ReportEmbed():
                 name = 'Mega'
             else:
                 name = raid.level
-            img_url = raid.bot.raid_info.egg_images[name]
+            img_url = raid.bot.raid_info.egg_images[raid.level]
             enddt = datetime.fromtimestamp(raid.hatch)
         # color = await boss.color()
         gym = raid.gym

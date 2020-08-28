@@ -504,6 +504,7 @@ class Users(Cog):
         else:
             update = meowthuser._update
             update.values(friendcode=friendcode)
+            await update.commit()
         return await ctx.send(f'Friend code set to {friendcode}')
 
     @command()

@@ -1261,7 +1261,7 @@ class Raid:
     async def invite_ask(self, user_id):
         meowthuser = MeowthUser.from_id(self.bot, user_id)
         display_name = self.guild.get_member(user_id).display_name
-        data = await meowthuser._data.get()[0]
+        data = (await meowthuser._data.get())[0]
         friendcode = data.get('friendcode')
         here_grp = self.here_grp
         here_users = here_grp.get('users', [])

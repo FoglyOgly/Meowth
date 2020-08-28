@@ -484,6 +484,29 @@ class Users(Cog):
 
     @command()
     @users_checks.users_enabled()
+    async def friendcode(self, ctx, *, friendcode):
+        """Set your in-game friend code.
+        """
+
+        friendcode = friendcode.replace(' ', '')
+        if not friendcode.isdigit() or len(friendcode) != 12:
+            return await ctx.error('Invalid friend code')
+
+
+        user_table = ctx.bot.dbi.table('users')
+        meowthuser = MeowthUser(ctx.bot, ctx.author)
+        data = await meowthuser._data.get()
+        if len(data) == 0:
+            insert = meowthuser._insert
+            d = {'id': ctx.author.id, 'friendcode': friendcode}
+            insert.row(**d)
+            await insert.commit()
+        else:
+            update = meowthuser._update
+            update.values(friendcode=friendcode) 
+
+    @command()
+    @users_checks.users_enabled()
     async def whois(self, ctx, ign):
         """Lookup player by in-game name."""
 

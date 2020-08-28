@@ -830,7 +830,7 @@ class Raid:
 
     @property
     def here_grp(self):
-        d = {'users': [x for x in self.trainer_dict if self.trainer_dict[x]['status'] == 'here']}
+        d = {'users': [x for x in self.trainer_dict if self.trainer_dict[x]['status'] in ['here', 'remote']]}
         d['est_power'] = self.grp_est_power(d)
         d['emoji'] = self.bot.get_emoji(self.bot.config.emoji['here'])
         return d
@@ -880,10 +880,7 @@ class Raid:
                 level_str = 'm'
             else:
                 level_str = self.level
-            if self.status == 'hatched':
-                return f"hatched-{level_str}-{gym_name}"
-            else:
-                return f"{level_str}-{gym_name}"
+            return f"{level_str}-{gym_name}"
 
     @property
     def channel_topic(self):
@@ -1260,6 +1257,22 @@ class Raid:
             insert.row(**old_grp)
             await insert.commit(do_update=True)
         await self.update_rsvp()
+
+    async def invite_ask(self, user_id):
+        meowthuser = MeowthUser.from_id(self.bot, user_id)
+        display_name = self.guild.get_member(user_id).display_name
+        data = await meowthuser._data.get()
+        friendcode = data.get('friendcode')
+        here_grp = self.here_grp
+        here_users = here_grp.get('users', [])
+        if here_users:
+            content = f"If you are at the raid and plan to invite {display_name}, hit the ✉ below!"
+            if friendcode:
+                content += f"\n{display_name}'s friend code is {friendcode}"
+            msg = await chn.send(content)
+            payload = await formatters.ask(self.bot, [msg], user_list=here_users, react_list=['✉'])
+            if payload:
+                await meowthuser.rsvp(self.id, "remote")
     
 
     async def update_rsvp(self, user_id=None, status=None, group=None):
@@ -1333,6 +1346,10 @@ class Raid:
                         display_status = 'is on the way'
                     elif status == 'here':
                         display_status = 'is at the raid'
+                    elif status == 'remote':
+                        display_status = 'is joining the raid remotely'
+                    elif status == 'invite':
+                        display_status = 'needs an invite to the raid'
                     elif status == 'cancel':
                         display_status = 'has canceled'
                     else:
@@ -1340,9 +1357,11 @@ class Raid:
                     content = f"{member.display_name} {display_status}!"
                     await chn.send(content)
                     await chn.send(embed=rsvpembed, delete_after=15)
+                    if status == 'invite':
+                        self.bot.loop.create_task(self.invite_ask(user_id))
                     if self.group_list:
                         grp = self.user_grp(member.id)
-                        if not grp and status in ('coming', 'here'):
+                        if not grp and status in ('coming', 'here', 'remote'):
                             return await self.raidgroup_ask(chn, member.id)
         elif user_id and group:
             if self.channel_ids:
@@ -2128,6 +2147,8 @@ class Raid:
             'maybe': 0,
             'coming': 0,
             'here': 0,
+            'remote': 0,
+            'invite': 0,
             'lobby': 0
         }
         for trainer in trainer_dict:
@@ -2145,9 +2166,9 @@ class Raid:
     @staticmethod
     def status_string(bot, trainer_dict):
         status_dict = Raid.status_dict(trainer_dict)
-        status_str = f"{bot.config.emoji['maybe']}: **{status_dict['maybe']}** | "
+        status_str = f"{bot.config.emoji['maybe']}: **{status_dict['maybe'] + status_dict['invite']}** | "
         status_str += f"{bot.config.emoji['coming']}: **{status_dict['coming']}** | "
-        status_str += f"{bot.get_emoji(bot.config.emoji['here'])}: **{status_dict['here']}**"
+        status_str += f"{bot.get_emoji(bot.config.emoji['here'])}: **{status_dict['here'] + status_dict['remote']}**"
         return status_str
     
     @staticmethod
@@ -2190,6 +2211,8 @@ class Raid:
             'maybe': 0,
             'coming': 0,
             'here': 0,
+            'remote': 0,
+            'invite': 0,
             'lobby': 0
         }
         trainer_dict = self.trainer_dict
@@ -2208,9 +2231,9 @@ class Raid:
     
     def grp_status_str(self, group):
         status_dict = self.grp_status_dict(group)
-        status_str = f"{self.bot.config.emoji['maybe']}: {status_dict['maybe']} | "
+        status_str = f"{self.bot.config.emoji['maybe']}: {status_dict['maybe'] + status_dict['invite']} | "
         status_str += f"{self.bot.config.emoji['coming']}: {status_dict['coming']} | "
-        status_str += f"{self.bot.get_emoji(self.bot.config.emoji['here'])}: {status_dict['here']}"
+        status_str += f"{self.bot.get_emoji(self.bot.config.emoji['here'])}: {status_dict['here'] + status_dict['remote']}"
         return status_str
     
     def grp_team_dict(self, group):
@@ -2269,6 +2292,10 @@ class Raid:
         coming_count = 0
         here_users = []
         here_count = 0
+        remote_users = []
+        remote_count = 0
+        invite_users = []
+        invite_count = 0
         lobby_users = []
         lobby_count = 0
         for trainer in trainer_dict:
@@ -2292,6 +2319,12 @@ class Raid:
             elif status == 'here':
                 here_users.append(sumstr)
                 here_count += total
+            elif status == 'remote':
+                remote_users.append(sumstr)
+                remote_count += total
+            elif status == 'invite':
+                invite_users.append(sumstr)
+                invite_count += total
             elif status == 'lobby':
                 lobby_users.append(sumstr)
                 lobby_count += total
@@ -2302,6 +2335,10 @@ class Raid:
             liststr += f"\n\n{self.bot.config.emoji['coming']} **({coming_count})**: {', '.join(coming_users)}"
         if here_users:
             liststr += f"\n\n{self.bot.get_emoji(self.bot.config.emoji['here'])} **({here_count})**: {', '.join(here_users)}"
+        if remote_users:
+            liststr += f"\n\n{self.bot.get_emoji(self.bot.config.emoji['remote'])} **({remote_count})**: {', '.join(remote_users)}"
+        if invite_users:
+            liststr += f"\n\n{self.bot.get_emoji(self.bot.config.emoji['invite'])} **({invite_count})**: {', '.join(invite_users)}"
         if lobby_users:
             liststr += f"\n\nLobby **({lobby_count})**: {', '.join(lobby_users)}"
         if tags:
@@ -3516,7 +3553,7 @@ class EggEmbed():
         reporter = raid.guild.get_member(raid.reporter_id)
         if reporter:
             reporter = reporter.display_name
-        footer_text = f"Reported by {reporter}"
+        footer_text = f"Reported by {reporter} • {raid.time_str}"
         color = raid.guild.me.color
         embed = formatters.make_embed(icon=EggEmbed.raid_icon, title="Raid Report",
             thumbnail=egg_img_url, msg_colour=color,

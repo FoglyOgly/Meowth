@@ -857,6 +857,44 @@ class RaidCog(Cog):
             return await self.mrsvp(ctx, "here", total, *teamcounts)
         await self.rsvp(ctx, "here", bosses, total, *teamcounts)
     
+    @command(category="RSVP")
+    @raid_checks.raid_channel()
+    @raid_checks.bot_has_permissions()
+    async def remote(self, ctx, bosses: commands.Greedy[Pokemon], total: typing.Optional[int]=None, *teamcounts):
+        """RSVP as using a Remote Raid Pass for the current raid.
+
+        **Arguments**
+        *bosses (optional):* Names of the bosses you are interested in.
+
+        *total (optional):* Number of trainers you are bringing. Defaults to
+            your last RSVP total, or 1.
+        
+        *teamcounts (optional):* Counts of each team in your group. Format:
+            `3m 2v 1i` means 3 Mystic, 2 Valor, 1 Instinct.
+        """
+        if total and total < 1:
+            return
+        await self.rsvp(ctx, "remote", bosses, total, *teamcounts)
+    
+    @command(category="RSVP")
+    @raid_checks.raid_channel()
+    @raid_checks.bot_has_permissions()
+    async def invite(self, ctx, bosses: commands.Greedy[Pokemon], total: typing.Optional[int]=None, *teamcounts):
+        """RSVP as needing an invite to the current raid.
+
+        **Arguments**
+        *bosses (optional):* Names of the bosses you are interested in.
+
+        *total (optional):* Number of trainers you are bringing. Defaults to
+            your last RSVP total, or 1.
+        
+        *teamcounts (optional):* Counts of each team in your group. Format:
+            `3m 2v 1i` means 3 Mystic, 2 Valor, 1 Instinct.
+        """
+        if total and total < 1:
+            return
+        await self.rsvp(ctx, "invite", bosses, total, *teamcounts)
+    
     @command(aliases=['x'], category="RSVP")
     @raid_checks.raid_or_meetup()
     @raid_checks.bot_has_permissions()
@@ -1073,7 +1111,7 @@ class RaidCog(Cog):
     @command(aliases=['timer'], category="Raid Info")
     @raid_checks.raid_or_meetup()
     @raid_checks.bot_has_permissions()
-    async def timerset(self, ctx, *, newtime):
+    async def timerset(self, ctx, *, newtime=None):
         """Set the raid's hatch time or expire time.
 
         If *newtime* is an integer, it is assumed
@@ -1088,6 +1126,10 @@ class RaidCog(Cog):
             raid_or_meetup = Meetup.by_channel.get(ctx.channel.id)
             if not raid_or_meetup:
                 return
+        if not newtime:
+            title = "Current Start Time"
+            details = raid_or_meetup.time_str
+            return await ctx.success(title=title, details=details)
         zone = raid_or_meetup.tz
         if newtime.isdigit():
             stamp = time.time() + 60*int(newtime)

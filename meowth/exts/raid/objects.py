@@ -1265,7 +1265,10 @@ class Raid:
         friendcode = data.get('friendcode')
         here_grp = self.here_grp
         here_users = here_grp.get('users', [])
-        if here_users:
+        if self.channel_ids:
+            for chnid in self.channel_ids:
+                chn = self.bot.get_channel(int(chnid))
+        if here_users and chn:
             content = f"If you are at the raid and plan to invite {display_name}, hit the ✉ below!"
             if friendcode:
                 content += f"\n{display_name}'s friend code is {friendcode}"
@@ -2336,9 +2339,9 @@ class Raid:
         if here_users:
             liststr += f"\n\n{self.bot.get_emoji(self.bot.config.emoji['here'])} **({here_count})**: {', '.join(here_users)}"
         if remote_users:
-            liststr += f"\n\n{self.bot.get_emoji(self.bot.config.emoji['remote'])} **({remote_count})**: {', '.join(remote_users)}"
+            liststr += f"\n\n{self.bot.config.emoji['remote']} **({remote_count})**: {', '.join(remote_users)}"
         if invite_users:
-            liststr += f"\n\n{self.bot.get_emoji(self.bot.config.emoji['invite'])} **({invite_count})**: {', '.join(invite_users)}"
+            liststr += f"\n\n{self.bot.config.emoji['invite']} **({invite_count})**: {', '.join(invite_users)}"
         if lobby_users:
             liststr += f"\n\nLobby **({lobby_count})**: {', '.join(lobby_users)}"
         if tags:

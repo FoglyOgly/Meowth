@@ -3366,7 +3366,7 @@ class RaidEmbed():
         reporter = raid.guild.get_member(raid.reporter_id)
         if reporter:
             reporter = reporter.display_name
-        footer = f"Reported by {reporter} • {raid.time_str}"
+        footer = f"Reported by {reporter} • {raid.time_str} (not updated)"
         color = raid.guild.me.color
         footer_icon = weather.icon_url
         embed = formatters.make_embed(icon=RaidEmbed.raid_icon, title="Raid Report", msg_colour=color,
@@ -3553,7 +3553,7 @@ class EggEmbed():
         reporter = raid.guild.get_member(raid.reporter_id)
         if reporter:
             reporter = reporter.display_name
-        footer_text = f"Reported by {reporter} • {raid.time_str}"
+        footer_text = f"Reported by {reporter} • {raid.time_str} (not updated)"
         color = raid.guild.me.color
         embed = formatters.make_embed(icon=EggEmbed.raid_icon, title="Raid Report",
             thumbnail=egg_img_url, msg_colour=color,

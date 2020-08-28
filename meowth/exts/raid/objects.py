@@ -877,7 +877,7 @@ class Raid:
             return f"{boss_name}-{gym_name}"
         else:
             if self.level == '7':
-                level_str = 'mega'
+                level_str = 'm'
             else:
                 level_str = self.level
             if self.status == 'hatched':
@@ -3168,7 +3168,6 @@ class ReportEmbed():
             "Status List": status_str,
             "Team List": team_str
         }
-        footer = raid.time_str
         weather = await raid.weather()
         weather = Weather(raid.bot, weather)
         footer_icon = weather.icon_url
@@ -3178,7 +3177,7 @@ class ReportEmbed():
         fields['Groups'] = raid.grps_str + "\u200b"
         color = raid.guild.me.color
         embed = formatters.make_embed(icon=RaidEmbed.raid_icon, title="Raid Report", msg_colour=color,
-            thumbnail=img_url, fields=fields, footer=footer, footer_icon=footer_icon)
+            thumbnail=img_url, fields=fields, footer_icon=footer_icon)
         return cls(embed)
 
 class RaidEmbed():
@@ -3367,9 +3366,6 @@ class RSVPEmbed():
     
     @classmethod
     def from_meetup(cls, meetup: Meetup):
-        bot = meetup.bot
-
-        start_dt = meetup.start_datetime
 
         status_str = meetup.status_str
         team_str = meetup.team_str
@@ -3380,17 +3376,19 @@ class RSVPEmbed():
         }
         color = meetup.guild.me.color
 
-        embed = formatters.make_embed(title="Current RSVP Totals", fields=fields, footer=meetup.time_str, msg_colour=color)
+        footer = meetup.time_str
+
+        embed = formatters.make_embed(title="Current RSVP Totals", fields=fields, footer=footer, msg_colour=color)
         return cls(embed)
     
     @classmethod
     def from_raid(cls, raid: Raid):
 
-        footer = raid.time_str
 
 
         status_str = raid.status_str
         team_str = raid.team_str
+        footer = raid.time_str
         fields = {
             "Status List": status_str,
             "Team List": team_str
@@ -3399,7 +3397,7 @@ class RSVPEmbed():
         fields['Groups'] = (False, grps_str)
         color = raid.guild.me.color
         embed = formatters.make_embed(icon=RSVPEmbed.raid_icon, title="Current RSVP Totals",
-            fields=fields, footer=footer, footer_icon=RSVPEmbed.footer_icon, msg_colour=color)
+            fields=fields, footer_icon=RSVPEmbed.footer_icon, footer=footer, msg_colour=color)
         return cls(embed)
     
     @classmethod
@@ -3410,6 +3408,7 @@ class RSVPEmbed():
         est = group.get('est_power', 0)
         start = raid.local_datetime(group['starttime'])
         time = start.strftime('%I:%M %p')
+        footer = raid.time_str
 
         fields = {
             "Status List": status_str,
@@ -3417,7 +3416,7 @@ class RSVPEmbed():
         }
         color = raid.guild.me.color
         embed = formatters.make_embed(icon=RSVPEmbed.raid_icon, title="Current Group RSVP Totals",
-            fields=fields, footer=raid.time_str, footer_icon=RSVPEmbed.footer_icon, msg_colour=color)
+            fields=fields, footer_icon=RSVPEmbed.footer_icon, footer=footer, msg_colour=color)
         if est:
             embed.add_field(name='Starting (Boss Damage Estimate)', value=f'{time} ({str(round(est*100)) + "%"})', inline=False)
         else:
@@ -3517,7 +3516,7 @@ class EggEmbed():
         reporter = raid.guild.get_member(raid.reporter_id)
         if reporter:
             reporter = reporter.display_name
-        footer_text = f"Reported by {reporter} • {raid.time_str}"
+        footer_text = f"Reported by {reporter}"
         color = raid.guild.me.color
         embed = formatters.make_embed(icon=EggEmbed.raid_icon, title="Raid Report",
             thumbnail=egg_img_url, msg_colour=color,
@@ -3611,10 +3610,9 @@ class CountersEmbed():
             i += 1
         ctrs_str.append(f'[Results courtesy of Pokebattler](https://www.pokebattler.com/raids/{boss.id})')
         fields['<:pkbtlr:512707623812857871> Counters'] = "\n".join(ctrs_str)
-        footer_text = raid.time_str
         color = raid.guild.me.color
         embed = formatters.make_embed(icon=CountersEmbed.raid_icon, thumbnail=img_url, msg_colour=color,
-            fields=fields, footer=footer_text, footer_icon=CountersEmbed.footer_icon)
+            fields=fields, footer_icon=CountersEmbed.footer_icon)
         return cls(embed)
 
 class TrainEmbed():
@@ -3767,9 +3765,8 @@ class MeetupEmbed:
             "Status List": status_str,
             "Team List": team_str
         }
-        footer_text = meetup.time_str
         color = meetup.guild.me.color
         embed = formatters.make_embed(title="Meetup Report",
             thumbnail='', msg_colour=color,
-            fields=fields, footer=footer_text)
+            fields=fields)
         return cls(embed)

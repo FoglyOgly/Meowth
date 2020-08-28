@@ -288,8 +288,10 @@ class Want():
         lures = ['glacial', 'mossy', 'magnetic']
         if arg in lures:
             return cls(ctx.bot, arg, ctx.guild.id)
-        tiers = ['1', '2', '3', '4', '5', 'ex', 'exgym', 'mega']
+        tiers = ['1', '2', '3', '4', '5', 'ex', 'exgym', 'mega', 'm']
         if arg in tiers:
+            if arg == 'm':
+                arg = 'mega'
             return cls(ctx.bot, arg, ctx.guild.id)
         try:
             pkmn = await Pokemon.convert(ctx, arg)

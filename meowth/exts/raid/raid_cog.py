@@ -1114,48 +1114,15 @@ class RaidCog(Cog):
         if isinstance(raid_or_meetup, Raid):
             raid = raid_or_meetup
             if raid.status == 'egg' or raid.status == 'hatched':
-                dt = datetime.fromtimestamp(raid.hatch)
-                local = raid.local_datetime(raid.hatch)
-                timestr = local.strftime('%I:%M %p')
-                datestr = local.strftime('%b %d')
                 title = "Hatch Time Updated"
-                if raid.level == 'EX':
-                    details = f"This EX Raid Egg will hatch on {datestr} at {timestr}"
-                else:
-                    details = f"This Raid Egg will hatch at {timestr}"
+                details = raid.time_str
             elif raid.status == 'active' or raid.status == 'expired':
                 title = "Expire Time Updated"
-                dt = datetime.fromtimestamp(raid.end)
-                localdt = raid.local_datetime(raid.end)
-                timestr = localdt.strftime('%I:%M %p')
-                datestr = localdt.strftime('%b %d')
-                if raid.level == 'EX':
-                    details = f"This EX Raid will end at {timestr}"
-                else:
-                    details = f"This Raid will end at {timestr}"
-            reporter = raid.guild.get_member(raid.reporter_id)
-            if reporter:
-                reporter = reporter.display_name
-            footer_text = f"Reported by {reporter} • {raid.time_str}"
+                details = raid.time_str
         elif isinstance(raid_or_meetup, Meetup):
             meetup = raid_or_meetup
-            dt = datetime.fromtimestamp(meetup.start)
-            local = meetup.local_datetime(meetup.start)
-            timestr = local.strftime('%I:%M %p')
-            datestr = local.strftime('%b %d')
             title = "Start Time Updated"
-            details = f"This Meetup will start on {datestr} at {timestr}"
-            footer_text = meetup.time_str
-        has_embed = False
-        for idstring in raid_or_meetup.message_ids:
-            chn, msg = await ChannelMessage.from_id_string(self.bot, idstring)
-            if not msg:
-                continue
-            if not has_embed:
-                embed = msg.embeds[0]
-                embed.set_footer(text=footer_text, icon_url=embed.footer.icon_url)
-                has_embed = True
-            await msg.edit(embed=embed)
+            details = meetup.time_str
         return await ctx.success(title=title, details=details)
     
     @command()

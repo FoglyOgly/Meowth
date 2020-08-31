@@ -1306,7 +1306,7 @@ class Raid:
                 inviter = self.guild.get_member(payload.user_id)
                 direct_inviter_content = f"Thanks for agreeing to invite {invitee_name} to the raid!"
                 if friendcode:
-                    direct_inviter_content += "Their friend code is below if you need it."
+                    direct_inviter_content += " Their friend code is below if you need it."
                 await inviter.send(direct_inviter_content)
                 if friendcode:
                     await inviter.send(friendcode)
@@ -1323,7 +1323,7 @@ class Raid:
                 invitercode = inviterdata.get('friendcode')
                 invitee_content = f"{inviter.display_name} has agreed to invite you to the raid!"
                 if invitercode:
-                    invitee_content += "Their friend code is below if you need it."
+                    invitee_content += " Their friend code is below if you need it."
                 await invitee.send(invitee_content)
                 if invitercode:
                     await invitee.send(invitercode)

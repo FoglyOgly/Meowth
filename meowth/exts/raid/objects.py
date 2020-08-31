@@ -1045,6 +1045,8 @@ class Raid:
         if channel:
             if not self.grp_is_here(grp):
                 await channel.send('WARNING: It looks like not everyone in your group is at the raid!')
+            if self.grp_remotes(grp) > raid_info.max_remotes:
+                await channel.send('WARNING: There are too many remote users in this group!')
         mention_str = ""
         for user in grp['users']:
             meowthuser = MeowthUser.from_id(self.bot, user)
@@ -1059,8 +1061,6 @@ class Raid:
         elif channel:
             if self.grp_total(grp) > 20:
                 await channel.send('WARNING: You will have to split into multiple groups for the raid!')
-            if self.grp_remotes(grp) > raid_info.max_remotes:
-                await channel.send('WARNING: There are too many remote users in this group!')
             grp_est = self.grp_est_power(grp)
             rec_size = await self.rec_group_size()
             if grp_est < 1:

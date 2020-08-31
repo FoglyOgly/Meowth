@@ -798,7 +798,7 @@ class Raid:
     def grp_is_here(self, grp):
         for user in grp['users']:
             status = self.trainer_dict.get(user, {}).get('status')
-            if status != 'here':
+            if status not in ['here', 'remote']:
                 return False
         return True
 
@@ -1052,6 +1052,7 @@ class Raid:
             await meowthuser.rsvp(self.id, "lobby", party=party)
             mention = meowthuser.user.mention + " "
             mention_str += mention
+            await self.notify_invite_users(user)
         await self.update_rsvp()
         if not channel:
             await asyncio.sleep(120)

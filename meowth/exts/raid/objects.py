@@ -1317,7 +1317,7 @@ class Raid:
                 if inviter_grp:
                     await self.join_grp(user_id, inviter_grp)
                 self.bot.loop.create_task(meowthuser.rsvp(self.id, "remote"))
-                meowthinviter = MeowthUser.from_id(payload.user_id)
+                meowthinviter = MeowthUser.from_id(self.bot, payload.user_id)
                 await meowthinviter.raid_invite(self.id, user_id)
                 inviterdata = (await meowthinviter._data.get())[0]
                 invitercode = data.get('friendcode')

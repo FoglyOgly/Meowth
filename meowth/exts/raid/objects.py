@@ -1967,6 +1967,9 @@ class Raid:
                     continue
                 if chn in channel_list:
                     continue
+                if channel_list:
+                    raidchan = channel_list[0]
+                    content += f" Coordinate in {raidchan.mention}!"
                 await msg.edit(content=content, embed=embed)
                 try:
                     await msg.clear_reactions()

@@ -1320,7 +1320,7 @@ class Raid:
                 meowthinviter = MeowthUser.from_id(self.bot, payload.user_id)
                 await meowthinviter.raid_invite(self.id, user_id)
                 inviterdata = (await meowthinviter._data.get())[0]
-                invitercode = data.get('friendcode')
+                invitercode = inviterdata.get('friendcode')
                 invitee_content = f"{inviter.display_name} has agreed to invite you to the raid!"
                 if invitercode:
                     invitee_content += "Their friend code is below if you need it."

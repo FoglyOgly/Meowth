@@ -1041,6 +1041,8 @@ class RaidCog(Cog):
         if level not in possible_levels:
             return
         raid = Raid.by_channel.get(str(ctx.channel.id))
+        if raid.status == 'hatched':
+            return await ctx.error(f'Please select a boss and use {ctx.prefix}boss instead!')
         if raid.status == 'active':
             raid.pkmn = None
             raid.hatch = raid.end

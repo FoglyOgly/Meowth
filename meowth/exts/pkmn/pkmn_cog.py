@@ -282,6 +282,12 @@ class Pokemon():
     async def _trade_available(self):
         data = self._data
         return await data.select('trade_available').get_value()
+
+    async def _research_available(self):
+        research_table = self.bot.dbi.table('research_tasks')
+        query = research_table.query('reward')
+        rewards = await query.get_values()
+        return self.id in rewards
     
     async def _shiny_available(self):
         data = self._data
@@ -882,13 +888,15 @@ class Pokemon():
                     megas = await x.get_megas()
                     mega_mons = [(cls(bot, x)) for x in megas]
                     mons += mega_mons
-            if command_name in ['raid', 'interested', 'coming', 'here']:
+            if command_name in ['raid', 'interested', 'coming', 'here', 'remote', 'invite']:
                 possible_mons = [x for x in mons if await x._raid_available(coords)]
             elif command_name == 'wild':
                 possible_mons = [x for x in mons if await x._wild_available()]
             elif command_name == 'rocket':
                 possible_mons = [x for x in mons if x.form == 63]
-            elif command_name in ['research', 'boss']:
+            elif command_name == 'research':
+                possible_mons = [x for x in mons if await x._research_available()]
+            elif command_name == 'boss':
                 possible_mons = [x for x in mons if x.form != 63 and x.form != 64]
             elif command_name == 'trade':
                 possible_mons = [x for x in mons if await x._trade_available()]

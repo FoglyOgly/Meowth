@@ -1873,7 +1873,8 @@ class Raid:
             if self.channel_ids and str(chn.id) not in self.channel_ids and self.status != 'expired':
                 report_embed = await self.report_embed()
                 try:
-                    report_content = content + f" Coordinate in {chn.mention}!"
+                    raidchan = self.bot.get_channel(int(self.channel_ids[0]))
+                    report_content = content + f" Coordinate in {raidchan.mention}!"
                     await msg.edit(content=report_content, embed=report_embed)
                 except:
                     pass

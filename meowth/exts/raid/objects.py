@@ -2422,7 +2422,7 @@ class Raid:
         embed = formatters.make_embed(title="Current Raid RSVP Totals", content=liststr, msg_colour=color)
         return await channel.send(embed=embed)
 
-    async def list_invites(self, channel):
+    # async def list_invites(self, channel):
 
     
     async def list_teams(self, channel, tags=False):

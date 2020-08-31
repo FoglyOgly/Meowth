@@ -943,7 +943,8 @@ class RaidCog(Cog):
         if not raid:
             raise NotRaidChannel
         if not group_time:
-            return await raid.raidgroup_ask(ctx.channel, ctx.author.id)
+            if not raid.user_was_invited(ctx.author.id):
+                return await raid.raidgroup_ask(ctx.channel, ctx.author.id)
         ctx._tz = raid.tz
         group_table = ctx.bot.dbi.table('raid_groups')
         insert = group_table.insert()

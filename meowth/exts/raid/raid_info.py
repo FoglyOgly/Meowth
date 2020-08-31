@@ -30,3 +30,6 @@ raid_lists = {
     '6': [],
     "EX": ["DEOXYS_ATTACK_FORM"]
 }
+
+status_can_invite = ['coming', 'here', 'remote'] # remote will be removed eventually
+max_remotes = 10 # will change to 5 eventually

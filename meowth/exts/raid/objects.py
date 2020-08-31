@@ -7,6 +7,7 @@ from meowth.utils import formatters, snowflake
 from meowth.utils.converters import ChannelMessage
 from .errors import *
 from .raid_checks import archive_category
+from . import raid_info
 
 import asyncio
 import aiohttp
@@ -834,6 +835,24 @@ class Raid:
         d['est_power'] = self.grp_est_power(d)
         d['emoji'] = self.bot.get_emoji(self.bot.config.emoji['here'])
         return d
+
+    def user_was_invited(self, user_id):
+        for x in self.trainer_dict:
+            invites = self.trainer_dict[x].get('invites', [])
+            if user_id in invites:
+                return True
+        return False
+    
+    def user_invite_slots(self, user_id):
+        invites = self.trainer_dict.get(user_id, {}).get('invites', [])
+        return 5 - len(invites)
+
+    @property
+    def users_can_invite(self):
+        users = [x for x in self.trainer_dict if self.trainer_dict[x]['status'] in raid_info.status_can_invite]
+        users = [x for x in users if not self.user_was_invited(x)]
+        users = [x for x in users if self.user_invite_slots(x) > 0]
+        return users
     
     @property
     def pokebattler_url(self):
@@ -946,6 +965,8 @@ class Raid:
             for group in self.group_list:
                 if emoji == group['emoji']:
                     await message.remove_reaction(emoji, user)
+                    if self.user_was_invited(payload.user_id):
+                        return
                     await self.join_grp(payload.user_id, group)
                     if not old_status or old_status == 'maybe':
                         new_status = 'coming'
@@ -993,7 +1014,7 @@ class Raid:
                     new_bosses = boss_list
         elif self.status == 'active':
             if emoji == '\u25b6':
-                if self.trainer_dict[payload.user_id]['status'] == 'here':
+                if self.trainer_dict[payload.user_id]['status'] in ['here', 'remote']:
                     grp = self.user_grp(payload.user_id)
                     if not grp:
                         grp = self.here_grp
@@ -1037,6 +1058,8 @@ class Raid:
         elif channel:
             if self.grp_total(grp) > 20:
                 await channel.send('WARNING: You will have to split into multiple groups for the raid!')
+            if self.grp_remotes(grp) > raid_info.max_remotes:
+                await channel.send('WARNING: There are too many remote users in this group!')
             grp_est = self.grp_est_power(grp)
             rec_size = await self.rec_group_size()
             if grp_est < 1:
@@ -1194,10 +1217,10 @@ class Raid:
                     except:
                         pass    
     
-    async def join_grp(self, user_id, group):
+    async def join_grp(self, user_id, group, invite=False):
         old_rsvp = self.trainer_dict.get(user_id, {})
         old_status = old_rsvp.get('status')
-        if not old_status or old_status == 'maybe':
+        if (not old_status or old_status == 'maybe') and not invite:
             meowthuser = MeowthUser.from_id(self.bot, user_id)
             party = await meowthuser.party()
             bosses = old_rsvp.get('bosses')
@@ -1235,6 +1258,10 @@ class Raid:
         insert.row(**d)
         await insert.commit(do_update=True)
         await self.update_rsvp(user_id=user_id, group=group)
+        invites = old_rsvp.get('invites', [])
+        if invites:
+            for x in invites:
+                await self.join_grp(x, group, invite=True)
     
     async def leave_grp(self, user_id):
         group_table = self.bot.dbi.table('raid_groups')
@@ -1260,22 +1287,61 @@ class Raid:
 
     async def invite_ask(self, user_id):
         meowthuser = MeowthUser.from_id(self.bot, user_id)
-        display_name = self.guild.get_member(user_id).display_name
+        invitee = self.guild.get_member(user_id)
+        invitee_name = invitee.display_name
         data = (await meowthuser._data.get())[0]
         friendcode = data.get('friendcode')
-        here_grp = self.here_grp
-        here_users = here_grp.get('users', [])
+        users_can_invite = self.users_can_invite
         if self.channel_ids:
             for chnid in self.channel_ids:
                 chn = self.bot.get_channel(int(chnid))
-        if here_users and chn:
-            content = f"If you are at the raid and plan to invite {display_name}, hit the ✉ below!"
-            if friendcode:
-                content += f"\n{display_name}'s friend code is {friendcode}"
+        if chn:
+            if not users_can_invite:
+                return await chn.send(f"{invitee_name}, there isn't anyone at the raid who can invite you yet! You may need to check back later as others RSVP.")
+            content = f"If you are going to do the raid and plan to invite {invitee_name}, hit the ✉ below!"
             msg = await chn.send(content)
-            payload = await formatters.ask(self.bot, [msg], user_list=here_users, react_list=['✉'])
+            payload = await formatters.ask(self.bot, [msg], user_list=users_can_invite, react_list=['✉'])
             if payload:
+                inviter = self.guild.get_member(payload.user_id)
+                direct_inviter_content = f"Thanks for agreeing to invite {invitee_name} to the raid!"
+                if friendcode:
+                    direct_inviter_content += "Their friend code is below if you need it."
+                await inviter.send(direct_inviter_content)
+                if friendcode:
+                    await inviter.send(friendcode)
+                if self.group_list:
+                    inviter_grp = self.user_grp(payload.user_id)
+                else:
+                    inviter_grp = None
+                if inviter_grp:
+                    await self.join_grp(user_id, inviter_grp)
                 await meowthuser.rsvp(self.id, "remote")
+                meowthinviter = MeowthUser.from_id(payload.user_id)
+                inviterdata = (await meowthinviter._data.get())[0]
+                invitercode = data.get('friendcode')
+                invitee_content = f"{inviter.display_name} has agreed to invite you to the raid!"
+                if invitercode:
+                    invitee_content += "Their friend code is below if you need it."
+                await invitee.send(invitee_content)
+                if invitercode:
+                    await invitee.send(invitercode)
+    
+    async def notify_invite_users(self, user_id):
+        invites = self.trainer_dict.get(user_id, {}).get('invites', [])
+        if not invites:
+            return
+        content = "Your group is starting the raid! You have agreed to invite the following users:"
+        for x in invites:
+            member = self.guild.get_member(x)
+            meowthuser = MeowthUser.from_id(self.bot, x)
+            ign = await meowthuser.ign()
+            if ign:
+                ign_str = f"In-game: {ign}"
+            else:
+                ign_str = "In-game: Unknown"
+            content += f"\n{member.display_name} - {ign_str}"
+        inviter = self.guild.get_member(user_id)
+        await inviter.send(content)
     
 
     async def update_rsvp(self, user_id=None, status=None, group=None):
@@ -1364,9 +1430,9 @@ class Raid:
                         self.bot.loop.create_task(self.invite_ask(user_id))
                     if self.group_list:
                         grp = self.user_grp(member.id)
-                        if not grp and status in ('coming', 'here', 'remote'):
+                        if not grp and status in ('coming', 'here', 'remote') and not self.user_was_invited(member.id):
                             return await self.raidgroup_ask(chn, member.id)
-        elif user_id and group:
+        elif user_id and group and not self.user_was_invited(user_id):
             if self.channel_ids:
                 for chnid in self.channel_ids:
                     chn = self.bot.get_channel(int(chnid))
@@ -1805,7 +1871,9 @@ class Raid:
             if self.channel_ids and str(chn.id) not in self.channel_ids and self.status != 'expired':
                 report_embed = await self.report_embed()
                 try:
-                    await msg.edit(embed=report_embed)
+                    raidchan = self.bot.get_channel.(self.channel_ids[0])
+                    report_content = content + f" Coordinate in {raidchan.mention}!"
+                    await msg.edit(content=report_content, embed=report_embed)
                 except:
                     pass
                 msg_list.append(msg)
@@ -1974,7 +2042,7 @@ class Raid:
         if mention:
             mention_list.append(mention)
         name = await self.pkmn.name()
-        content = f"Trainers {' '.join(mention_list)}: The egg has hatched into a {name} raid! RSVP using commands or reactions!" 
+        content = f"Trainers {' '.join(mention_list)}: The egg has hatched into a {name} raid!" 
         raid_table = self.bot.dbi.table('raids')
         update = raid_table.update()
         update.where(id=self.id)
@@ -2231,6 +2299,11 @@ class Raid:
         for trainer in group['users']:
             total += sum(trainer_dict[trainer]['party'])
         return total
+
+    def grp_remotes(self, group):
+        total = 0
+        status_dict = self.grp_status_dict(group)
+        return status_dict.get('remote', 0)
     
     def grp_status_str(self, group):
         status_dict = self.grp_status_dict(group)
@@ -2348,6 +2421,9 @@ class Raid:
             return await channel.send(f'Current Raid RSVP Totals\n\n{liststr}')
         embed = formatters.make_embed(title="Current Raid RSVP Totals", content=liststr, msg_colour=color)
         return await channel.send(embed=embed)
+
+    async def list_invites(self, channel):
+
     
     async def list_teams(self, channel, tags=False):
         color = self.guild.me.color
@@ -2462,11 +2538,13 @@ class Raid:
             bosses = rcrd.get('bosses')
             party = rcrd.get('party', [0,0,0,1])
             estimator = rcrd.get('estimator')
+            invites = rcrd.get('invites', [])
             rcrd_dict = {
                 'bosses': bosses,
                 'status': status,
                 'party': party,
-                'estimator': estimator
+                'estimator': estimator,
+                'invites': invites
             }
             return trainer, rcrd_dict
         trainer_dict = {}

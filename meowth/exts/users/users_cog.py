@@ -72,6 +72,12 @@ class MeowthUser:
         data.select('silph')
         silphid = await data.get_value()
         return silphid
+
+    async def ign(self):
+        data = self._data
+        data.select('ign')
+        ign = await data.get_value()
+        return ign
     
     async def set_team(self, team_id):
         update = self._update
@@ -190,13 +196,15 @@ class MeowthUser:
             'status': status,
             'estimator': estimator,
             'bosses': bosses,
-            'party': party
+            'party': party,
+            'invites': []
         }
         rsvp_table = self.bot.dbi.table('raid_rsvp')
         current_rsvp = rsvp_table.query().where(user_id=self.user.id, raid_id=raid_id)
         current_rsvp = await current_rsvp.get()
         if current_rsvp:
             old_d = dict(current_rsvp[0])
+            d['invites'] = old_d.get('invites', [])
             if old_d == d:
                 return
         insert = rsvp_table.insert()
@@ -215,6 +223,22 @@ class MeowthUser:
         if hasattr(self, 'party_expire_task'):
             self.party_expire_task.cancel()
         self.party_expire_task = self.bot.loop.create_task(self.clear_party(stamp))
+    
+    async def raid_invite(self, raid_id, invitee_id):
+        rsvp_table = self.bot.dbi.table('raid_rsvp')
+        current_rsvp = rsvp_table.query().where(user_id=self.user.id, raid_id=raid_id)
+        current_rsvp = await current_rsvp.get()
+        if current_rsvp:
+            old_d = dict(current_rsvp[0])
+        else:
+            return
+        old_invites = old_d.get('invites', [])
+        if invitee_id in old_invites:
+            return
+        old_invites.append(invitee_id)
+        insert = rsvp_table.insert()
+        insert.row(**old_d)
+        await insert.commit(do_update=True)
     
     async def train_rsvp(self, train, party=[0,0,0,1]):
         d = {

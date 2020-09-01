@@ -1315,9 +1315,11 @@ class Raid:
                 else:
                     inviter_grp = None
                 if inviter_grp:
-                    await self.join_grp(user_id, inviter_grp)
+                    self.bot.loop.create_task(self.join_grp(user_id, inviter_grp))
                 if self.status == 'egg':
                     bosses = self.boss_list
+                else:
+                    bosses = []
                 party = await meowthuser.party()
                 self.bot.loop.create_task(meowthuser.rsvp(self.id, "remote", bosses=bosses, party=party))
                 meowthinviter = MeowthUser.from_id(self.bot, payload.user_id)

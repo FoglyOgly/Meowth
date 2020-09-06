@@ -843,6 +843,13 @@ class Raid:
                 return True
         return False
     
+    def user_who_invited(self, user_id):
+        for x in self.trainer_dict:
+            invites = self.trainer_dict[x].get('invites', [])
+            if user_id in invites:
+                return x
+        return None
+    
     def user_invite_slots(self, user_id):
         invites = self.trainer_dict.get(user_id, {}).get('invites', [])
         return 5 - len(invites)
@@ -1445,6 +1452,10 @@ class Raid:
                     else:
                         break
                     content = f"{member.display_name} {display_status}!"
+                    if self.user_was_invited(user_id):
+                        inviter_id = self.user_who_invited(user_id)
+                        inviter = self.guild.get_member(inviter_id)
+                        content = f"{inviter.display_name} is inviting {member.display_name} to the raid!" 
                     await chn.send(content)
                     await chn.send(embed=rsvpembed, delete_after=15)
                     if status == 'invite':

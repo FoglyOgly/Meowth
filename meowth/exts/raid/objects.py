@@ -1453,9 +1453,9 @@ class Raid:
                         if self.users_need_invite:
                             num_invites = len(self.users_need_invite)
                             if num_invites == 1:
-                                content = "One trainer needs an invite to the raid! Use `!list invites` to see who needs an invite."
+                                content = f"{member.display_name}, one trainer needs an invite to the raid! Use `!list invites` to see who needs an invite."
                             else:
-                                content = f"{num_invites} trainers need an invite to the raid! Use `!list invites` to see who needs an invite."
+                                content = f"{member.display_name}, {num_invites} trainers need an invite to the raid! Use `!list invites` to see who needs an invite."
                             self.bot.loop.create_task(chn.send(content))
                     if self.group_list:
                         grp = self.user_grp(member.id)

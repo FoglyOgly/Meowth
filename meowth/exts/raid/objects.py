@@ -1449,6 +1449,14 @@ class Raid:
                     await chn.send(embed=rsvpembed, delete_after=15)
                     if status == 'invite':
                         self.bot.loop.create_task(self.invite_ask(user_id))
+                    elif user_id in self.users_can_invite:
+                        if self.users_need_invite:
+                            num_invites = len(self.users_need_invite)
+                            if num_invites == 1:
+                                content = "One trainer needs an invite to the raid! Use `!list invites` to see who needs an invite."
+                            else:
+                                content = f"{num_invites} trainers need an invite to the raid! Use `!list invites` to see who needs an invite."
+                            self.bot.loop.create_task(chn.send(content))
                     if self.group_list:
                         grp = self.user_grp(member.id)
                         if not grp and status in ('coming', 'here', 'remote') and not self.user_was_invited(member.id):
@@ -2447,9 +2455,14 @@ class Raid:
         return await channel.send(embed=embed)
 
     async def list_invites(self, channel):
+        oldmsg = getattr(self, 'invite_list', None)
+        if oldmsg:
+            self.bot.loop.create_task(oldmsg.delete())
+            self.invite_list = None
         if not self.users_need_invite:
             return await channel.send('No users currently need invites to this raid!')
         msg = await channel.send('The following users need invites to this raid! Press the corresponding reactions if you can invite them!')
+        self.invite_list = msg
         while self.status != 'expired':
             invites = self.users_need_invite
             emoji = formatters.mc_emoji(len(invites))

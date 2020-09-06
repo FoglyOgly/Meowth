@@ -257,6 +257,8 @@ class RaidCog(Cog):
                         if isinstance(raid, Meetup):
                             return await raid.list_rsvp(ctx.channel, tags=tags)
                         return await raid.list_bosses(ctx.channel, tags=tags)
+                    if 'invites' in ctx.args:
+                        return await raid.list_invites(ctx.channel)
                     return await raid.list_rsvp(ctx.channel, tags=tags)
             except NotRaidChannel:
                 pass

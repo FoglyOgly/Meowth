@@ -855,6 +855,11 @@ class Raid:
         return users
     
     @property
+    def users_need_invite(self):
+        users = [x for x in self.trainer_dict if self.trainer_dict[x]['status'] == 'invite']
+        return users
+    
+    @property
     def pokebattler_url(self):
         pkmnid = self.pkmn.id
         url = f"https://www.pokebattler.com/raids/{pkmnid}"
@@ -1303,35 +1308,44 @@ class Raid:
             msg = await chn.send(content)
             payload = await formatters.ask(self.bot, [msg], user_list=users_can_invite, react_list=['✉'])
             if payload:
-                inviter = self.guild.get_member(payload.user_id)
-                direct_inviter_content = f"Thanks for agreeing to invite {invitee_name} to the raid!"
-                if friendcode:
-                    direct_inviter_content += " Their friend code is below if you need it."
-                await inviter.send(direct_inviter_content)
-                if friendcode:
-                    await inviter.send(friendcode)
-                if self.group_list:
-                    inviter_grp = self.user_grp(payload.user_id)
-                else:
-                    inviter_grp = None
-                if inviter_grp:
-                    self.bot.loop.create_task(self.join_grp(user_id, inviter_grp))
-                if self.status == 'egg':
-                    bosses = self.boss_list
-                else:
-                    bosses = []
-                party = await meowthuser.party()
-                self.bot.loop.create_task(meowthuser.rsvp(self.id, "remote", bosses=bosses, party=party))
-                meowthinviter = MeowthUser.from_id(self.bot, payload.user_id)
-                await meowthinviter.raid_invite(self.id, user_id)
-                inviterdata = (await meowthinviter._data.get())[0]
-                invitercode = inviterdata.get('friendcode')
-                invitee_content = f"{inviter.display_name} has agreed to invite you to the raid!"
-                if invitercode:
-                    invitee_content += " Their friend code is below if you need it."
-                await invitee.send(invitee_content)
-                if invitercode:
-                    await invitee.send(invitercode)
+                return await self.raid_invite(payload.user_id, user_id)
+    
+    async def raid_invite(self, inviter_id, invitee_id):
+        inviter = self.guild.get_member(inviter_id)
+        invitee = self.guild.get_member(invitee_id)
+        inviter_name = inviter.display_name
+        invitee_name = invitee.display_name
+        meowthinvitee = MeowthUser.from_id(self.bot, invitee_id)
+        meowthinviter = MeowthUser.from_id(self.bot, inviter_id)
+        inviter_data = (await meowthinviter._data.get())[0]
+        invitee_data = (await meowthinvitee._data.get())[0]
+        inviter_friendcode = inviter_data.get('friendcode')
+        invitee_friendcode = invitee_data.get('friendcode')
+        direct_inviter_content = f"Thanks for agreeing to invite {invitee_name} to the raid!"
+        if invitee_friendcode:
+            direct_inviter_content += " Their friend code is below if you need it."
+        await inviter.send(direct_inviter_content)
+        if invitee_friendcode:
+            await inviter.send(invitee_friendcode)
+        if self.group_list:
+            inviter_grp = self.user_grp(inviter_id)
+        else:
+            inviter_grp = None
+        if inviter_grp:
+            self.bot.loop.create_task(self.join_grp(invitee_id, inviter_grp))
+        if self.status == 'egg':
+            bosses = self.boss_list
+        else:
+            bosses = []
+        party = await meowthinvitee.party()
+        self.bot.loop.create_task(meowthinvitee.rsvp(self.id, "remote", bosses=bosses, party=party))
+        await meowthinviter.raid_invite(self.id, invitee_id)
+        direct_invitee_content = f"{inviter.display_name} has agreed to invite you to the raid!"
+        if inviter_friendcode:
+            direct_invitee_content += " Their friend code is below if you need it."
+        await invitee.send(direct_invitee_content)
+        if inviter_friendcode:
+            await invitee.send(inviter_friendcode)
     
     async def notify_invite_users(self, user_id):
         invites = self.trainer_dict.get(user_id, {}).get('invites', [])
@@ -2432,8 +2446,26 @@ class Raid:
         embed = formatters.make_embed(title="Current Raid RSVP Totals", content=liststr, msg_colour=color)
         return await channel.send(embed=embed)
 
-    # async def list_invites(self, channel):
-
+    async def list_invites(self, channel):
+        if not self.users_need_invite:
+            return await channel.send('No users currently need invites to this raid!')
+        msg = await channel.send('The following users need invites to this raid! Press the corresponding reactions if you can invite them!')
+        while self.status != 'expired':
+            invites = self.users_need_invite
+            emoji = formatters.mc_emoji(len(invites))
+            invite_names = [self.guild.get_member(x).display_name for x in invites]
+            display_dict = dict(zip(emoji, invite_names))
+            choice_dict = dict(zip(emoji, invites))
+            embed = formatters.mc_embed(display_dict)
+            await msg.edit(embed=embed)
+            users_can_invite = self.users_can_invite
+            payload = await formatters.ask(self.bot, [msg], user_list=users_can_invite, react_list=emoji)
+            if payload:
+                inviter_id = payload.user_id
+                invitee_id = choice_dict[str(payload.emoji)]
+                await self.raid_invite(inviter_id, invitee_id)
+            else:
+                break
     
     async def list_teams(self, channel, tags=False):
         color = self.guild.me.color

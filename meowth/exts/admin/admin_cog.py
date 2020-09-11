@@ -357,7 +357,7 @@ class AdminCog(Cog):
                     await ctx.send('I could not interpret your response. Try again!')
                     continue
         if 'raid' in enabled_commands:
-            raid_levels = ['1', '2', '3', '4', '5', '7', 'EX', 'EX Raid Gyms']
+            raid_levels = ['1', '3', '5', '7', 'EX', 'EX Raid Gyms']
             for level in raid_levels:
                 column = f'category_{level.lower()}'
                 if level == 'EX Raid Gyms':

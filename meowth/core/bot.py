@@ -268,11 +268,12 @@ class Bot(commands.AutoShardedBot):
 
     # events
     async def on_guild_join(self, guild):
-        table = self.dbi.table('guild_settings')
+        table = self.dbi.table('guild_config')
         insert = table.insert
         d = {
             'guild_id': guild.id,
-            'version': self.version
+            'version': self.version,
+            'config_name': 'bot_version'
         }
         insert.row(**d)
         await insert.commit(do_update=True)

@@ -6,7 +6,8 @@ def core_table_sqls():
         'guild_config' : ("CREATE TABLE guild_config ("
                           "guild_id bigint NOT NULL, "
                           "config_name text NOT NULL, "
-                          "config_value text NOT NULL, "
+                          "config_value text, "
+                          "version text NOT NULL, "
                           "CONSTRAINT guild_config_pkey "
                           "PRIMARY KEY (guild_id, config_name));"),
 

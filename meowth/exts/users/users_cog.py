@@ -78,6 +78,12 @@ class MeowthUser:
         data.select('ign')
         ign = await data.get_value()
         return ign
+
+    async def friendcode(self):
+        data = self._data
+        data.select('friendcode')
+        fc = await data.get_value()
+        return fc
     
     async def set_team(self, team_id):
         update = self._update
@@ -506,14 +512,26 @@ class Users(Cog):
             await update.commit()
         return await ctx.send(f'In-game name set to {ign}')
 
-    @command()
+    @command(aliases=['friendcode', 'fc', 'tc'])
     @users_checks.users_enabled()
-    async def friendcode(self, ctx, *, friendcode):
-        """Set your in-game friend code.
+    async def trainercode(self, ctx, *, user_or_code):
+        """Set your in-game trainer code or look up another user's trainer code.
+        To look up a trainer, user_or_code should be a username or mention.
+        To set your trainer code, user_or_code should be a 12-digit number.
         """
 
-        friendcode = friendcode.replace(' ', '')
-        if not friendcode.isdigit() or len(friendcode) != 12:
+        try:
+            meowthuser = await MeowthUser.convert(ctx, user_or_code)
+        except:
+            meowthuser = None
+        if meowthuser:
+            fc = await meowthuser.friendcode()
+            if not fc:
+                return await ctx.error('Trainer code not found')
+            await ctx.send(f'Trainer code for {meowthuser.user.display_name}:')
+            return await ctx.send(fc)
+        user_or_code = user_or_code.replace(' ', '')
+        if not user_or_code.isdigit() or len(user_or_code) != 12:
             return await ctx.error('Invalid friend code')
 
 
@@ -522,14 +540,14 @@ class Users(Cog):
         data = await meowthuser._data.get()
         if len(data) == 0:
             insert = meowthuser._insert
-            d = {'id': ctx.author.id, 'friendcode': friendcode}
+            d = {'id': ctx.author.id, 'friendcode': user_or_code}
             insert.row(**d)
             await insert.commit()
         else:
             update = meowthuser._update
-            update.values(friendcode=friendcode)
+            update.values(friendcode=user_or_code)
             await update.commit()
-        return await ctx.send(f'Friend code set to {friendcode}')
+        return await ctx.send(f'Friend code set to {user_or_code}')
 
     @command()
     @users_checks.users_enabled()

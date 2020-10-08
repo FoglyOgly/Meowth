@@ -272,12 +272,12 @@ class Wild():
 
     
     async def process_reactions(self, payload):
-        user = self.bot.get_user(payload.user_id)
+        if payload.guild_id:
+            user = payload.member
+        else:
+            return
         channel = self.bot.get_channel(payload.channel_id)
         message = await channel.fetch_message(payload.message_id)
-        if payload.guild_id:
-            guild = self.bot.get_guild(payload.guild_id)
-            user = guild.get_member(user.id)
         if payload.emoji.is_custom_emoji():
             emoji = payload.emoji.id
         else:
@@ -492,12 +492,12 @@ class Modifier():
             self.monitor_task.cancel()
 
     async def process_reactions(self, payload):
-        user = self.bot.get_user(payload.user_id)
+        if payload.guild_id:
+            user = payload.member
+        else:
+            return
         channel = self.bot.get_channel(payload.channel_id)
         message = await channel.fetch_message(payload.message_id)
-        if payload.guild_id:
-            guild = self.bot.get_guild(payload.guild_id)
-            user = guild.get_member(user.id)
         if payload.emoji.is_custom_emoji():
             emoji = payload.emoji.id
         else:

@@ -275,8 +275,7 @@ class Trade():
                 return
             i = self.react_list.index(emoji)
             offer = self.wanted_pkmn[i]
-            g = self.bot.get_guild(self.guild_id)
-            trader = g.get_member(payload.user_id)
+            trader = payload.member
             if len(self.offered_pkmn) > 1:
                 content = f"{trader.display_name}, which of the following Pokemon do you want to trade for?"
                 mc_emoji = formatters.mc_emoji(len(self.offered_pkmn))

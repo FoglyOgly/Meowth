@@ -319,13 +319,13 @@ class Meetup:
         return status_reacts
     
     async def process_reactions(self, payload):
-        user = self.bot.get_user(payload.user_id)
+        if payload.guild_id:
+            user = payload.member
+        else:
+            return
         channel = self.bot.get_channel(payload.channel_id)
         message = await channel.fetch_message(payload.message_id)
         meowthuser = MeowthUser(self.bot, user)
-        if payload.guild_id:
-            guild = self.bot.get_guild(payload.guild_id)
-            user = guild.get_member(user.id)
         trainer_dict = self.trainer_dict
         trainer_data = trainer_dict.get(payload.user_id, {})
         old_status = trainer_data.get('status')
@@ -954,13 +954,13 @@ class Raid:
         return datetime.fromtimestamp(stamp, tz=localzone)
     
     async def process_reactions(self, payload):
-        user = self.bot.get_user(payload.user_id)
+        if payload.guild_id:
+            user = payload.member
+        else:
+            return
         channel = self.bot.get_channel(payload.channel_id)
         message = await channel.fetch_message(payload.message_id)
         meowthuser = MeowthUser(self.bot, user)
-        if payload.guild_id:
-            guild = self.bot.get_guild(payload.guild_id)
-            user = guild.get_member(user.id)
         trainer_dict = self.trainer_dict
         trainer_data = trainer_dict.get(payload.user_id, {})
         old_bosses = trainer_data.get('bosses', [])

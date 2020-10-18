@@ -8,6 +8,7 @@ from .errors import *
 import discord
 from discord.ext import commands
 
+
 class Item:
 
     def __init__(self, bot, item_id):
@@ -122,57 +123,55 @@ class Want():
             users = []
         return users
     
-    async def add_user(self, user_id):
+    async def add_user(self, user):
         users = await self._users()
         if not users:
             insert = self._insert
             await insert.commit(do_update=True)
             users = []
-        if user_id not in users:
-            users.append(user_id)
+        if user.id not in users:
+            users.append(user.id)
             update = self._update
             update.values(users=users)
             await update.commit()
             role = await self.role()
             if role:
-                member = self.guild.get_member(user_id)
-                if role not in member.roles:
-                    await member.add_roles(role)
+                if role not in user.roles:
+                    await user.add_roles(role)
             return 'success'
         else:
             return 'already done'
     
-    async def remove_user(self, user_id):
+    async def remove_user(self, user):
         users = await self._users()
         if not users:
             return 'already done'
-        if user_id not in users:
+        if user.id not in users:
             return 'already done'
-        users.remove(user_id)
+        users.remove(user.id)
         update = self._update
         update.values(users=users)
         await update.commit()
         role = await self.role()
         if role:
-            member = self.guild.get_member(user_id)
-            if role in member.roles:
-                await member.remove_roles(role)
+            if role in user.roles:
+                await user.remove_roles(role)
         return 'success'
     
-    async def notify_users(self, content, embed, author=None):
-        msgs = []
-        users = await self._users()
-        guild = self.guild
-        members = [guild.get_member(x) for x in users]
-        for member in members:
-            if member == author:
-                continue
-            try:
-                msg = await member.send(content, embed=embed)
-                msgs.append(f"{msg.channel.id}/{msg.id}")
-            except:
-                pass
-        return msgs
+#    async def notify_users(self, content, embed, author=None):
+#        msgs = []
+#        users = await self._users()
+#        guild = self.guild
+#        members = [guild.get_member(x) for x in users]
+#        for member in members:
+#            if member == author:
+#                continue
+#            try:
+#                msg = await member.send(content, embed=embed)
+#                msgs.append(f"{msg.channel.id}/{msg.id}")
+#            except:
+#                pass
+#        return msgs
 
     async def is_role(self):
         users = await self._users()
@@ -210,7 +209,7 @@ class Want():
             if not role:
                 guild = self.guild
                 users = await self._users()
-                members = [guild.get_member(x) for x in users]
+                members = [guild.fetch_member(x) for x in users]  # Role creation isn't common, so API call is ok.
                 members = [x for x in members if x]
                 raid_tiers = ['1', '2', '3', '4', '5', 'EX', 'MEGA']
                 if self.want.startswith('FAMILY'):
@@ -268,12 +267,9 @@ class Want():
         if role:
             return role.mention
         users = await self._users()
-        guild = self.guild
-        members = [guild.get_member(x) for x in users]
-        members = [x for x in members if x]
-        if not members:
+        if not users:
             return None
-        mentions = [x.mention for x in members]
+        mentions = [f"<@!{user_id}>" for user_id in users]
         mention_str = " ".join(mentions)
         return mention_str
         
@@ -326,7 +322,7 @@ class WantCog(Cog):
         added_wants = []
         already = []
         for want in wants:
-            status = await want.add_user(ctx.author.id)
+            status = await want.add_user(ctx.author)
             if status == 'already done':
                 already.append(want.want)
                 continue
@@ -344,7 +340,7 @@ class WantCog(Cog):
     async def unwant(self, ctx, wants: commands.Greedy[Want]):
         removed_wants = []
         for want in wants:
-            status = await want.remove_user(ctx.author.id)
+            status = await want.remove_user(ctx.author)
             if status == 'already done':
                 continue
             removed_wants.append(want.want)

@@ -89,12 +89,16 @@ class Trade():
     def lister_name(self):
         g = self.bot.get_guild(self.guild_id)
         m = g.get_member(self.lister_id)
+        if not m:
+            m = g.fetch_member(self.lister_id)
         return m.display_name
     
     @property
     def lister(self):
         g = self.bot.get_guild(self.guild_id)
         m = g.get_member(self.lister_id)
+        if not m:
+            m = g.fetch_member(self.lister_id)
         return m
     
     @property
@@ -315,6 +319,8 @@ class Trade():
                     if offer['msg'] == idstring:
                         g = self.bot.get_guild(self.guild_id)
                         trader = g.get_member(offer['trader'])
+                        if not trader:
+                            trader = g.fetch_member(offer['trader'])
                         listed = offer['listed']
                         offered = offer['offered']
                         return await self.accept_offer(trader, listed, offered)
@@ -324,6 +330,8 @@ class Trade():
                     if offer['msg'] == idstring:
                         g = self.bot.get_guild(self.guild_id)
                         trader = g.get_member(offer['trader'])
+                        if not trader:
+                            trader = g.fetch_member(offer['trader'])
                         listed = offer['listed']
                         offered = offer['offered']
                         msg = offer['msg']

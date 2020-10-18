@@ -871,7 +871,10 @@ class WildEmbed():
             'Moveset': moveset.strip(),
             'Gender': wild.pkmn.gender.title() if wild.pkmn.gender else "Unknown"
         }
-        reporter = wild.guild.get_member(wild.reporter_id).display_name
+        reporter = wild.guild.get_member(wild.reporter_id)
+        if not reporter:
+            reporter = wild.guild.fetch_member(wild.reporter_id)
+        reporter = reporter.display_name
         footer = f"Reported by {reporter}"
         reportdt = datetime.fromtimestamp(wild.created)
         color = wild.guild.me.color
@@ -903,7 +906,10 @@ class ModEmbed():
             fields['Pokemon'] = "\n".join(pkmn_names)
         fields['Location'] = f'[{directions_text}]({directions_url})'
         img_url = mod.img_url()
-        reporter = mod.guild.get_member(mod.reporter_id).display_name
+        reporter = mod.guild.get_member(mod.reporter_id)
+        if not reporter:
+            reporter = mod.guild.fetch_member(mod.reporter_id)
+        reporter = reporter.display_name
         footer = f"Reported by {reporter}"
         reportdt = datetime.fromtimestamp(mod.created)
         color = mod.guild.me.color

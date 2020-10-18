@@ -518,7 +518,10 @@ class GetTools:
         if not guild:
             return None
         if isinstance(search_term, int):
-            return guild.get_member(search_term)
+            member = guild.get_member(search_term)
+            if not member:
+                member = guild.fetch_member(search_term)
+            return member
         if isinstance(search_term, str):
             member = self.get(guild.members, name=search_term)
             if not member:

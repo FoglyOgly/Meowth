@@ -442,7 +442,7 @@ class ResearchCog(Cog):
         research = Research.by_message.get(idstring)
         if not research or payload.user_id == self.bot.user.id:
             return
-        user = chn.guild.get_member(payload.user_id)
+        user = payload.member
         if payload.emoji.is_custom_emoji():
             emoji = payload.emoji.id
             if isinstance(emoji, int):

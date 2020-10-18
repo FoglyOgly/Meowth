@@ -290,7 +290,7 @@ class Task:
         return await query.get_values()
 
     @classmethod
-    async def convert(cls, ctx, arg):
+    async def convert(cls, ctx, arg, require_task=False):
         arg = arg.lower()
         table = ctx.bot.dbi.table('research_tasks')
         query = table.query('task')
@@ -301,6 +301,29 @@ class Task:
             task_matches = [x[0] for x in matches]
         else:
             task_matches = []
+
+        async def ask_partial_task():
+            other_ask = await ctx.send('What is the Task for this Research? Please type your answer below.')
+
+            def check(m):
+                return m.author == ctx.author and m.channel == ctx.channel
+
+            try:
+                other_reply = await ctx.bot.wait_for('message', check=check, timeout=300)
+            except asyncio.TimeoutError:
+                return PartialTask(ctx.bot, arg)
+            else:
+                try:
+                    await other_reply.delete()
+                except (discord.Forbidden, discord.NotFound):
+                    pass
+                return PartialTask(ctx.bot, other_reply.content)
+            finally:
+                try:
+                    await other_ask.delete()
+                except discord.NotFound:
+                    pass
+
         if len(task_matches) > 1:
             react_list = formatters.mc_emoji(len(task_matches))
             display_dict = dict(zip(react_list, task_matches))
@@ -317,28 +340,11 @@ class Task:
             except discord.NotFound:
                 pass
             if task == 'Other':
-                other_ask = await ctx.send('What is the Task for this Research? Please type your answer below.')
-
-                def check(m):
-                    return m.author == ctx.author and m.channel == ctx.channel
-
-                try:
-                    other_reply = await ctx.bot.wait_for('message', check=check, timeout=300)
-                except asyncio.TimeoutError:
-                    return PartialTask(ctx.bot, arg)
-                else:
-                    try:
-                        await other_reply.delete()
-                    except (discord.Forbidden, discord.NotFound):
-                        pass
-                    return PartialTask(ctx.bot, other_reply.content)
-                finally:
-                    try:
-                        await other_ask.delete()
-                    except discord.NotFound:
-                        pass
+                return await ask_partial_task()
         elif len(task_matches) == 1:
             task = task_matches[0]
+        elif require_task:
+            return await ask_partial_task()
         else:
             raise ValueError
         return cls(ctx.bot, task)
@@ -492,7 +498,6 @@ class ResearchCog(Cog):
             emoji = str(payload.emoji)
             await msg.remove_reaction(emoji, user)
             if emoji == '\U0001F4DD':
-                print('hello')
                 askmsg = await chn.send(f"{user.mention}: What Research task is located here? Please type your response below.")
 
                 def check(m):
@@ -507,7 +512,7 @@ class ResearchCog(Cog):
                 except discord.HTTPException:
                     pass
                 ctx = await self.bot.get_context(reply, cls=Context)
-                task = await Task.convert(ctx, reply.content)
+                task = await Task.convert(ctx, reply.content, require_task=True)
                 research.task = task
 
         embed = await ResearchEmbed.from_research(research)
@@ -640,7 +645,7 @@ class ResearchCog(Cog):
                 await multi.delete()
             except:
                 pass
-            task = await Task.convert(ctx, cat)
+            task = await Task.convert(ctx, cat, require_task=True)
         if isinstance(task, Task) and not reward:
             possible_rewards = await task.possible_rewards()
             if len(possible_rewards) == 1:

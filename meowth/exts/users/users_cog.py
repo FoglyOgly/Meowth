@@ -191,6 +191,8 @@ class MeowthUser:
                 if sum((mystic, instinct, valor, unknown)) > total:
                     total = sum((mystic, instinct, valor, unknown))
                 unknown = total - sum((mystic, instinct, valor))
+        if sum((mystic, instinct, valor, unknown)) == 0:
+            return await self.party()
         return [mystic, instinct, valor, unknown]
 
 

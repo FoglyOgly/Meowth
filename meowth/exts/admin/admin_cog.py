@@ -314,7 +314,8 @@ class AdminCog(Cog):
             'clean', 'archive', 'welcome', 'meetup', 'forecast', 'rocket']
         features = [x for x in features if x in possible_commands]
         if not features:
-            return await ctx.send("The list of valid command groups to enable is `raid, train, wild, users, trade, clean, welcome, archive, meetup, research, rocket`.")
+            return await ctx.send("The list of valid command groups to enable is `raid, train, research, wild, "
+                                  "rocket, users, trade, clean, welcome, archive, meetup`.")
         location_commands = ['raid', 'wild', 'research', 'train', 'meetup', 'forecast', 'rocket']
         enabled_commands = []
         required_perms = {}
@@ -632,7 +633,8 @@ class AdminCog(Cog):
             'clean', 'welcome', 'meetup', 'forecast', 'rocket']
         features = [x for x in features if x in possible_commands]
         if not features:
-            return await ctx.send("The list of valid command groups to disable is `raid, wild, research, users, train, trade, clean, welcome, meetup`.")
+            return await ctx.send("The list of valid command groups to disable is `raid, train, research, wild, "
+                                  "rocket, users, trade, clean, welcome, meetup`.")
         disabled_commands = []
         if 'forecast' in features:
             d = {

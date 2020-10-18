@@ -167,7 +167,7 @@ class Meetup:
         for trainer in trainer_dict:
             member = self.guild.get_member(trainer)
             if not member:
-                member = self.guild.fetch_member(trainer)
+                member = await self.guild.fetch_member(trainer)
             if tags:
                 name = member.mention
             else:
@@ -220,7 +220,7 @@ class Meetup:
         for trainer in trainer_dict:
             member = self.guild.get_member(trainer)
             if not member:
-                member = self.guild.fetch_member(trainer)
+                member = await self.guild.fetch_member(trainer)
             if not member:
                 continue
             if tags:
@@ -668,7 +668,8 @@ class Raid:
     def reporter(self):
         reporter = self.guild.get_member(self.reporter_id)
         if not reporter:
-            reporter = self.guild.fetch_member(self.reporter_id)
+            # TODO
+            pass
         return reporter
 
     @property
@@ -1323,10 +1324,10 @@ class Raid:
     async def raid_invite(self, inviter_id, invitee_id):
         inviter = self.guild.get_member(inviter_id)
         if not inviter:
-            inviter = self.guild.fetch_member(inviter_id)
+            inviter = await self.guild.fetch_member(inviter_id)
         invitee = self.guild.get_member(invitee_id)
         if not invitee:
-            invitee = self.guild.fetch_member(invitee_id)
+            invitee = await self.guild.fetch_member(invitee_id)
         inviter_name = inviter.display_name
         invitee_name = invitee.display_name
         meowthinvitee = MeowthUser.from_id(self.bot, invitee_id)
@@ -1369,7 +1370,7 @@ class Raid:
         for x in invites:
             member = self.guild.get_member(x)
             if not member:
-                member = self.guild.fetch_member(x)
+                member = await self.guild.fetch_member(x)
             meowthuser = MeowthUser.from_id(self.bot, x)
             ign = await meowthuser.ign()
             if ign:
@@ -2422,7 +2423,7 @@ class Raid:
         for trainer in trainer_dict:
             member = self.guild.get_member(trainer)
             if not member:
-                member = self.guild.fetch_member(trainer)
+                member = await self.guild.fetch_member(trainer)
             if tags:
                 name = member.mention
             else:
@@ -2505,7 +2506,7 @@ class Raid:
         for trainer in trainer_dict:
             member = self.guild.get_member(trainer)
             if not member:
-                member = self.guild.fetch_member(trainer)
+                member = await self.guild.fetch_member(trainer)
             if not member:
                 continue
             if tags:
@@ -2553,7 +2554,7 @@ class Raid:
             for user in users:
                 member = self.guild.get_member(user)
                 if not member:
-                    member = self.guild.fetch_member(user)
+                    member = await self.guild.fetch_member(user)
                 if not member:
                     continue
                 if tags:
@@ -2581,7 +2582,7 @@ class Raid:
         for trainer in trainer_dict:
             member = self.guild.get_member(trainer)
             if not member:
-                member = self.guild.fetch_member(trainer)
+                member = await self.guild.fetch_member(trainer)
             if not member:
                 continue
             if tags:
@@ -2996,7 +2997,7 @@ class Train:
         for trainer in trainer_dict:
             member = self.guild.get_member(trainer)
             if not member:
-                member = self.guild.fetch_member(trainer)
+                member = await self.guild.fetch_member(trainer)
             name = member.display_name
             party = trainer_dict[trainer]['party']
             total = sum(party)
@@ -3522,7 +3523,7 @@ class RaidEmbed():
             fields['Groups'] = grps_str
         reporter = raid.guild.get_member(raid.reporter_id)
         if not reporter:
-            reporter = raid.guild.fetch_member(raid.reporter_id)
+            reporter = await raid.guild.fetch_member(raid.reporter_id)
         if reporter:
             reporter = reporter.display_name
         footer = f"Reported by {reporter} • {raid.time_str} (not updated)"
@@ -3711,7 +3712,7 @@ class EggEmbed():
         fields['Groups'] = (False, grps_str)
         reporter = raid.guild.get_member(raid.reporter_id)
         if not reporter:
-            reporter = raid.guild.fetch_member(raid.reporter_id)
+            reporter = await raid.guild.fetch_member(raid.reporter_id)
         if reporter:
             reporter = reporter.display_name
         footer_text = f"Reported by {reporter} • {raid.time_str} (not updated)"

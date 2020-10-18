@@ -843,7 +843,7 @@ class ResearchEmbed:
         }
         reporter = research.guild.get_member(research.reporter_id)
         if not reporter:
-            reporter = research.guild.fetch_member(research.reporter_id)
+            reporter = await research.guild.fetch_member(research.reporter_id)
         color = research.guild.me.color
         reporter_name = reporter.display_name
         reporter_avy = reporter.avatar_url

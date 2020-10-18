@@ -873,7 +873,7 @@ class WildEmbed():
         }
         reporter = wild.guild.get_member(wild.reporter_id)
         if not reporter:
-            reporter = wild.guild.fetch_member(wild.reporter_id)
+            reporter = await wild.guild.fetch_member(wild.reporter_id)
         reporter = reporter.display_name
         footer = f"Reported by {reporter}"
         reportdt = datetime.fromtimestamp(wild.created)
@@ -908,7 +908,7 @@ class ModEmbed():
         img_url = mod.img_url()
         reporter = mod.guild.get_member(mod.reporter_id)
         if not reporter:
-            reporter = mod.guild.fetch_member(mod.reporter_id)
+            reporter = await mod.guild.fetch_member(mod.reporter_id)
         reporter = reporter.display_name
         footer = f"Reported by {reporter}"
         reportdt = datetime.fromtimestamp(mod.created)

@@ -133,7 +133,7 @@ class ScoreCog(Cog):
             try:
                 member = ctx.guild.get_member(row['user_id'])
                 if not member:
-                    member = ctx.guild.fetch_member(row['user_id'])
+                    member = await ctx.guild.fetch_member(row['user_id'])
                 name = member.display_name
             except:
                 continue

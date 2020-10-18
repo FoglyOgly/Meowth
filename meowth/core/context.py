@@ -520,7 +520,8 @@ class GetTools:
         if isinstance(search_term, int):
             member = guild.get_member(search_term)
             if not member:
-                member = guild.fetch_member(search_term)
+                # TODO
+                pass
             return member
         if isinstance(search_term, str):
             member = self.get(guild.members, name=search_term)

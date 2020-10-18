@@ -82,15 +82,13 @@ class Trade():
             cls.by_offer[offer['msg']] = new_trade
         return new_trade
 
-
-
-
     @property
     def lister_name(self):
         g = self.bot.get_guild(self.guild_id)
         m = g.get_member(self.lister_id)
         if not m:
-            m = g.fetch_member(self.lister_id)
+            # TODO
+            pass
         return m.display_name
     
     @property
@@ -98,7 +96,8 @@ class Trade():
         g = self.bot.get_guild(self.guild_id)
         m = g.get_member(self.lister_id)
         if not m:
-            m = g.fetch_member(self.lister_id)
+            # TODO
+            pass
         return m
     
     @property
@@ -320,7 +319,7 @@ class Trade():
                         g = self.bot.get_guild(self.guild_id)
                         trader = g.get_member(offer['trader'])
                         if not trader:
-                            trader = g.fetch_member(offer['trader'])
+                            trader = await g.fetch_member(offer['trader'])
                         listed = offer['listed']
                         offered = offer['offered']
                         return await self.accept_offer(trader, listed, offered)
@@ -331,7 +330,7 @@ class Trade():
                         g = self.bot.get_guild(self.guild_id)
                         trader = g.get_member(offer['trader'])
                         if not trader:
-                            trader = g.fetch_member(offer['trader'])
+                            trader = await g.fetch_member(offer['trader'])
                         listed = offer['listed']
                         offered = offer['offered']
                         msg = offer['msg']

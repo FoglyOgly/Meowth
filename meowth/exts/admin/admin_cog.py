@@ -32,7 +32,8 @@ def do_template(message, author, guild):
             if match.isdigit() and (not member):
                 member = guild.get_member(int(match))
                 if not member:
-                    member = guild.fetch_member(int(match))
+                    # TODO
+                    pass
             if not member:
                 not_found.append(full_match)
             return member.mention if member else full_match
@@ -564,7 +565,7 @@ class AdminCog(Cog):
             g = ctx.bot.get_guild(344960572649111552)
             gm = g.get_member(ctx.author.id)
             if not gm:
-                gm = g.fetch_member(ctx.author.id)
+                gm = await g.fetch_member(ctx.author.id)
             r = g.get_role(616734835104546826)
             if r not in gm.roles:
                 content = 'Unfortunately, because of the cost of using the AccuWeather API, you must be a Meowth Patreon Super Nerd to enable in-game weather forecasts. Visit www.patreon.com/meowthbot to become a Patron!'

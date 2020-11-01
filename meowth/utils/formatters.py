@@ -246,6 +246,9 @@ def deleted_message_embed(bot, data):
     guild = bot.get_guild(guild_id)
     author_id = data['author_id']
     author = guild.get_member(author_id)
+    if not author:
+        # TODO
+        pass
     content = data['content']
     embed = make_embed(title=author.display_name, content=content, icon=author.avatar_url)
     sent = data['sent']

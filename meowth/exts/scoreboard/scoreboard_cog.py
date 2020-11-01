@@ -131,7 +131,10 @@ class ScoreCog(Cog):
         for i in range(len(data)):
             row = data[i]
             try:
-                name = ctx.guild.get_member(row['user_id']).display_name
+                member = ctx.guild.get_member(row['user_id'])
+                if not member:
+                    member = await ctx.guild.fetch_member(row['user_id'])
+                name = member.display_name
             except:
                 continue
             names.append(name)

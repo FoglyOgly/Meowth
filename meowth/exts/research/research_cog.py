@@ -842,6 +842,8 @@ class ResearchEmbed:
             'Reward': desc + "\n<:silph:548259248442703895>Research tasks and rewards provided by [The Silph Road](https://thesilphroad.com/research-tasks)"
         }
         reporter = research.guild.get_member(research.reporter_id)
+        if not reporter:
+            reporter = await research.guild.fetch_member(research.reporter_id)
         color = research.guild.me.color
         reporter_name = reporter.display_name
         reporter_avy = reporter.avatar_url

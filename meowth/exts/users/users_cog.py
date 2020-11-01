@@ -566,6 +566,8 @@ class Users(Cog):
         if match:
             meowthuser = await MeowthUser.from_ign(ctx.bot, match)
             member = ctx.guild.get_member(meowthuser.user.id)
+            if not member:
+                member = await ctx.guild.fetch_member(meowthuser.user.id)
             if member:
                 name = member.display_name
             else:

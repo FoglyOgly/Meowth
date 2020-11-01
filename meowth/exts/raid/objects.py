@@ -166,6 +166,8 @@ class Meetup:
         lobby_count = 0
         for trainer in trainer_dict:
             member = self.guild.get_member(trainer)
+            if not member:
+                member = await self.guild.fetch_member(trainer)
             if tags:
                 name = member.mention
             else:
@@ -217,6 +219,8 @@ class Meetup:
         other_list = []
         for trainer in trainer_dict:
             member = self.guild.get_member(trainer)
+            if not member:
+                member = await self.guild.fetch_member(trainer)
             if not member:
                 continue
             if tags:
@@ -294,8 +298,6 @@ class Meetup:
             chn = self.channel
             if chn:
                 rsvpembed = RSVPEmbed.from_meetup(self).embed
-                guild = self.guild
-                member = guild.get_member(user_id)
                 if status == 'maybe':
                     display_status = 'is interested'
                 elif status == 'coming':
@@ -306,9 +308,9 @@ class Meetup:
                     display_status = 'has canceled'
                 else:
                     return
-                content = f"{member.display_name} {display_status}!"
+                content = f"<@!{user_id}> {display_status}!"
                 try:
-                    await chn.send(content)
+                    await chn.send(content, allowed_mentions=discord.AllowedMentions.none())
                     await chn.send(embed=rsvpembed, delete_after=15)
                 except:
                     return
@@ -664,8 +666,12 @@ class Raid:
 
     @property
     def reporter(self):
-        return self.guild.get_member(self.reporter_id)
-    
+        reporter = self.guild.get_member(self.reporter_id)
+        if not reporter:
+            # TODO
+            pass
+        return reporter
+
     @property
     def report_channel(self):
         return self.bot.get_channel(self.report_channel_id)
@@ -763,10 +769,9 @@ class Raid:
     
     async def raidgroup_ask(self, channel, user):
         color = self.guild.me.color
-        member = self.guild.get_member(user)
         grps_str = self.grps_str
         embed = formatters.make_embed(title='Groups (Boss Damage Estimate)', content=grps_str, msg_colour=color)
-        msg = await channel.send(f"{member.mention}: select a group from the list below!, or use \u2754 to remain ungrouped!", embed=embed)
+        msg = await channel.send(f"<@!{user}>: select a group from the list below!, or use \u2754 to remain ungrouped!", embed=embed)
         groups = self.group_list
         emoji_list = [x['emoji'] for x in groups]
         emoji_list += '\u2754'
@@ -1300,8 +1305,6 @@ class Raid:
 
     async def invite_ask(self, user_id):
         meowthuser = MeowthUser.from_id(self.bot, user_id)
-        invitee = self.guild.get_member(user_id)
-        invitee_name = invitee.display_name
         data = (await meowthuser._data.get())[0]
         friendcode = data.get('friendcode')
         users_can_invite = self.users_can_invite
@@ -1310,16 +1313,21 @@ class Raid:
                 chn = self.bot.get_channel(int(chnid))
         if chn:
             if not users_can_invite:
-                return await chn.send(f"{invitee_name}, there isn't anyone at the raid who can invite you yet! You may need to check back later as others RSVP.")
-            content = f"If you are going to do the raid and plan to invite {invitee_name}, hit the ✉ below!"
-            msg = await chn.send(content)
+                content = f"<@!{user_id}>, there isn't anyone at the raid who can invite you yet! You may need to check back later as others RSVP."
+                return await chn.send(content, allowed_mentions=discord.AllowedMentions.none())
+            content = f"If you are going to do the raid and plan to invite <@!{user_id}>, hit the ✉ below!"
+            msg = await chn.send(content, allowed_mentions=discord.AllowedMentions.none())
             payload = await formatters.ask(self.bot, [msg], user_list=users_can_invite, react_list=['✉'])
             if payload:
                 return await self.raid_invite(payload.user_id, user_id)
     
     async def raid_invite(self, inviter_id, invitee_id):
         inviter = self.guild.get_member(inviter_id)
+        if not inviter:
+            inviter = await self.guild.fetch_member(inviter_id)
         invitee = self.guild.get_member(invitee_id)
+        if not invitee:
+            invitee = await self.guild.fetch_member(invitee_id)
         inviter_name = inviter.display_name
         invitee_name = invitee.display_name
         meowthinvitee = MeowthUser.from_id(self.bot, invitee_id)
@@ -1361,6 +1369,8 @@ class Raid:
         content = "Your group is starting the raid! You have agreed to invite the following users:"
         for x in invites:
             member = self.guild.get_member(x)
+            if not member:
+                member = await self.guild.fetch_member(x)
             meowthuser = MeowthUser.from_id(self.bot, x)
             ign = await meowthuser.ign()
             if ign:
@@ -1436,7 +1446,6 @@ class Raid:
                         continue
                     rsvpembed = RSVPEmbed.from_raid(self).embed
                     guild = self.bot.get_guild(self.guild_id)
-                    member = guild.get_member(user_id)
                     if status == 'maybe':
                         display_status = 'is interested'
                     elif status == 'coming':
@@ -1451,12 +1460,11 @@ class Raid:
                         display_status = 'has canceled'
                     else:
                         break
-                    content = f"{member.display_name} {display_status}!"
+                    content = f"<@!{user_id}> {display_status}!"
                     if self.user_was_invited(user_id):
                         inviter_id = self.user_who_invited(user_id)
-                        inviter = self.guild.get_member(inviter_id)
-                        content = f"{inviter.display_name} is inviting {member.display_name} to the raid!" 
-                    await chn.send(content)
+                        content = f"<@!{inviter_id}> is inviting <@!{user_id}> to the raid!"
+                    await chn.send(content, allowed_mentioned=discord.AllowedMentions.none())
                     await chn.send(embed=rsvpembed, delete_after=15)
                     if status == 'invite':
                         self.bot.loop.create_task(self.invite_ask(user_id))
@@ -1464,14 +1472,14 @@ class Raid:
                         if self.users_need_invite:
                             num_invites = len(self.users_need_invite)
                             if num_invites == 1:
-                                content = f"{member.display_name}, one trainer needs an invite to the raid! Use `!list invites` to see who needs an invite."
+                                content = f"<@!{user_id}>, one trainer needs an invite to the raid! Use `!list invites` to see who needs an invite."
                             else:
-                                content = f"{member.display_name}, {num_invites} trainers need an invite to the raid! Use `!list invites` to see who needs an invite."
-                            self.bot.loop.create_task(chn.send(content))
+                                content = f"<@!{user_id}>, {num_invites} trainers need an invite to the raid! Use `!list invites` to see who needs an invite."
+                            self.bot.loop.create_task(chn.send(content, allowed_mentions=discord.AllowedMentions.none()))
                     if self.group_list:
-                        grp = self.user_grp(member.id)
-                        if not grp and status in ('coming', 'here', 'remote') and not self.user_was_invited(member.id):
-                            return await self.raidgroup_ask(chn, member.id)
+                        grp = self.user_grp(user_id)
+                        if not grp and status in ('coming', 'here', 'remote') and not self.user_was_invited(user_id):
+                            return await self.raidgroup_ask(chn, user_id)
         elif user_id and group and not self.user_was_invited(user_id):
             if self.channel_ids:
                 for chnid in self.channel_ids:
@@ -1479,13 +1487,10 @@ class Raid:
                     if not chn:
                         continue
                     rsvpembed = RSVPEmbed.from_raidgroup(self, group).embed
-                    guild = self.bot.get_guild(self.guild_id)
-                    member = guild.get_member(user_id)
-                    content = f"{member.display_name} has joined Group {group['emoji']}!"
-                    await chn.send(content)
+                    content = f"<@!{user_id}> has joined Group {group['emoji']}!"
+                    await chn.send(content, allowed_mentions=discord.AllowedMentions.none())
                     await chn.send(embed=rsvpembed, delete_after=15)
-        
-    
+
     async def monitor_status(self):
         try:
             hatch = self.hatch
@@ -2075,8 +2080,7 @@ class Raid:
                 cancel_list.append(meowthuser)
         mention_list = []
         for user_id in int_list:
-            member = self.guild.get_member(user_id)
-            mention = member.mention
+            mention = f"<@!{user_id}>"
             mention_list.append(mention)
         self.pkmn = RaidBoss(Pokemon(self.bot, pkmn))
         family_id = await self.pkmn._familyId()
@@ -2195,12 +2199,11 @@ class Raid:
         else:
             sync = False
         await channel.edit(name=new_name, category=category, sync_permissions=sync)
-        member = guild.get_member(user_id)
-        content = f"Channel archive initiated by {member.display_name}."
+        content = f"Channel archive initiated by <@!{user_id}>."
         if reason:
             content += f" Reason: {reason}"
         content += "\nDeleted messages from this channel will be posted below."
-        await channel.send(content)
+        await channel.send(content, allowed_mentions=discord.AllowedMentions.none())
         try:
             table = self.bot.dbi.table('discord_messages')
             query = table.query
@@ -2419,6 +2422,8 @@ class Raid:
         lobby_count = 0
         for trainer in trainer_dict:
             member = self.guild.get_member(trainer)
+            if not member:
+                member = await self.guild.fetch_member(trainer)
             if tags:
                 name = member.mention
             else:
@@ -2477,7 +2482,7 @@ class Raid:
         while self.status != 'expired':
             invites = self.users_need_invite
             emoji = formatters.mc_emoji(len(invites))
-            invite_names = [self.guild.get_member(x).display_name for x in invites]
+            invite_names = [f"<@!{user_id}>" for user_id in invites]  # This will be used in an embed so not mentioned.
             display_dict = dict(zip(emoji, invite_names))
             choice_dict = dict(zip(emoji, invites))
             embed = formatters.mc_embed(display_dict)
@@ -2500,6 +2505,8 @@ class Raid:
         other_list = []
         for trainer in trainer_dict:
             member = self.guild.get_member(trainer)
+            if not member:
+                member = await self.guild.fetch_member(trainer)
             if not member:
                 continue
             if tags:
@@ -2547,6 +2554,8 @@ class Raid:
             for user in users:
                 member = self.guild.get_member(user)
                 if not member:
+                    member = await self.guild.fetch_member(user)
+                if not member:
                     continue
                 if tags:
                     name = member.mention
@@ -2572,6 +2581,8 @@ class Raid:
         boss_dict = {x: [] for x in boss_list}
         for trainer in trainer_dict:
             member = self.guild.get_member(trainer)
+            if not member:
+                member = await self.guild.fetch_member(trainer)
             if not member:
                 continue
             if tags:
@@ -2985,6 +2996,8 @@ class Train:
         other_list = []
         for trainer in trainer_dict:
             member = self.guild.get_member(trainer)
+            if not member:
+                member = await self.guild.fetch_member(trainer)
             name = member.display_name
             party = trainer_dict[trainer]['party']
             total = sum(party)
@@ -3179,14 +3192,13 @@ class Train:
             await msg.edit(embed=train_embed.embed)
         channel = self.channel
         guild = channel.guild
-        member = guild.get_member(user_id)
         if status == 'join':
             status_str = ' has joined the train!'
         elif status == 'cancel':
             status_str =' has left the train!'
-        content = f'{member.display_name}{status_str}'
+        content = f'<@!{user_id}>{status_str}'
         embed = TRSVPEmbed.from_train(self).embed
-        await channel.send(content)
+        await channel.send(content, allowed_mentions=discord.AllowedMentions.none())
         await channel.send(embed=embed, delete_after=15)
         if not self.trainer_dict:
             await self.end_train()
@@ -3242,12 +3254,11 @@ class Train:
         new_name = 'archived-' + old_name
         category = await archive_category(bot, guild)
         await channel.edit(name=new_name, category=category, sync_permissions=True)
-        member = guild.get_member(user_id)
-        content = f"Channel archive initiated by {member.display_name}."
+        content = f"Channel archive initiated by <@!{user_id}>."
         if reason:
             content += f" Reason: {reason}"
         content += "\nDeleted messages from this channel will be posted below."
-        await channel.send(content)
+        await channel.send(content, allowed_mentions=discord.AllowedMentions.none())
         table = self.bot.dbi.table('discord_messages')
         query = table.query
         query.where(channel_id=channel.id)
@@ -3511,6 +3522,8 @@ class RaidEmbed():
         else:
             fields['Groups'] = grps_str
         reporter = raid.guild.get_member(raid.reporter_id)
+        if not reporter:
+            reporter = await raid.guild.fetch_member(raid.reporter_id)
         if reporter:
             reporter = reporter.display_name
         footer = f"Reported by {reporter} • {raid.time_str} (not updated)"
@@ -3698,6 +3711,8 @@ class EggEmbed():
         grps_str = raid.grps_str + "\u200b"
         fields['Groups'] = (False, grps_str)
         reporter = raid.guild.get_member(raid.reporter_id)
+        if not reporter:
+            reporter = await raid.guild.fetch_member(raid.reporter_id)
         if reporter:
             reporter = reporter.display_name
         footer_text = f"Reported by {reporter} • {raid.time_str} (not updated)"

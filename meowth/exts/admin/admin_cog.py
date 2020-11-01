@@ -8,6 +8,7 @@ import re
 import pickle
 from typing import Union
 
+
 def do_template(message, author, guild):
     not_found = []
 
@@ -30,21 +31,24 @@ def do_template(message, author, guild):
             member = guild.get_member_named(match)
             if match.isdigit() and (not member):
                 member = guild.get_member(int(match))
-            if (not member):
+                if not member:
+                    # TODO
+                    pass
+            if not member:
                 not_found.append(full_match)
             return member.mention if member else full_match
         elif match_type == '#':
             channel = discord.utils.get(guild.text_channels, name=match)
             if match.isdigit() and (not channel):
                 channel = guild.get_channel(int(match))
-            if (not channel):
+            if not channel:
                 not_found.append(full_match)
             return channel.mention if channel else full_match
         elif match_type == '&':
             role = discord.utils.get(guild.roles, name=match)
             if match.isdigit() and (not role):
                 role = discord.utils.get(guild.roles, id=int(match))
-            if (not role):
+            if not role:
                 not_found.append(full_match)
             return role.mention if role else full_match
     template_pattern = '(?i){(@|#|&|<)([^{}]+)}|{(user|server)}|<*:([a-zA-Z0-9]+):[0-9]*>*'
@@ -560,8 +564,10 @@ class AdminCog(Cog):
         if 'forecast' in enabled_commands:
             g = ctx.bot.get_guild(344960572649111552)
             gm = g.get_member(ctx.author.id)
+            if not gm:
+                gm = await g.fetch_member(ctx.author.id)
             r = g.get_role(616734835104546826)
-            if not r in gm.roles:
+            if r not in gm.roles:
                 content = 'Unfortunately, because of the cost of using the AccuWeather API, you must be a Meowth Patreon Super Nerd to enable in-game weather forecasts. Visit www.patreon.com/meowthbot to become a Patron!'
                 await ctx.send(content)
             else:

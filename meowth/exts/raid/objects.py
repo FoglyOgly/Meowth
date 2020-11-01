@@ -1463,7 +1463,7 @@ class Raid:
                     if self.user_was_invited(user_id):
                         inviter_id = self.user_who_invited(user_id)
                         content = f"<@!{inviter_id}> is inviting <@!{user_id}> to the raid!"
-                    await chn.send(content, allowed_mentioned=discord.AllowedMentions.none())
+                    await chn.send(content, allowed_mentions=discord.AllowedMentions.none())
                     await chn.send(embed=rsvpembed, delete_after=15)
                     if status == 'invite':
                         self.bot.loop.create_task(self.invite_ask(user_id))

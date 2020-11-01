@@ -1378,6 +1378,8 @@ class Raid:
                 ign_str = "In-game: Unknown"
             content += f"\n{member.display_name} - {ign_str}"
         inviter = self.guild.get_member(user_id)
+        if not inviter:
+            inviter = await self.guild.fetch_member(user_id)
         await inviter.send(content)
     
 

@@ -32,8 +32,7 @@ def do_template(message, author, guild):
             if match.isdigit() and (not member):
                 member = guild.get_member(int(match))
                 if not member:
-                    # TODO
-                    pass
+                    return f"<@{match}>"
             if not member:
                 not_found.append(full_match)
             return member.mention if member else full_match

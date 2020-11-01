@@ -668,8 +668,7 @@ class Raid:
     def reporter(self):
         reporter = self.guild.get_member(self.reporter_id)
         if not reporter:
-            # TODO
-            pass
+            return None
         return reporter
 
     @property

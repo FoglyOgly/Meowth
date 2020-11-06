@@ -209,7 +209,13 @@ class Want():
             if not role:
                 guild = self.guild
                 users = await self._users()
-                members = [await guild.fetch_member(x) for x in users]  # Role creation isn't common, so API call is ok.
+                members = []
+                for x in users:
+                    try:
+                        member = await guild.fetch_member(x)
+                    except:
+                        continue
+                    members.append(member)
                 members = [x for x in members if x]
                 raid_tiers = ['1', '2', '3', '4', '5', 'EX', 'MEGA']
                 if self.want.startswith('FAMILY'):

@@ -23,6 +23,7 @@ class ReportChannelMap:
             folium.Marker(coords, tooltip=name).add_to(m)
         return m
 
+    @property
     def url(self):
         return f"https://meowthbot.com/map/{self.report_channel.channel.id}"
 

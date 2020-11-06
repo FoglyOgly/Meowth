@@ -45,7 +45,7 @@ class WebmapCog(Cog):
 
     async def run(self):
         app = web.Application()
-        app.add_routes([web.get('/map/{channel_id}', )])
+        app.add_routes([web.get('/map/{channel_id}', serve_map)])
         runner = web.AppRunner(app)
         await runner.setup()
         site = web.TCPSite(runner, '0.0.0.0', 3001)

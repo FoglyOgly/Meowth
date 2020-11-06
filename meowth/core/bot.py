@@ -80,6 +80,7 @@ class Bot(commands.AutoShardedBot):
         intents.members = True
         intents.messages = True
         intents.reactions = True
+        self.chunk_processes = {}
         kwargs = dict(owner_id=self.owner,
                       command_prefix=self.dbi.prefix_manager,
                       status=discord.Status.dnd, case_insensitive=True,
@@ -229,9 +230,17 @@ class Bot(commands.AutoShardedBot):
         ctx = await self.get_context(message, cls=Context)
         if not ctx.command:
             return
-        guild_version = await ctx.version()
-        if guild_version == self.version or ctx.command.name in ['importconfig', 'configure', 'enable']:
-            await self.invoke(ctx)
+        await self.chunk(ctx.guild)
+        await self.invoke(ctx)
+    
+    async def chunk(self, guild):
+        if not guild.chunked:
+            chunk_task = self.chunk_processes.get(guild.id)
+            if not chunk_task:
+                chunk_task = self.loop.create_task(guild.chunk())
+                self.chunk_processes[guild.id] = chunk_task
+            await chunk_task
+            self.chunk_processes.pop(guild.id, None)
 
     def match(self, data_list, item):
         result = fuzzymatch.get_match(data_list, item)[0]

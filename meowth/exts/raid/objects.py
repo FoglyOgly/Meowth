@@ -1461,11 +1461,21 @@ class Raid:
                         display_status = 'has canceled'
                     else:
                         break
-                    content = f"<@!{user_id}> {display_status}!"
+                    user = guild.get_member(user_id)
+                    if user:
+                        user_content = user.display_name
+                    else:
+                        user_content = f"<@!{user_id}>"
+                    content = f"{user_content} {display_status}!"
                     if self.user_was_invited(user_id):
                         inviter_id = self.user_who_invited(user_id)
-                        content = f"<@!{inviter_id}> is inviting <@!{user_id}> to the raid!"
-                    await chn.send(content, allowed_mentions=discord.AllowedMentions.none())
+                        inviter = guild.get_member(inviter_id)
+                        if inviter:
+                            inviter_content = inviter.display_name
+                        else:
+                            inviter_content = f"<@!{inviter_id}>"
+                        content = f"{inviter_content} is inviting {user_content} to the raid!"
+                    await chn.send(content)
                     await chn.send(embed=rsvpembed, delete_after=15)
                     if status == 'invite':
                         self.bot.loop.create_task(self.invite_ask(user_id))
@@ -1473,10 +1483,10 @@ class Raid:
                         if self.users_need_invite:
                             num_invites = len(self.users_need_invite)
                             if num_invites == 1:
-                                content = f"<@!{user_id}>, one trainer needs an invite to the raid! Use `!list invites` to see who needs an invite."
+                                content = f"{user_content}, one trainer needs an invite to the raid! Use `!list invites` to see who needs an invite."
                             else:
-                                content = f"<@!{user_id}>, {num_invites} trainers need an invite to the raid! Use `!list invites` to see who needs an invite."
-                            self.bot.loop.create_task(chn.send(content, allowed_mentions=discord.AllowedMentions.none()))
+                                content = f"{user_content}, {num_invites} trainers need an invite to the raid! Use `!list invites` to see who needs an invite."
+                            self.bot.loop.create_task(chn.send(content))
                     if self.group_list:
                         grp = self.user_grp(user_id)
                         if not grp and status in ('coming', 'here', 'remote') and not self.user_was_invited(user_id):

@@ -1311,10 +1311,15 @@ class Raid:
             for chnid in self.channel_ids:
                 chn = self.bot.get_channel(int(chnid))
         if chn:
+            member = self.guild.get_member(user_id)
+            if not member:
+                member_content = f"<@!{user_id}>"
+            else:
+                member_content = member.display_name
             if not users_can_invite:
-                content = f"<@!{user_id}>, there isn't anyone at the raid who can invite you yet! You may need to check back later as others RSVP."
+                content = f"{member_content}, there isn't anyone at the raid who can invite you yet! You may need to check back later as others RSVP."
                 return await chn.send(content, allowed_mentions=discord.AllowedMentions.none())
-            content = f"If you are going to do the raid and plan to invite <@!{user_id}>, hit the ✉ below!"
+            content = f"If you are going to do the raid and plan to invite {member_content}, hit the ✉ below!"
             msg = await chn.send(content, allowed_mentions=discord.AllowedMentions.none())
             payload = await formatters.ask(self.bot, [msg], user_list=users_can_invite, react_list=['✉'])
             if payload:

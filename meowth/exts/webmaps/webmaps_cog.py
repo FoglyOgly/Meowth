@@ -49,6 +49,7 @@ class WebmapCog(Cog):
         runner = web.AppRunner(app)
         await runner.setup()
         site = web.TCPSite(runner, '0.0.0.0', 3000)
+        await site.start()
 
     
     @command(name='showmap')

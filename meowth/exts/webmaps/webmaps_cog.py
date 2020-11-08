@@ -48,7 +48,7 @@ class WebmapCog(Cog):
         app.add_routes([web.get('/map/{channel_id}', self.serve_map)])
         runner = web.AppRunner(app)
         await runner.setup()
-        site = web.TCPSite(runner, '0.0.0.0', 3001)
+        site = web.TCPSite(runner, '0.0.0.0', 3000)
 
     
     @command(name='showmap')

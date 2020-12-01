@@ -94,6 +94,20 @@ class Tutorial(Cog):
                     d[key] = row[key]
         return d
 
+    async def guild_timezone(self, guild):
+        # Default timezone
+        timezone = 'Etc/UTC'
+        # Get the guild's timezone if it exists.
+        report_channel_table = self.bot.dbi.table('report_channels')
+        query = report_channel_table.query
+        query.where(guild_id=guild.id)
+        query.select('timezone')
+        data = await query.get()
+        for row in data:
+            if row['timezone']:
+                timezone = row['timezone']
+        return timezone
+
     async def want_tutorial(self, ctx):
 
         await ctx.tutorial_channel.send(
@@ -227,7 +241,7 @@ class Tutorial(Cog):
             f"Try expressing interest in this raid!\n\n"
             f"Ex: `{prefix}interested 5 m3 i1 v1` would mean 5 trainers: "
             "3 Mystic, 1 Instinct, 1 Valor\n"
-            "Alternatively, you may use the :thinking: reaction to express interest. "
+            "Alternatively, you may use the 🙋 reaction to express interest. "
             "I will automatically use the party totals from your last RSVP if you use the reaction.")
 
         # wait for interested status update
@@ -337,9 +351,7 @@ class Tutorial(Cog):
             "than the recommended group size for the boss, or if your group is larger "
             "than 20 trainers, or if you are starting the raid when the trainers "
             "who are still on the way to the raid won't be able to take the boss on "
-            "their own, I will alert you to those circumstances and ask you to confirm "
-            "that you want to begin the raid. You can use a reaction to either cancel "
-            "the raid start or to go ahead.")
+            "their own, I will alert you to those circumstances.")
 
         # wait for starting command completion
         try:
@@ -384,13 +396,17 @@ class Tutorial(Cog):
 
         await ctx.tutorial_channel.send(
             f"This server utilizes the **{ctx.prefix}research** command to "
-            "report field research tasks! There are three ways to use this "
+            "report field research tasks! There are multiple ways to use this "
             f"command: **{ctx.prefix}research <location>** will start an interactive "
             "session where I will prompt you for the task category, specific task, and "
             "reward of the research task. You can also use "
             f"**{ctx.prefix}research <task_category> <location>** to "
-            "skip the first prompt. Finally, you can use "
-            f"**{ctx.prefix}research <task> <location> to skip to the reward prompt. "
+            "skip the first prompt. Or you can use "
+            f"**{ctx.prefix}research <task> <location>** to skip to the reward prompt. "
+            "Alternatively, you can use "
+            f"**{ctx.prefix}research <reward> <location>** to skip to the task prompt. "
+            "Finally, you can use "
+            f"**{ctx.prefix}research <reward> <task> <location>** to skip all prompts. "
             "At each step, I will try to match your task and reward input with known "
             "Field Research tasks, Pokemon, or items. To input the task category as "
             "a shortcut, use single words like `raid` or `catch`.\n\n"
@@ -404,6 +420,7 @@ class Tutorial(Cog):
             # acknowledge and wait a second before continuing
             await ctx.tutorial_channel.send("Great job!")
             await asyncio.sleep(1)
+            return True
 
         # if no response for 5 minutes, close tutorial
         except asyncio.TimeoutError:
@@ -479,6 +496,10 @@ class Tutorial(Cog):
         d['category_3'] = 'message'
         d['category_4'] = 'message'
         d['category_5'] = 'message'
+        d['category_ex'] = 'message'
+        d['lat'] = -90
+        d['lon'] = 0
+        d['radius'] = 1
         enabled = [x for x in d if d[x] is True]
         report_channel_table = ctx.bot.dbi.table('report_channels')
         insert = report_channel_table.insert
@@ -565,6 +586,15 @@ class Tutorial(Cog):
              f"you! Continue in {ctx.tutorial_channel.mention}"),
             delete_after=20.0)
 
+        # set tutorial settings
+        d = {
+            'channelid': ctx.tutorial_channel.id,
+            'users': True
+        }
+        report_channel_table = ctx.bot.dbi.table('report_channels')
+        insert = report_channel_table.insert
+        insert.row(**d)
+        await insert.commit()
 
         await ctx.tutorial_channel.send(
             f"Hi {ctx.author.mention}! I'm Meowth, a Discord helper bot for "
@@ -610,6 +640,19 @@ class Tutorial(Cog):
              f"you! Continue in {ctx.tutorial_channel.mention}"),
             delete_after=20.0)
 
+        # set tutorial settings
+        d = {
+            'channelid': ctx.tutorial_channel.id,
+            'wild': True,
+            'city': 'Antarctica',
+            'lat': -90,
+            'lon': 0,
+            'radius': 1
+        }
+        report_channel_table = ctx.bot.dbi.table('report_channels')
+        insert = report_channel_table.insert
+        insert.row(**d)
+        await insert.commit()
 
         await ctx.tutorial_channel.send(
             f"Hi {ctx.author.mention}! I'm Meowth, a Discord helper bot for "
@@ -655,6 +698,27 @@ class Tutorial(Cog):
              f"you! Continue in {ctx.tutorial_channel.mention}"),
             delete_after=20.0)
 
+        # set tutorial settings
+        timezone = await self.guild_timezone(guild)
+        d = {
+            'channelid': ctx.tutorial_channel.id,
+            'raid': True,
+            'city': 'Antarctica',
+            'timezone': timezone,
+            'lat': -90,
+            'lon': 0,
+            'radius': 1,
+            'category_1': 'message',
+            'category_2': 'message',
+            'category_3': 'message',
+            'category_4': 'message',
+            'category_5': 'message',
+            'category_ex': 'message'
+        }
+        report_channel_table = ctx.bot.dbi.table('report_channels')
+        insert = report_channel_table.insert
+        insert.row(**d)
+        await insert.commit()
 
         await ctx.tutorial_channel.send(
             f"Hi {ctx.author.mention}! I'm Meowth, a Discord helper bot for "
@@ -700,6 +764,21 @@ class Tutorial(Cog):
              f"you! Continue in {ctx.tutorial_channel.mention}"),
             delete_after=20.0)
 
+        # set tutorial settings
+        timezone = await self.guild_timezone(guild)
+        d = {
+            'channelid': ctx.tutorial_channel.id,
+            'research': True,
+            'city': 'Antarctica',
+            'timezone': timezone,
+            'lat': -90,
+            'lon': 0,
+            'radius': 1
+        }
+        report_channel_table = ctx.bot.dbi.table('report_channels')
+        insert = report_channel_table.insert
+        insert.row(**d)
+        await insert.commit()
 
         await ctx.tutorial_channel.send(
             f"Hi {ctx.author.mention}! I'm Meowth, a Discord helper bot for "
@@ -715,6 +794,9 @@ class Tutorial(Cog):
                 "This channel will be deleted in ten seconds.")
             await asyncio.sleep(10)
         finally:
+            query = report_channel_table.query
+            query.where(channelid=ctx.tutorial_channel.id)
+            await query.delete()
             await ctx.tutorial_channel.delete()
 
     @tutorial.command()
@@ -741,6 +823,16 @@ class Tutorial(Cog):
             ("Meowth! I've created a private tutorial channel for "
              f"you! Continue in {ctx.tutorial_channel.mention}"),
             delete_after=20.0)
+
+        # set tutorial settings
+        d = {
+            'channelid': ctx.tutorial_channel.id,
+            'users': True
+        }
+        report_channel_table = ctx.bot.dbi.table('report_channels')
+        insert = report_channel_table.insert
+        insert.row(**d)
+        await insert.commit()
 
         await ctx.tutorial_channel.send(
             f"Hi {ctx.author.mention}! I'm Meowth, a Discord helper bot for "

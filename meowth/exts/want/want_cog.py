@@ -8,6 +8,7 @@ from .errors import *
 import discord
 from discord.ext import commands
 
+
 class Item:
 
     def __init__(self, bot, item_id):
@@ -56,7 +57,7 @@ class Item:
         elif len(item_matches) == 1:
             item = item_matches[0]
         else:
-            return PartialItem(ctx.bot, arg)
+            return None
         return cls(ctx.bot, item)
 
 class PartialItem:
@@ -92,7 +93,10 @@ class Want():
     def _data(self):
         want_table = self.bot.dbi.table('wants')
         query = want_table.query()
-        query.where(guild=self.guildid, want=self.want)
+        try:
+            query.where(guild=self.guildid, want=self.want)
+        except:
+            return None
         return query
     
     @property
@@ -111,71 +115,69 @@ class Want():
     
     async def _users(self):
         _data = self._data
+        if not _data:
+            return []
         _data.select('users')
         users = await _data.get_value()
         if not users:
             users = []
         return users
     
-    async def add_user(self, user_id):
+    async def add_user(self, user):
         users = await self._users()
         if not users:
             insert = self._insert
             await insert.commit(do_update=True)
             users = []
-        if user_id not in users:
-            users.append(user_id)
+        if user.id not in users:
+            users.append(user.id)
             update = self._update
             update.values(users=users)
             await update.commit()
             role = await self.role()
             if role:
-                member = self.guild.get_member(user_id)
-                if role not in member.roles:
-                    await member.add_roles(role)
-            else:
-                return 'dm'
+                if role not in user.roles:
+                    await user.add_roles(role)
             return 'success'
         else:
             return 'already done'
     
-    async def remove_user(self, user_id):
+    async def remove_user(self, user):
         users = await self._users()
         if not users:
             return 'already done'
-        if user_id not in users:
+        if user.id not in users:
             return 'already done'
-        users.remove(user_id)
+        users.remove(user.id)
         update = self._update
         update.values(users=users)
         await update.commit()
         role = await self.role()
         if role:
-            member = self.guild.get_member(user_id)
-            if role in member.roles:
-                await member.remove_roles(role)
+            if role in user.roles:
+                await user.remove_roles(role)
         return 'success'
     
-    async def notify_users(self, content, embed, author=None):
-        msgs = []
-        users = await self._users()
-        guild = self.guild
-        members = [guild.get_member(x) for x in users]
-        for member in members:
-            if member == author:
-                continue
-            try:
-                msg = await member.send(content, embed=embed)
-                msgs.append(f"{msg.channel.id}/{msg.id}")
-            except:
-                pass
-        return msgs
+#    async def notify_users(self, content, embed, author=None):
+#        msgs = []
+#        users = await self._users()
+#        guild = self.guild
+#        members = [guild.get_member(x) for x in users]
+#        for member in members:
+#            if member == author:
+#                continue
+#            try:
+#                msg = await member.send(content, embed=embed)
+#                msgs.append(f"{msg.channel.id}/{msg.id}")
+#            except:
+#                pass
+#        return msgs
 
     async def is_role(self):
         users = await self._users()
         if not users:
             return False
-        if len(users) > 10:
+        if len(users) > 5:
             return True
         else:
             _data = self._data
@@ -188,6 +190,9 @@ class Want():
                         await role.delete()
                     except:
                         pass
+                _update = self._update
+                _update.values(role=None)
+                await _update.commit()
             return False
         
     async def role(self):
@@ -198,13 +203,21 @@ class Want():
             _data = self._data
             _data.select('role')
             roleid = await _data.get_value()
+            role = None
             if roleid:
                 role = self.guild.get_role(roleid)
-            else:
+            if not role:
                 guild = self.guild
                 users = await self._users()
-                members = [guild.get_member(x) for x in users]
-                raid_tiers = ['1', '2', '3', '4', '5', 'EX']
+                members = []
+                for x in users:
+                    try:
+                        member = await guild.fetch_member(x)
+                    except:
+                        continue
+                    members.append(member)
+                members = [x for x in members if x]
+                raid_tiers = ['1', '2', '3', '4', '5', 'EX', 'MEGA']
                 if self.want.startswith('FAMILY'):
                     pokemon_table = self.bot.dbi.table('pokemon')
                     pokemon_query = pokemon_table.query('pokemonid')
@@ -218,8 +231,17 @@ class Want():
                         role = await guild.create_role(name=name, mentionable=True)
                     except:
                         return None
-                elif self.want in raid_tiers:
-                    name = "Tier " + self.want
+                elif self.want.upper() in raid_tiers:
+                    if self.want.lower() == 'mega':
+                        name = "Mega"
+                    else:
+                        name = "Tier " + self.want.upper()
+                    try:
+                        role = await guild.create_role(name=name, mentionable=True)
+                    except:
+                        return None
+                elif self.want.lower() == 'exgym':
+                    name = 'EX Raid Gym'
                     try:
                         role = await guild.create_role(name=name, mentionable=True)
                     except:
@@ -233,7 +255,7 @@ class Want():
                 else:
                     items_table = self.bot.dbi.table('item_names')
                     name_query = items_table.query('name')
-                    name_query.where(itemid=self.want, language_id=9)
+                    name_query.where(item_id=self.want, language_id=9)
                     name = await name_query.get_value()
                     try:
                         role = await guild.create_role(name=name, mentionable=True)
@@ -246,11 +268,32 @@ class Want():
                     await member.add_roles(role)
             return role
     
+    async def mention(self):
+        role = await self.role()
+        if role:
+            return role.mention
+        users = await self._users()
+        if not users:
+            return None
+        mentions = [f"<@!{user_id}>" for user_id in users]
+        mention_str = " ".join(mentions)
+        return mention_str
+        
     @classmethod
     async def convert(cls, ctx, arg):
         arg = arg.lower()
-        tiers = ['1', '2', '3', '4', '5', 'ex', 'exgym']
+        if arg == 'rocket':
+            return cls(ctx.bot, arg, ctx.guild.id)
+        leaders = ['arlo', 'cliff', 'sierra', 'giovanni']
+        if arg in leaders:
+            return cls(ctx.bot, arg, ctx.guild.id)
+        lures = ['glacial', 'mossy', 'magnetic']
+        if arg in lures:
+            return cls(ctx.bot, arg, ctx.guild.id)
+        tiers = ['1', '2', '3', '4', '5', 'ex', 'exgym', 'mega', 'm']
         if arg in tiers:
+            if arg == 'm':
+                arg = 'mega'
             return cls(ctx.bot, arg, ctx.guild.id)
         try:
             pkmn = await Pokemon.convert(ctx, arg)
@@ -283,30 +326,27 @@ class WantCog(Cog):
     @want_checks.want_enabled()
     async def want(self, ctx, wants: commands.Greedy[Want]):
         added_wants = []
-        dm_subs = []
+        already = []
         for want in wants:
-            status = await want.add_user(ctx.author.id)
+            status = await want.add_user(ctx.author)
             if status == 'already done':
+                already.append(want.want)
                 continue
-            elif status == 'dm':
-                dm_subs.append(want.want)
             added_wants.append(want.want)
-        if dm_subs:
-            try:
-                content = 'I will notify you about these wants via direct message for the time being, so please make sure you can receive DMs from me!'
-                content += "\n"
-                content += "\n".join(dm_subs)
-                await ctx.author.send(content)
-            except:
-                await ctx.warning('DM Test Failed', details=content)
+        if not added_wants:
+            if already:
+                return await ctx.success('Already Added', details="\n".join(already))
+            return await ctx.error('No Valid Wants Found')
         await ctx.success(title="Wants Added", details="\n".join(added_wants))
+        if already:
+            await ctx.success(title="Already Added", details="\n".join(already))
     
     @command()
     @want_checks.want_enabled()
     async def unwant(self, ctx, wants: commands.Greedy[Want]):
         removed_wants = []
         for want in wants:
-            status = await want.remove_user(ctx.author.id)
+            status = await want.remove_user(ctx.author)
             if status == 'already done':
                 continue
             removed_wants.append(want.want)

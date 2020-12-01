@@ -54,8 +54,8 @@ class ErrorHandler(Cog):
             fields = {
                 'Missing Arguments': "\n".join(missing_args(ctx))
             }
-            await ctx.error(title="Error: Missing Required Arguments",
-                details="Reply to this message with the missing arguments!", fields=fields)
+            await ctx.warning(title="Warning: Missing Required Arguments",
+                details="Reply to this message with the missing arguments listed below!", fields=fields)
             def check(m):
                 return m.author == ctx.author and m.channel == ctx.channel
             reply = await ctx.bot.wait_for('message', check=check)

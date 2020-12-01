@@ -4,6 +4,7 @@ import discord
 from meowth.utils.fuzzymatch import get_match, get_matches
 from meowth.utils import formatters
 import pywraps2 as s2
+from staticmap import StaticMap, Line
 import aiohttp
 import asyncio
 import datetime
@@ -12,10 +13,12 @@ import pytz
 from pytz import timezone
 import io
 import codecs
-from math import radians, degrees
+from math import radians, degrees, sqrt, ceil
 import csv
 from urllib.parse import quote_plus
 import googlemaps
+import re
+import requests
 from typing import List
 import tempfile
 
@@ -23,6 +26,7 @@ from .map_info import gmaps_api_key
 from .errors import *
 
 gmaps = googlemaps.Client(key=gmaps_api_key)
+
 
 class ReportChannel():
     def __init__(self, bot, channel):
@@ -45,7 +49,7 @@ class ReportChannel():
             record = record[0]
         else:
             return None
-        if not record['lat'] or not record['lon']:
+        if record['lat'] is None or record['lon'] is None:
             return None
         return (float(record['lat']), float(record['lon']))
 
@@ -106,7 +110,6 @@ class ReportChannel():
             return False
         return cell.cellid in covering
 
-    
     async def level_10_covering(self):
         cap = await self.s2_cap()
         if not cap:
@@ -188,6 +191,13 @@ class ReportChannel():
         query_args = [f'{channel_id}%']
         data = await self.bot.dbi.execute_query(query, *query_args)
         return [next(row.values()) for row in data]
+
+    async def get_all_rockets(self):
+        channel_id = self.channel.id
+        query = f"SELECT id FROM rockets WHERE exists (SELECT * FROM (SELECT unnest(messages)) x(message) WHERE x.message LIKE $1) ORDER BY created ASC;"
+        query_args = [f'{channel_id}%']
+        data = await self.bot.dbi.execute_query(query, *query_args)
+        return [next(row.values()) for row in data]
     
     async def get_raid_lists(self):
         lat, lon = await self.center_coords()
@@ -198,7 +208,8 @@ class ReportChannel():
             "4": {},
             "5": {},
             "6": {},
-            "EX": {}
+            "EX": {},
+            "7": {}
         }
         table = self.bot.dbi.table('raid_bosses')
         query = table.query
@@ -231,10 +242,19 @@ class ReportChannel():
             raid_lists[level][boss_id] = d
         return raid_lists
 
-    
-
-
-        
+    async def get_map(self):
+        covering = await self.level_10_covering()
+        cells = [S2_L10(self.bot, x) for x in covering]
+        approx_width = sqrt(len(cells))
+        px_dim = 100*ceil(approx_width)
+        lines = []
+        for x in cells:
+            lines.extend(x.get_border())
+        url_template = 'https://a.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}.png'
+        m = StaticMap(px_dim, ceil(px_dim*1.2), 5, ceil(px_dim/10), url_template)
+        for l in lines:
+            m.add_line(l)
+        return m, cells
 
 
 class S2_L10():
@@ -267,15 +287,19 @@ class S2_L10():
         async with aiohttp.ClientSession() as session:
             async with session.get(url, params=params) as resp:
                 data = await resp.json()
-                place_id = data[0]['Key']
+                try:
+                    place_id = data[0]['Key']
+                except:
+                    print(data)
+                    return None
                 return place_id
 
-
-    async def weather(self):
-        weather_query = self.bot.dbi.table('weather_forecasts').query()
+    async def weather(self, guild_id):
+        weather_query = self.bot.dbi.table('current_weather').query()
         col = "current_weather"
         try:
             weather_query.select(col).where(cellid=self.cellid)
+            weather_query.where(guild_id=guild_id)
             weather = await weather_query.get_value()
         except:
             return "NO_WEATHER"
@@ -283,32 +307,87 @@ class S2_L10():
             return "NO_WEATHER"
         return weather
     
-    async def correct_weather(self, weather):
-        weather_table = self.bot.dbi.table('weather_forecasts')
-        query = weather_table.query
+    async def pull_hour(self, guild_id):
+        query = self.bot.dbi.table('current_weather').query('pull_hour')
+        try:
+            query.where(cellid=self.cellid)
+            query.where(guild_id=guild_id)
+            pull_hour = await query.get_value()
+        except:
+            pull_hour = 0
+        if not pull_hour:
+            pull_hour = 0
+        return pull_hour
+    
+    async def forecast(self, guild_id):
+        pull_hour = await self.pull_hour(guild_id)
+        table = self.bot.dbi.table('weather_forecasts')
+        query = table.query
         query.where(cellid=self.cellid)
+        query.where(pull_hour=pull_hour)
+        data = await query.get()
+        if not data:
+            return None
+        d = dict(data[0])
+        f = {}
+        current_hour = datetime.datetime.utcnow().hour % 8
+        if pull_hour < current_hour:
+            end = pull_hour + 8
+        else:
+            end = pull_hour
+        hours = list(range(current_hour, end+1))
+        hours = [x % 8 for x in hours]
+        for i in range(len(hours)):
+            f[i] = d[f'forecast_{hours[i]}']
+        return f
+
+    
+    async def correct_weather(self, weather, guild_id):
+        table = self.bot.dbi.table('current_weather')
+        query = table.query
+        query.where(cellid=self.cellid)
+        query.where(guild_id=guild_id)
         data = await query.get()
         if not data:
             d = {
                 'cellid': self.cellid,
-                'forecast_0': "NO_WEATHER",
-                'forecast_1': "NO_WEATHER",
-                'forecast_2': "NO_WEATHER",
-                'forecast_3': "NO_WEATHER",
-                'forecast_4': "NO_WEATHER",
-                'forecast_5': "NO_WEATHER",
-                'forecast_6': "NO_WEATHER",
-                'forecast_7': "NO_WEATHER",
-                'forecast_8': "NO_WEATHER",
-                'forecast_9': "NO_WEATHER",
-                'forecast_10': "NO_WEATHER",
-                'forecast_11': "NO_WEATHER",
-                'current_weather': weather
+                'guild_id': guild_id,
+                'current_weather': weather,
+                'forecast': False,
             }
         else:
             d = dict(data[0])
+            if d['current_weather'] == weather:
+                return
             d['current_weather'] = weather
-        insert = weather_table.insert
+            if d['forecast']:
+                forecast_table = self.bot.dbi.table('weather_forecasts')
+                query = forecast_table.query('pull_hour')
+                try:
+                    query.where(cellid=self.cellid)
+                    query.where(current_weather=weather)
+                    hour = await query.get_value()
+                except:
+                    hour = 0
+                if not hour:
+                    hour = 0
+                d['pull_hour'] = hour
+                del_update = forecast_table.update
+                del_update.where(cellid=self.cellid)
+                del_update.where(forecast_table['current_weather']!=weather)
+                del_update.values(
+                    forecast_0=None,
+                    forecast_1=None,
+                    forecast_2=None,
+                    forecast_3=None,
+                    forecast_4=None,
+                    forecast_5=None,
+                    forecast_6=None,
+                    forecast_7=None,
+                    current_weather=None
+                )
+                await del_update.commit()
+        insert = table.insert
         insert.row(**d)
         await insert.commit(do_update=True)
 
@@ -327,6 +406,32 @@ class S2_L10():
         query.where(raid_table['gym'].in_(gyms))
         raids = await query.get_values()
         return raids
+    
+    def get_vertices(self):
+        cellid = int(self.cellid, base=16)
+        cell = s2.S2Cell(s2.S2CellId(cellid))
+        loop = s2.S2Loop(cell)
+        v0 = loop.GetS2LatLngVertex(0)
+        v0 = [v0.lat().degrees(), v0.lng().degrees()]
+        v1 = loop.GetS2LatLngVertex(1)
+        v1 = [v1.lat().degrees(), v1.lng().degrees()]
+        v2 = loop.GetS2LatLngVertex(2)
+        v2 = [v2.lat().degrees(), v2.lng().degrees()]
+        v3 = loop.GetS2LatLngVertex(3)
+        v3 = [v3.lat().degrees(), v3.lng().degrees()]
+        return [v0, v1, v2, v3]
+    
+    def get_border(self):
+        vs = self.get_vertices()
+        vs = [[x[1], x[0]] for x in vs]
+        l1 = Line([vs[0], vs[1]], 'darkgray', 1)
+        l2 = Line([vs[1], vs[2]], 'darkgray', 1)
+        l3 = Line([vs[2], vs[3]], 'darkgray', 1)
+        l4 = Line([vs[3], vs[0]], 'darkgray', 1)
+        return [l1, l2, l3, l4]
+    
+
+
 
 class S2_L12():
     def __init__(self, bot, cellid):
@@ -345,7 +450,6 @@ class S2_L12():
         cellid = int(self.cellid, base=16)
         center_coords = s2.S2LatLng(s2.S2CellId(cellid).ToPoint())
         return center_coords
-
 
 
 class POI():
@@ -397,7 +501,6 @@ class POI():
             return ''
         prefix = "https://www.google.com/maps/dir/?api=1&"
         prefix += f"destination={lat},{lon}"
-        prefix += "&dir_action=navigate"
         return prefix
     
     async def address(self):
@@ -420,13 +523,15 @@ class POI():
     async def weather(self):
         L10id = await self._L10()
         L10 = S2_L10(self.bot, L10id)
-        weather = await L10.weather()
+        guild_id = await self._guildid()
+        weather = await L10.weather(guild_id)
         return weather
     
     async def correct_weather(self, weather):
         L10id = await self._L10()
         L10 = S2_L10(self.bot, L10id)
-        await L10.correct_weather(weather)
+        guild_id = await self._guildid()
+        await L10.correct_weather(weather, guild_id)
     
     async def get_all_channels(self, cmd, level=None):
         report_table = self.bot.dbi.table('report_channels')
@@ -441,22 +546,115 @@ class POI():
             query.where(wild=True)
         elif cmd == 'research':
             query.where(research=True)
+        elif cmd == 'rocket':
+            query.where(rocket=True)
         channelid_list = await query.get_values()
         channel_list = [ReportChannel(self.bot, self.bot.get_channel(x)) for x in channelid_list if self.bot.get_channel(x)]
         gym_channels = [y for y in channel_list if await y.point_in_channel(coords)]
         return gym_channels
+
+    @classmethod
+    async def get_location_match(cls, ctx, arg, gym_data, stop_data):
+        if gym_data and not stop_data:
+            locations_name = 'Gyms'
+        elif stop_data and not gym_data:
+            locations_name = 'Pokestops'
+        else:
+            locations_name = "locations"
+
+        nick_list = []
+        for x in gym_data:
+            if x.get('nickname'):
+                nick_list.append((x['nickname'], x['id'], True))  # third value is_gym
+            else:
+                continue
+        for x in stop_data:
+            if x.get('nickname'):
+                nick_list.append((x['nickname'], x['id'], False))  # third value is_gym
+            else:
+                continue
+        if nick_list:
+            nicks = [x[0] for x in nick_list]
+            nick_matches = get_matches(nicks, arg)
+            if nick_matches:
+                nick_matches = [x[0] for x in nick_matches]
+                nick_ids = [(x[1], x[2]) for x in nick_list if x[0] in nick_matches]
+            else:
+                nick_ids = []
+        else:
+            nick_ids = []
+        name_list = [(x['name'], x['id'], True) for x in gym_data] + [(x['name'], x['id'], False) for x in stop_data]
+        names = [x[0] for x in name_list]
+        name_matches = get_matches(names, arg)
+        if name_matches:
+            name_matches = [x[0] for x in name_matches]
+            name_ids = [(x[1], x[2]) for x in name_list if x[0] in name_matches]
+        else:
+            name_ids = []
+        possible_ids = set(nick_ids) | set(name_ids)
+        id_list = list(possible_ids)
+        if len(id_list) > 1:
+            names = []
+            # Loop through id_list to ensure names appear in same order as ids.
+            for id in id_list:
+                if id[1]:
+                    name = next(x['name'] for x in gym_data if x['id'] == id[0])
+                else:
+                    name = next(x['name'] for x in stop_data if x['id'] == id[0])
+                names.append(name)
+            react_list = formatters.mc_emoji(len(id_list))
+            choice_dict = dict(zip(react_list, id_list))
+            display_dict = dict(zip(react_list, names))
+            display_dict["\u2754"] = "Other"
+            react_list.append("\u2754")
+            embed = formatters.mc_embed(display_dict)
+            multi = await ctx.send(f'Multiple possible {locations_name} found! Please select from the following list.',
+                                   embed=embed)
+            payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
+                                           react_list=react_list)
+            await multi.delete()
+            if not payload or str(payload.emoji) == "\u2754":
+                return False
+            loc_id = choice_dict[str(payload.emoji)]
+            return loc_id
+        elif len(id_list) == 1:
+            loc_id = id_list[0]
+            return loc_id
+        return None
     
     @classmethod
     async def convert(cls, ctx, arg):
         if hasattr(ctx, 'report_channel_id'):
-            ctx.channel = ctx.bot.get_channel(ctx.report_channel_id)
-        stop_convert = await Pokestop.convert(ctx, arg)
-        if isinstance(stop_convert, Pokestop):
-            return stop_convert
-        gym_convert = await Gym.convert(ctx, arg)
-        return gym_convert
+            channel = ctx.bot.get_channel(ctx.report_channel_id)
+        else:
+            channel = ctx.channel
+        report_channel = ReportChannel(ctx.bot, channel)
+        gyms_query = await report_channel.get_all_gyms()
+        stops_query = await report_channel.get_all_stops()
+        gym_data = []
+        stop_data = []
+        if gyms_query:
+            gyms_query.select('id', 'name', 'nickname')
+            gym_data = await gyms_query.get()
+        if stops_query:
+            stops_query.select('id', 'name', 'nickname')
+            stop_data = await stops_query.get()
 
-    
+        if not (gym_data or stop_data):
+            city = await report_channel.city()
+            return PartialPOI(ctx.bot, city, arg)
+        loc_ids = await cls.get_location_match(ctx, arg, gym_data, stop_data)
+        if not loc_ids:
+            city = await report_channel.city()
+            return PartialPOI(ctx.bot, city, arg)
+        else:
+            loc_id = loc_ids[0]
+            is_gym = loc_ids[1]
+        if is_gym:
+            return Gym(ctx.bot, loc_id)
+        else:
+            return Pokestop(ctx.bot, loc_id)
+
 
 class Gym(POI):
 
@@ -487,47 +685,12 @@ class Gym(POI):
         if not data:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
-        nick_dict = {}
-        for x in data:
-            if x.get('nickname'):
-                nick_dict[x['nickname']] = x['id']
-            else:
-                continue
-        name_dict = {x['name'] : x['id'] for x in data}
-        if nick_dict:
-            nick_matches = get_matches(nick_dict.keys(), arg)
-            if nick_matches:
-                nick_ids = [nick_dict[x[0]] for x in nick_matches]
-            else:
-                nick_ids = []
-        else:
-            nick_matches = []
-            nick_ids = []
-        name_matches = get_matches(name_dict.keys(), arg)
-        if name_matches:
-            name_ids = [name_dict[x[0]] for x in name_matches]
-        else:
-            name_ids = []
-        possible_ids = set(nick_ids) | set(name_ids)
-        id_list = list(possible_ids)
-        if len(id_list) > 1:
-            possible_gyms = [cls(ctx.bot, y) for y in id_list]
-            names = [await z.display_str() for z in possible_gyms]
-            react_list = formatters.mc_emoji(len(id_list))
-            choice_dict = dict(zip(react_list, id_list))
-            display_dict = dict(zip(react_list, names))
-            embed = formatters.mc_embed(display_dict)
-            multi = await ctx.send('Multiple possible Gyms found! Please select from the following list.',
-                embed=embed)
-            payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
-                react_list=react_list)
-            gym_id = choice_dict[str(payload.emoji)]
-            await multi.delete()
-        elif len(id_list) == 1:
-            gym_id = id_list[0]
-        else:
+        gym_ids = await cls.get_location_match(ctx, arg, data, [])
+        if not gym_ids:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
+        else:
+            gym_id = gym_ids[0]
         return cls(ctx.bot, gym_id)
     
     @classmethod
@@ -568,7 +731,6 @@ class PartialPOI():
         return "NO_WEATHER"
 
 
-
 class Pokestop(POI):
 
     @property
@@ -589,47 +751,12 @@ class Pokestop(POI):
         if not data:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
-        nick_dict = {}
-        for x in data:
-            if x.get('nickname'):
-                nick_dict[x['nickname']] = x['id']
-            else:
-                continue
-        name_dict = {x['name'] : x['id'] for x in data}
-        if nick_dict:
-            nick_matches = get_matches(nick_dict.keys(), arg, score_cutoff=70)
-            if nick_matches:
-                nick_ids = [nick_dict[x[0]] for x in nick_matches]
-            else:
-                nick_ids = []
-        else:
-            nick_matches = []
-            nick_ids = []
-        name_matches = get_matches(name_dict.keys(), arg, score_cutoff=70)
-        if name_matches:
-            name_ids = [name_dict[x[0]] for x in name_matches]
-        else:
-            name_ids = []
-        possible_ids = set(nick_ids) | set(name_ids)
-        id_list = list(possible_ids)
-        if len(id_list) > 1:
-            possible_stops = [cls(ctx.bot, y) for y in id_list]
-            names = [await z.display_str() for z in possible_stops]
-            react_list = formatters.mc_emoji(len(id_list))
-            choice_dict = dict(zip(react_list, id_list))
-            display_dict = dict(zip(react_list, names))
-            embed = formatters.mc_embed(display_dict)
-            multi = await ctx.send('Multiple possible Pokestops found! Please select from the following list.',
-                embed=embed)
-            payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
-                react_list=react_list)
-            stop_id = choice_dict[str(payload.emoji)]
-            await multi.delete()
-        elif len(id_list) == 1:
-            stop_id = id_list[0]
-        else:
+        stop_ids = await cls.get_location_match(ctx, arg, [], data)
+        if not stop_ids:
             city = await report_channel.city()
             return PartialPOI(ctx.bot, city, arg)
+        else:
+            stop_id = stop_ids[0]
         return cls(ctx.bot, stop_id)
 
 
@@ -648,41 +775,50 @@ class Mapper(Cog):
         elif isinstance(error, InvalidGMapsKey):
             await ctx.error('Google Maps API Key invalid.')
     
-    async def gyms_from_csv(self, guildid, file):
+    async def gyms_from_csv(self, ctx, file):
         bot = self.bot
+        guildid = ctx.guild.id
         gyms_table = bot.dbi.table('gyms')
         insert = gyms_table.insert()
-        reader = csv.DictReader(codecs.iterdecode(file.readlines(), 'utf-8'))
+        reader = csv.DictReader(codecs.iterdecode(file.readlines(), 'utf-8-sig'))
         rows = []
-        for row in reader:
-            valid_data = {}
-            valid_data['guild'] = guildid
-            if isinstance(row.get('name'), str):
-                valid_data['name'] = row['name']
-            else:
-                continue
-            if isinstance(row.get('nickname'), str):
-                valid_data['nickname'] = row.get('nickname')
-            else:
-                pass
-            try:
-                lat = float(row.get('lat'))
-                lon = float(row.get('lon'))
-            except:
-                continue
-            l10 = S2_L10.from_coords(bot, (lat, lon))
-            valid_data['lat'] = lat
-            valid_data['lon'] = lon
-            valid_data['l10'] = l10.cellid
-            if isinstance(row.get('exraid'), str):
-                if row['exraid'].lower() == 'false':
-                    valid_data['exraid'] = False
-                elif row['exraid'].lower() == 'true':
-                    valid_data['exraid'] = True
-            rows.append(valid_data)
+        try:
+            for row in reader:
+                valid_data = {}
+                valid_data['guild'] = guildid
+                if isinstance(row.get('name'), str):
+                    valid_data['name'] = row['name']
+                else:
+                    await ctx.send("Column 'name' not found. Please check the headers in your csv file.")
+                    return False  # The database commit will fail so might as well abort now.
+                if isinstance(row.get('nickname'), str):
+                    valid_data['nickname'] = row.get('nickname')
+                else:
+                    pass
+                try:
+                    lat = float(row.get('lat'))
+                    lon = float(row.get('lon'))
+                except:
+                    await ctx.send(f"Failed to parse coordinates for gym '{row['name']}'.")
+                    return False
+                l10 = S2_L10.from_coords(bot, (lat, lon))
+                valid_data['lat'] = lat
+                valid_data['lon'] = lon
+                valid_data['l10'] = l10.cellid
+                if isinstance(row.get('exraid'), str):
+                    if row['exraid'].lower() == 'false':
+                        valid_data['exraid'] = False
+                    elif row['exraid'].lower() == 'true':
+                        valid_data['exraid'] = True
+                rows.append(valid_data)
+        except UnicodeDecodeError:
+            await ctx.send("Invalid character encountered. Please use utf-8 encoding for your file or restrict "
+                           "yourself to the ASCII character set.")
+            return False
         insert.rows(rows)
         await insert.commit(do_update=True)
-    
+        return True
+
     async def csv_from_gyms(self, guildid):
         bot = self.bot
         gyms_table = bot.dbi.table('gyms')
@@ -701,37 +837,45 @@ class Mapper(Cog):
         outstr = infile.getvalue().encode()
         f = io.BytesIO(outstr)
         return f
-        
 
-    async def stops_from_csv(self, guildid, file):
+    async def stops_from_csv(self, ctx, file):
         bot = self.bot
+        guildid = ctx.guild.id
         stops_table = bot.dbi.table('pokestops')
         insert = stops_table.insert()
-        reader = csv.DictReader(codecs.iterdecode(file.readlines(), 'utf-8'))
+        reader = csv.DictReader(codecs.iterdecode(file.readlines(), 'utf-8-sig'))
         rows = []
-        for row in reader:
-            valid_data = {}
-            valid_data['guild'] = guildid
-            if isinstance(row.get('name'), str):
-                valid_data['name'] = row['name']
-            else:
-                continue
-            if isinstance(row.get('nickname'), str):
-                valid_data['nickname'] = row.get('nickname')
-            else:
-                pass
-            try:
-                lat = float(row.get('lat'))
-                lon = float(row.get('lon'))
-            except:
-                continue
-            l10 = S2_L10.from_coords(bot, (lat, lon))
-            valid_data['lat'] = lat
-            valid_data['lon'] = lon
-            valid_data['l10'] = l10.cellid
-            rows.append(valid_data)
+        try:
+            for row in reader:
+                valid_data = {}
+                valid_data['guild'] = guildid
+                if isinstance(row.get('name'), str):
+                    valid_data['name'] = row['name']
+                else:
+                    await ctx.send("Column 'name' not found. Please check the headers in your csv file.")
+                    return False  # The database commit will fail so might as well abort now.
+                if isinstance(row.get('nickname'), str):
+                    valid_data['nickname'] = row.get('nickname')
+                else:
+                    pass
+                try:
+                    lat = float(row.get('lat'))
+                    lon = float(row.get('lon'))
+                except:
+                    await ctx.send(f"Failed to parse coordinates for stop '{row['name']}'.")
+                    return False
+                l10 = S2_L10.from_coords(bot, (lat, lon))
+                valid_data['lat'] = lat
+                valid_data['lon'] = lon
+                valid_data['l10'] = l10.cellid
+                rows.append(valid_data)
+        except UnicodeDecodeError:
+            await ctx.send("Invalid character encountered. Please use utf-8 encoding for your file or restrict "
+                           "yourself to the ASCII character set.")
+            return False
         insert.rows(rows)
         await insert.commit(do_update=True)
+        return True
     
     async def csv_from_stops(self, guildid):
         bot = self.bot
@@ -798,10 +942,50 @@ class Mapper(Cog):
         }
         insert.row(**d)
         await insert.commit()
-    
+
+    @command()
+    @checks.is_admin()
+    @checks.location_set()
+    async def listgyms(self, ctx):
+        """List all Gyms in a reporting channel's defined area."""
+        report_channel = ReportChannel(ctx.bot, ctx.channel)
+        gyms_query = await report_channel.get_all_gyms()
+        if not gyms_query:
+            return await ctx.error('No gyms found')
+        gyms_query.select('name', 'nickname', 'lat', 'lon', 'exraid')
+        data = await gyms_query.get()
+        entries = [(x['name'], x.get('nickname'), f"{x['lat']}, {x['lon']}", x['exraid']) for x in data]
+        entries = [str(x) for x in entries]
+        await ctx.send('(Name, Nickname, Latitude, Longitude, EX Raid)')
+        for x in self.pages(entries):
+            await ctx.send("\n".join(x))
+
+    @command()
+    @checks.is_admin()
+    @checks.location_set()
+    async def liststops(self, ctx):
+        """List all Pokéstops in a reporting channel's defined area."""
+        report_channel = ReportChannel(ctx.bot, ctx.channel)
+        stops_query = await report_channel.get_all_stops()
+        if not stops_query:
+            return await ctx.error('No pokéstops found')
+        stops_query.select('name', 'nickname', 'lat', 'lon')
+        data = await stops_query.get()
+        entries = [(x['name'], x.get('nickname'), f"{x['lat']}, {x['lon']}") for x in data]
+        entries = [str(x) for x in entries]
+        await ctx.send('(Name, Nickname, Latitude, Longitude)')
+        for x in self.pages(entries):
+            await ctx.send("\n".join(x))
+
+    @staticmethod
+    def pages(l):
+        for i in range(0, len(l), 20):
+            yield l[i: i + 20]
+
     @command()
     @checks.location_set()
-    async def whereis(self, ctx, location: POI):
+    async def whereis(self, ctx, *, location: POI):
+        """Returns a Google Maps link to a Gym or Pokestop."""
         if not isinstance(location, POI):
             return await ctx.error('Location not found')
         display_str = await location.display_str()
@@ -831,12 +1015,15 @@ class Mapper(Cog):
         Format must match the [template.](https://docs.google.com/spreadsheets/d/1W-VTAzlnDefgBIXoc7kuRcxJIlYo7iojqRRQ0uwTifc/edit?usp=sharing)
         Gyms will only be usable by the server they were imported in.
         """
-        attachment = ctx.message.attachments[0]
-        guildid = ctx.guild.id
+        try:
+            attachment = ctx.message.attachments[0]
+        except IndexError:
+            await ctx.send("No file was attached. Please attach a csv file when using this command.")
+            return
         f = io.BytesIO()
         await attachment.save(f)
-        await self.gyms_from_csv(guildid, f)
-        await ctx.send("Import successful")
+        if await self.gyms_from_csv(ctx, f):
+            await ctx.send("Import successful!")
 
     @command()
     @commands.has_permissions(manage_guild=True)
@@ -846,12 +1033,15 @@ class Mapper(Cog):
         Format must match the [template.](https://docs.google.com/spreadsheets/d/1W-VTAzlnDefgBIXoc7kuRcxJIlYo7iojqRRQ0uwTifc/edit?usp=sharing)
         Pokestops will only be usable by the server they were imported in.
         """
-        attachment = ctx.message.attachments[0]
-        guildid = ctx.guild.id
+        try:
+            attachment = ctx.message.attachments[0]
+        except IndexError:
+            await ctx.send("No file was attached. Please attach a csv file when using this command.")
+            return
         f = io.BytesIO()
         await attachment.save(f)
-        await self.stops_from_csv(guildid, f)
-        await ctx.send("Import successful")
+        if await self.stops_from_csv(ctx, f):
+            await ctx.send("Import successful!")
     
     @command()
     @commands.has_permissions(manage_guild=True)
@@ -865,7 +1055,7 @@ class Mapper(Cog):
         *nickname (optional):* nickname of the Gym.
         
         To add multiple gyms, use `!importgyms`
-        To add an EX Raid Gym, use `!exraidgym`
+        To add an EX Raid Gym, use `!addexraidgym`
         """
         guild_id = ctx.guild.id
         await self.add_gym(guild_id, name, lat, lon, nickname=nickname)
@@ -883,7 +1073,7 @@ class Mapper(Cog):
         *nickname (optional):* nickname of the Gym.
         
         To add multiple gyms, use `!importgyms`
-        To add a regular Gym, use `!gym`
+        To add a regular Gym, use `!addgym`
         """
         guild_id = ctx.guild.id
         await self.add_gym(guild_id, name, lat, lon, exraid=True, nickname=nickname)
@@ -915,7 +1105,10 @@ class Mapper(Cog):
         if not f:
             return await ctx.send('No gyms found')
         to_send = discord.File(f, filename=f'{ctx.guild.name}_gyms.csv')
-        await ctx.send(file=to_send)
+        try:
+            await ctx.send(file=to_send)
+        except discord.Forbidden:
+            await ctx.error('Missing permission to send files!')
     
     @command()
     @commands.has_permissions(manage_guild=True)
@@ -926,7 +1119,10 @@ class Mapper(Cog):
         if not f:
             return await ctx.send('No Pokestops found')
         to_send = discord.File(f, filename=f'{ctx.guild.name}_stops.csv')
-        await ctx.send(field=to_send)
+        try:
+            await ctx.send(file=to_send)
+        except discord.Forbidden:
+            await ctx.error('Missing permission to send files!')
 
     @command()
     @commands.has_permissions(manage_guild=True)
@@ -949,6 +1145,111 @@ class Mapper(Cog):
         query.where(guild=guild_id)
         await query.delete()
         return await ctx.send("Pokestops deleted")
+
+    @command()
+    @commands.has_permissions(manage_guild=True)
+    async def importgymsheet(self, ctx, *args):
+        """Delete current Gyms and import the fresh list of Gyms from a Google spreadsheet.
+
+        Format must match the [template.](https://docs.google.com/spreadsheets/d/1W-VTAzlnDefgBIXoc7kuRcxJIlYo7iojqRRQ0uwTifc/edit?usp=sharing)
+        Gyms will only be usable by the server they were imported in.
+        """
+        if args:
+            url = args[0]
+            ids = self.spreadsheet_ids_from_url(url)
+            if not ids:
+                await ctx.send("Please provide a link to a Google spreadsheet.")
+                return
+            # TODO: Save ids to database
+            # await ctx.send("Saving spreadsheet link.")
+        else:
+            # TODO: Get ids from database
+            ids = None
+            if not ids:
+                await ctx.send("Please provide a link to a Google spreadsheet.")
+                return
+            await ctx.send("Using saved spreadsheet link.")
+        f = self.download_spreadsheet(*ids)
+        if not f:
+            await ctx.send("Failed to get data from Google.")
+            return
+        await ctx.send("Downloaded spreadsheet.")
+        # Delete old gyms.
+        guild_id = ctx.guild.id
+        table = ctx.bot.dbi.table('gyms')
+        query = table.query
+        query.where(guild=guild_id)
+        await query.delete()
+        await ctx.send("Deleted old Gyms, starting import...")
+        # Import new gyms.
+        if await self.gyms_from_csv(ctx, f):
+            await ctx.send("Import successful!")
+        else:
+            await ctx.send("Import failed.")
+
+    @command()
+    @commands.has_permissions(manage_guild=True)
+    async def importstopsheet(self, ctx, *args):
+        """Delete current Pokestops and import the fresh list of Pokestops from a Google spreadsheet.
+
+        Format must match the [template.](https://docs.google.com/spreadsheets/d/1W-VTAzlnDefgBIXoc7kuRcxJIlYo7iojqRRQ0uwTifc/edit?usp=sharing)
+        Pokestops will only be usable by the server they were imported in.
+        """
+        if args:
+            url = args[0]
+            ids = self.spreadsheet_ids_from_url(url)
+            if not ids:
+                await ctx.send("Please provide a link to a Google spreadsheet.")
+                return
+            # TODO: Save ids to database
+            # await ctx.send("Saving spreadsheet link.")
+        else:
+            # TODO: Get ids from database
+            ids = None
+            if not ids:
+                await ctx.send("Please provide a link to a Google spreadsheet.")
+                return
+            await ctx.send("Using saved spreadsheet link.")
+        f = self.download_spreadsheet(*ids)
+        if not f:
+            await ctx.send("Failed to get data from Google.")
+            return
+        await ctx.send("Downloaded spreadsheet.")
+        # Delete old stops.
+        guild_id = ctx.guild.id
+        table = ctx.bot.dbi.table('pokestops')
+        query = table.query
+        query.where(guild=guild_id)
+        await query.delete()
+        await ctx.send("Deleted old Pokestops, starting import...")
+        # Import new stops.
+        if await self.stops_from_csv(ctx, f):
+            await ctx.send("Import successful!")
+        else:
+            await ctx.send("Import failed.")
+
+    @staticmethod
+    def spreadsheet_ids_from_url(provided_url):
+        match = re.search('/spreadsheets/d/([a-zA-Z0-9-_]+)', provided_url)
+        if match:
+            spreadsheet_id = match.group(0)[16:]
+        else:
+            return
+        match = re.search('[#&]gid=([0-9]+)', provided_url)
+        if match:
+            sheet_id = match.group(0)[5:]
+        else:
+            return
+        return spreadsheet_id, sheet_id
+
+    @staticmethod
+    def download_spreadsheet(spreadsheet_id, sheet_id):
+        url = "https://docs.google.com/spreadsheets/d/" + spreadsheet_id + "/export?gid=" + sheet_id + "&format=csv"
+        r = requests.get(url)
+        if not r.ok:
+            return
+        f = io.BytesIO(r.content)
+        return f
 
     @staticmethod
     async def get_travel_times(bot, origins: List[int], dests: List[int]):
@@ -1011,8 +1312,3 @@ class Mapper(Cog):
             await insert.commit(do_update=True)
         return times
 
-
-    
-    
-
-    

@@ -21,21 +21,26 @@ class SilphCog(Cog):
         all_verified = True
         for r in data:
             task = r['title']
-            verified = r['verified']
-            if not verified:
-                all_verified = False
             rewards = r['rewards']
             pkmn_rewards = rewards.get('pokemon', [])
             item_rewards = rewards.get('items', {})
             for pkmn in pkmn_rewards:
+                if not pkmn['pokemon']:
+                    continue
                 slug = pkmn['pokemon']['slug']
                 meowthid = slug.upper().replace('-', '_')
                 if meowthid == 'GIRATINA_ALTERED':
                     meowthid = 'GIRATINA'
-                forms = ['ALOLA', 'ATTACK', 'DEFENSE', 'SPEED', 'RAINY', 'SNOWY', 'SUNNY', 'ORIGIN', 'PLANT', 'SANDY', 'TRASH']
+                forms = ['ALOLA', 'ATTACK', 'DEFENSE', 'SPEED', 'RAINY', 'SNOWY', 'SUNNY', 'ORIGIN', 'PLANT', 'SANDY', 'TRASH', 'GALAR']
                 for form in forms:
                     if meowthid.endswith(form):
+                        if form == 'GALAR':
+                            meowthid += "IAN"
                         meowthid += "_FORM"
+                if meowthid.endswith('_M'):
+                    meowthid += "ALE"
+                elif meowthid.endswith('_F'):
+                    meowthid += "EMALE"
                 row = {
                     'task': task,
                     'reward': meowthid
@@ -70,10 +75,18 @@ class SilphCog(Cog):
                 meowthid = silphid.upper().replace('-', '_')
                 if meowthid == 'GIRATINA_ALTERED':
                     meowthid = 'GIRATINA'
-                forms = ['ALOLA', 'ATTACK', 'DEFENSE', 'SPEED', 'RAINY', 'SNOWY', 'SUNNY', 'ORIGIN', 'PLANT', 'SANDY', 'TRASH']
+                forms = ['ALOLA', 'ATTACK', 'DEFENSE', 'SPEED', 'RAINY', 'SNOWY', 'SUNNY', 'ORIGIN', 'PLANT', 'SANDY', 'TRASH', 'ARMOR', 'GALAR']
                 for form in forms:
                     if meowthid.endswith(form):
+                        if form == 'ARMOR':
+                            meowthid = "MEWTWO_A"
+                        if form == 'GALAR':
+                            meowthid += "IAN"
                         meowthid += "_FORM"
+                if meowthid.endswith('_M'):
+                    meowthid += "ALE"
+                elif meowthid.endswith('_F'):
+                    meowthid += "EMALE"
                 d = {
                     'level': new_level,
                     'pokemon_id': meowthid,
@@ -97,9 +110,10 @@ class SilphCog(Cog):
 
     @command()
     @users_checks.users_enabled()
-    async def silph(self, ctx, silph_id: SilphTrainer):
+    async def silph(self, ctx, silph_name: SilphTrainer):
         """Link your Silph Road account."""
 
+        silph_id = silph_name
         silph_card = silph_id.card
         linked_discord = silph_card.discord_name
         if not linked_discord == str(ctx.author):

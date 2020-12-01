@@ -1,14 +1,29 @@
 from meowth import Cog, command, bot
-from meowth.exts.map import S2_L10
+from meowth.exts.map import S2_L10, ReportChannel
 from meowth.utils import fuzzymatch
 import aiohttp
 import asyncio
-from datetime import datetime
+from datetime import datetime, timedelta
+import os
+from staticmap import IconMarker
+from copy import deepcopy
+import io
+import discord
+from discord.ext import commands
+import imageio
+from PIL import Image, ImageDraw, ImageFont
+from math import ceil
+from pytz import timezone
+
+from . import weather_checks
+
 
 class Weather():
 
     def __init__(self, bot, value):
         self.bot = bot
+        if not value:
+            value = "NO_WEATHER"
         self.value = value
 
     async def name(self):
@@ -28,6 +43,23 @@ class Weather():
         query = types_table.query('emoji').where(weather=self.value)
         emoji_list = await query.get_values()
         return "".join(emoji_list)
+    
+    @property
+    def icon_url(self):
+        url = f'https://github.com/FoglyOgly/Meowth/blob/new-core/meowth/images/weather/{self.value}.png?raw=true'
+        return url
+    
+    @property
+    def icon_path(self):
+        bot_dir = self.bot.bot_dir
+        path = os.path.join(bot_dir, "images", "weather", f"{self.value}_small_black.png")
+        return path
+    
+    @property
+    def icon_path_color(self):
+        bot_dir = self.bot.bot_dir
+        path = os.path.join(bot_dir, "images", "weather", f"{self.value}.png")
+        return path
 
 
     @classmethod
@@ -72,33 +104,183 @@ class WeatherCog(Cog):
     def __init__(self, bot):
         self.bot = bot
         loop = asyncio.get_event_loop()
-        loop.create_task(self.update_weather())
+        # loop.create_task(self.update_weather())
     
     async def update_weather(self):
-        weather_query = self.bot.dbi.table('weather_forecasts').query()
-        weather_query.select('cellid')
-        cells = await weather_query.get_values()
-        for cell in cells:
-            s2cell = S2_L10(self.bot, cell)
-            place_id = await s2cell.weather_place()
-            insert = {'cellid': cell}
+        channel = self.bot.get_channel(428016400368402442)
+        while True:
+            now = datetime.utcnow()
+            if now.minute < 30:
+                then = now.replace(minute=30)
+            else:
+                then = (now + timedelta(hours=1)).replace(minute=30)
+            sleeptime = (then - now).total_seconds()
+            await channel.send(f'Sleeping until {str(then)}')
+            await asyncio.sleep(sleeptime)
+            weather_query = self.bot.dbi.table('current_weather').query()
+            weather_query.select('cellid')
+            weather_query.where(forecast=True)
+            cells = await weather_query.get_values()
+            cells = list(set(cells))
+            pull_hour = then.hour % 8
+            await channel.send(f'Pulling: pull hour is {str(pull_hour)}')
             forecast_table = self.bot.dbi.table('weather_forecasts')
-            async with aiohttp.ClientSession() as session:
-                url = f"http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/{place_id}"
-                params = {
-                    'apikey' : self.bot.config.weatherapikey,
-                    'details': 'true',
-                    'metric': 'true'
+            rows = []
+            for cell in cells:
+                s2cell = S2_L10(self.bot, cell)
+                place_id = await s2cell.weather_place()
+                if not place_id:
+                    continue
+                insert = {'cellid': cell}
+                insert['pull_hour'] = pull_hour
+                forecast_table = self.bot.dbi.table('weather_forecasts')
+                async with aiohttp.ClientSession() as session:
+                    url = f"http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/{place_id}"
+                    params = {
+                        'apikey' : self.bot.config.weatherapikey,
+                        'details': 'true',
+                        'metric': 'true'
+                    }
+                    async with session.get(url, params=params) as resp:
+                        try:
+                            data = await resp.json()
+                        except aiohttp.client_exceptions.ContentTypeError:
+                            data = await resp.json(content_type='text/html')
+                        try:
+                            data = data[:8]
+                        except TypeError:
+                            await channel.send(f'```{data}```')
+                            return
+                        for hour in data:
+                            weather = await Weather.from_data(self.bot, hour)
+                            time = (datetime.utcfromtimestamp(hour['EpochDateTime']).hour) % 8
+                            col = f"forecast_{time}"
+                            insert[col] = weather.value
+                rows.append(insert)
+            insert = forecast_table.insert
+            insert.rows(rows)
+            await insert.commit(do_update=True)
+
+    @command(name='forecast')
+    @commands.cooldown(rate=1, per=3600, type=commands.BucketType.channel)
+    @weather_checks.forecast_enabled()
+    @weather_checks.channel_has_location()
+    async def forecast(self, ctx):
+        async with ctx.typing():
+            if ctx.location == 'channel':
+                return await self.channel_forecast(ctx)
+            # else:
+            #     return await self.gym_forecast(ctx, ctx.location, ctx._tz)
+    
+    # async def gym_forecast(self, ctx, gym, zone):
+    #     cell_id = await gym._L10()
+    #     cell = S2_L10(ctx.bot, cell_id)
+    #     forecast = await cell.forecast(ctx.guild.id)
+    #     if not forecast:
+    #         return None
+    #     font = ImageFont.truetype(
+    #         font=os.path.join(ctx.bot.bot_dir, "fonts", "Poppins-Regular.ttf"),
+    #         size=44
+    #     )
+    #     tz = timezone(zone)
+    #     now_dt = datetime.now(tz=tz)
+    #     initial_hr = now_dt.replace(minute=0)
+    #     ims = []
+    #     for hour in forecast:
+    #         weather = Weather(ctx.bot, forecast[hour])
+    #         icon_path = weather.icon_path_color
+    #         im = Image.new('RGBA', (256, 300), color=(0,0,0,0))
+    #         fchour = initial_hr + timedelta(hours=hour)
+    #         timestr = fchour.strftime('%I:%M %p')
+    #         d = ImageDraw.Draw(im)
+    #         w, h = d.textsize(timestr, font=font)
+    #         icon_im = Image.open(icon_path)
+    #         im.paste(icon_im, (0,44))
+    #         x = (256-w) / 2
+    #         d.text((x, 5), timestr, font=font, fill=(0, 255, 255, 255))
+    #         ims.append(im)
+    #     num_hours = len(ims)
+    #     banner = Image.new('RGBA', (256*num_hours, 300), color=(0,0,0,0))
+    #     for i in range(num_hours):
+    #         im = ims[i]
+    #         banner.paste(im, (256*i, 0))
+    #     f = io.BytesIO()
+    #     banner.save(f, format='PNG')
+    #     to_send = discord.File(io.BytesIO(f.getvalue()), filename='forecast.png')
+    #     p = ctx.prefix
+    #     title = 'Pokémon Go Weather Forecast: Current Location'
+    #     desc = f'You can help Meowth determine the correct pull times by using **{p}weather** to correct the predicted weather in raid channels!'
+    #     embed = discord.Embed(title=title, description=desc)
+    #     embed.set_image(url='attachment://forecast.png')
+    #     await ctx.send(file=to_send, embed=embed)
+
+
+    
+    async def channel_forecast(self, ctx):
+        channel = ReportChannel(ctx.bot, ctx.channel)
+        base_map, cells = await channel.get_map()
+        W = base_map.width
+        H = base_map.height
+        padding_y = base_map.padding[1]
+        font_size = ceil(padding_y * 1.2)
+        font = ImageFont.truetype(
+            font=os.path.join(ctx.bot.bot_dir, "fonts", "Poppins-Regular.ttf"),
+            size=font_size
+        )
+        markers = []
+        for cell in cells:
+            forecast = await cell.forecast(ctx.guild.id)
+            if not forecast:
+                continue
+            coords = cell.center_coords
+            coords = (coords.lng().degrees(), coords.lat().degrees())
+            for hour in forecast:
+                weather = Weather(ctx.bot, forecast[hour])
+                icon_path = weather.icon_path
+                m = {
+                    'hour': hour,
+                    'icon_path': icon_path,
+                    'coords': coords
                 }
-                async with session.get(url, params=params) as resp:
-                    data = await resp.json()
-                    for hour in data:
-                        weather = await Weather.from_data(self.bot, hour)
-                        time = datetime.utcfromtimestamp(hour['EpochDateTime']).hour % 12
-                        col = f"forecast_{time}"
-                        insert[col] = weather.value
-            forecast_table.insert(**insert)
-            await forecast_table.insert.commit(do_update=True)
+                markers.append(m)
+        max_hour = max([x['hour'] for x in markers], default=0)
+        maps = []
+        for i in range(max_hour+1):
+            maps.append(deepcopy(base_map))
+        for m in markers:
+            hour = m['hour']
+            frame = maps[hour]
+            coords = m['coords']
+            icon_path = m['icon_path']
+            marker = IconMarker(coords, icon_path, 32, 32)
+            frame.add_marker(marker)
+        f = io.BytesIO()
+        images = [m.render() for m in maps]
+        zone = await ctx.tz()
+        tz = timezone(zone)
+        now_dt = datetime.now(tz=tz)
+        initial_hr = now_dt.replace(minute=0)
+        for i in range(len(images)):
+            im = images[i]
+            im = im.crop((0,0,W,(H-padding_y)))
+            hour = initial_hr + timedelta(hours=i)
+            timestr = hour.strftime('%I:%M %p')
+            d = ImageDraw.Draw(im)
+            w, h = d.textsize(timestr, font=font)
+            x = (W - w) / 2
+            d.text((x, ceil(H*.01)), timestr, font=font, fill=(0,0,0,255))
+            images[i] = im
+        imageio.mimwrite(f, images, format='GIF-PIL', duration=1, subrectangles=True)
+        to_send = discord.File(io.BytesIO(f.getvalue()), filename='forecast.gif')
+        p = ctx.prefix
+        title = 'Pokémon Go Weather Forecast: Current Region'
+        desc = f'You can help Meowth determine the correct pull times by using **{p}weather** to correct the predicted weather in raid channels!'
+        embed = discord.Embed(title=title, description=desc)
+        embed.set_image(url='attachment://forecast.gif')
+        await ctx.send(embed=embed, file=to_send)
+
+
+            
         
 
                         

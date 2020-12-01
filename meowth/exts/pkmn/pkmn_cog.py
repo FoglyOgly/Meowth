@@ -49,6 +49,14 @@ class Pokemon():
             form = 59
         elif 'WEST_SEA' in pokemonId:
             form = 60
+        elif 'A_FORM' in pokemonId:
+            form = 61
+        elif 'SHADOW' in pokemonId:
+            form = 63
+        elif 'PURIFIED' in pokemonId:
+            form = 64
+        elif 'GALAR' in pokemonId:
+            form = 107
         self.form = form
         self.gender = gender
         self.shiny = shiny
@@ -274,11 +282,20 @@ class Pokemon():
     async def _trade_available(self):
         data = self._data
         return await data.select('trade_available').get_value()
+
+    async def _research_available(self):
+        research_table = self.bot.dbi.table('research_tasks')
+        query = research_table.query('reward')
+        rewards = await query.get_values()
+        return self.id in rewards
     
     async def _shiny_available(self):
         data = self._data
         return await data.select('shiny_available').get_value()
-    
+
+    async def _mega_available(self):
+        data = self._data
+        return await data.select('wild_available').get_value()
     
     async def _baseStamina(self):
         data = self._data
@@ -358,7 +375,7 @@ class Pokemon():
         if await self._gender_type() == 'DIMORPH' and self.gender:
             url += '_'
             url += self.gender.upper()
-        url += '.png?cache=3'
+        url += '.png?cache=5'
         return url
     
     async def color(self):
@@ -377,7 +394,13 @@ class Pokemon():
         dex_data = self._dex_data
         name = await dex_data.select('name').get_value()
         name = name.strip()
-        if self.form:
+        if self.form == 64:
+            pure_emoji = self.bot.get_emoji(603609730232877088)
+            name += f" {str(pure_emoji)}"
+        elif self.form == 63:
+            shadow_emoji = self.bot.get_emoji(603609764882022440)
+            name += f" {str(shadow_emoji)}"
+        elif self.form:
             name += " "
             form_names_table = self.bot.dbi.table('form_names')
             form_name_query = form_names_table.query('name')
@@ -587,6 +610,13 @@ class Pokemon():
         new_query.where(num=num)
         ids = await query.get_values()
         return ids
+
+    async def get_megas(self):
+        table = self.bot.dbi.table('pokemon')
+        query = table.query('pokemonid')
+        query.where(evolves_from=self.id)
+        ids = await query.get_values()
+        return ids
     
     async def cpm(self):
         if not self.lvl:
@@ -599,7 +629,7 @@ class Pokemon():
     
     
     async def calculate_cp(self):
-        if not all([self.lvl, self.attiv, self.defiv, self.staiv]):
+        if None in [self.lvl, self.attiv, self.defiv, self.staiv]:
             return None
         else:
             cpm = await self.cpm()
@@ -727,8 +757,8 @@ class Pokemon():
             self.gender = 'MALE'
         elif arg == 'female':
             self.gender = 'FEMALE'
-        elif arg.startswith('$iv'):
-            iv_arg = arg[3:]
+        elif arg.startswith('iv'):
+            iv_arg = arg[2:]
             attiv, defiv, staiv = iv_arg.split('/', maxsplit=2)
             attiv = int(attiv)
             defiv = int(defiv)
@@ -748,8 +778,8 @@ class Pokemon():
             elif staiv < 0:
                 staiv = 0
             self.staiv = staiv
-        elif arg.startswith('$lvl'):
-            lvl = float(arg[4:])
+        elif arg.startswith('lvl'):
+            lvl = float(arg[3:])
             double = lvl*2
             rounded = round(double)
             if rounded < 2:
@@ -761,14 +791,12 @@ class Pokemon():
 
     @classmethod
     async def from_arg(cls, bot, command_name, chn, user_id, arg, coords=None):
-        pokemon = bot.dbi.table('pokemon')
         pokedex = bot.dbi.table('pokedex')
         form_names = bot.dbi.table('form_names')
-        forms_table = bot.dbi.table('forms')
-        movesets = bot.dbi.table('movesets')
         id_list = []
         name_list = await pokedex.query('name').get_values()
         form_list = await form_names.query('name').get_values()
+        form_list = [x.strip('()') for x in form_list]
         args = arg.lower().split()
         shiny = False
         form = None
@@ -782,7 +810,7 @@ class Pokemon():
         chargeMove2id = None
         cp = None
         for arg in args:
-            if arg.startswith('cp'):
+            if arg.startswith('cp') and len(arg) > 2 and arg[2].isdigit():
                 cp = int(arg[2:])
             elif arg.startswith('@'):
                 arg = arg[1:]
@@ -800,11 +828,11 @@ class Pokemon():
             elif arg == 'shiny':
                 shiny = True
             elif arg == 'male':
-                gender = 'male'
+                gender = 'MALE'
             elif arg == 'female':
-                gender = 'female'
-            elif arg.startswith('$iv'):
-                iv_arg = arg[3:]
+                gender = 'FEMALE'
+            elif arg.startswith('iv') and len(arg) > 2 and arg[2].isdigit():
+                iv_arg = arg[2:]
                 attiv, defiv, staiv = iv_arg.split('/', maxsplit=2)
                 attiv = int(attiv)
                 defiv = int(defiv)
@@ -821,8 +849,8 @@ class Pokemon():
                     staiv = 15
                 elif staiv < 0:
                     staiv = 0
-            elif arg.startswith('$lvl'):
-                lvl = float(arg[4:])
+            elif arg.startswith('lvl') and len(arg) > 3 and arg[3].isdigit():
+                lvl = float(arg[3:])
                 double = lvl*2
                 rounded = round(double)
                 if rounded < 2:
@@ -832,33 +860,46 @@ class Pokemon():
                 valid_level = rounded/2
                 lvl = valid_level
             else:
+                id_set = set()
                 form_name = fuzzymatch.get_match(form_list, arg)
                 if form_name[0]:
-                    forms = form_names.query('formid').where(name=form_name[0])
+                    forms = bot.dbi.table('form_names').query('formid').where(name=f"({form_name[0]})")
                     form = await forms.get_value()
-                    id_list = await forms_table.query('pokemonid').where(formid=form).get_values()
+                    query = bot.dbi.table('forms').query('pokemonid').where(formid=form)
+                    ids = await query.get_values()
+                    id_set.update(ids)
+                names = fuzzymatch.get_matches(name_list, arg, scorer='ratio')
+                if names:
+                    names = [x[0] for x in names]
+                    query = bot.dbi.table('pokedex').query('pokemonid').where(pokedex['name'].in_(names))
+                    ids = await query.get_values()
+                    id_set.update(ids)
+                if not id_set:
+                    raise PokemonNotFound
                 else:
-                    names = fuzzymatch.get_matches(name_list, arg)
-                    if names:
-                        names = [x[0] for x in names]
-                        ref = pokedex.query('pokemonid').where(
-                            pokedex['name'].in_(names))
-                        ids = await ref.get_values()
-                    else:
-                        raise PokemonNotFound
-        if id_list:
-            possible_ids = set(ids) & set(id_list)
-        else:
-            possible_ids = set(ids)
-        length = len(possible_ids)
-        if length == 0:
+                    id_list.append(id_set)
+        possible_ids = set.intersection(*id_list)
+        if not possible_ids:
             raise PokemonNotFound
         else:
             mons = [(cls(bot, x)) for x in possible_ids]
-            if command_name == 'raid':
+            for x in mons:
+                if await x._mega_available():
+                    megas = await x.get_megas()
+                    mega_mons = [(cls(bot, x)) for x in megas]
+                    mons += mega_mons
+            if command_name in ['raid', 'interested', 'coming', 'here', 'remote', 'invite']:
                 possible_mons = [x for x in mons if await x._raid_available(coords)]
             elif command_name == 'wild':
                 possible_mons = [x for x in mons if await x._wild_available()]
+            elif command_name == 'rocket':
+                possible_mons = [x for x in mons if x.form == 63]
+            elif command_name == 'research':
+                possible_mons = [x for x in mons if await x._research_available()]
+            elif command_name == 'boss':
+                possible_mons = [x for x in mons if x.form != 63 and x.form != 64]
+            elif command_name == 'trade':
+                possible_mons = [x for x in mons if await x._trade_available()]
             else:
                 possible_mons = mons
             impossible_mons = [x for x in mons if x not in possible_mons]
@@ -867,6 +908,7 @@ class Pokemon():
             elif len(possible_mons) == 1:
                 pkmn = possible_mons[0]
             else:
+                length = len(possible_mons)
                 possible_names = [(await mon.name()) for mon in possible_mons]
                 react_list = formatters.mc_emoji(length)
                 choice_dict = dict(zip(react_list, possible_mons))
@@ -879,7 +921,10 @@ class Pokemon():
                 pkmn = choice_dict[str(payload.emoji)]
                 await multi.delete()
         if form:
-            pkmn.form = form
+            query = bot.dbi.table('forms').query('formid').where(pokemonid=pkmn.id)
+            possible_forms = await query.get_values()
+            if form in possible_forms:
+                pkmn.form = form
         pkmn.shiny = shiny
         pkmn.attiv = attiv
         pkmn.defiv = defiv
@@ -889,6 +934,7 @@ class Pokemon():
         pkmn.chargeMoveid = chargeMoveid
         pkmn.chargeMove2id = chargeMove2id
         pkmn.cp = cp
+        pkmn.gender = gender
         return pkmn
 
     @classmethod    

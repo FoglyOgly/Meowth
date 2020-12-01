@@ -80,8 +80,9 @@ async def check_location_set(ctx):
     else:
         raise LocationNotSet
     values = [data.get('lat'), data.get('lon'), data.get('radius')]
-    if not all(values):
-        raise LocationNotSet
+    for x in values:
+        if x is None:
+            raise LocationNotSet
     return True
 
 def location_set():

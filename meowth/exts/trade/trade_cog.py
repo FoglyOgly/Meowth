@@ -1,7 +1,7 @@
 from meowth import Cog, command, bot, checks
 from meowth.utils.converters import ChannelMessage
 from meowth.exts.pkmn import Pokemon, Move
-from meowth.exts.pkmn.errors import PokemonInvalidContext
+from meowth.exts.pkmn.errors import PokemonInvalidContext, PokemonNotFound
 from meowth.exts.want import Want
 from meowth.exts.users import MeowthUser
 from meowth.utils import formatters, snowflake
@@ -9,6 +9,7 @@ from meowth.utils import formatters, snowflake
 from discord.ext import commands
 
 import asyncio
+import shlex
 from functools import partial
 
 from . import trade_checks
@@ -81,19 +82,15 @@ class Trade():
             cls.by_offer[offer['msg']] = new_trade
         return new_trade
 
-
-
-
     @property
     def lister_name(self):
-        g = self.bot.get_guild(self.guild_id)
-        m = g.get_member(self.lister_id)
-        return m.display_name
+        return f"<@!{self.lister_id}>"
     
-    @property
-    def lister(self):
+    async def lister(self):
         g = self.bot.get_guild(self.guild_id)
         m = g.get_member(self.lister_id)
+        if not m:
+            m = await g.fetch_member(self.lister_id)
         return m
     
     @property
@@ -152,7 +149,8 @@ class Trade():
         }
         embed = await self.make_offer_embed(trader, listed_pokemon, offered_pokemon)
         embed.color = self.guild.me.color
-        offermsg = await self.lister.send(
+        lister = await self.lister()
+        offermsg = await lister.send(
             f"{trader.display_name} has made an offer on your trade! Use the reactions to accept or reject the offer.",
             embed=embed
         )
@@ -170,7 +168,8 @@ class Trade():
     
     async def accept_offer(self, trader, listed, offer):
         content = f'{self.lister_name} has accepted your trade offer! Please DM them to coordinate the trade.'
-        embed = await self.make_offer_embed(self.lister, offer, listed)
+        lister = await self.lister()
+        embed = await self.make_offer_embed(lister, offer, listed)
         embed.color = self.guild.me.color
         await trader.send(content, embed=embed)
         trade_table = self.bot.dbi.table('trades')
@@ -227,7 +226,8 @@ class Trade():
         except:
             pass
         content = f'{self.lister_name} has rejected your trade offer.'
-        embed = await self.make_offer_embed(self.lister, offer, listed)
+        lister = await self.lister()
+        embed = await self.make_offer_embed(lister, offer, listed)
         embed.color = self.guild.me.color
         await trader.send(content, embed=embed)
         offer_dict = {
@@ -274,8 +274,7 @@ class Trade():
                 return
             i = self.react_list.index(emoji)
             offer = self.wanted_pkmn[i]
-            g = self.bot.get_guild(self.guild_id)
-            trader = g.get_member(payload.user_id)
+            trader = payload.member
             if len(self.offered_pkmn) > 1:
                 content = f"{trader.display_name}, which of the following Pokemon do you want to trade for?"
                 mc_emoji = formatters.mc_emoji(len(self.offered_pkmn))
@@ -300,7 +299,7 @@ class Trade():
                 def check(m):
                     return m.channel == chn and m.author == trader
                 offermsg = await self.bot.wait_for('message', check=check)
-                offer = await Pokemon.from_arg(self.bot, chn, trader.id, offermsg.content)
+                offer = await Pokemon.from_arg(self.bot, 'trade', chn, trader.id, offermsg.content)
                 if not await offer._trade_available():
                     return await chn.send(f'{await offer.name()} cannot be traded!')
                 await askmsg.delete()
@@ -315,6 +314,8 @@ class Trade():
                     if offer['msg'] == idstring:
                         g = self.bot.get_guild(self.guild_id)
                         trader = g.get_member(offer['trader'])
+                        if not trader:
+                            trader = await g.fetch_member(offer['trader'])
                         listed = offer['listed']
                         offered = offer['offered']
                         return await self.accept_offer(trader, listed, offered)
@@ -324,10 +325,21 @@ class Trade():
                     if offer['msg'] == idstring:
                         g = self.bot.get_guild(self.guild_id)
                         trader = g.get_member(offer['trader'])
+                        if not trader:
+                            trader = await g.fetch_member(offer['trader'])
                         listed = offer['listed']
                         offered = offer['offered']
                         msg = offer['msg']
                         return await self.reject_offer(trader, listed, offered, msg)
+    
+    async def get_wants(self):
+        wants = []
+        for pkmn in self.offered_pkmn:
+            family = await pkmn._familyId()
+            wants.append(family)
+        wants = [Want(self.bot, x, self.guild_id) for x in wants]
+        want_dict = {x: await x.mention() for x in wants}
+        return want_dict
             
         
 
@@ -378,12 +390,24 @@ class TradeCog(Cog):
             fields={"Invalid Pokemon": "\n".join(invalid_names)}
             await ctx.warning('The following Pokemon cannot be traded!',
                 fields=fields)
-        listmsg = await ctx.send(f"{ctx.author.display_name} - what Pokemon are you willing to accept in exchange? Use 'any' if you will accept anything and 'OBO' if you want to allow other offers. Use commas to separate Pokemon.")
+        listmsg = await ctx.send(f"{ctx.author.display_name} - what Pokemon are you willing to accept in exchange? Use 'any' if you will accept anything and 'OBO' if you want to allow other offers. \n**NOTE: Remember to wrap multi-word Pokemon arguments in quotes.**")
         def check(m):
             return m.channel == ctx.channel and m.author == ctx.author
         wantmsg = await ctx.bot.wait_for('message', check=check)
-        wantargs = wantmsg.content.lower().split(',')
+        wantmsg = wantmsg.content.lower()
+        wantargs = wantmsg.split(',')
         wantargs = list(map(str.strip, wantargs))
+        pkmn_convert = partial(Pokemon.convert, ctx)
+        if len(wantargs) == 1:
+            # No commas have been used.
+            try:
+                # Check if a single pokemon was specified, e.g. shiny pidgey.
+                [await pkmn_convert(arg) for arg in wantargs]
+            except PokemonNotFound:
+                # Use new syntax instead; account for smart quotes.
+                wantmsg = wantmsg.replace('“', '"')
+                wantmsg = wantmsg.replace('”', '"')
+                wantargs = shlex.split(wantmsg)
         if 'any' in wantargs:
             wantargs.remove('any')
             accept_any = True
@@ -394,7 +418,6 @@ class TradeCog(Cog):
             accept_other = True
         else:
             accept_other = False
-        pkmn_convert = partial(Pokemon.convert, ctx)
         wants = [await pkmn_convert(arg) for arg in wantargs]
         wants = [await Pokemon.validate(want, 'trade') for want in wants]
         if len(wants) == 1:
@@ -406,16 +429,21 @@ class TradeCog(Cog):
             wants.append('any')
         if accept_other:
             wants.append('obo')
-        listing_id = f'{ctx.channel.id}/{listmsg.id}'
-        trade_id = next(snowflake.create())
-        new_trade = Trade(trade_id, self.bot, ctx.guild.id, ctx.author.id, listing_id, valid_offers, wants)
-        Trade.by_listing[listing_id] = new_trade
-        embed = await TradeEmbed.from_trade(new_trade)
         try:
+            await listmsg.delete()
             await wantmsg.delete()
         except:
             pass
-        await listmsg.edit(content="", embed=embed.embed)
+        trade_id = next(snowflake.create())
+        new_trade = Trade(trade_id, self.bot, ctx.guild.id, ctx.author.id, None, valid_offers, wants)
+        embed = await TradeEmbed.from_trade(new_trade)
+        wants = await new_trade.get_wants()
+        mentions = [wants.get(x) for x in wants if wants.get(x)]
+        mention_str = "\u200b".join(mentions)
+        listmsg = await ctx.send(mention_str, embed=embed.embed)
+        listing_id = f'{ctx.channel.id}/{listmsg.id}'
+        new_trade.listing_id = listing_id
+        Trade.by_listing[listing_id] = new_trade
         want_emoji = new_trade.react_list
         for emoji in want_emoji:
             await listmsg.add_reaction(emoji)

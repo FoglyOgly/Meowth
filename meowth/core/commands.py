@@ -510,7 +510,7 @@ class Core(Cog):
                     "\n").format(shard, latency * 1000, here)
         await ctx.embed('Latency', msg, msg_type='info')
 
-    @command(category='Owner')
+    @command()
     @checks.is_admin()
     async def purge(self, ctx, msg_number: int = 10):
         """Delete a number of messages from the channel.
@@ -524,7 +524,9 @@ class Core(Cog):
                 guild=ctx.guild)
             await ctx.send(embed=embed)
             return
-        deleted = await ctx.channel.purge(limit=msg_number)
+        def is_unpinned(m):
+            return not m.pinned
+        deleted = await ctx.channel.purge(limit=msg_number, check=is_unpinned)
         embed = make_embed(
             msg_type='success',
             title='Deleted {} message{}'.format(
@@ -570,14 +572,14 @@ class Core(Cog):
                     msg_type='info', title=f"Prefix is {default_prefix}")
                 await ctx.send(embed=embed)
         else:
-            if await ctx.is_co_owner():
-                if new_prefix:
-                    await ctx.guild_dm.prefix(new_prefix)
-                    if new_prefix.lower() == 'reset':
-                        new_prefix = bot.default_prefix
-                    embed = make_embed(
-                        msg_type='success', title=f"Prefix set to {new_prefix}")
-                    return await ctx.send(embed=embed)
+            if new_prefix:
+                await ctx.guild_dm.prefix(new_prefix)
+                if new_prefix.lower() == 'reset':
+                    new_prefix = bot.default_prefix
+                embed = make_embed(
+                    msg_type='success', title=f"Prefix set to {new_prefix}")
+                ctx.bot.prefixes[ctx.guild.id] = new_prefix
+                return await ctx.send(embed=embed)
             guild_prefix = await ctx.guild_dm.prefix(new_prefix)
             prefix = guild_prefix if guild_prefix else default_prefix
             embed = make_embed(

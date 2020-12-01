@@ -8,6 +8,7 @@ import re
 import pickle
 from typing import Union
 
+
 def do_template(message, author, guild):
     not_found = []
 
@@ -30,21 +31,23 @@ def do_template(message, author, guild):
             member = guild.get_member_named(match)
             if match.isdigit() and (not member):
                 member = guild.get_member(int(match))
-            if (not member):
+                if not member:
+                    return f"<@{match}>"
+            if not member:
                 not_found.append(full_match)
             return member.mention if member else full_match
         elif match_type == '#':
             channel = discord.utils.get(guild.text_channels, name=match)
             if match.isdigit() and (not channel):
                 channel = guild.get_channel(int(match))
-            if (not channel):
+            if not channel:
                 not_found.append(full_match)
             return channel.mention if channel else full_match
         elif match_type == '&':
             role = discord.utils.get(guild.roles, name=match)
             if match.isdigit() and (not role):
                 role = discord.utils.get(guild.roles, id=int(match))
-            if (not role):
+            if not role:
                 not_found.append(full_match)
             return role.mention if role else full_match
     template_pattern = '(?i){(@|#|&|<)([^{}]+)}|{(user|server)}|<*:([a-zA-Z0-9]+):[0-9]*>*'
@@ -258,6 +261,8 @@ class AdminCog(Cog):
         *lat:* The latitude of the central point of the area.
         *lon:* The longitude of the central point of the area.
         *radius:* The radius in kilometers of the area.
+
+        Example: `!setlocation "Joplin MO" 37.084086 -94.513494 20`
         """
         report_channel_table = self.bot.dbi.table('report_channels')
         channel_id = ctx.channel.id
@@ -286,9 +291,9 @@ class AdminCog(Cog):
 
         **Arguments**
         *features:* list of features to enable. Can include any of
-        `['raid', 'wild', 'research', 'users', 'train', 'trade', 'clean', 'archive', 'welcome']`
+        `['raid', 'wild', 'research', 'users', 'train', 'trade', 'clean', 'archive', 'welcome', 'meetup', 'forecast', 'rocket']`
 
-        Raid, wild, research, and train require a defined location. Use `!setlocation`
+        Raid, wild, research, train and meetup require a defined location. Use `!setlocation`
         before enabling these.
         """
         guild_id = ctx.guild.id
@@ -308,18 +313,19 @@ class AdminCog(Cog):
             rcrd = dict(data[0])
         else:
             rcrd = {'channelid': channel_id, 'guild_id': ctx.guild.id}
-        possible_commands = ['raid', 'wild', 'users', 'train', 'trade',
-            'clean', 'welcome', 'archive', 'meetup', 'research']
+        possible_commands = ['raid', 'wild', 'research', 'users', 'train', 'trade',
+            'clean', 'archive', 'welcome', 'meetup', 'forecast', 'rocket']
         features = [x for x in features if x in possible_commands]
         if not features:
-            return await ctx.send("The list of valid command groups to enable is `raid, train, wild, users, trade, clean, welcome, archive, meetup, research`.")
-        location_commands = ['raid', 'wild', 'research', 'train', 'meetup']
+            return await ctx.send("The list of valid command groups to enable is `raid, train, research, wild, "
+                                  "rocket, users, trade, clean, welcome, archive, meetup`.")
+        location_commands = ['raid', 'wild', 'research', 'train', 'meetup', 'forecast', 'rocket']
         enabled_commands = []
         required_perms = {}
         me = ctx.guild.me
         perms = ctx.channel.permissions_for(me)
         for x in features:
-            if x in ['raid', 'wild', 'trade', 'train', 'users', 'meetup', 'research']:
+            if x in ['raid', 'wild', 'trade', 'train', 'users', 'meetup', 'research', 'rocket']:
                 required_perms['Add Reactions'] = perms.add_reactions
                 required_perms['Manage Messages'] = perms.manage_messages
                 required_perms['Use External Emojis'] = perms.external_emojis
@@ -355,7 +361,7 @@ class AdminCog(Cog):
                     await ctx.send('I could not interpret your response. Try again!')
                     continue
         if 'raid' in enabled_commands:
-            raid_levels = ['1', '2', '3', '4', '5', 'EX', 'EX Raid Gyms']
+            raid_levels = ['1', '3', '5', '7', 'EX', 'EX Raid Gyms']
             for level in raid_levels:
                 column = f'category_{level.lower()}'
                 if level == 'EX Raid Gyms':
@@ -365,13 +371,19 @@ class AdminCog(Cog):
                         'You can type `disable` if you do not want this, or type the name or ID of '
                         'the category you want those raid channels to appear in.')
                 else:
-                    content = (f'How do you want Level {level} Raids reported in this ' 
+                    if level == '7':
+                        level_str = 'Mega'
+                    elif level == 'EX':
+                        level_str = "EX"
+                    else:
+                        level_str = f"Level {level}"
+                    content = (f'How do you want {level_str} Raids reported in this ' 
                         'channel to be displayed? You can type `message` if you want just '
                         'a message in this channel. If you want each raid to be given its own '
                         'channel for coordination, type the name or ID of the category you '
                         'want the channel to appear in, or type `none` for an uncategorized '
-                        'channel. You can also type `disable` to disallow reports of Level '
-                        f'{level} Raids in this channel.')
+                        'channel. You can also type `disable` to disallow reports of '
+                        f'{level_str} Raids in this channel.')
                 await ctx.send(content)
                 def check(m):
                     return m.author == ctx.message.author and m.channel == ctx.channel
@@ -548,6 +560,26 @@ class AdminCog(Cog):
             table = ctx.bot.dbi.table('archive')
             insert = table.insert.row(**d)
             await insert.commit(do_update=True)
+        if 'forecast' in enabled_commands:
+            g = ctx.bot.get_guild(344960572649111552)
+            gm = g.get_member(ctx.author.id)
+            if not gm:
+                gm = await g.fetch_member(ctx.author.id)
+            r = g.get_role(616734835104546826)
+            if r not in gm.roles:
+                content = 'Unfortunately, because of the cost of using the AccuWeather API, you must be a Meowth Patreon Super Nerd to enable in-game weather forecasts. Visit www.patreon.com/meowthbot to become a Patron!'
+                await ctx.send(content)
+            else:
+                d = {
+                    'guild_id': ctx.guild.id,
+                    'patron_id': ctx.author.id,
+                    'enabled': True
+                }
+                table = ctx.bot.dbi.table('forecast_config')
+                insert = table.insert.row(**d)
+                await insert.commit(do_update=True)
+                content = f'Forecasts have been enabled in this server! Please note that it may take up to eight hours for this to take effect. You can use `{ctx.prefix}forecast` in any reporting channel to check the forecast, and you can use `{ctx.prefix}weather` in raid channels at known Gyms to improve the forecast.'
+                await ctx.send(content)
         if not all(required_perms.values()):
             missing_perms = [x for x in required_perms if not required_perms[x]]
             while True:
@@ -592,7 +624,7 @@ class AdminCog(Cog):
 
         **Arguments**
         *features:* list of features to disable. Can include any of
-        `['raid', 'wild', 'research', 'users', 'train', 'trade', 'clean', 'welcome', 'archive']`
+        `['raid', 'wild', 'research', 'users', 'train', 'trade', 'clean', 'welcome', 'meetup', 'forecast', 'rocket']`
         """
         channel_id = ctx.channel.id
         channel_table = self.bot.dbi.table('report_channels')
@@ -603,11 +635,24 @@ class AdminCog(Cog):
         else:
             rcrd = {'channelid': channel_id}
         possible_commands = ['raid', 'wild', 'research', 'users', 'train', 'trade',
-            'clean', 'welcome']
+            'clean', 'welcome', 'meetup', 'forecast', 'rocket']
         features = [x for x in features if x in possible_commands]
         if not features:
-            return await ctx.send("The list of valid command groups to disable is `raid, wild, research, users, train, trade, clean, welcome`.")
+            return await ctx.send("The list of valid command groups to disable is `raid, train, research, wild, "
+                                  "rocket, users, trade, clean, welcome, meetup`.")
         disabled_commands = []
+        if 'forecast' in features:
+            d = {
+                'guild_id': ctx.guild.id,
+                'patron_id': ctx.author.id,
+                'enabled': False
+            }
+            table = ctx.bot.dbi.table('forecast_config')
+            insert = table.insert.row(**d)
+            await insert.commit(do_update=True)
+            content = f'Forecasts have been disabled in this server. Please note that this does not delete your Patreon pledge. Visit Patreon if you wish to delete or alter your pledge.'
+            await ctx.send(content)
+            features.remove('forecast')
         if 'welcome' in features:
             table = ctx.bot.dbi.table('welcome')
             query = table.query

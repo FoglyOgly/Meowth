@@ -11,6 +11,7 @@ import aiohttp
 from datetime import datetime
 from contextlib import redirect_stdout
 from subprocess import Popen, PIPE
+from copy import deepcopy
 
 import pathlib
 
@@ -18,6 +19,7 @@ import discord
 from discord.ext import commands
 
 from meowth import checks, command, group, Cog
+from meowth.exts.pkmn import Pokemon
 from meowth.utils import make_embed, get_match
 from meowth.utils.formatters import ilcode
 from meowth.utils.converters import BotCommand, Guild, Multi
@@ -31,8 +33,23 @@ class Dev(Cog):
         self.bot = bot
         self._last_result = None
 
-    def __local_check(self, ctx):
+    def cog_check(self, ctx):
         return checks.check_is_co_owner(ctx)
+
+    @Cog.listener()
+    async def on_member_update(self, before, after):
+        g = self.bot.get_guild(344960572649111552)
+        if after.guild != g:
+            return
+        r = g.get_role(616734835104546826)
+        if r in before.roles and r not in after.roles:
+            table = self.bot.dbi.table('forecast_config')
+            update = table.update
+            update.where(patron_id=after.id)
+            update.values(enabled=False)
+            return await update.commit()
+        
+
 
     @command()
     async def linecount(self, ctx):
@@ -505,3 +522,43 @@ class Dev(Cog):
             except:
                 fail += 1
         return await ctx.send(f'Announcement sent. {success} successes, {fail} failures.')
+    
+    @command()
+    @checks.is_owner()
+    async def newshadow(self, ctx, pokemon: Pokemon):
+        pkmn_table = ctx.bot.dbi.table('pokemon')
+        dex_table = ctx.bot.dbi.table('pokedex')
+        forms_table = ctx.bot.dbi.table('forms')
+        shadow_id = pokemon.id + '_SHADOW_FORM'
+        purified_id = pokemon.id + '_PURIFIED_FORM'
+        shadow_form = 63
+        purified_form = 64
+        pkmn_query = pkmn_table.query.where(pokemonid=pokemon.id)
+        pkmn_dict = dict((await pkmn_query.get())[0])
+        shadow_dict = deepcopy(pkmn_dict)
+        shadow_dict['pokemonid'] = shadow_id
+        shadow_dict['formid'] = shadow_form
+        shadow_dict['shiny_available'] = False
+        shadow_dict['trade_available'] = False
+        purified_dict = deepcopy(pkmn_dict)
+        purified_dict['pokemonid'] = purified_id
+        purified_dict['formid'] = purified_form
+        pkmn_insert = pkmn_table.insert
+        pkmn_insert.row(**shadow_dict)
+        pkmn_insert.row(**purified_dict)
+        await pkmn_insert.commit()
+        dex_query = dex_table.query.where(pokemonid=pokemon.id)
+        dex_dict = dict((await dex_query.get())[0])
+        shadow_dex = deepcopy(dex_dict)
+        shadow_dex['pokemonid'] = shadow_id
+        purified_dex = deepcopy(dex_dict)
+        purified_dex['pokemonid'] = purified_id
+        dex_insert = dex_table.insert
+        dex_insert.row(**shadow_dex)
+        dex_insert.row(**purified_dex)
+        await dex_insert.commit()
+        form_insert = forms_table.insert
+        form_insert.row(pokemonid=shadow_id, formid=shadow_form)
+        form_insert.row(pokemonid=purified_id, formid=purified_form)
+        await form_insert.commit()
+        await ctx.success(f'New Shadow and Purified Pokemon - {pokemon.id}')

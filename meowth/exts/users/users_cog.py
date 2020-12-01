@@ -4,6 +4,12 @@ import re
 
 import discord
 from discord.ext import commands
+import pytz
+from pytz import timezone
+from datetime import datetime, timedelta
+import time
+import asyncio
+import typing
 
 from . import users_checks
 
@@ -66,6 +72,18 @@ class MeowthUser:
         data.select('silph')
         silphid = await data.get_value()
         return silphid
+
+    async def ign(self):
+        data = self._data
+        data.select('ign')
+        ign = await data.get_value()
+        return ign
+
+    async def friendcode(self):
+        data = self._data
+        data.select('friendcode')
+        fc = await data.get_value()
+        return fc
     
     async def set_team(self, team_id):
         update = self._update
@@ -94,6 +112,19 @@ class MeowthUser:
                 party = [0, 0, 0, 0]
                 party[team-1] = 1
         return party
+
+    async def default_party(self):
+        data = self._data
+        data.select('default_party')
+        party = await data.get_value()
+        if not party:
+            team = await self.team()
+            if not team:
+                party = [0,0,0,1]
+            else:
+                party = [0, 0, 0, 0]
+                party[team-1] = 1
+        return party
     
     async def set_party(self, party: list = [0,0,0,1]):
         data = await self._data.get()
@@ -105,6 +136,13 @@ class MeowthUser:
             insert = self._insert
             insert.row(id=self.user.id, party=party)
             await insert.commit()
+    
+    async def clear_party(self, clear_time):
+        party = await self.default_party()
+        sleeptime = clear_time - time.time()
+        await asyncio.sleep(sleeptime)
+        await self.set_party(party)
+        
     
     async def party_list(self, total=0, *teamcounts):
         if not teamcounts:
@@ -153,6 +191,8 @@ class MeowthUser:
                 if sum((mystic, instinct, valor, unknown)) > total:
                     total = sum((mystic, instinct, valor, unknown))
                 unknown = total - sum((mystic, instinct, valor))
+        if sum((mystic, instinct, valor, unknown)) == 0:
+            return await self.party()
         return [mystic, instinct, valor, unknown]
 
 
@@ -164,17 +204,48 @@ class MeowthUser:
             'status': status,
             'estimator': estimator,
             'bosses': bosses,
-            'party': party
+            'party': party,
+            'invites': []
         }
         rsvp_table = self.bot.dbi.table('raid_rsvp')
         current_rsvp = rsvp_table.query().where(user_id=self.user.id, raid_id=raid_id)
         current_rsvp = await current_rsvp.get()
         if current_rsvp:
             old_d = dict(current_rsvp[0])
+            d['invites'] = old_d.get('invites', [])
             if old_d == d:
                 return
         insert = rsvp_table.insert()
         insert.row(**d)
+        await insert.commit(do_update=True)
+        raid_table = self.bot.dbi.table('raids')
+        query = raid_table.query('tz')
+        query.where(id=raid_id)
+        zone = await query.get_value()
+        tz = timezone(zone)
+        now_dt = datetime.now(tz=tz)
+        midnight_dt = now_dt + timedelta(days=1)
+        midnight_dt = midnight_dt.replace(hour=0, minute=0, second=0)
+        midnight_dt = midnight_dt.astimezone(pytz.utc)
+        stamp = midnight_dt.timestamp()
+        if hasattr(self, 'party_expire_task'):
+            self.party_expire_task.cancel()
+        self.party_expire_task = self.bot.loop.create_task(self.clear_party(stamp))
+    
+    async def raid_invite(self, raid_id, invitee_id):
+        rsvp_table = self.bot.dbi.table('raid_rsvp')
+        current_rsvp = rsvp_table.query().where(user_id=self.user.id, raid_id=raid_id)
+        current_rsvp = await current_rsvp.get()
+        if current_rsvp:
+            old_d = dict(current_rsvp[0])
+        else:
+            return
+        old_invites = old_d.get('invites', [])
+        if invitee_id in old_invites:
+            return
+        old_invites.append(invitee_id)
+        insert = rsvp_table.insert()
+        insert.row(**old_d)
         await insert.commit(do_update=True)
     
     async def train_rsvp(self, train, party=[0,0,0,1]):
@@ -200,6 +271,19 @@ class MeowthUser:
                     insert = rsvp_table.insert
                     insert.row(**old_d)
                     await insert.commit(do_update=True)
+                    raid_table = self.bot.dbi.table('raids')
+                    query = raid_table.query('tz')
+                    query.where(id=raid_id)
+                    zone = await query.get_value()
+                    tz = timezone(zone)
+                    now_dt = datetime.now(tz=tz)
+                    midnight_dt = now_dt + timedelta(days=1)
+                    midnight_dt = midnight_dt.replace(hour=0, minute=0, second=0)
+                    midnight_dt = midnight_dt.astimezone(pytz.utc)
+                    stamp = midnight_dt.timestamp()
+                    if hasattr(self, 'party_expire_task'):
+                        self.party_expire_task.cancel()
+                    self.party_expire_task = self.bot.loop.create_task(self.clear_party(stamp))
     
     async def meetup_rsvp(self, meetup, status, party=[0,0,0,1]):
         d = {
@@ -212,6 +296,19 @@ class MeowthUser:
         insert = meetup_rsvp_table.insert
         insert.row(**d)
         await insert.commit(do_update=True)
+        meetup_table = self.bot.dbi.table('meetups')
+        query = meetup_table.query('tz')
+        query.where(id=meetup.id)
+        zone = await query.get_value()
+        tz = timezone(zone)
+        now_dt = datetime.now(tz=tz)
+        midnight_dt = now_dt + timedelta(days=1)
+        midnight_dt = midnight_dt.replace(hour=0, minute=0, second=0)
+        midnight_dt = midnight_dt.astimezone(pytz.utc)
+        stamp = midnight_dt.timestamp()
+        if hasattr(self, 'party_expire_task'):
+            self.party_expire_task.cancel()
+        self.party_expire_task = self.bot.loop.create_task(self.clear_party(stamp))
     
     async def leave_train(self, train):
         train_rsvp_table = self.bot.dbi.table('train_rsvp')
@@ -325,7 +422,7 @@ class Team:
             query.where(team_name=match)
             team_id = await query.get_value()
         else:
-            return await ctx.send("Team not found!")
+            return
         
         return cls(ctx.bot, ctx.guild.id, team_id)
 
@@ -341,11 +438,11 @@ class Users(Cog):
 
     @command()
     @users_checks.users_enabled()
-    @commands.cooldown(1, 3600, commands.BucketType.member)
     async def team(self, ctx, *, chosen_team: Team):
         """Set your Pokemon Go team."""
 
-        user_table = ctx.bot.dbi.table('users')
+        if chosen_team is None:
+            return await ctx.send("Team not found!")
         meowthuser = MeowthUser(ctx.bot, ctx.author)
         data = await meowthuser._data.get()
         if len(data) == 0:
@@ -363,7 +460,10 @@ class Users(Cog):
                 old_team = Team(ctx.bot, ctx.guild.id, old_team_id)
                 old_role = await old_team.role()
                 if old_role:
-                    await ctx.author.remove_roles(old_role)
+                    try:
+                        await ctx.author.remove_roles(old_role)
+                    except discord.Forbidden:
+                        await ctx.error("Missing permissions")
             update = meowthuser._update
             update.values(team=chosen_team.id)
             await update.commit()
@@ -382,7 +482,6 @@ class Users(Cog):
     async def pokebattler(self, ctx, pb_id: int):
         """Set your Pokebattler ID."""
 
-        user_table = ctx.bot.dbi.table('users')
         meowthuser = MeowthUser(ctx.bot, ctx.author)
         data = await meowthuser._data.get()
         if len(data) == 0:
@@ -415,6 +514,43 @@ class Users(Cog):
             await update.commit()
         return await ctx.send(f'In-game name set to {ign}')
 
+    @command(aliases=['friendcode', 'fc', 'tc'])
+    @users_checks.users_enabled()
+    async def trainercode(self, ctx, *, user_or_code):
+        """Set your in-game trainer code or look up another user's trainer code.
+        To look up a trainer, user_or_code should be a username or mention.
+        To set your trainer code, user_or_code should be a 12-digit number.
+        """
+
+        try:
+            meowthuser = await MeowthUser.convert(ctx, user_or_code)
+        except:
+            meowthuser = None
+        if meowthuser:
+            fc = await meowthuser.friendcode()
+            if not fc:
+                return await ctx.error('Trainer code not found')
+            await ctx.send(f'Trainer code for {meowthuser.user.display_name}:')
+            return await ctx.send(fc)
+        user_or_code = user_or_code.replace(' ', '')
+        if not user_or_code.isdigit() or len(user_or_code) != 12:
+            return await ctx.error('Invalid friend code')
+
+
+        user_table = ctx.bot.dbi.table('users')
+        meowthuser = MeowthUser(ctx.bot, ctx.author)
+        data = await meowthuser._data.get()
+        if len(data) == 0:
+            insert = meowthuser._insert
+            d = {'id': ctx.author.id, 'friendcode': user_or_code}
+            insert.row(**d)
+            await insert.commit()
+        else:
+            update = meowthuser._update
+            update.values(friendcode=user_or_code)
+            await update.commit()
+        return await ctx.send(f'Friend code set to {user_or_code}')
+
     @command()
     @users_checks.users_enabled()
     async def whois(self, ctx, ign):
@@ -430,6 +566,8 @@ class Users(Cog):
         if match:
             meowthuser = await MeowthUser.from_ign(ctx.bot, match)
             member = ctx.guild.get_member(meowthuser.user.id)
+            if not member:
+                member = await ctx.guild.fetch_member(meowthuser.user.id)
             if member:
                 name = member.display_name
             else:
@@ -441,10 +579,20 @@ class Users(Cog):
     @command()
     @users_checks.users_enabled()
     async def iam(self, ctx, roles: commands.Greedy[discord.Role]):
-        if not roles:
-            return await ctx.error('No roles found')
-        valid_roles = []
         table = ctx.bot.dbi.table('custom_roles')
+        if not roles:
+            query = table.query
+            query.where(guild_id=ctx.guild.id)
+            records = await query.get()
+            custom_roles = 'This server has the following custom roles: '
+            for row in records:
+                role_id = row['role_id']
+                role = discord.utils.get(ctx.guild.roles, id=role_id)
+                if role:
+                    custom_roles = custom_roles + '`' + role.name + '`, '
+            custom_roles = custom_roles[:-2] + '.'
+            return await ctx.send(custom_roles)
+        valid_roles = []
         for role in roles:
             query = table.query
             query.where(guild_id=ctx.guild.id)
@@ -477,6 +625,54 @@ class Users(Cog):
             await ctx.author.remove_roles(*valid_roles)
             return await ctx.success('Roles Removed', details="\n".join(role_names))
         return await ctx.error('No valid roles found')
+    
+    @command(name='party')
+    @users_checks.users_enabled()
+    async def default_party(self, ctx, total: typing.Optional[int]=None, *teamcounts):
+        """Set your default raiding party composition.
+
+        **Arguments**
+        *total (optional):* Number of trainers you are bringing. Defaults to
+            your last RSVP total, or 1.
+        
+        *teamcounts (optional):* Counts of each team in your group. Format:
+            `3m 2v 1i` means 3 Mystic, 2 Valor, 1 Instinct.
+        
+        Meowth resets your raid party to this value
+        at midnight local time."""
+
+        meowthuser = MeowthUser(ctx.bot, ctx.author)
+
+        if total or teamcounts:
+            party = await meowthuser.party_list(total, *teamcounts)
+        else:
+            party = await meowthuser.party()
+        
+        data = await meowthuser._data.get()
+        if len(data) == 0:
+            insert = meowthuser._insert
+            d = {'id': ctx.author.id, 'default_party': party, 'party': party}
+            insert.row(**d)
+            await insert.commit()
+        else:
+            update = meowthuser._update
+            update.values(default_party=party, party=party)
+            await update.commit()
+        table = ctx.bot.dbi.table('raid_rsvp')
+        update = table.update
+        try:
+            update.where(user_id=ctx.author.id)
+            update.values(party=party)
+            await update.commit()
+        except:
+            pass
+        party_str = f"{ctx.bot.config.team_emoji['mystic']}: {party[0]} | "
+        party_str += f"{ctx.bot.config.team_emoji['instinct']}: {party[1]} | "
+        party_str += f"{ctx.bot.config.team_emoji['valor']}: {party[2]} | "
+        party_str += f"{ctx.bot.config.team_emoji['unknown']}: {party[3]}"
+        return await ctx.send(f'Default party set to {party_str}')
+        
+
         
 
 

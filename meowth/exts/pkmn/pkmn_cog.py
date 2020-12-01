@@ -295,7 +295,7 @@ class Pokemon():
 
     async def _mega_available(self):
         data = self._data
-        return await data.select('wild_available').get_value()
+        return await data.select('mega_available').get_value()
     
     async def _baseStamina(self):
         data = self._data

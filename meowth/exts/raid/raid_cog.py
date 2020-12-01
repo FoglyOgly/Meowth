@@ -430,6 +430,7 @@ class RaidCog(Cog):
         gym_split = gym_and_time.split()
         zone = await ctx.tz()
         current_time = time.time()
+        gym_split[-1] = gym_split[-1].replace(';', ':').replace('.', ':')
         if ':' in gym_split[-1]:
             converter = time_converter()
             stamp = await converter.convert(ctx, gym_split[-1])

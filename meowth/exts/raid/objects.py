@@ -308,7 +308,13 @@ class Meetup:
                     display_status = 'has canceled'
                 else:
                     return
-                content = f"<@!{user_id}> {display_status}!"
+                guild = self.bot.get_guild(self.guild_id)
+                user = guild.get_member(user_id)
+                if user:
+                    user_content = user.display_name
+                else:
+                    user_content = f"<@!{user_id}>"
+                content = f"{user_content} {display_status}!"
                 try:
                     await chn.send(content, allowed_mentions=discord.AllowedMentions.none())
                     await chn.send(embed=rsvpembed, delete_after=15)
@@ -3212,7 +3218,12 @@ class Train:
             status_str = ' has joined the train!'
         elif status == 'cancel':
             status_str =' has left the train!'
-        content = f'<@!{user_id}>{status_str}'
+        user = guild.get_member(user_id)
+        if user:
+            user_content = user.display_name
+        else:
+            user_content = f"<@!{user_id}>"
+        content = f"{user_content} {status_str}!"
         embed = TRSVPEmbed.from_train(self).embed
         await channel.send(content, allowed_mentions=discord.AllowedMentions.none())
         await channel.send(embed=embed, delete_after=15)

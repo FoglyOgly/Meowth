@@ -271,7 +271,7 @@ class AdminCog(Cog):
         if data:
             d = dict(data[0])
         else:
-            d = {'channelid': channel_id}
+            d = {'channelid': channel_id, 'guild_id': ctx.guild.id}
         d['city'] = city
         d['lat'] = lat
         d['lon'] = lon

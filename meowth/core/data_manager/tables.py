@@ -19,7 +19,7 @@ def core_table_sqls():
                               "CONSTRAINT restart_savedata_pk "
                               "PRIMARY KEY (restart_snowflake));"),
 
-        'prefixes'       : ("CREATE TABLE prefix ("
+        'prefixes'       : ("CREATE TABLE prefixes ("
                           "guild_id bigint NOT NULL, "
                           "prefix text NOT NULL, "
                           "CONSTRAINT prefixes_pkey "

@@ -6,8 +6,9 @@ def core_table_sqls():
         'guild_config' : ("CREATE TABLE guild_config ("
                           "guild_id bigint NOT NULL, "
                           "config_name text NOT NULL, "
-                          "config_value text NOT NULL, "
-                          "CONSTRAINT guild_config_pk "
+                          "config_value text, "
+                          "version text NOT NULL, "
+                          "CONSTRAINT guild_config_pkey "
                           "PRIMARY KEY (guild_id, config_name));"),
 
         'restart_savedata' : ("CREATE TABLE restart_savedata ("
@@ -19,7 +20,7 @@ def core_table_sqls():
                               "CONSTRAINT restart_savedata_pk "
                               "PRIMARY KEY (restart_snowflake));"),
 
-        'prefixes'       : ("CREATE TABLE prefix ("
+        'prefixes'       : ("CREATE TABLE prefixes ("
                           "guild_id bigint NOT NULL, "
                           "prefix text NOT NULL, "
                           "CONSTRAINT prefixes_pkey "

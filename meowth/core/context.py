@@ -296,7 +296,7 @@ class Context(commands.Context):
     async def version(self):
         if not self.guild:
             return None
-        table = self.bot.dbi.table('guild_settings')
+        table = self.bot.dbi.table('guild_config')
         query = table.query('version')
         try:
             query.where(guild_id=self.guild.id)

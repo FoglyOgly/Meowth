@@ -308,7 +308,7 @@ class IntervalColumn(Column):
         super().__init__(name, sqltypes.IntervalSQL(field), **kwargs)
 
 class ArrayColumn(Column):
-    def __init__(self, name, inner_type, size=None):
+    def __init__(self, name, inner_type, size=None, **kwargs):
         super().__init__(name, sqltypes.ArraySQL(inner_type, size=size), **kwargs)
 
 class Schema:

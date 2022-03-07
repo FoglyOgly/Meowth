@@ -1,4 +1,5 @@
 from meowth import Cog, command, bot, checks
+from meowth.core.context import Context
 from meowth.exts.map import Gym, Pokestop, ReportChannel, PartialPOI, S2_L10, POI
 from meowth.exts.pkmn import Pokemon, Move
 from meowth.exts.pkmn.errors import MoveInvalid
@@ -16,6 +17,7 @@ from math import ceil
 import discord
 from discord.ext import commands
 from discord import Embed
+from discord import app_commands
 import asyncio
 import aiohttp
 import time
@@ -61,6 +63,11 @@ class RaidCog(Cog):
         self.bot.loop.create_task(self.pickup_traindata())
         self.bot.loop.create_task(self.pickup_meetupdata())
         self.bot.loop.create_task(self.add_listeners())
+
+        tree = app_commands.CommandTree(bot)
+        self.tree = tree
+        tree.add_command(self.raid_slash_command)
+        self.bot.loop.create_task(tree.sync(guild=discord.Object(id=344960572649111552)))
     
     async def add_listeners(self):
         if self.bot.dbi.raid_listener:
@@ -511,6 +518,47 @@ class RaidCog(Cog):
             hatch = None
         raid_id = next(snowflake.create())
         new_raid = Raid(raid_id, ctx.bot, ctx.guild.id, ctx.channel.id, ctx.author.id, gym, level=level, pkmn=boss, hatch=hatch, end=end, tz=zone)
+        ctx.raid = new_raid
+        return await self.setup_raid(ctx, new_raid)
+
+    @app_commands.command(name='raid', guild=discord.Object(id=344960572649111552))
+    async def raid_slash_command(self, interaction: discord.Interaction, boss: str, gym: str, minutes_remaining: app_commands.Range[int, 1, 45]=45):
+        ctx = self.bot.get_context(interaction.message, cls=Context)
+        zone = await ctx.tz()
+        gym = await Gym.convert(ctx, gym)
+        raid_table = ctx.bot.dbi.table('raids')
+        if isinstance(gym, Gym):
+            query = raid_table.query()
+            query.where(gym=str(gym.id), guild=ctx.guild.id)
+            old_raid = await query.get()
+            if old_raid:
+                old_raid = old_raid[0]
+                old_raid = await Raid.from_data(ctx.bot, old_raid)
+                if old_raid.level != 'EX':
+                    if old_raid.hatch:
+                        embed = await old_raid.egg_embed()
+                    else:
+                        embed = await old_raid.raid_embed()
+                    if old_raid.channel_ids:
+                        mentions = []
+                        for channelid in old_raid.channel_ids:
+                            channel = ctx.guild.get_channel(int(channelid))
+                            if not channel:
+                                continue
+                            mention = channel.mention
+                            mentions.append(mention)
+                        if mentions:
+                            return await ctx.send(f"""There is already a raid reported at this gym! Coordinate here: {", ".join(mentions)}""", embed=embed)
+                    else:
+                        msg = await ctx.send(f"""There is already a raid reported at this gym! Coordinate here!""", embed=embed)
+                        old_raid.message_ids.append(f"{msg.channel.id}/{msg.id}")
+                        return msg
+        raid_boss = await RaidBoss.convert(ctx, boss)
+        level = await raid_boss.raid_level()
+        hatch = None
+        end = time.time() + 60*minutes_remaining
+        raid_id = next(snowflake.create())
+        new_raid = Raid(raid_id, self.bot, interaction.guild_id, interaction.channel_id, interaction.user.id, gym, level=level, pkmn=raid_boss, hatch=hatch, end=end, tz=zone)
         ctx.raid = new_raid
         return await self.setup_raid(ctx, new_raid)
 

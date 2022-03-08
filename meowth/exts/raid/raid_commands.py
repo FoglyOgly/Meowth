@@ -14,7 +14,7 @@ class RaidCommands(app_commands.Group):
         bot = interaction.client
         raid_cog = bot.get_cog('RaidCog')
         raid_lists = await raid_cog.get_raid_lists()
-        boss_list = [x.keys() for x in raid_lists.values()]
+        boss_list = [x for y in raid_lists.values() for x in list(y.keys())]
         return [
             app_commands.Choice(name=boss, value=boss)
             for boss in boss_list if current.lower() in boss.lower()

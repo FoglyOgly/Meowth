@@ -558,7 +558,7 @@ class RaidCog(Cog):
         hatch = None
         end = time.time() + 60*minutes_remaining
         raid_id = next(snowflake.create())
-        new_raid = Raid(raid_id, ctx.bot, interaction.guild_id, interaction.channel_id, interaction.user.id, gym, level=level, pkmn=raid_boss, hatch=hatch, end=end, tz=zone)
+        new_raid = Raid(raid_id, self.bot, interaction.guild_id, interaction.channel_id, interaction.user.id, gym, level=level, pkmn=raid_boss, hatch=hatch, end=end, tz=zone)
         ctx.raid = new_raid
         return await self.setup_raid(ctx, new_raid)
 

@@ -59,15 +59,10 @@ class RaidCog(Cog):
     def __init__(self, bot):
         bot.raid_info = raid_info
         self.bot = bot
-        # self.bot.loop.create_task(self.pickup_raiddata())
-        # self.bot.loop.create_task(self.pickup_traindata())
-        # self.bot.loop.create_task(self.pickup_meetupdata())
-        # self.bot.loop.create_task(self.add_listeners())
-        tree = app_commands.CommandTree(bot)
-        self.tree = tree
-        tree.add_command(self.raid_slash_command)
-        print(tree.get_commands(guild=discord.Object(id=344960572649111552)))
-        self.bot.loop.create_task(tree.sync(guild=discord.Object(id=344960572649111552)))
+        self.bot.loop.create_task(self.pickup_raiddata())
+        self.bot.loop.create_task(self.pickup_traindata())
+        self.bot.loop.create_task(self.pickup_meetupdata())
+        self.bot.loop.create_task(self.add_listeners())
     
     async def add_listeners(self):
         if self.bot.dbi.raid_listener:
@@ -521,8 +516,6 @@ class RaidCog(Cog):
         ctx.raid = new_raid
         return await self.setup_raid(ctx, new_raid)
 
-    @app_commands.command(name='raid')
-    @app_commands.guilds(discord.Object(id=344960572649111552))
     async def raid_slash_command(self, interaction: discord.Interaction, boss: str, gym: str, minutes_remaining: app_commands.Range[int, 1, 45]=45):
         ctx = self.bot.get_context(interaction.message, cls=Context)
         zone = await ctx.tz()

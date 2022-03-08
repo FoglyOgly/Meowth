@@ -66,7 +66,7 @@ class RaidCog(Cog):
         tree = app_commands.CommandTree(bot)
         self.tree = tree
         tree.add_command(self.raid_slash_command)
-        print(tree.get_commands())
+        print(tree.get_commands(guild=discord.Object(id=344960572649111552)))
         self.bot.loop.create_task(tree.sync(guild=discord.Object(id=344960572649111552)))
     
     async def add_listeners(self):

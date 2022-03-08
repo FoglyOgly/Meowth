@@ -3,6 +3,8 @@ from typing import List
 import discord
 from discord import app_commands
 
+from ..pkmn import Pokemon
+
 class RaidCommands(app_commands.Group):
 
     def __init__(self):
@@ -15,9 +17,10 @@ class RaidCommands(app_commands.Group):
         raid_cog = bot.get_cog('RaidCog')
         raid_lists = await raid_cog.get_raid_lists()
         boss_list = [x for y in raid_lists.values() for x in list(y.keys())]
+        pkmn_list = [await Pokemon(bot, x).name() for x in boss_list]
         return [
             app_commands.Choice(name=boss, value=boss)
-            for boss in boss_list if current.lower() in boss.lower()
+            for boss in pkmn_list if current.lower() in boss.lower()
         ]
 
     @app_commands.command(name='hatched')

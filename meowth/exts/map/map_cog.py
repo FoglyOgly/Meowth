@@ -959,6 +959,16 @@ class Mapper(Cog):
         await ctx.send('(Name, Nickname, Latitude, Longitude, EX Raid)')
         for x in self.pages(entries):
             await ctx.send("\n".join(x))
+    
+    async def list_all_gyms(self, channel):
+        report_channel = ReportChannel(self.bot, channel)
+        gyms_query = await report_channel.get_all_gyms()
+        if not gyms_query:
+            return []
+        gyms_query.select('name')
+        data = await gyms_query.get()
+        entries = [x['name'] for x in data]
+        return entries
 
     @command()
     @checks.is_admin()

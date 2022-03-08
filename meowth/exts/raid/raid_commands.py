@@ -23,10 +23,21 @@ class RaidCommands(app_commands.Group):
             for boss in pkmn_list if current.lower() in boss.lower()
         ]
 
+    async def gym_autocomplete(
+        self, interaction: discord.Interaction, current: str, namespace: app_commands.Namespace
+    ) -> List[app_commands.Choice[str]]:
+        bot = interaction.client
+        map_cog = bot.get_cog('Mapper')
+        gym_list = await map_cog.list_all_gyms(interaction.channel)
+        return [
+            app_commands.Choice(name=gym, value=gym)
+            for gym in gym_list if current.lower() in gym.lower()
+        ]
+
     @app_commands.command(name='hatched')
     @app_commands.guilds(discord.Object(id=344960572649111552))
     @app_commands.describe(boss='the raid boss', gym='the raid gym', minutes_remaining='whole number of minutes remaining')
-    @app_commands.autocomplete(boss=boss_autocomplete)
+    @app_commands.autocomplete(boss=boss_autocomplete, gym=gym_autocomplete)
     async def raid_slash_command(self, interaction: discord.Interaction, boss: str, gym: str, minutes_remaining: app_commands.Range[int, 1, 45]=45):
         await interaction.response.send_message('Thanks for your report!', ephemeral=True)
         bot = interaction.client

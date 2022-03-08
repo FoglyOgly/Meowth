@@ -9,7 +9,7 @@ class RaidCommands(app_commands.Group):
         super().__init__(name='raid', description='Report Pokemon Go raids')
 
     async def boss_autocomplete(
-        interaction: discord.Interaction, current: str, namespace: app_commands.Namespace
+        self, interaction: discord.Interaction, current: str, namespace: app_commands.Namespace
     ) -> List[app_commands.Choice[str]]:
         bot = interaction.client
         raid_cog = bot.get_cog('RaidCog')

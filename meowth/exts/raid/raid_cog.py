@@ -59,14 +59,14 @@ class RaidCog(Cog):
     def __init__(self, bot):
         bot.raid_info = raid_info
         self.bot = bot
-        self.bot.loop.create_task(self.pickup_raiddata())
-        self.bot.loop.create_task(self.pickup_traindata())
-        self.bot.loop.create_task(self.pickup_meetupdata())
-        self.bot.loop.create_task(self.add_listeners())
+        # self.bot.loop.create_task(self.pickup_raiddata())
+        # self.bot.loop.create_task(self.pickup_traindata())
+        # self.bot.loop.create_task(self.pickup_meetupdata())
+        # self.bot.loop.create_task(self.add_listeners())
         tree = app_commands.CommandTree(bot)
         self.tree = tree
         tree.add_command(self.raid_slash_command)
-        print(tree.get_commands)
+        print(tree.get_commands())
         self.bot.loop.create_task(tree.sync(guild=discord.Object(id=344960572649111552)))
     
     async def add_listeners(self):

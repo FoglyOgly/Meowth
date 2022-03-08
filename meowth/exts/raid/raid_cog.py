@@ -63,7 +63,6 @@ class RaidCog(Cog):
         self.bot.loop.create_task(self.pickup_traindata())
         self.bot.loop.create_task(self.pickup_meetupdata())
         self.bot.loop.create_task(self.add_listeners())
-        global tree 
         tree = app_commands.CommandTree(bot)
         self.tree = tree
         tree.add_command(self.raid_slash_command)
@@ -521,7 +520,8 @@ class RaidCog(Cog):
         ctx.raid = new_raid
         return await self.setup_raid(ctx, new_raid)
 
-    @tree.command(name='raid', guild=discord.Object(id=344960572649111552))
+    @app_commands.command(name='raid')
+    @app_commands.guilds(discord.Object(id=344960572649111552))
     async def raid_slash_command(self, interaction: discord.Interaction, boss: str, gym: str, minutes_remaining: app_commands.Range[int, 1, 45]=45):
         ctx = self.bot.get_context(interaction.message, cls=Context)
         zone = await ctx.tz()

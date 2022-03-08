@@ -66,6 +66,7 @@ class RaidCog(Cog):
         tree = app_commands.CommandTree(bot)
         self.tree = tree
         tree.add_command(self.raid_slash_command)
+        print(tree.get_commands)
         self.bot.loop.create_task(tree.sync(guild=discord.Object(id=344960572649111552)))
     
     async def add_listeners(self):
@@ -520,11 +521,10 @@ class RaidCog(Cog):
         ctx.raid = new_raid
         return await self.setup_raid(ctx, new_raid)
 
-    @staticmethod
     @app_commands.command(name='raid')
     @app_commands.guilds(discord.Object(id=344960572649111552))
-    async def raid_slash_command(interaction: discord.Interaction, boss: str, gym: str, minutes_remaining: app_commands.Range[int, 1, 45]=45):
-        ctx = interaction.client.get_context(interaction.message, cls=Context)
+    async def raid_slash_command(self, interaction: discord.Interaction, boss: str, gym: str, minutes_remaining: app_commands.Range[int, 1, 45]=45):
+        ctx = self.bot.get_context(interaction.message, cls=Context)
         zone = await ctx.tz()
         gym = await Gym.convert(ctx, gym)
         raid_table = ctx.bot.dbi.table('raids')
@@ -561,8 +561,7 @@ class RaidCog(Cog):
         raid_id = next(snowflake.create())
         new_raid = Raid(raid_id, ctx.bot, interaction.guild_id, interaction.channel_id, interaction.user.id, gym, level=level, pkmn=raid_boss, hatch=hatch, end=end, tz=zone)
         ctx.raid = new_raid
-        raid_cog = ctx.bot.get_cog('RaidCog')
-        return await raid_cog.setup_raid(ctx, new_raid)
+        return await self.setup_raid(ctx, new_raid)
 
     
     async def list_raids(self, channel):

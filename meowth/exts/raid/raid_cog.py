@@ -31,6 +31,8 @@ emoji_letters = ['🇦','🇧','🇨','🇩','🇪','🇫','🇬','🇭','🇮',
     '🇲','🇳','🇴','🇵','🇶','🇷','🇸','🇹','🇺','🇻','🇼','🇽','🇾','🇿'
 ]
 
+tree = app_commands.CommandTree(bot)
+
 class time_converter(commands.Converter):
     async def convert(self, ctx, argument):
         zone = await ctx.tz()
@@ -64,7 +66,6 @@ class RaidCog(Cog):
         self.bot.loop.create_task(self.pickup_meetupdata())
         self.bot.loop.create_task(self.add_listeners())
 
-        tree = app_commands.CommandTree(bot)
         self.tree = tree
         tree.add_command(self.raid_slash_command)
         self.bot.loop.create_task(tree.sync(guild=discord.Object(id=344960572649111552)))
@@ -521,7 +522,7 @@ class RaidCog(Cog):
         ctx.raid = new_raid
         return await self.setup_raid(ctx, new_raid)
 
-    @app_commands.command(name='raid', guild=discord.Object(id=344960572649111552))
+    @tree.command(name='raid', guild=discord.Object(id=344960572649111552))
     async def raid_slash_command(self, interaction: discord.Interaction, boss: str, gym: str, minutes_remaining: app_commands.Range[int, 1, 45]=45):
         ctx = self.bot.get_context(interaction.message, cls=Context)
         zone = await ctx.tz()

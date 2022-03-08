@@ -63,6 +63,7 @@ class RaidCog(Cog):
         self.bot.loop.create_task(self.pickup_traindata())
         self.bot.loop.create_task(self.pickup_meetupdata())
         self.bot.loop.create_task(self.add_listeners())
+        global tree 
         tree = app_commands.CommandTree(bot)
         self.tree = tree
         tree.add_command(self.raid_slash_command)

@@ -517,7 +517,6 @@ class RaidCog(Cog):
         return await self.setup_raid(ctx, new_raid)
 
     async def raid_slash_command(self, interaction: discord.Interaction, boss: str, gym: str, minutes_remaining: app_commands.Range[int, 1, 45]=45):
-        print(self.bot.config)
         message = await interaction.original_message()
         ctx = await self.bot.get_context(message, cls=Context)
         class Object(object):

@@ -519,6 +519,11 @@ class RaidCog(Cog):
     async def raid_slash_command(self, interaction: discord.Interaction, boss: str, gym: str, minutes_remaining: app_commands.Range[int, 1, 45]=45):
         message = await interaction.original_message()
         ctx = await self.bot.get_context(message, cls=Context)
+        class Object(object):
+            pass
+        a = Object()
+        a.name = 'raid'
+        ctx.command = a
         zone = await ctx.tz()
         gym = await Gym.convert(ctx, gym)
         raid_table = ctx.bot.dbi.table('raids')

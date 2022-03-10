@@ -693,6 +693,7 @@ class RaidCog(Cog):
         else:
             embed = await new_raid.raid_embed()
         reportembed = await new_raid.report_embed()
+        print(str(embed))
         exgymcat = None
         if isinstance(gym, Gym):
             if level != 'EX':

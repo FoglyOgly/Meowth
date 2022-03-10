@@ -35,7 +35,6 @@ class RaidCommands(app_commands.Group):
         ]
 
     @app_commands.command(name='hatched')
-    @app_commands.guilds(discord.Object(id=344960572649111552))
     @app_commands.describe(boss='the raid boss', gym='the raid gym', minutes_remaining='whole number of minutes remaining')
     @app_commands.autocomplete(boss=boss_autocomplete, gym=gym_autocomplete)
     async def raid_slash_command(self, interaction: discord.Interaction, boss: str, gym: str, minutes_remaining: app_commands.Range[int, 1, 45]=45):
@@ -45,7 +44,6 @@ class RaidCommands(app_commands.Group):
         return await raid_cog.raid_slash_command(interaction, boss, gym, minutes_remaining)
     
     @app_commands.command(name='egg')
-    @app_commands.guilds(discord.Object(id=344960572649111552))
     @app_commands.describe(level='the raid level', gym='the raid gym', minutes_to_hatch='whole number of minutes to hatch')
     @app_commands.autocomplete(gym=gym_autocomplete)
     async def egg_slash_command(self, interaction: discord.Interaction, level: Literal['1', '3', '5', '7'], gym: str, minutes_to_hatch: app_commands.Range[int, 1, 60]=60):

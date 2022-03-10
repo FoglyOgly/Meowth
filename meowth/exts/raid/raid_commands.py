@@ -21,7 +21,7 @@ class RaidCommands(app_commands.Group):
         return [
             app_commands.Choice(name=boss, value=boss)
             for boss in pkmn_list if current.lower() in boss.lower()
-        ]
+        ][:25]
 
     async def gym_autocomplete(
         self, interaction: discord.Interaction, current: str, namespace: app_commands.Namespace
@@ -32,7 +32,7 @@ class RaidCommands(app_commands.Group):
         return [
             app_commands.Choice(name=gym, value=gym)
             for gym in gym_list if current.lower() in gym.lower()
-        ]
+        ][:25]
 
     @app_commands.command(name='hatched')
     @app_commands.describe(boss='the raid boss', gym='the raid gym', minutes_remaining='whole number of minutes remaining')

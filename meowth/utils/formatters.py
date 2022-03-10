@@ -37,7 +37,7 @@ def colour(*args):
     else:
         return discord.Colour.lighter_grey()
 
-def make_embed(msg_type='', title=None, icon=None, content=None,
+def make_embed(msg_type='', title=None, icon=None, content='',
                msg_colour=None, guild=None, title_url=None,
                thumbnail='', image='', fields=None, footer=None,
                footer_icon=None, inline=True):

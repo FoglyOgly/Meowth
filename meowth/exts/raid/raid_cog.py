@@ -562,6 +562,45 @@ class RaidCog(Cog):
         ctx.raid = new_raid
         return await self.setup_raid(ctx, new_raid)
 
+    async def egg_slash_command(self, interaction: discord.Interaction, level: int, gym: str, minutes_to_hatch: app_commands.Range[int, 1, 60]):
+        message = await interaction.original_message()
+        ctx = await self.bot.get_context(message, cls=Context)
+        zone = await ctx.tz()
+        gym = await Gym.convert(ctx, gym)
+        raid_table = ctx.bot.dbi.table('raids')
+        if isinstance(gym, Gym):
+            query = raid_table.query()
+            query.where(gym=str(gym.id), guild=ctx.guild.id)
+            old_raid = await query.get()
+            if old_raid:
+                old_raid = old_raid[0]
+                old_raid = await Raid.from_data(ctx.bot, old_raid)
+                if old_raid.level != 'EX':
+                    if old_raid.hatch:
+                        embed = await old_raid.egg_embed()
+                    else:
+                        embed = await old_raid.raid_embed()
+                    if old_raid.channel_ids:
+                        mentions = []
+                        for channelid in old_raid.channel_ids:
+                            channel = ctx.guild.get_channel(int(channelid))
+                            if not channel:
+                                continue
+                            mention = channel.mention
+                            mentions.append(mention)
+                        if mentions:
+                            return await ctx.send(f"""There is already a raid reported at this gym! Coordinate here: {", ".join(mentions)}""", embed=embed)
+                    else:
+                        msg = await ctx.send(f"""There is already a raid reported at this gym! Coordinate here!""", embed=embed)
+                        old_raid.message_ids.append(f"{msg.channel.id}/{msg.id}")
+                        return msg
+        hatch = time.time() + 60*minutes_to_hatch
+        end = hatch + 60*ctx.bot.raid_info.raid_times[level][1]
+        raid_id = next(snowflake.create())
+        new_raid = Raid(raid_id, self.bot, interaction.guild_id, interaction.channel_id, interaction.user.id, gym, level=level, hatch=hatch, end=end, tz=zone)
+        ctx.raid = new_raid
+        return await self.setup_raid(ctx, new_raid)
+
     
     async def list_raids(self, channel):
         color = channel.guild.me.color

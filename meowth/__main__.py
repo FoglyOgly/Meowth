@@ -31,6 +31,8 @@ if discord.version_info.major < 1:
 def run_bot(debug=False, launcher=None, from_restart=False):
     """Sets up the bot, runs it and handles exit codes."""
 
+    discord.http._set_api_version(9)
+
     # create async loop and setup contextvar
     loop = asyncio.get_event_loop()
     context.ctx_setup(loop)

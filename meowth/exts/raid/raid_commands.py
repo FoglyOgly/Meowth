@@ -48,7 +48,7 @@ class RaidCommands(app_commands.Group):
     @app_commands.guilds(discord.Object(id=344960572649111552))
     @app_commands.describe(level='the raid level', gym='the raid gym', minutes_to_hatch='whole number of minutes to hatch')
     @app_commands.autocomplete(gym=gym_autocomplete)
-    async def egg_slash_command(self, interaction: discord.Interaction, level: Literal[1, 3, 5, 7], gym: str, minutes_to_hatch: app_commands.Range[int, 1, 60]=60):
+    async def egg_slash_command(self, interaction: discord.Interaction, level: Literal['1', '3', '5', '7'], gym: str, minutes_to_hatch: app_commands.Range[int, 1, 60]=60):
         await interaction.response.send_message('Thanks for your report!', ephemeral=True)
         bot = interaction.client
         raid_cog = bot.get_cog('RaidCog')

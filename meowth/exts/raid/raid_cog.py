@@ -524,6 +524,7 @@ class RaidCog(Cog):
         a = Object()
         a.name = 'raid'
         ctx.command = a
+        ctx.author = interaction.user
         zone = await ctx.tz()
         gym = await Gym.convert(ctx, gym)
         raid_table = ctx.bot.dbi.table('raids')
@@ -562,10 +563,11 @@ class RaidCog(Cog):
         ctx.raid = new_raid
         return await self.setup_raid(ctx, new_raid)
 
-    async def egg_slash_command(self, interaction: discord.Interaction, level: int, gym: str, minutes_to_hatch: app_commands.Range[int, 1, 60]):
+    async def egg_slash_command(self, interaction: discord.Interaction, level: str, gym: str, minutes_to_hatch: app_commands.Range[int, 1, 60]):
         message = await interaction.original_message()
         ctx = await self.bot.get_context(message, cls=Context)
         zone = await ctx.tz()
+        ctx.author = interaction.user
         gym = await Gym.convert(ctx, gym)
         raid_table = ctx.bot.dbi.table('raids')
         if isinstance(gym, Gym):

@@ -871,6 +871,7 @@ class Pokemon():
                     id_set.update(ids)
                 names = fuzzymatch.get_matches(name_list, arg, scorer='ratio')
                 if names:
+                    print(names)
                     names = [x[0] for x in names]
                     query = bot.dbi.table('pokedex').query('pokemonid').where(pokedex['name'].in_(names))
                     ids = await query.get_values()

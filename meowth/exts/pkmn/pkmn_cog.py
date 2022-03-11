@@ -860,6 +860,7 @@ class Pokemon():
                 valid_level = rounded/2
                 lvl = valid_level
             else:
+                arg = arg.replace(' ', '')
                 id_set = set()
                 form_name = fuzzymatch.get_match(form_list, arg)
                 if form_name[0]:

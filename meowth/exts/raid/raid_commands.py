@@ -41,6 +41,7 @@ class RaidCommands(app_commands.Group):
         await interaction.response.send_message('Thanks for your report!', ephemeral=True)
         bot = interaction.client
         raid_cog = bot.get_cog('RaidCog')
+        boss = boss.replace(' ', '')
         return await raid_cog.raid_slash_command(interaction, boss, gym, minutes_remaining)
     
     @app_commands.command(name='egg')

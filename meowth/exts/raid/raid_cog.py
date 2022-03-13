@@ -1,5 +1,6 @@
 from meowth import Cog, command, bot, checks
 from meowth.core.context import Context
+from meowth.core.errors import LocationNotSet
 from meowth.exts.map import Gym, Pokestop, ReportChannel, PartialPOI, S2_L10, POI
 from meowth.exts.pkmn import Pokemon, Move
 from meowth.exts.pkmn.errors import MoveInvalid
@@ -527,10 +528,11 @@ class RaidCog(Cog):
         ctx.author = interaction.user
         try:
             await raid_checks.is_raid_enabled(ctx)
-        except RaidDisabled as e:
+            await raid_checks.check_bot_permissions(ctx)
+            await checks.check_location_set(ctx)
+        except Exception as e:
             self.bot.dispatch('command_error', ctx, e)
-        await raid_checks.check_bot_permissions(ctx)
-        await checks.check_location_set(ctx)
+            return
         zone = await ctx.tz()
         gym = await Gym.convert(ctx, gym)
         raid_table = ctx.bot.dbi.table('raids')
@@ -574,6 +576,13 @@ class RaidCog(Cog):
         ctx = await self.bot.get_context(message, cls=Context)
         zone = await ctx.tz()
         ctx.author = interaction.user
+        try:
+            await raid_checks.is_raid_enabled(ctx)
+            await raid_checks.check_bot_permissions(ctx)
+            await checks.check_location_set(ctx)
+        except Exception as e:
+            self.bot.dispatch('command_error', ctx, e)
+            return
         gym = await Gym.convert(ctx, gym)
         raid_table = ctx.bot.dbi.table('raids')
         if isinstance(gym, Gym):

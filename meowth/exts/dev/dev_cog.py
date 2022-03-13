@@ -377,7 +377,8 @@ class Dev(Cog):
             react_total = sum([r.count for r in msg.reactions])
             react_users = 0
             for reaction in msg.reactions:
-                react_users += len(await reaction.users().flatten())
+                users = [user async for user in reaction.users()]
+                react_users += len(users)
             reactions.append(
                 f"**Total:** {react_total}"
             )

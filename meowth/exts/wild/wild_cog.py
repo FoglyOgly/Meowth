@@ -141,7 +141,7 @@ class Wild():
             message_list.append(msg)
             for react in msg.reactions:
                 if react.emoji == self.react_list['coming']:
-                    usrs = await react.users().flatten()
+                    usrs = [user async for user in react.users()]
                     channels_users[chn].extend(usrs)
                     channels_users[chn].remove(self.bot.user)
                     break
@@ -444,7 +444,7 @@ class Modifier():
             message_list.append(msg)
             for react in msg.reactions:
                 if react.emoji == self.react_list['coming']:
-                    usrs = await react.users().flatten()
+                    usrs = [user async for user in react.users()]
                     channels_users[chn].extend(usrs)
                     channels_users[chn].remove(self.bot.user)
                     break

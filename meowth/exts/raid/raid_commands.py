@@ -9,6 +9,9 @@ class RaidCommands(app_commands.Group):
 
     def __init__(self):
         super().__init__(name='raid', description='Report Pokemon Go raids')
+    
+    async def on_error(self, interaction, command, error):
+        raise error
 
     async def boss_autocomplete(
         self, interaction: discord.Interaction, current: str, namespace: app_commands.Namespace

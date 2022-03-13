@@ -5,13 +5,15 @@ from discord import app_commands
 
 from ..pkmn import Pokemon
 
+app_commands.on_error()
+
 class RaidCommands(app_commands.Group):
 
     def __init__(self):
         super().__init__(name='raid', description='Report Pokemon Go raids')
     
     async def on_error(self, interaction, command, error):
-        raise error
+        raise error.original
 
     async def boss_autocomplete(
         self, interaction: discord.Interaction, current: str, namespace: app_commands.Namespace

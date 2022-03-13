@@ -5,8 +5,6 @@ from discord import app_commands
 
 from ..pkmn import Pokemon
 
-app_commands.on_error()
-
 class RaidCommands(app_commands.Group):
 
     def __init__(self):

@@ -88,7 +88,7 @@ class Context(commands.Context):
                 value = convert_to_bool(value)
             return value
 
-    async def error(self, title, details=None, log_level='warning',
+    async def error(self, title, details='', log_level='warning',
                     exc: Exception = None, **options):
         """Submit an error to log and reply with error message"""
         msg = await self.embed(
@@ -103,7 +103,7 @@ class Context(commands.Context):
             log(log_msg)
         return msg
 
-    async def success(self, title=None, details=None, send=True, **options):
+    async def success(self, title=None, details='', send=True, **options):
         """Quick send or build an info embed response."""
         if title:
             return await self.embed(
@@ -111,7 +111,7 @@ class Context(commands.Context):
         else:
             await self.ok()
 
-    async def info(self, title, details=None, send=True, **options):
+    async def info(self, title, details='', send=True, **options):
         """Quick send or build an info embed response."""
         return await self.embed(
             title, details, msg_type='info', send=send, **options)
@@ -121,7 +121,7 @@ class Context(commands.Context):
         return await self.embed(
             title, details, msg_type='warning', send=send, **options)
 
-    async def embed(self, title, description=None, plain_msg='', *,
+    async def embed(self, title, description='', plain_msg='', *,
                     msg_type=None, title_url=None, colour=None,
                     icon=None, thumbnail='', image='', fields: dict = None,
                     footer=None, footer_icon=None, send=True, inline=False):

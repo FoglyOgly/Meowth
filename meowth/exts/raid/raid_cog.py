@@ -525,7 +525,10 @@ class RaidCog(Cog):
         a.name = 'raid'
         ctx.command = a
         ctx.author = interaction.user
-        await raid_checks.is_raid_enabled(ctx)
+        try:
+            await raid_checks.is_raid_enabled(ctx)
+        except RaidDisabled as e:
+            self.bot.dispatch('command_error', ctx, e)
         await raid_checks.check_bot_permissions(ctx)
         await checks.check_location_set(ctx)
         zone = await ctx.tz()

@@ -525,6 +525,9 @@ class RaidCog(Cog):
         a.name = 'raid'
         ctx.command = a
         ctx.author = interaction.user
+        await raid_checks.is_raid_enabled(ctx)
+        await raid_checks.check_bot_permissions(ctx)
+        await checks.check_location_set(ctx)
         zone = await ctx.tz()
         gym = await Gym.convert(ctx, gym)
         raid_table = ctx.bot.dbi.table('raids')

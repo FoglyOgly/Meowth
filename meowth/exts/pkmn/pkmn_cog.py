@@ -618,6 +618,7 @@ class Pokemon():
         ids = await query.get_values()
         return ids
     
+    
     async def cpm(self):
         if not self.lvl:
             return None
@@ -1112,6 +1113,13 @@ class Pokedex(Cog):
             pokemon_name = await error.pokemon.name()
             await ctx.error(f'Legacy move {move_name} invalid in current context.')
 
+    async def get_wilds(self):
+        table = self.bot.dbi.table('pokemon')
+        query = table.query('pokemonid')
+        query.where(wild_available=True)
+        ids = await query.get_values()
+        return [Pokemon(self.bot, x) for x in ids]
+    
     @command()
     async def pokedex(self, ctx, *, pokemon: Pokemon):
         """Display a Pokedex entry."""

@@ -969,6 +969,21 @@ class Mapper(Cog):
         data = await gyms_query.get()
         entries = [x['name'] for x in data]
         return entries
+    
+    async def list_all_stops(self, channel):
+        report_channel = ReportChannel(self.bot, channel)
+        stops_query = await report_channel.get_all_stops()
+        if not stops_query:
+            return []
+        stops_query.select('name')
+        data = await stops_query.get()
+        entries = [x['name'] for x in data]
+        return entries
+    
+    async def list_all_pois(self, channel):
+        gyms = await self.list_all_gyms(channel)
+        stops = await self.list_all_stops(channel)
+        return gyms + stops
 
     @command()
     @checks.is_admin()

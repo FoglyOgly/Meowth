@@ -1,4 +1,6 @@
+from re import A
 from meowth import Cog, command, bot, checks
+from meowth.core.context import Context
 from meowth.exts.map import POI, Gym, Pokestop, ReportChannel, PartialPOI
 from meowth.exts.pkmn import Pokemon, Move
 from meowth.exts.pkmn.errors import PokemonInvalidContext
@@ -14,6 +16,8 @@ import asyncio
 from pytz import timezone
 from math import ceil
 from discord.ext import commands
+from discord import app_commands
+import discord
 from discord.ext.commands import Greedy
 from typing import Optional
 
@@ -626,9 +630,41 @@ class WildCog(Cog):
                 disguised = None
         else:
             disguised = None
-        wild_table = self.bot.dbi.table('wilds')
         wild_id = next(snowflake.create())
         new_wild = Wild(wild_id, self.bot, ctx.guild.id, ctx.author.id, location, pkmn)
+        return await self.setup_wild(ctx, new_wild, disguised)
+    
+    async def wild_slash_command(self, interaction: discord.Interaction, pokemon: str, location: str, disguise: str=None):
+        message = await interaction.original_message()
+        ctx = await self.bot.get_context(message, cls=Context)
+        class Object(object):
+            pass
+        a = Object()
+        a.name = 'wild'
+        ctx.command = a
+        ctx.author = interaction.user
+        try:
+            await wild_checks.is_wild_enabled(ctx)
+            await checks.check_location_set(ctx)
+        except Exception as e:
+            self.bot.dispatch('command_error', ctx, e)
+            return
+        zone = await ctx.tz()
+        poi = await POI.convert(ctx, location)
+        wild_table = ctx.bot.dbi.table('wilds')
+        pkmn = await Pokemon.convert(ctx, pokemon)
+        if pokemon == 'DITTO' and disguise:
+            disguise = await Pokemon.convert(ctx, disguise)
+        wild_id = next(snowflake.create())
+        new_wild = Wild(wild_id, self.bot, interaction.guild_id, interaction.user.id, poi, pkmn)
+        return await self.setup_wild(ctx, new_wild, disguise)
+
+
+    async def setup_wild(self, ctx, new_wild: Wild, disguised: Pokemon=None):
+        pkmn = new_wild.pkmn
+        location = new_wild.location
+        wild_id = new_wild.id
+        wild_table = ctx.bot.dbi.table('wilds')
         react_list = list(new_wild.react_list.values())
         name = await pkmn.name()
         family = await pkmn._familyId()

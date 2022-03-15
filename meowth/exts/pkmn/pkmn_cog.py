@@ -1118,13 +1118,10 @@ class Pokedex(Cog):
         query = table.query('pokemonid')
         query.where(wild_available=True)
         wild_ids = await query.get_values()
-        print(len(wild_ids))
         dex_table = self.bot.dbi.table('Pokedex')
         dex_query = dex_table.query('pokemonid')
         dex_query.where(dex_table['name'].ilike(f'%{current}%'))
-        print(dex_query.sql())
         current_ids = await dex_query.get_values()
-        print(len(current_ids))
         ids = list(set(current_ids).intersection(set(wild_ids)))
         return [Pokemon(self.bot, x) for x in ids]
     

@@ -1121,7 +1121,7 @@ class Pokedex(Cog):
         print(len(wild_ids))
         dex_table = self.bot.dbi.table('Pokedex')
         dex_query = dex_table.query('pokemonid')
-        dex_query.where(dex_table['name'].like(f'%{current}%'))
+        dex_query.where(dex_table['name'].ilike(f'%{current}%'))
         print(dex_query.sql())
         current_ids = await dex_query.get_values()
         print(len(current_ids))

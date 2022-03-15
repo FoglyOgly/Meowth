@@ -1113,11 +1113,16 @@ class Pokedex(Cog):
             pokemon_name = await error.pokemon.name()
             await ctx.error(f'Legacy move {move_name} invalid in current context.')
 
-    async def get_wilds(self):
+    async def get_wilds(self, current):
         table = self.bot.dbi.table('pokemon')
         query = table.query('pokemonid')
         query.where(wild_available=True)
-        ids = await query.get_values()
+        wild_ids = await query.get_values()
+        dex_table = self.bot.dbi.table('pokedex')
+        dex_query = dex_table.query('pokemonid')
+        dex_query.where(dex_table['name'].like(current))
+        current_ids = await dex_query.get_values()
+        ids = list(set(current_ids).intersection(set(wild_ids)))
         return [Pokemon(self.bot, x) for x in ids]
     
     @command()

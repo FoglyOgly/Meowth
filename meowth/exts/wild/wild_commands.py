@@ -17,11 +17,11 @@ class WildCommands(app_commands.Group):
     ) -> List[app_commands.Choice[str]]:
         bot = interaction.client
         pkmn_cog = bot.get_cog('Pokedex')
-        wild_list = await pkmn_cog.get_wilds()
+        wild_list = await pkmn_cog.get_wilds(current)
         pkmn_list = [await x.name() for x in wild_list]
         return [
             app_commands.Choice(name=pkmn, value=pkmn)
-            for pkmn in pkmn_list if current.lower() in pkmn.lower()
+            for pkmn in pkmn_list
         ][:25]
     
     async def location_autocomplete(

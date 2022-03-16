@@ -108,7 +108,7 @@ class ScoreCog(Cog):
                 'Research': str(d['research']),
                 'Service': str(d['service'])
             }
-        return await ctx.info(f'Scorecard for {user.display_name}', fields=fields, thumbnail=user.avatar_url)
+        return await ctx.info(f'Scorecard for {user.display_name}', fields=fields, thumbnail=user.avatar.url)
         
     @command()
     @score_checks.users_enabled()

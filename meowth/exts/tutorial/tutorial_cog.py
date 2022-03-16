@@ -231,7 +231,7 @@ class Tutorial(Cog):
 
         # post raid help info prefix, avatar, user
         helpembed = await formatters.get_raid_help(
-            ctx.prefix, ctx.bot.user.avatar_url)
+            ctx.prefix, ctx.bot.user.avatar.url)
 
         await tutorial_channel.send(
             f"This channel will now be treated as a raid channel. Here is a list of "

@@ -157,11 +157,11 @@ class Bot(commands.AutoShardedBot):
 
     @property
     def avatar(self):
-        return self.user.avatar.url
+        return self.user.display_avatar.url
 
     @property
     def avatar_small(self):
-        return self.user.avatar.with_size(64)
+        return self.user.display_avatar.with_size(64)
 
     @property
     def uptime(self):

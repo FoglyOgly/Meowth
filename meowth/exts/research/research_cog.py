@@ -846,7 +846,7 @@ class ResearchEmbed:
             reporter = await research.guild.fetch_member(research.reporter_id)
         color = research.guild.me.color
         reporter_name = reporter.display_name
-        reporter_avy = reporter.avatar.url
+        reporter_avy = reporter.display_avatar.url
         footer = f"Reported by {reporter_name} • Expires"
         icon_url = ("https://raw.githubusercontent.com/"
                 "FoglyOgly/Meowth/new-core/meowth/images/misc/field-research.png")

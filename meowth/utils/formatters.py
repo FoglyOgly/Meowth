@@ -118,7 +118,7 @@ async def url_color(url):
     return discord.Colour.from_rgb(*(await _dominant_color_from_url(url)))
 
 async def user_color(user):
-    return await url_color(user.avatar.with_format('png'))
+    return await url_color(user.display_avatar.with_format('png'))
 
 def bold(msg: str):
     """Format to bold markdown text"""

@@ -96,7 +96,7 @@ class Trade():
     @property
     def lister_avy(self):
         u = self.bot.get_user(self.lister_id)
-        return u.avatar.url
+        return u.display_avatar.url
     
     @property
     def react_list(self):
@@ -137,7 +137,7 @@ class Trade():
                 },
             inline=True,
             footer=trader.display_name,
-            footer_icon=trader.avatar.with_size(size=256),
+            footer_icon=trader.display_avatar.with_size(size=256),
             thumbnail=offer_url
         )
     

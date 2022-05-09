@@ -988,7 +988,7 @@ class Raid:
                         new_status = 'coming'
         if emoji == '\u2754':
             await message.remove_reaction(emoji, user)
-            return await formatters.get_raid_help('!', self.bot.user.avatar.url, user)
+            return await formatters.get_raid_help('!', self.bot.user.display_avatar.url, user)
         if emoji == '❌':
             await message.remove_reaction(emoji, user)
             await self.leave_grp(payload.user_id)

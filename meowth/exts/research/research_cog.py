@@ -553,6 +553,13 @@ class ResearchCog(Cog):
             return []
         return await query.get_values()
     
+    async def get_tasks(self, current):
+        table = self.bot.dbi.table('research_tasks')
+        query = table.query('task')
+        query.where(table['task'].ilike(f'%{current}%'))
+        current_ids = await query.get_values()
+        return current_ids
+    
     @command()
     @checks.is_co_owner()
     async def cleartasks(self, ctx, *, cleartime=None):
@@ -708,6 +715,42 @@ class ResearchCog(Cog):
             reward = reward.id
         research_id = next(snowflake.create())
         research = Research(research_id, ctx.bot, ctx.guild.id, ctx.author.id, task, location, reward, tz, time.time())
+        return await self.setup_research(ctx, research)
+
+    async def research_slash_command(self, interaction: discord.Interaction, task: str, location: str, reward: str):
+        message = await interaction.original_message()
+        ctx = await self.bot.get_context(message, cls=Context)
+        class Object(object):
+            pass
+        a = Object()
+        a.name = 'research'
+        ctx.command = a
+        ctx.author = interaction.user 
+        try:
+            await research_checks.is_research_enabled(ctx)
+            await checks.check_location_set(ctx)
+        except Exception as e:
+            self.bot.dispatch('command_error', ctx, e)
+            return
+        zone = await ctx.tz()
+        task_obj = Task(ctx.bot, task)
+        pokestop = await Pokestop.convert(ctx, location)
+        try:
+            reward_obj = await Pokemon.convert(ctx, reward)
+        except:
+            reward_obj = None
+        if not reward_obj:
+            try:
+                reward_obj = await ItemReward.convert(ctx, reward)
+            except:
+                reward_obj = ItemReward(ctx.bot, f'partial/{reward}/1')
+        research_id = next(snowflake.create())
+        research = Research(research_id, self.bot, interaction.guild_id, interaction.user.id, task_obj, pokestop, reward_obj, zone, time.time())
+        return await self.setup_research(ctx, research)
+        
+
+    async def setup_research(self, ctx, research: Research):
+        location = research.location
         embed = await ResearchEmbed.from_research(research)
         embed = embed.embed
         wants = await research.get_wants()

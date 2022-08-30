@@ -31,12 +31,12 @@ class ResearchCommands(app_commands.Group):
         possible_rewards = await task.possible_rewards()
         async def reward_desc(reward):
             if '/' in reward:
-                reward = ItemReward(self.bot, reward)
+                reward = ItemReward(bot, reward)
                 desc = await reward.description()
             elif reward == 'unknown_encounter':
                 desc = "Unknown Encounter"
             else:
-                pkmn = Pokemon(self.bot, reward)
+                pkmn = Pokemon(bot, reward)
                 desc = await pkmn.name()
                 if await pkmn._shiny_available():
                     desc += " :sparkles:"
@@ -60,7 +60,7 @@ class ResearchCommands(app_commands.Group):
             for poi in poi_list if current.lower() in poi.lower()
         ][:25]
     
-    @app_commands.command()
+    @app_commands.command(name='')
     @app_commands.describe(task='the field research task', reward='the Pokemon or item reward', location='the Pokestop where the research is')
     @app_commands.autocomplete(task=task_autocomplete, reward=reward_autocomplete, location=location_autocomplete)
     async def research_slash_command(self, interaction: discord.Interaction, task: str, reward: str, location: str):

@@ -744,8 +744,8 @@ class ResearchCog(Cog):
                 reward_obj = await ItemReward.convert(ctx, reward)
             except:
                 reward_obj = ItemReward(ctx.bot, f'partial/{reward}/1')
-        if not isinstance(reward, str):
-            reward = reward.id
+        if not isinstance(reward_obj, str):
+            reward_obj = reward_obj.id
         research_id = next(snowflake.create())
         research = Research(research_id, self.bot, interaction.guild_id, interaction.user.id, task_obj, pokestop, reward_obj, zone, time.time())
         return await self.setup_research(ctx, research)

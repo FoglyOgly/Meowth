@@ -38,10 +38,6 @@ class ResearchCommands(app_commands.Group):
             else:
                 pkmn = Pokemon(bot, reward)
                 desc = await pkmn.name()
-                if await pkmn._shiny_available():
-                    desc += " :sparkles:"
-                type_emoji = await pkmn.type_emoji()
-                desc += f" {type_emoji}"
             return desc
         reward_descs = [await reward_desc(x) for x in possible_rewards]
         return [

@@ -60,7 +60,7 @@ class ResearchCommands(app_commands.Group):
             for poi in poi_list if current.lower() in poi.lower()
         ][:25]
     
-    @app_commands.command(name='')
+    @app_commands.command(name='task')
     @app_commands.describe(task='the field research task', reward='the Pokemon or item reward', location='the Pokestop where the research is')
     @app_commands.autocomplete(task=task_autocomplete, reward=reward_autocomplete, location=location_autocomplete)
     async def research_slash_command(self, interaction: discord.Interaction, task: str, reward: str, location: str):

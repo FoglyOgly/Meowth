@@ -296,6 +296,13 @@ class Bot(commands.AutoShardedBot):
     async def on_message(self, message):
         self.counter["messages_read"] += 1
         await self.process_commands(message)
+    
+    async def wait_for(self, event, /, *, check=None, timeout=None):
+        result = await super().wait_for(event, check=check, timeout=timeout)
+        if event == "message":
+            if result.content.startswith(self.user.mention):
+                result.content = result.content.replace(self.user.mention, '').strip()
+        return result
 
     async def on_resumed(self):
         self.counter["sessions_resumed"] += 1

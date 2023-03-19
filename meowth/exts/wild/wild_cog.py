@@ -405,6 +405,10 @@ class Modifier():
             return 'Magnetic Lure Module'
         if self.kind == 'mossy':
             return 'Mossy Lure Module'
+        if self.kind == 'rainy':
+            return 'Rainy Lure Module'
+        if self.kind == 'golden':
+            return 'Golden Lure Module'
     
     def img_url(self):
         url = ("https://raw.githubusercontent.com/"
@@ -723,7 +727,7 @@ class WildCog(Cog):
         """Report a lured Pokestop.
 
         **Arguments**
-        *kind:* Glacial, Mossy or Magnetic
+        *kind:* Glacial, Mossy, Magnetic, Rainy or Golden
         *location:* The location of the lure.
 
         If *location* is the name of a known Pokestop,
@@ -732,7 +736,7 @@ class WildCog(Cog):
 
         **Example:** `!lure glacial city park`"""
 
-        word_list = ["glacial", "mossy", "magnetic"]
+        word_list = ["glacial", "mossy", "magnetic", "rainy", "golden"]
         result = fuzzymatch.get_match(word_list, kind)
         kind = result[0]
         if not kind:

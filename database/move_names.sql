@@ -1,0 +1,1996 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 15.4
+-- Dumped by pg_dump version 15.4
+
+-- Started on 2023-08-29 10:00:56
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 3508 (class 0 OID 16530)
+-- Dependencies: 239
+-- Data for Name: move_names; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.move_names (moveid, language_id, name) FROM stdin;
+AQUA_TAIL	9	Aqua Tail
+SEED_BOMB	9	Seed Bomb
+PSYSHOCK	9	Psyshock
+ANCIENT_POWER	9	Ancient Power
+ROCK_TOMB	9	Rock Tomb
+ROCK_SLIDE	9	Rock Slide
+POWER_GEM	9	Power Gem
+SHADOW_SNEAK	9	Shadow Sneak
+SHADOW_PUNCH	9	Shadow Punch
+OMINOUS_WIND	9	Ominous Wind
+SHADOW_BALL	9	Shadow Ball
+MAGNET_BOMB	9	Magnet Bomb
+IRON_HEAD	9	Iron Head
+PARABOLIC_CHARGE	9	Parabolic Charge
+THUNDER_PUNCH	9	Thunder Punch
+THUNDER	9	Thunder
+THUNDERBOLT	9	Thunderbolt
+TWISTER	9	Twister
+DRAGON_PULSE	9	Dragon Pulse
+DRAGON_CLAW	9	Dragon Claw
+DISARMING_VOICE	9	Disarming Voice
+DRAINING_KISS	9	Draining Kiss
+DAZZLING_GLEAM	9	Dazzling Gleam
+MOONBLAST	9	Moonblast
+PLAY_ROUGH	9	Play Rough
+CROSS_POISON	9	Cross Poison
+SLUDGE_BOMB	9	Sludge Bomb
+SLUDGE_WAVE	9	Sludge Wave
+GUNK_SHOT	9	Gunk Shot
+BONE_CLUB	9	Bone Club
+BULLDOZE	9	Bulldoze
+MUD_BOMB	9	Mud Bomb
+SIGNAL_BEAM	9	Signal Beam
+X_SCISSOR	9	X-Scissor
+FLAME_CHARGE	9	Flame Charge
+FLAME_BURST	9	Flame Burst
+FIRE_BLAST	9	Fire Blast
+BRINE	9	Brine
+WATER_PULSE	9	Water Pulse
+SCALD	9	Scald
+HYDRO_PUMP	9	Hydro Pump
+PSYCHIC	9	Psychic
+PSYSTRIKE	9	Psystrike
+ICY_WIND	9	Icy Wind
+GIGA_DRAIN	9	Giga Drain
+FIRE_PUNCH	9	Fire Punch
+SOLAR_BEAM	9	Solar Beam
+LEAF_BLADE	9	Leaf Blade
+POWER_WHIP	9	Power Whip
+AIR_CUTTER	9	Air Cutter
+HURRICANE	9	Hurricane
+BRICK_BREAK	9	Brick Break
+SWIFT	9	Swift
+HORN_ATTACK	9	Horn Attack
+STOMP	9	Stomp
+HYPER_FANG	9	Hyper Fang
+BODY_SLAM	9	Body Slam
+REST	9	Rest
+STRUGGLE	9	Struggle
+SCALD_BLASTOISE	9	Scald
+HYDRO_PUMP_BLASTOISE	9	Hydro Pump
+WRAP_GREEN	9	Wrap
+WRAP_PINK	9	Wrap
+FURY_CUTTER_FAST	9	Fury Cutter
+BUG_BITE_FAST	9	Bug Bite
+BITE_FAST	9	Bite
+SUCKER_PUNCH_FAST	9	Sucker Punch
+DRAGON_BREATH_FAST	9	Dragon Breath
+THUNDER_SHOCK_FAST	9	Thunder Shock
+SPARK_FAST	9	Spark
+LOW_KICK_FAST	9	Low Kick
+KARATE_CHOP_FAST	9	Karate Chop
+EMBER_FAST	9	Ember
+WING_ATTACK_FAST	9	Wing Attack
+PECK_FAST	9	Peck
+LICK_FAST	9	Lick
+SHADOW_CLAW_FAST	9	Shadow Claw
+VINE_WHIP_FAST	9	Vine Whip
+RAZOR_LEAF_FAST	9	Razor Leaf
+MUD_SHOT_FAST	9	Mud Shot
+ICE_SHARD_FAST	9	Ice Shard
+FROST_BREATH_FAST	9	Frost Breath
+QUICK_ATTACK_FAST	9	Quick Attack
+SCRATCH_FAST	9	Scratch
+TACKLE_FAST	9	Tackle
+POUND_FAST	9	Pound
+CUT_FAST	9	Cut
+POISON_JAB_FAST	9	Poison Jab
+ACID_FAST	9	Acid
+PSYCHO_CUT_FAST	9	Psycho Cut
+ROCK_THROW_FAST	9	Rock Throw
+METAL_CLAW_FAST	9	Metal Claw
+BULLET_PUNCH_FAST	9	Bullet Punch
+WATER_GUN_FAST	9	Water Gun
+SPLASH_FAST	9	Splash
+WATER_GUN_FAST_BLASTOISE	9	Water Gun
+MUD_SLAP_FAST	9	Mud-Slap
+ZEN_HEADBUTT_FAST	9	Zen Headbutt
+CONFUSION_FAST	9	Confusion
+POISON_STING_FAST	9	Poison Sting
+BUBBLE_FAST	9	Bubble
+FEINT_ATTACK_FAST	9	Feint Attack
+STEEL_WING_FAST	9	Steel Wing
+FIRE_FANG_FAST	9	Fire Fang
+ROCK_SMASH_FAST	9	Rock Smash
+TRANSFORM_FAST	9	Transform
+COUNTER_FAST	9	Counter
+POWDER_SNOW_FAST	9	Powder Snow
+CLOSE_COMBAT	9	Close Combat
+DYNAMIC_PUNCH	9	Dynamic Punch
+FOCUS_BLAST	9	Focus Blast
+AURORA_BEAM	9	Aurora Beam
+CHARGE_BEAM_FAST	9	Charge Beam
+VOLT_SWITCH_FAST	9	Volt Switch
+WILD_CHARGE	9	Wild Charge
+ZAP_CANNON	9	Zap Cannon
+DRAGON_TAIL_FAST	9	Dragon Tail
+AVALANCHE	9	Avalanche
+AIR_SLASH_FAST	9	Air Slash
+BRAVE_BIRD	9	Brave Bird
+SKY_ATTACK	9	Sky Attack
+SAND_TOMB	9	Sand Tomb
+ROCK_BLAST	9	Rock Blast
+INFESTATION_FAST	9	Infestation
+STRUGGLE_BUG_FAST	9	Struggle Bug
+SILVER_WIND	9	Silver Wind
+ASTONISH_FAST	9	Astonish
+HEX_FAST	9	Hex
+NIGHT_SHADE	9	Night Shade
+IRON_TAIL_FAST	9	Iron Tail
+GYRO_BALL	9	Gyro Ball
+HEAVY_SLAM	9	Heavy Slam
+FIRE_SPIN_FAST	9	Fire Spin
+OVERHEAT	9	Overheat
+SLUDGE	9	Sludge
+VICE_GRIP	9	Vice Grip
+BULLET_SEED_FAST	9	Bullet Seed
+GRASS_KNOT	9	Grass Knot
+ENERGY_BALL	9	Energy Ball
+EXTRASENSORY_FAST	9	Extrasensory
+FUTURESIGHT	9	Futuresight
+MIRROR_COAT	9	Mirror Coat
+OUTRAGE	9	Outrage
+SNARL_FAST	9	Snarl
+CRUNCH	9	Crunch
+FOUL_PLAY	9	Foul Play
+TAKE_DOWN_FAST	9	Take Down
+WATERFALL_FAST	9	Waterfall
+SURF	9	Surf
+DRACO_METEOR	9	Draco Meteor
+DOOM_DESIRE	9	Doom Desire
+YAWN_FAST	9	Yawn
+PSYCHO_BOOST	9	Psycho Boost
+ORIGIN_PULSE	9	Origin Pulse
+PRECIPICE_BLADES	9	Precipice Blades
+PRESENT_FAST	9	Present
+WEATHER_BALL_FIRE	9	Weather Ball
+WEATHER_BALL_ICE	9	Weather Ball
+WEATHER_BALL_ROCK	9	Weather Ball
+WEATHER_BALL_WATER	9	Weather Ball
+FRENZY_PLANT	9	Frenzy Plant
+SMACK_DOWN_FAST	9	Smack Down
+BLAST_BURN	9	Blast Burn
+HYDRO_CANNON	9	Hydro Cannon
+LAST_RESORT	9	Last Resort
+METEOR_MASH	9	Meteor Mash
+SKULL_BASH	9	Skull Bash
+ACID_SPRAY	9	Acid Spray
+EARTH_POWER	9	Earth Power
+CRABHAMMER	9	Crabhammer
+LEAF_TORNADO	9	Leaf Tornado
+POWER_UP_PUNCH	9	Power Up Punch
+CHARM_FAST	9	Charm
+FRUSTRATION	9	Frustration
+RETURN	9	Return
+SYNCHRONOISE	9	Synchronoise
+LOCK_ON_FAST	9	Lock-On
+THUNDER_FANG_FAST	9	Thunder Fang
+ICE_FANG_FAST	9	Ice Fang
+HORN_DRILL	9	Horn Drill
+FISSURE	9	Fissure
+SACRED_SWORD	9	Sacred Sword
+FLYING_PRESS	9	Flying Press
+AURA_SPHERE	9	Aura Sphere
+PAYBACK	9	Payback
+ROCK_WRECKER	9	Rock Wrecker
+AEROBLAST	9	Aeroblast
+TECHNO_BLAST_NORMAL	9	Techno Blast
+TECHNO_BLAST_BURN	9	Techno Blast
+TECHNO_BLAST_CHILL	9	Techno Blast
+TECHNO_BLAST_WATER	9	Techno Blast
+TECHNO_BLAST_SHOCK	9	Techno Blast
+FLY	9	Fly
+V_CREATE	9	V-create
+LEAF_STORM	9	Leaf Storm
+TRI_ATTACK	9	Tri Attack
+GUST_FAST	9	Gust
+INCINERATE_FAST	9	Incinerate
+FEATHER_DANCE	9	Feather Dance
+HIDDEN_POWER_NORMAL_FAST	9	Hidden Power
+HIDDEN_POWER_FIGHTING_FAST	9	Hidden Power
+HIDDEN_POWER_FLYING_FAST	9	Hidden Power
+HIDDEN_POWER_POISON_FAST	9	Hidden Power
+HIDDEN_POWER_GROUND_FAST	9	Hidden Power
+HIDDEN_POWER_ROCK_FAST	9	Hidden Power
+HIDDEN_POWER_BUG_FAST	9	Hidden Power
+HIDDEN_POWER_GHOST_FAST	9	Hidden Power
+HIDDEN_POWER_STEEL_FAST	9	Hidden Power
+HIDDEN_POWER_FIRE_FAST	9	Hidden Power
+HIDDEN_POWER_WATER_FAST	9	Hidden Power
+HIDDEN_POWER_GRASS_FAST	9	Hidden Power
+HIDDEN_POWER_ELECTRIC_FAST	9	Hidden Power
+HIDDEN_POWER_PSYCHIC_FAST	9	Hidden Power
+HIDDEN_POWER_ICE_FAST	9	Hidden Power
+HIDDEN_POWER_DRAGON_FAST	9	Hidden Power
+HIDDEN_POWER_DARK_FAST	9	Hidden Power
+HIDDEN_POWER_FAIRY_FAST	9	Hidden Power
+WRAP	6	Wickel
+HYPER_BEAM	6	Hyperstrahl
+DARK_PULSE	6	Finsteraura
+SLUDGE	6	Schlammbad
+VICE_GRIP	6	Klammer
+FLAME_WHEEL	6	Flammenrad
+MEGAHORN	6	Vielender
+FLAMETHROWER	6	Flammenwurf
+DIG	6	Schaufler
+CROSS_CHOP	6	Kreuzhieb
+PSYBEAM	6	Psystrahl
+EARTHQUAKE	6	Erdbeben
+STONE_EDGE	6	Steinkante
+ICE_PUNCH	6	Eishieb
+HEART_STAMP	6	Herzstempel
+DISCHARGE	6	Ladungsstoß
+FLASH_CANNON	6	Lichtkanone
+DRILL_PECK	6	Bohrschnabel
+ICE_BEAM	6	Eisstrahl
+BLIZZARD	6	Blizzard
+HEAT_WAVE	6	Hitzewelle
+AERIAL_ACE	6	Aero-Ass
+DRILL_RUN	6	Schlagbohrer
+PETAL_BLIZZARD	6	Blütenwirbel
+MEGA_DRAIN	6	Megasauger
+BUG_BUZZ	6	Käfergebrumm
+POISON_FANG	6	Giftzahn
+NIGHT_SLASH	6	Nachthieb
+BUBBLE_BEAM	6	Blubbstrahl
+SUBMISSION	6	Überroller
+LOW_SWEEP	6	Fußtritt
+AQUA_JET	6	Wasserdüse
+AQUA_TAIL	6	Nassschweif
+SEED_BOMB	6	Samenbomben
+PSYSHOCK	6	Psychoschock
+ANCIENT_POWER	6	Antik-Kraft
+ROCK_TOMB	6	Felsgrab
+ROCK_SLIDE	6	Steinhagel
+POWER_GEM	6	Juwelenkraft
+SHADOW_SNEAK	6	Schattenstoß
+SHADOW_PUNCH	6	Finsterfaust
+OMINOUS_WIND	6	Unheilböen
+SHADOW_BALL	6	Spukball
+MAGNET_BOMB	6	Magnetbombe
+BUG_BUZZ	9	Bug Buzz
+IRON_HEAD	6	Eisenschädel
+PARABOLIC_CHARGE	6	Parabolladung
+THUNDER_PUNCH	6	Donnerschlag
+THUNDER	6	Donner
+THUNDERBOLT	6	Donnerblitz
+TWISTER	6	Windhose
+DRAGON_PULSE	6	Drachenpuls
+DRAGON_CLAW	6	Drachenklaue
+DISARMING_VOICE	6	Säuselstimme
+DRAINING_KISS	6	Diebeskuss
+DAZZLING_GLEAM	6	Zauberschein
+MOONBLAST	6	Mondgewalt
+PLAY_ROUGH	6	Knuddler
+CROSS_POISON	6	Giftstreich
+SLUDGE_BOMB	6	Matschbombe
+SLUDGE_WAVE	6	Schlammwoge
+GUNK_SHOT	6	Mülltreffer
+BONE_CLUB	6	Knochenkeule
+BULLDOZE	6	Dampfwalze
+MUD_BOMB	6	Schlammbombe
+SIGNAL_BEAM	6	Ampelleuchte
+FLAME_CHARGE	6	Nitroladung
+FLAME_BURST	6	Funkenflug
+FIRE_BLAST	6	Feuersturm
+BRINE	6	Lake
+WATER_PULSE	6	Aquawelle
+SCALD	6	Siedewasser
+HYDRO_PUMP	6	Hydropumpe
+PSYCHIC	6	Psychokinese
+PSYSTRIKE	6	Psychostoß
+ICY_WIND	6	Eissturm
+GIGA_DRAIN	6	Gigasauger
+FIRE_PUNCH	6	Feuerschlag
+SOLAR_BEAM	6	Solarstrahl
+LEAF_BLADE	6	Laubklinge
+POWER_WHIP	6	Blattgeißel
+AIR_CUTTER	6	Windschnitt
+HURRICANE	6	Orkan
+BRICK_BREAK	6	Durchbruch
+SWIFT	6	Sternschauer
+HORN_ATTACK	6	Hornattacke
+STOMP	6	Stampfer
+HYPER_FANG	6	Hyperzahn
+BODY_SLAM	6	Bodyslam
+REST	6	Erholung
+STRUGGLE	6	Verzweifler
+SCALD_BLASTOISE	6	Siedewasser
+HYDRO_PUMP_BLASTOISE	6	Hydropumpe
+WRAP_GREEN	6	Wickel
+WRAP_PINK	6	Wickel
+FURY_CUTTER_FAST	6	Zornklinge
+BUG_BITE_FAST	6	Käferbiss
+BITE_FAST	6	Biss
+SUCKER_PUNCH_FAST	6	Tiefschlag
+DRAGON_BREATH_FAST	6	Feuerodem
+THUNDER_SHOCK_FAST	6	Donnerschock
+SPARK_FAST	6	Funkensprung
+LOW_KICK_FAST	6	Fußkick
+KARATE_CHOP_FAST	6	Karateschlag
+EMBER_FAST	6	Glut
+WING_ATTACK_FAST	6	Flügelschlag
+PECK_FAST	6	Schnabel
+LICK_FAST	6	Schlecker
+SHADOW_CLAW_FAST	6	Dunkelklaue
+VINE_WHIP_FAST	6	Rankenhieb
+RAZOR_LEAF_FAST	6	Rasierblatt
+MUD_SHOT_FAST	6	Lehmschuss
+ICE_SHARD_FAST	6	Eissplitter
+FROST_BREATH_FAST	6	Eisesodem
+QUICK_ATTACK_FAST	6	Ruckzuckhieb
+SCRATCH_FAST	6	Kratzer
+TACKLE_FAST	6	Tackle
+POUND_FAST	6	Pfund
+CUT_FAST	6	Zerschneider
+POISON_JAB_FAST	6	Gifthieb
+ACID_FAST	6	Säure
+PSYCHO_CUT_FAST	6	Psychoklinge
+ROCK_THROW_FAST	6	Steinwurf
+METAL_CLAW_FAST	6	Metallklaue
+BULLET_PUNCH_FAST	6	Patronenhieb
+WATER_GUN_FAST	6	Aquaknarre
+SPLASH_FAST	6	Platscher
+WATER_GUN_FAST_BLASTOISE	6	Aquaknarre
+MUD_SLAP_FAST	6	Lehmschelle
+ZEN_HEADBUTT_FAST	6	Zen-Kopfstoß
+CONFUSION_FAST	6	Konfusion
+POISON_STING_FAST	6	Giftstachel
+BUBBLE_FAST	6	Blubber
+FEINT_ATTACK_FAST	6	Finte
+STEEL_WING_FAST	6	Stahlflügel
+FIRE_FANG_FAST	6	Feuerzahn
+ROCK_SMASH_FAST	6	Zertrümmerer
+TRANSFORM_FAST	6	Wandler
+COUNTER_FAST	6	Konter
+POWDER_SNOW_FAST	6	Pulverschnee
+CLOSE_COMBAT	6	Nahkampf
+DYNAMIC_PUNCH	6	Wuchtschlag
+FOCUS_BLAST	6	Fokusstoß
+AURORA_BEAM	6	Aurorastrahl
+CHARGE_BEAM_FAST	6	Ladestrahl
+VOLT_SWITCH_FAST	6	Voltwechsel
+WILD_CHARGE	6	Stromstoß
+ZAP_CANNON	6	Blitzkanone
+DRAGON_TAIL_FAST	6	Drachenrute
+AVALANCHE	6	Lawine
+AIR_SLASH_FAST	6	Luftschnitt
+BRAVE_BIRD	6	Sturzflug
+SKY_ATTACK	6	Himmelsfeger
+SAND_TOMB	6	Sandgrab
+ROCK_BLAST	6	Felswurf
+INFESTATION_FAST	6	Plage
+STRUGGLE_BUG_FAST	6	Käfertrutz
+SILVER_WIND	6	Silberhauch
+ASTONISH_FAST	6	Erstauner
+HEX_FAST	6	Bürde
+NIGHT_SHADE	6	Nachtnebel
+IRON_TAIL_FAST	6	Eisenschweif
+GYRO_BALL	6	Gyroball
+HEAVY_SLAM	6	Rammboss
+FIRE_SPIN_FAST	6	Feuerwirbel
+OVERHEAT	6	Hitzekoller
+BULLET_SEED_FAST	6	Kugelsaat
+GRASS_KNOT	6	Strauchler
+ENERGY_BALL	6	Energieball
+EXTRASENSORY_FAST	6	Sondersensor
+FUTURESIGHT	6	Seher
+MIRROR_COAT	6	Spiegelcape
+OUTRAGE	6	Wutanfall
+SNARL_FAST	6	Standpauke
+CRUNCH	6	Knirscher
+FOUL_PLAY	6	Schmarotzer
+HIDDEN_POWER_FAST	6	Kraftreserve
+TAKE_DOWN_FAST	6	Bodycheck
+WATERFALL_FAST	6	Kaskade
+SURF	6	Surfer
+DRACO_METEOR	6	Draco Meteor
+DOOM_DESIRE	6	Kismetwunsch
+YAWN_FAST	6	Gähner
+PSYCHO_BOOST	6	Psyschub
+ORIGIN_PULSE	6	Ursprungswoge
+PRECIPICE_BLADES	6	Abgrundsklinge
+PRESENT_FAST	6	Geschenk
+WEATHER_BALL_FIRE	6	Meteorologe
+WEATHER_BALL_ICE	6	Meteorologe
+WEATHER_BALL_ROCK	6	Meteorologe
+WEATHER_BALL_WATER	6	Meteorologe
+FRENZY_PLANT	6	Flora-Statue
+SMACK_DOWN_FAST	6	Katapult
+BLAST_BURN	6	Lohekanonade
+HYDRO_CANNON	6	Aquahaubitze
+LAST_RESORT	6	Zuflucht
+HIDDEN_POWER_NORMAL_FAST	6	Kraftreserve
+HIDDEN_POWER_FIGHTING_FAST	6	Kraftreserve
+HIDDEN_POWER_POISON_FAST	6	Kraftreserve
+HIDDEN_POWER_GROUND_FAST	6	Kraftreserve
+HIDDEN_POWER_ROCK_FAST	6	Kraftreserve
+HIDDEN_POWER_BUG_FAST	6	Kraftreserve
+HIDDEN_POWER_GHOST_FAST	6	Kraftreserve
+HIDDEN_POWER_STEEL_FAST	6	Kraftreserve
+HIDDEN_POWER_FIRE_FAST	6	Kraftreserve
+HIDDEN_POWER_WATER_FAST	6	Kraftreserve
+HIDDEN_POWER_GRASS_FAST	6	Kraftreserve
+HIDDEN_POWER_ELECTRIC_FAST	6	Kraftreserve
+HIDDEN_POWER_PSYCHIC_FAST	6	Kraftreserve
+HIDDEN_POWER_ICE_FAST	6	Kraftreserve
+HIDDEN_POWER_DRAGON_FAST	6	Kraftreserve
+HIDDEN_POWER_DARK_FAST	6	Kraftreserve
+HIDDEN_POWER_FAIRY_FAST	6	Kraftreserve
+WRAP	7	Constricción
+HYPER_BEAM	7	Hiperrayo
+DARK_PULSE	7	Pulso Umbrío
+SLUDGE	7	Residuos
+VICE_GRIP	7	Agarre
+FLAME_WHEEL	7	Rueda Fuego
+MEGAHORN	7	Megacuerno
+FLAMETHROWER	7	Lanzallamas
+DIG	7	Excavar
+CROSS_CHOP	7	Tajo Cruzado
+PSYBEAM	7	Psicorrayo
+EARTHQUAKE	7	Terremoto
+STONE_EDGE	7	Roca Afilada
+ICE_PUNCH	7	Puño Hielo
+HEART_STAMP	7	Arrumaco
+DISCHARGE	7	Chispazo
+FLASH_CANNON	7	Foco Resplandor
+DRILL_PECK	7	Pico Taladro
+ICE_BEAM	7	Rayo Hielo
+BLIZZARD	7	Ventisca
+HEAT_WAVE	7	Onda Ígnea
+AERIAL_ACE	7	Golpe Aéreo
+DRILL_RUN	7	Taladradora
+PETAL_BLIZZARD	7	Tormenta Floral
+MEGA_DRAIN	7	Megaagotar
+BUG_BUZZ	7	Zumbido
+POISON_FANG	7	Colmillo Veneno
+NIGHT_SLASH	7	Tajo Umbrío
+BUBBLE_BEAM	7	Rayo Burbuja
+SUBMISSION	7	Sumisión
+LOW_SWEEP	7	Puntapié
+AQUA_JET	7	Acua Jet
+AQUA_TAIL	7	Acua Cola
+SEED_BOMB	7	Bomba Germen
+PSYSHOCK	7	Psicocarga
+ANCIENT_POWER	7	Poder Pasado
+ROCK_TOMB	7	Tumba Rocas
+ROCK_SLIDE	7	Avalancha
+POWER_GEM	7	Joya de Luz
+SHADOW_SNEAK	7	Sombra Vil
+SHADOW_PUNCH	7	Puño Sombra
+OMINOUS_WIND	7	Viento Aciago
+SHADOW_BALL	7	Bola Sombra
+MAGNET_BOMB	7	Bomba Imán
+IRON_HEAD	7	Cabeza de Hierro
+PARABOLIC_CHARGE	7	Carga Parábola
+THUNDER_PUNCH	7	Puño Trueno
+THUNDER	7	Trueno
+THUNDERBOLT	7	Rayo
+TWISTER	7	Ciclón
+DRAGON_PULSE	7	Pulso Dragón
+DRAGON_CLAW	7	Garra Dragón
+DISARMING_VOICE	7	Voz Cautivadora
+DRAINING_KISS	7	Beso Drenaje
+DAZZLING_GLEAM	7	Brillo Mágico
+MOONBLAST	7	Anillo Ígneo
+PLAY_ROUGH	7	Carantoña
+CROSS_POISON	7	Veneno X
+SLUDGE_BOMB	7	Bomba Lodo
+SLUDGE_WAVE	7	Onda Tóxica
+GUNK_SHOT	7	Lanza Mugre
+BONE_CLUB	7	Hueso Palo
+BULLDOZE	7	Terratemblor
+MUD_BOMB	7	Bomba Fango
+SIGNAL_BEAM	7	Doble Rayo
+X_SCISSOR	7	Tijera X
+FLAME_CHARGE	7	Nitrocarga
+FLAME_BURST	7	Pirotecnia
+FIRE_BLAST	7	Llamarada
+BRINE	7	Salmuera
+WATER_PULSE	7	Hidropulso
+SCALD	7	Escaldar
+HYDRO_PUMP	7	Hidrobomba
+PSYCHIC	7	Psíquico
+PSYSTRIKE	7	Onda Mental
+ICY_WIND	7	Viento Hielo
+GIGA_DRAIN	7	Gigadrenado
+FIRE_PUNCH	7	Puño Fuego
+SOLAR_BEAM	7	Rayo Solar
+LEAF_BLADE	7	Hoja Aguda
+POWER_WHIP	7	Latigazo
+AIR_CUTTER	7	Aire Afilado
+HURRICANE	7	Vendaval
+BRICK_BREAK	7	Demolición
+SWIFT	7	Rapidez
+HORN_ATTACK	7	Cornada
+STOMP	7	Pisotón
+HYPER_FANG	7	Hipercolmillo
+BODY_SLAM	7	Golpe Cuerpo
+REST	7	Descanso
+STRUGGLE	7	Combate
+SCALD_BLASTOISE	7	Escaldar
+HYDRO_PUMP_BLASTOISE	7	Hidrobomba
+WRAP_GREEN	7	Constricción
+WRAP_PINK	7	Constricción
+FURY_CUTTER_FAST	7	Corte Furia
+BUG_BITE_FAST	7	Picadura
+BITE_FAST	7	Mordisco
+SUCKER_PUNCH_FAST	7	Golpe Bajo
+DRAGON_BREATH_FAST	7	Dragoaliento
+THUNDER_SHOCK_FAST	7	Impactrueno
+SPARK_FAST	7	Chispa
+LOW_KICK_FAST	7	Patada Baja
+KARATE_CHOP_FAST	7	Golpe Kárate
+EMBER_FAST	7	Ascuas
+WING_ATTACK_FAST	7	Ataque Ala
+PECK_FAST	7	Picotazo
+LICK_FAST	7	Lengüetazo
+SHADOW_CLAW_FAST	7	Garra Umbría
+VINE_WHIP_FAST	7	Látigo Cepa
+RAZOR_LEAF_FAST	7	Hoja Afilada
+MUD_SHOT_FAST	7	Disparo Lodo
+ICE_SHARD_FAST	7	Canto Helado
+FROST_BREATH_FAST	7	Vaho Gélido
+QUICK_ATTACK_FAST	7	Ataque Rápido
+SCRATCH_FAST	7	Arañazo
+TACKLE_FAST	7	Placaje
+POUND_FAST	7	Destructor
+CUT_FAST	7	Corte
+POISON_JAB_FAST	7	Puya Nociva
+ACID_FAST	7	Ácido
+PSYCHO_CUT_FAST	7	Psicocorte
+ROCK_THROW_FAST	7	Lanzarrocas
+METAL_CLAW_FAST	7	Garra Metal
+BULLET_PUNCH_FAST	7	Puño Bala
+WATER_GUN_FAST	7	Pistola Agua
+SPLASH_FAST	7	Salpicadura
+WATER_GUN_FAST_BLASTOISE	7	Pistola Agua
+MUD_SLAP_FAST	7	Bofetón Lodo
+ZEN_HEADBUTT_FAST	7	Cabezazo Zen
+CONFUSION_FAST	7	Confusión
+POISON_STING_FAST	7	Picotazo Veneno
+BUBBLE_FAST	7	Burbuja
+FEINT_ATTACK_FAST	7	Finta
+STEEL_WING_FAST	7	Ala de Acero
+FIRE_FANG_FAST	7	Colmillo Ígneo
+ROCK_SMASH_FAST	7	Golpe Roca
+TRANSFORM_FAST	7	Transformación
+COUNTER_FAST	7	Contraataque
+POWDER_SNOW_FAST	7	Nieve Polvo
+CLOSE_COMBAT	7	A Bocajarro
+DYNAMIC_PUNCH	7	Puño Dinámico
+FOCUS_BLAST	7	Onda Certera
+AURORA_BEAM	7	Rayo Aurora
+CHARGE_BEAM_FAST	7	Rayo Carga
+VOLT_SWITCH_FAST	7	Voltiocambio
+WILD_CHARGE	7	Voltio Cruel
+ZAP_CANNON	7	Electrocañón
+DRAGON_TAIL_FAST	7	Cola Dragón
+AVALANCHE	7	Alud
+AIR_SLASH_FAST	7	Tajo Aéreo
+BRAVE_BIRD	7	Pájaro Osado
+SKY_ATTACK	7	Ataque Aéreo
+SAND_TOMB	7	Bucle Arena
+ROCK_BLAST	7	Pedrada
+INFESTATION_FAST	7	Acoso
+STRUGGLE_BUG_FAST	7	Estoicismo
+SILVER_WIND	7	Viento Plata
+ASTONISH_FAST	7	Impresionar
+HEX_FAST	7	Infortunio
+NIGHT_SHADE	7	Tinieblas
+IRON_TAIL_FAST	7	Cola Férrea
+GYRO_BALL	7	Giro Bola
+HEAVY_SLAM	7	Cuerpo Pesado
+FIRE_SPIN_FAST	7	Giro Fuego
+OVERHEAT	7	Sofoco
+BULLET_SEED_FAST	7	Recurrente
+GRASS_KNOT	7	Hierba Lazo
+ENERGY_BALL	7	Energibola
+EXTRASENSORY_FAST	7	Paranormal
+FUTURESIGHT	7	Premonición
+MIRROR_COAT	7	Manto Espejo
+OUTRAGE	7	Enfado
+SNARL_FAST	7	Alarido
+CRUNCH	7	Triturar
+FOUL_PLAY	7	Juego Sucio
+HIDDEN_POWER_FAST	7	Poder Oculto
+TAKE_DOWN_FAST	7	Derribo
+WATERFALL_FAST	7	Cascada
+SURF	7	Surf
+DRACO_METEOR	7	Cometa Draco
+DOOM_DESIRE	7	Deseo Oculto
+YAWN_FAST	7	Bostezo
+PSYCHO_BOOST	7	Psicoataque
+ORIGIN_PULSE	7	Pulso Primigenio
+PRECIPICE_BLADES	7	Filo del Abismo
+PRESENT_FAST	7	Presente
+WEATHER_BALL_FIRE	7	Meteorobola
+WEATHER_BALL_ICE	7	Meteorobola
+WEATHER_BALL_ROCK	7	Meteorobola
+WEATHER_BALL_WATER	7	Meteorobola
+FRENZY_PLANT	7	Planta Feroz
+SMACK_DOWN_FAST	7	Antiaéreo
+BLAST_BURN	7	Anillo Ígneo
+HYDRO_CANNON	7	Hidrocañón
+LAST_RESORT	7	Última Baza
+HIDDEN_POWER_NORMAL_FAST	7	Poder Oculto
+HIDDEN_POWER_FIGHTING_FAST	7	Poder Oculto
+HIDDEN_POWER_FLYING_FAST	7	Poder Oculto
+HIDDEN_POWER_POISON_FAST	7	Poder Oculto
+HIDDEN_POWER_GROUND_FAST	7	Poder Oculto
+HIDDEN_POWER_ROCK_FAST	7	Poder Oculto
+HIDDEN_POWER_BUG_FAST	7	Poder Oculto
+HIDDEN_POWER_GHOST_FAST	7	Poder Oculto
+HIDDEN_POWER_STEEL_FAST	7	Poder Oculto
+HIDDEN_POWER_FIRE_FAST	7	Poder Oculto
+HIDDEN_POWER_WATER_FAST	7	Poder Oculto
+HIDDEN_POWER_GRASS_FAST	7	Poder Oculto
+HIDDEN_POWER_ELECTRIC_FAST	7	Poder Oculto
+HIDDEN_POWER_PSYCHIC_FAST	7	Poder Oculto
+HIDDEN_POWER_ICE_FAST	7	Poder Oculto
+HIDDEN_POWER_DRAGON_FAST	7	Poder Oculto
+HIDDEN_POWER_DARK_FAST	7	Poder Oculto
+HIDDEN_POWER_FAIRY_FAST	7	Poder Oculto
+WRAP	5	Ligotage
+HYPER_BEAM	5	Ultralaser
+DARK_PULSE	5	Vibrobscur
+SLUDGE	5	Détritus
+VICE_GRIP	5	Force Poigne
+FLAME_WHEEL	5	Roue de Feu
+MEGAHORN	5	Mégacorne
+FLAMETHROWER	5	Lance-Flammes
+DIG	5	Tunnel
+CROSS_CHOP	5	Coup-Croix
+PSYBEAM	5	Rafale Psy
+EARTHQUAKE	5	Séisme
+STONE_EDGE	5	Lame de Roc
+ICE_PUNCH	5	Poing-Glace
+HEART_STAMP	5	Crève-Cœur
+DISCHARGE	5	Coup d’Jus
+FLASH_CANNON	5	Luminocanon
+DRILL_PECK	5	Bec Vrille
+ICE_BEAM	5	Laser Glace
+BLIZZARD	5	Blizzard
+HEAT_WAVE	5	Canicule
+AERIAL_ACE	5	Aéropique
+DRILL_RUN	5	Tunnelier
+PETAL_BLIZZARD	5	Tempête Florale
+MEGA_DRAIN	5	Méga-Sangsue
+BUG_BUZZ	5	Bourdon
+POISON_FANG	5	Crochet Venin
+NIGHT_SLASH	5	Tranche-Nuit
+BUBBLE_BEAM	5	Bulles d’O
+LOW_SWEEP	5	Balayette
+AQUA_JET	5	Aqua-Jet
+AQUA_TAIL	5	Hydroqueue
+SEED_BOMB	5	Canon Graine
+PSYSHOCK	5	Choc Psy
+ANCIENT_POWER	5	Pouvoir Antique
+ROCK_TOMB	5	Tomberoche
+ROCK_SLIDE	5	Éboulement
+POWER_GEM	5	Rayon Gemme
+SHADOW_SNEAK	5	Ombre Portée
+SHADOW_PUNCH	5	Poing Ombre
+OMINOUS_WIND	5	Vent Mauvais
+SHADOW_BALL	5	Ball’Ombre
+MAGNET_BOMB	5	Bombaimant
+IRON_HEAD	5	Tête de Fer
+PARABOLIC_CHARGE	5	Parabocharge
+THUNDER_PUNCH	5	Poing-Éclair
+THUNDER	5	Fatal-Foudre
+THUNDERBOLT	5	Tonnerre
+TWISTER	5	Ouragan
+DRAGON_PULSE	5	Dracochoc
+DRAGON_CLAW	5	Dracogriffe
+DISARMING_VOICE	5	Voix Enjôleuse
+DRAINING_KISS	5	Vampibaiser
+DAZZLING_GLEAM	5	Éclat Magique
+MOONBLAST	5	Pouvoir Lunaire
+PLAY_ROUGH	5	Câlinerie
+CROSS_POISON	5	Poison-Croix
+SLUDGE_BOMB	5	Bomb-Beurk
+SLUDGE_WAVE	5	Cradovague
+GUNK_SHOT	5	Détricanon
+BONE_CLUB	5	Massd’Os
+BULLDOZE	5	Piétisol
+MUD_BOMB	5	Boue-Bombe
+SIGNAL_BEAM	5	Rayon Signal
+X_SCISSOR	5	Plaie-Croix
+FLAME_CHARGE	5	Nitrocharge
+FLAME_BURST	5	Rebondifeu
+FIRE_BLAST	5	Déflagration
+BRINE	5	Saumure
+WATER_PULSE	5	Vibraqua
+SCALD	5	Ébullition
+HYDRO_PUMP	5	Hydrocanon
+PSYCHIC	5	Psyko
+PSYSTRIKE	5	Frappe Psy
+ICY_WIND	5	Vent Glace
+GIGA_DRAIN	5	Giga-Sangsue
+FIRE_PUNCH	5	Poing de Feu
+SOLAR_BEAM	5	Lance-Soleil
+LEAF_BLADE	5	Lame-Feuille
+POWER_WHIP	5	Mégafouet
+AIR_CUTTER	5	Tranch’Air
+HURRICANE	5	Vent Violent
+BRICK_BREAK	5	Casse-Brique
+SWIFT	5	Météores
+HORN_ATTACK	5	Koud’Korne
+STOMP	5	Écrasement
+HYPER_FANG	5	Croc de Mort
+BODY_SLAM	5	Plaquage
+REST	5	Repos
+STRUGGLE	5	Lutte
+SCALD_BLASTOISE	5	Ébullition
+HYDRO_PUMP_BLASTOISE	5	Hydrocanon
+WRAP_GREEN	5	Ligotage
+WRAP_PINK	5	Ligotage
+FURY_CUTTER_FAST	5	Taillade
+BUG_BITE_FAST	5	Piqûre
+BITE_FAST	5	Morsure
+SUCKER_PUNCH_FAST	5	Coup Bas
+DRAGON_BREATH_FAST	5	Dracosouffle
+THUNDER_SHOCK_FAST	5	Éclair
+SPARK_FAST	5	Étincelle
+LOW_KICK_FAST	5	Balayage
+KARATE_CHOP_FAST	5	Poing-Karaté
+EMBER_FAST	5	Flammèche
+WING_ATTACK_FAST	5	Cru-Aile
+PECK_FAST	5	Picpic
+LICK_FAST	5	Léchouille
+SHADOW_CLAW_FAST	5	Griffe Ombre
+VINE_WHIP_FAST	5	Fouet Lianes
+RAZOR_LEAF_FAST	5	Tranch’Herbe
+MUD_SHOT_FAST	5	Tir de Boue
+ICE_SHARD_FAST	5	Éclats Glace
+FROST_BREATH_FAST	5	Souffle Glacé
+QUICK_ATTACK_FAST	5	Vive-Attaque
+SCRATCH_FAST	5	Griffe
+TACKLE_FAST	5	Charge
+POUND_FAST	5	Écras’Face
+CUT_FAST	5	Coupe
+POISON_JAB_FAST	5	Direct Toxik
+ACID_FAST	5	Acide
+PSYCHO_CUT_FAST	5	Coupe Psycho
+ROCK_THROW_FAST	5	Jet-Pierres
+METAL_CLAW_FAST	5	Griffe Acier
+BULLET_PUNCH_FAST	5	Pisto-Poing
+WATER_GUN_FAST	5	Pistolet à O
+SPLASH_FAST	5	Trempette
+WATER_GUN_FAST_BLASTOISE	5	Pistolet à O
+MUD_SLAP_FAST	5	Coud’Boue
+ZEN_HEADBUTT_FAST	5	Psykoud’Boul
+CONFUSION_FAST	5	Choc Mental
+POISON_STING_FAST	5	Dard-Venin
+BUBBLE_FAST	5	Écume
+FEINT_ATTACK_FAST	5	Feinte
+STEEL_WING_FAST	5	Aile d’Acier
+FIRE_FANG_FAST	5	Crocs Feu
+ROCK_SMASH_FAST	5	Éclate-Roc
+TRANSFORM_FAST	5	Morphing
+COUNTER_FAST	5	Riposte
+POWDER_SNOW_FAST	5	Poudreuse
+CLOSE_COMBAT	5	Close Combat
+DYNAMIC_PUNCH	5	Dynamopoing
+FOCUS_BLAST	5	Exploforce
+AURORA_BEAM	5	Onde Boréale
+CHARGE_BEAM_FAST	5	Rayon Chargé
+VOLT_SWITCH_FAST	5	Change Éclair
+WILD_CHARGE	5	Éclair Fou
+ZAP_CANNON	5	Élecanon
+DRAGON_TAIL_FAST	5	Draco-Queue
+AVALANCHE	5	Avalanche
+AIR_SLASH_FAST	5	Lame d’Air
+BRAVE_BIRD	5	Rapace
+SKY_ATTACK	5	Piqué
+SAND_TOMB	5	Tourbi-Sable
+ROCK_BLAST	5	Boule Roc
+INFESTATION_FAST	5	Harcèlement
+STRUGGLE_BUG_FAST	5	Survinsecte
+SILVER_WIND	5	Vent Argenté
+ASTONISH_FAST	5	Étonnement
+HEX_FAST	5	Châtiment
+NIGHT_SHADE	5	Ombre Nocturne
+IRON_TAIL_FAST	5	Queue de Fer
+GYRO_BALL	5	Gyroballe
+HEAVY_SLAM	5	Tacle Lourd
+FIRE_SPIN_FAST	5	Danse Flamme
+OVERHEAT	5	Surchauffe
+BULLET_SEED_FAST	5	Balle Graine
+GRASS_KNOT	5	Nœud Herbe
+ENERGY_BALL	5	Éco-Sphère
+EXTRASENSORY_FAST	5	Extrasenseur
+FUTURESIGHT	5	Prescience
+MIRROR_COAT	5	Voile Miroir
+OUTRAGE	5	Colère
+SNARL_FAST	5	Aboiement
+CRUNCH	5	Mâchouille
+FOUL_PLAY	5	Tricherie
+HIDDEN_POWER_FAST	5	Puissance Cachée
+TAKE_DOWN_FAST	5	Bélier
+WATERFALL_FAST	5	Cascade
+SURF	5	Surf
+DRACO_METEOR	5	Draco Météore
+DOOM_DESIRE	5	Carnareket
+YAWN_FAST	5	Bâillement
+PSYCHO_BOOST	5	Psycho Boost
+ORIGIN_PULSE	5	Onde Originelle
+PRECIPICE_BLADES	5	Lame Pangéenne
+PRESENT_FAST	5	Cadeau
+WEATHER_BALL_FIRE	5	Ball’Météo
+WEATHER_BALL_ICE	5	Ball’Météo
+WEATHER_BALL_ROCK	5	Ball’Météo
+WEATHER_BALL_WATER	5	Ball’Météo
+FRENZY_PLANT	5	Végé-Attak
+SMACK_DOWN_FAST	5	Anti-Air
+BLAST_BURN	5	Rafale Feu
+HYDRO_CANNON	5	Hydroblast
+LAST_RESORT	5	Dernier Recours
+HIDDEN_POWER_NORMAL_FAST	5	Puissance Cachée
+HIDDEN_POWER_FIGHTING_FAST	5	Puissance Cachée
+HIDDEN_POWER_FLYING_FAST	5	Puissance Cachée
+HIDDEN_POWER_POISON_FAST	5	Puissance Cachée
+HIDDEN_POWER_GROUND_FAST	5	Puissance Cachée
+HIDDEN_POWER_ROCK_FAST	5	Puissance Cachée
+HIDDEN_POWER_BUG_FAST	5	Puissance Cachée
+HIDDEN_POWER_GHOST_FAST	5	Puissance Cachée
+HIDDEN_POWER_STEEL_FAST	5	Puissance Cachée
+HIDDEN_POWER_FIRE_FAST	5	Puissance Cachée
+HIDDEN_POWER_WATER_FAST	5	Puissance Cachée
+HIDDEN_POWER_GRASS_FAST	5	Puissance Cachée
+HIDDEN_POWER_ELECTRIC_FAST	5	Puissance Cachée
+HIDDEN_POWER_PSYCHIC_FAST	5	Puissance Cachée
+HIDDEN_POWER_ICE_FAST	5	Puissance Cachée
+HIDDEN_POWER_DRAGON_FAST	5	Puissance Cachée
+HIDDEN_POWER_DARK_FAST	5	Puissance Cachée
+HIDDEN_POWER_FAIRY_FAST	5	Puissance Cachée
+WRAP	8	Avvolgibotta
+HYPER_BEAM	8	Iper Raggio
+DARK_PULSE	8	Neropulsar
+SLUDGE	8	Fango
+VICE_GRIP	8	Presa
+FLAME_WHEEL	8	Ruotafuoco
+MEGAHORN	8	Megacorno
+FLAMETHROWER	8	Lanciafiamme
+CROSS_CHOP	8	Incrocolpo
+PSYBEAM	8	Psicoraggio
+EARTHQUAKE	8	Terremoto
+STONE_EDGE	8	Pietrataglio
+ICE_PUNCH	8	Gelopugno
+HEART_STAMP	8	Cuorestampo
+DISCHARGE	8	Scarica
+FLASH_CANNON	8	Cannonflash
+DRILL_PECK	8	Perforbecco
+ICE_BEAM	8	Geloraggio
+BLIZZARD	8	Bora
+HEAT_WAVE	8	Ondacalda
+AERIAL_ACE	8	Aeroassalto
+DRILL_RUN	8	Giravvita
+PETAL_BLIZZARD	8	Fiortempesta
+MEGA_DRAIN	8	Megassorbimento
+BUG_BUZZ	8	Ronzio
+POISON_FANG	8	Velenodenti
+NIGHT_SLASH	8	Nottesferza
+BUBBLE_BEAM	8	Bollaraggio
+SUBMISSION	8	Sottomissione
+LOW_SWEEP	8	Calciobasso
+AQUA_JET	8	Acquagetto
+AQUA_TAIL	8	Idrondata
+SEED_BOMB	8	Semebomba
+PSYSHOCK	8	Psicoshock
+ANCIENT_POWER	8	Forzantica
+ROCK_TOMB	8	Rocciotomba
+ROCK_SLIDE	8	Frana
+POWER_GEM	8	Gemmoforza
+SHADOW_SNEAK	8	Furtivombra
+SHADOW_PUNCH	8	Pugnodombra
+OMINOUS_WIND	8	Funestovento
+SHADOW_BALL	8	Palla Ombra
+MAGNET_BOMB	8	Bombagnete
+IRON_HEAD	8	Metaltestata
+PARABOLIC_CHARGE	8	Caricaparabola
+THUNDER_PUNCH	8	Tuonopugno
+THUNDER	8	Tuono
+THUNDERBOLT	8	Fulmine
+TWISTER	8	Tornado
+DRAGON_PULSE	8	Dragopulsar
+DRAGON_CLAW	8	Dragartigli
+DISARMING_VOICE	8	Incantavoce
+DRAINING_KISS	8	Assorbibacio
+DAZZLING_GLEAM	8	Magibrillio
+FLAME_WHEEL	9	Flame Wheel
+POISON_FANG	9	Poison Fang
+MOONBLAST	8	Forza Lunare
+PLAY_ROUGH	8	Carineria
+CROSS_POISON	8	Velenocroce
+SLUDGE_BOMB	8	Fangobomba
+SLUDGE_WAVE	8	Fangonda
+GUNK_SHOT	8	Sporcolancio
+BONE_CLUB	8	Ossoclava
+BULLDOZE	8	Battiterra
+MUD_BOMB	8	Pantanobomba
+SIGNAL_BEAM	8	Segnoraggio
+X_SCISSOR	8	Forbice X
+FLAME_CHARGE	8	Nitrocarica
+FLAME_BURST	8	Pirolancio
+FIRE_BLAST	8	Fuocobomba
+BRINE	8	Acquadisale
+WATER_PULSE	8	Idropulsar
+SCALD	8	Idrovampata
+HYDRO_PUMP	8	Idropompa
+PSYCHIC	8	Psichico
+PSYSTRIKE	8	Psicobotta
+ICY_WIND	8	Ventogelato
+GIGA_DRAIN	8	Gigassorbimento
+SOLAR_BEAM	8	Solarraggio
+LEAF_BLADE	8	Fendifoglia
+POWER_WHIP	8	Vigorcolpo
+AIR_CUTTER	8	Aerasoio
+BRICK_BREAK	8	Breccia
+SWIFT	8	Comete
+HORN_ATTACK	8	Incornata
+STOMP	8	Pestone
+HYPER_FANG	8	Iperzanna
+BODY_SLAM	8	Corposcontro
+REST	8	Riposo
+STRUGGLE	8	Scontro
+SCALD_BLASTOISE	8	Idrovampata
+HYDRO_PUMP_BLASTOISE	8	Idropompa
+WRAP_GREEN	8	Avvolgibotta
+WRAP_PINK	8	Avvolgibotta
+FURY_CUTTER_FAST	8	Tagliofuria
+BUG_BITE_FAST	8	Coleomorso
+BITE_FAST	8	Morso
+SUCKER_PUNCH_FAST	8	Sbigoattacco
+DRAGON_BREATH_FAST	8	Dragospiro
+THUNDER_SHOCK_FAST	8	Tuonoshock
+SPARK_FAST	8	Scintilla
+LOW_KICK_FAST	8	Colpo Basso
+KARATE_CHOP_FAST	8	Colpokarate
+EMBER_FAST	8	Braciere
+WING_ATTACK_FAST	8	Attacco d’Ala
+PECK_FAST	8	Beccata
+LICK_FAST	8	Leccata
+SHADOW_CLAW_FAST	8	Ombrartigli
+VINE_WHIP_FAST	8	Frustata
+RAZOR_LEAF_FAST	8	Foglielama
+MUD_SHOT_FAST	8	Colpodifango
+ICE_SHARD_FAST	8	Geloscheggia
+FROST_BREATH_FAST	8	Alitogelido
+QUICK_ATTACK_FAST	8	Attacco Rapido
+SCRATCH_FAST	8	Graffio
+TACKLE_FAST	8	Azione
+POUND_FAST	8	Botta
+CUT_FAST	8	Taglio
+POISON_JAB_FAST	8	Velenpuntura
+ACID_FAST	8	Acido
+PSYCHO_CUT_FAST	8	Psicotaglio
+ROCK_THROW_FAST	8	Sassata
+METAL_CLAW_FAST	8	Ferrartigli
+BULLET_PUNCH_FAST	8	Pugnoscarica
+WATER_GUN_FAST	8	Pistolacqua
+SPLASH_FAST	8	Splash
+WATER_GUN_FAST_BLASTOISE	8	Pistolacqua
+MUD_SLAP_FAST	8	Fangosberla
+ZEN_HEADBUTT_FAST	8	Cozzata Zen
+CONFUSION_FAST	8	Confusione
+POISON_STING_FAST	8	Velenospina
+BUBBLE_FAST	8	Bolla
+FEINT_ATTACK_FAST	8	Finta
+STEEL_WING_FAST	8	Alacciaio
+FIRE_FANG_FAST	8	Rogodenti
+ROCK_SMASH_FAST	8	Spaccaroccia
+TRANSFORM_FAST	8	Trasformazione
+COUNTER_FAST	8	Contrattacco
+POWDER_SNOW_FAST	8	Polneve
+CLOSE_COMBAT	8	Zuffa
+DYNAMIC_PUNCH	8	Dinamipugno
+FOCUS_BLAST	8	Focalcolpo
+AURORA_BEAM	8	Raggiaurora
+CHARGE_BEAM_FAST	8	Raggioscossa
+VOLT_SWITCH_FAST	8	Invertivolt
+WILD_CHARGE	8	Sprizzalampo
+ZAP_CANNON	8	Falcecannone
+DRAGON_TAIL_FAST	8	Codadrago
+AVALANCHE	8	Slavina
+AIR_SLASH_FAST	8	Eterelama
+BRAVE_BIRD	8	Baldeali
+SKY_ATTACK	8	Aeroattacco
+SAND_TOMB	8	Sabbiotomba
+ROCK_BLAST	8	Cadutamassi
+INFESTATION_FAST	8	Assillo
+STRUGGLE_BUG_FAST	8	Entomoblocco
+SILVER_WIND	8	Ventargenteo
+ASTONISH_FAST	8	Sgomento
+HEX_FAST	8	Sciagura
+NIGHT_SHADE	8	Ombra Notturna
+IRON_TAIL_FAST	8	Codacciaio
+GYRO_BALL	8	Vortexpalla
+HEAVY_SLAM	8	Pesobomba
+FIRE_SPIN_FAST	8	Turbofuoco
+OVERHEAT	8	Vampata
+BULLET_SEED_FAST	8	Semitraglia
+GRASS_KNOT	8	Laccioerboso
+ENERGY_BALL	8	Energipalla
+EXTRASENSORY_FAST	8	Extrasenso
+FUTURESIGHT	8	Divinazione
+MIRROR_COAT	8	Specchiovelo
+OUTRAGE	8	Oltraggio
+SNARL_FAST	8	Urlorabbia
+CRUNCH	8	Sgranocchio
+FOUL_PLAY	8	Ripicca
+HIDDEN_POWER_FAST	8	Introforza
+TAKE_DOWN_FAST	8	Riduttore
+WATERFALL_FAST	8	Cascata
+SURF	8	Surf
+DRACO_METEOR	8	Dragobolide
+DOOM_DESIRE	8	Obbliderio
+YAWN_FAST	8	Sbadiglio
+PSYCHO_BOOST	8	Psicoslancio
+ORIGIN_PULSE	8	Primopulsar
+PRECIPICE_BLADES	8	Spade Telluriche
+PRESENT_FAST	8	Regalino
+PETAL_BLIZZARD	9	Petal Blizzard
+WEATHER_BALL_FIRE	8	Palla Clima
+WEATHER_BALL_ICE	8	Palla Clima
+WEATHER_BALL_ROCK	8	Palla Clima
+WEATHER_BALL_WATER	8	Palla Clima
+FRENZY_PLANT	8	Radicalbero
+SMACK_DOWN_FAST	8	Abbattimento
+BLAST_BURN	8	Incendio
+HYDRO_CANNON	8	Idrocannone
+LAST_RESORT	8	Ultimascelta
+HIDDEN_POWER_NORMAL_FAST	8	Introforza
+HIDDEN_POWER_FIGHTING_FAST	8	Introforza
+HIDDEN_POWER_FLYING_FAST	8	Introforza
+HIDDEN_POWER_POISON_FAST	8	Introforza
+HIDDEN_POWER_GROUND_FAST	8	Introforza
+HIDDEN_POWER_ROCK_FAST	8	Introforza
+HIDDEN_POWER_BUG_FAST	8	Introforza
+HIDDEN_POWER_GHOST_FAST	8	Introforza
+HIDDEN_POWER_STEEL_FAST	8	Introforza
+HIDDEN_POWER_FIRE_FAST	8	Introforza
+HIDDEN_POWER_WATER_FAST	8	Introforza
+HIDDEN_POWER_ELECTRIC_FAST	8	Introforza
+HIDDEN_POWER_PSYCHIC_FAST	8	Introforza
+HIDDEN_POWER_ICE_FAST	8	Introforza
+HIDDEN_POWER_DRAGON_FAST	8	Introforza
+HIDDEN_POWER_DARK_FAST	8	Introforza
+HIDDEN_POWER_FAIRY_FAST	8	Introforza
+HYPER_BEAM	1	はかいこうせん
+DARK_PULSE	1	あくのはどう
+SLUDGE	1	ヘドロこうげき
+VICE_GRIP	1	はさむ
+FLAME_WHEEL	1	かえんぐるま
+MEGAHORN	1	メガホーン
+FLAMETHROWER	1	かえんほうしゃ
+DIG	1	あなをほる
+CROSS_CHOP	1	クロスチョップ
+PSYBEAM	1	サイケこうせん
+EARTHQUAKE	1	じしん
+STONE_EDGE	1	ストーンエッジ
+ICE_PUNCH	1	れいとうパンチ
+HEART_STAMP	1	ハートスタンプ
+DISCHARGE	1	ほうでん
+FLASH_CANNON	1	ラスターカノン
+DRILL_PECK	1	ドリルくちばし
+ICE_BEAM	1	れいとうビーム
+BLIZZARD	1	ふぶき
+HEAT_WAVE	1	ねっぷう
+AERIAL_ACE	1	つばめがえし
+DRILL_RUN	1	ドリルライナー
+PETAL_BLIZZARD	1	はなふぶき
+MEGA_DRAIN	1	メガドレイン
+BUG_BUZZ	1	むしのさざめき
+POISON_FANG	1	どくどくのキバ
+NIGHT_SLASH	1	つじぎり
+BUBBLE_BEAM	1	バブルこうせん
+SUBMISSION	1	じごくぐるま
+LOW_SWEEP	1	ローキック
+AQUA_JET	1	アクアジェット
+AQUA_TAIL	1	アクアテール
+SEED_BOMB	1	タネばくだん
+PSYSHOCK	1	サイコショック
+ANCIENT_POWER	1	げんしのちから
+ROCK_TOMB	1	がんせきふうじ
+ROCK_SLIDE	1	いわなだれ
+POWER_GEM	1	パワージェム
+SHADOW_SNEAK	1	かげうち
+SHADOW_PUNCH	1	シャドーパンチ
+OMINOUS_WIND	1	あやしいかぜ
+SHADOW_BALL	1	シャドーボール
+MAGNET_BOMB	1	マグネットボム
+IRON_HEAD	1	アイアンヘッド
+PARABOLIC_CHARGE	1	パラボラチャージ
+THUNDER_PUNCH	1	かみなりパンチ
+THUNDER	1	かみなり
+THUNDERBOLT	1	１０まんボルト
+TWISTER	1	たつまき
+DRAGON_PULSE	1	りゅうのはどう
+DRAGON_CLAW	1	ドラゴンクロー
+DISARMING_VOICE	1	チャームボイス
+DRAINING_KISS	1	ドレインキッス
+DAZZLING_GLEAM	1	マジカルシャイン
+MOONBLAST	1	ムーンフォース
+PLAY_ROUGH	1	じゃれつく
+CROSS_POISON	1	クロスポイズン
+SLUDGE_BOMB	1	ヘドロばくだん
+SLUDGE_WAVE	1	ヘドロウェーブ
+GUNK_SHOT	1	ダストシュート
+BONE_CLUB	1	ホネこんぼう
+BULLDOZE	1	じならし
+MUD_BOMB	1	どろばくだん
+SIGNAL_BEAM	1	シグナルビーム
+X_SCISSOR	1	シザークロス
+FLAME_CHARGE	1	ニトロチャージ
+FLAME_BURST	1	はじけるほのお
+FIRE_BLAST	1	だいもんじ
+BRINE	1	しおみず
+WATER_PULSE	1	みずのはどう
+SCALD	1	ねっとう
+HYDRO_PUMP	1	ハイドロポンプ
+PSYCHIC	1	サイコキネシス
+PSYSTRIKE	1	サイコブレイク
+ICY_WIND	1	こごえるかぜ
+GIGA_DRAIN	1	ギガドレイン
+FIRE_PUNCH	1	ほのおのパンチ
+SOLAR_BEAM	1	ソーラービーム
+LEAF_BLADE	1	リーフブレード
+POWER_WHIP	1	パワーウィップ
+AIR_CUTTER	1	エアカッター
+HURRICANE	1	ぼうふう
+BRICK_BREAK	1	かわらわり
+SWIFT	1	スピードスター
+HORN_ATTACK	1	つのでつく
+STOMP	1	ふみつけ
+HYPER_FANG	1	ひっさつまえば
+BODY_SLAM	1	のしかかり
+REST	1	ねむる
+STRUGGLE	1	わるあがき
+SCALD_BLASTOISE	1	ねっとう
+HYDRO_PUMP_BLASTOISE	1	ハイドロポンプ
+WRAP_GREEN	1	まきつく
+WRAP_PINK	1	まきつく
+FURY_CUTTER_FAST	1	れんぞくぎり
+BUG_BITE_FAST	1	むしくい
+BITE_FAST	1	かみつく
+SUCKER_PUNCH_FAST	1	ふいうち
+DRAGON_BREATH_FAST	1	りゅうのいぶき
+THUNDER_SHOCK_FAST	1	でんきショック
+SPARK_FAST	1	スパーク
+LOW_KICK_FAST	1	けたぐり
+KARATE_CHOP_FAST	1	からてチョップ
+EMBER_FAST	1	ひのこ
+WING_ATTACK_FAST	1	つばさでうつ
+PECK_FAST	1	つつく
+LICK_FAST	1	したでなめる
+SHADOW_CLAW_FAST	1	シャドークロー
+VINE_WHIP_FAST	1	つるのムチ
+RAZOR_LEAF_FAST	1	はっぱカッター
+MUD_SHOT_FAST	1	マッドショット
+ICE_SHARD_FAST	1	こおりのつぶて
+FROST_BREATH_FAST	1	こおりのいぶき
+QUICK_ATTACK_FAST	1	でんこうせっか
+SCRATCH_FAST	1	ひっかく
+TACKLE_FAST	1	たいあたり
+POUND_FAST	1	はたく
+CUT_FAST	1	いあいぎり
+POISON_JAB_FAST	1	どくづき
+ACID_FAST	1	ようかいえき
+PSYCHO_CUT_FAST	1	サイコカッター
+ROCK_THROW_FAST	1	いわおとし
+METAL_CLAW_FAST	1	メタルクロー
+BULLET_PUNCH_FAST	1	バレットパンチ
+WATER_GUN_FAST	1	みずでっぽう
+SPLASH_FAST	1	はねる
+WATER_GUN_FAST_BLASTOISE	1	みずでっぽう
+MUD_SLAP_FAST	1	どろかけ
+ZEN_HEADBUTT_FAST	1	しねんのずつき
+CONFUSION_FAST	1	ねんりき
+POISON_STING_FAST	1	どくばり
+BUBBLE_FAST	1	あわ
+FEINT_ATTACK_FAST	1	だましうち
+STEEL_WING_FAST	1	はがねのつばさ
+FIRE_FANG_FAST	1	ほのおのキバ
+ROCK_SMASH_FAST	1	いわくだき
+TRANSFORM_FAST	1	へんしん
+COUNTER_FAST	1	カウンター
+POWDER_SNOW_FAST	1	こなゆき
+CLOSE_COMBAT	1	インファイト
+DYNAMIC_PUNCH	1	ばくれつパンチ
+FOCUS_BLAST	1	きあいだま
+AURORA_BEAM	1	オーロラビーム
+CHARGE_BEAM_FAST	1	チャージビーム
+VOLT_SWITCH_FAST	1	ボルトチェンジ
+WILD_CHARGE	1	ワイルドボルト
+ZAP_CANNON	1	でんじほう
+DRAGON_TAIL_FAST	1	ドラゴンテール
+AVALANCHE	1	ゆきなだれ
+AIR_SLASH_FAST	1	エアスラッシュ
+BRAVE_BIRD	1	ブレイブバード
+SKY_ATTACK	1	ゴッドバード
+SAND_TOMB	1	すなじごく
+ROCK_BLAST	1	ロックブラスト
+INFESTATION_FAST	1	まとわりつく
+STRUGGLE_BUG_FAST	1	むしのていこう
+SILVER_WIND	1	ぎんいろのかぜ
+ASTONISH_FAST	1	おどろかす
+HEX_FAST	1	たたりめ
+NIGHT_SHADE	1	ナイトヘッド
+IRON_TAIL_FAST	1	アイアンテール
+GYRO_BALL	1	ジャイロボール
+HEAVY_SLAM	1	ヘビーボンバー
+FIRE_SPIN_FAST	1	ほのおのうず
+OVERHEAT	1	オーバーヒート
+BULLET_SEED_FAST	1	タネマシンガン
+GRASS_KNOT	1	くさむすび
+ENERGY_BALL	1	エナジーボール
+EXTRASENSORY_FAST	1	じんつうりき
+FUTURESIGHT	1	みらいよち
+MIRROR_COAT	1	ミラーコート
+OUTRAGE	1	げきりん
+SNARL_FAST	1	バークアウト
+CRUNCH	1	かみくだく
+FOUL_PLAY	1	イカサマ
+HIDDEN_POWER_FAST	1	めざめるパワー
+TAKE_DOWN_FAST	1	とっしん
+WATERFALL_FAST	1	たきのぼり
+SURF	1	なみのり
+DRACO_METEOR	1	りゅうせいぐん
+DOOM_DESIRE	1	はめつのねがい
+YAWN_FAST	1	あくび
+PSYCHO_BOOST	1	サイコブースト
+ORIGIN_PULSE	1	こんげんのはどう
+PRECIPICE_BLADES	1	だんがいのつるぎ
+PRESENT_FAST	1	プレゼント
+WEATHER_BALL_FIRE	1	ウェザーボール
+WEATHER_BALL_ICE	1	ウェザーボール
+WEATHER_BALL_ROCK	1	ウェザーボール
+WEATHER_BALL_WATER	1	ウェザーボール
+FRENZY_PLANT	1	ハードプラント
+SMACK_DOWN_FAST	1	うちおとす
+BLAST_BURN	1	ブラストバーン
+HYDRO_CANNON	1	ハイドロカノン
+LAST_RESORT	1	とっておき
+HIDDEN_POWER_NORMAL_FAST	1	めざめるパワー
+HIDDEN_POWER_FIGHTING_FAST	1	めざめるパワー
+HIDDEN_POWER_FLYING_FAST	1	めざめるパワー
+HIDDEN_POWER_POISON_FAST	1	めざめるパワー
+HIDDEN_POWER_GROUND_FAST	1	めざめるパワー
+HIDDEN_POWER_ROCK_FAST	1	めざめるパワー
+HIDDEN_POWER_BUG_FAST	1	めざめるパワー
+HIDDEN_POWER_GHOST_FAST	1	めざめるパワー
+HIDDEN_POWER_STEEL_FAST	1	めざめるパワー
+HIDDEN_POWER_FIRE_FAST	1	めざめるパワー
+HIDDEN_POWER_WATER_FAST	1	めざめるパワー
+HIDDEN_POWER_GRASS_FAST	1	めざめるパワー
+HIDDEN_POWER_ELECTRIC_FAST	1	めざめるパワー
+HIDDEN_POWER_PSYCHIC_FAST	1	めざめるパワー
+HIDDEN_POWER_ICE_FAST	1	めざめるパワー
+HIDDEN_POWER_DRAGON_FAST	1	めざめるパワー
+HIDDEN_POWER_DARK_FAST	1	めざめるパワー
+HIDDEN_POWER_FAIRY_FAST	1	めざめるパワー
+WRAP	3	김밥말이
+HYPER_BEAM	3	파괴광선
+DARK_PULSE	3	악의파동
+SLUDGE	3	오물공격
+VICE_GRIP	3	찝기
+FLAME_WHEEL	3	화염자동차
+MEGAHORN	3	메가폰
+FLAMETHROWER	3	화염방사
+DIG	3	구멍파기
+CROSS_CHOP	3	크로스촙
+PSYBEAM	3	환상빔
+EARTHQUAKE	3	지진
+STONE_EDGE	3	스톤에지
+ICE_PUNCH	3	냉동펀치
+HEART_STAMP	3	하트스탬프
+FLASH_CANNON	3	러스터캐논
+DRILL_PECK	3	회전부리
+ICE_BEAM	3	냉동빔
+BLIZZARD	3	눈보라
+HEAT_WAVE	3	열풍
+AERIAL_ACE	3	제비반환
+DRILL_RUN	3	드릴라이너
+PETAL_BLIZZARD	3	꽃보라
+MEGA_DRAIN	3	메가드레인
+BUG_BUZZ	3	벌레의야단법석
+POISON_FANG	3	독엄니
+NIGHT_SLASH	3	깜짝베기
+BUBBLE_BEAM	3	거품광선
+SUBMISSION	3	지옥의바퀴
+LOW_SWEEP	3	로킥
+AQUA_JET	3	아쿠아제트
+AQUA_TAIL	3	아쿠아테일
+SEED_BOMB	3	씨폭탄
+PSYSHOCK	3	사이코쇼크
+ANCIENT_POWER	3	원시의힘
+ROCK_TOMB	3	암석봉인
+ROCK_SLIDE	3	스톤샤워
+POWER_GEM	3	파워젬
+SHADOW_SNEAK	3	야습
+SHADOW_PUNCH	3	섀도펀치
+OMINOUS_WIND	3	괴상한바람
+SHADOW_BALL	3	섀도볼
+MAGNET_BOMB	3	마그넷봄
+IRON_HEAD	3	아이언헤드
+PARABOLIC_CHARGE	3	파라볼라차지
+THUNDER_PUNCH	3	번개펀치
+THUNDER	3	번개
+THUNDERBOLT	3	10만볼트
+TWISTER	3	회오리
+DRAGON_PULSE	3	용의파동
+DRAGON_CLAW	3	드래곤크루
+DISARMING_VOICE	3	차밍보이스
+DRAINING_KISS	3	드레인키스
+DAZZLING_GLEAM	3	매지컬샤인
+MOONBLAST	3	문포스
+PLAY_ROUGH	3	치근거리기
+CROSS_POISON	3	크로스포이즌
+SLUDGE_BOMB	3	오물폭탄
+SLUDGE_WAVE	3	오물웨이브
+GUNK_SHOT	3	더스트슈트
+BONE_CLUB	3	뼈다귀치기
+BULLDOZE	3	땅고르기
+MUD_BOMB	3	진흙폭탄
+SIGNAL_BEAM	3	시그널빔
+X_SCISSOR	3	시저크로스
+FLAME_CHARGE	3	니트로차지
+FLAME_BURST	3	불꽃튀기기
+FIRE_BLAST	3	불대문자
+BRINE	3	소금물
+WATER_PULSE	3	물의파동
+SCALD	3	열탕
+HYDRO_PUMP	3	하이드로펌프
+PSYCHIC	3	사이코키네시스
+PSYSTRIKE	3	사이코브레이크
+ICY_WIND	3	얼다바람
+GIGA_DRAIN	3	기가드레인
+FIRE_PUNCH	3	불꽃펀치
+SOLAR_BEAM	3	솔라빔
+LEAF_BLADE	3	리프블레이드
+POWER_WHIP	3	파워휩
+AIR_CUTTER	3	에어컷터
+HURRICANE	3	폭풍
+BRICK_BREAK	3	깨트리다
+SWIFT	3	스피드스타
+HORN_ATTACK	3	뿔찌르기
+STOMP	3	짓밟기
+HYPER_FANG	3	필살앞니
+BODY_SLAM	3	누르기
+REST	3	잠자기
+STRUGGLE	3	발버둥
+SCALD_BLASTOISE	3	열탕
+HYDRO_PUMP_BLASTOISE	3	하이드로펌프
+WRAP_GREEN	3	김밥말이
+WRAP_PINK	3	김밥말이
+FURY_CUTTER_FAST	3	연속자르기
+BUG_BITE_FAST	3	벌레먹음
+BITE_FAST	3	물기
+SUCKER_PUNCH_FAST	3	기습
+DRAGON_BREATH_FAST	3	용의숨결
+THUNDER_SHOCK_FAST	3	전기쇼크
+SPARK_FAST	3	스파크
+LOW_KICK_FAST	3	안다리걸기
+KARATE_CHOP_FAST	3	태권당수
+EMBER_FAST	3	불꽃세례
+WING_ATTACK_FAST	3	날개치기
+PECK_FAST	3	쪼기
+LICK_FAST	3	핥기
+SHADOW_CLAW_FAST	3	섀도크루
+VINE_WHIP_FAST	3	덩굴채찍
+RAZOR_LEAF_FAST	3	잎날가르기
+MUD_SHOT_FAST	3	머드숏
+ICE_SHARD_FAST	3	얼음뭉치
+FROST_BREATH_FAST	3	얼음숨결
+QUICK_ATTACK_FAST	3	전광석화
+SCRATCH_FAST	3	할퀴기
+TACKLE_FAST	3	몸통박치기
+POUND_FAST	3	막치기
+CUT_FAST	3	풀베기
+POISON_JAB_FAST	3	독찌르기
+ACID_FAST	3	용해액
+PSYCHO_CUT_FAST	3	사이코커터
+ROCK_THROW_FAST	3	돌떨구기
+METAL_CLAW_FAST	3	메탈크로우
+MEGAHORN	9	Megahorn
+FLAMETHROWER	9	Flamethrower
+BULLET_PUNCH_FAST	3	불릿펀치
+WATER_GUN_FAST	3	물대포
+SPLASH_FAST	3	튀어오르기
+WATER_GUN_FAST_BLASTOISE	3	물대포
+MUD_SLAP_FAST	3	진흙뿌리기
+ZEN_HEADBUTT_FAST	3	사념의박치기
+CONFUSION_FAST	3	염동력
+POISON_STING_FAST	3	독침
+BUBBLE_FAST	3	거품
+FEINT_ATTACK_FAST	3	속여때리기
+STEEL_WING_FAST	3	강철날개
+FIRE_FANG_FAST	3	불꽃엄니
+ROCK_SMASH_FAST	3	바위깨기
+TRANSFORM_FAST	3	변신
+COUNTER_FAST	3	카운터
+POWDER_SNOW_FAST	3	눈싸라기
+CLOSE_COMBAT	3	인파이트
+DYNAMIC_PUNCH	3	폭발펀치
+FOCUS_BLAST	3	기합구슬
+AURORA_BEAM	3	오로라빔
+CHARGE_BEAM_FAST	3	차지빔
+VOLT_SWITCH_FAST	3	볼트체인지
+WILD_CHARGE	3	와일드볼트
+ZAP_CANNON	3	전자포
+DRAGON_TAIL_FAST	3	드래곤테일
+AVALANCHE	3	눈사태
+AIR_SLASH_FAST	3	에어슬래시
+BRAVE_BIRD	3	브레이브버드
+SKY_ATTACK	3	불새
+SAND_TOMB	3	모래지옥
+ROCK_BLAST	3	락블레스트
+INFESTATION_FAST	3	엉겨붙기
+STRUGGLE_BUG_FAST	3	벌레의저항
+SILVER_WIND	3	은빛바람
+ASTONISH_FAST	3	놀래키기
+HEX_FAST	3	병상첨병
+NIGHT_SHADE	3	나이트헤드
+IRON_TAIL_FAST	3	아이언테일
+GYRO_BALL	3	자이로볼
+HEAVY_SLAM	3	헤비봄버
+FIRE_SPIN_FAST	3	회오리불꽃
+OVERHEAT	3	오버히트
+BULLET_SEED_FAST	3	기관총
+GRASS_KNOT	3	풀묶기
+ENERGY_BALL	3	에너지볼
+EXTRASENSORY_FAST	3	신통력
+FUTURESIGHT	3	미래예지
+MIRROR_COAT	3	미러코트
+OUTRAGE	3	역린
+SNARL_FAST	3	바크아웃
+CRUNCH	3	깨물어부수기
+FOUL_PLAY	3	속임수
+HIDDEN_POWER_FAST	3	잠재파워
+TAKE_DOWN_FAST	3	돌진
+WATERFALL_FAST	3	폭포오르기
+SURF	3	파도타기
+DRACO_METEOR	3	용성군
+DOOM_DESIRE	3	파멸의소원
+YAWN_FAST	3	하품
+PSYCHO_BOOST	3	사이코부스트
+ORIGIN_PULSE	3	근원의파동
+PRECIPICE_BLADES	3	단애의칼
+PRESENT_FAST	3	프레젠트
+WEATHER_BALL_FIRE	3	웨더볼
+WEATHER_BALL_ICE	3	웨더볼
+WEATHER_BALL_ROCK	3	웨더볼
+WEATHER_BALL_WATER	3	웨더볼
+FRENZY_PLANT	3	하드플랜트
+SMACK_DOWN_FAST	3	떨어뜨리기
+BLAST_BURN	3	블러스트번
+HYDRO_CANNON	3	하이드로캐논
+LAST_RESORT	3	뒀다쓰기
+HIDDEN_POWER_NORMAL_FAST	3	잠재파워
+HIDDEN_POWER_FIGHTING_FAST	3	잠재파워
+HIDDEN_POWER_FLYING_FAST	3	잠재파워
+HIDDEN_POWER_POISON_FAST	3	잠재파워
+HIDDEN_POWER_GROUND_FAST	3	잠재파워
+HIDDEN_POWER_ROCK_FAST	3	잠재파워
+HIDDEN_POWER_BUG_FAST	3	잠재파워
+HIDDEN_POWER_GHOST_FAST	3	잠재파워
+HIDDEN_POWER_STEEL_FAST	3	잠재파워
+HIDDEN_POWER_FIRE_FAST	3	잠재파워
+HIDDEN_POWER_WATER_FAST	3	잠재파워
+HIDDEN_POWER_GRASS_FAST	3	잠재파워
+HIDDEN_POWER_ELECTRIC_FAST	3	잠재파워
+HIDDEN_POWER_PSYCHIC_FAST	3	잠재파워
+HIDDEN_POWER_ICE_FAST	3	잠재파워
+HIDDEN_POWER_DRAGON_FAST	3	잠재파워
+HIDDEN_POWER_DARK_FAST	3	잠재파워
+HIDDEN_POWER_FAIRY_FAST	3	잠재파워
+WRAP	13	Embrulho
+HYPER_BEAM	13	Hiper-raio
+DARK_PULSE	13	Pulso Sombrio
+SLUDGE	13	Ataque de Lama
+VICE_GRIP	13	Agarramento Viciado
+FLAME_WHEEL	13	Roda de Fogo
+MEGAHORN	13	Megachifre
+FLAMETHROWER	13	Lança-chamas
+DIG	13	Cavar
+CROSS_CHOP	13	Golpe Cruzado
+PSYBEAM	13	Feixe Psíquico
+EARTHQUAKE	13	Terremoto
+STONE_EDGE	13	Gume de Pedra
+ICE_PUNCH	13	Soco de Gelo
+HEART_STAMP	13	Estampa de Coração
+DISCHARGE	13	Descarga
+FLASH_CANNON	13	Canhão de Flash
+DRILL_PECK	13	Bico Broca
+ICE_BEAM	13	Raio Congelante
+BLIZZARD	13	Nevasca
+HEAT_WAVE	13	Onda de Calor
+AERIAL_ACE	13	Ás dos Ares
+DRILL_RUN	13	Furação
+PETAL_BLIZZARD	13	Nevasca de Pétalas
+MEGA_DRAIN	13	Megadreno
+BUG_BUZZ	13	Zumbido de Inseto
+POISON_FANG	13	Presa Venenosa
+NIGHT_SLASH	13	Talho Noturno
+BUBBLE_BEAM	13	Jato de Bolhas
+SUBMISSION	13	Submissão
+LOW_SWEEP	13	Movimento Baixo
+AQUA_JET	13	Aqua Jato
+AQUA_TAIL	13	Aqua Cauda
+SEED_BOMB	13	Bomba de Sementes
+PSYSHOCK	13	Choque Psíquico
+ANCIENT_POWER	13	Poder Ancestral
+ROCK_TOMB	13	Tumba de Rochas
+ROCK_SLIDE	13	Deslize de Pedras
+POWER_GEM	13	Gema Poderosa
+SHADOW_SNEAK	13	Furtividade nas Sombras
+SHADOW_PUNCH	13	Soco Sombrio
+OMINOUS_WIND	13	Vento Ominoso
+SHADOW_BALL	13	Bola Sombria
+MAGNET_BOMB	13	Bomba Ímã
+IRON_HEAD	13	Cabeça de Ferro
+PARABOLIC_CHARGE	13	Ataque Parabólico
+THUNDER_PUNCH	13	Soco Trovoada
+THUNDER	13	Trovão
+THUNDERBOLT	13	Relâmpago
+TWISTER	13	Twister
+DRAGON_PULSE	13	Pulso do Dragão
+DRAGON_CLAW	13	Garra de Dragão
+DISARMING_VOICE	13	Voz Desarmante
+DRAINING_KISS	13	Beijo Drenante
+DAZZLING_GLEAM	13	Clarão Deslumbrante
+MOONBLAST	13	Explosão Lunar
+PLAY_ROUGH	13	Jogo Duro
+CROSS_POISON	13	Corte-veneno
+SLUDGE_BOMB	13	Bomba de Lodo
+SLUDGE_WAVE	13	Onda de Lama
+GUNK_SHOT	13	Tiro de Sujeira
+BONE_CLUB	13	Bastão de Osso
+MUD_BOMB	13	Bomba de Lama
+SIGNAL_BEAM	13	Feixe Sinalizador
+X_SCISSOR	13	Tesoura X
+FLAME_CHARGE	13	Ataque de Chamas
+FLAME_BURST	13	Rajada de Chamas
+FIRE_BLAST	13	Rajada de Fogo
+BRINE	13	Salmoura
+WATER_PULSE	13	Pulso d'Água
+SCALD	13	Escaldada
+HYDRO_PUMP	13	Jato d'Água
+PSYCHIC	13	Psíquico
+PSYSTRIKE	13	Golpe Psíquico
+ICY_WIND	13	Vento Congelante
+GIGA_DRAIN	13	Gigadreno
+FIRE_PUNCH	13	Soco de Fogo
+SOLAR_BEAM	13	Raio Solar
+LEAF_BLADE	13	Lâmina de Folha
+POWER_WHIP	13	Chicote Poderoso
+AIR_CUTTER	13	Cortador de Ar
+HURRICANE	13	Furacão
+BRICK_BREAK	13	Quebra-telha
+SWIFT	13	Ataque Veloz
+HORN_ATTACK	13	Ataque de Chifre
+STOMP	13	Pisotear
+HYPER_FANG	13	Hiperpresa
+BODY_SLAM	13	Pancada Corporal
+REST	13	Descansar
+STRUGGLE	13	Insistência
+SCALD_BLASTOISE	13	Escaldada
+HYDRO_PUMP_BLASTOISE	13	Jato d'Água
+WRAP_GREEN	13	Embrulho
+WRAP_PINK	13	Embrulho
+FURY_CUTTER_FAST	13	Cortador de Fúria
+BUG_BITE_FAST	13	Picada
+BITE_FAST	13	Mordida
+SUCKER_PUNCH_FAST	13	Soco Enganador
+DRAGON_BREATH_FAST	13	Sopro do Dragão
+THUNDER_SHOCK_FAST	13	Trovoada de Choques
+SPARK_FAST	13	Faísca
+LOW_KICK_FAST	13	Rasteira
+KARATE_CHOP_FAST	13	Golpe de Caratê
+EMBER_FAST	13	Brasa
+WING_ATTACK_FAST	13	Ataque de Asa
+PECK_FAST	13	Bicada
+LICK_FAST	13	Lambida
+SHADOW_CLAW_FAST	13	Garra Sombria
+VINE_WHIP_FAST	13	Chicote de Vinha
+RAZOR_LEAF_FAST	13	Folha Navalha
+MUD_SHOT_FAST	13	Tiro de Lama
+ICE_SHARD_FAST	13	Caco de Gelo
+FROST_BREATH_FAST	13	Respiração de Gelo
+QUICK_ATTACK_FAST	13	Ataque Rápido
+SCRATCH_FAST	13	Arranhão
+TACKLE_FAST	13	Investida
+POUND_FAST	13	Pancada
+CUT_FAST	13	Cortar
+POISON_JAB_FAST	13	Golpe Envenenado
+ACID_FAST	13	Ácido
+PSYCHO_CUT_FAST	13	Corte Psíquico
+ROCK_THROW_FAST	13	Lançamento de Rocha
+METAL_CLAW_FAST	13	Garra de Metal
+BULLET_PUNCH_FAST	13	Soco Projétil
+WATER_GUN_FAST	13	Revólver d'Água
+SPLASH_FAST	13	Borrifada
+WATER_GUN_FAST_BLASTOISE	13	Revólver d'Água
+MUD_SLAP_FAST	13	Tapa de Lama
+ZEN_HEADBUTT_FAST	13	Cabeçada Zen
+CONFUSION_FAST	13	Confusão
+POISON_STING_FAST	13	Ferrão Venenoso
+BUBBLE_FAST	13	Bolha
+FEINT_ATTACK_FAST	13	Ataque Dissimulado
+STEEL_WING_FAST	13	Asa de Aço
+FIRE_FANG_FAST	13	Presas de Fogo
+ROCK_SMASH_FAST	13	Esmagamento de Pedras
+TRANSFORM_FAST	13	Transformação
+COUNTER_FAST	13	Contra-atacar
+POWDER_SNOW_FAST	13	Neve em Pó
+CLOSE_COMBAT	13	Corpo-a-corpo
+DYNAMIC_PUNCH	13	Soco Dinâmico
+FOCUS_BLAST	13	Explosão Focalizada
+AURORA_BEAM	13	Raio Aurora
+CHARGE_BEAM_FAST	13	Carga de Raio
+VOLT_SWITCH_FAST	13	Troca Elétrica
+WILD_CHARGE	13	Ataque Selvagem
+ZAP_CANNON	13	Canhão Zap
+DRAGON_TAIL_FAST	13	Cauda do Dragão
+AVALANCHE	13	Avalanche
+AIR_SLASH_FAST	13	Golpe de Ar
+BRAVE_BIRD	13	Pássaro Bravo
+SKY_ATTACK	13	Ataque do Céu
+SAND_TOMB	13	Fosso de Areia
+ROCK_BLAST	13	Explosão de Rocha
+INFESTATION_FAST	13	Infestação
+STRUGGLE_BUG_FAST	13	Ira de Inseto
+SILVER_WIND	13	Vento Prateado
+ASTONISH_FAST	13	Abismar
+HEX_FAST	13	Feitiço
+NIGHT_SHADE	13	Sombra Noturna
+IRON_TAIL_FAST	13	Cauda de Ferro
+GYRO_BALL	13	Girobola
+HEAVY_SLAM	13	Golpe Pesado
+FIRE_SPIN_FAST	13	Chama Furacão
+OVERHEAT	13	Superaquecimento
+BULLET_SEED_FAST	13	Projétil de Semente
+GRASS_KNOT	13	Nó de Grama
+ENERGY_BALL	13	Bola de Energia
+EXTRASENSORY_FAST	13	Extrassensorial
+FUTURESIGHT	13	Visão do Futuro
+MIRROR_COAT	13	Casaco Espelhado
+OUTRAGE	13	Ultraje
+SNARL_FAST	13	Rosnado
+CRUNCH	13	Mastigada
+FOUL_PLAY	13	Jogo Sujo
+HIDDEN_POWER_FAST	13	Poder Oculto
+TAKE_DOWN_FAST	13	Desmantelar
+WATERFALL_FAST	13	Cachoeira
+SURF	13	Surfar
+DRACO_METEOR	13	Meteoro do Dragão
+DOOM_DESIRE	13	Desejo Cruel
+YAWN_FAST	13	Bocejo
+PSYCHO_BOOST	13	Impulso Psíquico
+ORIGIN_PULSE	13	Pulso Original
+PRESENT_FAST	13	Presente
+WEATHER_BALL_FIRE	13	Esfera Climática
+WEATHER_BALL_ICE	13	Esfera Climática
+WEATHER_BALL_ROCK	13	Esfera Climática
+WEATHER_BALL_WATER	13	Esfera Climática
+FRENZY_PLANT	13	Planta Mortal
+SMACK_DOWN_FAST	13	Derrubada
+BLAST_BURN	13	Queimadura Explosiva
+HYDRO_CANNON	13	Hidro Canhão
+LAST_RESORT	13	Último Recurso
+HIDDEN_POWER_NORMAL_FAST	13	Poder Oculto
+HIDDEN_POWER_FIGHTING_FAST	13	Poder Oculto
+HIDDEN_POWER_FLYING_FAST	13	Poder Oculto
+HIDDEN_POWER_POISON_FAST	13	Poder Oculto
+HIDDEN_POWER_GROUND_FAST	13	Poder Oculto
+HIDDEN_POWER_ROCK_FAST	13	Poder Oculto
+HIDDEN_POWER_BUG_FAST	13	Poder Oculto
+HIDDEN_POWER_GHOST_FAST	13	Poder Oculto
+HIDDEN_POWER_STEEL_FAST	13	Poder Oculto
+HIDDEN_POWER_FIRE_FAST	13	Poder Oculto
+HIDDEN_POWER_WATER_FAST	13	Poder Oculto
+HIDDEN_POWER_GRASS_FAST	13	Poder Oculto
+HIDDEN_POWER_ELECTRIC_FAST	13	Poder Oculto
+HIDDEN_POWER_PSYCHIC_FAST	13	Poder Oculto
+HIDDEN_POWER_ICE_FAST	13	Poder Oculto
+HIDDEN_POWER_DRAGON_FAST	13	Poder Oculto
+HIDDEN_POWER_DARK_FAST	13	Poder Oculto
+HIDDEN_POWER_FAIRY_FAST	13	Poder Oculto
+WRAP	4	緊束
+HYPER_BEAM	4	破壞光線
+DARK_PULSE	4	惡之波動
+SLUDGE	4	污泥攻擊
+VICE_GRIP	4	夾住
+FLAME_WHEEL	4	火焰輪
+MEGAHORN	4	超級角擊
+FLAMETHROWER	4	噴射火焰
+DIG	4	挖洞
+CROSS_CHOP	4	十字劈
+PSYBEAM	4	幻象光線
+EARTHQUAKE	4	地震
+STONE_EDGE	4	尖石攻擊
+ICE_PUNCH	4	冰凍拳
+HEART_STAMP	4	愛心印章
+DISCHARGE	4	放電
+FLASH_CANNON	4	加農光炮
+DRILL_PECK	4	啄鑽
+ICE_BEAM	4	冰凍光束
+BLIZZARD	4	暴風雪
+HEAT_WAVE	4	熱風
+AERIAL_ACE	4	燕返
+DRILL_RUN	4	直衝鑽
+PETAL_BLIZZARD	4	落英繽紛
+MEGA_DRAIN	4	超級吸取
+BUG_BUZZ	4	蟲鳴
+POISON_FANG	4	劇毒牙
+NIGHT_SLASH	4	暗襲要害
+BUBBLE_BEAM	4	泡沫光線
+SUBMISSION	4	地獄翻滾
+LOW_SWEEP	4	下盤踢
+AQUA_JET	4	水流噴射
+AQUA_TAIL	4	水流尾
+SEED_BOMB	4	種子炸彈
+PSYSHOCK	4	精神衝擊
+ANCIENT_POWER	4	原始之力
+ROCK_TOMB	4	岩石封鎖
+ROCK_SLIDE	4	岩崩
+POWER_GEM	4	力量寶石
+SHADOW_SNEAK	4	影子偷襲
+SHADOW_PUNCH	4	暗影拳
+OMINOUS_WIND	4	奇異之風
+SHADOW_BALL	4	暗影球
+MAGNET_BOMB	4	磁鐵炸彈
+IRON_HEAD	4	鐵頭
+PARABOLIC_CHARGE	4	拋物面充電
+THUNDER_PUNCH	4	雷電拳
+THUNDER	4	打雷
+THUNDERBOLT	4	十萬伏特
+TWISTER	4	龍捲風
+DRAGON_PULSE	4	龍之波動
+DRAGON_CLAW	4	龍爪
+DISARMING_VOICE	4	魅惑之聲
+DRAINING_KISS	4	吸取之吻
+DAZZLING_GLEAM	4	魔法閃耀
+MOONBLAST	4	月亮之力
+PLAY_ROUGH	4	嬉鬧
+CROSS_POISON	4	十字毒刃
+SLUDGE_BOMB	4	污泥炸彈
+SLUDGE_WAVE	4	污泥波
+GUNK_SHOT	4	垃圾射擊
+BONE_CLUB	4	骨棒
+BULLDOZE	4	重踏
+MUD_BOMB	4	泥巴炸彈
+SIGNAL_BEAM	4	信號光束
+X_SCISSOR	4	十字剪
+FLAME_CHARGE	4	蓄能焰襲
+FLAME_BURST	4	烈焰濺射
+FIRE_BLAST	4	大字爆炎
+BRINE	4	鹽水
+WATER_PULSE	4	水之波動
+SCALD	4	熱水
+HYDRO_PUMP	4	水炮
+PSYCHIC	4	精神強念
+PSYSTRIKE	4	精神擊破
+ICY_WIND	4	冰凍之風
+WRAP	9	Wrap
+HYPER_BEAM	9	Hyper Beam
+DARK_PULSE	9	Dark Pulse
+DIG	9	Dig
+CROSS_CHOP	9	Cross Chop
+PSYBEAM	9	Psybeam
+EARTHQUAKE	9	Earthquake
+STONE_EDGE	9	Stone Edge
+ICE_PUNCH	9	Ice Punch
+HEART_STAMP	9	Heart Stamp
+DISCHARGE	9	Discharge
+FLASH_CANNON	9	Flash Cannon
+DRILL_PECK	9	Drill Peck
+ICE_BEAM	9	Ice Beam
+BLIZZARD	9	Blizzard
+HEAT_WAVE	9	Heat Wave
+AERIAL_ACE	9	Aerial Ace
+DRILL_RUN	9	Drill Run
+MEGA_DRAIN	9	Mega Drain
+NIGHT_SLASH	9	Night Slash
+BUBBLE_BEAM	9	Bubble Beam
+SUBMISSION	9	Submission
+LOW_SWEEP	9	Low Sweep
+GIGA_DRAIN	4	終極吸取
+FIRE_PUNCH	4	火焰拳
+SOLAR_BEAM	4	日光束
+LEAF_BLADE	4	葉刃
+POWER_WHIP	4	強力鞭打
+AIR_CUTTER	4	空氣利刃
+HURRICANE	4	暴風
+BRICK_BREAK	4	劈瓦
+SWIFT	4	高速星星
+HORN_ATTACK	4	角撞
+STOMP	4	踩踏
+HYPER_FANG	4	必殺門牙
+BODY_SLAM	4	泰山壓頂
+REST	4	睡覺
+STRUGGLE	4	掙扎
+SCALD_BLASTOISE	4	熱水
+HYDRO_PUMP_BLASTOISE	4	水炮
+WRAP_GREEN	4	緊束
+WRAP_PINK	4	緊束
+FURY_CUTTER_FAST	4	連斬
+BUG_BITE_FAST	4	蟲咬
+BITE_FAST	4	咬住
+SUCKER_PUNCH_FAST	4	突襲
+DRAGON_BREATH_FAST	4	龍息
+SCRATCH_FAST	4	抓
+TACKLE_FAST	4	撞擊
+WATER_GUN_FAST	4	水槍
+SPLASH_FAST	4	躍起
+WATER_GUN_FAST_BLASTOISE	4	水槍
+MUD_SLAP_FAST	4	擲泥
+ZEN_HEADBUTT_FAST	4	意念頭錘
+CONFUSION_FAST	4	念力
+POISON_STING_FAST	4	毒針
+BUBBLE_FAST	4	泡沫
+FEINT_ATTACK_FAST	4	出奇一擊
+STEEL_WING_FAST	4	鋼翼
+FIRE_FANG_FAST	4	火焰牙
+ROCK_SMASH_FAST	4	碎岩
+TRANSFORM_FAST	4	變身
+COUNTER_FAST	4	雙倍奉還
+POWDER_SNOW_FAST	4	細雪
+CLOSE_COMBAT	4	近身戰
+DYNAMIC_PUNCH	4	爆裂拳
+FOCUS_BLAST	4	真氣彈
+AURORA_BEAM	4	極光束
+CHARGE_BEAM_FAST	4	充電光束
+VOLT_SWITCH_FAST	4	伏特替換
+WILD_CHARGE	4	瘋狂伏特
+ZAP_CANNON	4	電磁炮
+DRAGON_TAIL_FAST	4	龍尾
+AVALANCHE	4	雪崩
+AIR_SLASH_FAST	4	空氣斬
+BRAVE_BIRD	4	勇鳥猛攻
+SKY_ATTACK	4	神鳥猛擊
+SAND_TOMB	4	流沙地獄
+ROCK_BLAST	4	岩石爆擊
+INFESTATION_FAST	4	死纏爛打
+STRUGGLE_BUG_FAST	4	蟲之抵抗
+SILVER_WIND	4	銀色旋風
+ASTONISH_FAST	4	驚嚇
+HEX_FAST	4	禍不單行
+NIGHT_SHADE	4	黑夜魔影
+IRON_TAIL_FAST	4	鐵尾
+GYRO_BALL	4	陀螺球
+HEAVY_SLAM	4	重磅衝撞
+FIRE_SPIN_FAST	4	火焰旋渦
+OVERHEAT	4	過熱
+BULLET_SEED_FAST	4	種子機關槍
+GRASS_KNOT	4	打草結
+ENERGY_BALL	4	能量球
+EXTRASENSORY_FAST	4	神通力
+FUTURESIGHT	4	預知未來
+MIRROR_COAT	4	鏡面反射
+OUTRAGE	4	逆麟
+SNARL_FAST	4	大聲咆哮
+CRUNCH	4	咬碎
+FOUL_PLAY	4	欺詐
+HIDDEN_POWER_FAST	4	覺醒力量
+TAKE_DOWN_FAST	4	猛撞
+WATERFALL_FAST	4	攀瀑
+SURF	4	衝浪
+DRACO_METEOR	4	流星群
+DOOM_DESIRE	4	破滅之願
+YAWN_FAST	4	哈欠
+HIDDEN_POWER_FAST	9	Hidden Power
+PSYCHO_BOOST	4	精神突進
+ORIGIN_PULSE	4	根源波動
+PRECIPICE_BLADES	4	斷崖之劍
+PRESENT_FAST	4	禮物
+WEATHER_BALL_FIRE	4	氣象球
+AQUA_JET	9	Aqua Jet
+X_SCISSOR	6	Kreuzschere
+HIDDEN_POWER_FLYING_FAST	6	Kraftreserve
+SUBMISSION	5	Sacrifice
+DIG	8	Fossa
+FIRE_PUNCH	8	Fuocopugno
+HURRICANE	8	Tifone
+HIDDEN_POWER_GRASS_FAST	8	Introforza
+WRAP	1	まきつく
+DISCHARGE	3	방전
+BULLDOZE	13	Tremor
+PRECIPICE_BLADES	13	Lâmina Abissal
+THUNDER_SHOCK_FAST	4	電擊
+SPARK_FAST	4	電光
+LOW_KICK_FAST	4	踢倒
+KARATE_CHOP_FAST	4	空手劈
+EMBER_FAST	4	火花
+WING_ATTACK_FAST	4	翅膀攻擊
+PECK_FAST	4	啄
+LICK_FAST	4	舌舔
+SHADOW_CLAW_FAST	4	暗影爪
+VINE_WHIP_FAST	4	藤鞭
+RAZOR_LEAF_FAST	4	飛葉快刀
+MUD_SHOT_FAST	4	泥巴射擊
+ICE_SHARD_FAST	4	冰礫
+FROST_BREATH_FAST	4	冰息
+QUICK_ATTACK_FAST	4	電光一閃
+POUND_FAST	4	拍擊
+CUT_FAST	4	居合斬
+POISON_JAB_FAST	4	毒擊
+ACID_FAST	4	溶解液
+PSYCHO_CUT_FAST	4	精神利刃
+ROCK_THROW_FAST	4	落石
+METAL_CLAW_FAST	4	金屬爪
+BULLET_PUNCH_FAST	4	子彈拳
+WEATHER_BALL_ICE	4	氣象球
+WEATHER_BALL_ROCK	4	氣象球
+WEATHER_BALL_WATER	4	氣象球
+FRENZY_PLANT	4	瘋狂植物
+SMACK_DOWN_FAST	4	擊落
+BLAST_BURN	4	爆炸烈焰
+HYDRO_CANNON	4	加農水砲
+LAST_RESORT	4	珍藏
+HIDDEN_POWER_NORMAL_FAST	4	覺醒力量
+HIDDEN_POWER_FIGHTING_FAST	4	覺醒力量
+HIDDEN_POWER_FLYING_FAST	4	覺醒力量
+HIDDEN_POWER_POISON_FAST	4	覺醒力量
+HIDDEN_POWER_GROUND_FAST	4	覺醒力量
+HIDDEN_POWER_ROCK_FAST	4	覺醒力量
+HIDDEN_POWER_BUG_FAST	4	覺醒力量
+HIDDEN_POWER_GHOST_FAST	4	覺醒力量
+HIDDEN_POWER_STEEL_FAST	4	覺醒力量
+HIDDEN_POWER_FIRE_FAST	4	覺醒力量
+HIDDEN_POWER_WATER_FAST	4	覺醒力量
+HIDDEN_POWER_GRASS_FAST	4	覺醒力量
+HIDDEN_POWER_ELECTRIC_FAST	4	覺醒力量
+HIDDEN_POWER_PSYCHIC_FAST	4	覺醒力量
+HIDDEN_POWER_ICE_FAST	4	覺醒力量
+HIDDEN_POWER_DRAGON_FAST	4	覺醒力量
+HIDDEN_POWER_DARK_FAST	4	覺醒力量
+HIDDEN_POWER_FAIRY_FAST	4	覺醒力量
+\.
+
+
+-- Completed on 2023-08-29 10:00:57
+
+--
+-- PostgreSQL database dump complete
+--
+

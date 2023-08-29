@@ -1,5 +1,5 @@
 aiocontextvars==0.2.2
-aiohttp==3.7.4.post0
+aiohttp==3.8.5
 async-timeout==3.0.1
 asyncpg==0.25.0
 attrs==21.4.0

@@ -1,11 +1,11 @@
-[![PyPI](https://img.shields.io/badge/discord.py-1.0.0a-green.svg)](https://github.com/Rapptz/discord.py/tree/rewrite/)
+[![PyPI](https://img.shields.io/badge/discord.py-1.0.0a-green.svg)](https://github.com/Rapptz/discord.py/)
 [![PyPI](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/downloads/release/python-364/)
 [![PyPI](https://img.shields.io/badge/support-discord-lightgrey.svg)](https://discord.gg/hhVjAN8)
 
 # Meowth
 A Discord helper bot for Pokemon Go communities.
 
-Meowth is a Discord bot written in Python 3.6.1+ built with [discord.py v1.0.0a (rewrite branch)](https://github.com/Rapptz/discord.py/tree/rewrite)
+Meowth is a Discord bot written in Python 3.8+ built with [discord.py](https://github.com/Rapptz/discord.py/)
 
 ## Meowth v3 Features
 
@@ -17,93 +17,35 @@ Meowth assists with organising Pokemon Go communities with support for:
  - Raid reporting and RSVP
  - Research reporting
  - Pokebattler integration for raid counters
- - Silph card integration
  - Gym matching extension for self-hosters
 
 #### *`Note: All reports are provided by your active server members. Meowth does not support any TOS breaking features such as spoofing, Pokemon Go bot accounts and automated raid reporting.`*
 
-# Invite Public Meowth (no hosting required)
 
-
-1. Use [THIS LINK](https://discordapp.com/oauth2/authorize?client_id=346759953006198784&scope=bot&permissions=268822608) to invite Meowth  
-1. Select your server and click Authorize
-1. Verify you aren't a robot (if the captcha doesn't appear, disable your adblocker)
-1. In your server, type `!configure`
-1. Go through the DM configuration session with Meowth to setup your server  
-   *Be sure to read the prompts carefully and join the [support server](https://discord.gg/hhVjAN8) if you get stuck*
-1. That's it! Enjoy!
-
-#### *``Note: You must have the manage_server permission to invite a bot.``*
-
-You can join the Meowth Discord Support Server for updates, setup help, feature requests, or just to test out the bot before you add it:  
+You can join the Meowth Discord Support Server for setup help:  
 https://discord.gg/hhVjAN8
 
 # Install your own Meowth
 
-## Dependancies
+## Dependencies
 
-## **`Python 3.6.1+`**
+## **`Python 3.8+`**
 
 [Go here](https://github.com/FoglyOgly/Meowth#installing-python) for details on how to install Python 3.6.
 
 **For all future CLI commands, replace the command name `python3` with the relevant interpreter command name for your system (such as the common `py` command name on Windows). See details [here](https://github.com/FoglyOgly/Meowth#installing-python).**
 
-## **`Discord.py v1.0.0a (Rewrite Branch)`**
+## **`Other dependencies`**
 
-The [rewrite branch of discord.py](https://github.com/Rapptz/discord.py/tree/rewrite) is an in-development branch that does not yet have an official stable release, however the default/master branch is feature-frozen, and lacks support for some of the newer features in discord such as categories.
-
-If you intend to fork Meowth and alter any code, ensure you keep up to date with any breaking changes that might occur in this branch of discord.py.
+Note: It is recommended to setup a venv for this as newer versions of some dependencies may have breaking changes.
 
 ```bash
-python3 -m pip install -U git+https://github.com/Rapptz/discord.py@rewrite
+python3 -m pip install -r requirements.txt
 ```
 
-#### *``Note: You will receive the following warning on your first run, which can be disregarded:``*
-`PyNaCl is not installed, voice will NOT be supported`
+## **`S2Geometry`**
 
-## **`Git`**
-
-To clone the files from our repository or your own forked repository on GitHub, you will need to have `git` installed.
-
-### Windows
-
-Download the [Git for Windows](https://git-scm.com/download/win) software.
-
-On install, ensure the following:
- - `Windows Explorer integration` component (and all sub-components) is selected.
- - `Use Git from the Windows Command Prompt` is selected in the PATH adjustment step.
- - `Checkout as-is, commit Unix-style line endings` is selected in the line ending config step.
- 
- ### Linux
-
-First check if it's already installed with:
-```bash
-git --version
-```
-
-If it's not already installed, use your relevant package manager to install it.
-
-For Debian and Ubuntu, it would usually be:
-```bash
-sudo apt-get install git
-```
-
-## **`Required Python Packages`**
-
-Linux:
-```bash
-python3 -m pip install "requests>=2.18.4" "hastebin.py>=0.2" "python-dateutil>=2.6.1" "fuzzywuzzy>=0.15.1" "dateparser>=0.6.0"
-```
-
-## **`Optional Python Packages`**
-
-`python-Levenshtein` is an optional package that increases the speed of fuzzy matching strings, which we use for matching up pokemon names, gym names and possibly other things in future. It also removes the `Using slow pure-python SequenceMatcher` warning emitted from the `fuzzywuzzy` python package, which can otherwise be ignored.
-
-```bash
-python3 -m pip install python-Levenshtein
-```
-
-The above may not be supported on all systems. You can sometimes find a suitable wheel [here](https://www.lfd.uci.edu/~gohlke/pythonlibs/#python-levenshtein) to install with, or you may have to look around for details suitable for your specific system.
+The Meowth mapping extension, which is responsible for storing location information on gyms, pokestops, etc., as well as for defining the geographical areas covered by reporting channels, the weather forecasting features, etc, is all based on the S2Geometry framework. This is a C++ package that has a Python wrapper that can be very very difficult to get working. Since the last time it was set up things seem to have changed quite a bit, so you will need to visit the [S2Geometry](https://s2geometry.io/) website to try to get it working with your Python installation. 
 
 ## **`Meowth`**
 
@@ -200,112 +142,6 @@ Arguments within \< \> are required.<br/>
 Arguments within \[ \] are optional.<br/>
 pkmn = Pokemon
 
-### Admin or Manager Commands:
-
-| Commands | Requirements  | Description |
-| -------- |:-------------:| ------------|
-| **!save**  | *Owner Only* | Saves the save data to file. |
-| **!exit**  | *Owner Only* | Saves the save data to file and shutdown Meowth. |
-| **!restart**  | *Owner Only* | Saves the save data to file and restarts Meowth. |
-| **!announce** \[msg\] | *Owner Only* | Sends announcement message to server owners. |
-| **!welcome** \[@member\] | *Owner Only* | Sends the welcome message to either user or mentioned member. |
-| **!outputlog**  | *Server Manager Only* | Uploads the log file to hastebin and replies with the link. |
-| **!set prefix** \[prefix\] | *Server Manager Only* | Sets Meowth's prefix. |
-| **!set regional** \<pkmn\> | *Server Manager Only* | Sets server's regional raid boss. Accepts number or name. |
-| **!set timezone** \<UTC offset\> | *Server Manager Only* | Sets server's timezone. Accepts numbers from -12 to 14. |
-| **!get prefix** | *Server Manager Only* | Displays Meowth's prefix. |
-| **!get perms** \[channelid\] | *Server Manager Only* | Displays Meowth's permissions in guild and channel. |
-| **!welcome** \[user\] | *Owner Only* | Test welcome message on mentioned member |
-| **!configure** | *Server Manager Only* | Configure Meowth |
-| **!reload_json** | *Owner Only* | reloads JSON files for the server |
-| **!raid_json** \[level\] \[bosslist\] | *Owner Only* | Edits or displays raid_info.json |
-| **!changeraid** \[level or boss\] | *Channel Manager Only* | Changes raid boss or egg level |
-| **!clearstatus**  | *Channel Manager<br/>Raid Channel* | Cancel everyone's status. |
-| **!setstatus** \<user\> \<status\> \[count\] | *Channel Manager<br/>Raid Channel* | Changes raid channel status lists. |
-| **!cleanroles** | *Channel Manager* | Removes all 0 member pokemon roles. |
-| **!reset_board** \[user\] \[type\] | *Server Manager* | Resets \[user\]'s or server's leaderboard by type or total. |
-
-### Miscellaneous Commands
-| Commands | Requirements  | Description |
-| -------- |:-------------:| ------------|
-| **!help** \[command\] | - | Shows bot/command help, with descriptions. |
-| **!about** | - | Shows info about Meowth. |
-| **!uptime** | - | Shows Meowth's uptime. |
-| **!team** \<team\> | - | Let's users set their team role. |
-| **!set silph** \<Silph name\> | - | Links user\'s Silph Road account to Meowth. |
-| **!silphcard** \[Silph name\] | - | Displays [Silph name]\'s or user\'s trainer card. |
-| **!profile** \[username\] | - | Displays [username]\'s or user\'s profile. |
-| **!leaderboard** \[type\] | - | Displays reporting leaderboard. Accepts total, raids, eggs, exraids, wilds, research. Defaults to total. |
-
-### Pokemon Notification Commands:
-
-| Commands | Requirements  | Description |
-| -------- |:-------------:| ------------|
-| **!want** \<pkmn\> | *Want Channel* | Adds a Pokemon to your notification roles. |
-| **!unwant** \<pkmn\> | *Want Channel* | Removes a Pokemon from your notification roles. |
-| **!unwant all**  | *Want Channel* | Removes all Pokemon from your notification roles. |
-
-### Reporting Commands:
-
-| Commands | Requirements  | Description |
-| -------- |:-------------:| ------------|
-| **!wild** \<pkmn\> \<location\> | *Region Channel* | Reports a wild pokemon, notifying people who want it. `Aliases: !w` |
-| **!raid** \<pkmn\> \<place\> \[timer\] | *Region Channel* | Creates an open raid channel. `Aliases: !r`|
-| **!raidegg** \<level\> \<place\> \[timer\] | *Region Channel* | Creates a raid egg channel. `Aliases: !re, !regg, !egg` |
-| **!raid** \<pkmn\> | *Raid Egg Channel* | Converts raid egg to an open raid. |
-| **!raid assume** \<pkmn\> | *Raid Egg Channel* | Assumes a pokemon on hatch. |
-| **!exraid** \<pkmn\> \<place\> | *Region Channel* | Creates an exraid channel. `Aliases: !ex`|
-| **!invite**  | *Region Channel* | Gain entry to exraids. |
-| **!research** \[pokestop name \[optional URL\], quest, reward\] | *Region Channel* | Reports field research. Guided version available with just **!research** `Aliases: !res` |
-
-### Raid Channel Management:
-
-| Commands | Requirements  | Description |
-| -------- |:-------------:| ------------|
-| **!timer** | *Raid Channel* | Shows the expiry time for the raid. |
-| **!timerset** \<timer\> | *Raid Channel* | Set the expiry time for the raid. |
-| **!starttime** \[HH:MM AM/PM\] | *Raid Channel* | Set a time for a group to start a raid. |
-| **!location** | *Raid Channel* | Shows the raid location. |
-| **!location new** \<place/map\> | *Raid Channel* | Sets the raid location. |
-| **!recover** | *Raid Channel* | Recovers an unresponsive raid channel. |
-| **!duplicate** | *Raid Channel* | Reports the raid as a duplicate channel. |
-| **!weather** | *Raid Channel* | Sets the weather for the raid. |
-| **!counters** | *Raid Channel* | Simulate a Raid battle with Pokebattler. |
-| **!archive** | *Raid Channel* | Mark a channel for archiving. |
-
-### Status Management:
-
-| Commands | Requirements  | Description |
-| -------- |:-------------:| ------------|
-| **!interested** \[number\] \[teamcounts\] \[boss list or all\] | *Raid Channel* | Sets your status for the raid to 'interested'. Teamcounts format is `m# v# i# u#`. You can also supply a list of bosses or 'all' that you are interested in. `Aliases: !i, !maybe` |
-| **!coming** \[number\] \[teamcounts\] \[boss list or all\] | *Raid Channel* | Sets your status for the raid to 'coming'.  Teamcounts format is `m# v# i# u#`. You can also supply a list of bosses or 'all' that you are interested in. `Aliases: !c` |
-| **!here** \[number\] \[teamcounts\] \[boss list or all\] | *Raid Channel* | Sets your status for the raid to 'here'.  Teamcounts format is `m# v# i# u#`. You can also supply a list of bosses or 'all' that you are interested in. `Aliases: !h` |
-| **!lobby** \[number\] | *Raid Channel* | Indicate you are entering the raid lobby. `Aliases: !l` |
-| **!starting** \[team\] | *Raid Channel* | Clears all members 'here', announce raid start. |
-| **!backout** | *Raid Channel* | Request players in lobby to backout. |
-| **!cancel**  | *Raid Channel* | Cancel your status. `Aliases: !x` |
-
-### List Commands:
-
-| Commands | Requirements  | Description |
-| -------- |:-------------:| ------------|
-| **!list** | *Region Channel* | Lists all raids from that region channel. `Aliases: !lists`|
-| **!list**  | *Raid Channel* | Lists all member status' for the raid. `Aliases: !lists`|
-| **!list tags** | *Raid Channel* | Same behavior as !list, but with @mentions. |
-| **!list interested** | *Raid Channel* | Lists 'interested' members for the raid. |
-| **!list coming**  | *Raid Channel* | Lists 'coming' members for the raid. |
-| **!list here** | *Raid Channel* | Lists 'here' members for the raid. |
-| **!list lobby** | *Raid Channel* | List the number and users who are in the raid lobby. |
-| **!list teams** | *Raid Channel* | Lists teams of the members that have RSVPd. |
-| **!list mystic** | *Raid Channel* | Lists teams of mystic members that have RSVPd. |
-| **!list valor** | *Raid Channel* | Lists teams of valor members that have RSVPd. |
-| **!list instinct** | *Raid Channel* | Lists teams of instinct members that have RSVPd. |
-| **!list unknown** | *Raid Channel* | Lists members with unknown team that have RSVPd. |
-| **!list bosses** | *Raid Channel* | Lists boss interest of members that have RSVPd. |
-| **!list wants** | *Want Channel* | List the wants for the user. |
-| **!list wilds** | *Region Channel* | List the wilds for the channel. |
-| **!list research** | *Region Channel* | List the research for the channel. |
-
 ## General notes on Meowth:
 
 Meowth relies completely on users for reports. Meowth was designed as an alternative to Discord bots that use scanners and other illegitimate sources of information about Pokemon Go. As a result, Meowth works only as well as the users who use it. As there are a lot of ways to interact with Meowth, there can be a bit of a rough learning period, but it quickly becomes worth it. Some commands are not necessary for normal usage and are only there for advanced users.
@@ -346,22 +182,22 @@ If you're using Linux, you will likely have a version of Python 3 already instal
 python3 --version
 ```
 
-If the version is not `3.6.1` or above, or `python3` is not found, you will need to install it on your system. You do not need to remove any existing versions from your system and it is usually not recommended to uninstal the default package as other system packages may rely on it.
+If the version is not `3.8` or above, or `python3` is not found, you will need to install it on your system. You do not need to remove any existing versions from your system and it is usually not recommended to uninstal the default package as other system packages may rely on it.
 
-**There are a large variety of flavours of linux, so be sure to reference online guides on how to install the required Python version with your specific system and package manager.**
+# Database Setup
 
-If you're on a version of Debian or Ubuntu and there is not a suitable ready-made package to install, the following is how to build and install Python 3.6.5 tailored for your specific system:
-```bash
-sudo apt-get update &&
-sudo apt-get install ca-certificates libexpat1 libffi6 libgdbm3 libreadline7 libsqlite3-0 libssl1.1 dpkg-dev gcc libbz2-dev libc6-dev libexpat1-dev libffi-dev libgdbm-dev liblzma-dev libncursesw5-dev libreadline-dev libsqlite3-dev libssl-dev make tcl-dev tk-dev wget xz-utils zlib1g-dev gnupg dirmngr
-wget https://www.python.org/ftp/python/3.6.5/Python-3.6.5.tar.xz
-wget https://www.python.org/ftp/python/3.6.5/Python-3.6.5.tar.xz.asc
-gpg --keyserver ha.pool.sks-keyservers.net --recv-keys 0D96DF4D4110E5C43FBFB17F2D347EA6AA65421D
-gpg --batch --verify Python-3.6.5.tar.xz.asc Python-3.6.5.tar.xz
-tar -xf Python-3.6.5.tar.xz
-cd Python-3.6.5
-./configure --enable-optimizations --enable-loadable-sqlite-extensions --enable-shared --with-system-expat --with-system-ffi
-sudo make -j "$(nproc)"
-sudo make altinstall
-```
-#### *``Credits to Devon from the discord.py support server for testing and providing the above script.``*
+## Installing PostgreSQL
+
+Meowth uses a Postgres database for data management. The schema and required data are provided in the database directory. You should make sure that postgres is installed on the machine you intend to run Meowth on as Meowth uses a purely local connection to the database. Visit the [Postgres website](https://www.postgresql.org/) to download Postgres if necessary. When installed, create a database called meowth on the server.
+
+## Loading the required data
+
+Using either the pgAdmin app or the psql command-line tool, load the files in the database directory starting with the schema. The schema contains the information on all the required tables as well as the triggers and functions that enable some real-time updates to trigger Meowth messages. Once the schema is loaded, each remaining file in the directory contains required data for another table. These are critical data regarding Pokemon, their moves, and so on. However, the data in them is badly out of date in some respects. You will likely have to do a lot of manual work here to get things up to date - for instance, many Pokemon which were not available in the wild at the time of the last update to the data are now available in the wild. You will either need to make a blanket update to allow all Pokemon to be reported in the wild or you will need to figure out which ones are missing. Instructions on how to update the data in the database likely requires some basic knowledge of SQL and is beyond the scope of this readme.
+
+## Keeping the database up to date
+
+Several Meowth features, notably the raid feature, require Meowth to have an up-to-date list of the available raid bosses in the raid_bosses table. In the past, this data was available via a Silph Road API. At the time of this writing there is no known alternative API, so updates must be done to the database manually. Additionally, as new Pokemon, forms, variants, moves, etc. become available in the game, various tables need to be kept up-to-date manually as well.
+
+# Running Meowth locally
+
+When Meowth began, it was a purely local effort run for one Discord server out of its creator's parent's house on a seldom-used iMac. In this configuration the only requirement to run Meowth for a single server or a small number of servers is to run it on a machine that can stay on and connected to the Internet most of the time. If that isn't doable, there are various cloud hosting services such as AWS, Azure, and GCP, along with others. Many of these offer free trials or some limited services for free indefinitely, but it definitely adds complexity to the deployment setup as well as any restarts that need to happen.

@@ -297,9 +297,9 @@ class AdminCog(Cog):
         before enabling these.
         """
         guild_id = ctx.guild.id
-        settings = ctx.bot.dbi.table('guild_settings')
+        settings = ctx.bot.dbi.table('guild_config')
         insert = settings.insert
-        insert.row(guild_id=guild_id, version=ctx.bot.version)
+        insert.row(guild_id=guild_id, version=ctx.bot.version, config_name='enabled_raids')
         await insert.commit(do_update=True)
         try:
             await ctx.guild.me.edit(nick='Meowth 3.0')
@@ -675,7 +675,7 @@ class AdminCog(Cog):
 
         Usable only by server admins."""
         guild_id = ctx.guild.id
-        settings = ctx.bot.dbi.table('guild_settings')
+        settings = ctx.bot.dbi.table('guild_config')
         insert = settings.insert
         insert.row(guild_id=guild_id, version=ctx.bot.version)
         await insert.commit(do_update=True)
@@ -946,7 +946,7 @@ class AdminCog(Cog):
     async def configure(self, ctx):
         """Gives information about how to configure Meowth 3.0."""
         guild_id = ctx.guild.id
-        settings = ctx.bot.dbi.table('guild_settings')
+        settings = ctx.bot.dbi.table('guild_config')
         insert = settings.insert
         insert.row(guild_id=guild_id, version=ctx.bot.version)
         await insert.commit(do_update=True)

@@ -3,7 +3,7 @@ from discord.ext import commands
 import discord
 from meowth.utils.fuzzymatch import get_match, get_matches
 from meowth.utils import formatters
-import pywraps2 as s2
+import s2geometry as s2
 from staticmap import StaticMap, Line
 import aiohttp
 import asyncio

@@ -24,6 +24,7 @@ setup(
     dependency_links=[
         'discord.py @ '
         'https://github.com/Rapptz/discord.py@rewrite#egg=discord.py-1'
+        'https://github.com/jackyaz/Meowth.git#egg=Meowth'
     ],
 
     classifiers=[

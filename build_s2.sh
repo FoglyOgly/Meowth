@@ -10,7 +10,7 @@ mkdir src
 cd src
 git clone https://github.com/google/googletest
 cmake -S /src/googletest -B /build/googletest -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/output -DBUILD_GMOCK=ON
-cmake --build /build/googletest --install
+cmake --build /build/googletest --target install
 
 cd /
 mkdir src

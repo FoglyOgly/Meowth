@@ -47,6 +47,8 @@ python3 -m pip install -r requirements.txt
 
 The Meowth mapping extension, which is responsible for storing location information on gyms, pokestops, etc., as well as for defining the geographical areas covered by reporting channels, the weather forecasting features, etc, is all based on the S2Geometry framework. This is a C++ package that has a Python wrapper that can be very very difficult to get working. Since the last time it was set up things seem to have changed quite a bit, so you will need to visit the [S2Geometry](https://s2geometry.io/) website to try to get it working with your Python installation. 
 
+You can run the included ```build_s2.sh``` script to help with this.
+
 ## **`Meowth`**
 
 1. Create a Bot user in the [Discord Developers panel](https://discordapp.com/developers/applications/me):
@@ -60,6 +62,9 @@ The Meowth mapping extension, which is responsible for storing location informat
 
 1. Download the files in this repository, or your own fork if you intend to modify source  
    #### *``Note: If you alter the code significantly, adapt to support platforms we don't or integrate any TOS-breaking features, we ask you don't name your instance Meowth to avoid confusion to users between our instance and yours.``*
+
+1. Install the bot by running:
+   ```python3 setup.py install```
 
 1. Copy the bot config template `config_blank.json`, rename to `config.json` and edit it:
    - `bot_token` is the Token you copied down earlier from the Discord Developers page and requires quotes as it's a string.

@@ -22,10 +22,9 @@ import requests
 from typing import List
 import tempfile
 
-from .map_info import gmaps_api_key
 from .errors import *
 
-gmaps = googlemaps.Client(key=gmaps_api_key)
+gmaps = googlemaps.Client(key=self.bot.config.gmapsapikey)
 
 
 class ReportChannel():

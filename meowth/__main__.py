@@ -19,8 +19,8 @@ from functools import partial
 
 import discord
 
-from core import Bot, logger, context
-from utils import ExitCodes
+from meowth.core import Bot, logger, context
+from meowth.utils import ExitCodes
 
 if discord.version_info.major < 1:
     print("You are not running discord.py v1.0.0a or above.\n\n"

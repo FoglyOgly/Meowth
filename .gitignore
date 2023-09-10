@@ -26,3 +26,4 @@ docs/
 logs/
 emoji/
 meowth-logo.jpg
+config/config.py

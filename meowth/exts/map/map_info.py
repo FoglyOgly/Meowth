@@ -1,1 +1,1 @@
-gmaps_api_key = 'apikeygoeshere'
+gmaps_api_key = self.bot.config.gmapsapikey

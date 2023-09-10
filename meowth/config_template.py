@@ -96,6 +96,7 @@ raid_times = {
 }
 
 # weatherapikey = 
+# gmapsapikey = 
 
 max_report_distance = 20
 

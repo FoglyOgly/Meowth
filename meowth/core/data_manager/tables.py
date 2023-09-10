@@ -3,14 +3,14 @@ from meowth.core.logger import LOGGERS
 
 def core_table_sqls():
     sql_dict = {
-        'guild_config' : ("CREATE TABLE guild_config ("
+        'guild_config' : ("CREATE TABLE IF NOT EXISTS guild_config ("
                           "guild_id bigint NOT NULL, "
                           "config_name text NOT NULL, "
                           "config_value text NOT NULL, "
                           "CONSTRAINT guild_config_pk "
                           "PRIMARY KEY (guild_id, config_name));"),
 
-        'restart_savedata' : ("CREATE TABLE restart_savedata ("
+        'restart_savedata' : ("CREATE TABLE IF NOT EXISTS restart_savedata ("
                               "restart_snowflake bigint NOT NULL, "
                               "restart_by bigint NOT NULL, "
                               "restart_channel bigint NOT NULL, "
@@ -19,13 +19,13 @@ def core_table_sqls():
                               "CONSTRAINT restart_savedata_pk "
                               "PRIMARY KEY (restart_snowflake));"),
 
-        'prefixes'       : ("CREATE TABLE prefix ("
+        'prefixes'       : ("CREATE TABLE IF NOT EXISTS prefix ("
                           "guild_id bigint NOT NULL, "
                           "prefix text NOT NULL, "
                           "CONSTRAINT prefixes_pkey "
                           "PRIMARY KEY (guild_id));"),
 
-        'discord_messages' : ("CREATE TABLE discord_messages ("
+        'discord_messages' : ("CREATE TABLE IF NOT EXISTS discord_messages ("
                               "message_id bigint NOT NULL, "
                               "sent bigint NOT NULL, "
                               "is_edit bool NOT NULL DEFAULT FALSE, "
@@ -41,7 +41,7 @@ def core_table_sqls():
                               "CONSTRAINT discord_messages_pkey "
                               "PRIMARY KEY (message_id, sent));"),
 
-        'command_log'      : ("CREATE TABLE command_log ("
+        'command_log'      : ("CREATE TABLE IF NOT EXISTS command_log ("
                               "message_id bigint NOT NULL, "
                               "sent bigint NOT NULL, "
                               "author_id bigint NOT NULL, "
@@ -58,7 +58,7 @@ def core_table_sqls():
                               "PRIMARY KEY (message_id, sent));")
     }
 
-    log_sql = ("CREATE TABLE {log_table} ("
+    log_sql = ("CREATE TABLE IF NOT EXISTS {log_table} ("
                "log_id bigint NOT NULL, "
                "created bigint NOT NULL, "
                "logger_name text, "

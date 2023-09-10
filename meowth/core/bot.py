@@ -152,7 +152,7 @@ class Bot(commands.AutoShardedBot):
     @cached_property
     def invite_url(self):
         invite_url = discord.utils.oauth_url(self.user.id,
-                                             permissions=self.req_perms)
+                                             permissions=self.req_perms).replace("+application.commands","")
         return invite_url
 
     @property

@@ -186,7 +186,7 @@ class Core(Cog):
     @command(name="botinvite", category='Bot Info')
     async def _bot_invite(self, ctx, plain_url: bool = False):
         """Shows bot's invite url"""
-        invite_url = ctx.bot.invite_url
+        invite_url = ctx.bot.invite_url.replace("+application.commands","")
         if plain_url:
             await ctx.send("Invite URL: <{}>".format(invite_url))
             return

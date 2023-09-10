@@ -11,7 +11,7 @@ preload_extensions = ['raid','map','pkmn','research','rocket','wild','users','ad
 version = '3'
 
 # minimum required permissions for bot user
-bot_permissions = 268822736
+bot_permissions = 18135768366161
 
 # postgresql database credentials
 db_details = {

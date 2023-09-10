@@ -24,7 +24,7 @@ import tempfile
 
 from .errors import *
 
-gmaps = googlemaps.Client(key=self.bot.config.gmapsapikey)
+gmaps = googlemaps.Client(key=bot.config.gmapsapikey)
 
 
 class ReportChannel():

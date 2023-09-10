@@ -253,7 +253,7 @@ class Core(Cog):
     async def _stats(self, ctx):
         """Shows stats about bot"""
         bot = ctx.bot
-        owner = await bot.get_user_info(ctx.bot.owner)
+        owner = bot.get_user(ctx.bot.owner_id)
         uptime_str = bot.uptime_str
         cpu_p = await ctx.bot.loop.run_in_executor(None, self.get_cpu)
         mem = psutil.virtual_memory()
@@ -269,6 +269,10 @@ class Core(Cog):
             'MB':1048576,
             'GB':1073741824
         }
+
+        p_mem_str = ""
+        swap_str = ""
+
         for size, value in data_sizes.items():
             if (p_mem / value) > 1 < 1024:
                 p_mem_str = "{} {}".format(

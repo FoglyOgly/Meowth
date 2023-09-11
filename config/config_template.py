@@ -29,7 +29,8 @@ emoji = {
     'here': '<:here:350686955316445185>',
     'remote': '🛰',
     'invite': '✉',
-    'cancel': '❌'
+    'cancel': '❌',
+    'pkbtlr': '<:pkbtlr:1150901168176894113>'
 }
 
 # default language

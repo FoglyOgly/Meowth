@@ -644,8 +644,6 @@ class Raid:
             return None
         react_list = react_list + grp_reacts
         react_list.append('\u2754')
-        if self.status == 'active' or len(self.boss_list) == 1:
-            react_list.append(512707623812857871)
         return react_list
 
     @property
@@ -993,7 +991,7 @@ class Raid:
             await message.remove_reaction(emoji, user)
             await self.leave_grp(payload.user_id)
             return await meowthuser.cancel_rsvp(self.id)
-        if emoji == 512707623812857871:
+        if emoji == self.bot.config.emoji['pkbtlr']:
             if self.status != 'active':
                 if len(self.boss_list) > 1:
                     raise RaidNotActive
@@ -2301,7 +2299,7 @@ class Raid:
         status_dict = Raid.status_dict(trainer_dict)
         status_str = f"{bot.config.emoji['maybe']}: **{status_dict['maybe'] + status_dict['invite']}** | "
         status_str += f"{bot.config.emoji['coming']}: **{status_dict['coming']}** | "
-        status_str += f"{bot.get_emoji(bot.config.emoji['here'])}: **{status_dict['here'] + status_dict['remote']}**"
+        status_str += f"{bot.config.emoji['here']}: **{status_dict['here'] + status_dict['remote']}**"
         return status_str
     
     @staticmethod
@@ -3824,7 +3822,7 @@ class CountersEmbed():
             ctrs_str.append(ctr_str)
             i += 1
         ctrs_str.append(f'[Results courtesy of Pokebattler](https://www.pokebattler.com/raids/{boss.id})')
-        fields['<:pkbtlr:512707623812857871> Counters'] = "\n".join(ctrs_str)
+        fields[bot.config.emoji['pkbtlr'] + ' Counters'] = "\n".join(ctrs_str)
         color = raid.guild.me.color
         embed = formatters.make_embed(icon=CountersEmbed.raid_icon, thumbnail=img_url, msg_colour=color,
             fields=fields, footer_icon=CountersEmbed.footer_icon)

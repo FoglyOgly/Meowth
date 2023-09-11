@@ -62,7 +62,7 @@ allow_assume = {
 
 status_emoji = {
     "omw"     : ":omw:",
-    "here_id" : ":here:"
+    "here" : ":here:"
 }
 
 type_emoji = {

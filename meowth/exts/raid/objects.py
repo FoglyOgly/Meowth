@@ -17,6 +17,7 @@ import discord
 from discord.ext import commands
 import time
 from pytz import timezone
+import re
 
 emoji_letters = ['🇦','🇧','🇨','🇩','🇪','🇫','🇬','🇭','🇮','🇯','🇰','🇱',
     '🇲','🇳','🇴','🇵','🇶','🇷','🇸','🇹','🇺','🇻','🇼','🇽','🇾','🇿'
@@ -469,11 +470,6 @@ class Meetup:
             await asyncio.sleep(60)
             await self.channel.delete()
 
-
-
-
-
-
     async def update_url(self, url):
         location = self.location
         if isinstance(location, POI):
@@ -644,6 +640,8 @@ class Raid:
             return None
         react_list = react_list + grp_reacts
         react_list.append('\u2754')
+        if self.status == 'active' or len(self.boss_list) == 1:
+            react_list.append(self.bot.config.pkbtlr_emoji['pkbtlr'])
         return react_list
 
     @property
@@ -785,8 +783,6 @@ class Raid:
             if emoji == group['emoji']:
                 await self.join_grp(payload.user_id, group)
 
-        
-    
     @property
     def grpd_users(self):
         return [x for y in self.group_list for x in y['users']]
@@ -970,10 +966,11 @@ class Raid:
         new_status = None
         party = await meowthuser.party()
         if payload.emoji.is_custom_emoji():
-            emoji = payload.emoji.id
+            emoji = str(payload.emoji.id)
         else:
             emoji = str(payload.emoji)
-        if emoji not in self.react_list:
+        status_reacts_temp = [re.sub('<:.*:','',sub).replace('>','').strip("'") for sub in self.react_list]
+        if emoji not in status_reacts_temp:
             return
         if isinstance(emoji, str):
             for group in self.group_list:
@@ -991,7 +988,7 @@ class Raid:
             await message.remove_reaction(emoji, user)
             await self.leave_grp(payload.user_id)
             return await meowthuser.cancel_rsvp(self.id)
-        if emoji == self.bot.config.emoji['pkbtlr']:
+        if emoji == self.bot.config.pkbtlr_emoji['pkbtlr']:
             if self.status != 'active':
                 if len(self.boss_list) > 1:
                     raise RaidNotActive
@@ -1039,7 +1036,7 @@ class Raid:
                 else:
                     return await message.remove_reaction(emoji, user)
             for k, v in self.bot.config.emoji.items():
-                if v == emoji:
+                if re.sub('<:.*:','',v).replace('>','').strip("'") == emoji:
                     new_status = k
             new_bosses = []
         else:
@@ -3822,7 +3819,7 @@ class CountersEmbed():
             ctrs_str.append(ctr_str)
             i += 1
         ctrs_str.append(f'[Results courtesy of Pokebattler](https://www.pokebattler.com/raids/{boss.id})')
-        fields[bot.config.emoji['pkbtlr'] + ' Counters'] = "\n".join(ctrs_str)
+        fields[bot.config.pkbtlr_emoji['pkbtlr'] + ' Counters'] = "\n".join(ctrs_str)
         color = raid.guild.me.color
         embed = formatters.make_embed(icon=CountersEmbed.raid_icon, thumbnail=img_url, msg_colour=color,
             fields=fields, footer_icon=CountersEmbed.footer_icon)

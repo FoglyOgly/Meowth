@@ -29,8 +29,7 @@ emoji = {
     'here': '<:here:350686955316445185>',
     'remote': '🛰',
     'invite': '✉',
-    'cancel': '❌',
-    'pkbtlr': '<:pkbtlr:1150901168176894113>'
+    'cancel': '❌'
 }
 
 # default language
@@ -50,6 +49,10 @@ team_emoji = {
     "valor"    : "<:valor:351758298975830016>",
     "instinct" : "<:instinct:351758298627702786>",
     "unknown" : "\u2754"
+}
+
+pkbtlr_emoji = {
+    'pkbtlr': '<:pkbtlr:1150901168176894113>'
 }
 
 # raid settings

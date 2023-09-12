@@ -988,7 +988,7 @@ class Raid:
             await message.remove_reaction(emoji, user)
             await self.leave_grp(payload.user_id)
             return await meowthuser.cancel_rsvp(self.id)
-        if emoji == self.bot.config.pkbtlr_emoji['pkbtlr']:
+        if emoji == re.sub('<:.*:','',self.bot.config.pkbtlr_emoji['pkbtlr']).replace('>','').strip("'"):
             if self.status != 'active':
                 if len(self.boss_list) > 1:
                     raise RaidNotActive

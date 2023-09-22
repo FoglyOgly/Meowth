@@ -404,6 +404,7 @@ WORKDIR /src
 RUN git clone https://github.com/google/s2geometry.git
 WORKDIR /src/s2geometry/
 RUN cmake -DCMAKE_PREFIX_PATH=/output/lib/cmake/absl -DCMAKE_CXX_STANDARD=17 -DWITH_PYTHON=ON
+RUN make -j $(nproc)
 RUN make install -j $(nproc)
 
 WORKDIR /src/s2geometry/

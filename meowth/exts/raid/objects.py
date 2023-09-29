@@ -18,6 +18,7 @@ from discord.ext import commands
 import time
 from pytz import timezone
 import re
+import random
 
 emoji_letters = ['🇦','🇧','🇨','🇩','🇪','🇫','🇬','🇭','🇮','🇯','🇰','🇱',
     '🇲','🇳','🇴','🇵','🇶','🇷','🇸','🇹','🇺','🇻','🇼','🇽','🇾','🇿'
@@ -1941,6 +1942,7 @@ class Raid:
                 msg_list.append(msg)
                 continue
             try:
+                embed.timestamp = embed.timestamp + random.randint(5000,10000)
                 await msg.edit(content=content, embed=embed)
             except Exception as e:
                 continue

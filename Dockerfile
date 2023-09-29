@@ -178,9 +178,6 @@ ENV PGDATA /var/lib/postgresql/data
 # this 777 will be replaced by 700 at runtime (allows semi-arbitrary "--user" values)
 RUN mkdir -p "$PGDATA" && chown -R postgres:postgres "$PGDATA" && chmod 777 "$PGDATA"
 
-#COPY docker-entrypoint.sh /usr/local/bin/
-#ENTRYPOINT ["docker-entrypoint.sh"]
-
 # We set the default STOPSIGNAL to SIGINT, which corresponds to what PostgreSQL
 # calls "Fast Shutdown mode" wherein new connections are disallowed and any
 # in-progress transactions are aborted, allowing PostgreSQL to stop cleanly and
@@ -381,7 +378,7 @@ RUN set -eux; \
 
 ### START MEOWTH BUILD AND SETUP ###
 #python3 python3-pip python3-dev python3-venv 
-RUN apt-get update && apt-get install -y build-essential git libgflags-dev libgoogle-glog-dev libgtest-dev libssl-dev swig cmake openssl sudo \
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential git libgflags-dev libgoogle-glog-dev libgtest-dev libssl-dev swig cmake openssl sudo \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 

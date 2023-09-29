@@ -33,15 +33,19 @@ class Weather():
         return name
     
     async def types_boosted(self):
-        types_table = self.bot.dbi.table('types')
-        query = types_table.select('typeid').where(weather=self.value)
-        type_list = await query.get_values()
+        type_list = []
+
+        for pkmn_type in self.bot.config.type_emoji.values():
+            if(pkmn_type.get("weather") == self.value):
+                type_list.append(pkmn_type.get("typeid"))
+
         return type_list
     
     async def boosted_emoji_str(self):
-        types_table = self.bot.dbi.table('types')
-        query = types_table.query('emoji').where(weather=self.value)
-        emoji_list = await query.get_values()
+        emoji_list = []
+        for pkmn_type in self.bot.config.type_emoji.values():
+            if(pkmn_type.get("weather") == self.value):
+                emoji_list.append(pkmn_type.get("emoji"))
         return "".join(emoji_list)
     
     @property

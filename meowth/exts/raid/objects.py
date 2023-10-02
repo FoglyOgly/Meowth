@@ -1306,10 +1306,6 @@ class Raid:
 
     async def invite_ask(self, user_id):
         meowthuser = MeowthUser.from_id(self.bot, user_id)
-        logfilejy = open('/app/debuglog.txt', "a", encoding='utf-8')
-        print(f"meowthuser: {meowthuser}",flush=True,file=logfilejy)
-        print(f"user_id: {user_id}",flush=True,file=logfilejy)
-        logfilejy.close()
         data = (await meowthuser._data.get())[0]
         friendcode = data.get('friendcode')
         users_can_invite = self.users_can_invite

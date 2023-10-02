@@ -225,8 +225,7 @@ class Bot(commands.AutoShardedBot):
         Without this being run in the main `on_message` event, commands will
         not be processed.
         """
-        
-        if message.author.bot and message.author.display_name != 'PoGoWebhook':
+        if message.author.bot:
             return
         ctx = await self.get_context(message, cls=Context)
         if not ctx.command:

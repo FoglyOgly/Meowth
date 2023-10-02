@@ -195,6 +195,8 @@ class Pokemon():
         type1 = await self._type()
         type2 = await self._type2()
         weather = []
+        if type1 is None:
+            pass
         if not type2:
             weather.append(self.bot.config.type_emoji.get(type1.replace("POKEMON_TYPE_","").lower()).get("weather"))
         else:

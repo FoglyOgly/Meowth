@@ -50,7 +50,7 @@ class Weather():
     
     @property
     def icon_url(self):
-        url = f'https://github.com/FoglyOgly/Meowth/blob/new-core/meowth/images/weather/{self.value}.png?raw=true'
+        url = f'https://github.com/jackyaz/Meowth/blob/self-host/meowth/images/weather/{self.value}.png?raw=true'
         return url
     
     @property

@@ -31,9 +31,9 @@ https://discord.gg/hhVjAN8
 
 ## **`Python 3.8+`**
 
-[Go here](https://github.com/FoglyOgly/Meowth#installing-python) for details on how to install Python 3.6.
+[Go here](https://github.com/jackyaz/Meowth#installing-python) for details on how to install Python 3.6.
 
-**For all future CLI commands, replace the command name `python3` with the relevant interpreter command name for your system (such as the common `py` command name on Windows). See details [here](https://github.com/FoglyOgly/Meowth#installing-python).**
+**For all future CLI commands, replace the command name `python3` with the relevant interpreter command name for your system (such as the common `py` command name on Windows). See details [here](https://github.com/jackyaz/Meowth#installing-python).**
 
 ## **`Other dependencies`**
 

@@ -1641,6 +1641,8 @@ ALTER TABLE ONLY public.custom_roles
 ALTER TABLE ONLY public.discord_logs
     ADD CONSTRAINT discord_logs_pkey PRIMARY KEY (log_id);
 
+ALTER TABLE ONLY public.discord_messages
+    ADD CONSTRAINT discord_messages_pkey PRIMARY KEY (message_id, sent);
 
 --
 -- TOC entry 3454 (class 2606 OID 32501)

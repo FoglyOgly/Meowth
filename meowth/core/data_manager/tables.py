@@ -22,7 +22,7 @@ def core_table_sqls():
         'prefixes'       : ("CREATE TABLE IF NOT EXISTS prefix ("
                           "guild_id bigint NOT NULL, "
                           "prefix text NOT NULL, "
-                          "CONSTRAINT prefixes_pkey "
+                          "CONSTRAINT prefixes_pkey, "
                           "PRIMARY KEY (guild_id));"),
 
         'discord_messages' : ("CREATE TABLE IF NOT EXISTS discord_messages ("
@@ -38,7 +38,7 @@ def core_table_sqls():
                               "embeds jsonb[], "
                               "webhook_id bigint, "
                               "attachments text[], "
-                              "CONSTRAINT discord_messages_pkey "
+                              "CONSTRAINT discord_messages_pkey, "
                               "PRIMARY KEY (message_id, sent));"),
 
         'command_log'      : ("CREATE TABLE IF NOT EXISTS command_log ("
@@ -54,7 +54,7 @@ def core_table_sqls():
                               "subcommand_passed text, "
                               "command_failed bool NOT NULL DEFAULT FALSE, "
                               "cog text, "
-                              "CONSTRAINT command_log_pkey "
+                              "CONSTRAINT command_log_pkey, "
                               "PRIMARY KEY (message_id, sent));")
     }
 
@@ -69,7 +69,7 @@ def core_table_sqls():
                "line_no int, "
                "message text, "
                "traceback text, "
-               "CONSTRAINT {log_table}_pkey "
+               "CONSTRAINT {log_table}_pkey, "
                "PRIMARY KEY (log_id));")
 
     for log in LOGGERS:

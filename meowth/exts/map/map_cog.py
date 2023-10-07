@@ -1017,7 +1017,7 @@ class Mapper(Cog):
         content = f"{display_str}\n[Directions]({url})"
         if isinstance(location, Gym):
             thumbnail = ("https://raw.githubusercontent.com/"
-                "FoglyOgly/Meowth/new-core/meowth/images/misc/gym.png")
+                "jackyaz/Meowth/self-host/meowth/images/misc/gym.png")
             if await location._exraid():
                 title = "EX Raid Gym"
             else:
@@ -1025,7 +1025,7 @@ class Mapper(Cog):
         elif isinstance(location, Pokestop):
             title = "Pokestop"
             thumbnail = ("https://raw.githubusercontent.com/"
-                "FoglyOgly/Meowth/new-core/meowth/images/misc/pokestop.png")
+                "jackyaz/Meowth/self-host/meowth/images/misc/pokestop.png")
         color = ctx.guild.me.color
         embed = formatters.make_embed(title=title, content=content, thumbnail=thumbnail, msg_colour=color)
         await ctx.send(embed=embed)

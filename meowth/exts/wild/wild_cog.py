@@ -412,7 +412,7 @@ class Modifier():
     
     def img_url(self):
         url = ("https://raw.githubusercontent.com/"
-            "FoglyOgly/Meowth/new-core/meowth/images/misc/")
+            "jackyaz/Meowth/self-host/meowth/images/misc/")
         url += f"{self.kind}.png"
         return url
 

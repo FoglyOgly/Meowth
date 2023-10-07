@@ -364,7 +364,7 @@ class Pokemon():
     
     async def sprite_url(self):
         url = ("https://raw.githubusercontent.com/"
-            "FoglyOgly/Meowth/new-core/meowth/images/pkmn/")
+            "jackyaz/Meowth/self-host/meowth/images/pkmn/")
         url += self.id
         if self.form:
             url += '_'

@@ -25,7 +25,7 @@ class Item:
     @property
     def img_url(self):
         url = ("https://raw.githubusercontent.com/"
-            "FoglyOgly/Meowth/new-core/meowth/images/misc/")
+            "jackyaz/Meowth/self-host/meowth/images/misc/")
         url += self.id
         url += '.png'
         return url

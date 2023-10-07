@@ -863,7 +863,7 @@ class ResearchEmbed:
         elif reward == 'unknown_encounter':
             desc = "Unknown Encounter"
             thumbnail = ("https://raw.githubusercontent.com/"
-                "FoglyOgly/Meowth/new-core/meowth/images/misc/unknown_encounter.png")
+                "jackyaz/Meowth/self-host/meowth/images/misc/unknown_encounter.png")
         else:
             pkmn = Pokemon(bot, reward)
             desc = await pkmn.name()
@@ -894,7 +894,7 @@ class ResearchEmbed:
         reporter_avy = reporter.display_avatar.url
         footer = f"Reported by {reporter_name} • Expires"
         icon_url = ("https://raw.githubusercontent.com/"
-                "FoglyOgly/Meowth/new-core/meowth/images/misc/field-research.png")
+                "jackyaz/Meowth/self-host/meowth/images/misc/field-research.png")
         embed = formatters.make_embed(title=title, thumbnail=thumbnail,
             fields=fields, footer=footer, footer_icon=reporter_avy, icon=icon_url, msg_colour=color)
         embed.timestamp = datetime.utcfromtimestamp(research.expires_at)

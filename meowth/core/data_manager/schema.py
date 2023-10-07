@@ -793,14 +793,14 @@ class Insert:
 
         # handle conflict if required
         if do_update:
-            const_str = ', '.join(self._primaries)
-            sql += f" ON CONFLICT ({const_str}) DO UPDATE SET "
+            constraint_name=f"{self._from}_pkey"
+            sql += f" ON CONFLICT ON CONSTRAINT {constraint_name} DO UPDATE SET "
             excluded = [f'{c} = excluded.{c}' for c in cols]
             sql += ', '.join(excluded)
 
         if do_update is False:
-            const_str = ', '.join(self._primaries)
-            sql += f" ON CONFLICT ({const_str}) DO NOTHING"
+            constraint_name=f"{self._from}_pkey"
+            sql += f" ON CONFLICT ON CONSTRAINT {constraint_name} DO NOTHING"
 
         # add the returning statement if specified
         if self._returning:

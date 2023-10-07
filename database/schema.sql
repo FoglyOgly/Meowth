@@ -1677,7 +1677,7 @@ ALTER TABLE ONLY public.forms
 --
 
 ALTER TABLE ONLY public.guild_config
-    ADD CONSTRAINT guild_config_pk PRIMARY KEY (guild_id, config_name);
+    ADD CONSTRAINT guild_config_pkey PRIMARY KEY (guild_id, config_name);
 
 
 --
@@ -1902,7 +1902,7 @@ ALTER TABLE ONLY public.research_tasks
 --
 
 ALTER TABLE ONLY public.restart_savedata
-    ADD CONSTRAINT restart_savedata_pk PRIMARY KEY (restart_snowflake);
+    ADD CONSTRAINT restart_savedata_pkey PRIMARY KEY (restart_snowflake);
 
 
 --

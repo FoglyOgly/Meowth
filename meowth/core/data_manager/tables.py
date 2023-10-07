@@ -7,7 +7,7 @@ def core_table_sqls():
                           "guild_id bigint NOT NULL, "
                           "config_name text NOT NULL, "
                           "config_value text NOT NULL, "
-                          "CONSTRAINT guild_config_pk "
+                          "CONSTRAINT guild_config_pkey, "
                           "PRIMARY KEY (guild_id, config_name));"),
 
         'restart_savedata' : ("CREATE TABLE IF NOT EXISTS restart_savedata ("
@@ -16,7 +16,7 @@ def core_table_sqls():
                               "restart_channel bigint NOT NULL, "
                               "restart_guild bigint, "
                               "restart_message bigint, "
-                              "CONSTRAINT restart_savedata_pk "
+                              "CONSTRAINT restart_savedata_pkey, "
                               "PRIMARY KEY (restart_snowflake));"),
 
         'prefixes'       : ("CREATE TABLE IF NOT EXISTS prefix ("

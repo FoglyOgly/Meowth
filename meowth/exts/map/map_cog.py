@@ -238,7 +238,8 @@ class ReportChannel():
                 regiondata = await query.get()
                 if not regiondata:
                     continue
-            raid_lists[level][boss_id] = d
+            if d.get("available"):
+                raid_lists[level][boss_id] = d
         return raid_lists
 
     async def get_map(self):

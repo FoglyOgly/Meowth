@@ -139,7 +139,9 @@ class RaidCog(Cog):
             return level, boss_id, d
         for rcrd in rows:
             level, boss_id, d = data(rcrd)
-            raid_lists[level][boss_id] = d
+            
+            if d.get("available"):
+                raid_lists[level][boss_id] = d
         return raid_lists
 
     async def archive_cat_phrases(self, guild):

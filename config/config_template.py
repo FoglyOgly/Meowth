@@ -81,13 +81,13 @@ type_emoji = {
     "ghost"    : { "typeid" : "POKEMON_TYPE_GHOST",    "emoji" : "<:ghost1:351758295683432449>",   "weather" : "FOG" },
     "grass"    : { "typeid" : "POKEMON_TYPE_GRASS",    "emoji" : "<:grass:351758295729700868>",    "weather" : "CLEAR" },
     "ground"   : { "typeid" : "POKEMON_TYPE_GROUND",   "emoji" : "<:ground:351758295968776194>",   "weather" : "CLEAR" },
-    "ice "     : { "typeid" : "POKEMON_TYPE_ICE",      "emoji" : "<:ice:351758296111120384>",      "weather" : "SNOW" },
+    "ice"     : { "typeid" : "POKEMON_TYPE_ICE",      "emoji" : "<:ice:351758296111120384>",      "weather" : "SNOW" },
     "normal"   : { "typeid" : "POKEMON_TYPE_NORMAL",   "emoji" : "<:normal:351758296409178112>",   "weather" : "PARTLY_CLOUDY" },
     "poison"   : { "typeid" : "POKEMON_TYPE_POISON",   "emoji" : "<:poison:351758295976902679>",   "weather" : "OVERCAST" },
     "psychic"  : { "typeid" : "POKEMON_TYPE_PSYCHIC",  "emoji" : "<:psychic:351758294744039426>",  "weather" : "WINDY" },
     "rock"     : { "typeid" : "POKEMON_TYPE_ROCK",     "emoji" : "<:rock1:351758296077697024>",     "weather" : "PARTLY_CLOUDY" },
     "steel"    : { "typeid" : "POKEMON_TYPE_STEEL",    "emoji" : "<:steel:351758296425955328>",    "weather" : "SNOW" },
-    "water "   : { "typeid" : "POKEMON_TYPE_WATER",    "emoji" : "<:water:351758295142498325>",    "weather" : "RAINY" }
+    "water"   : { "typeid" : "POKEMON_TYPE_WATER",    "emoji" : "<:water:351758295142498325>",    "weather" : "RAINY" }
 }
 
 raid_times = {

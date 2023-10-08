@@ -235,7 +235,7 @@ class Core(Cog):
         # embed_colour = await url_color(bot.avatar_small)
         embed = make_embed(
             icon=bot.avatar_small, title=f"{bot.user}",
-            content='\n'.join(about), 
+            content='\n'.join(about),
             # msg_colour=embed_colour
             )
         embed.set_thumbnail(url=bot.avatar)
@@ -613,7 +613,7 @@ class Core(Cog):
             await p.paginate()
         except Exception as e:
             await ctx.send(e)
-    
+
     @command(name='list')
     async def _list(self, ctx, *args):
         """Base command for listing reports or RSVPs."""

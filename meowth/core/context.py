@@ -1,6 +1,5 @@
 import asyncio
 import textwrap
-import gettext
 import builtins
 
 from aiocontextvars import ContextVar
@@ -345,7 +344,7 @@ class GetTools:
                 member = members.get(search_term, None)
             return member
 
-    async def message(self, id, channel=None, guild=None, no_cache=False):
+    async def message(self, message_id, channel=None, guild=None, no_cache=False):
         """Get a message from the current or specified channels.
 
         Parameters
@@ -371,11 +370,11 @@ class GetTools:
                 return None
         channel = channel or self.ctx.channel
         if not no_cache:
-            msg = self.get(channel._state._messages, id=id)
+            msg = self.get(channel._state._messages, id=message_id)
             if msg:
                 return msg
         try:
-            return await channel.fetch_message(id)
+            return await channel.fetch_message(message_id)
         except discord.NotFound:
             return None
 

@@ -1,8 +1,8 @@
 import importlib
 import logging
 
-from meowth.utils import Map
 from discord.ext.commands import Cog
+from meowth.utils import Map
 
 
 class Cog(Cog):
@@ -66,10 +66,10 @@ class Cog(Cog):
         for table in self.tables.values():
             if await table.exists():
                 self.logger.info(
-                    f'Cog table {table.name} for {cog_name} found.')
+                    "Cog table %s for %s found.", table.name, cog_name)
                 table.new_columns = []
                 table.initial_data = []
                 continue
             await table.create()
-            self.logger.info(f'Cog table {table.name} for {cog_name} created.')
+            self.logger.info("Cog table %s for %s created.", table.name, cog_name)
         del table_module

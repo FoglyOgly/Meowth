@@ -118,7 +118,7 @@ class Core(Cog):
                                           activity=game)
             embed = make_embed(
                 msg_type='success',
-                title="Status changed to {}.".format(status))
+                title=f"Status changed to {status}.")
             await ctx.send(embed=embed)
 
     @_set.command(name="username", aliases=["name"])
@@ -131,9 +131,9 @@ class Core(Cog):
             embed = make_embed(
                 msg_type='error',
                 title="Failed to change name",
-                content=("Remember that you can only do it up to 2 times an "
+                content="Remember that you can only do it up to 2 times an "
                          "hour. Use nicknames if you need frequent changes. "
-                         "**{}set nickname**").format(ctx.prefix))
+                         f"**{ctx.prefix}set nickname**")
             await ctx.send(embed=embed)
         else:
             embed = make_embed(msg_type='success', title="Username set.")
@@ -165,9 +165,8 @@ class Core(Cog):
             embed = make_embed(
                 msg_type='error',
                 title="Failed to set nickname",
-                content=("I'm missing permissions to change my nickname. "
-                         "Use **{}get guildperms** to check permissions."
-                         "").format(ctx.prefix))
+                content="I'm missing permissions to change my nickname. "
+                         f"Use **{ctx.prefix}get guildperms** to check permissions.")
             await ctx.send()
         else:
             embed = make_embed(msg_type='success', title="Nickname set.")

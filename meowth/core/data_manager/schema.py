@@ -1,7 +1,7 @@
 from itertools import zip_longest, chain
 from more_itertools import partition
 
-from .errors import PostgresError, SchemaError, ResponseError, QueryError
+from .errors import SchemaError, ResponseError, QueryError
 from . import sqltypes
 
 class SQLOperator:
@@ -67,7 +67,7 @@ class SQLOperator:
     @classmethod
     def in_(cls):
         return cls('=', 'in', '{column} {operator} any({value})')
-    
+
     @classmethod
     def contains_(cls):
         return cls('=', 'in', '{value} {operator} any({column})')
@@ -75,11 +75,11 @@ class SQLOperator:
     @classmethod
     def is_(cls):
         return cls('IS', 'is', cls.default_template)
-    
+
     @classmethod
     def isnot_(cls):
         return cls('IS NOT', 'is not', cls.default_template)
-    
+
     @classmethod
     def notnull_(cls):
         return cls('IS NOT NULL', 'is not None', '{column} {operator}')
@@ -149,44 +149,34 @@ class Column:
             return self.full_name
 
     def __lt__(self, value):
-        return SQLComparison(
-            SQLOperator.lt(), self.aggregate, self.full_name, value)
+        return SQLComparison(SQLOperator.lt(), self.aggregate, self.full_name, value)
 
     def __le__(self, value):
-        return SQLComparison(
-            SQLOperator.le(), self.aggregate, self.full_name, value)
+        return SQLComparison(SQLOperator.le(), self.aggregate, self.full_name, value)
 
     def __eq__(self, value):
-        return SQLComparison(
-            SQLOperator.eq(), self.aggregate, self.full_name, value)
+        return SQLComparison(SQLOperator.eq(), self.aggregate, self.full_name, value)
 
     def __ne__(self, value):
-        return SQLComparison(
-            SQLOperator.ne(), self.aggregate, self.full_name, value)
+        return SQLComparison(SQLOperator.ne(), self.aggregate, self.full_name, value)
 
     def __gt__(self, value):
-        return SQLComparison(
-            SQLOperator.gt(), self.aggregate, self.full_name, value)
+        return SQLComparison(SQLOperator.gt(), self.aggregate, self.full_name, value)
 
     def __ge__(self, value):
-        return SQLComparison(
-            SQLOperator.ge(), self.aggregate, self.full_name, value)
+        return SQLComparison(SQLOperator.ge(), self.aggregate, self.full_name, value)
 
     def like(self, value):
-        return SQLComparison(
-            SQLOperator.like(), self.aggregate, self.full_name, value)
+        return SQLComparison(SQLOperator.like(), self.aggregate, self.full_name, value)
 
     def ilike(self, value):
-        return SQLComparison(
-            SQLOperator.ilike(), self.aggregate, self.full_name, value)
+        return SQLComparison(SQLOperator.ilike(), self.aggregate, self.full_name, value)
 
     def not_like(self, value):
-        return SQLComparison(
-            SQLOperator.not_like(), self.aggregate, self.full_name, value)
+        return SQLComparison(SQLOperator.not_like(), self.aggregate, self.full_name, value)
 
     def not_ilike(self, value):
-        return SQLComparison(
-            SQLOperator.not_ilike(), self.aggregate, self.full_name, value)
+        return SQLComparison(SQLOperator.not_ilike(), self.aggregate, self.full_name, value)
 
     def between(self, minvalue, maxvalue):
         return SQLComparison(
@@ -194,24 +184,19 @@ class Column:
             minvalue=minvalue, maxvalue=maxvalue)
 
     def in_(self, value):
-        return SQLComparison(
-            SQLOperator.in_(), self.aggregate, self.full_name, value)
-    
+        return SQLComparison(SQLOperator.in_(), self.aggregate, self.full_name, value)
+
     def contains_(self, value):
-        return SQLComparison(
-            SQLOperator.contains_(), self.aggregate, self.full_name, value)
-    
+        return SQLComparison(SQLOperator.contains_(), self.aggregate, self.full_name, value)
+
     def is_(self, value):
-        return SQLComparison(
-            SQLOperator.is_(), self.aggregate, self.full_name, value)
-    
+        return SQLComparison(SQLOperator.is_(), self.aggregate, self.full_name, value)
+
     def isnot_(self, value):
-        return SQLComparison(
-            SQLOperator.isnot_(), self.aggregate, self.full_name, value)
-    
+        return SQLComparison(SQLOperator.isnot_(), self.aggregate, self.full_name, value)
+
     def notnull_(self):
-        return SQLComparison(
-            SQLOperator.notnull_(), self.aggregate, self.full_name)
+        return SQLComparison(SQLOperator.notnull_(), self.aggregate, self.full_name)
 
     @classmethod
     def from_dict(cls, data):
@@ -462,7 +447,7 @@ class Table:
 
     async def drop(self):
         """Drop table from database."""
-        sql = f"DROP TABLE $1"
+        sql = "DROP TABLE $1"
         return await self.dbi.execute_transaction(sql, (self.full_name,))
 
     async def get_constraints(self):

@@ -397,10 +397,10 @@ class Pokemon():
         name = await dex_data.select('name').get_value()
         name = name.strip()
         if self.form == 64:
-            pure_emoji = self.bot.get_emoji(603609730232877088)
+            pure_emoji = self.bot.config.form_emoji['purified']
             name += f" {str(pure_emoji)}"
         elif self.form == 63:
-            shadow_emoji = self.bot.get_emoji(603609764882022440)
+            shadow_emoji = self.bot.config.form_emoji['shadow']
             name += f" {str(shadow_emoji)}"
         elif self.form:
             name += " "

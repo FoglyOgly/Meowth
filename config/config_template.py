@@ -52,7 +52,12 @@ team_emoji = {
 }
 
 pkbtlr_emoji = {
-    'pkbtlr': '<:pkbtlr:1150901168176894113>'
+    'pkbtlr' : '<:pkbtlr:1150901168176894113>'
+}
+
+form_emoji = {
+    'shadow' : '<:shadow:1165329645496788434>',
+    'purified' : '<:purified:1163456644170522706>'
 }
 
 # raid settings

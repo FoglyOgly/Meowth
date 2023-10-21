@@ -350,7 +350,7 @@ _main() {
 		fi
 	fi
 
-    nohup sudo -- bash -c "export PYTHONPATH=:. && python3 /app/meowth/launcher.py -d" &
+    nohup sudo -- bash -c 'export PATH="/app/venv/bin:$PATH" && export PYTHONPATH=/app && python3 /app/meowth/launcher.py -d' &
 	exec "$@"
 }
 

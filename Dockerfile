@@ -1,5 +1,97 @@
-FROM debian:bookworm-slim
+FROM python:3.10.13-slim-bookworm as s2geometry
 LABEL maintainer="Jack Yaz <jackyaz@outlook.com>"
+
+
+### START S2GEOMETRY BUILD AND SETUP ###
+
+RUN apt-get update && \
+	apt-get install -y --no-install-recommends \
+	build-essential \
+	git \
+	libgflags-dev \
+	libgoogle-glog-dev \
+	libgtest-dev \
+	libssl-dev \
+	swig \
+	cmake \
+	openssl \
+	sudo \
+ 	&& apt-get clean \
+ 	&& rm -rf /var/lib/apt/lists/*
+
+RUN python3 -m venv /app/venv
+ENV PATH="/app/venv/bin:$PATH"
+RUN python3 -m pip install --upgrade pip
+
+WORKDIR /src
+RUN git clone https://github.com/google/googletest
+RUN cmake -S /src/googletest -B /build/googletest -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/output -DBUILD_GMOCK=ON
+RUN cmake --build /build/googletest --target install
+
+WORKDIR /src
+RUN git clone https://github.com/abseil/abseil-cpp
+WORKDIR /src/abseil-cpp/build
+RUN cmake -S /src/abseil-cpp -B /build/abseil-cpp -DCMAKE_PREFIX_PATH=/output -DCMAKE_INSTALL_PREFIX=/output -DABSL_ENABLE_INSTALL=ON -DABSL_USE_EXTERNAL_GOOGLETEST=ON -DABSL_FIND_GOOGLETEST=ON -DCMAKE_CXX_STANDARD=17 -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+RUN cmake --build /build/abseil-cpp --target install
+
+WORKDIR /src
+RUN git clone https://github.com/google/s2geometry.git
+WORKDIR /src/s2geometry/
+RUN cmake -DCMAKE_PREFIX_PATH=/output/lib/cmake/absl -DCMAKE_CXX_STANDARD=17 -DWITH_PYTHON=ON
+RUN make -j $(nproc)
+RUN make install -j $(nproc)
+
+WORKDIR /src/s2geometry/
+
+RUN sed -i "s/'-DWITH_PYTHON=ON'/'-DWITH_PYTHON=ON',/" /src/s2geometry/setup.py
+RUN sed -i "/'-DWITH_PYTHON=ON',/a \                                        '-DCMAKE_PREFIX_PATH=/output/lib/cmake'" /src/s2geometry/setup.py
+RUN sed -i "/'-DWITH_PYTHON=ON',/a \                                        '-DCMAKE_CXX_STANDARD=17'," /src/s2geometry/setup.py
+RUN sed -i 's/install_prefix="s2geometry"/install_prefix="pywraps2"/' /src/s2geometry/setup.py
+
+RUN python3 -m pip install cmake_build_extension wheel
+RUN python3 setup.py bdist_wheel
+
+### END S2GEOMETRY BUILD AND SETUP ###
+
+### START MEOWTH BUILD AND SETUP ###
+
+FROM python:3.10.13-slim-bookworm as meowth
+LABEL maintainer="Jack Yaz <jackyaz@outlook.com>"
+
+COPY --from=s2geometry /src/s2geometry/dist/s2geometry-0.11.0.dev1-cp310-cp310-linux_x86_64.whl /app/s2geometry-0.11.0.dev1-cp310-cp310-linux_x86_64.whl
+
+RUN apt-get update && \
+	apt-get install -y --no-install-recommends \
+	git \
+	openssl \
+	sudo \
+ 	&& apt-get clean \
+ 	&& rm -rf /var/lib/apt/lists/*
+
+RUN python3 -m venv /app/venv
+ENV PATH="/app/venv/bin:$PATH"
+RUN python3 -m pip install --upgrade pip
+
+RUN python3 -m pip install /app/s2geometry-0.11.0.dev1-cp310-cp310-linux_x86_64.whl
+
+COPY config /app/config
+COPY database /app/database
+COPY meowth /app/meowth
+COPY requirements.txt /app/
+COPY setup.py /app/
+COPY README.md /app/
+COPY LICENSE /app/
+
+WORKDIR /app
+
+RUN python3 -m pip install -r requirements.txt
+RUN python3 setup.py install
+
+RUN ln -s /app/config/config.py /app/meowth/config.py
+
+WORKDIR /
+
+### END MEOWTH BUILD AND SETUP ###
 
 ### START POSTGRES BUILD AND SETUP ###
 
@@ -208,234 +300,11 @@ STOPSIGNAL SIGINT
 # documentation at https://www.postgresql.org/docs/12/server-start.html notes
 # that even 90 seconds may not be long enough in many instances.
 
-### END POSTGRES BUILD AND SETUP ###
-
-### BUILD AND INSTALL PYTHON 3.10.12 ###
-
-# ensure local python is preferred over distribution python
-ENV PATH /usr/local/bin:$PATH
-
-# http://bugs.python.org/issue19846
-# > At the moment, setting "LANG=C" on a Linux system *fundamentally breaks Python 3*, and that's not OK.
-ENV LANG C.UTF-8
-
-# runtime dependencies
-RUN set -eux; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends \
-		ca-certificates \
-		netbase \
-		tzdata \
-	; \
-	rm -rf /var/lib/apt/lists/*
-
-ENV GPG_KEY A035C8C19219BA821ECEA86B64E628F8D684696D
-ENV PYTHON_VERSION 3.10.12
-
-RUN set -eux; \
-	\
-	savedAptMark="$(apt-mark showmanual)"; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends \
-		dpkg-dev \
-		gcc \
-		gnupg \
-		libbluetooth-dev \
-		libbz2-dev \
-		libc6-dev \
-		libdb-dev \
-		libexpat1-dev \
-		libffi-dev \
-		libgdbm-dev \
-		liblzma-dev \
-		libncursesw5-dev \
-		libreadline-dev \
-		libsqlite3-dev \
-		libssl-dev \
-		make \
-		tk-dev \
-		uuid-dev \
-		wget \
-		xz-utils \
-		zlib1g-dev \
-	; \
-	\
-	wget -O python.tar.xz "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz"; \
-	wget -O python.tar.xz.asc "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz.asc"; \
-	GNUPGHOME="$(mktemp -d)"; export GNUPGHOME; \
-	gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys "$GPG_KEY"; \
-	gpg --batch --verify python.tar.xz.asc python.tar.xz; \
-	gpgconf --kill all; \
-	rm -rf "$GNUPGHOME" python.tar.xz.asc; \
-	mkdir -p /usr/src/python; \
-	tar --extract --directory /usr/src/python --strip-components=1 --file python.tar.xz; \
-	rm python.tar.xz; \
-	\
-	cd /usr/src/python; \
-	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
-	./configure \
-		--build="$gnuArch" \
-		--enable-loadable-sqlite-extensions \
-		--enable-optimizations \
-		--enable-option-checking=fatal \
-		--enable-shared \
-		--with-lto \
-		--with-system-expat \
-		--without-ensurepip \
-	; \
-	nproc="$(nproc)"; \
-	EXTRA_CFLAGS="$(dpkg-buildflags --get CFLAGS)"; \
-	LDFLAGS="$(dpkg-buildflags --get LDFLAGS)"; \
-	LDFLAGS="${LDFLAGS:--Wl},--strip-all"; \
-	make -j "$nproc" \
-		"EXTRA_CFLAGS=${EXTRA_CFLAGS:-}" \
-		"LDFLAGS=${LDFLAGS:-}" \
-		"PROFILE_TASK=${PROFILE_TASK:-}" \
-	; \
-# https://github.com/docker-library/python/issues/784
-# prevent accidental usage of a system installed libpython of the same version
-	rm python; \
-	make -j "$nproc" \
-		"EXTRA_CFLAGS=${EXTRA_CFLAGS:-}" \
-		"LDFLAGS=${LDFLAGS:--Wl},-rpath='\$\$ORIGIN/../lib'" \
-		"PROFILE_TASK=${PROFILE_TASK:-}" \
-		python \
-	; \
-	make install; \
-	\
-	cd /; \
-	rm -rf /usr/src/python; \
-	\
-	find /usr/local -depth \
-		\( \
-			\( -type d -a \( -name test -o -name tests -o -name idle_test \) \) \
-			-o \( -type f -a \( -name '*.pyc' -o -name '*.pyo' -o -name 'libpython*.a' \) \) \
-		\) -exec rm -rf '{}' + \
-	; \
-	\
-	ldconfig; \
-	\
-	apt-mark auto '.*' > /dev/null; \
-	apt-mark manual $savedAptMark; \
-	find /usr/local -type f -executable -not \( -name '*tkinter*' \) -exec ldd '{}' ';' \
-		| awk '/=>/ { print $(NF-1) }' \
-		| sort -u \
-		| xargs -r dpkg-query --search \
-		| cut -d: -f1 \
-		| sort -u \
-		| xargs -r apt-mark manual \
-	; \
-	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
-	rm -rf /var/lib/apt/lists/*; \
-	\
-	python3 --version
-
-# make some useful symlinks that are expected to exist ("/usr/local/bin/python" and friends)
-RUN set -eux; \
-	for src in idle3 pydoc3 python3 python3-config; do \
-		dst="$(echo "$src" | tr -d 3)"; \
-		[ -s "/usr/local/bin/$src" ]; \
-		[ ! -e "/usr/local/bin/$dst" ]; \
-		ln -svT "$src" "/usr/local/bin/$dst"; \
-	done
-
-# if this is called "PIP_VERSION", pip explodes with "ValueError: invalid truth value '<VERSION>'"
-ENV PYTHON_PIP_VERSION 22.3.1
-# https://github.com/docker-library/python/issues/365
-ENV PYTHON_SETUPTOOLS_VERSION 65.5.1
-# https://github.com/pypa/get-pip
-ENV PYTHON_GET_PIP_URL https://github.com/pypa/get-pip/raw/0d8570dc44796f4369b652222cf176b3db6ac70e/public/get-pip.py
-ENV PYTHON_GET_PIP_SHA256 96461deced5c2a487ddc65207ec5a9cffeca0d34e7af7ea1afc470ff0d746207
-
-RUN set -eux; \
-	\
-	savedAptMark="$(apt-mark showmanual)"; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends wget; \
-	\
-	wget -O get-pip.py "$PYTHON_GET_PIP_URL"; \
-	echo "$PYTHON_GET_PIP_SHA256 *get-pip.py" | sha256sum -c -; \
-	\
-	apt-mark auto '.*' > /dev/null; \
-	[ -z "$savedAptMark" ] || apt-mark manual $savedAptMark > /dev/null; \
-	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
-	rm -rf /var/lib/apt/lists/*; \
-	\
-	export PYTHONDONTWRITEBYTECODE=1; \
-	\
-	python get-pip.py \
-		--disable-pip-version-check \
-		--no-cache-dir \
-		--no-compile \
-		"pip==$PYTHON_PIP_VERSION" \
-		"setuptools==$PYTHON_SETUPTOOLS_VERSION" \
-	; \
-	rm -f get-pip.py; \
-	\
-	pip --version
-
-### END PYTHON INSTALL ###
-
-### START MEOWTH BUILD AND SETUP ###
-#python3 python3-pip python3-dev python3-venv 
-RUN apt-get update && apt-get install -y --no-install-recommends build-essential git libgflags-dev libgoogle-glog-dev libgtest-dev libssl-dev swig cmake openssl sudo \
- && apt-get clean \
- && rm -rf /var/lib/apt/lists/*
-
 RUN echo 'postgres  ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
-RUN /usr/local/bin/python3 -m pip install --upgrade pip
+### END POSTGRES BUILD AND SETUP ###
 
-WORKDIR /src
-RUN git clone https://github.com/google/googletest
-RUN cmake -S /src/googletest -B /build/googletest -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/output -DBUILD_GMOCK=ON
-RUN cmake --build /build/googletest --target install
-
-WORKDIR /src
-RUN git clone https://github.com/abseil/abseil-cpp
-WORKDIR /src/abseil-cpp/build
-RUN cmake -S /src/abseil-cpp -B /build/abseil-cpp -DCMAKE_PREFIX_PATH=/output -DCMAKE_INSTALL_PREFIX=/output -DABSL_ENABLE_INSTALL=ON -DABSL_USE_EXTERNAL_GOOGLETEST=ON -DABSL_FIND_GOOGLETEST=ON -DCMAKE_CXX_STANDARD=17 -DCMAKE_POSITION_INDEPENDENT_CODE=ON
-RUN cmake --build /build/abseil-cpp --target install
-
-WORKDIR /src
-RUN git clone https://github.com/google/s2geometry.git
-WORKDIR /src/s2geometry/
-RUN cmake -DCMAKE_PREFIX_PATH=/output/lib/cmake/absl -DCMAKE_CXX_STANDARD=17 -DWITH_PYTHON=ON
-RUN make -j $(nproc)
-RUN make install -j $(nproc)
-
-WORKDIR /src/s2geometry/
-
-RUN sed -i "s/'-DWITH_PYTHON=ON'/'-DWITH_PYTHON=ON',/" /src/s2geometry/setup.py
-RUN sed -i "/'-DWITH_PYTHON=ON',/a \                                        '-DCMAKE_PREFIX_PATH=/output/lib/cmake'" /src/s2geometry/setup.py
-RUN sed -i "/'-DWITH_PYTHON=ON',/a \                                        '-DCMAKE_CXX_STANDARD=17'," /src/s2geometry/setup.py
-RUN sed -i 's/install_prefix="s2geometry"/install_prefix="pywraps2"/' /src/s2geometry/setup.py
-
-RUN pip install cmake_build_extension wheel
-RUN /usr/local/bin/python3 setup.py bdist_wheel
-
-RUN pip install /src/s2geometry/dist/*
-
-RUN rm -rf /src
-RUN rm -rf /build
-
-COPY config /app/config
-COPY database /app/database
-COPY meowth /app/meowth
-COPY requirements.txt /app/
-COPY setup.py /app/
-COPY README.md /app/
-COPY LICENSE /app/
-WORKDIR /app
-
-RUN /usr/local/bin/python3 -m pip install -r requirements.txt
-RUN /usr/local/bin/python3 setup.py install
-
-ENV PYTHONPATH="${PYTHONPATH}:."
-
-RUN ln -s /app/config/config.py /app/meowth/config.py
-
-### END MEOWTH BUILD AND SETUP ###
+ENV PYTHONPATH="/app"
 
 COPY entry.sh /
 RUN chmod 0755 /entry.sh

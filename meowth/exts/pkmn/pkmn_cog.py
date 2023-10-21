@@ -352,18 +352,18 @@ class Pokemon():
     async def _evo_cost_candy(self):
         data = self._data
         return await data.select('evo_cost_candy').get_value()
-    
-    
+
+
     async def _evo_cost_item(self):
         data = self._data
         return await data.select('evo_cost_item').get_value()
-    
-    
+
+
     async def _evo_condition(self):
         data = self._data
         return await data.select('evo_condition').get_value()
-    
-    
+
+
     async def sprite_url(self):
         url = ("https://raw.githubusercontent.com/"
             "jackyaz/Meowth/self-host/meowth/images/pkmn/")
@@ -379,11 +379,13 @@ class Pokemon():
             url += self.gender.upper()
         url += '.png?cache=5'
         return url
-    
+
+
     async def color(self):
         url = await self.sprite_url()
         color = await formatters.url_color(url)
         return color
+
 
     @property
     def _dex_data(self):
@@ -391,7 +393,7 @@ class Pokemon():
         data = dex_ref.where(language_id=9)
         return data
 
-    
+
     async def name(self):
         dex_data = self._dex_data
         name = await dex_data.select('name').get_value()
@@ -410,18 +412,18 @@ class Pokemon():
             form_name = await form_name_query.get_value()
             name += form_name
         return name
-    
-    
+
+
     async def description(self):
         dex_data = self._dex_data
         return await dex_data.select('description').get_value()
-    
-    
+
+
     async def category(self):
         dex_data = self._dex_data
         return await dex_data.select('category').get_value()
-    
-    
+
+
     async def type_dict(self):
         type_chart_ref = self.bot.dbi.table('type_chart').query()
         type1_ref = await type_chart_ref.where(defender_type_id=await self._type()).get()
@@ -443,16 +445,16 @@ class Pokemon():
         for type in type1_dict:
             type_dict[type] = type1_dict[type] * type2_dict.get(type, 1)
         return type_dict
-    
-    
+
+
     async def type_chart(self):
         type_dict = await self.type_dict()
         type_chart = {}
         for type in type_dict:
             type_chart[type] = round(log(float(type_dict[type]), 1.6))
         return type_chart
-    
-    
+
+
     async def weaknesses_emoji(self):
         type_chart = await self.type_chart()
         types_sorted = sorted(type_chart.items(), key=(lambda x: x[1]), reverse=True)

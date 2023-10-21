@@ -1114,7 +1114,16 @@ CREATE TABLE public.report_channels (
     meetup boolean,
     category_meetup numeric(20,0),
     rocket boolean,
-    category_7 text
+    category_6 text,
+    category_7 text,
+    category_8 text,
+    category_9 text,
+    category_10 text,
+    category_11 text,
+    category_12 text,
+    category_13 text,
+    category_14 text,
+    category_15 text
 );
 
 

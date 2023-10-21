@@ -496,6 +496,16 @@ class Tutorial(Cog):
         d['category_3'] = 'message'
         d['category_4'] = 'message'
         d['category_5'] = 'message'
+        d['category_6'] = 'message'
+        d['category_7'] = 'message'
+        d['category_8'] = 'message'
+        d['category_9'] = 'message'
+        d['category_10'] = 'message'
+        d['category_11'] = 'message'
+        d['category_12'] = 'message'
+        d['category_13'] = 'message'
+        d['category_14'] = 'message'
+        d['category_15'] = 'message'
         d['category_ex'] = 'message'
         d['lat'] = -90
         d['lon'] = 0
@@ -713,6 +723,16 @@ class Tutorial(Cog):
             'category_3': 'message',
             'category_4': 'message',
             'category_5': 'message',
+            'category_6': 'message',
+            'category_7': 'message',
+            'category_8': 'message',
+            'category_9': 'message',
+            'category_10': 'message',
+            'category_11': 'message',
+            'category_12': 'message',
+            'category_13': 'message',
+            'category_14': 'message',
+            'category_15': 'message',
             'category_ex': 'message'
         }
         report_channel_table = ctx.bot.dbi.table('report_channels')

@@ -361,7 +361,7 @@ class AdminCog(Cog):
                     await ctx.send('I could not interpret your response. Try again!')
                     continue
         if 'raid' in enabled_commands:
-            raid_levels = ['1', '3', '5', '7', 'EX', 'EX Raid Gyms']
+            raid_levels = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', 'EX', 'EX Raid Gyms']
             for level in raid_levels:
                 column = f'category_{level.lower()}'
                 if level == 'EX Raid Gyms':
@@ -371,8 +371,10 @@ class AdminCog(Cog):
                         'You can type `disable` if you do not want this, or type the name or ID of '
                         'the category you want those raid channels to appear in.')
                 else:
-                    if level == '7':
-                        level_str = 'Mega'
+                    if level == '6':
+                        level_str = 'Mega (Normal)'
+                    elif level == '7':
+                        level_str = 'Mega (Legendary)'
                     elif level == 'EX':
                         level_str = "EX"
                     else:
@@ -771,17 +773,47 @@ class AdminCog(Cog):
                     d['category_3'] = cat
                     d['category_4'] = cat
                     d['category_5'] = cat
+                    d['category_6'] = cat
+                    d['category_7'] = cat
+                    d['category_8'] = cat
+                    d['category_9'] = cat
+                    d['category_10'] = cat
+                    d['category_11'] = cat
+                    d['category_12'] = cat
+                    d['category_13'] = cat
+                    d['category_14'] = cat
+                    d['category_15'] = cat
                 elif catsort == 'level':
                     cat_1 = str(cat_dict.get('1'))
                     cat_2 = str(cat_dict.get('2'))
                     cat_3 = str(cat_dict.get('3'))
                     cat_4 = str(cat_dict.get('4'))
                     cat_5 = str(cat_dict.get('5'))
+                    cat_5 = str(cat_dict.get('6'))
+                    cat_5 = str(cat_dict.get('7'))
+                    cat_5 = str(cat_dict.get('8'))
+                    cat_5 = str(cat_dict.get('9'))
+                    cat_5 = str(cat_dict.get('10'))
+                    cat_5 = str(cat_dict.get('11'))
+                    cat_5 = str(cat_dict.get('12'))
+                    cat_5 = str(cat_dict.get('13'))
+                    cat_5 = str(cat_dict.get('14'))
+                    cat_5 = str(cat_dict.get('15'))
                     d['category_1'] = cat_1
                     d['category_2'] = cat_2
                     d['category_3'] = cat_3
                     d['category_4'] = cat_4
                     d['category_5'] = cat_5
+                    d['category_6'] = cat
+                    d['category_7'] = cat
+                    d['category_8'] = cat
+                    d['category_9'] = cat
+                    d['category_10'] = cat
+                    d['category_11'] = cat
+                    d['category_12'] = cat
+                    d['category_13'] = cat
+                    d['category_14'] = cat
+                    d['category_15'] = cat
                 elif catsort == 'same':
                     cat = str(channel_exists.category.id)
                     d['category_1'] = cat
@@ -789,12 +821,32 @@ class AdminCog(Cog):
                     d['category_3'] = cat
                     d['category_4'] = cat
                     d['category_5'] = cat
+                    d['category_6'] = cat
+                    d['category_7'] = cat
+                    d['category_8'] = cat
+                    d['category_9'] = cat
+                    d['category_10'] = cat
+                    d['category_11'] = cat
+                    d['category_12'] = cat
+                    d['category_13'] = cat
+                    d['category_14'] = cat
+                    d['category_15'] = cat
                 else:
                     d['category_1'] = 'none'
                     d['category_2'] = 'none'
                     d['category_3'] = 'none'
                     d['category_4'] = 'none'
                     d['category_5'] = 'none'
+                    d['category_6'] = 'none'
+                    d['category_7'] = 'none'
+                    d['category_8'] = 'none'
+                    d['category_9'] = 'none'
+                    d['category_10'] = 'none'
+                    d['category_11'] = 'none'
+                    d['category_12'] = 'none'
+                    d['category_13'] = 'none'
+                    d['category_14'] = 'none'
+                    d['category_15'] = 'none'
                 report_channels[chan] = d
         exraid_dict = old_config.get('exraid', {})
         if exraid_dict.get('enabled'):

@@ -217,7 +217,7 @@ class Want():
                         continue
                     members.append(member)
                 members = [x for x in members if x]
-                raid_tiers = ['1', '2', '3', '4', '5', 'EX', 'MEGA']
+                raid_tiers = ['1', '2', '3', '4', '5', '8', '9', '10', '11', '12', '13', '14', '15', 'EX', 'MEGA']
                 if self.want.startswith('FAMILY'):
                     pokemon_table = self.bot.dbi.table('pokemon')
                     pokemon_query = pokemon_table.query('pokemonid')
@@ -290,7 +290,7 @@ class Want():
         lures = ['glacial', 'mossy', 'magnetic']
         if arg in lures:
             return cls(ctx.bot, arg, ctx.guild.id)
-        tiers = ['1', '2', '3', '4', '5', 'ex', 'exgym', 'mega', 'm']
+        tiers = ['1', '2', '3', '4', '5', '8', '9', '10', '11', '12', '13', '14', '15', 'ex', 'exgym', 'mega', 'm']
         if arg in tiers:
             if arg == 'm':
                 arg = 'mega'

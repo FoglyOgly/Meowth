@@ -872,7 +872,7 @@ class Raid:
         
     @staticmethod
     def pokebattler_data_url(pkmnid, level, att_level, weather):
-        if level == '7':
+        if level == '7' or level == '6':
             level = 'MEGA'
         json_url = 'https://fight2.pokebattler.com/raids/defenders/'
         json_url += f"{pkmnid}/levels/RAID_LEVEL_{level}/attackers/levels/"
@@ -885,7 +885,7 @@ class Raid:
     
     @staticmethod
     def user_pokebattler_data_url(pkmnid, level, pb_id, weather):
-        if level == '7':
+        if level == '7' or level == '6':
             level = 'MEGA'
         json_url = 'https://fight2.pokebattler.com/raids/defenders/'
         json_url += f"{pkmnid}/levels/RAID_LEVEL_{level}/attackers/users/"
@@ -905,7 +905,7 @@ class Raid:
             boss_name = await self.pkmn.name()
             return f"{boss_name}-{gym_name}"
         else:
-            if self.level == '7':
+            if self.level == '7' or self.level == '6':
                 level_str = 'm'
             else:
                 level_str = self.level
@@ -2240,7 +2240,7 @@ class Raid:
 
     async def get_wants(self):
         wants = []
-        if self.level == '7':
+        if self.level == '7' or self.level == '6':
             wants.append('mega')
         else:
             wants.append(self.level)
@@ -3355,7 +3355,7 @@ class ReportEmbed():
             img_url = await boss.sprite_url()
         else:
             bossfield = "Level"
-            if raid.level == '7':
+            if raid.level == '7' or raid.level == '6':
                 name = 'Mega'
             else:
                 name = raid.level
@@ -3715,7 +3715,7 @@ class EggEmbed():
         status_str = raid.status_str
         team_str = raid.team_str
         boss_str = await raid.boss_list_str()
-        if level == '7':
+        if level == '7' or level == '6':
             level_str = 'Mega'
         else:
             level_str = level

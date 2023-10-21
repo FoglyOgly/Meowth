@@ -120,7 +120,15 @@ class RaidCog(Cog):
             "5": {},
             "6": {},
             "EX": {},
-            "7": {}
+            "7": {},
+            "8": {},
+            "9": {},
+            "10": {},
+            "11": {},
+            "12": {},
+            "13": {},
+            "14": {},
+            "15": {}
         }
         table = self.bot.dbi.table('raid_bosses')
         query = table.query
@@ -496,8 +504,6 @@ class RaidCog(Cog):
                         msg = await ctx.send(f"""There is already a raid reported at this gym! Coordinate here!""", embed=embed)
                         old_raid.message_ids.append(f"{msg.channel.id}/{msg.id}")
                         return msg
-        if level_or_boss in ['m', '7']:
-            level_or_boss = '7'
         if level_or_boss.isdigit():
             level = level_or_boss
             boss = None
@@ -578,6 +584,7 @@ class RaidCog(Cog):
         ctx = await self.bot.get_context(message, cls=Context)
         zone = await ctx.tz()
         ctx.author = interaction.user
+
         try:
             await raid_checks.is_raid_enabled(ctx)
             await raid_checks.check_bot_permissions(ctx)
@@ -1144,7 +1151,7 @@ class RaidCog(Cog):
         """Correct the raid level in an existing raid channel.
 
         Usable only by mods."""
-        possible_levels = ['1', '2', '3', '4', '5', 'EX', '7']
+        possible_levels = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', 'EX']
         if level not in possible_levels:
             return
         raid = Raid.by_channel.get(str(ctx.channel.id))

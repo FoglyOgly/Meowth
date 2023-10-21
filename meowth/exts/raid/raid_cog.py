@@ -619,9 +619,9 @@ class RaidCog(Cog):
                             mention = channel.mention
                             mentions.append(mention)
                         if mentions:
-                            return await ctx.send(f"""There is already a raid reported at this gym! Coordinate here: {", ".join(mentions)}""", embed=embed)
+                            return await ctx.send(f'There is already a raid reported at this gym! Coordinate here: {", ".join(mentions)}', embed=embed)
                     else:
-                        msg = await ctx.send(f"""There is already a raid reported at this gym! Coordinate here!""", embed=embed)
+                        msg = await ctx.send("There is already a raid reported at this gym! Coordinate here!", embed=embed)
                         old_raid.message_ids.append(f"{msg.channel.id}/{msg.id}")
                         return msg
         raid_boss = await RaidBoss.convert(ctx, boss)
@@ -716,9 +716,9 @@ class RaidCog(Cog):
                             mention = channel.mention
                             mentions.append(mention)
                         if mentions:
-                            return await ctx.send(f"""There is already a raid reported at this gym! Coordinate here: {", ".join(mentions)}""", embed=embed)
+                            return await ctx.send(f'There is already a raid reported at this gym! Coordinate here: {", ".join(mentions)}', embed=embed)
                     else:
-                        msg = await ctx.send(f"""There is already a raid reported at this gym! Coordinate here!""", embed=embed)
+                        msg = await ctx.send("There is already a raid reported at this gym! Coordinate here!", embed=embed)
                         old_raid.message_ids.append(f"{msg.channel.id}/{msg.id}")
                         return msg
         hatch = time.time() + 60*minutes_to_hatch

@@ -53,47 +53,10 @@ RUN python3 setup.py bdist_wheel
 
 ### END S2GEOMETRY BUILD AND SETUP ###
 
-### START MEOWTH BUILD AND SETUP ###
+### START POSTGRES BUILD AND SETUP ###
 
 FROM python:3.10.13-slim-bookworm as meowth
 LABEL maintainer="Jack Yaz <jackyaz@outlook.com>"
-
-COPY --from=s2geometry /src/s2geometry/dist/s2geometry-0.11.0.dev1-cp310-cp310-linux_x86_64.whl /app/s2geometry-0.11.0.dev1-cp310-cp310-linux_x86_64.whl
-
-RUN apt-get update && \
-	apt-get install -y --no-install-recommends \
-	git \
-	openssl \
-	sudo \
- 	&& apt-get clean \
- 	&& rm -rf /var/lib/apt/lists/*
-
-RUN python3 -m venv /app/venv
-ENV PATH="/app/venv/bin:$PATH"
-RUN python3 -m pip install --upgrade pip
-
-RUN python3 -m pip install /app/s2geometry-0.11.0.dev1-cp310-cp310-linux_x86_64.whl
-
-COPY config /app/config
-COPY database /app/database
-COPY meowth /app/meowth
-COPY requirements.txt /app/
-COPY setup.py /app/
-COPY README.md /app/
-COPY LICENSE /app/
-
-WORKDIR /app
-
-RUN python3 -m pip install -r requirements.txt
-RUN python3 setup.py install
-
-RUN ln -s /app/config/config.py /app/meowth/config.py
-
-WORKDIR /
-
-### END MEOWTH BUILD AND SETUP ###
-
-### START POSTGRES BUILD AND SETUP ###
 
 # explicitly set user/group IDs
 RUN set -eux; \
@@ -300,9 +263,46 @@ STOPSIGNAL SIGINT
 # documentation at https://www.postgresql.org/docs/12/server-start.html notes
 # that even 90 seconds may not be long enough in many instances.
 
+### END POSTGRES BUILD AND SETUP ###
+
+### START MEOWTH BUILD AND SETUP ###
+
+COPY --from=s2geometry /src/s2geometry/dist/s2geometry-0.11.0.dev1-cp310-cp310-linux_x86_64.whl /app/s2geometry-0.11.0.dev1-cp310-cp310-linux_x86_64.whl
+
+RUN apt-get update && \
+	apt-get install -y --no-install-recommends \
+	git \
+	openssl \
+	sudo \
+ 	&& apt-get clean \
+ 	&& rm -rf /var/lib/apt/lists/*
+
 RUN echo 'postgres  ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
-### END POSTGRES BUILD AND SETUP ###
+RUN python3 -m venv /app/venv
+ENV PATH="/app/venv/bin:$PATH"
+RUN python3 -m pip install --upgrade pip
+
+RUN python3 -m pip install /app/s2geometry-0.11.0.dev1-cp310-cp310-linux_x86_64.whl
+
+COPY config /app/config
+COPY database /app/database
+COPY meowth /app/meowth
+COPY requirements.txt /app/
+COPY setup.py /app/
+COPY README.md /app/
+COPY LICENSE /app/
+
+WORKDIR /app
+
+RUN python3 -m pip install -r requirements.txt
+RUN python3 setup.py install
+
+RUN ln -s /app/config/config.py /app/meowth/config.py
+
+WORKDIR /
+
+### END MEOWTH BUILD AND SETUP ###
 
 ENV PYTHONPATH="/app"
 

@@ -461,7 +461,6 @@ class ResearchCog(Cog):
                         choice_dict = dict(zip(react_list, pkmn_dict.values()))
                         display_dict = dict(zip(react_list, pkmn_dict.keys()))
                         embed = formatters.mc_embed(display_dict)
-                        embed.fields[0].value = embed.fields[0].value + "\n<:silph:548259248442703895>Research tasks and rewards provided by [The Silph Road](https://thesilphroad.com/research-tasks)"
                         multi = await chn.send(f"{user.mention}: What is the reward for this task? Please select from the options below. If you don't know, just ignore this!",
                             embed=embed)
                         payload = await formatters.ask(self.bot, [multi], user_list=[user.id],
@@ -677,7 +676,6 @@ class ResearchCog(Cog):
                 choice_dict = dict(zip(react_list, reward_dict.values()))
                 display_dict = dict(zip(react_list, reward_dict.keys()))
                 embed = formatters.mc_embed(display_dict)
-                embed.fields[0].value = embed.fields[0].value + "\n<:silph:548259248442703895>Research tasks and rewards provided by [The Silph Road](https://thesilphroad.com/research-tasks)"
                 multi = await ctx.send('What is the reward for this task? Please select from the options below.',
                     embed=embed)
                 payload = await formatters.ask(ctx.bot, [multi], user_list=[ctx.author.id],
@@ -884,7 +882,7 @@ class ResearchEmbed:
         fields = {
             'Pokestop': f"[{directions_text}]({directions_url})",
             'Task': task,
-            'Reward': desc + "\n<:silph:548259248442703895>Research tasks and rewards provided by [The Silph Road](https://thesilphroad.com/research-tasks)"
+            'Reward': desc
         }
         reporter = research.guild.get_member(research.reporter_id)
         if not reporter:

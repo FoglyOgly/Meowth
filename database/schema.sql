@@ -1420,7 +1420,6 @@ CREATE TABLE public.users (
     id numeric(20,0) NOT NULL,
     team integer,
     level integer,
-    silph text,
     pokebattler integer,
     party integer[] DEFAULT ARRAY[0, 0, 0, 1],
     ign text,

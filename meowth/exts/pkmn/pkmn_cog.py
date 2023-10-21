@@ -1137,6 +1137,7 @@ class Pokedex(Cog):
     @command()
     @checks.is_co_owner()
     async def movesupdate(self, ctx):
+        await ctx.send('Updating movesets table')
         async with aiohttp.ClientSession() as sess:
             async with sess.get('https://fight.pokebattler.com/pokemon') as resp:
                 data = await resp.json()
@@ -1167,5 +1168,52 @@ class Pokedex(Cog):
         insert.rows(move_list)
         await movesets_table.query().delete()
         await insert.commit()
-        return await ctx.send('Movesets table updated')
+        await ctx.send('Movesets table updated')
+
+        await ctx.send('Updating moves table')
+        async with aiohttp.ClientSession() as sess:
+            async with sess.get('https://fight.pokebattler.com/moves') as resp:
+                data = await resp.json()
+
+        movenames_dicts = data['move']
+        movename_list = []
+        moves_list = []
+
+        for movename in movenames_dicts:
+            if movename.get('moveId'):
+                movename_list.append({
+                    'moveid': movename.get('moveId'),
+                    'language_id': 9,
+                    'name': movename.get('moveId').replace('_FAST','').replace('_',' ').title()
+                })
+                if movename.get('type'):
+                    fast = False
+                    if movename.get('moveId').endswith("_FAST"):
+                        fast = True
+                    moves_list.append({
+                        'moveid': movename.get('moveId'),
+                        'fast': fast,
+                        'type': movename.get('type'),
+                        'power': movename.get('power'),
+                        'criticalchance': movename.get('criticalChance'),
+                        'staminalossscalar': movename.get('staminaLossScalar'),
+                        'durationms': movename.get('durationMs'),
+                        'damagewindowstartms': movename.get('damageWindowStartMs', 0),
+                        'damagewindowendms': movename.get('damageWindowEndMs', 0),
+                        'energydelta': movename.get('energyDelta')
+                    })
+
+        movenames_table = ctx.bot.dbi.table('move_names')
+        insert = movenames_table.insert()
+        insert.rows(movename_list)
+        await movenames_table.query().delete()
+        await insert.commit()
+
+        moves_table = ctx.bot.dbi.table('moves')
+        insert = moves_table.insert()
+        insert.rows(moves_list)
+        await moves_table.query().delete()
+        await insert.commit()
+
+        return await ctx.send('Moves table updated')
         

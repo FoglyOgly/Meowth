@@ -24,7 +24,12 @@ emoji_letters = ['🇦','🇧','🇨','🇩','🇪','🇫','🇬','🇭','🇮',
 ]
 
 class RaidBoss(Pokemon):
+seconds_per_unit = {"s": 1, "m": 60, "h": 3600, "d": 86400, "w": 604800}
 
+def convert_to_seconds(s):
+    return int(s[:-1]) * seconds_per_unit[s[-1]]
+
+class RaidBoss(Pokemon):
     def __init__(self, pkmn):
         self.bot = pkmn.bot
         self.id = pkmn.id
@@ -1858,7 +1863,14 @@ class Raid:
         return (await RaidEmbed.from_raid(self)).embed
 
     def expired_embed(self):
-        embed = formatters.make_embed(content="This raid has expired!", footer="Expired")
+        raid_expire_grace_period = self.bot.config.raid_expire_grace_period
+        raid_expire_grace_time = self.end + convert_to_seconds(raid_expire_grace_period)
+        embed = formatters.make_embed(content="This raid and channel has expired!", footer="Raid and channel expired")
+        embed.timestamp = datetime.fromtimestamp(raid_expire_grace_time)
+        return embed
+
+    def expired_grace_embed(self):
+        embed = formatters.make_embed(content="This raid has expired, channel will be deleted soon!", footer="Raid expired, channel will be removed soon")
         embed.timestamp = datetime.fromtimestamp(self.end)
         return embed
     
@@ -1919,10 +1931,16 @@ class Raid:
         react_list = self.react_list
         message_ids = self.message_ids
         train_msgs = self.train_msgs
+
+        raid_expire_grace_period = self.bot.config.raid_expire_grace_period
+        raid_expire_grace_time = self.end + convert_to_seconds(raid_expire_grace_period)
+
         if self.hatch and self.hatch > time.time():
             embed = await self.egg_embed()
         elif self.end > time.time():
             embed = await self.raid_embed()
+        elif time.time() > self.end and time.time() < raid_expire_grace_time:
+            embed = self.expired_grace_embed()
         else:
             embed = self.expired_embed()
         for messageid in message_ids:
@@ -2131,6 +2149,8 @@ class Raid:
     
     async def expire_raid(self):
         try:
+            self.bot.loop.create_task(self.update_messages())
+            await asyncio.sleep(self.bot.config.raid_expire_grace_period)
             self.bot.loop.create_task(self.update_messages())
             await asyncio.sleep(60)
             try:

@@ -31,6 +31,3 @@ class RaidNotActive(CommandError):
 class MeetupDisabled(CommandError):
     'Exception raised, meetup not enabled'
     pass
-
-
-

@@ -180,14 +180,14 @@ class Core(Cog):
             await ctx.embed('Uptime', uptime_str, colour='blue',
                             icon="https://i.imgur.com/82Cqf1x.png")
         except discord.errors.Forbidden:
-            await ctx.send("Uptime: {}".format(uptime_str))
+            await ctx.send(f"Uptime: {uptime_str}")
 
     @command(name="botinvite", category='Bot Info')
     async def _bot_invite(self, ctx, plain_url: bool = False):
         """Shows bot's invite url"""
         invite_url = ctx.bot.invite_url.replace("+application.commands","")
         if plain_url:
-            await ctx.send("Invite URL: <{}>".format(invite_url))
+            await ctx.send(f"Invite URL: <{invite_url}>")
             return
         else:
             embed = make_embed(
@@ -198,7 +198,7 @@ class Core(Cog):
         try:
             await ctx.send(embed=embed)
         except discord.errors.Forbidden:
-            await ctx.send("Invite URL: <{}>".format(invite_url))
+            await ctx.send(f"Invite URL: <{invite_url}>")
 
     @command(name="about", category='Bot Info')
     async def _about(self, ctx):
@@ -208,7 +208,7 @@ class Core(Cog):
         bot_repo = author_repo + "/Meowth"
         uptime_str = bot.uptime_str
         owner = await ctx.get.user(ctx.bot.owner)
-        invite_str = "[Invite Me!]({})".format(bot.invite_url)
+        invite_str = "f[Invite Me!]({bot.invite_url})"
 
         if ctx.guild:
             prefix = bot.prefixes.get(ctx.guild.id, bot.default_prefix)
@@ -274,11 +274,9 @@ class Core(Cog):
 
         for size, value in data_sizes.items():
             if (p_mem / value) > 1 < 1024:
-                p_mem_str = "{} {}".format(
-                    round(p_mem / value, 2), size)
+                p_mem_str = f"{round(p_mem / value, 2)} {size}"
             if (swapped / value) > 1 < 1024:
-                swap_str = "{} {}".format(
-                    round(swapped / value, 2), size)
+                swap_str = f"{round(swapped / value, 2)} {size}"
 
         member_count = 0
         server_count = 0
@@ -421,9 +419,9 @@ class Core(Cog):
         for perm, bitshift in perm_dict.items():
             if bool((req_perms.value >> bitshift) & 1):
                 if bool((guild_perms.value >> bitshift) & 1):
-                    msg += ":white_small_square:  {}\n".format(perm)
+                    msg += f":white_small_square:  {perm}\n"
                 else:
-                    msg += ":black_small_square:  {}\n".format(perm)
+                    msg += f":black_small_square:  {perm}\n"
 
         try:
             if not isinstance(ctx.channel, discord.DMChannel):
@@ -509,8 +507,7 @@ class Core(Cog):
         msg = ''
         for shard, latency in ctx.bot.latencies:
             here = '  🡸' if shard == ctx.guild.shard_id else ''
-            msg += ("**Shard {0}:** {1:.2f} ms{2}"
-                    "\n").format(shard, latency * 1000, here)
+            msg += f"**Shard {shard}:** {latency * 1000:.2f} ms{here}\n"
         await ctx.embed('Latency', msg, msg_type='info')
 
     @command()
@@ -532,8 +529,7 @@ class Core(Cog):
         deleted = await ctx.channel.purge(limit=msg_number, check=is_unpinned)
         embed = make_embed(
             msg_type='success',
-            title='Deleted {} message{}'.format(
-                len(deleted), "s" if len(deleted) > 1 else ""))
+            title=f'Deleted {len(deleted)} message{"s" if len(deleted) > 1 else ""}')
         result_msg = await ctx.send(embed=embed)
         await asyncio.sleep(3)
         await result_msg.delete()
@@ -550,7 +546,7 @@ class Core(Cog):
                                title='Cog Manager reloaded.')
             await ctx.send(embed=embed)
         except Exception as e:
-            msg = "{}: {}".format(type(e).__name__, e)
+            msg = f"{type(e).__name__}: {e}"
             embed = make_embed(msg_type='error',
                                title='Error loading Cog Manager',
                                content=msg)
@@ -568,7 +564,7 @@ class Core(Cog):
             if new_prefix:
                 embed = make_embed(
                     msg_type='error',
-                    title=f"Prefix can only be changed in guilds.")
+                    title="Prefix can only be changed in guilds.")
                 await ctx.send(embed=embed)
             else:
                 embed = make_embed(
@@ -616,7 +612,6 @@ class Core(Cog):
     @command(name='list')
     async def _list(self, ctx, *args):
         """Base command for listing reports or RSVPs."""
-        pass
 
     # @group(category='Server Config', name='enable', aliases=['disable'],
     #        invoke_without_command=True, hidden=True)
@@ -666,7 +661,6 @@ class Core(Cog):
     #     embed = make_embed(
     #         msg_type='info', title='Available Cogs', content=cog_msg)
     #     await ctx.send(embed=embed)
-
 
 def setup(bot):
     bot.add_cog(Core(bot))

@@ -4,7 +4,6 @@ import logging
 from discord.ext.commands import Cog
 from meowth.utils import Map
 
-
 class Cog(Cog):
     """Base Class for Cogs to inherit in order to automate Cog setup.
 

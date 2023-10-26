@@ -77,7 +77,6 @@ def core_table_sqls():
 
     return sql_dict
 
-
 class CogTable:
     table_config = {
         "name" : "base_default_table",

@@ -96,8 +96,8 @@ type_emoji = {
 }
 
 
-# weatherapikey = 
-# gmapsapikey = 
+# weatherapikey =
+# gmapsapikey =
 
 max_report_distance = 20
 

@@ -178,7 +178,7 @@ class Core(Cog):
         uptime_str = ctx.bot.uptime_str
         try:
             await ctx.embed('Uptime', uptime_str, colour='blue',
-                            icon="https://i.imgur.com/82Cqf1x.png")
+                            icon="https://raw.githubusercontent.com/jackyaz/Meowth/self-host/meowth/images/misc/uptime.png")
         except discord.errors.Forbidden:
             await ctx.send(f"Uptime: {uptime_str}")
 

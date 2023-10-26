@@ -1803,8 +1803,8 @@ class Raid:
         return countersembed.embed
 
     async def hatched_embed(self):
-        raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png'
-        footer_icon = 'https://media.discordapp.net/attachments/346766728132427777/512699022822080512/imageedit_10_6071805149.png'
+        raid_icon = 'https://raw.githubusercontent.com/jackyaz/Meowth/self-host/meowth/images/misc/raid_map.png'
+        footer_icon = 'https://raw.githubusercontent.com/jackyaz/Meowth/self-host/meowth/images/misc/raid_icon.png'
         level = self.level
         egg_img_url = self.bot.raid_info.egg_images[level]
         color = self.guild.me.color
@@ -3332,8 +3332,8 @@ class ReportEmbed():
 
     def __init__(self, embed):
         self.embed = embed
-    
-    raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png' #TODO
+
+    raid_icon = 'https://raw.githubusercontent.com/jackyaz/Meowth/self-host/meowth/images/misc/raid_map.png'
 
     boss_index = 0
     gym_index = 1
@@ -3398,7 +3398,7 @@ class RaidEmbed():
     def __init__(self, embed):
         self.embed = embed
 
-    raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png' #TODO
+    raid_icon = 'https://raw.githubusercontent.com/jackyaz/Meowth/self-host/meowth/images/misc/raid_map.png'
 
     boss_index = 0
     gym_index = 1
@@ -3556,8 +3556,8 @@ class RSVPEmbed():
     def __init__(self, embed):
         self.embed = embed
 
-    raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png' #TODO
-    footer_icon = 'https://media.discordapp.net/attachments/346766728132427777/512699022822080512/imageedit_10_6071805149.png'
+    raid_icon = 'https://raw.githubusercontent.com/jackyaz/Meowth/self-host/meowth/images/misc/raid_map.png'
+    footer_icon = 'https://raw.githubusercontent.com/jackyaz/Meowth/self-host/meowth/images/misc/raid_icon.png'
 
     status_index = 0
     team_index = 1
@@ -3636,9 +3636,9 @@ class RSVPEmbed():
 class EggEmbed():
     def __init__(self, embed):
         self.embed = embed
-    
-    raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png'
-            
+
+    raid_icon = 'https://raw.githubusercontent.com/jackyaz/Meowth/self-host/meowth/images/misc/raid_map.png'
+
     level_index = 0
     status_index = 2
     team_index = 3
@@ -3734,9 +3734,9 @@ class EggEmbed():
 class CountersEmbed():
     def __init__(self, embed):
         self.embed = embed
-    
-    raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png' #TODO
-    footer_icon = 'https://media.discordapp.net/attachments/346766728132427777/512699022822080512/imageedit_10_6071805149.png'
+
+    raid_icon = 'https://raw.githubusercontent.com/jackyaz/Meowth/self-host/meowth/images/misc/raid_map.png'
+    footer_icon = 'https://raw.githubusercontent.com/jackyaz/Meowth/self-host/meowth/images/misc/raid_icon.png'
 
     boss_index = 0
     weather_index = 1

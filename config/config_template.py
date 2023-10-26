@@ -95,14 +95,6 @@ type_emoji = {
     "water"    : { "typeid" : "POKEMON_TYPE_WATER",    "emoji" : "<:water:351758295142498325>",    "weather" : "RAINY" }
 }
 
-raid_times = {
-    1: (60, 45),
-    2: (60, 45),
-    3: (60, 45),
-    4: (60, 45),
-    5: (60, 45),
-    "EX": (None, 45)
-}
 
 # weatherapikey = 
 # gmapsapikey = 

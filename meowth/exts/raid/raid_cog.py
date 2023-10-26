@@ -15,10 +15,6 @@ from .errors import *
 from .objects import Raid, RaidBoss, Train, Meetup
 
 from math import ceil
-import discord
-from discord.ext import commands
-from discord import Embed
-from discord import app_commands
 import asyncio
 import aiohttp
 import time
@@ -27,6 +23,10 @@ from dateparser import parse
 from pytz import timezone
 import typing
 import re
+import discord
+from discord.ext import commands
+from discord import Embed
+from discord import app_commands
 
 emoji_letters = ['🇦','🇧','🇨','🇩','🇪','🇫','🇬','🇭','🇮','🇯','🇰','🇱',
     '🇲','🇳','🇴','🇵','🇶','🇷','🇸','🇹','🇺','🇻','🇼','🇽','🇾','🇿'

@@ -120,7 +120,13 @@ The Docker container includes Postgres with a pre-configured database ready for 
 
 ### Loading the required data
 
-The schema and required data are provided in the database directory. Using either the pgAdmin app or the psql command-line tool, load the files in the database directory starting with the schema. The schema contains the information on all the required tables as well as the triggers and functions that enable some real-time updates to trigger Meowth messages. Once the schema is loaded, each remaining file in the directory contains required data for another table. These are critical data regarding Pokemon, their moves, and so on. However, the data in them is badly out of date in some respects. You will likely have to do a lot of manual work here to get things up to date - for instance, many Pokemon which were not available in the wild at the time of the last update to the data are now available in the wild. You will either need to make a blanket update to allow all Pokemon to be reported in the wild or you will need to figure out which ones are missing. Instructions on how to update the data in the database likely requires some basic knowledge of SQL and is beyond the scope of this readme.
+The schema and required data are provided in the database directory. Using either the pgAdmin app or the psql command-line tool, load the files in the database directory starting with the schema.
+
+The schema contains the information on all the required tables as well as the triggers and functions that enable some real-time updates to trigger Meowth messages.
+
+Once the schema is loaded, each remaining file in the directory contains required data for another table. These are critical data regarding Pokemon, their moves, and so on. However, the data in them is badly out of date in some respects. You will likely have to do a lot of manual work here to get things up to date - for instance, many Pokemon which were not available in the wild at the time of the last update to the data are now available in the wild. You will either need to make a blanket update to allow all Pokemon to be reported in the wild or you will need to figure out which ones are missing.
+
+Instructions on how to update the data in the database likely requires some basic knowledge of SQL and is beyond the scope of this readme.
 
 ### Configuring Meowth
 

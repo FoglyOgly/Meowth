@@ -2135,7 +2135,7 @@ class Raid:
     async def expire_raid(self):
         try:
             self.bot.loop.create_task(self.update_messages())
-            await asyncio.sleep(self.bot.config.raid_expire_grace_period)
+            await asyncio.sleep(convert_to_seconds(self.bot.config.raid_expire_grace_period))
             self.bot.loop.create_task(self.update_messages())
             await asyncio.sleep(60)
             try:

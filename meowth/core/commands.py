@@ -208,7 +208,7 @@ class Core(Cog):
         bot_repo = author_repo + "/Meowth"
         uptime_str = bot.uptime_str
         owner = await ctx.get.user(ctx.bot.owner)
-        invite_str = "f[Invite Me!]({bot.invite_url})"
+        invite_str = f"[Invite Me!]({bot.invite_url})"
 
         if ctx.guild:
             prefix = bot.prefixes.get(ctx.guild.id, bot.default_prefix)

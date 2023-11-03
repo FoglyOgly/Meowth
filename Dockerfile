@@ -266,8 +266,8 @@ STOPSIGNAL SIGINT
 
 ### START MEOWTH BUILD AND SETUP ###
 
-COPY --from=s2geometry /src/s2geometry/dist/s2geometry-0.11.0.dev1-cp310-cp310-linux_x86_64.whl /app/s2geometry-0.11.0.dev1-cp310-cp310-linux_x86_64.whl
 RUN mkdir /app
+COPY --from=s2geometry /src/s2geometry/dist/*.whl /app/.
 
 RUN apt-get update && \
 	apt-get install -y --no-install-recommends \
@@ -282,7 +282,7 @@ RUN python3 -m venv /app/venv
 ENV PATH="/app/venv/bin:$PATH"
 RUN python3 -m pip install --upgrade pip
 
-RUN python3 -m pip install /app/s2geometry-0.11.0.dev1-cp310-cp310-linux_x86_64.whl
+RUN python3 -m pip install /app/*.whl
 
 COPY config /app/config
 COPY database /app/database

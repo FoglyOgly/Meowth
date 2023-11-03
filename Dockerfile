@@ -14,8 +14,6 @@ RUN apt-get update && \
 	libssl-dev \
 	swig \
 	cmake \
-	openssl \
-	sudo \
  	&& apt-get clean \
  	&& rm -rf /var/lib/apt/lists/*
 
@@ -274,7 +272,6 @@ RUN mkdir /app
 RUN apt-get update && \
 	apt-get install -y --no-install-recommends \
 	git \
-	openssl \
 	sudo \
  	&& apt-get clean \
  	&& rm -rf /var/lib/apt/lists/*

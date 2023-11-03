@@ -19,6 +19,7 @@ RUN apt-get update && \
  	&& apt-get clean \
  	&& rm -rf /var/lib/apt/lists/*
 
+RUN mkdir /app
 RUN python3 -m venv /app/venv
 ENV PATH="/app/venv/bin:$PATH"
 RUN python3 -m pip install --upgrade pip
@@ -268,6 +269,7 @@ STOPSIGNAL SIGINT
 ### START MEOWTH BUILD AND SETUP ###
 
 COPY --from=s2geometry /src/s2geometry/dist/s2geometry-0.11.0.dev1-cp310-cp310-linux_x86_64.whl /app/s2geometry-0.11.0.dev1-cp310-cp310-linux_x86_64.whl
+RUN mkdir /app
 
 RUN apt-get update && \
 	apt-get install -y --no-install-recommends \

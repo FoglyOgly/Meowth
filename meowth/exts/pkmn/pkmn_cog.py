@@ -397,6 +397,8 @@ class Pokemon():
     async def name(self):
         dex_data = self._dex_data
         name = await dex_data.select('name').get_value()
+        if name is None:
+            return f"MISSINGNO - {self.id} - DO NOT USE - REPORT TO ADMIN"
         name = name.strip()
         if self.form == 64:
             pure_emoji = self.bot.config.form_emoji['purified']

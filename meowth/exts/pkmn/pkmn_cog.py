@@ -86,10 +86,10 @@ class Pokemon():
             'chargeMove2id': self.chargeMove2id
         }
         return d
-    
+
     def __repr__(self):
         return repr(self.to_dict)
-    
+
     @classmethod
     def from_dict(cls, bot, data):
         pkmn_id = data['id']
@@ -106,9 +106,9 @@ class Pokemon():
         chargeMove2id = data['chargeMove2id']
         return cls(bot, pkmn_id, form=form, gender=gender,
             shiny=shiny, attiv=attiv, defiv=defiv, staiv=staiv,
-            lvl=lvl, cp=cp, quickMoveid=quickMoveid, 
+            lvl=lvl, cp=cp, quickMoveid=quickMoveid,
             chargeMoveid=chargeMoveid, chargeMove2id=chargeMove2id)
-    
+
     async def moveset_str(self):
         fast = self.quickMoveid or None
         charge = self.chargeMoveid or None
@@ -140,7 +140,7 @@ class Pokemon():
             charge2_emoji = await charge2_move.emoji()
             moveset_str += f'| {charge2_name} {charge2_emoji}'
         return moveset_str
-    
+
     async def trade_display_str(self):
         name = await self.name()
         if self.shiny:
@@ -164,29 +164,29 @@ class Pokemon():
             level_str = ""
         display_str = f"{shiny_str}{gender_str}{level_str}{name}{moveset_str}"
         return display_str
-    
+
     @property
     def _data(self):
         pokemon_ref = self.bot.dbi.table('pokemon').query()
         data = pokemon_ref.where(pokemonid=self.id)
         return data
-    
-    
+
+
     async def _num(self):
         data = self._data
         return await data.select('num').get_value()
 
-    
+
     async def _gen(self):
         data = self._data
         return await data.select('gen').get_value()
-    
-    
+
+
     async def _type(self):
         data = self._data
         return await data.select('type').get_value()
-    
-    
+
+
     async def _type2(self):
         data = self._data
         return await data.select('type2').get_value()
@@ -205,7 +205,7 @@ class Pokemon():
             weather.append(self.bot.config.type_emoji.get(type1.replace("POKEMON_TYPE_","").lower()).get("weather"))
             weather.append(self.bot.config.type_emoji.get(type2.replace("POKEMON_TYPE_","").lower()).get("weather"))
         return weather
-    
+
     async def weather_str(self):
         weather = await self.boost_weather()
         weather_names = []
@@ -218,8 +218,8 @@ class Pokemon():
     async def is_boosted(self, weather):
         boost_weather = await self.boost_weather()
         return weather in boost_weather
-    
-    
+
+
     async def type_emoji(self):
         emoji_string = ''
         type1 = await self._type()
@@ -232,32 +232,32 @@ class Pokemon():
         emoji_string += type1_emoji
         emoji_string += type2_emoji
         return emoji_string
-    
-    
+
+
     async def _form_type_id(self):
         data = self._data
         return await data.select('form_type_id').get_value()
-    
-    
+
+
     async def _gender_type(self):
         data = self._data
         return await data.select('gender_type').get_value()
-    
-    
+
+
     async def _mythical(self):
         data = self._data
         return await data.select('mythical').get_value()
-    
-    
+
+
     async def _legendary(self):
         data = self._data
         return await data.select('legendary').get_value()
-    
-    
+
+
     async def _wild_available(self):
         data = self._data
         return await data.select('wild_available').get_value()
-    
+
     async def _raid_available(self, coords):
         table = self.bot.dbi.table('raid_bosses')
         query = table.query
@@ -290,7 +290,7 @@ class Pokemon():
         query = research_table.query('reward')
         rewards = await query.get_values()
         return self.id in rewards
-    
+
     async def _shiny_available(self):
         data = self._data
         return await data.select('shiny_available').get_value()
@@ -298,57 +298,57 @@ class Pokemon():
     async def _mega_available(self):
         data = self._data
         return await data.select('mega_available').get_value()
-    
+
     async def _baseStamina(self):
         data = self._data
         return await data.select('baseStamina').get_value()
-    
-    
+
+
     async def _baseAttack(self):
         data = self._data
         return await data.select('baseAttack').get_value()
-    
-    
+
+
     async def _baseDefense(self):
         data = self._data
         return await data.select('baseDefense').get_value()
-    
-    
+
+
     async def _HeightM(self):
         data = self._data
         return await data.select('HeightM').get_value()
-    
-    
+
+
     async def _WeightKg(self):
         data = self._data
         return await data.select('WeightKg').get_value()
-    
-    
+
+
     async def _HeightStdDev(self):
         data = self._data
         return await data.select('HeightStdDev').get_value()
-    
-    
+
+
     async def _WeightStdDev(self):
         data = self._data
         return await data.select('WeightStdDev').get_value()
-    
-    
+
+
     async def _familyId(self):
         data = self._data
         return await data.select('familyId').get_value()
-    
-    
+
+
     async def _stageID(self):
         data = self._data
         return await data.select('stageID').get_value()
-    
-    
+
+
     async def _evolves_from(self):
         data = self._data
         return await data.select('evolves_from').get_value()
-    
-    
+
+
     async def _evo_cost_candy(self):
         data = self._data
         return await data.select('evo_cost_candy').get_value()
@@ -480,7 +480,7 @@ class Pokemon():
             i += 1
         return emoji_string
 
-    
+
     async def resistances_emoji(self):
         type_chart = await self.type_chart()
         types_sorted = sorted(type_chart.items(), key=(lambda x: x[1]))
@@ -506,8 +506,8 @@ class Pokemon():
                 break
             i += 1
         return emoji_string
-    
-    
+
+
     async def moves(self):
         movesets_query = await self.bot.dbi.table('movesets').query().where(
             pokemonid=self.id).get()
@@ -520,7 +520,7 @@ class Pokemon():
         moves = await self.bot.dbi.table('movesets').query('moveid').where(
             pokemonid=self.id).where(legacy=True).get_values()
         return moves
-    
+
     async def fast_moves(self):
         moves = await self.moves()
         fast_moves = []
@@ -530,7 +530,7 @@ class Pokemon():
                 fast_moves.append(move.id)
         return fast_moves
 
-    
+
     async def charge_moves(self):
         moves = await self.moves()
         charge_moves = []
@@ -539,8 +539,8 @@ class Pokemon():
             if not await move._fast():
                 charge_moves.append(move.id)
         return charge_moves
-    
-    
+
+
     async def dex_embed(self):
         num = await self._num()
         description = await self.description()
@@ -602,7 +602,7 @@ class Pokemon():
             footer = '* denotes legacy move'
         )
         return embed
-    
+
     @staticmethod
     async def get_all_forms(bot, pokemonid):
         table = bot.dbi.table('pokemon')
@@ -620,8 +620,8 @@ class Pokemon():
         query.where(evolves_from=self.id)
         ids = await query.get_values()
         return ids
-    
-    
+
+
     async def cpm(self):
         if not self.lvl:
             return None
@@ -630,8 +630,8 @@ class Pokemon():
                 level=self.lvl)
             cpm = await cpm_ref.select('cpm').get_value()
             return cpm
-    
-    
+
+
     async def calculate_cp(self):
         if None in [self.lvl, self.attiv, self.defiv, self.staiv]:
             return None
@@ -656,7 +656,7 @@ class Pokemon():
         if cp < 10:
             cp = 10
         return cp
-    
+
     async def max_cp(self, level=40):
         cpm_ref = self.bot.dbi.table('cpm_table').query('cpm').where(
             level=level)
@@ -668,7 +668,7 @@ class Pokemon():
         if cp < 10:
             cp = 10
         return cp
-    
+
     async def validate(self, context, weather=None):
         if self.quickMoveid:
             quick_moves = await self.fast_moves()
@@ -734,7 +734,7 @@ class Pokemon():
                 elif self.chargeMove2id in legacy_moves:
                     raise MoveInvalidLegacy(self, self.chargeMove2id)
         return self
-    
+
     async def get_info_from_arg(self, bot, arg):
         if arg.startswith('cp'):
             if len(arg) == 2:
@@ -941,7 +941,7 @@ class Pokemon():
         pkmn.gender = gender
         return pkmn
 
-    @classmethod    
+    @classmethod
     async def convert(cls, ctx, arg):
         report_channel = ReportChannel(ctx.bot, ctx.channel)
         coords = await report_channel.center_coords()
@@ -963,74 +963,74 @@ class Move:
     def _data(self):
         data = self.bot.dbi.table('moves').query().where(moveid=self.id)
         return data
-    
-    
+
+
     async def _fast(self):
         data = self._data
         is_fast = await data.select('fast').get_value()
         return is_fast
-    
+
     async def is_legacy(self, pkmn_id):
         movesets_table = self.bot.dbi.table('movesets')
         query = movesets_table.query('legacy')
         query.where(pokemonid=pkmn_id)
         query.where(moveid=self.id)
-        return await query.get_value()    
-    
+        return await query.get_value()
+
     async def _type(self):
         data = self._data
         move_type = await data.select('type').get_value()
         return move_type
-    
-    
+
+
     async def _power(self):
         data = self._data
         power = await data.select('power').get_value()
         return power
-    
-    
+
+
     async def _criticalChance(self):
         data = self._data
         critChance = await data.select('criticalChance').get_value()
         return critChance
-    
-    
+
+
     async def _staminaLossScalar(self):
         data = self._data
         stamloss = await data.select('staminaLossScalar').get_value()
         return stamloss
-    
-    
+
+
     async def _durationMs(self):
         data = self._data
         duration = await data.select('durationMs').get_value()
         return duration
-    
-    
+
+
     async def _damageWindowStartMs(self):
         data = self._data
         start = await data.select('damageWindowStartMs').get_value()
         return start
-    
-    
+
+
     async def _damageWindowEndMs(self):
         data = self._data
         end = await data.select('damageWindowEndMs').get_value()
         return end
-    
-    
+
+
     async def _energyDelta(self):
         data = self._data
         energy = await data.select('energyDelta').get_value()
         return energy
-    
-    
+
+
     async def dps(self):
         power = await self._power()
         duration = await self._durationMs()
         return (power*1000/duration)
-    
-    
+
+
     async def eps(self):
         if not await self._fast():
             return None
@@ -1038,8 +1038,8 @@ class Move:
             energy = await self._energyDelta()
             duration = await self._durationMs()
             return (energy*1000/duration)
-        
-    
+
+
     async def dpe(self):
         if await self._fast():
             return None
@@ -1047,20 +1047,20 @@ class Move:
             energy = await self._energyDelta()
             power = await self._power()
             return (power/energy)
-    
-    
+
+
     async def emoji(self):
         _type = await self._type()
         emoji = self.bot.config.type_emoji.get(_type.replace("POKEMON_TYPE_","").lower()).get("emoji")
         return emoji
-    
-    
+
+
     async def name(self):
         names_ref = self.bot.dbi.table('move_names').query().where(moveid=self.id).where(
             language_id=9)
         name = await names_ref.select('name').get_value()
         return name
-    
+
     @classmethod
     async def from_arg(cls, bot, arg):
         names = bot.dbi.table('move_names')
@@ -1071,18 +1071,18 @@ class Move:
             return cls(bot, match_id)
         else:
             raise MoveNotFound
-    
+
     @classmethod
     async def convert(cls, ctx, arg):
         return await cls.from_arg(ctx.bot, arg)
-            
-            
+
+
 
 class Pokedex(Cog):
 
     def __init__(self, bot):
         self.bot = bot
-    
+
     @Cog.listener()
     async def on_command_error(self, ctx, error):
         if isinstance(error, PokemonNotFound):
@@ -1126,14 +1126,14 @@ class Pokedex(Cog):
         current_ids = await dex_query.get_values()
         ids = list(set(current_ids).intersection(set(wild_ids)))
         return [Pokemon(self.bot, x) for x in ids]
-    
+
     @command()
     async def pokedex(self, ctx, *, pokemon: Pokemon):
         """Display a Pokedex entry."""
         embed = await pokemon.dex_embed()
         embed.color = ctx.guild.me.color
         return await ctx.send(embed=embed)
-    
+
     @command()
     @checks.is_co_owner()
     async def movesupdate(self, ctx):
@@ -1216,4 +1216,4 @@ class Pokedex(Cog):
         await insert.commit()
 
         return await ctx.send('Moves table updated')
-        
+

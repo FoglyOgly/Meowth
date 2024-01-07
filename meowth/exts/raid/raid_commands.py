@@ -17,13 +17,15 @@ class RaidCommands(app_commands.Group):
         self, interaction: discord.Interaction, current: str, namespace: app_commands.Namespace
     ) -> List[app_commands.Choice[str]]:
         bot = interaction.client
+        shadow_emoji = bot.config.form_emoji['shadow']
         raid_cog = bot.get_cog('RaidCog')
         raid_lists = await raid_cog.get_raid_lists()
         boss_list = [x for y in raid_lists.values() for x in list(y.keys())]
         pkmn_list = [await Pokemon(bot, x).name() for x in boss_list]
+        pkmn_list_clean = [x.replace(f"{str(shadow_emoji)}","- Shadow") for x in pkmn_list]
         return [
             app_commands.Choice(name=boss, value=boss)
-            for boss in pkmn_list if current.lower() in boss.lower()
+            for boss in pkmn_list_clean if current.lower() in boss.lower()
         ][:25]
 
     async def gym_autocomplete(

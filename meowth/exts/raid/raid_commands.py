@@ -1,4 +1,4 @@
-from typing import List, Literal
+from typing import List
 
 import discord
 from discord import app_commands
@@ -9,7 +9,7 @@ class RaidCommands(app_commands.Group):
 
     def __init__(self):
         super().__init__(name='raid', description='Report Pokemon Go raids')
-    
+
     async def on_error(self, interaction, command, error):
         raise error.original
 
@@ -17,13 +17,15 @@ class RaidCommands(app_commands.Group):
         self, interaction: discord.Interaction, current: str, namespace: app_commands.Namespace
     ) -> List[app_commands.Choice[str]]:
         bot = interaction.client
+        shadow_emoji = bot.config.form_emoji['shadow']
         raid_cog = bot.get_cog('RaidCog')
         raid_lists = await raid_cog.get_raid_lists()
         boss_list = [x for y in raid_lists.values() for x in list(y.keys())]
         pkmn_list = [await Pokemon(bot, x).name() for x in boss_list]
+        pkmn_list_clean = [x.replace(f"{str(shadow_emoji)}","- Shadow") for x in pkmn_list]
         return [
             app_commands.Choice(name=boss, value=boss)
-            for boss in pkmn_list if current.lower() in boss.lower()
+            for boss in pkmn_list_clean if current.lower() in boss.lower()
         ][:25]
 
     async def gym_autocomplete(
@@ -46,14 +48,12 @@ class RaidCommands(app_commands.Group):
         raid_cog = bot.get_cog('RaidCog')
         boss = boss.replace(' ', '').replace('(', ' (')
         return await raid_cog.raid_slash_command(interaction, boss, gym, minutes_remaining)
-    
+
     @app_commands.command(name='egg')
     @app_commands.describe(level='the raid level', gym='the raid gym', minutes_to_hatch='whole number of minutes to hatch')
     @app_commands.autocomplete(gym=gym_autocomplete)
-    async def egg_slash_command(self, interaction: discord.Interaction, level: Literal['1', '3', '5', '7'], gym: str, minutes_to_hatch: app_commands.Range[int, 1, 60]=60):
+    async def egg_slash_command(self, interaction: discord.Interaction, level: app_commands.Range[int, 1, 15], gym: str, minutes_to_hatch: app_commands.Range[int, 1, 60]=60):
         await interaction.response.send_message('Thanks for your report!', ephemeral=True)
         bot = interaction.client
         raid_cog = bot.get_cog('RaidCog')
-        return await raid_cog.egg_slash_command(interaction, level, gym, minutes_to_hatch)
-    
-    
+        return await raid_cog.egg_slash_command(interaction, str(level), gym, minutes_to_hatch)

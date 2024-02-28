@@ -15,10 +15,6 @@ from .errors import *
 from .objects import Raid, RaidBoss, Train, Meetup
 
 from math import ceil
-import discord
-from discord.ext import commands
-from discord import Embed
-from discord import app_commands
 import asyncio
 import aiohttp
 import time
@@ -27,6 +23,10 @@ from dateparser import parse
 from pytz import timezone
 import typing
 import re
+import discord
+from discord.ext import commands
+from discord import Embed
+from discord import app_commands
 
 emoji_letters = ['🇦','🇧','🇨','🇩','🇪','🇫','🇬','🇭','🇮','🇯','🇰','🇱',
     '🇲','🇳','🇴','🇵','🇶','🇷','🇸','🇹','🇺','🇻','🇼','🇽','🇾','🇿'
@@ -120,7 +120,15 @@ class RaidCog(Cog):
             "5": {},
             "6": {},
             "EX": {},
-            "7": {}
+            "7": {},
+            "8": {},
+            "9": {},
+            "10": {},
+            "11": {},
+            "12": {},
+            "13": {},
+            "14": {},
+            "15": {}
         }
         table = self.bot.dbi.table('raid_bosses')
         query = table.query
@@ -139,7 +147,9 @@ class RaidCog(Cog):
             return level, boss_id, d
         for rcrd in rows:
             level, boss_id, d = data(rcrd)
-            raid_lists[level][boss_id] = d
+            
+            if d.get("available"):
+                raid_lists[level][boss_id] = d
         return raid_lists
 
     async def archive_cat_phrases(self, guild):
@@ -489,13 +499,11 @@ class RaidCog(Cog):
                             mention = channel.mention
                             mentions.append(mention)
                         if mentions:
-                            return await ctx.send(f"""There is already a raid reported at this gym! Coordinate here: {", ".join(mentions)}""", embed=embed)
+                            return await ctx.send(f'There is already a raid reported at this gym! Coordinate here: {", ".join(mentions)}', embed=embed)
                     else:
-                        msg = await ctx.send(f"""There is already a raid reported at this gym! Coordinate here!""", embed=embed)
+                        msg = await ctx.send("There is already a raid reported at this gym! Coordinate here!", embed=embed)
                         old_raid.message_ids.append(f"{msg.channel.id}/{msg.id}")
                         return msg
-        if level_or_boss in ['m', '7']:
-            level_or_boss = '7'
         if level_or_boss.isdigit():
             level = level_or_boss
             boss = None
@@ -514,6 +522,60 @@ class RaidCog(Cog):
             hatch = None
         raid_id = next(snowflake.create())
         new_raid = Raid(raid_id, ctx.bot, ctx.guild.id, ctx.channel.id, ctx.author.id, gym, level=level, pkmn=boss, hatch=hatch, end=end, tz=zone)
+        ctx.raid = new_raid
+        return await self.setup_raid(ctx, new_raid)
+
+    async def raid_slash_command_bot(self, message, boss: str, gym: str, minutes_remaining: app_commands.Range[int, 1, 45]=45):
+        ctx = await self.bot.get_context(message, cls=Context)
+        class Object(object):
+            pass
+        a = Object()
+        a.name = 'raid'
+        ctx.command = a
+        ctx.author = message.author
+        try:
+            await raid_checks.is_raid_enabled(ctx)
+            await raid_checks.check_bot_permissions(ctx)
+            await checks.check_location_set(ctx)
+        except Exception as e:
+            self.bot.dispatch('command_error', ctx, e)
+            return
+        zone = await ctx.tz()
+        gym = await Gym.convert(ctx, gym)
+
+        raid_table = ctx.bot.dbi.table('raids')
+        if isinstance(gym, Gym):
+            query = raid_table.query()
+            query.where(gym=str(gym.id), guild=ctx.guild.id)
+            old_raid = await query.get()
+            if old_raid:
+                old_raid = old_raid[0]
+                old_raid = await Raid.from_data(ctx.bot, old_raid)
+                if old_raid.level != 'EX':
+                    if old_raid.hatch:
+                        embed = await old_raid.egg_embed()
+                    else:
+                        embed = await old_raid.raid_embed()
+                    if old_raid.channel_ids:
+                        mentions = []
+                        for channelid in old_raid.channel_ids:
+                            channel = ctx.guild.get_channel(int(channelid))
+                            if not channel:
+                                continue
+                            mention = channel.mention
+                            mentions.append(mention)
+                        if mentions:
+                            return await ctx.send(f'There is already a raid reported at this gym! Coordinate here: {", ".join(mentions)}', embed=embed)
+                    else:
+                        msg = await ctx.send("There is already a raid reported at this gym! Coordinate here!", embed=embed)
+                        old_raid.message_ids.append(f"{msg.channel.id}/{msg.id}")
+                        return msg
+        raid_boss = await RaidBoss.convert(ctx, boss)
+        level = await raid_boss.raid_level()
+        hatch = None
+        end = time.time() + 60*minutes_remaining
+        raid_id = next(snowflake.create())
+        new_raid = Raid(raid_id, self.bot, message.guild.id, message.channel.id, message.author.id, gym, level=level, pkmn=raid_boss, hatch=hatch, end=end, tz=zone)
         ctx.raid = new_raid
         return await self.setup_raid(ctx, new_raid)
 
@@ -557,9 +619,9 @@ class RaidCog(Cog):
                             mention = channel.mention
                             mentions.append(mention)
                         if mentions:
-                            return await ctx.send(f"""There is already a raid reported at this gym! Coordinate here: {", ".join(mentions)}""", embed=embed)
+                            return await ctx.send(f'There is already a raid reported at this gym! Coordinate here: {", ".join(mentions)}', embed=embed)
                     else:
-                        msg = await ctx.send(f"""There is already a raid reported at this gym! Coordinate here!""", embed=embed)
+                        msg = await ctx.send("There is already a raid reported at this gym! Coordinate here!", embed=embed)
                         old_raid.message_ids.append(f"{msg.channel.id}/{msg.id}")
                         return msg
         raid_boss = await RaidBoss.convert(ctx, boss)
@@ -571,11 +633,11 @@ class RaidCog(Cog):
         ctx.raid = new_raid
         return await self.setup_raid(ctx, new_raid)
 
-    async def egg_slash_command(self, interaction: discord.Interaction, level: str, gym: str, minutes_to_hatch: app_commands.Range[int, 1, 60]):
-        message = await interaction.original_message()
+    async def egg_slash_command_bot(self, message, level: str, gym: str, minutes_to_hatch: app_commands.Range[int, 1, 60]):
         ctx = await self.bot.get_context(message, cls=Context)
         zone = await ctx.tz()
-        ctx.author = interaction.user
+        ctx.author = message.author
+
         try:
             await raid_checks.is_raid_enabled(ctx)
             await raid_checks.check_bot_permissions(ctx)
@@ -606,9 +668,57 @@ class RaidCog(Cog):
                             mention = channel.mention
                             mentions.append(mention)
                         if mentions:
-                            return await ctx.send(f"""There is already a raid reported at this gym! Coordinate here: {", ".join(mentions)}""", embed=embed)
+                            return await ctx.send(f'There is already a raid reported at this gym! Coordinate here: {", ".join(mentions)}', embed=embed)
                     else:
-                        msg = await ctx.send(f"""There is already a raid reported at this gym! Coordinate here!""", embed=embed)
+                        msg = await ctx.send("There is already a raid reported at this gym! Coordinate here!", embed=embed)
+                        old_raid.message_ids.append(f"{msg.channel.id}/{msg.id}")
+                        return msg
+        hatch = time.time() + 60*minutes_to_hatch
+        end = hatch + 60*ctx.bot.raid_info.raid_times[level][1]
+        raid_id = next(snowflake.create())
+        new_raid = Raid(raid_id, self.bot, message.guild.id, message.channel.id, message.author.id, gym, level=level, hatch=hatch, end=end, tz=zone)
+        ctx.raid = new_raid
+        return await self.setup_raid(ctx, new_raid)
+
+    async def egg_slash_command(self, interaction: discord.Interaction, level: str, gym: str, minutes_to_hatch: app_commands.Range[int, 1, 60]):
+        message = await interaction.original_message()
+        ctx = await self.bot.get_context(message, cls=Context)
+        zone = await ctx.tz()
+        ctx.author = interaction.user
+
+        try:
+            await raid_checks.is_raid_enabled(ctx)
+            await raid_checks.check_bot_permissions(ctx)
+            await checks.check_location_set(ctx)
+        except Exception as e:
+            self.bot.dispatch('command_error', ctx, e)
+            return
+        gym = await Gym.convert(ctx, gym)
+        raid_table = ctx.bot.dbi.table('raids')
+        if isinstance(gym, Gym):
+            query = raid_table.query()
+            query.where(gym=str(gym.id), guild=ctx.guild.id)
+            old_raid = await query.get()
+            if old_raid:
+                old_raid = old_raid[0]
+                old_raid = await Raid.from_data(ctx.bot, old_raid)
+                if old_raid.level != 'EX':
+                    if old_raid.hatch:
+                        embed = await old_raid.egg_embed()
+                    else:
+                        embed = await old_raid.raid_embed()
+                    if old_raid.channel_ids:
+                        mentions = []
+                        for channelid in old_raid.channel_ids:
+                            channel = ctx.guild.get_channel(int(channelid))
+                            if not channel:
+                                continue
+                            mention = channel.mention
+                            mentions.append(mention)
+                        if mentions:
+                            return await ctx.send(f'There is already a raid reported at this gym! Coordinate here: {", ".join(mentions)}', embed=embed)
+                    else:
+                        msg = await ctx.send("There is already a raid reported at this gym! Coordinate here!", embed=embed)
                         old_raid.message_ids.append(f"{msg.channel.id}/{msg.id}")
                         return msg
         hatch = time.time() + 60*minutes_to_hatch
@@ -1142,7 +1252,7 @@ class RaidCog(Cog):
         """Correct the raid level in an existing raid channel.
 
         Usable only by mods."""
-        possible_levels = ['1', '2', '3', '4', '5', 'EX', '7']
+        possible_levels = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', 'EX']
         if level not in possible_levels:
             return
         raid = Raid.by_channel.get(str(ctx.channel.id))

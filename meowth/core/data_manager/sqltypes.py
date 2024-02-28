@@ -3,7 +3,6 @@ import datetime
 import decimal
 from .errors import SchemaError
 
-
 class SQLType:
     python = None
 
@@ -38,20 +37,17 @@ class SQLType:
     def is_real_type(self):
         return True
 
-
 class BooleanSQL(SQLType):
     python = bool
 
     def to_sql(self):
         return 'BOOLEAN'
 
-
 class DateSQL(SQLType):
     python = datetime.date
 
     def to_sql(self):
         return 'DATE'
-
 
 class DatetimeSQL(SQLType):
     python = datetime.datetime
@@ -64,20 +60,17 @@ class DatetimeSQL(SQLType):
             return 'TIMESTAMP WITH TIMEZONE'
         return 'TIMESTAMP'
 
-
 class DoubleSQL(SQLType):
     python = float
 
     def to_sql(self):
         return 'REAL'
 
-
 class FloatSQL(SQLType):
     python = float
 
     def to_sql(self):
         return 'FLOAT'
-
 
 class IntegerSQL(SQLType):
     python = int
@@ -106,7 +99,6 @@ class IntegerSQL(SQLType):
     def is_real_type(self):
         return not self.auto_increment
 
-
 class IntervalSQL(SQLType):
     python = datetime.timedelta
     valid_fields = (
@@ -128,7 +120,6 @@ class IntervalSQL(SQLType):
             return 'INTERVAL ' + self.field
         return 'INTERVAL'
 
-
 class DecimalSQL(SQLType):
     python = decimal.Decimal
 
@@ -148,13 +139,11 @@ class DecimalSQL(SQLType):
             return f'NUMERIC({self.precision}, {self.scale})'
         return 'NUMERIC'
 
-
 class StringSQL(SQLType):
     python = str
 
     def to_sql(self):
         return 'TEXT'
-
 
 class TimeSQL(SQLType):
     python = datetime.time
@@ -166,7 +155,6 @@ class TimeSQL(SQLType):
         if self.timezone:
             return 'TIME WITH TIME ZONE'
         return 'TIME'
-
 
 class JSONSQL(SQLType):
     python = None

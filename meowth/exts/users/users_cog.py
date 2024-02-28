@@ -66,12 +66,6 @@ class MeowthUser:
         data.select('pokebattler')
         pbid = await data.get_value()
         return pbid
-    
-    async def silph(self):
-        data = self._data
-        data.select('silph')
-        silphid = await data.get_value()
-        return silphid
 
     async def ign(self):
         data = self._data
@@ -93,11 +87,6 @@ class MeowthUser:
     async def set_pokebattler(self, pb_id):
         update = self._update
         update.values(pokebattler=pb_id)
-        await update.commit()
-    
-    async def set_silph(self, silph):
-        update = self._update
-        update.values(silph=silph)
         await update.commit()
     
     async def party(self):

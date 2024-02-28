@@ -10,14 +10,14 @@ with open('README.md') as f:
 
 setup(
     name='Meowth',
-    version='3.0.0b',
+    version='3.0.0',
     author='FoglyOgly, Scragly',
     url='https://github.com/FoglyOgly/Meowth',
     license='GPLv3',
     description='A Discord Bot for Pokemon Go Communities.',
     long_description=readme,
     include_package_data=True,
-
+    packages=['meowth'],
     install_requires=requirements,
 
     # this will be dead next month with the new pip version

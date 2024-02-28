@@ -1,6 +1,6 @@
 import asyncio
 import textwrap
-import gettext
+import builtins
 
 from aiocontextvars import ContextVar
 
@@ -14,7 +14,6 @@ from meowth.utils import convert_to_bool, make_embed, bold
 cvar = ContextVar('bot')
 
 def ctx_setup(loop):
-    import builtins
     builtins.__dict__['_'] = use_current_gettext
     builtins.__dict__['get_ctx'] = cvar.get
     builtins.__dict__['__cvar__'] = cvar
@@ -283,7 +282,7 @@ class Context(commands.Context):
         finally:
             if autodelete:
                 await msg.delete()
-    
+
     async def tz(self):
         if hasattr(self, '_tz'):
             return self._tz
@@ -292,7 +291,7 @@ class Context(commands.Context):
         query.where(channelid=self.channel.id)
         zone = await query.get_value()
         return zone
-    
+
     async def version(self):
         if not self.guild:
             return None
@@ -345,7 +344,7 @@ class GetTools:
                 member = members.get(search_term, None)
             return member
 
-    async def message(self, id, channel=None, guild=None, no_cache=False):
+    async def message(self, message_id, channel=None, guild=None, no_cache=False):
         """Get a message from the current or specified channels.
 
         Parameters
@@ -371,11 +370,11 @@ class GetTools:
                 return None
         channel = channel or self.ctx.channel
         if not no_cache:
-            msg = self.get(channel._state._messages, id=id)
+            msg = self.get(channel._state._messages, id=message_id)
             if msg:
                 return msg
         try:
-            return await channel.fetch_message(id)
+            return await channel.fetch_message(message_id)
         except discord.NotFound:
             return None
 
@@ -520,7 +519,6 @@ class GetTools:
         if isinstance(search_term, int):
             member = guild.get_member(search_term)
             if not member:
-                # TODO
                 pass
             return member
         if isinstance(search_term, str):

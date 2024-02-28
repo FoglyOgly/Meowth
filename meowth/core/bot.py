@@ -152,7 +152,7 @@ class Bot(commands.AutoShardedBot):
     @cached_property
     def invite_url(self):
         invite_url = discord.utils.oauth_url(self.user.id,
-                                             permissions=self.req_perms)
+                                             permissions=self.req_perms).replace("+application.commands","")
         return invite_url
 
     @property
@@ -172,19 +172,19 @@ class Bot(commands.AutoShardedBot):
         uptime = self.uptime
         year_str, month_str, day_str, hour_str = ('',)*4
         if uptime.years >= 1:
-            year_str = "{0}y ".format(uptime.years)
+            year_str = f"{uptime.years}y "
         if uptime.months >= 1 or year_str:
-            month_str = "{0}m ".format(uptime.months)
+            month_str = f"{uptime.months}m "
         if uptime.days >= 1 or month_str:
             d_unit = 'd' if month_str else ' days'
-            day_str = "{0}{1} ".format(uptime.days, d_unit)
+            day_str = f"{uptime.days}{d_unit} "
         if uptime.hours >= 1 or day_str:
             h_unit = ':' if month_str else ' hrs'
-            hour_str = "{0}{1}".format(uptime.hours, h_unit)
+            hour_str = f"{uptime.hours}{h_unit}"
         m_unit = '' if month_str else ' mins'
-        mins = uptime.minutes if month_str else ' {0}'.format(uptime.minutes)
-        secs = '' if day_str else ' {0} secs'.format(uptime.seconds)
-        min_str = "{0}{1}{2}".format(mins, m_unit, secs)
+        mins = uptime.minutes if month_str else f" {uptime.minutes}"
+        secs = '' if day_str else f" {uptime.seconds} secs"
+        min_str = f"{mins}{m_unit}{secs}"
 
         uptime_str = ''.join((year_str, month_str, day_str, hour_str, min_str))
 
@@ -292,11 +292,11 @@ class Bot(commands.AutoShardedBot):
         }
         insert.row(**d)
         await insert.commit(do_update=True)
-    
+
     async def on_message(self, message):
         self.counter["messages_read"] += 1
         await self.process_commands(message)
-    
+
     async def wait_for(self, event, /, *, check=None, timeout=None):
         result = await super().wait_for(event, check=check, timeout=timeout)
         if event == "message":
@@ -323,7 +323,7 @@ class Bot(commands.AutoShardedBot):
 
     async def on_ready(self):
         intro = "Meowth - Discord bot for Pokemon Go Communities"
-        intro_deco = "{0}\n{1}\n{0}".format('='*len(intro), intro)
+        intro_deco = f"{'='*len(intro)}\n{intro}\n{'='*len(intro)}"
         if not self.launch_time:
             self.launch_time = datetime.utcnow()
         if not self.launcher:
@@ -346,10 +346,10 @@ class Bot(commands.AutoShardedBot):
             print("I'm not in any server yet, so be sure to invite me!")
         if self.invite_url:
             print(f"\nInvite URL: {self.invite_url}\n")
-        
+
         # load extensions marked for preload in config
         for ext in self.preload_ext:
-            ext_name = ("meowth.exts."+ext)
+            ext_name = "meowth.exts."+ext
             self.load_extension(ext_name)
 
         if self.from_restart:

@@ -25,8 +25,7 @@ class DatabaseInterface:
                  database="meowth",
                  port=5432):
         self.loop = None
-        self.dsn = "postgres://{}:{}@{}:{}/{}".format(
-            username, password, hostname, port, database)
+        self.dsn = f"postgres://{username}:{password}@{hostname}:{port}/{database}"
         self.pool = None
         self.settings_conn = None
         self.settings_stmt = None
@@ -42,10 +41,10 @@ class DatabaseInterface:
         self.pool = await asyncpg.create_pool(
             self.dsn, loop=loop, init=init_conn)
         await self.prepare()
-        
+
 
     async def recreate_pool(self):
-        logger.warning(f'Re-creating closed database pool.')
+        logger.warning('Re-creating closed database pool.')
         self.pool = await asyncpg.create_pool(
             self.dsn, loop=self.loop, init=init_conn)
 
@@ -67,9 +66,9 @@ class DatabaseInterface:
         for k, v in core_sql.items():
             table_exists = await self.table(k).exists()
             if not table_exists:
-                logger.warning(f'Core table {k} not found. Creating...')
+                logger.warning("Core table %s not found. Creating...", k)
                 await self.execute_transaction(v)
-                logger.warning(f'Core table {k} created.')
+                logger.warning("Core table %s created.", k)
 
     async def stop(self):
         conns = (self.settings_conn, self.listener_conn)
@@ -102,7 +101,7 @@ class DatabaseInterface:
                     result.append(rcrd)
             return result
         except asyncpg.exceptions.InterfaceError as e:
-            logger.error(f'Exception {type(e)}: {e}')
+            logger.error("Exception %s: %s", type(e), e)
             await self.recreate_pool()
             return await self.execute_query(query, *query_args)
 
@@ -123,10 +122,10 @@ class DatabaseInterface:
                             result.append(rcrd)
                 return result
         except asyncpg.exceptions.InterfaceError as e:
-            logger.error(f'Exception {type(e)}: {e}')
+            logger.error("Exception %s: %s", type(e), e)
             await self.recreate_pool()
             return await self.execute_transaction(query, *query_args)
-        
+
     async def add_listeners(self, *listeners):
         con = self.listener_conn
         for listener in listeners:
@@ -135,7 +134,7 @@ class DatabaseInterface:
             self.listeners.append(listener)
             await con.add_listener(listener[0], listener[1])
         return
-    
+
     async def remove_listeners(self, *listeners):
         con = self.listener_conn
         for listener in listeners:
@@ -168,6 +167,6 @@ class DatabaseInterface:
         table.query.where(table_schema='public')
         table.query.order_by('table_name')
         return await table.query.get()
-    
+
     def schema(self, name):
         return Schema(self, name)

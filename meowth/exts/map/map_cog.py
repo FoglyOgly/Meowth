@@ -22,10 +22,9 @@ import requests
 from typing import List
 import tempfile
 
-from .map_info import gmaps_api_key
 from .errors import *
 
-gmaps = googlemaps.Client(key=gmaps_api_key)
+gmaps = googlemaps.Client(key=bot.config.gmapsapikey)
 
 
 class ReportChannel():
@@ -209,7 +208,15 @@ class ReportChannel():
             "5": {},
             "6": {},
             "EX": {},
-            "7": {}
+            "7": {},
+            "8": {},
+            "9": {},
+            "10": {},
+            "11": {},
+            "12": {},
+            "13": {},
+            "14": {},
+            "15": {}
         }
         table = self.bot.dbi.table('raid_bosses')
         query = table.query
@@ -239,7 +246,8 @@ class ReportChannel():
                 regiondata = await query.get()
                 if not regiondata:
                     continue
-            raid_lists[level][boss_id] = d
+            if d.get("available"):
+                raid_lists[level][boss_id] = d
         return raid_lists
 
     async def get_map(self):
@@ -1018,7 +1026,7 @@ class Mapper(Cog):
         content = f"{display_str}\n[Directions]({url})"
         if isinstance(location, Gym):
             thumbnail = ("https://raw.githubusercontent.com/"
-                "FoglyOgly/Meowth/new-core/meowth/images/misc/gym.png")
+                "jackyaz/Meowth/self-host/meowth/images/misc/gym.png")
             if await location._exraid():
                 title = "EX Raid Gym"
             else:
@@ -1026,7 +1034,7 @@ class Mapper(Cog):
         elif isinstance(location, Pokestop):
             title = "Pokestop"
             thumbnail = ("https://raw.githubusercontent.com/"
-                "FoglyOgly/Meowth/new-core/meowth/images/misc/pokestop.png")
+                "jackyaz/Meowth/self-host/meowth/images/misc/pokestop.png")
         color = ctx.guild.me.color
         embed = formatters.make_embed(title=title, content=content, thumbnail=thumbnail, msg_colour=color)
         await ctx.send(embed=embed)

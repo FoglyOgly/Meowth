@@ -147,7 +147,7 @@ def main():
                 pass
 
     # when not restarting, show exit code and exit fully
-    print("Exit code: {exit_code}".format(exit_code=code))
+    print(f"Exit code: {code}")
     sys.exit(code)
 
 if __name__ == '__main__':

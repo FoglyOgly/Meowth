@@ -95,13 +95,13 @@ class CogManager(Cog):
     async def _core(self, ctx):
         """Reload Core Commands."""
         await self.load_extension(
-            ctx, 'Core Commands', f'meowth.core.commands')
+            ctx, 'Core Commands', 'meowth.core.commands')
 
     @load.command(name="cm")
     async def _cm(self, ctx):
         """Reload Cog Manager."""
         await self.load_extension(
-            ctx, 'Cog Manager', f'meowth.core.cog_manager')
+            ctx, 'Cog Manager', 'meowth.core.cog_manager')
 
     @command(category='Owner', name='reload', aliases=['load'])
     async def _reload(self, ctx, *, cogs):

@@ -55,7 +55,7 @@ def do_template(message, author, guild):
     return (msg, not_found)
 
 class AdminCog(Cog):
-    
+
     def __init__(self, bot):
         self.bot = bot
 
@@ -94,7 +94,7 @@ class AdminCog(Cog):
                                 return
                             except:
                                 pass
-    
+
     @Cog.listener()
     async def on_member_join(self, member):
         guild = member.guild
@@ -142,7 +142,7 @@ class AdminCog(Cog):
                 missing_perms.append(x[0])
         missing_perms = [x.replace('_', ' ').replace('guild', 'server').title() for x in missing_perms]
         return missing_perms
-    
+
     async def welcome_channel(self, guild):
         table = self.bot.dbi.table('welcome')
         query = table.query
@@ -160,7 +160,7 @@ class AdminCog(Cog):
             return 'dm', message
         else:
             return None, None
-    
+
     async def archive_cat_phrases(self, guild):
         table = self.bot.dbi.table('archive')
         query = table.query
@@ -174,7 +174,7 @@ class AdminCog(Cog):
         cat = self.bot.get_channel(catid)
         phrase_list = data.get('phrase_list', [])
         return cat, phrase_list
-    
+
     @command()
     @commands.has_permissions(manage_guild=True)
     async def teamrole(self, ctx, team: Team, role: discord.Role):
@@ -236,7 +236,7 @@ class AdminCog(Cog):
         insert.rows(rows)
         await insert.commit(do_update=True)
         await ctx.success('Custom roles added', details="\n".join(role_names))
-    
+
     @command()
     @checks.is_admin()
     async def removecustomroles(self, ctx, roles: commands.Greedy[discord.Role]):
@@ -361,56 +361,112 @@ class AdminCog(Cog):
                     await ctx.send('I could not interpret your response. Try again!')
                     continue
         if 'raid' in enabled_commands:
-            raid_levels = ['1', '3', '5', '7', 'EX', 'EX Raid Gyms']
-            for level in raid_levels:
-                column = f'category_{level.lower()}'
-                if level == 'EX Raid Gyms':
-                    column = 'category_ex_gyms'
-                    content = ('I can categorize raids of any level that are reported at '
-                        'recognized EX Raid Gyms differently from other raids of the same level. '
-                        'You can type `disable` if you do not want this, or type the name or ID of '
-                        'the category you want those raid channels to appear in.')
-                else:
-                    if level == '7':
-                        level_str = 'Mega'
-                    elif level == 'EX':
-                        level_str = "EX"
-                    else:
-                        level_str = f"Level {level}"
-                    content = (f'How do you want {level_str} Raids reported in this ' 
-                        'channel to be displayed? You can type `message` if you want just '
-                        'a message in this channel. If you want each raid to be given its own '
-                        'channel for coordination, type the name or ID of the category you '
-                        'want the channel to appear in, or type `none` for an uncategorized '
-                        'channel. You can also type `disable` to disallow reports of '
-                        f'{level_str} Raids in this channel.')
-                await ctx.send(content)
-                def check(m):
-                    return m.author == ctx.message.author and m.channel == ctx.channel
-                while True:
-                    try:
-                        resp = await self.bot.wait_for('message', check=check)
-                    except:
-                        break
-                    if resp.content.lower() == 'message':
-                        rcrd[column] = 'message'
-                        break
-                    elif resp.content.lower() == 'disable':
-                        rcrd[column] = None
-                        break
-                    elif resp.content.lower() == 'none':
-                        rcrd[column] = 'none'
-                        break
-                    else:
-                        converter = commands.CategoryChannelConverter()
-                        category = await converter.convert(ctx, resp.content)
-                        if category:
-                            rcrd[column] = str(category.id)
-                            required_perms['Manage Channels'] = perms.manage_channels
+            raid_levels = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', 'EX', 'EX Raid Gyms']
+
+            await ctx.send('I can use channel categories for to help you organise raids. There are currently 15 raid levels. Would you like to use a single category or multiple categories to organise them?'
+                           'Choose either of `single` or `multiple`.')
+            def check(m):
+                return m.author == ctx.message.author and m.channel == ctx.channel
+            while True:
+                try:
+                    resp = await self.bot.wait_for('message', check=check)
+                except:
+                    break
+                if resp.content.lower() == 'single':
+                    await ctx.send(f'How do you want raids reported in this '
+                            'channel to be displayed? You can type `message` if you want just '
+                            'a message in this channel. If you want each raid to be given its own '
+                            'channel for coordination, type the name or ID of the category you '
+                            'want the channel to appear in, or type `none` for an uncategorized '
+                            'channel.')
+                    while True:
+                        try:
+                            resp = await self.bot.wait_for('message', check=check)
+                        except:
+                            break
+                        if resp.content.lower() == 'message':
+                            for level in raid_levels:
+                                column = f'category_{level.lower()}'
+                                if level == 'EX Raid Gyms':
+                                    column = 'category_ex_gyms'
+                                rcrd[column] = 'message'
+                            break
+                        elif resp.content.lower() == 'none':
+                            for level in raid_levels:
+                                column = f'category_{level.lower()}'
+                                if level == 'EX Raid Gyms':
+                                    column = 'category_ex_gyms'
+                                rcrd[column] = 'none'
                             break
                         else:
-                            await ctx.send('I could not interpret your response. Try again!')
-                            continue
+                            converter = commands.CategoryChannelConverter()
+                            category = await converter.convert(ctx, resp.content)
+                            if category:
+                                for level in raid_levels:
+                                    column = f'category_{level.lower()}'
+                                    if level == 'EX Raid Gyms':
+                                        column = 'category_ex_gyms'
+                                    rcrd[column] = str(category.id)
+                                required_perms['Manage Channels'] = perms.manage_channels
+                                break
+                            else:
+                                await ctx.send('I could not interpret your response. Try again!')
+                                continue
+                    break
+                elif resp.content.lower() == 'multiple':
+                    for level in raid_levels:
+                        column = f'category_{level.lower()}'
+                        if level == 'EX Raid Gyms':
+                            column = 'category_ex_gyms'
+                            content = ('I can categorize raids of any level that are reported at '
+                                'recognized EX Raid Gyms differently from other raids of the same level. '
+                                'You can type `disable` if you do not want this, or type the name or ID of '
+                                'the category you want those raid channels to appear in.')
+                        else:
+                            if level == '6':
+                                level_str = 'Mega (Normal)'
+                            elif level == '7':
+                                level_str = 'Mega (Legendary)'
+                            elif level == 'EX':
+                                level_str = "EX"
+                            else:
+                                level_str = f"Level {level}"
+                            content = (f'How do you want {level_str} Raids reported in this '
+                                'channel to be displayed? You can type `message` if you want just '
+                                'a message in this channel. If you want each raid to be given its own '
+                                'channel for coordination, type the name or ID of the category you '
+                                'want the channel to appear in, or type `none` for an uncategorized '
+                                'channel. You can also type `disable` to disallow reports of '
+                                f'{level_str} Raids in this channel.')
+                        await ctx.send(content)
+                        while True:
+                            try:
+                                resp = await self.bot.wait_for('message', check=check)
+                            except:
+                                break
+                            if resp.content.lower() == 'message':
+                                rcrd[column] = 'message'
+                                break
+                            elif resp.content.lower() == 'disable':
+                                rcrd[column] = None
+                                break
+                            elif resp.content.lower() == 'none':
+                                rcrd[column] = 'none'
+                                break
+                            else:
+                                converter = commands.CategoryChannelConverter()
+                                category = await converter.convert(ctx, resp.content)
+                                if category:
+                                    rcrd[column] = str(category.id)
+                                    required_perms['Manage Channels'] = perms.manage_channels
+                                    break
+                                else:
+                                    await ctx.send('I could not interpret your response. Try again!')
+                                    continue
+                    break
+                else:
+                    await ctx.send("I couldn't understand your reply. Try again.")
+                    continue
         if 'welcome' in enabled_commands:
             old_welcome_channel, message = await self.welcome_channel(ctx.guild)
             new_welcome_channel = None
@@ -771,17 +827,47 @@ class AdminCog(Cog):
                     d['category_3'] = cat
                     d['category_4'] = cat
                     d['category_5'] = cat
+                    d['category_6'] = cat
+                    d['category_7'] = cat
+                    d['category_8'] = cat
+                    d['category_9'] = cat
+                    d['category_10'] = cat
+                    d['category_11'] = cat
+                    d['category_12'] = cat
+                    d['category_13'] = cat
+                    d['category_14'] = cat
+                    d['category_15'] = cat
                 elif catsort == 'level':
                     cat_1 = str(cat_dict.get('1'))
                     cat_2 = str(cat_dict.get('2'))
                     cat_3 = str(cat_dict.get('3'))
                     cat_4 = str(cat_dict.get('4'))
                     cat_5 = str(cat_dict.get('5'))
+                    cat_5 = str(cat_dict.get('6'))
+                    cat_5 = str(cat_dict.get('7'))
+                    cat_5 = str(cat_dict.get('8'))
+                    cat_5 = str(cat_dict.get('9'))
+                    cat_5 = str(cat_dict.get('10'))
+                    cat_5 = str(cat_dict.get('11'))
+                    cat_5 = str(cat_dict.get('12'))
+                    cat_5 = str(cat_dict.get('13'))
+                    cat_5 = str(cat_dict.get('14'))
+                    cat_5 = str(cat_dict.get('15'))
                     d['category_1'] = cat_1
                     d['category_2'] = cat_2
                     d['category_3'] = cat_3
                     d['category_4'] = cat_4
                     d['category_5'] = cat_5
+                    d['category_6'] = cat
+                    d['category_7'] = cat
+                    d['category_8'] = cat
+                    d['category_9'] = cat
+                    d['category_10'] = cat
+                    d['category_11'] = cat
+                    d['category_12'] = cat
+                    d['category_13'] = cat
+                    d['category_14'] = cat
+                    d['category_15'] = cat
                 elif catsort == 'same':
                     cat = str(channel_exists.category.id)
                     d['category_1'] = cat
@@ -789,12 +875,32 @@ class AdminCog(Cog):
                     d['category_3'] = cat
                     d['category_4'] = cat
                     d['category_5'] = cat
+                    d['category_6'] = cat
+                    d['category_7'] = cat
+                    d['category_8'] = cat
+                    d['category_9'] = cat
+                    d['category_10'] = cat
+                    d['category_11'] = cat
+                    d['category_12'] = cat
+                    d['category_13'] = cat
+                    d['category_14'] = cat
+                    d['category_15'] = cat
                 else:
                     d['category_1'] = 'none'
                     d['category_2'] = 'none'
                     d['category_3'] = 'none'
                     d['category_4'] = 'none'
                     d['category_5'] = 'none'
+                    d['category_6'] = 'none'
+                    d['category_7'] = 'none'
+                    d['category_8'] = 'none'
+                    d['category_9'] = 'none'
+                    d['category_10'] = 'none'
+                    d['category_11'] = 'none'
+                    d['category_12'] = 'none'
+                    d['category_13'] = 'none'
+                    d['category_14'] = 'none'
+                    d['category_15'] = 'none'
                 report_channels[chan] = d
         exraid_dict = old_config.get('exraid', {})
         if exraid_dict.get('enabled'):
@@ -940,7 +1046,7 @@ class AdminCog(Cog):
             except:
                 pass
         await ctx.send(f'Deleted {deleted_roles} empty roles')
-    
+
     @command()
     @checks.is_admin()
     async def configure(self, ctx):
@@ -965,4 +1071,4 @@ class AdminCog(Cog):
             f'Meowth 2.0 configuration, please use `{ctx.prefix}importconfig` to attempt to '
             'import your settings before attempting to configure Meowth 3.0. If this is not done, '
             'you may find that both Meowth versions attempt to respond to your commands.')
-    
+

@@ -37,7 +37,7 @@ COMMENT ON EXTENSION adminpack IS 'administrative functions for PostgreSQL';
 
 --
 -- TOC entry 280 (class 1255 OID 16409)
--- Name: cancel(); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: cancel(); Type: FUNCTION; Schema: public; Owner: meowth
 --
 
 CREATE FUNCTION public.cancel() RETURNS trigger
@@ -53,11 +53,11 @@ END;
 $$;
 
 
-ALTER FUNCTION public.cancel() OWNER TO postgres;
+ALTER FUNCTION public.cancel() OWNER TO meowth;
 
 --
 -- TOC entry 281 (class 1255 OID 16410)
--- Name: enable_forecast(); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: enable_forecast(); Type: FUNCTION; Schema: public; Owner: meowth
 --
 
 CREATE FUNCTION public.enable_forecast() RETURNS trigger
@@ -70,11 +70,11 @@ END;
 $$;
 
 
-ALTER FUNCTION public.enable_forecast() OWNER TO postgres;
+ALTER FUNCTION public.enable_forecast() OWNER TO meowth;
 
 --
 -- TOC entry 282 (class 1255 OID 16411)
--- Name: get_message_ids(bigint); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: get_message_ids(bigint); Type: FUNCTION; Schema: public; Owner: meowth
 --
 
 CREATE FUNCTION public.get_message_ids(bigint) RETURNS text[]
@@ -84,11 +84,11 @@ SELECT messages FROM raids WHERE id = $1
 $_$;
 
 
-ALTER FUNCTION public.get_message_ids(bigint) OWNER TO postgres;
+ALTER FUNCTION public.get_message_ids(bigint) OWNER TO meowth;
 
 --
 -- TOC entry 283 (class 1255 OID 16412)
--- Name: get_raid_messages(bigint); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: get_raid_messages(bigint); Type: FUNCTION; Schema: public; Owner: meowth
 --
 
 CREATE FUNCTION public.get_raid_messages(x bigint) RETURNS text[]
@@ -103,11 +103,11 @@ END;
 $$;
 
 
-ALTER FUNCTION public.get_raid_messages(x bigint) OWNER TO postgres;
+ALTER FUNCTION public.get_raid_messages(x bigint) OWNER TO meowth;
 
 --
 -- TOC entry 284 (class 1255 OID 16413)
--- Name: insert_reverse_travel(); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: insert_reverse_travel(); Type: FUNCTION; Schema: public; Owner: meowth
 --
 
 CREATE FUNCTION public.insert_reverse_travel() RETURNS trigger
@@ -123,11 +123,11 @@ END;
 $$;
 
 
-ALTER FUNCTION public.insert_reverse_travel() OWNER TO postgres;
+ALTER FUNCTION public.insert_reverse_travel() OWNER TO meowth;
 
 --
 -- TOC entry 285 (class 1255 OID 16414)
--- Name: notify_messages(bigint, text[]); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: notify_messages(bigint, text[]); Type: FUNCTION; Schema: public; Owner: meowth
 --
 
 CREATE FUNCTION public.notify_messages(raidid bigint, list text[]) RETURNS void
@@ -139,11 +139,11 @@ END;
 $$;
 
 
-ALTER FUNCTION public.notify_messages(raidid bigint, list text[]) OWNER TO postgres;
+ALTER FUNCTION public.notify_messages(raidid bigint, list text[]) OWNER TO meowth;
 
 --
 -- TOC entry 286 (class 1255 OID 16415)
--- Name: rsvp_notify(); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: rsvp_notify(); Type: FUNCTION; Schema: public; Owner: meowth
 --
 
 CREATE FUNCTION public.rsvp_notify() RETURNS trigger
@@ -155,11 +155,11 @@ END;
 $$;
 
 
-ALTER FUNCTION public.rsvp_notify() OWNER TO postgres;
+ALTER FUNCTION public.rsvp_notify() OWNER TO meowth;
 
 --
 -- TOC entry 287 (class 1255 OID 16416)
--- Name: unhere(); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: unhere(); Type: FUNCTION; Schema: public; Owner: meowth
 --
 
 CREATE FUNCTION public.unhere() RETURNS trigger
@@ -178,11 +178,11 @@ END;
 $$;
 
 
-ALTER FUNCTION public.unhere() OWNER TO postgres;
+ALTER FUNCTION public.unhere() OWNER TO meowth;
 
 --
 -- TOC entry 288 (class 1255 OID 16417)
--- Name: update_cells(); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: update_cells(); Type: FUNCTION; Schema: public; Owner: meowth
 --
 
 CREATE FUNCTION public.update_cells() RETURNS trigger
@@ -202,11 +202,11 @@ END;
 $$;
 
 
-ALTER FUNCTION public.update_cells() OWNER TO postgres;
+ALTER FUNCTION public.update_cells() OWNER TO meowth;
 
 --
 -- TOC entry 289 (class 1255 OID 16418)
--- Name: update_meetuprsvp(); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: update_meetuprsvp(); Type: FUNCTION; Schema: public; Owner: meowth
 --
 
 CREATE FUNCTION public.update_meetuprsvp() RETURNS trigger
@@ -232,11 +232,11 @@ END;
 $$;
 
 
-ALTER FUNCTION public.update_meetuprsvp() OWNER TO postgres;
+ALTER FUNCTION public.update_meetuprsvp() OWNER TO meowth;
 
 --
 -- TOC entry 290 (class 1255 OID 16419)
--- Name: update_raid_weather(); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: update_raid_weather(); Type: FUNCTION; Schema: public; Owner: meowth
 --
 
 CREATE FUNCTION public.update_raid_weather() RETURNS trigger
@@ -257,11 +257,11 @@ END;
 $$;
 
 
-ALTER FUNCTION public.update_raid_weather() OWNER TO postgres;
+ALTER FUNCTION public.update_raid_weather() OWNER TO meowth;
 
 --
 -- TOC entry 302 (class 1255 OID 16420)
--- Name: update_rsvp(); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: update_rsvp(); Type: FUNCTION; Schema: public; Owner: meowth
 --
 
 CREATE FUNCTION public.update_rsvp() RETURNS trigger
@@ -303,11 +303,11 @@ END;
 $$;
 
 
-ALTER FUNCTION public.update_rsvp() OWNER TO postgres;
+ALTER FUNCTION public.update_rsvp() OWNER TO meowth;
 
 --
 -- TOC entry 303 (class 1255 OID 16421)
--- Name: update_trainrsvp(); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: update_trainrsvp(); Type: FUNCTION; Schema: public; Owner: meowth
 --
 
 CREATE FUNCTION public.update_trainrsvp() RETURNS trigger
@@ -336,11 +336,11 @@ END;
 $$;
 
 
-ALTER FUNCTION public.update_trainrsvp() OWNER TO postgres;
+ALTER FUNCTION public.update_trainrsvp() OWNER TO meowth;
 
 --
 -- TOC entry 304 (class 1255 OID 16422)
--- Name: update_weather(); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: update_weather(); Type: FUNCTION; Schema: public; Owner: meowth
 --
 
 CREATE FUNCTION public.update_weather() RETURNS void
@@ -356,7 +356,7 @@ END;
 $$;
 
 
-ALTER FUNCTION public.update_weather() OWNER TO postgres;
+ALTER FUNCTION public.update_weather() OWNER TO meowth;
 
 SET default_tablespace = '';
 
@@ -364,7 +364,7 @@ SET default_table_access_method = heap;
 
 --
 -- TOC entry 215 (class 1259 OID 16423)
--- Name: accuweather; Type: TABLE; Schema: public; Owner: postgres
+-- Name: accuweather; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.accuweather (
@@ -374,11 +374,11 @@ CREATE TABLE public.accuweather (
 );
 
 
-ALTER TABLE public.accuweather OWNER TO postgres;
+ALTER TABLE public.accuweather OWNER TO meowth;
 
 --
 -- TOC entry 216 (class 1259 OID 16428)
--- Name: archive; Type: TABLE; Schema: public; Owner: postgres
+-- Name: archive; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.archive (
@@ -388,11 +388,11 @@ CREATE TABLE public.archive (
 );
 
 
-ALTER TABLE public.archive OWNER TO postgres;
+ALTER TABLE public.archive OWNER TO meowth;
 
 --
 -- TOC entry 217 (class 1259 OID 16433)
--- Name: command_log; Type: TABLE; Schema: public; Owner: postgres
+-- Name: command_log; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.command_log (
@@ -411,11 +411,11 @@ CREATE TABLE public.command_log (
 );
 
 
-ALTER TABLE public.command_log OWNER TO postgres;
+ALTER TABLE public.command_log OWNER TO meowth;
 
 --
 -- TOC entry 218 (class 1259 OID 16439)
--- Name: counters_data; Type: TABLE; Schema: public; Owner: postgres
+-- Name: counters_data; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.counters_data (
@@ -447,11 +447,11 @@ CREATE TABLE public.counters_data (
 );
 
 
-ALTER TABLE public.counters_data OWNER TO postgres;
+ALTER TABLE public.counters_data OWNER TO meowth;
 
 --
 -- TOC entry 219 (class 1259 OID 16444)
--- Name: cpm_table; Type: TABLE; Schema: public; Owner: postgres
+-- Name: cpm_table; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.cpm_table (
@@ -460,11 +460,11 @@ CREATE TABLE public.cpm_table (
 );
 
 
-ALTER TABLE public.cpm_table OWNER TO postgres;
+ALTER TABLE public.cpm_table OWNER TO meowth;
 
 --
 -- TOC entry 220 (class 1259 OID 16447)
--- Name: current_weather; Type: TABLE; Schema: public; Owner: postgres
+-- Name: current_weather; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.current_weather (
@@ -476,11 +476,11 @@ CREATE TABLE public.current_weather (
 );
 
 
-ALTER TABLE public.current_weather OWNER TO postgres;
+ALTER TABLE public.current_weather OWNER TO meowth;
 
 --
 -- TOC entry 221 (class 1259 OID 16452)
--- Name: custom_roles; Type: TABLE; Schema: public; Owner: postgres
+-- Name: custom_roles; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.custom_roles (
@@ -489,11 +489,11 @@ CREATE TABLE public.custom_roles (
 );
 
 
-ALTER TABLE public.custom_roles OWNER TO postgres;
+ALTER TABLE public.custom_roles OWNER TO meowth;
 
 --
 -- TOC entry 222 (class 1259 OID 16455)
--- Name: discord_logs; Type: TABLE; Schema: public; Owner: postgres
+-- Name: discord_logs; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.discord_logs (
@@ -510,11 +510,11 @@ CREATE TABLE public.discord_logs (
 );
 
 
-ALTER TABLE public.discord_logs OWNER TO postgres;
+ALTER TABLE public.discord_logs OWNER TO meowth;
 
 --
 -- TOC entry 223 (class 1259 OID 16460)
--- Name: discord_messages; Type: TABLE; Schema: public; Owner: postgres
+-- Name: discord_messages; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.discord_messages (
@@ -533,11 +533,11 @@ CREATE TABLE public.discord_messages (
 );
 
 
-ALTER TABLE public.discord_messages OWNER TO postgres;
+ALTER TABLE public.discord_messages OWNER TO meowth;
 
 --
 -- TOC entry 224 (class 1259 OID 16467)
--- Name: forecast_config; Type: TABLE; Schema: public; Owner: postgres
+-- Name: forecast_config; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.forecast_config (
@@ -547,11 +547,11 @@ CREATE TABLE public.forecast_config (
 );
 
 
-ALTER TABLE public.forecast_config OWNER TO postgres;
+ALTER TABLE public.forecast_config OWNER TO meowth;
 
 --
 -- TOC entry 225 (class 1259 OID 16470)
--- Name: form_names; Type: TABLE; Schema: public; Owner: postgres
+-- Name: form_names; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.form_names (
@@ -561,11 +561,11 @@ CREATE TABLE public.form_names (
 );
 
 
-ALTER TABLE public.form_names OWNER TO postgres;
+ALTER TABLE public.form_names OWNER TO meowth;
 
 --
 -- TOC entry 226 (class 1259 OID 16475)
--- Name: forms; Type: TABLE; Schema: public; Owner: postgres
+-- Name: forms; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.forms (
@@ -574,11 +574,11 @@ CREATE TABLE public.forms (
 );
 
 
-ALTER TABLE public.forms OWNER TO postgres;
+ALTER TABLE public.forms OWNER TO meowth;
 
 --
 -- TOC entry 227 (class 1259 OID 16480)
--- Name: guild_config; Type: TABLE; Schema: public; Owner: postgres
+-- Name: guild_config; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.guild_config (
@@ -588,11 +588,11 @@ CREATE TABLE public.guild_config (
 );
 
 
-ALTER TABLE public.guild_config OWNER TO postgres;
+ALTER TABLE public.guild_config OWNER TO meowth;
 
 --
 -- TOC entry 228 (class 1259 OID 16485)
--- Name: guild_settings; Type: TABLE; Schema: public; Owner: postgres
+-- Name: guild_settings; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.guild_settings (
@@ -601,11 +601,11 @@ CREATE TABLE public.guild_settings (
 );
 
 
-ALTER TABLE public.guild_settings OWNER TO postgres;
+ALTER TABLE public.guild_settings OWNER TO meowth;
 
 --
 -- TOC entry 229 (class 1259 OID 16490)
--- Name: gym_travel; Type: TABLE; Schema: public; Owner: postgres
+-- Name: gym_travel; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.gym_travel (
@@ -615,11 +615,11 @@ CREATE TABLE public.gym_travel (
 );
 
 
-ALTER TABLE public.gym_travel OWNER TO postgres;
+ALTER TABLE public.gym_travel OWNER TO meowth;
 
 --
 -- TOC entry 230 (class 1259 OID 16493)
--- Name: gyms; Type: TABLE; Schema: public; Owner: postgres
+-- Name: gyms; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.gyms (
@@ -634,11 +634,11 @@ CREATE TABLE public.gyms (
 );
 
 
-ALTER TABLE public.gyms OWNER TO postgres;
+ALTER TABLE public.gyms OWNER TO meowth;
 
 --
 -- TOC entry 231 (class 1259 OID 16498)
--- Name: gyms_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: gyms_id_seq; Type: SEQUENCE; Schema: public; Owner: meowth
 --
 
 CREATE SEQUENCE public.gyms_id_seq
@@ -649,12 +649,12 @@ CREATE SEQUENCE public.gyms_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.gyms_id_seq OWNER TO postgres;
+ALTER TABLE public.gyms_id_seq OWNER TO meowth;
 
 --
 -- TOC entry 3711 (class 0 OID 0)
 -- Dependencies: 231
--- Name: gyms_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: gyms_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: meowth
 --
 
 ALTER SEQUENCE public.gyms_id_seq OWNED BY public.gyms.id;
@@ -662,7 +662,7 @@ ALTER SEQUENCE public.gyms_id_seq OWNED BY public.gyms.id;
 
 --
 -- TOC entry 232 (class 1259 OID 16499)
--- Name: integers; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: integers; Type: SEQUENCE; Schema: public; Owner: meowth
 --
 
 CREATE SEQUENCE public.integers
@@ -673,11 +673,11 @@ CREATE SEQUENCE public.integers
     CACHE 1;
 
 
-ALTER TABLE public.integers OWNER TO postgres;
+ALTER TABLE public.integers OWNER TO meowth;
 
 --
 -- TOC entry 233 (class 1259 OID 16500)
--- Name: item_names; Type: TABLE; Schema: public; Owner: postgres
+-- Name: item_names; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.item_names (
@@ -687,11 +687,11 @@ CREATE TABLE public.item_names (
 );
 
 
-ALTER TABLE public.item_names OWNER TO postgres;
+ALTER TABLE public.item_names OWNER TO meowth;
 
 --
 -- TOC entry 234 (class 1259 OID 16505)
--- Name: languages; Type: TABLE; Schema: public; Owner: postgres
+-- Name: languages; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.languages (
@@ -703,11 +703,11 @@ CREATE TABLE public.languages (
 );
 
 
-ALTER TABLE public.languages OWNER TO postgres;
+ALTER TABLE public.languages OWNER TO meowth;
 
 --
 -- TOC entry 235 (class 1259 OID 16510)
--- Name: meetup_rsvp; Type: TABLE; Schema: public; Owner: postgres
+-- Name: meetup_rsvp; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.meetup_rsvp (
@@ -718,11 +718,11 @@ CREATE TABLE public.meetup_rsvp (
 );
 
 
-ALTER TABLE public.meetup_rsvp OWNER TO postgres;
+ALTER TABLE public.meetup_rsvp OWNER TO meowth;
 
 --
 -- TOC entry 236 (class 1259 OID 16515)
--- Name: meetups; Type: TABLE; Schema: public; Owner: postgres
+-- Name: meetups; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.meetups (
@@ -738,11 +738,11 @@ CREATE TABLE public.meetups (
 );
 
 
-ALTER TABLE public.meetups OWNER TO postgres;
+ALTER TABLE public.meetups OWNER TO meowth;
 
 --
 -- TOC entry 237 (class 1259 OID 16520)
--- Name: meowth_logs; Type: TABLE; Schema: public; Owner: postgres
+-- Name: meowth_logs; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.meowth_logs (
@@ -759,11 +759,11 @@ CREATE TABLE public.meowth_logs (
 );
 
 
-ALTER TABLE public.meowth_logs OWNER TO postgres;
+ALTER TABLE public.meowth_logs OWNER TO meowth;
 
 --
 -- TOC entry 238 (class 1259 OID 16525)
--- Name: modifiers; Type: TABLE; Schema: public; Owner: postgres
+-- Name: modifiers; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.modifiers (
@@ -778,11 +778,11 @@ CREATE TABLE public.modifiers (
 );
 
 
-ALTER TABLE public.modifiers OWNER TO postgres;
+ALTER TABLE public.modifiers OWNER TO meowth;
 
 --
 -- TOC entry 239 (class 1259 OID 16530)
--- Name: move_names; Type: TABLE; Schema: public; Owner: postgres
+-- Name: move_names; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.move_names (
@@ -792,11 +792,11 @@ CREATE TABLE public.move_names (
 );
 
 
-ALTER TABLE public.move_names OWNER TO postgres;
+ALTER TABLE public.move_names OWNER TO meowth;
 
 --
 -- TOC entry 240 (class 1259 OID 16535)
--- Name: moves; Type: TABLE; Schema: public; Owner: postgres
+-- Name: moves; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.moves (
@@ -813,11 +813,11 @@ CREATE TABLE public.moves (
 );
 
 
-ALTER TABLE public.moves OWNER TO postgres;
+ALTER TABLE public.moves OWNER TO meowth;
 
 --
 -- TOC entry 241 (class 1259 OID 16540)
--- Name: movesets; Type: TABLE; Schema: public; Owner: postgres
+-- Name: movesets; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.movesets (
@@ -827,11 +827,11 @@ CREATE TABLE public.movesets (
 );
 
 
-ALTER TABLE public.movesets OWNER TO postgres;
+ALTER TABLE public.movesets OWNER TO meowth;
 
 --
 -- TOC entry 242 (class 1259 OID 16545)
--- Name: pokedex; Type: TABLE; Schema: public; Owner: postgres
+-- Name: pokedex; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.pokedex (
@@ -843,11 +843,11 @@ CREATE TABLE public.pokedex (
 );
 
 
-ALTER TABLE public.pokedex OWNER TO postgres;
+ALTER TABLE public.pokedex OWNER TO meowth;
 
 --
 -- TOC entry 243 (class 1259 OID 16550)
--- Name: pokemon; Type: TABLE; Schema: public; Owner: postgres
+-- Name: pokemon; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.pokemon (
@@ -884,11 +884,11 @@ CREATE TABLE public.pokemon (
 );
 
 
-ALTER TABLE public.pokemon OWNER TO postgres;
+ALTER TABLE public.pokemon OWNER TO meowth;
 
 --
 -- TOC entry 244 (class 1259 OID 16555)
--- Name: pokestops; Type: TABLE; Schema: public; Owner: postgres
+-- Name: pokestops; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.pokestops (
@@ -902,11 +902,11 @@ CREATE TABLE public.pokestops (
 );
 
 
-ALTER TABLE public.pokestops OWNER TO postgres;
+ALTER TABLE public.pokestops OWNER TO meowth;
 
 --
 -- TOC entry 245 (class 1259 OID 16560)
--- Name: pokestops_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: pokestops_id_seq; Type: SEQUENCE; Schema: public; Owner: meowth
 --
 
 CREATE SEQUENCE public.pokestops_id_seq
@@ -917,12 +917,12 @@ CREATE SEQUENCE public.pokestops_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.pokestops_id_seq OWNER TO postgres;
+ALTER TABLE public.pokestops_id_seq OWNER TO meowth;
 
 --
 -- TOC entry 3712 (class 0 OID 0)
 -- Dependencies: 245
--- Name: pokestops_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: pokestops_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: meowth
 --
 
 ALTER SEQUENCE public.pokestops_id_seq OWNED BY public.pokestops.id;
@@ -930,7 +930,7 @@ ALTER SEQUENCE public.pokestops_id_seq OWNED BY public.pokestops.id;
 
 --
 -- TOC entry 246 (class 1259 OID 16561)
--- Name: prefixes; Type: TABLE; Schema: public; Owner: postgres
+-- Name: prefixes; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.prefixes (
@@ -939,11 +939,11 @@ CREATE TABLE public.prefixes (
 );
 
 
-ALTER TABLE public.prefixes OWNER TO postgres;
+ALTER TABLE public.prefixes OWNER TO meowth;
 
 --
 -- TOC entry 247 (class 1259 OID 16566)
--- Name: raid_bosses; Type: TABLE; Schema: public; Owner: postgres
+-- Name: raid_bosses; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.raid_bosses (
@@ -958,11 +958,11 @@ CREATE TABLE public.raid_bosses (
 );
 
 
-ALTER TABLE public.raid_bosses OWNER TO postgres;
+ALTER TABLE public.raid_bosses OWNER TO meowth;
 
 --
 -- TOC entry 248 (class 1259 OID 16571)
--- Name: raid_groups; Type: TABLE; Schema: public; Owner: postgres
+-- Name: raid_groups; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.raid_groups (
@@ -974,11 +974,11 @@ CREATE TABLE public.raid_groups (
 );
 
 
-ALTER TABLE public.raid_groups OWNER TO postgres;
+ALTER TABLE public.raid_groups OWNER TO meowth;
 
 --
 -- TOC entry 249 (class 1259 OID 16576)
--- Name: raid_groups_grp_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: raid_groups_grp_id_seq; Type: SEQUENCE; Schema: public; Owner: meowth
 --
 
 CREATE SEQUENCE public.raid_groups_grp_id_seq
@@ -989,12 +989,12 @@ CREATE SEQUENCE public.raid_groups_grp_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.raid_groups_grp_id_seq OWNER TO postgres;
+ALTER TABLE public.raid_groups_grp_id_seq OWNER TO meowth;
 
 --
 -- TOC entry 3713 (class 0 OID 0)
 -- Dependencies: 249
--- Name: raid_groups_grp_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: raid_groups_grp_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: meowth
 --
 
 ALTER SEQUENCE public.raid_groups_grp_id_seq OWNED BY public.raid_groups.grp_id;
@@ -1002,7 +1002,7 @@ ALTER SEQUENCE public.raid_groups_grp_id_seq OWNED BY public.raid_groups.grp_id;
 
 --
 -- TOC entry 250 (class 1259 OID 16577)
--- Name: raid_rsvp; Type: TABLE; Schema: public; Owner: postgres
+-- Name: raid_rsvp; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.raid_rsvp (
@@ -1017,11 +1017,11 @@ CREATE TABLE public.raid_rsvp (
 );
 
 
-ALTER TABLE public.raid_rsvp OWNER TO postgres;
+ALTER TABLE public.raid_rsvp OWNER TO meowth;
 
 --
 -- TOC entry 251 (class 1259 OID 16583)
--- Name: raids; Type: TABLE; Schema: public; Owner: postgres
+-- Name: raids; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.raids (
@@ -1042,11 +1042,11 @@ CREATE TABLE public.raids (
 );
 
 
-ALTER TABLE public.raids OWNER TO postgres;
+ALTER TABLE public.raids OWNER TO meowth;
 
 --
 -- TOC entry 252 (class 1259 OID 16588)
--- Name: raids_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: raids_id_seq; Type: SEQUENCE; Schema: public; Owner: meowth
 --
 
 CREATE SEQUENCE public.raids_id_seq
@@ -1057,12 +1057,12 @@ CREATE SEQUENCE public.raids_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.raids_id_seq OWNER TO postgres;
+ALTER TABLE public.raids_id_seq OWNER TO meowth;
 
 --
 -- TOC entry 3714 (class 0 OID 0)
 -- Dependencies: 252
--- Name: raids_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: raids_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: meowth
 --
 
 ALTER SEQUENCE public.raids_id_seq OWNED BY public.raids.id;
@@ -1070,7 +1070,7 @@ ALTER SEQUENCE public.raids_id_seq OWNED BY public.raids.id;
 
 --
 -- TOC entry 253 (class 1259 OID 16589)
--- Name: regional_raids; Type: TABLE; Schema: public; Owner: postgres
+-- Name: regional_raids; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.regional_raids (
@@ -1082,11 +1082,11 @@ CREATE TABLE public.regional_raids (
 );
 
 
-ALTER TABLE public.regional_raids OWNER TO postgres;
+ALTER TABLE public.regional_raids OWNER TO meowth;
 
 --
 -- TOC entry 254 (class 1259 OID 16594)
--- Name: report_channels; Type: TABLE; Schema: public; Owner: postgres
+-- Name: report_channels; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.report_channels (
@@ -1114,15 +1114,24 @@ CREATE TABLE public.report_channels (
     meetup boolean,
     category_meetup numeric(20,0),
     rocket boolean,
-    category_7 text
+    category_6 text,
+    category_7 text,
+    category_8 text,
+    category_9 text,
+    category_10 text,
+    category_11 text,
+    category_12 text,
+    category_13 text,
+    category_14 text,
+    category_15 text
 );
 
 
-ALTER TABLE public.report_channels OWNER TO postgres;
+ALTER TABLE public.report_channels OWNER TO meowth;
 
 --
 -- TOC entry 255 (class 1259 OID 16606)
--- Name: research; Type: TABLE; Schema: public; Owner: postgres
+-- Name: research; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.research (
@@ -1139,11 +1148,11 @@ CREATE TABLE public.research (
 );
 
 
-ALTER TABLE public.research OWNER TO postgres;
+ALTER TABLE public.research OWNER TO meowth;
 
 --
 -- TOC entry 256 (class 1259 OID 16611)
--- Name: research_tasks; Type: TABLE; Schema: public; Owner: postgres
+-- Name: research_tasks; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.research_tasks (
@@ -1152,11 +1161,11 @@ CREATE TABLE public.research_tasks (
 );
 
 
-ALTER TABLE public.research_tasks OWNER TO postgres;
+ALTER TABLE public.research_tasks OWNER TO meowth;
 
 --
 -- TOC entry 257 (class 1259 OID 16616)
--- Name: restart_savedata; Type: TABLE; Schema: public; Owner: postgres
+-- Name: restart_savedata; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.restart_savedata (
@@ -1168,11 +1177,11 @@ CREATE TABLE public.restart_savedata (
 );
 
 
-ALTER TABLE public.restart_savedata OWNER TO postgres;
+ALTER TABLE public.restart_savedata OWNER TO meowth;
 
 --
 -- TOC entry 258 (class 1259 OID 16619)
--- Name: rockets; Type: TABLE; Schema: public; Owner: postgres
+-- Name: rockets; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.rockets (
@@ -1187,11 +1196,11 @@ CREATE TABLE public.rockets (
 );
 
 
-ALTER TABLE public.rockets OWNER TO postgres;
+ALTER TABLE public.rockets OWNER TO meowth;
 
 --
 -- TOC entry 259 (class 1259 OID 16624)
--- Name: scoreboard; Type: TABLE; Schema: public; Owner: postgres
+-- Name: scoreboard; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.scoreboard (
@@ -1205,11 +1214,11 @@ CREATE TABLE public.scoreboard (
 );
 
 
-ALTER TABLE public.scoreboard OWNER TO postgres;
+ALTER TABLE public.scoreboard OWNER TO meowth;
 
 --
 -- TOC entry 260 (class 1259 OID 16627)
--- Name: task_names; Type: TABLE; Schema: public; Owner: postgres
+-- Name: task_names; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.task_names (
@@ -1220,11 +1229,11 @@ CREATE TABLE public.task_names (
 );
 
 
-ALTER TABLE public.task_names OWNER TO postgres;
+ALTER TABLE public.task_names OWNER TO meowth;
 
 --
 -- TOC entry 261 (class 1259 OID 16632)
--- Name: team_names; Type: TABLE; Schema: public; Owner: postgres
+-- Name: team_names; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.team_names (
@@ -1234,11 +1243,11 @@ CREATE TABLE public.team_names (
 );
 
 
-ALTER TABLE public.team_names OWNER TO postgres;
+ALTER TABLE public.team_names OWNER TO meowth;
 
 --
 -- TOC entry 262 (class 1259 OID 16637)
--- Name: team_roles; Type: TABLE; Schema: public; Owner: postgres
+-- Name: team_roles; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.team_roles (
@@ -1249,11 +1258,11 @@ CREATE TABLE public.team_roles (
 );
 
 
-ALTER TABLE public.team_roles OWNER TO postgres;
+ALTER TABLE public.team_roles OWNER TO meowth;
 
 --
 -- TOC entry 263 (class 1259 OID 16640)
--- Name: teams; Type: TABLE; Schema: public; Owner: postgres
+-- Name: teams; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.teams (
@@ -1264,11 +1273,11 @@ CREATE TABLE public.teams (
 );
 
 
-ALTER TABLE public.teams OWNER TO postgres;
+ALTER TABLE public.teams OWNER TO meowth;
 
 --
 -- TOC entry 264 (class 1259 OID 16645)
--- Name: to_archive; Type: TABLE; Schema: public; Owner: postgres
+-- Name: to_archive; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.to_archive (
@@ -1278,11 +1287,11 @@ CREATE TABLE public.to_archive (
 );
 
 
-ALTER TABLE public.to_archive OWNER TO postgres;
+ALTER TABLE public.to_archive OWNER TO meowth;
 
 --
 -- TOC entry 265 (class 1259 OID 16650)
--- Name: trades; Type: TABLE; Schema: public; Owner: postgres
+-- Name: trades; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.trades (
@@ -1296,11 +1305,11 @@ CREATE TABLE public.trades (
 );
 
 
-ALTER TABLE public.trades OWNER TO postgres;
+ALTER TABLE public.trades OWNER TO meowth;
 
 --
 -- TOC entry 266 (class 1259 OID 16655)
--- Name: trades_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: trades_id_seq; Type: SEQUENCE; Schema: public; Owner: meowth
 --
 
 CREATE SEQUENCE public.trades_id_seq
@@ -1311,12 +1320,12 @@ CREATE SEQUENCE public.trades_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.trades_id_seq OWNER TO postgres;
+ALTER TABLE public.trades_id_seq OWNER TO meowth;
 
 --
 -- TOC entry 3715 (class 0 OID 0)
 -- Dependencies: 266
--- Name: trades_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: trades_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: meowth
 --
 
 ALTER SEQUENCE public.trades_id_seq OWNED BY public.trades.id;
@@ -1324,7 +1333,7 @@ ALTER SEQUENCE public.trades_id_seq OWNED BY public.trades.id;
 
 --
 -- TOC entry 267 (class 1259 OID 16656)
--- Name: train_rsvp; Type: TABLE; Schema: public; Owner: postgres
+-- Name: train_rsvp; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.train_rsvp (
@@ -1334,11 +1343,11 @@ CREATE TABLE public.train_rsvp (
 );
 
 
-ALTER TABLE public.train_rsvp OWNER TO postgres;
+ALTER TABLE public.train_rsvp OWNER TO meowth;
 
 --
 -- TOC entry 268 (class 1259 OID 16661)
--- Name: trains; Type: TABLE; Schema: public; Owner: postgres
+-- Name: trains; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.trains (
@@ -1355,11 +1364,11 @@ CREATE TABLE public.trains (
 );
 
 
-ALTER TABLE public.trains OWNER TO postgres;
+ALTER TABLE public.trains OWNER TO meowth;
 
 --
 -- TOC entry 269 (class 1259 OID 16666)
--- Name: type_chart; Type: TABLE; Schema: public; Owner: postgres
+-- Name: type_chart; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.type_chart (
@@ -1369,11 +1378,11 @@ CREATE TABLE public.type_chart (
 );
 
 
-ALTER TABLE public.type_chart OWNER TO postgres;
+ALTER TABLE public.type_chart OWNER TO meowth;
 
 --
 -- TOC entry 270 (class 1259 OID 16671)
--- Name: types; Type: TABLE; Schema: public; Owner: postgres
+-- Name: types; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.types (
@@ -1383,11 +1392,11 @@ CREATE TABLE public.types (
 );
 
 
-ALTER TABLE public.types OWNER TO postgres;
+ALTER TABLE public.types OWNER TO meowth;
 
 --
 -- TOC entry 271 (class 1259 OID 16676)
--- Name: unhandled_errors; Type: TABLE; Schema: public; Owner: postgres
+-- Name: unhandled_errors; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.unhandled_errors (
@@ -1400,18 +1409,17 @@ CREATE TABLE public.unhandled_errors (
 );
 
 
-ALTER TABLE public.unhandled_errors OWNER TO postgres;
+ALTER TABLE public.unhandled_errors OWNER TO meowth;
 
 --
 -- TOC entry 272 (class 1259 OID 16681)
--- Name: users; Type: TABLE; Schema: public; Owner: postgres
+-- Name: users; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.users (
     id numeric(20,0) NOT NULL,
     team integer,
     level integer,
-    silph text,
     pokebattler integer,
     party integer[] DEFAULT ARRAY[0, 0, 0, 1],
     ign text,
@@ -1420,11 +1428,11 @@ CREATE TABLE public.users (
 );
 
 
-ALTER TABLE public.users OWNER TO postgres;
+ALTER TABLE public.users OWNER TO meowth;
 
 --
 -- TOC entry 273 (class 1259 OID 16687)
--- Name: wants; Type: TABLE; Schema: public; Owner: postgres
+-- Name: wants; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.wants (
@@ -1435,11 +1443,11 @@ CREATE TABLE public.wants (
 );
 
 
-ALTER TABLE public.wants OWNER TO postgres;
+ALTER TABLE public.wants OWNER TO meowth;
 
 --
 -- TOC entry 274 (class 1259 OID 16692)
--- Name: weather_forecasts; Type: TABLE; Schema: public; Owner: postgres
+-- Name: weather_forecasts; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.weather_forecasts (
@@ -1457,11 +1465,11 @@ CREATE TABLE public.weather_forecasts (
 );
 
 
-ALTER TABLE public.weather_forecasts OWNER TO postgres;
+ALTER TABLE public.weather_forecasts OWNER TO meowth;
 
 --
 -- TOC entry 275 (class 1259 OID 16697)
--- Name: weather_names; Type: TABLE; Schema: public; Owner: postgres
+-- Name: weather_names; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.weather_names (
@@ -1472,11 +1480,11 @@ CREATE TABLE public.weather_names (
 );
 
 
-ALTER TABLE public.weather_names OWNER TO postgres;
+ALTER TABLE public.weather_names OWNER TO meowth;
 
 --
 -- TOC entry 276 (class 1259 OID 16702)
--- Name: web_sessions; Type: TABLE; Schema: public; Owner: postgres
+-- Name: web_sessions; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.web_sessions (
@@ -1487,11 +1495,11 @@ CREATE TABLE public.web_sessions (
 );
 
 
-ALTER TABLE public.web_sessions OWNER TO postgres;
+ALTER TABLE public.web_sessions OWNER TO meowth;
 
 --
 -- TOC entry 277 (class 1259 OID 16707)
--- Name: welcome; Type: TABLE; Schema: public; Owner: postgres
+-- Name: welcome; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.welcome (
@@ -1501,11 +1509,11 @@ CREATE TABLE public.welcome (
 );
 
 
-ALTER TABLE public.welcome OWNER TO postgres;
+ALTER TABLE public.welcome OWNER TO meowth;
 
 --
 -- TOC entry 278 (class 1259 OID 16712)
--- Name: wilds; Type: TABLE; Schema: public; Owner: postgres
+-- Name: wilds; Type: TABLE; Schema: public; Owner: meowth
 --
 
 CREATE TABLE public.wilds (
@@ -1520,11 +1528,11 @@ CREATE TABLE public.wilds (
 );
 
 
-ALTER TABLE public.wilds OWNER TO postgres;
+ALTER TABLE public.wilds OWNER TO meowth;
 
 --
 -- TOC entry 279 (class 1259 OID 16717)
--- Name: wilds_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: wilds_id_seq; Type: SEQUENCE; Schema: public; Owner: meowth
 --
 
 CREATE SEQUENCE public.wilds_id_seq
@@ -1535,12 +1543,12 @@ CREATE SEQUENCE public.wilds_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.wilds_id_seq OWNER TO postgres;
+ALTER TABLE public.wilds_id_seq OWNER TO meowth;
 
 --
 -- TOC entry 3716 (class 0 OID 0)
 -- Dependencies: 279
--- Name: wilds_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: wilds_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: meowth
 --
 
 ALTER SEQUENCE public.wilds_id_seq OWNED BY public.wilds.id;
@@ -1548,7 +1556,7 @@ ALTER SEQUENCE public.wilds_id_seq OWNED BY public.wilds.id;
 
 --
 -- TOC entry 3425 (class 2604 OID 16718)
--- Name: gyms id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: gyms id; Type: DEFAULT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.gyms ALTER COLUMN id SET DEFAULT nextval('public.gyms_id_seq'::regclass);
@@ -1556,7 +1564,7 @@ ALTER TABLE ONLY public.gyms ALTER COLUMN id SET DEFAULT nextval('public.gyms_id
 
 --
 -- TOC entry 3426 (class 2604 OID 16719)
--- Name: pokestops id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: pokestops id; Type: DEFAULT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.pokestops ALTER COLUMN id SET DEFAULT nextval('public.pokestops_id_seq'::regclass);
@@ -1564,7 +1572,7 @@ ALTER TABLE ONLY public.pokestops ALTER COLUMN id SET DEFAULT nextval('public.po
 
 --
 -- TOC entry 3427 (class 2604 OID 16720)
--- Name: raid_groups grp_id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: raid_groups grp_id; Type: DEFAULT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.raid_groups ALTER COLUMN grp_id SET DEFAULT nextval('public.raid_groups_grp_id_seq'::regclass);
@@ -1572,7 +1580,7 @@ ALTER TABLE ONLY public.raid_groups ALTER COLUMN grp_id SET DEFAULT nextval('pub
 
 --
 -- TOC entry 3438 (class 2606 OID 32398)
--- Name: accuweather accuweather_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: accuweather accuweather_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.accuweather
@@ -1581,7 +1589,7 @@ ALTER TABLE ONLY public.accuweather
 
 --
 -- TOC entry 3440 (class 2606 OID 32400)
--- Name: archive archive_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: archive archive_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.archive
@@ -1590,7 +1598,7 @@ ALTER TABLE ONLY public.archive
 
 --
 -- TOC entry 3442 (class 2606 OID 32402)
--- Name: command_log command_log_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: command_log command_log_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.command_log
@@ -1599,7 +1607,7 @@ ALTER TABLE ONLY public.command_log
 
 --
 -- TOC entry 3444 (class 2606 OID 32404)
--- Name: counters_data counters_data_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: counters_data counters_data_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.counters_data
@@ -1608,7 +1616,7 @@ ALTER TABLE ONLY public.counters_data
 
 --
 -- TOC entry 3446 (class 2606 OID 32406)
--- Name: cpm_table cpm_table_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: cpm_table cpm_table_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.cpm_table
@@ -1617,7 +1625,7 @@ ALTER TABLE ONLY public.cpm_table
 
 --
 -- TOC entry 3448 (class 2606 OID 32408)
--- Name: current_weather current_weather_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: current_weather current_weather_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.current_weather
@@ -1626,7 +1634,7 @@ ALTER TABLE ONLY public.current_weather
 
 --
 -- TOC entry 3450 (class 2606 OID 32410)
--- Name: custom_roles custom_roles_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: custom_roles custom_roles_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.custom_roles
@@ -1635,16 +1643,18 @@ ALTER TABLE ONLY public.custom_roles
 
 --
 -- TOC entry 3452 (class 2606 OID 32412)
--- Name: discord_logs discord_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: discord_logs discord_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.discord_logs
     ADD CONSTRAINT discord_logs_pkey PRIMARY KEY (log_id);
 
+ALTER TABLE ONLY public.discord_messages
+    ADD CONSTRAINT discord_messages_pkey PRIMARY KEY (message_id, sent);
 
 --
 -- TOC entry 3454 (class 2606 OID 32501)
--- Name: forecast_config forecast_config_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: forecast_config forecast_config_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.forecast_config
@@ -1653,7 +1663,7 @@ ALTER TABLE ONLY public.forecast_config
 
 --
 -- TOC entry 3456 (class 2606 OID 32503)
--- Name: form_names form_names_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: form_names form_names_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.form_names
@@ -1662,7 +1672,7 @@ ALTER TABLE ONLY public.form_names
 
 --
 -- TOC entry 3458 (class 2606 OID 32505)
--- Name: forms forms_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: forms forms_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.forms
@@ -1671,16 +1681,16 @@ ALTER TABLE ONLY public.forms
 
 --
 -- TOC entry 3460 (class 2606 OID 32507)
--- Name: guild_config guild_config_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: guild_config guild_config_pk; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.guild_config
-    ADD CONSTRAINT guild_config_pk PRIMARY KEY (guild_id, config_name);
+    ADD CONSTRAINT guild_config_pkey PRIMARY KEY (guild_id, config_name);
 
 
 --
 -- TOC entry 3462 (class 2606 OID 32509)
--- Name: guild_settings guild_settings_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: guild_settings guild_settings_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.guild_settings
@@ -1689,7 +1699,7 @@ ALTER TABLE ONLY public.guild_settings
 
 --
 -- TOC entry 3464 (class 2606 OID 32511)
--- Name: gym_travel gym_travel_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: gym_travel gym_travel_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.gym_travel
@@ -1698,7 +1708,7 @@ ALTER TABLE ONLY public.gym_travel
 
 --
 -- TOC entry 3466 (class 2606 OID 32513)
--- Name: gyms gyms_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: gyms gyms_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.gyms
@@ -1707,7 +1717,7 @@ ALTER TABLE ONLY public.gyms
 
 --
 -- TOC entry 3468 (class 2606 OID 32515)
--- Name: item_names item_names_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: item_names item_names_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.item_names
@@ -1716,7 +1726,7 @@ ALTER TABLE ONLY public.item_names
 
 --
 -- TOC entry 3470 (class 2606 OID 32517)
--- Name: languages languages_identifier_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: languages languages_identifier_key; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.languages
@@ -1725,7 +1735,7 @@ ALTER TABLE ONLY public.languages
 
 --
 -- TOC entry 3472 (class 2606 OID 32519)
--- Name: languages languages_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: languages languages_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.languages
@@ -1734,7 +1744,7 @@ ALTER TABLE ONLY public.languages
 
 --
 -- TOC entry 3474 (class 2606 OID 32521)
--- Name: meetup_rsvp meetup_rsvp_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: meetup_rsvp meetup_rsvp_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.meetup_rsvp
@@ -1743,7 +1753,7 @@ ALTER TABLE ONLY public.meetup_rsvp
 
 --
 -- TOC entry 3476 (class 2606 OID 32523)
--- Name: meetups meetups_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: meetups meetups_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.meetups
@@ -1752,7 +1762,7 @@ ALTER TABLE ONLY public.meetups
 
 --
 -- TOC entry 3478 (class 2606 OID 32525)
--- Name: meowth_logs meowth_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: meowth_logs meowth_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.meowth_logs
@@ -1761,7 +1771,7 @@ ALTER TABLE ONLY public.meowth_logs
 
 --
 -- TOC entry 3480 (class 2606 OID 32527)
--- Name: modifiers modifiers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: modifiers modifiers_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.modifiers
@@ -1770,7 +1780,7 @@ ALTER TABLE ONLY public.modifiers
 
 --
 -- TOC entry 3482 (class 2606 OID 32529)
--- Name: move_names move_names_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: move_names move_names_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.move_names
@@ -1779,7 +1789,7 @@ ALTER TABLE ONLY public.move_names
 
 --
 -- TOC entry 3484 (class 2606 OID 32531)
--- Name: moves moves_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: moves moves_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.moves
@@ -1788,7 +1798,7 @@ ALTER TABLE ONLY public.moves
 
 --
 -- TOC entry 3486 (class 2606 OID 32533)
--- Name: pokedex pokedex_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: pokedex pokedex_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.pokedex
@@ -1797,7 +1807,7 @@ ALTER TABLE ONLY public.pokedex
 
 --
 -- TOC entry 3488 (class 2606 OID 32535)
--- Name: pokemon pokemon_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: pokemon pokemon_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.pokemon
@@ -1806,7 +1816,7 @@ ALTER TABLE ONLY public.pokemon
 
 --
 -- TOC entry 3490 (class 2606 OID 32537)
--- Name: pokestops pokestops_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: pokestops pokestops_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.pokestops
@@ -1815,7 +1825,7 @@ ALTER TABLE ONLY public.pokestops
 
 --
 -- TOC entry 3492 (class 2606 OID 32539)
--- Name: prefixes prefixes_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: prefixes prefixes_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.prefixes
@@ -1824,7 +1834,7 @@ ALTER TABLE ONLY public.prefixes
 
 --
 -- TOC entry 3494 (class 2606 OID 32541)
--- Name: raid_bosses raid_bosses_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: raid_bosses raid_bosses_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.raid_bosses
@@ -1833,7 +1843,7 @@ ALTER TABLE ONLY public.raid_bosses
 
 --
 -- TOC entry 3496 (class 2606 OID 32543)
--- Name: raid_groups raid_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: raid_groups raid_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.raid_groups
@@ -1842,7 +1852,7 @@ ALTER TABLE ONLY public.raid_groups
 
 --
 -- TOC entry 3498 (class 2606 OID 32545)
--- Name: raid_rsvp raid_rsvp_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: raid_rsvp raid_rsvp_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.raid_rsvp
@@ -1851,7 +1861,7 @@ ALTER TABLE ONLY public.raid_rsvp
 
 --
 -- TOC entry 3500 (class 2606 OID 32547)
--- Name: raids raids_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: raids raids_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.raids
@@ -1860,7 +1870,7 @@ ALTER TABLE ONLY public.raids
 
 --
 -- TOC entry 3502 (class 2606 OID 32549)
--- Name: regional_raids regional_raids_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: regional_raids regional_raids_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.regional_raids
@@ -1869,7 +1879,7 @@ ALTER TABLE ONLY public.regional_raids
 
 --
 -- TOC entry 3504 (class 2606 OID 32551)
--- Name: report_channels report_channels_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: report_channels report_channels_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.report_channels
@@ -1878,7 +1888,7 @@ ALTER TABLE ONLY public.report_channels
 
 --
 -- TOC entry 3506 (class 2606 OID 32553)
--- Name: research research_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: research research_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.research
@@ -1887,7 +1897,7 @@ ALTER TABLE ONLY public.research
 
 --
 -- TOC entry 3508 (class 2606 OID 32555)
--- Name: research_tasks research_tasks_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: research_tasks research_tasks_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.research_tasks
@@ -1896,16 +1906,16 @@ ALTER TABLE ONLY public.research_tasks
 
 --
 -- TOC entry 3510 (class 2606 OID 32557)
--- Name: restart_savedata restart_savedata_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: restart_savedata restart_savedata_pk; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.restart_savedata
-    ADD CONSTRAINT restart_savedata_pk PRIMARY KEY (restart_snowflake);
+    ADD CONSTRAINT restart_savedata_pkey PRIMARY KEY (restart_snowflake);
 
 
 --
 -- TOC entry 3512 (class 2606 OID 32559)
--- Name: rockets rockets_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: rockets rockets_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.rockets
@@ -1914,7 +1924,7 @@ ALTER TABLE ONLY public.rockets
 
 --
 -- TOC entry 3514 (class 2606 OID 32561)
--- Name: scoreboard scoreboard_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: scoreboard scoreboard_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.scoreboard
@@ -1923,7 +1933,7 @@ ALTER TABLE ONLY public.scoreboard
 
 --
 -- TOC entry 3516 (class 2606 OID 32563)
--- Name: task_names task_names_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: task_names task_names_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.task_names
@@ -1932,7 +1942,7 @@ ALTER TABLE ONLY public.task_names
 
 --
 -- TOC entry 3518 (class 2606 OID 32565)
--- Name: team_names team_names_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: team_names team_names_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.team_names
@@ -1941,7 +1951,7 @@ ALTER TABLE ONLY public.team_names
 
 --
 -- TOC entry 3520 (class 2606 OID 32567)
--- Name: team_roles team_roles_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: team_roles team_roles_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.team_roles
@@ -1950,7 +1960,7 @@ ALTER TABLE ONLY public.team_roles
 
 --
 -- TOC entry 3522 (class 2606 OID 32569)
--- Name: teams teams_color_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: teams teams_color_id_key; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.teams
@@ -1959,7 +1969,7 @@ ALTER TABLE ONLY public.teams
 
 --
 -- TOC entry 3524 (class 2606 OID 32571)
--- Name: teams teams_identifier_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: teams teams_identifier_key; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.teams
@@ -1968,7 +1978,7 @@ ALTER TABLE ONLY public.teams
 
 --
 -- TOC entry 3526 (class 2606 OID 32573)
--- Name: teams teams_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: teams teams_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.teams
@@ -1977,7 +1987,7 @@ ALTER TABLE ONLY public.teams
 
 --
 -- TOC entry 3528 (class 2606 OID 32575)
--- Name: to_archive to_archive_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: to_archive to_archive_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.to_archive
@@ -1986,7 +1996,7 @@ ALTER TABLE ONLY public.to_archive
 
 --
 -- TOC entry 3530 (class 2606 OID 32577)
--- Name: trades trades_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: trades trades_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.trades
@@ -1995,7 +2005,7 @@ ALTER TABLE ONLY public.trades
 
 --
 -- TOC entry 3532 (class 2606 OID 32579)
--- Name: train_rsvp train_rsvp_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: train_rsvp train_rsvp_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.train_rsvp
@@ -2004,7 +2014,7 @@ ALTER TABLE ONLY public.train_rsvp
 
 --
 -- TOC entry 3534 (class 2606 OID 32581)
--- Name: trains trains_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: trains trains_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.trains
@@ -2013,7 +2023,7 @@ ALTER TABLE ONLY public.trains
 
 --
 -- TOC entry 3536 (class 2606 OID 32583)
--- Name: type_chart type_chart_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: type_chart type_chart_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.type_chart
@@ -2022,7 +2032,7 @@ ALTER TABLE ONLY public.type_chart
 
 --
 -- TOC entry 3538 (class 2606 OID 32585)
--- Name: types types_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: types types_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.types
@@ -2031,7 +2041,7 @@ ALTER TABLE ONLY public.types
 
 --
 -- TOC entry 3540 (class 2606 OID 32587)
--- Name: users users_ign_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: users users_ign_key; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.users
@@ -2040,7 +2050,7 @@ ALTER TABLE ONLY public.users
 
 --
 -- TOC entry 3542 (class 2606 OID 32589)
--- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.users
@@ -2049,7 +2059,7 @@ ALTER TABLE ONLY public.users
 
 --
 -- TOC entry 3544 (class 2606 OID 32591)
--- Name: wants wants_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: wants wants_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.wants
@@ -2058,7 +2068,7 @@ ALTER TABLE ONLY public.wants
 
 --
 -- TOC entry 3546 (class 2606 OID 32593)
--- Name: weather_forecasts weather_forecasts_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: weather_forecasts weather_forecasts_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.weather_forecasts
@@ -2067,7 +2077,7 @@ ALTER TABLE ONLY public.weather_forecasts
 
 --
 -- TOC entry 3548 (class 2606 OID 32595)
--- Name: weather_names weather_names_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: weather_names weather_names_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.weather_names
@@ -2076,7 +2086,7 @@ ALTER TABLE ONLY public.weather_names
 
 --
 -- TOC entry 3550 (class 2606 OID 32597)
--- Name: web_sessions web_sessions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: web_sessions web_sessions_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.web_sessions
@@ -2085,7 +2095,7 @@ ALTER TABLE ONLY public.web_sessions
 
 --
 -- TOC entry 3552 (class 2606 OID 32599)
--- Name: welcome welcome_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: welcome welcome_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.welcome
@@ -2094,7 +2104,7 @@ ALTER TABLE ONLY public.welcome
 
 --
 -- TOC entry 3554 (class 2606 OID 32601)
--- Name: wilds wilds_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: wilds wilds_pkey; Type: CONSTRAINT; Schema: public; Owner: meowth
 --
 
 ALTER TABLE ONLY public.wilds
@@ -2103,7 +2113,7 @@ ALTER TABLE ONLY public.wilds
 
 --
 -- TOC entry 3559 (class 2620 OID 32602)
--- Name: meetup_rsvp meetup_rsvp; Type: TRIGGER; Schema: public; Owner: postgres
+-- Name: meetup_rsvp meetup_rsvp; Type: TRIGGER; Schema: public; Owner: meowth
 --
 
 CREATE TRIGGER meetup_rsvp BEFORE INSERT OR DELETE OR UPDATE ON public.meetup_rsvp FOR EACH ROW EXECUTE FUNCTION public.update_meetuprsvp();
@@ -2111,7 +2121,7 @@ CREATE TRIGGER meetup_rsvp BEFORE INSERT OR DELETE OR UPDATE ON public.meetup_rs
 
 --
 -- TOC entry 3561 (class 2620 OID 32603)
--- Name: raid_rsvp notify_rsvp; Type: TRIGGER; Schema: public; Owner: postgres
+-- Name: raid_rsvp notify_rsvp; Type: TRIGGER; Schema: public; Owner: meowth
 --
 
 CREATE TRIGGER notify_rsvp AFTER INSERT OR DELETE OR UPDATE ON public.raid_rsvp FOR EACH ROW EXECUTE FUNCTION public.update_rsvp();
@@ -2119,7 +2129,7 @@ CREATE TRIGGER notify_rsvp AFTER INSERT OR DELETE OR UPDATE ON public.raid_rsvp 
 
 --
 -- TOC entry 3555 (class 2620 OID 32604)
--- Name: current_weather notify_weather; Type: TRIGGER; Schema: public; Owner: postgres
+-- Name: current_weather notify_weather; Type: TRIGGER; Schema: public; Owner: meowth
 --
 
 CREATE TRIGGER notify_weather BEFORE INSERT OR UPDATE OF current_weather ON public.current_weather FOR EACH ROW EXECUTE FUNCTION public.update_raid_weather();
@@ -2127,7 +2137,7 @@ CREATE TRIGGER notify_weather BEFORE INSERT OR UPDATE OF current_weather ON publ
 
 --
 -- TOC entry 3557 (class 2620 OID 32605)
--- Name: gym_travel reverse_travel; Type: TRIGGER; Schema: public; Owner: postgres
+-- Name: gym_travel reverse_travel; Type: TRIGGER; Schema: public; Owner: meowth
 --
 
 CREATE TRIGGER reverse_travel AFTER INSERT ON public.gym_travel FOR EACH ROW EXECUTE FUNCTION public.insert_reverse_travel();
@@ -2135,7 +2145,7 @@ CREATE TRIGGER reverse_travel AFTER INSERT ON public.gym_travel FOR EACH ROW EXE
 
 --
 -- TOC entry 3562 (class 2620 OID 32606)
--- Name: train_rsvp train_rsvp; Type: TRIGGER; Schema: public; Owner: postgres
+-- Name: train_rsvp train_rsvp; Type: TRIGGER; Schema: public; Owner: meowth
 --
 
 CREATE TRIGGER train_rsvp BEFORE INSERT OR DELETE OR UPDATE ON public.train_rsvp FOR EACH ROW EXECUTE FUNCTION public.update_trainrsvp();
@@ -2143,7 +2153,7 @@ CREATE TRIGGER train_rsvp BEFORE INSERT OR DELETE OR UPDATE ON public.train_rsvp
 
 --
 -- TOC entry 3558 (class 2620 OID 32607)
--- Name: gyms update_cells; Type: TRIGGER; Schema: public; Owner: postgres
+-- Name: gyms update_cells; Type: TRIGGER; Schema: public; Owner: meowth
 --
 
 CREATE TRIGGER update_cells AFTER INSERT ON public.gyms FOR EACH ROW EXECUTE FUNCTION public.update_cells();
@@ -2151,7 +2161,7 @@ CREATE TRIGGER update_cells AFTER INSERT ON public.gyms FOR EACH ROW EXECUTE FUN
 
 --
 -- TOC entry 3560 (class 2620 OID 32608)
--- Name: pokestops update_cells; Type: TRIGGER; Schema: public; Owner: postgres
+-- Name: pokestops update_cells; Type: TRIGGER; Schema: public; Owner: meowth
 --
 
 CREATE TRIGGER update_cells AFTER INSERT ON public.pokestops FOR EACH ROW EXECUTE FUNCTION public.update_cells();
@@ -2159,7 +2169,7 @@ CREATE TRIGGER update_cells AFTER INSERT ON public.pokestops FOR EACH ROW EXECUT
 
 --
 -- TOC entry 3556 (class 2620 OID 32609)
--- Name: forecast_config update_forecast_config; Type: TRIGGER; Schema: public; Owner: postgres
+-- Name: forecast_config update_forecast_config; Type: TRIGGER; Schema: public; Owner: meowth
 --
 
 CREATE TRIGGER update_forecast_config AFTER INSERT OR UPDATE ON public.forecast_config FOR EACH ROW EXECUTE FUNCTION public.enable_forecast();

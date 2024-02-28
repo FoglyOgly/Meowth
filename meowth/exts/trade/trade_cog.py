@@ -37,7 +37,7 @@ class Trade():
         self.wanted_pkmn = wanted_pkmn
         self.offer_list = []
     
-    icon_url = 'https://github.com/FoglyOgly/Meowth/blob/new-core/meowth/images/misc/trade_icon_small.png?raw=true'
+    icon_url = 'https://github.com/jackyaz/Meowth/blob/self-host/meowth/images/misc/trade_icon_small.png?raw=true'
 
     @classmethod
     def from_data(cls, bot, data):

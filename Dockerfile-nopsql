@@ -1,0 +1,101 @@
+FROM python:3.10.13-slim-bookworm as s2geometry
+LABEL maintainer="Jack Yaz <jackyaz@outlook.com>"
+
+
+### START S2GEOMETRY BUILD AND SETUP ###
+
+RUN apt-get update && \
+	apt-get install -y --no-install-recommends \
+	build-essential \
+	git \
+	libgflags-dev \
+	libgoogle-glog-dev \
+	libgtest-dev \
+	libssl-dev \
+	swig \
+	cmake \
+ 	&& apt-get clean \
+ 	&& rm -rf /var/lib/apt/lists/*
+
+RUN mkdir /app
+RUN python3 -m venv /app/venv
+ENV PATH="/app/venv/bin:$PATH"
+RUN python3 -m pip install --upgrade pip
+
+WORKDIR /src
+RUN git clone https://github.com/google/googletest
+RUN cmake -S /src/googletest -B /build/googletest -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/output -DBUILD_GMOCK=ON
+RUN cmake --build /build/googletest --target install
+
+WORKDIR /src
+RUN git clone https://github.com/abseil/abseil-cpp
+WORKDIR /src/abseil-cpp/build
+RUN cmake -S /src/abseil-cpp -B /build/abseil-cpp -DCMAKE_PREFIX_PATH=/output -DCMAKE_INSTALL_PREFIX=/output -DABSL_ENABLE_INSTALL=ON -DABSL_USE_EXTERNAL_GOOGLETEST=ON -DABSL_FIND_GOOGLETEST=ON -DCMAKE_CXX_STANDARD=17 -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+RUN cmake --build /build/abseil-cpp --target install
+
+WORKDIR /src
+RUN git clone https://github.com/google/s2geometry.git
+WORKDIR /src/s2geometry/
+RUN cmake -DCMAKE_PREFIX_PATH=/output/lib/cmake/absl -DCMAKE_CXX_STANDARD=17 -DWITH_PYTHON=ON
+RUN make -j $(nproc)
+RUN make install -j $(nproc)
+
+WORKDIR /src/s2geometry/
+
+RUN sed -i "s/'-DWITH_PYTHON=ON'/'-DWITH_PYTHON=ON',/" /src/s2geometry/setup.py
+RUN sed -i "/'-DWITH_PYTHON=ON',/a \                                        '-DCMAKE_PREFIX_PATH=/output/lib/cmake'" /src/s2geometry/setup.py
+RUN sed -i "/'-DWITH_PYTHON=ON',/a \                                        '-DCMAKE_CXX_STANDARD=17'," /src/s2geometry/setup.py
+RUN sed -i 's/install_prefix="s2geometry"/install_prefix="pywraps2"/' /src/s2geometry/setup.py
+
+RUN python3 -m pip install cmake_build_extension wheel
+RUN python3 setup.py bdist_wheel
+
+### END S2GEOMETRY BUILD AND SETUP ###
+
+### START MEOWTH BUILD AND SETUP ###
+
+FROM python:3.10.13-slim-bookworm as meowth
+LABEL maintainer="Jack Yaz <jackyaz@outlook.com>"
+
+RUN mkdir /app
+COPY --from=s2geometry /src/s2geometry/dist/s2geometry-0.11.0.dev1-cp310-cp310-linux_x86_64.whl /app/s2geometry-0.11.0.dev1-cp310-cp310-linux_x86_64.whl
+
+RUN apt-get update && \
+	apt-get install -y --no-install-recommends \
+	git \
+ 	&& apt-get clean \
+ 	&& rm -rf /var/lib/apt/lists/*
+
+RUN python3 -m venv /app/venv
+ENV PATH="/app/venv/bin:$PATH"
+RUN python3 -m pip install --upgrade pip
+
+RUN python3 -m pip install /app/*.whl
+
+COPY config /app/config
+COPY database /app/database
+COPY meowth /app/meowth
+COPY requirements.txt /app/
+COPY setup.py /app/
+COPY README.md /app/
+COPY LICENSE /app/
+
+WORKDIR /app
+
+RUN python3 -m pip install -r requirements.txt
+RUN python3 setup.py install
+
+RUN ln -s /app/config/config.py /app/meowth/config.py
+
+WORKDIR /
+
+### END MEOWTH BUILD AND SETUP ###
+
+ENV PYTHONPATH="/app"
+
+COPY entry-nopsql.sh /
+RUN chmod 0755 /entry-nopsql.sh
+
+VOLUME /app/config
+
+ENTRYPOINT ["/entry-nopsql.sh"]

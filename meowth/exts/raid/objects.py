@@ -1,3 +1,13 @@
+import asyncio
+from datetime import datetime
+from math import ceil
+import time
+import re
+import aiohttp
+import discord
+from discord.ext import commands
+from pytz import timezone
+
 from meowth.exts.map import Gym, ReportChannel, Mapper, PartialPOI, POI
 from meowth.exts.users import MeowthUser
 from meowth.exts.pkmn import Pokemon, Move
@@ -9,21 +19,16 @@ from .errors import *
 from .raid_checks import archive_category
 from . import raid_info
 
-import asyncio
-import aiohttp
-from datetime import datetime
-from math import ceil
-import discord
-from discord.ext import commands
-import time
-from pytz import timezone
-
 emoji_letters = ['🇦','🇧','🇨','🇩','🇪','🇫','🇬','🇭','🇮','🇯','🇰','🇱',
     '🇲','🇳','🇴','🇵','🇶','🇷','🇸','🇹','🇺','🇻','🇼','🇽','🇾','🇿'
 ]
 
-class RaidBoss(Pokemon):
+seconds_per_unit = {"s": 1, "m": 60, "h": 3600, "d": 86400, "w": 604800}
 
+def convert_to_seconds(s):
+    return int(s[:-1]) * seconds_per_unit[s[-1]]
+
+class RaidBoss(Pokemon):
     def __init__(self, pkmn):
         self.bot = pkmn.bot
         self.id = pkmn.id
@@ -54,15 +59,13 @@ class RaidBoss(Pokemon):
         elif await super()._evolves_from():
             return False
         return True
-    
+
     @classmethod
     async def convert(cls, ctx, arg):
         pkmn = await Pokemon.convert(ctx, arg)
-        return cls(pkmn)   
-
+        return cls(pkmn)
 
 class Meetup:
-
     instances = dict()
     by_message = dict()
     by_channel = dict()
@@ -73,7 +76,7 @@ class Meetup:
         instance = super().__new__(cls)
         cls.instances[meetup_id] = instance
         return instance
-    
+
     def __init__(self, meetup_id, bot, guild_id, channel_id, report_channel_id, location, start, tz):
         self.id = meetup_id
         self.bot = bot
@@ -87,7 +90,7 @@ class Meetup:
         self.message_ids = []
         self.channel_id = channel_id
         self.trainer_dict = {}
-    
+
     def to_dict(self):
         if isinstance(self.location, POI):
             locid = str(self.location.id)
@@ -105,13 +108,13 @@ class Meetup:
             'message_ids': self.message_ids
         }
         return d
-    
+
     @property
     def _data(self):
         table = self.bot.dbi.table('meetups')
         query = table.query.where(id=self.id)
         return query
-    
+
     @property
     def _insert(self):
         table = self.bot.dbi.table('meetups')
@@ -119,7 +122,7 @@ class Meetup:
         d = self.to_dict()
         insert.row(**d)
         return insert
-    
+
     async def upsert(self):
         insert = self._insert
         await insert.commit(do_update=True)
@@ -127,7 +130,7 @@ class Meetup:
     @property
     def guild(self):
         return self.bot.get_guild(self.guild_id)
-    
+
     @property
     def channel(self):
         return self.bot.get_channel(self.channel_id)
@@ -135,7 +138,7 @@ class Meetup:
     @property
     def channel_topic(self):
         return "Use the ❔ button for help with commands you can use in this channel!"
-    
+
     @property
     def time_str(self):
         hatchlocal = self.local_datetime(self.start)
@@ -148,11 +151,11 @@ class Meetup:
             enddatestr = endlocal.strftime('%b %d')
             topic_str += f"| Ends on {enddatestr} at {endtimestr}"
         return topic_str
-    
+
     @property
     def report_channel(self):
         return self.bot.get_channel(self.report_channel_id)
-    
+
     async def list_rsvp(self, channel, tags=False):
         color = self.guild.me.color
         trainer_dict = self.trainer_dict
@@ -209,7 +212,7 @@ class Meetup:
             return await channel.send(embed=embed)
         except:
             return
-    
+
     async def list_teams(self, channel, tags=False):
         color = self.guild.me.color
         trainer_dict = self.trainer_dict
@@ -259,7 +262,7 @@ class Meetup:
             return await channel.send(embed=embed)
         except:
             return
-    
+
     async def get_trainer_dict(self):
         def data(rcrd):
             trainer = rcrd['user_id']
@@ -279,7 +282,7 @@ class Meetup:
             trainer, rcrd_dict = data(rcrd)
             trainer_dict[trainer] = rcrd_dict
         return trainer_dict
-    
+
     async def update_rsvp(self, user_id=None, status=None):
         self.trainer_dict = await self.get_trainer_dict()
         has_embed = False
@@ -314,12 +317,12 @@ class Meetup:
                     await chn.send(embed=rsvpembed, delete_after=15)
                 except:
                     return
-    
+
     @property
     def react_list(self):
         status_reacts = list(self.bot.config.emoji.values())
         return status_reacts
-    
+
     async def process_reactions(self, payload):
         if payload.guild_id:
             user = payload.member
@@ -346,10 +349,10 @@ class Meetup:
         await message.remove_reaction(emoji, user)
         if new_status != old_status:
             await meowthuser.meetup_rsvp(self, new_status, party=party)
-    
+
     async def meetup_embed(self):
         return (await MeetupEmbed.from_meetup(self)).embed
-    
+
     @staticmethod
     def status_dict(trainer_dict):
         d = {
@@ -362,12 +365,12 @@ class Meetup:
             status = trainer_dict[trainer]['status']
             d[status] += total
         return d
-    
+
     @property
     def status_str(self):
         status_str = self.status_string(self.bot, self.trainer_dict)
         return status_str
-    
+
     @staticmethod
     def status_string(bot, trainer_dict):
         status_dict = Meetup.status_dict(trainer_dict)
@@ -375,7 +378,7 @@ class Meetup:
         status_str += f"{bot.config.emoji['coming']}: **{status_dict['coming']}** | "
         status_str += f"{bot.get_emoji(bot.config.emoji['here'])}: **{status_dict['here']}**"
         return status_str
-    
+
     @staticmethod
     def team_dict(trainer_dict):
         d = {
@@ -408,22 +411,22 @@ class Meetup:
         team_str += f"{bot.config.team_emoji['valor']}: {team_dict['valor']} | "
         team_str += f"{bot.config.team_emoji['unknown']}: {team_dict['unknown']}"
         return team_str
-    
+
     @property
     def current_local_datetime(self):
         zone = self.tz
         localzone = timezone(zone)
         return datetime.now(tz=localzone)
-    
+
     def local_datetime(self, stamp):
         zone = self.tz
         localzone = timezone(zone)
         return datetime.fromtimestamp(stamp, tz=localzone)
-    
+
     @property
     def start_datetime(self):
         return self.local_datetime(self.start)
-    
+
     def update_time(self, new_time: float):
         if self.monitor_task:
             self.monitor_task.cancel()
@@ -468,11 +471,6 @@ class Meetup:
             await self.channel.send('This Meetup has ended! This channel will be deleted in one minute.')
             await asyncio.sleep(60)
             await self.channel.delete()
-
-
-
-
-
 
     async def update_url(self, url):
         location = self.location
@@ -522,9 +520,7 @@ class Meetup:
             cls.by_message[msgid] = meetup
         return meetup
 
-
 class Raid:
-
     instances = dict()
     by_message = dict()
     by_channel = dict()
@@ -563,16 +559,16 @@ class Raid:
         self.train_msgs = []
         self._weather = "NO_WEATHER"
         self.completed_by = []
-    
+
     def __eq__(self, other):
         if isinstance(other, Raid):
             return self.id == other.id
         else:
             return False
-    
+
     def __hash__(self):
         return hash(self.id)
-    
+
     def to_dict(self):
         if isinstance(self.gym, Gym):
             gymid = str(self.gym.id)
@@ -595,13 +591,13 @@ class Raid:
             'completed_by': self.completed_by
         }
         return d
-    
+
     @property
     def _data(self):
         table = self.bot.dbi.table('raids')
         query = table.query.where(id=self.id)
         return query
-    
+
     @property
     def _insert(self):
         table = self.bot.dbi.table('raids')
@@ -609,11 +605,11 @@ class Raid:
         d = self.to_dict()
         insert.row(**d)
         return insert
-    
+
     async def upsert(self):
         insert = self._insert
         await insert.commit(do_update=True)
-    
+
     @property
     def status(self):
         if self.hatch and time.time() < self.hatch:
@@ -624,7 +620,7 @@ class Raid:
             return "active"
         else:
             return "expired"
-    
+
     @property
     def react_list(self):
         boss_reacts = formatters.mc_emoji(len(self.boss_list))
@@ -645,7 +641,7 @@ class Raid:
         react_list = react_list + grp_reacts
         react_list.append('\u2754')
         if self.status == 'active' or len(self.boss_list) == 1:
-            react_list.append(512707623812857871)
+            react_list.append(self.bot.config.pkbtlr_emoji['pkbtlr'])
         return react_list
 
     @property
@@ -653,13 +649,13 @@ class Raid:
         level = self.level
         max_times = self.bot.raid_info.raid_times[level]
         return max_times[0]
-    
+
     @property
     def max_active(self):
         level = self.level
         max_times = self.bot.raid_info.raid_times[level]
         return max_times[1]
-    
+
     @property
     def guild(self):
         return self.bot.get_guild(self.guild_id)
@@ -674,7 +670,7 @@ class Raid:
     @property
     def report_channel(self):
         return self.bot.get_channel(self.report_channel_id)
-    
+
     def update_time(self, new_time: float):
         if self.monitor_task:
             self.monitor_task.cancel()
@@ -710,7 +706,7 @@ class Raid:
         update.values(hatch=self.hatch, endtime=self.end)
         self.bot.loop.create_task(update.commit())
         self.monitor_task = self.bot.loop.create_task(self.monitor_status())
-    
+
     async def get_boss_list(self):
         level = self.level
         report_channel = ReportChannel(self.bot, self.report_channel)
@@ -718,7 +714,7 @@ class Raid:
         boss_list = list(boss_lists[level].keys())
         self.boss_list = boss_list
         return boss_list
-    
+
     async def boss_list_str(self, weather=None):
         boss_names = []
         boss_list = await self.get_boss_list()
@@ -742,9 +738,8 @@ class Raid:
                 name += ' :sparkles:'
             boss_names.append(f"{name} {type_emoji}: **{interest}**")
         boss_list_str = "\n".join(boss_names)
-        boss_list_str += "\n<:silph:548259248442703895>Boss list provided by [The Silph Road](https://thesilphroad.com/raid-bosses)"
         return boss_list_str
-    
+
     @property
     def grps_str(self):
         ungrp = self.ungrp
@@ -765,7 +760,7 @@ class Raid:
         if ungrp_est != '0':
             grps_str.append(f"\u2754: ({ungrp_est}%)")
         return "\n".join(grps_str) + '\u200b'
-    
+
     async def raidgroup_ask(self, channel, user):
         color = self.guild.me.color
         grps_str = self.grps_str
@@ -787,18 +782,16 @@ class Raid:
             if emoji == group['emoji']:
                 await self.join_grp(payload.user_id, group)
 
-        
-    
     @property
     def grpd_users(self):
         return [x for y in self.group_list for x in y['users']]
-    
+
     def user_grp(self, user):
         for grp in self.group_list:
             if user in grp['users']:
                 return grp
         return None
-    
+
     def grp_is_here(self, grp):
         for user in grp['users']:
             status = self.trainer_dict.get(user, {}).get('status')
@@ -815,7 +808,7 @@ class Raid:
                     d['users'].append(x)
         d['est_power'] = self.grp_est_power(d)
         return d
-    
+
     def grp_others(self, grp):
         d = {'users': []}
         for x in self.trainer_dict:
@@ -826,7 +819,7 @@ class Raid:
         if len(d['users']) == 0:
             return None
         return d
-    
+
     @property
     def coming_grp(self):
         d = {'users': [x for x in self.trainer_dict if self.trainer_dict[x]['status'] == 'coming']}
@@ -846,14 +839,14 @@ class Raid:
             if user_id in invites:
                 return True
         return False
-    
+
     def user_who_invited(self, user_id):
         for x in self.trainer_dict:
             invites = self.trainer_dict[x].get('invites', [])
             if user_id in invites:
                 return x
         return None
-    
+
     def user_invite_slots(self, user_id):
         invites = self.trainer_dict.get(user_id, {}).get('invites', [])
         return 5 - len(invites)
@@ -864,34 +857,34 @@ class Raid:
         users = [x for x in users if not self.user_was_invited(x)]
         users = [x for x in users if self.user_invite_slots(x) > 0]
         return users
-    
+
     @property
     def users_need_invite(self):
         users = [x for x in self.trainer_dict if self.trainer_dict[x]['status'] == 'invite']
         return users
-    
+
     @property
     def pokebattler_url(self):
         pkmnid = self.pkmn.id
         url = f"https://www.pokebattler.com/raids/{pkmnid}"
         return url
-        
+
     @staticmethod
     def pokebattler_data_url(pkmnid, level, att_level, weather):
-        if level == '7':
+        if level == '7' or level == '6':
             level = 'MEGA'
         json_url = 'https://fight2.pokebattler.com/raids/defenders/'
         json_url += f"{pkmnid}/levels/RAID_LEVEL_{level}/attackers/levels/"
         json_url += f"{att_level}/strategies/CINEMATIC_ATTACK_WHEN_POSSIBLE/"
-        json_url += f"DEFENSE_RANDOM_MC"
+        json_url += "DEFENSE_RANDOM_MC"
         json_url += f"?sort=ESTIMATOR&weatherCondition={weather}"
         json_url += "&dodgeStrategy=DODGE_REACTION_TIME"
         json_url += "&aggregation=AVERAGE&randomAssistants=-1"
         return json_url
-    
+
     @staticmethod
     def user_pokebattler_data_url(pkmnid, level, pb_id, weather):
-        if level == '7':
+        if level == '7' or level == '6':
             level = 'MEGA'
         json_url = 'https://fight2.pokebattler.com/raids/defenders/'
         json_url += f"{pkmnid}/levels/RAID_LEVEL_{level}/attackers/users/"
@@ -901,7 +894,7 @@ class Raid:
         json_url += "&dodgeStrategy=DODGE_REACTION_TIME"
         json_url += "&aggregation=AVERAGE&randomAssistants=-1"
         return json_url
-    
+
     async def channel_name(self):
         if isinstance(self.gym, Gym):
             gym_name = await self.gym._name()
@@ -911,7 +904,7 @@ class Raid:
             boss_name = await self.pkmn.name()
             return f"{boss_name}-{gym_name}"
         else:
-            if self.level == '7':
+            if self.level == '7' or self.level == '6':
                 level_str = 'm'
             else:
                 level_str = self.level
@@ -920,7 +913,7 @@ class Raid:
     @property
     def channel_topic(self):
         return "Use the ❔ button for help with commands you can use in this channel!"
-    
+
     @property
     def time_str(self):
         topic_str = ""
@@ -940,13 +933,13 @@ class Raid:
         else:
             topic_str += f"Ends at {endtimestr}"
         return topic_str
-    
+
     @property
     def current_local_datetime(self):
         zone = self.tz
         localzone = timezone(zone)
         return datetime.now(tz=localzone)
-    
+
     def local_datetime(self, stamp):
         if not stamp:
             return None
@@ -956,7 +949,7 @@ class Raid:
         else:
             localzone = timezone(zone)
         return datetime.fromtimestamp(stamp, tz=localzone)
-    
+
     async def process_reactions(self, payload):
         if payload.guild_id:
             user = payload.member
@@ -972,10 +965,11 @@ class Raid:
         new_status = None
         party = await meowthuser.party()
         if payload.emoji.is_custom_emoji():
-            emoji = payload.emoji.id
+            emoji = str(payload.emoji.id)
         else:
             emoji = str(payload.emoji)
-        if emoji not in self.react_list:
+        status_reacts_temp = [re.sub('<:.*:','',sub).replace('>','').strip("'") for sub in self.react_list]
+        if emoji not in status_reacts_temp:
             return
         if isinstance(emoji, str):
             for group in self.group_list:
@@ -993,7 +987,7 @@ class Raid:
             await message.remove_reaction(emoji, user)
             await self.leave_grp(payload.user_id)
             return await meowthuser.cancel_rsvp(self.id)
-        if emoji == 512707623812857871:
+        if emoji == re.sub('<:.*:','',self.bot.config.pkbtlr_emoji['pkbtlr']).replace('>','').strip("'"):
             if self.status != 'active':
                 if len(self.boss_list) > 1:
                     raise RaidNotActive
@@ -1041,13 +1035,19 @@ class Raid:
                 else:
                     return await message.remove_reaction(emoji, user)
             for k, v in self.bot.config.emoji.items():
-                if v == emoji:
+                if re.sub('<:.*:','',v).replace('>','').strip("'") == emoji:
                     new_status = k
             new_bosses = []
         else:
             return
         if isinstance(emoji, int):
             emoji = self.bot.get_emoji(emoji)
+        else:
+            try:
+                result = int(emoji)
+                emoji = self.bot.get_emoji(result)
+            except ValueError:
+                pass
         try:
             await message.remove_reaction(emoji, user)
         except:
@@ -1056,7 +1056,7 @@ class Raid:
             return
         if new_bosses != old_bosses or new_status != old_status:
             await meowthuser.rsvp(self.id, new_status, bosses=new_bosses, party=party)
-    
+
     async def start_grp(self, grp, author, channel=None):
         if channel:
             if not self.grp_is_here(grp):
@@ -1146,7 +1146,7 @@ class Raid:
             grp_query.where(starttime=grp['starttime'])
             await grp_query.delete()
         await self.update_rsvp()
-        return              
+        return
 
     def _rsvp(self, connection, pid, channel, payload):
         if channel != f'rsvp_{self.id}':
@@ -1158,13 +1158,13 @@ class Raid:
         userid, status = payload.split('/')
         user_id = int(userid)
         event_loop.create_task(self.update_rsvp(user_id=user_id, status=status))
-    
+
     def _weather(self, connection, pid, channel, payload):
         if not isinstance(self.gym, Gym):
             return
         event_loop = asyncio.get_event_loop()
         event_loop.create_task(self.change_weather(payload))
-    
+
     async def change_weather(self, payload):
         if self.hatch and (self.hatch - time.time() > 3600):
             send = False
@@ -1232,8 +1232,8 @@ class Raid:
                     try:
                         await channel.send(content)
                     except:
-                        pass    
-    
+                        pass
+
     async def join_grp(self, user_id, group, invite=False):
         old_rsvp = self.trainer_dict.get(user_id, {})
         old_status = old_rsvp.get('status')
@@ -1279,7 +1279,7 @@ class Raid:
         if invites:
             for x in invites:
                 await self.join_grp(x, group, invite=True)
-    
+
     async def leave_grp(self, user_id):
         group_table = self.bot.dbi.table('raid_groups')
         insert = group_table.insert
@@ -1305,7 +1305,7 @@ class Raid:
     async def invite_ask(self, user_id):
         meowthuser = MeowthUser.from_id(self.bot, user_id)
         data = (await meowthuser._data.get())[0]
-        friendcode = data.get('friendcode')
+        #friendcode = data.get('friendcode')
         users_can_invite = self.users_can_invite
         if self.channel_ids:
             for chnid in self.channel_ids:
@@ -1324,7 +1324,7 @@ class Raid:
             payload = await formatters.ask(self.bot, [msg], user_list=users_can_invite, react_list=['✉'])
             if payload:
                 return await self.raid_invite(payload.user_id, user_id)
-    
+
     async def raid_invite(self, inviter_id, invitee_id):
         inviter = self.guild.get_member(inviter_id)
         if not inviter:
@@ -1332,7 +1332,7 @@ class Raid:
         invitee = self.guild.get_member(invitee_id)
         if not invitee:
             invitee = await self.guild.fetch_member(invitee_id)
-        inviter_name = inviter.display_name
+        #inviter_name = inviter.display_name
         invitee_name = invitee.display_name
         meowthinvitee = MeowthUser.from_id(self.bot, invitee_id)
         meowthinviter = MeowthUser.from_id(self.bot, inviter_id)
@@ -1365,7 +1365,7 @@ class Raid:
         await invitee.send(direct_invitee_content)
         if inviter_friendcode:
             await invitee.send(inviter_friendcode)
-    
+
     async def notify_invite_users(self, user_id):
         invites = self.trainer_dict.get(user_id, {}).get('invites', [])
         if not invites:
@@ -1386,7 +1386,7 @@ class Raid:
         if not inviter:
             inviter = await self.guild.fetch_member(user_id)
         await inviter.send(content)
-    
+
 
     async def update_rsvp(self, user_id=None, status=None, group=None):
         self.trainer_dict = await self.get_trainer_dict()
@@ -1528,16 +1528,16 @@ class Raid:
                 self.hatch_task.cancel()
             elif self.expire_task:
                 self.expire_task.cancel()
-        
 
-    
+
+
     async def weather(self):
         gym = self.gym
         if isinstance(gym, Gym):
             weather = await gym.weather()
             self._weather = weather
         return self._weather
-    
+
     async def is_boosted(self, weather=None):
         if not weather:
             weather = await self.weather()
@@ -1547,7 +1547,7 @@ class Raid:
             if len(boss_list) == 1:
                 pkmn = RaidBoss(Pokemon(self.bot, boss_list[0]))
         return await pkmn.is_boosted(weather)
-    
+
     async def cp_range(self, weather=None):
         boost = await self.is_boosted(weather=weather)
         pkmn = self.pkmn
@@ -1568,7 +1568,7 @@ class Raid:
         pkmn.staiv = 15
         high_cp = await pkmn.calculate_cp()
         return [low_cp, high_cp]
-    
+
     async def pb_data(self, weather=None):
         data_table = self.bot.dbi.table('counters_data')
         if not weather:
@@ -1599,7 +1599,7 @@ class Raid:
             return data[0]
         else:
             return None
-    
+
     async def generic_counters_data(self, weather=None):
         data = await self.pb_data(weather=weather)
         if not data:
@@ -1612,33 +1612,33 @@ class Raid:
             ctr = Pokemon(self.bot, ctrid, quickMoveid=ctrfast, chargeMoveid=ctrcharge)
             ctrs_list.append(ctr)
         return ctrs_list
-    
+
     async def estimator_20(self, weather=None):
         data = await self.pb_data(weather=weather)
         if not data:
             return None
         estimator = data['estimator_20']
         return estimator
-    
+
     async def estimator_min(self, weather=None):
         data = await self.pb_data(weather=weather)
         if not data:
             return None
         estimator = data['estimator_min']
         return estimator
-    
+
     async def rec_group_size(self, weather=None):
         estimator = await self.estimator_20(weather=weather)
         if not estimator:
             return None
         return ceil(estimator)
-    
+
     async def min_group_size(self):
         estimator = await self.estimator_min()
         if not estimator:
             return None
         return ceil(estimator)
-    
+
     def user_est_power(self, user_id):
         trainer_dict = self.trainer_dict.get(user_id)
         if trainer_dict:
@@ -1646,7 +1646,7 @@ class Raid:
             return est_power
         else:
             return 0
-    
+
     def grp_est_power(self, group):
         est = 0
         users = group['users']
@@ -1660,7 +1660,7 @@ class Raid:
         if not pkmn:
             boss_list = self.boss_list
             if len(boss_list) == 1:
-                    pkmn = RaidBoss(Pokemon(self.bot, boss_list[0]))
+                pkmn = RaidBoss(Pokemon(self.bot, boss_list[0]))
         pkmnid = pkmn.id
         level = self.level
         if level == 'EX':
@@ -1795,16 +1795,16 @@ class Raid:
 
     async def egg_embed(self):
         return (await EggEmbed.from_raid(self)).embed
-    
+
     async def counters_embed(self, user):
         countersembed = await CountersEmbed.from_raid(user, self)
         if not countersembed:
             return None
         return countersembed.embed
-    
+
     async def hatched_embed(self):
-        raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png'
-        footer_icon = 'https://media.discordapp.net/attachments/346766728132427777/512699022822080512/imageedit_10_6071805149.png'
+        raid_icon = 'https://raw.githubusercontent.com/jackyaz/Meowth/self-host/meowth/images/misc/raid_map.png'
+        footer_icon = 'https://raw.githubusercontent.com/jackyaz/Meowth/self-host/meowth/images/misc/raid_icon.png'
         level = self.level
         egg_img_url = self.bot.raid_info.egg_images[level]
         color = self.guild.me.color
@@ -1858,14 +1858,21 @@ class Raid:
         return (await RaidEmbed.from_raid(self)).embed
 
     def expired_embed(self):
-        embed = formatters.make_embed(content="This raid has expired!", footer="Expired")
+        raid_expire_grace_period = self.bot.config.raid_expire_grace_period
+        raid_expire_grace_time = self.end + convert_to_seconds(raid_expire_grace_period)
+        embed = formatters.make_embed(content="This raid and channel has expired!", footer="Raid and channel expired")
+        embed.timestamp = datetime.fromtimestamp(raid_expire_grace_time)
+        return embed
+
+    def expired_grace_embed(self):
+        embed = formatters.make_embed(content="This raid has expired, channel will be deleted soon!", footer="Raid expired, channel will be removed soon")
         embed.timestamp = datetime.fromtimestamp(self.end)
         return embed
-    
+
     async def report_embed(self):
         return (await ReportEmbed.from_raid(self)).embed
 
-    
+
     async def update_url(self, url):
         gym = self.gym
         if isinstance(gym, Gym):
@@ -1891,7 +1898,7 @@ class Raid:
                 except:
                     pass
             elif (self.channel_ids or str(chn.id) in self.channel_ids) and self.status != 'expired':
-                if self.hatch and self.hatch > time.time():        
+                if self.hatch and self.hatch > time.time():
                     embed = await self.egg_embed()
                 elif self.end > time.time():
                     embed = await self.raid_embed()
@@ -1909,9 +1916,6 @@ class Raid:
                         await chn.send(content=content, embed=embed)
                     except:
                         pass
-                
-            
-
 
     async def update_messages(self, content=''):
         msg_list = []
@@ -1919,10 +1923,16 @@ class Raid:
         react_list = self.react_list
         message_ids = self.message_ids
         train_msgs = self.train_msgs
+
+        raid_expire_grace_period = self.bot.config.raid_expire_grace_period
+        raid_expire_grace_time = self.end + convert_to_seconds(raid_expire_grace_period)
+
         if self.hatch and self.hatch > time.time():
             embed = await self.egg_embed()
         elif self.end > time.time():
             embed = await self.raid_embed()
+        elif time.time() > self.end and time.time() < raid_expire_grace_time:
+            embed = self.expired_grace_embed()
         else:
             embed = self.expired_embed()
         for messageid in message_ids:
@@ -1940,6 +1950,7 @@ class Raid:
                 msg_list.append(msg)
                 continue
             try:
+                embed.timestamp = embed.timestamp
                 await msg.edit(content=content, embed=embed)
             except Exception as e:
                 continue
@@ -1986,8 +1997,6 @@ class Raid:
                     await msg.add_reaction(react)
         return msg_list
 
-    
-    
     async def hatch_egg(self):
         try:
             if self.end < time.time():
@@ -2081,8 +2090,6 @@ class Raid:
                     except:
                         pass
 
-        
-
     async def report_hatch(self, pkmn):
         trainer_dict = self.trainer_dict
         int_list = []
@@ -2105,7 +2112,7 @@ class Raid:
         if mention:
             mention_list.append(mention)
         name = await self.pkmn.name()
-        content = f"Trainers {' '.join(mention_list)}: The egg has hatched into a {name} raid!" 
+        content = f"Trainers {' '.join(mention_list)}: The egg has hatched into a {name} raid!"
         raid_table = self.bot.dbi.table('raids')
         update = raid_table.update()
         update.where(id=self.id)
@@ -2124,12 +2131,11 @@ class Raid:
             await self.gym.correct_weather(weather.value)
         else:
             await self.change_weather(weather.value)
-        
 
-        
-    
     async def expire_raid(self):
         try:
+            self.bot.loop.create_task(self.update_messages())
+            await asyncio.sleep(convert_to_seconds(self.bot.config.raid_expire_grace_period))
             self.bot.loop.create_task(self.update_messages())
             await asyncio.sleep(60)
             try:
@@ -2203,7 +2209,7 @@ class Raid:
             self.bot.loop.create_task(grps.delete())
         except asyncio.CancelledError:
             raise
-    
+
     async def archive_raid(self, channel, user_id, reason=None):
         guild = channel.guild
         bot = self.bot
@@ -2232,13 +2238,11 @@ class Raid:
         except:
             pass
 
-
-
     # async def update_gym(self, gym):
 
     async def get_wants(self):
         wants = []
-        if self.level == '7':
+        if self.level == '7' or self.level == '6':
             wants.append('mega')
         else:
             wants.append(self.level)
@@ -2257,8 +2261,6 @@ class Raid:
         wants = [Want(self.bot, x, self.guild_id) for x in wants]
         want_dict = {x: await x.mention() for x in wants}
         return want_dict
-
-        
 
     async def boss_interest_dict(self):
         boss_list = self.boss_list
@@ -2290,20 +2292,20 @@ class Raid:
             if status and status != 'cancel':
                 d[status] += total
         return d
-    
+
     @property
     def status_str(self):
         status_str = self.status_string(self.bot, self.trainer_dict)
         return status_str
-    
+
     @staticmethod
     def status_string(bot, trainer_dict):
         status_dict = Raid.status_dict(trainer_dict)
         status_str = f"{bot.config.emoji['maybe']}: **{status_dict['maybe'] + status_dict['invite']}** | "
         status_str += f"{bot.config.emoji['coming']}: **{status_dict['coming']}** | "
-        status_str += f"{bot.get_emoji(bot.config.emoji['here'])}: **{status_dict['here'] + status_dict['remote']}**"
+        status_str += f"{bot.config.emoji['here']}: **{status_dict['here'] + status_dict['remote']}**"
         return status_str
-    
+
     @staticmethod
     def team_dict(trainer_dict):
         d = {
@@ -2338,7 +2340,7 @@ class Raid:
         team_str += f"{bot.config.team_emoji['valor']}: {team_dict['valor']} | "
         team_str += f"{bot.config.team_emoji['unknown']}: {team_dict['unknown']}"
         return team_str
-    
+
     def grp_status_dict(self, group):
         d = {
             'maybe': 0,
@@ -2354,7 +2356,7 @@ class Raid:
             status = trainer_dict[trainer]['status']
             d[status] += total
         return d
-    
+
     def grp_total(self, group):
         total = 0
         trainer_dict = self.trainer_dict
@@ -2363,17 +2365,17 @@ class Raid:
         return total
 
     def grp_remotes(self, group):
-        total = 0
+        #total = 0
         status_dict = self.grp_status_dict(group)
         return status_dict.get('remote', 0)
-    
+
     def grp_status_str(self, group):
         status_dict = self.grp_status_dict(group)
         status_str = f"{self.bot.config.emoji['maybe']}: {status_dict['maybe'] + status_dict['invite']} | "
         status_str += f"{self.bot.config.emoji['coming']}: {status_dict['coming']} | "
         status_str += f"{self.bot.get_emoji(self.bot.config.emoji['here'])}: {status_dict['here'] + status_dict['remote']}"
         return status_str
-    
+
     def grp_team_dict(self, group):
         d = {
             'mystic': 0,
@@ -2392,7 +2394,7 @@ class Raid:
             d['valor'] += redcount
             d['unknown'] += unknowncount
         return d
-    
+
     def grp_team_str(self, group):
         team_dict = self.grp_team_dict(group)
         team_str = f"{self.bot.config.team_emoji['mystic']}: {team_dict['mystic']} | "
@@ -2420,7 +2422,7 @@ class Raid:
             grp['est_power'] = self.grp_est_power(grp)
             group_list.append(grp)
         return group_list
-    
+
     async def list_rsvp(self, channel, tags=False):
         color = self.guild.me.color
         trainer_dict = self.trainer_dict
@@ -2511,7 +2513,7 @@ class Raid:
                 await self.raid_invite(inviter_id, invitee_id)
             else:
                 break
-    
+
     async def list_teams(self, channel, tags=False):
         color = self.guild.me.color
         trainer_dict = self.trainer_dict
@@ -2555,7 +2557,7 @@ class Raid:
             return await channel.send(f'Current Raid Team Totals\n\n{liststr}')
         embed = formatters.make_embed(title="Current Raid Team Totals", content=liststr, msg_colour=color)
         return await channel.send(embed=embed)
-    
+
     async def list_groups(self, channel, tags=False):
         color = self.guild.me.color
         liststr = ""
@@ -2589,7 +2591,7 @@ class Raid:
             return await channel.send(f'Current Raid Groups\n\n{liststr}')
         embed = formatters.make_embed(title="Current Raid Groups", content=liststr, msg_colour=color)
         return await channel.send(embed=embed)
-    
+
     async def list_bosses(self, channel, tags=False):
         color = self.guild.me.color
         trainer_dict = self.trainer_dict
@@ -2703,8 +2705,8 @@ class Raid:
         raid.completed_by = completed_by
         await raid.get_boss_list()
         return raid
-    
-    
+
+
     async def summary_str(self):
         if self.status == 'egg':
             pre_str = f'**Level {self.level} Raid at'
@@ -2779,7 +2781,7 @@ class Train:
         self.multi_msg_ids = []
         self.message_ids = []
         self.trainer_dict = {}
-    
+
     def to_dict(self):
         d = {
             'id': self.id,
@@ -2794,13 +2796,13 @@ class Train:
             'message_ids': self.message_ids
         }
         return d
-    
+
     @property
     def _data(self):
         table = self.bot.dbi.table('trains')
         query = table.query.where(id=self.id)
         return query
-    
+
     @property
     def _insert(self):
         table = self.bot.dbi.table('trains')
@@ -2812,15 +2814,15 @@ class Train:
     async def upsert(self):
         insert = self._insert
         await insert.commit(do_update=True)
-    
+
     @property
     def guild(self):
         return self.bot.get_guild(self.guild_id)
-    
+
     @property
     def channel(self):
         return self.bot.get_channel(self.channel_id)
-    
+
     async def messages(self):
         for msgid in self.message_ids:
             chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
@@ -2828,12 +2830,12 @@ class Train:
                 yield msg
             else:
                 continue
-    
+
     @property
     def report_channel(self):
         rchan = self.bot.get_channel(self.report_channel_id)
         return ReportChannel(self.bot, rchan)
-    
+
     async def report_msgs(self):
         for msgid in self.report_msg_ids:
             try:
@@ -2842,7 +2844,7 @@ class Train:
                     yield msg
             except:
                 continue
-        
+
     async def clear_reports(self):
         async for msg in self.report_msgs():
             try:
@@ -2850,7 +2852,7 @@ class Train:
             except:
                 pass
         self.report_msg_ids = []
-    
+
     async def multi_msgs(self):
         for msgid in self.multi_msg_ids:
             chn, msg = await ChannelMessage.from_id_string(self.bot, msgid)
@@ -2858,7 +2860,7 @@ class Train:
                 yield msg
             else:
                 continue
-    
+
     async def clear_multis(self):
         async for msg in self.multi_msgs():
             try:
@@ -2866,13 +2868,13 @@ class Train:
             except:
                 pass
         self.multi_msg_ids = []
-    
+
     async def reported_raids(self):
         for msgid in self.report_msg_ids:
             raid = Raid.by_trainreport.get(msgid)
             msg = await self.channel.fetch_message(msgid)
             yield (msg, raid)
-    
+
     async def report_results(self):
         async for msg, raid in self.reported_raids():
             reacts = msg.reactions
@@ -2881,13 +2883,13 @@ class Train:
                     continue
                 count = react.count
                 yield (raid, count)
-    
+
     async def possible_raids(self):
         idlist = await self.report_channel.get_all_raids()
         raid_list = [Raid.instances.get(x) for x in idlist if Raid.instances.get(x)]
         raid_list = [x for x in raid_list if x.level != 'EX']
         return raid_list
-    
+
     async def select_raid(self, raid):
         if not raid:
             await self.end_train()
@@ -2924,7 +2926,7 @@ class Train:
         self.next_raid = None
         await self.upsert()
         self.bot.loop.create_task(self.poll_next_raid())
-    
+
     async def finish_current_raid(self):
         raid = self.current_raid
         if raid:
@@ -3051,13 +3053,13 @@ class Train:
             multi = await self.report_channel.channel.send(content, embed=embed)
             content = ""
             self.multi_msg_ids.append(f'{self.report_channel_id}/{multi.id}')
-        payload = await formatters.ask(self.bot, [multi], user_list=[author.id], 
+        payload = await formatters.ask(self.bot, [multi], user_list=[author.id],
             react_list=react_list)
         choice_dict = dict(zip(react_list, raids))
         first_raid = choice_dict[str(payload.emoji)]
         await self.clear_multis()
         await self.select_raid(first_raid)
-    
+
     async def poll_next_raid(self):
         raids = await self.possible_raids()
         if self.current_raid:
@@ -3072,7 +3074,7 @@ class Train:
             self.multi_msg_ids.append(f'{self.channel_id}/{multi.id}')
         await self.upsert()
         self.poll_task = self.bot.loop.create_task(self.get_poll_results(multi, raids, react_list))
-        
+
     async def get_poll_results(self, multi, raids, react_list):
         results = None
         if multi:
@@ -3102,12 +3104,12 @@ class Train:
             return choice_dict[str(emoji)]
         else:
             return
-    
+
     async def display_choices(self, raids, react_list):
         color = self.guild.me.color
         dest_dict = {}
         eggs_list = []
-        hatched_list = []
+        #hatched_list = []
         active_list = []
         if self.current_raid:
             if isinstance(self.current_raid.gym, Gym):
@@ -3184,7 +3186,7 @@ class Train:
             return await next_raid.gym.url()
         else:
             return next_raid.gym.url
-    
+
     async def new_raid(self, raid: Raid):
         embed = await TRaidEmbed.from_raid(self, raid)
         content = "Use the reaction below to vote for this raid next!"
@@ -3197,7 +3199,7 @@ class Train:
         raid.train_msgs.append(f'{msg.channel.id}/{msg.id}')
         await msg.add_reaction('\u2b06')
         await self.upsert()
-        
+
     async def update_rsvp(self, user_id, status):
         self.trainer_dict = await self.get_trainer_dict()
         has_embed = False
@@ -3207,7 +3209,7 @@ class Train:
                 train_embed.team_str = self.team_str
             await msg.edit(embed=train_embed.embed)
         channel = self.channel
-        guild = channel.guild
+        #guild = channel.guild
         if status == 'join':
             status_str = ' has joined the train!'
         elif status == 'cancel':
@@ -3219,7 +3221,7 @@ class Train:
         if not self.trainer_dict:
             await self.end_train()
 
-    
+
     async def end_train(self):
         try:
             await self.channel.send('This train is now empty! This channel will be deleted in one minute.')
@@ -3283,7 +3285,7 @@ class Train:
         for row in data:
             embed = formatters.deleted_message_embed(self.bot, row)
             await channel.send(embed=embed)
-    
+
     async def train_embed(self):
         return await TrainEmbed.from_train(self)
 
@@ -3330,8 +3332,8 @@ class ReportEmbed():
 
     def __init__(self, embed):
         self.embed = embed
-    
-    raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png' #TODO
+
+    raid_icon = 'https://raw.githubusercontent.com/jackyaz/Meowth/self-host/meowth/images/misc/raid_map.png'
 
     boss_index = 0
     gym_index = 1
@@ -3353,12 +3355,12 @@ class ReportEmbed():
             img_url = await boss.sprite_url()
         else:
             bossfield = "Level"
-            if raid.level == '7':
+            if raid.level == '7' or raid.level == '6':
                 name = 'Mega'
             else:
                 name = raid.level
             img_url = raid.bot.raid_info.egg_images[raid.level]
-            enddt = datetime.fromtimestamp(raid.hatch)
+            #enddt = datetime.fromtimestamp(raid.hatch)
         # color = await boss.color()
         gym = raid.gym
         if isinstance(gym, Gym):
@@ -3396,7 +3398,7 @@ class RaidEmbed():
     def __init__(self, embed):
         self.embed = embed
 
-    raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png' #TODO
+    raid_icon = 'https://raw.githubusercontent.com/jackyaz/Meowth/self-host/meowth/images/misc/raid_map.png'
 
     boss_index = 0
     gym_index = 1
@@ -3422,32 +3424,32 @@ class RaidEmbed():
         self.embed.set_field_at(RaidEmbed.cp_index, name="CP Range", value=cp_str)
         self.embed.set_field_at(RaidEmbed.moveset_index, name="Moveset", value=moveset_str)
         return self
-    
+
     def set_weather(self, weather, cp_str, ctrs_str, rec_str=None):
         self.embed.set_field_at(RaidEmbed.cp_index, name="CP Range", value=cp_str)
         if rec_str:
             self.embed.set_field_at(RaidEmbed.rec_index, name="Recommended Group Size", value=rec_str)
         self.embed.set_footer(text=self.embed.footer.text, icon_url=weather.icon_url)
         return self
-    
+
     def set_moveset(self, moveset_str, ctrs_str, rec_str=None):
         self.embed.set_field_at(RaidEmbed.moveset_index, name="Moveset", value=moveset_str)
         if rec_str:
             self.embed.set_field_at(RaidEmbed.rec_index, name="Recommended Group Size", value=rec_str)
         return self
-    
+
     @property
     def status_str(self):
         return self.embed.fields[RaidEmbed.status_index].value
-    
+
     @status_str.setter
     def status_str(self, status_str):
         self.embed.set_field_at(RaidEmbed.status_index, name="Status List", value=status_str)
-    
+
     @property
     def team_str(self):
         return self.embed.fields[RaidEmbed.team_index].value
-    
+
     @team_str.setter
     def team_str(self, team_str):
         self.embed.set_field_at(RaidEmbed.team_index, name="Team List", value=team_str)
@@ -3455,15 +3457,15 @@ class RaidEmbed():
     @property
     def rec_str(self):
         return self.embed.fields[RaidEmbed.rec_index].value
-    
+
     @rec_str.setter
     def rec_str(self, rec_str):
         self.embed.set_field_at(RaidEmbed.rec_index, name="Recommended Group Size", value=rec_str)
-    
+
     @property
     def grps_str(self):
         return self.embed.fields[RaidEmbed.group_index].value
-    
+
     @grps_str.setter
     def grps_str(self, grps_tuple):
         self.embed.set_field_at(RaidEmbed.group_index, name=grps_tuple[0], value=grps_tuple[1])
@@ -3499,7 +3501,7 @@ class RaidEmbed():
         is_boosted = await boss.is_boosted(weather.value)
         cp_range = await raid.cp_range()
         cp_str = f"{cp_range[0]}-{cp_range[1]}"
-        end = raid.end
+        #end = raid.end
         if is_boosted:
             cp_str += " (Boosted)"
         img_url = await boss.sprite_url()
@@ -3551,12 +3553,11 @@ class RaidEmbed():
         return cls(embed)
 
 class RSVPEmbed():
-
     def __init__(self, embed):
         self.embed = embed
 
-    raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png' #TODO
-    footer_icon = 'https://media.discordapp.net/attachments/346766728132427777/512699022822080512/imageedit_10_6071805149.png'
+    raid_icon = 'https://raw.githubusercontent.com/jackyaz/Meowth/self-host/meowth/images/misc/raid_map.png'
+    footer_icon = 'https://raw.githubusercontent.com/jackyaz/Meowth/self-host/meowth/images/misc/raid_icon.png'
 
     status_index = 0
     team_index = 1
@@ -3564,19 +3565,19 @@ class RSVPEmbed():
     @property
     def status_str(self):
         return self.embed.fields[RSVPEmbed.status_index].value
-    
+
     @status_str.setter
     def status_str(self, status_str):
         self.embed.set_field_at(RSVPEmbed.status_index, name="Status List", value=status_str)
-    
+
     @property
     def team_str(self):
         return self.embed.fields[RSVPEmbed.team_index].value
-    
+
     @team_str.setter
     def team_str(self, team_str):
         self.embed.set_field_at(RSVPEmbed.team_index, name="Team List", value=team_str)
-    
+
     @classmethod
     def from_meetup(cls, meetup: Meetup):
 
@@ -3593,12 +3594,9 @@ class RSVPEmbed():
 
         embed = formatters.make_embed(title="Current RSVP Totals", fields=fields, footer=footer, msg_colour=color)
         return cls(embed)
-    
+
     @classmethod
     def from_raid(cls, raid: Raid):
-
-
-
         status_str = raid.status_str
         team_str = raid.team_str
         footer = raid.time_str
@@ -3612,10 +3610,9 @@ class RSVPEmbed():
         embed = formatters.make_embed(icon=RSVPEmbed.raid_icon, title="Current RSVP Totals",
             fields=fields, footer_icon=RSVPEmbed.footer_icon, footer=footer, msg_colour=color)
         return cls(embed)
-    
+
     @classmethod
     def from_raidgroup(cls, raid: Raid, group):
-
         status_str = raid.grp_status_str(group)
         team_str = raid.grp_team_str(group)
         est = group.get('est_power', 0)
@@ -3635,14 +3632,13 @@ class RSVPEmbed():
         else:
             embed.add_field(name='Starting', value=time, inline=False)
         return cls(embed)
-    
-class EggEmbed():
 
+class EggEmbed():
     def __init__(self, embed):
         self.embed = embed
-    
-    raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png'
-            
+
+    raid_icon = 'https://raw.githubusercontent.com/jackyaz/Meowth/self-host/meowth/images/misc/raid_map.png'
+
     level_index = 0
     status_index = 2
     team_index = 3
@@ -3654,48 +3650,45 @@ class EggEmbed():
         self.boss_str = boss_list_str
         self.embed.set_footer(text=self.embed.footer.text, icon_url=weather.icon_url)
         return self
-    
+
     @property
     def status_str(self):
         return self.embed.fields[EggEmbed.status_index].value
-    
+
     @status_str.setter
     def status_str(self, status_str):
         self.embed.set_field_at(EggEmbed.status_index, name="Status List", value=status_str)
-    
+
     @property
     def team_str(self):
         return self.embed.fields[EggEmbed.team_index].value
-    
+
     @team_str.setter
     def team_str(self, team_str):
         self.embed.set_field_at(EggEmbed.team_index, name="Team List", value=team_str)
-    
+
     @property
     def boss_str(self):
         return self.embed.fields[EggEmbed.boss_list_index].value
-    
+
     @boss_str.setter
     def boss_str(self, boss_str):
         self.embed.set_field_at(EggEmbed.boss_list_index, name="Boss Interest", value=boss_str)
-    
+
     @property
     def grps_str(self):
         return self.embed.fields[EggEmbed.group_index].value
-    
+
     @grps_str.setter
     def grps_str(self, grps_tuple):
         self.embed.set_field_at(EggEmbed.group_index, name=grps_tuple[0], value=grps_tuple[1], inline=False)
 
-    
-
-    
     @classmethod
     async def from_raid(cls, raid: Raid):
         level = raid.level
         egg_img_url = raid.bot.raid_info.egg_images[level]
         # color = await formatters.url_color(egg_img_url)
-        hatch = raid.hatch
+        #hatch = raid.hatch
         gym = raid.gym
         if isinstance(gym, Gym):
             directions_url = await gym.url()
@@ -3713,7 +3706,7 @@ class EggEmbed():
         status_str = raid.status_str
         team_str = raid.team_str
         boss_str = await raid.boss_list_str()
-        if level == '7':
+        if level == '7' or level == '6':
             level_str = 'Mega'
         else:
             level_str = level
@@ -3739,12 +3732,11 @@ class EggEmbed():
         return cls(embed)
 
 class CountersEmbed():
-
     def __init__(self, embed):
         self.embed = embed
-    
-    raid_icon = 'https://media.discordapp.net/attachments/423492585542385664/512682888236367872/imageedit_1_9330029197.png' #TODO
-    footer_icon = 'https://media.discordapp.net/attachments/346766728132427777/512699022822080512/imageedit_10_6071805149.png'
+
+    raid_icon = 'https://raw.githubusercontent.com/jackyaz/Meowth/self-host/meowth/images/misc/raid_map.png'
+    footer_icon = 'https://raw.githubusercontent.com/jackyaz/Meowth/self-host/meowth/images/misc/raid_icon.png'
 
     boss_index = 0
     weather_index = 1
@@ -3790,7 +3782,7 @@ class CountersEmbed():
         cp_range = await raid.cp_range()
         cp_str = f"{cp_range[0]}-{cp_range[1]}"
         end = raid.end
-        enddt = datetime.fromtimestamp(end)
+        #enddt = datetime.fromtimestamp(end)
         if is_boosted:
             cp_str += " (Boosted)"
         img_url = await boss.sprite_url()
@@ -3824,30 +3816,29 @@ class CountersEmbed():
             ctrs_str.append(ctr_str)
             i += 1
         ctrs_str.append(f'[Results courtesy of Pokebattler](https://www.pokebattler.com/raids/{boss.id})')
-        fields['<:pkbtlr:512707623812857871> Counters'] = "\n".join(ctrs_str)
+        fields[bot.config.pkbtlr_emoji['pkbtlr'] + ' Counters'] = "\n".join(ctrs_str)
         color = raid.guild.me.color
         embed = formatters.make_embed(icon=CountersEmbed.raid_icon, thumbnail=img_url, msg_colour=color,
             fields=fields, footer_icon=CountersEmbed.footer_icon)
         return cls(embed)
 
 class TrainEmbed():
-
     def __init__(self, embed):
         self.embed = embed
-    
+
     title = "Raid Train"
-    current_raid_index = 1 
+    current_raid_index = 1
     team_index = 2
     channel_index = 0
 
     @property
     def team_str(self):
         return self.embed.fields[TrainEmbed.team_index].value
-    
+
     @team_str.setter
     def team_str(self, team_str):
         self.embed.set_field_at(TrainEmbed.team_index, name="Team List", value=team_str)
-    
+
     @classmethod
     async def from_train(cls, train: Train):
         title = cls.title
@@ -3867,12 +3858,11 @@ class TrainEmbed():
         return cls(embed)
 
 class TRSVPEmbed():
-
     def __init__(self, embed):
         self.embed = embed
-    
+
     title = 'Current Train Totals'
-    
+
     @classmethod
     def from_train(cls, train: Train):
         title = cls.title
@@ -3884,13 +3874,10 @@ class TRSVPEmbed():
         embed = formatters.make_embed(title=title, fields=fields, msg_colour=color)
         return cls(embed)
 
-
-
 class TRaidEmbed():
-
     def __init__(self, embed):
         self.embed = embed
-    
+
     @classmethod
     async def from_raid(cls, train: Train, raid: Raid):
         if raid.status == 'active':
@@ -3908,8 +3895,8 @@ class TRaidEmbed():
             name = raid.level
             img_url = raid.bot.raid_info.egg_images[name]
         bot = raid.bot
-        end = raid.end
-        enddt = datetime.fromtimestamp(end)
+        #end = raid.end
+        #enddt = datetime.fromtimestamp(end)
         color = raid.guild.me.color
         gym = raid.gym
         travel_time = "Unknown"
@@ -3941,29 +3928,28 @@ class TRaidEmbed():
         return cls(embed)
 
 class MeetupEmbed:
-
     def __init__(self, embed):
         self.embed = embed
-    
+
     status_index = 1
     team_index = 2
 
     @property
     def status_str(self):
         return self.embed.fields[MeetupEmbed.status_index].value
-    
+
     @status_str.setter
     def status_str(self, status_str):
         self.embed.set_field_at(MeetupEmbed.status_index, name="Status List", value=status_str)
-    
+
     @property
     def team_str(self):
         return self.embed.fields[MeetupEmbed.team_index].value
-    
+
     @team_str.setter
     def team_str(self, team_str):
         self.embed.set_field_at(MeetupEmbed.team_index, name="Team List", value=team_str)
-    
+
     @classmethod
     async def from_meetup(cls, meetup: Meetup):
         location = meetup.location

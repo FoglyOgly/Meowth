@@ -13,9 +13,6 @@ Options:
 import argparse
 import asyncio
 import sys
-import os
-from multiprocessing import Pool
-from functools import partial
 
 import discord
 
@@ -86,7 +83,7 @@ def parse_cli_args():
 
 def main():
     args = parse_cli_args()
-    run_bot(debug=args.debug, launcher=args.launcher, 
+    run_bot(debug=args.debug, launcher=args.launcher,
         from_restart=args.fromrestart)
 
 
